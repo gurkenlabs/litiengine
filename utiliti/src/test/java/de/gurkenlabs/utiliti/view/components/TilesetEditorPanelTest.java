@@ -8,7 +8,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TilesetEntry;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import de.gurkenlabs.litiengine.environment.tilemap.TerrainType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -164,6 +166,38 @@ class TilesetEditorPanelTest {
     assertEquals(null, tileset.getTile(0).getType());
     UndoManager.instance().redo();
     assertEquals("wall", tileset.getTile(0).getType());
+  }
+
+  @Test
+  void terrainControlsCreateAndAssignTerrainToSelectedTile() throws Exception {
+    Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset);
+
+    panel.addTerrainSetForTest();
+    panel.addTerrainForTest();
+    panel.assignTerrainSlotForTest(0);
+
+    WangSet terrainSet = (WangSet) tileset.getTerrainSets().getFirst();
+    assertEquals(1, terrainSet.getTerrains().size());
+    assertEquals(1, terrainSet.getWangTiles().size());
+    assertEquals(1, terrainSet.getWangTiles().getFirst().getWangId()[0]);
+  }
+
+  @Test
+  void terrainTypeUpdatesTerrainSetAndAllowsCornerAssignment() throws Exception {
+    Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset);
+
+    panel.addTerrainSetForTest();
+    panel.addTerrainForTest();
+    panel.setTerrainTypeForTest(TerrainType.CORNER);
+    panel.assignTerrainSlotForTest(1);
+
+    WangSet terrainSet = (WangSet) tileset.getTerrainSets().getFirst();
+    assertEquals(TerrainType.CORNER, terrainSet.getType());
+    assertEquals(1, terrainSet.getWangTiles().getFirst().getWangId()[1]);
   }
 
   private static Tileset tileset(String name, String imageSource, int tileCount, int columns) throws Exception {

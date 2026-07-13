@@ -133,6 +133,14 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     this.animation = animation;
   }
 
+  String getLegacyTerrain() {
+    return this.terrain;
+  }
+
+  void clearLegacyTerrain() {
+    this.terrain = null;
+  }
+
   @Override
   public IMapObjectLayer getCollisionInfo() {
     return this.collisionData;

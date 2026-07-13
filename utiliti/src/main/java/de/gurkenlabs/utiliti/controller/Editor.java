@@ -33,6 +33,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.model.Cursors;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.UserPreferences;
+import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.view.components.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.view.components.StatusBar;
 import de.gurkenlabs.utiliti.view.components.Tray;
@@ -122,11 +123,6 @@ public class Editor extends Screen {
 
     if (Game.world().environment() != null) {
       Game.world().environment().render(g);
-    }
-
-    if (Resources.images().count() > 200) {
-      Resources.images().clear();
-      log.log(Level.INFO, "cache cleared!");
     }
 
     if (this.currentResourceFile != null) {
@@ -257,6 +253,7 @@ public class Editor extends Screen {
     }
 
     Game.world().unloadEnvironment();
+    ToolManager.instance().clearSelections();
     UndoManager.clearAll();
     getMapComponent().clearAll();
     this.currentResourceFile = null;
@@ -295,6 +292,7 @@ public class Editor extends Screen {
     this.loading = true;
     try {
       UndoManager.clearAll();
+      ToolManager.instance().clearSelections();
 
       // set up project settings
       this.currentResourceFile = gameFile;
@@ -304,6 +302,7 @@ public class Editor extends Screen {
       }
 
       this.setProjectPath(gameFile);
+      this.loadProjectTilesetTerrains(gameFile.getParent());
       this.projectCodeIntegration.reload(gameFile);
 
       // load maps from game file
@@ -512,6 +511,76 @@ public class Editor extends Screen {
     } finally {
       spritePanel.dispose();
     }
+  }
+
+  private void loadProjectTilesetTerrains(Path projectRoot) {
+    if (projectRoot == null || this.gameFile == null || this.gameFile.getTilesets().isEmpty()) {
+      return;
+    }
+    List<Tileset> sources;
+    try (Stream<Path> paths = Files.walk(projectRoot)) {
+      sources = paths.filter(Files::isRegularFile)
+        .filter(path -> {
+          String extension = FileUtilities.getExtension(path);
+          return extension.equals(Tileset.FILE_EXTENSION) || extension.equals(TmxMap.FILE_EXTENSION);
+        })
+        .sorted()
+        .flatMap(path -> loadProjectTilesets(path).stream())
+        .filter(source -> source.getTerrainSets() != null && !source.getTerrainSets().isEmpty())
+        .toList();
+    } catch (IOException e) {
+      log.log(Level.WARNING, "Could not search project for tilesets: {0}", e.getMessage());
+      return;
+    }
+
+    List<Tileset> targets = Stream.concat(
+        this.gameFile.getTilesets().stream(),
+        this.gameFile.getMaps().stream().flatMap(map -> map.getTilesets().stream()).filter(Tileset.class::isInstance).map(Tileset.class::cast))
+      .distinct()
+      .toList();
+    for (Tileset target : targets) {
+      if (!needsTerrainNameEnrichment(target)) {
+        continue;
+      }
+      List<Tileset> matches = sources.stream().filter(source -> sameTileset(target, source)).toList();
+      if (!matches.isEmpty() && matches.stream().allMatch(source -> sameTerrainNames(matches.getFirst(), source))) {
+        target.enrichTerrainMetadataFrom(matches.getFirst());
+      } else if (!matches.isEmpty()) {
+        log.log(Level.WARNING, "Skipped ambiguous terrain definitions for tileset {0}", target.getName());
+      }
+    }
+  }
+
+  private static List<Tileset> loadProjectTilesets(Path path) {
+    try {
+      if (FileUtilities.getExtension(path).equals(Tileset.FILE_EXTENSION)) {
+        return List.of(XmlUtilities.read(Tileset.class, path.toUri().toURL()));
+      }
+      TmxMap map = XmlUtilities.read(TmxMap.class, path.toUri().toURL());
+      return map.getTilesets().stream().filter(Tileset.class::isInstance).map(Tileset.class::cast).toList();
+    } catch (IOException | JAXBException | RuntimeException e) {
+      log.log(Level.WARNING, "Could not load terrain definitions from " + path, e);
+      return List.of();
+    }
+  }
+
+  private static boolean needsTerrainNameEnrichment(Tileset tileset) {
+    return tileset.getTerrainSets() != null && !tileset.getTerrainSets().isEmpty()
+      && tileset.getTerrainSets().stream().flatMap(set -> set.getTerrains().stream())
+      .anyMatch(terrain -> terrain.getName() == null || terrain.getName().matches("Terrain \\d+"));
+  }
+
+  private static boolean sameTileset(Tileset first, Tileset second) {
+    return Objects.equals(first.getName(), second.getName())
+      && first.getTileCount() == second.getTileCount()
+      && first.getTileWidth() == second.getTileWidth()
+      && first.getTileHeight() == second.getTileHeight();
+  }
+
+  private static boolean sameTerrainNames(Tileset first, Tileset second) {
+    List<String> firstNames = first.getTerrainSets().stream().flatMap(set -> set.getTerrains().stream()).map(terrain -> terrain.getName()).toList();
+    List<String> secondNames = second.getTerrainSets().stream().flatMap(set -> set.getTerrains().stream()).map(terrain -> terrain.getName()).toList();
+    return firstNames.equals(secondNames);
   }
 
   public void importEmitters() {

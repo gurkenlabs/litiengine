@@ -452,6 +452,7 @@ public class UndoManager {
   private Map<String, Object> snapshotMapProperties(IMap map) {
     Map<String, Object> props = new HashMap<>();
     props.put("name", map.getName());
+    props.put("tilesets", new ArrayList<>(map.getTilesets()));
     for (Map.Entry<String, ICustomProperty> entry : map.getProperties().entrySet()) {
       props.put("prop:" + entry.getKey(), entry.getValue().getAsString());
     }
@@ -473,6 +474,15 @@ public class UndoManager {
 
   private void restoreMapProperties(IMap map, Map<String, Object> props) {
     map.setName((String) props.get("name"));
+    if (props.get("tilesets") instanceof List<?> tilesets) {
+      map.getTilesets().clear();
+      for (Object tileset : tilesets) {
+        if (tileset instanceof de.gurkenlabs.litiengine.environment.tilemap.ITileset value) {
+          map.getTilesets().add(value);
+        }
+      }
+      UI.mapTilesetsChanged(map);
+    }
     map.getProperties().keySet().removeIf(k -> !k.equals("name"));
     for (Map.Entry<String, Object> entry : props.entrySet()) {
       if (entry.getKey().startsWith("prop:")) {

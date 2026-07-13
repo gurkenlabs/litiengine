@@ -71,4 +71,46 @@ class TilesetTests {
 
     assertEquals("because wang!", terrainSet.getStringValue("tell me whyyyy"));
   }
+
+  @Test
+  void testLegacyTerrainsAreConvertedToCornerWangSet() {
+    IMap map = Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-legacy-terrain.tmx");
+
+    var terrainSet = map.getTilesets().getFirst().getTerrainSets().getFirst();
+    assertEquals("Terrains", terrainSet.getName());
+    assertEquals(TerrainType.CORNER, terrainSet.getType());
+    assertEquals("grass", terrainSet.getTerrains().getFirst().getName());
+    assertEquals("dirt", terrainSet.getTerrains().get(1).getName());
+    assertEquals(0, ((WangColor) terrainSet.getTerrains().getFirst()).getTileId());
+    assertEquals("soft", ((WangColor) terrainSet.getTerrains().getFirst()).getStringValue("footstep", null));
+    assertEquals(1, ((WangColor) terrainSet.getTerrains().get(1)).getTileId());
+    assertEquals("grass", terrainSet.getTerrains(0)[7].getName());
+    assertEquals("dirt", terrainSet.getTerrains(0)[1].getName());
+    assertEquals("grass", terrainSet.getTerrains(0)[5].getName());
+    assertEquals("dirt", terrainSet.getTerrains(0)[3].getName());
+  }
+
+  @Test
+  void convertedLegacyTerrainSetCanBeRemoved() {
+    IMap map = Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-legacy-terrain.tmx");
+    Tileset tileset = new Tileset((Tileset) map.getTilesets().getFirst());
+
+    tileset.getTerrainSets().clear();
+
+    assertEquals(0, tileset.getTerrainSets().size());
+  }
+
+  @Test
+  void testExternalLegacyTerrainsAreConvertedToCornerWangSet() {
+    IMap map = Resources.maps().get("de/gurkenlabs/litiengine/environment/tilemap/xml/test-legacy-terrain-external.tmx");
+
+    var terrainSet = map.getTilesets().getFirst().getTerrainSets().getFirst();
+    assertEquals("Terrains", terrainSet.getName());
+    assertEquals(TerrainType.CORNER, terrainSet.getType());
+    assertEquals("grass", terrainSet.getTerrains(0)[7].getName());
+    assertEquals("dirt", terrainSet.getTerrains(0)[1].getName());
+    assertEquals("grass", terrainSet.getTerrains(0)[5].getName());
+    assertEquals("dirt", terrainSet.getTerrains(0)[3].getName());
+  }
+
 }

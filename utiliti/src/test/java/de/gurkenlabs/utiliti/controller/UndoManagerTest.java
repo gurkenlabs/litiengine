@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -95,6 +96,35 @@ class UndoManagerTest {
 
     assertEquals(Color.BLACK, map.getColorValue(MapProperty.AMBIENTCOLOR));
     assertEquals(Color.BLACK, Game.world().environment().getAmbientLight().getColor());
+  }
+
+  @Test
+  void mapUndoRedoRestoresTilesetMembership() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("undo-map-tilesets-test");
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    Tileset first = new Tileset();
+    first.setName("first");
+    Tileset second = new Tileset();
+    second.setName("second");
+    map.getTilesets().add(first);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+
+    manager.mapChanging(map);
+    map.getTilesets().add(second);
+    manager.mapChanged(map);
+    manager.undo();
+
+    assertEquals(1, map.getTilesets().size());
+    assertSame(first, map.getTilesets().getFirst());
+    manager.redo();
+    assertEquals(2, map.getTilesets().size());
+    assertSame(second, map.getTilesets().get(1));
   }
 
   @Test

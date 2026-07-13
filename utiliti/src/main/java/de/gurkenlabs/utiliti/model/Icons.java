@@ -102,6 +102,7 @@ public final class Icons {
   public static final Icon SPAWNPOINT_16 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 16, 16);
   public static final Icon SPRITESHEET_16 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 16, 16);
   public static final Icon TILESET_16 = IconLoader.get().getUIAwareIcon("tileset.svg", 16, 16);
+  public static final Icon TERRAIN_16 = IconLoader.get().getUIAwareIcon("terrain.svg", 16, 16);
   public static final Icon TRIGGER_16 = IconLoader.get().getUIAwareIcon("trigger.svg", 16, 16);
 
 
@@ -152,6 +153,7 @@ public final class Icons {
   public static final Icon SPRITESHEET_24 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 24, 24);
   public static final Icon ANIMATION_24 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 24, 24);
   public static final Icon TILESET_24 = IconLoader.get().getUIAwareIcon("tileset.svg", 24, 24);
+  public static final Icon TERRAIN_24 = IconLoader.get().getUIAwareIcon("terrain.svg", 24, 24);
   public static final Icon TRIGGER_24 = IconLoader.get().getUIAwareIcon("trigger.svg", 24, 24);
 
 

@@ -1,6 +1,8 @@
 package de.gurkenlabs.utiliti.controller.tool;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.WangColor;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +15,8 @@ public final class ToolManager {
   private Tool activeTool;
   private ITileLayer activeTileLayer;
   private int selectedTileGid;
+  private WangSet selectedTerrainSet;
+  private WangColor selectedTerrain;
 
   private ToolManager() {
     this.tools = new ArrayList<>();
@@ -71,6 +75,32 @@ public final class ToolManager {
 
   public void setSelectedTileGid(int selectedTileGid) {
     this.selectedTileGid = selectedTileGid;
+  }
+
+  public WangSet getSelectedTerrainSet() {
+    return this.selectedTerrainSet;
+  }
+
+  public WangColor getSelectedTerrain() {
+    return this.selectedTerrain;
+  }
+
+  public void setSelectedTerrain(WangSet terrainSet, WangColor terrain) {
+    this.selectedTerrainSet = terrainSet;
+    this.selectedTerrain = terrain;
+    for (Runnable listener : this.listeners) {
+      listener.run();
+    }
+  }
+
+  public void clearSelections() {
+    this.activeTileLayer = null;
+    this.selectedTileGid = 0;
+    this.selectedTerrainSet = null;
+    this.selectedTerrain = null;
+    for (Runnable listener : this.listeners) {
+      listener.run();
+    }
   }
 
   public void addListener(Runnable listener) {

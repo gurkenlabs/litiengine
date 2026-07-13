@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentListener;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
@@ -28,6 +29,7 @@ import de.gurkenlabs.utiliti.controller.tool.BucketFillTool;
 import de.gurkenlabs.utiliti.controller.tool.EraserTool;
 import de.gurkenlabs.utiliti.controller.tool.PointerTool;
 import de.gurkenlabs.utiliti.controller.tool.StampBrushTool;
+import de.gurkenlabs.utiliti.controller.tool.TerrainBrushTool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Style.Theme;
@@ -223,6 +225,22 @@ public final class UI {
     return true;
   }
 
+  public static void mapTilesetsChanged(IMap map) {
+    if (!javax.swing.SwingUtilities.isEventDispatchThread()) {
+      javax.swing.SwingUtilities.invokeLater(() -> mapTilesetsChanged(map));
+      return;
+    }
+    if (mapPropertyPanel != null) {
+      mapPropertyPanel.refreshTilesets(map);
+    }
+    if (tileLayerTilesetEditorPanel != null) {
+      tileLayerTilesetEditorPanel.bindIfMapChanged(map);
+    }
+    if (sceneGraph != null) {
+      sceneGraph.refreshLayerCommandState();
+    }
+  }
+
   public static void showLayerProperties(ILayer layer) {
     if (layerPropertyPanel == null) {
       return;
@@ -230,7 +248,7 @@ public final class UI {
 
     if (layer instanceof ITileLayer) {
       tileLayerPropertyPanel.bind(layer);
-      tileLayerTilesetEditorPanel.bind(Game.world().environment().getMap());
+      tileLayerTilesetEditorPanel.bindIfMapChanged(Game.world().environment().getMap());
       if (inspectorCards != null && inspectorHost != null) {
         inspectorCards.show(inspectorHost, "tileLayers");
         activeInspectorCard = "tileLayers";
@@ -415,7 +433,11 @@ public final class UI {
     inspectorHost.add(mapObjectPanel, "objects");
     inspectorHost.add(mapPropertyPanel, "map");
     inspectorHost.add(layerPropertyPanel, "layers");
-    inspectorHost.add(tilesetEditorPanel, "tilesets");
+    javax.swing.JScrollPane tilesetInspectorScroll = new javax.swing.JScrollPane(tilesetEditorPanel);
+    tilesetInspectorScroll.setBorder(null);
+    tilesetInspectorScroll.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    tilesetInspectorScroll.getViewport().setBackground(Style.COLOR_BG);
+    inspectorHost.add(tilesetInspectorScroll, "tilesets");
     inspectorHost.add(tileLayerPropertyPanel, "tileLayers");
     inspectorHost.add(spriteEditorPanel, "sprites");
     inspectorHost.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
@@ -586,6 +608,7 @@ public final class UI {
     ToolManager tm = ToolManager.instance();
     tm.register(new PointerTool());
     tm.register(new StampBrushTool());
+    tm.register(new TerrainBrushTool());
     tm.register(new EraserTool());
     tm.register(new BucketFillTool());
   }

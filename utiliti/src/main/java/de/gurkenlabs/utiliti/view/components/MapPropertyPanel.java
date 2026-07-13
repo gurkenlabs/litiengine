@@ -77,6 +77,7 @@ public class MapPropertyPanel extends JPanel {
   private final DefaultTableModel model;
   private JTabbedPane tilesetTabs;
   private final TilesetTabsPanel tilesetPanel;
+  private java.util.function.Consumer<IMap> tilesetsChanged = UI::mapTilesetsChanged;
 
   private transient IMap dataSource;
   private boolean binding;
@@ -421,6 +422,16 @@ public class MapPropertyPanel extends JPanel {
     this.tilesetPanel.bind(this.dataSource);
   }
 
+  void refreshTilesets(IMap map) {
+    if (this.dataSource == map) {
+      refreshTilesets();
+    }
+  }
+
+  void onTilesetsChanged(java.util.function.Consumer<IMap> listener) {
+    this.tilesetsChanged = listener != null ? listener : _ -> {};
+  }
+
   void showAddTilesetMenu(JButton owner) {
     if (Editor.instance().getGameFile() == null) {
       return;
@@ -443,7 +454,7 @@ public class MapPropertyPanel extends JPanel {
     menu.show(owner, 0, owner.getHeight());
   }
 
-  private void addTileset(Tileset tileset) {
+  void addTileset(Tileset tileset) {
     if (this.dataSource == null || this.dataSource.getTilesets().stream()
         .anyMatch(existing -> java.util.Objects.equals(existing.getName(), tileset.getName()))) {
       return;
@@ -451,7 +462,7 @@ public class MapPropertyPanel extends JPanel {
     UndoManager.instance().mapChanging(this.dataSource);
     this.dataSource.getTilesets().add(tileset);
     UndoManager.instance().mapChanged(this.dataSource);
-    refreshTilesets();
+    this.tilesetsChanged.accept(this.dataSource);
   }
 
   void addAllTilesets() {
@@ -580,10 +591,13 @@ public class MapPropertyPanel extends JPanel {
     if (this.dataSource == null || selectedTileset == null) {
       return;
     }
+    if (!this.dataSource.getTilesets().contains(selectedTileset)) {
+      return;
+    }
     UndoManager.instance().mapChanging(this.dataSource);
     this.dataSource.getTilesets().remove(selectedTileset);
     UndoManager.instance().mapChanged(this.dataSource);
-    refreshTilesets();
+    this.tilesetsChanged.accept(this.dataSource);
   }
 
   public void saveChanges() {

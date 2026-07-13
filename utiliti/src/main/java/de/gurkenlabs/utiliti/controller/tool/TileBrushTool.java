@@ -45,13 +45,21 @@ abstract class TileBrushTool implements Tool {
   }
 
   protected final boolean paintTile(ITileLayer layer, Point location, int gid) {
+    return paintTile(layer, location, gid, true);
+  }
+
+  protected final boolean repaintTile(ITileLayer layer, Point location, int gid) {
+    return paintTile(layer, location, gid, false);
+  }
+
+  private boolean paintTile(ITileLayer layer, Point location, int gid, boolean oncePerStroke) {
     if (!painting || layer == null || location == null) {
       return false;
     }
     // Input reuses its tile Point. Capture coordinates before recording undo actions.
     int x = location.x;
     int y = location.y;
-    if (!paintedTiles.add(new Point(x, y))) {
+    if (oncePerStroke && !paintedTiles.add(new Point(x, y))) {
       return false;
     }
     ITile tile = layer.getTile(x, y);
@@ -79,5 +87,10 @@ abstract class TileBrushTool implements Tool {
     }
     Editor.instance().setCurrentStatus("Select a tile layer before painting");
     return null;
+  }
+
+  @Override
+  public void deactivated() {
+    endPainting();
   }
 }

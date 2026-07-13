@@ -5,10 +5,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
+import de.gurkenlabs.litiengine.environment.tilemap.ITerrainSet;
+import de.gurkenlabs.litiengine.environment.tilemap.TerrainType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TilesetEntry;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Frame;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TileAnimation;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.WangColor;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.controller.UndoManager;
@@ -39,6 +43,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -67,10 +72,19 @@ public class TilesetEditorPanel extends JPanel {
   private final JTable tilePropertyTable;
   private final DefaultTableModel animationModel;
   private final JTable animationTable;
+  private final JComboBox<WangSet> terrainSetCombo;
+  private final JComboBox<WangColor> terrainCombo;
+  private final JComboBox<TerrainType> terrainTypeCombo;
+  private final JTextField terrainSetNameField;
+  private final JTextField terrainNameField;
+  private final JTextField terrainProbabilityField;
+  private final JButton terrainColorButton;
+  private final JButton[] terrainSlots;
   private final TileGrid tileGrid;
   private final JScrollPane gridScroll;
   private final JLabel zoomLabel;
   private final Timer animationTimer;
+  private Runnable tilesetNameChanged = () -> {};
   private Tileset tileset;
   private boolean binding;
 
@@ -104,7 +118,10 @@ public class TilesetEditorPanel extends JPanel {
     this.tileOffsetYSpinner = new JSpinner(new SpinnerNumberModel(0, -100000, 100000, 1));
     this.tileOffsetXSpinner.addChangeListener(_ -> applyTilesetRenderSettings());
     this.tileOffsetYSpinner.addChangeListener(_ -> applyTilesetRenderSettings());
-    JPanel renderSettings = labeledOffsets();
+    JPanel renderSettings = new JPanel(new BorderLayout(8, 0));
+    renderSettings.setOpaque(false);
+    JPanel terrainHost = new JPanel(new BorderLayout());
+    terrainHost.setOpaque(false);
 
     this.tilesetPropertyModel = createPropertyModel();
     this.tilesetPropertyModel.addTableModelListener(_ -> applyTilesetProperties());
@@ -113,19 +130,25 @@ public class TilesetEditorPanel extends JPanel {
       () -> this.tilesetPropertyModel.addRow(new Object[] {"", ""})), false);
     tilesetProperties.setContentInsets(8, 0, 8, 0);
 
-    JPanel tilesetControls = new JPanel(new BorderLayout(0, 6));
+    JPanel tilesetControls = new JPanel();
+    tilesetControls.setLayout(new BoxLayout(tilesetControls, BoxLayout.Y_AXIS));
     tilesetControls.setOpaque(false);
-    tilesetControls.add(namePanel, BorderLayout.CENTER);
-    JPanel lowerTilesetControls = new JPanel(new BorderLayout(0, 6));
-    lowerTilesetControls.setOpaque(false);
-    lowerTilesetControls.add(renderSettings, BorderLayout.NORTH);
-    lowerTilesetControls.add(tilesetProperties, BorderLayout.CENTER);
-    tilesetControls.add(lowerTilesetControls, BorderLayout.SOUTH);
+    tilesetControls.add(namePanel);
+    tilesetControls.add(javax.swing.Box.createVerticalStrut(6));
+    tilesetControls.add(renderSettings);
+    tilesetControls.add(javax.swing.Box.createVerticalStrut(6));
+    tilesetControls.add(tilesetProperties);
+    tilesetControls.add(javax.swing.Box.createVerticalStrut(6));
+    tilesetControls.add(terrainHost);
     add(tilesetControls, BorderLayout.NORTH);
 
     this.tileGrid = new TileGrid();
     this.tileGrid.setSelectionChanged(this::updateSelectedTileControls);
     this.gridScroll = new JScrollPane(this.tileGrid);
+    this.gridScroll.setMinimumSize(new Dimension(0, 180));
+    this.gridScroll.setPreferredSize(new Dimension(0, 560));
+    this.gridScroll.setMaximumSize(new Dimension(Short.MAX_VALUE, 620));
+    this.gridScroll.setAlignmentX(LEFT_ALIGNMENT);
     this.gridScroll.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
     this.gridScroll.getViewport().setBackground(Style.COLOR_SURFACE);
     JButton zoomOut = Style.iconButton(Icons.MINUS_16);
@@ -138,17 +161,19 @@ public class TilesetEditorPanel extends JPanel {
     zoomOut.setToolTipText("Zoom out");
     zoomIn.setToolTipText("Zoom in");
     fit.setToolTipText("Fit tileset");
-    JPanel zoomControls = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 4, 0));
+    JPanel zoomControls = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 4, 0));
     zoomControls.setOpaque(false);
     zoomControls.add(zoomOut);
     zoomControls.add(this.zoomLabel);
     zoomControls.add(zoomIn);
     zoomControls.add(fit);
-    JPanel gridPanel = new JPanel(new BorderLayout(0, 4));
-    gridPanel.setOpaque(false);
-    gridPanel.add(zoomControls, BorderLayout.NORTH);
-    gridPanel.add(this.gridScroll, BorderLayout.CENTER);
-    add(gridPanel, BorderLayout.CENTER);
+    renderSettings.add(labeledOffsets(), BorderLayout.CENTER);
+    renderSettings.add(zoomControls, BorderLayout.EAST);
+    JPanel bodyPanel = new JPanel();
+    bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
+    bodyPanel.setOpaque(false);
+    bodyPanel.add(this.gridScroll);
+    add(bodyPanel, BorderLayout.CENTER);
 
     this.previewLabel = new JLabel("", SwingConstants.CENTER);
     this.previewLabel.setOpaque(true);
@@ -179,12 +204,29 @@ public class TilesetEditorPanel extends JPanel {
     };
     this.animationModel.addTableModelListener(_ -> applyAnimationFrames());
     this.animationTable = createPropertyTable(this.animationModel);
+    this.terrainSetCombo = new JComboBox<>();
+    this.terrainCombo = new JComboBox<>();
+    this.terrainTypeCombo = new JComboBox<>(TerrainType.values());
+    this.terrainSetNameField = metadataField(this::applyTerrainSetName);
+    this.terrainNameField = metadataField(this::applyTerrainName);
+    this.terrainProbabilityField = metadataField(this::applyTerrainProbability);
+    this.terrainColorButton = new JButton();
+    this.terrainColorButton.setToolTipText("Choose terrain color");
+    this.terrainColorButton.setPreferredSize(new Dimension(36, 24));
+    this.terrainColorButton.setFocusable(false);
+    this.terrainColorButton.addActionListener(_ -> chooseTerrainColor());
+    this.terrainSlots = new JButton[8];
+    this.terrainSetCombo.addActionListener(_ -> updateTerrainControls());
+    this.terrainCombo.addActionListener(_ -> updateTerrainSelectionControls());
+    this.terrainTypeCombo.addActionListener(_ -> applyTerrainSetType());
+    terrainHost.add(createTerrainPanel(), BorderLayout.CENTER);
 
     JPanel typePanel = labeledField("Class", this.typeField);
     JPanel probabilityPanel = labeledField("Probability", this.probabilityField);
 
     JPanel selectedTilePanel = new JPanel(new BorderLayout(0, 8));
     selectedTilePanel.setOpaque(false);
+    selectedTilePanel.setAlignmentX(LEFT_ALIGNMENT);
     selectedTilePanel.add(this.previewLabel, BorderLayout.NORTH);
     JPanel controls = new JPanel(new BorderLayout(0, 6));
     controls.setOpaque(false);
@@ -208,16 +250,28 @@ public class TilesetEditorPanel extends JPanel {
     lowerTileControls.add(animationPanel);
     controls.add(lowerTileControls, BorderLayout.SOUTH);
     selectedTilePanel.add(controls, BorderLayout.CENTER);
-    add(selectedTilePanel, BorderLayout.SOUTH);
+    bodyPanel.add(javax.swing.Box.createVerticalStrut(8));
+    bodyPanel.add(selectedTilePanel);
+    bodyPanel.add(javax.swing.Box.createVerticalGlue());
 
     this.animationTimer = new Timer(80, _ -> updateSelectedTilePreview());
-    this.animationTimer.start();
     updateZoomLabel();
+  }
+
+  @Override public void addNotify() {
+    super.addNotify();
+    this.animationTimer.start();
+  }
+
+  @Override public void removeNotify() {
+    this.animationTimer.stop();
+    super.removeNotify();
   }
 
   public void bind(Tileset tileset) {
     this.tileset = tileset;
     this.tileGrid.bind(tileset);
+    updateTerrainSets(null);
     javax.swing.SwingUtilities.invokeLater(this::fitGrid);
     publishSelectedTile();
     if (tileset == null) {
@@ -239,6 +293,14 @@ public class TilesetEditorPanel extends JPanel {
 
   Tileset getTileset() {
     return this.tileset;
+  }
+
+  void dispose() {
+    this.animationTimer.stop();
+  }
+
+  void onTilesetNameChanged(Runnable listener) {
+    this.tilesetNameChanged = listener != null ? listener : () -> {};
   }
 
   private void setGridZoom(float zoom) {
@@ -266,6 +328,10 @@ public class TilesetEditorPanel extends JPanel {
 
   int getSelectedTileIdForTest() {
     return this.tileGrid.selectedTile;
+  }
+
+  void selectTileForTest(int tile) {
+    this.tileGrid.selectTile(tile);
   }
 
   String getDetailTextForTest() {
@@ -323,6 +389,22 @@ public class TilesetEditorPanel extends JPanel {
 
   boolean isSelectedAnimationFrameForTest(int tile) {
     return this.tileGrid.selectedAnimationFrameTiles().contains(tile);
+  }
+
+  void addTerrainSetForTest() {
+    addTerrainSet();
+  }
+
+  void addTerrainForTest() {
+    addTerrain();
+  }
+
+  void assignTerrainSlotForTest(int index) {
+    applyTerrainSlot(index);
+  }
+
+  void setTerrainTypeForTest(TerrainType type) {
+    this.terrainTypeCombo.setSelectedItem(type);
   }
 
   private static DefaultTableModel createPropertyModel() {
@@ -417,6 +499,326 @@ public class TilesetEditorPanel extends JPanel {
     return propertyPanel;
   }
 
+  private JPanel createTerrainPanel() {
+    JButton addSet = Style.textButton("+");
+    addSet.setToolTipText("Add terrain set");
+    addSet.addActionListener(_ -> addTerrainSet());
+    JButton removeSet = Style.textButton("-");
+    removeSet.setToolTipText("Remove terrain set");
+    removeSet.addActionListener(_ -> removeTerrainSet());
+    JButton addTerrain = Style.textButton("+");
+    addTerrain.setToolTipText("Add terrain");
+    addTerrain.addActionListener(_ -> addTerrain());
+    JButton removeTerrain = Style.textButton("-");
+    removeTerrain.setToolTipText("Remove terrain");
+    removeTerrain.addActionListener(_ -> removeTerrain());
+
+    JPanel sets = new JPanel(new BorderLayout(6, 0));
+    sets.setOpaque(false);
+    JLabel setLabel = fieldLabel("Set", 56);
+    sets.add(setLabel, BorderLayout.WEST);
+    sets.add(this.terrainSetCombo, BorderLayout.CENTER);
+    JPanel setButtons = new JPanel();
+    setButtons.setLayout(new BoxLayout(setButtons, BoxLayout.X_AXIS));
+    setButtons.setOpaque(false);
+    this.terrainTypeCombo.setMaximumSize(new Dimension(120, this.terrainTypeCombo.getPreferredSize().height));
+    setButtons.add(this.terrainTypeCombo);
+    setButtons.add(javax.swing.Box.createHorizontalStrut(4));
+    setButtons.add(addSet);
+    setButtons.add(javax.swing.Box.createHorizontalStrut(4));
+    setButtons.add(removeSet);
+    sets.add(setButtons, BorderLayout.EAST);
+
+    JPanel terrains = new JPanel(new BorderLayout(6, 0));
+    terrains.setOpaque(false);
+    terrains.add(fieldLabel("Terrain", 56), BorderLayout.WEST);
+    terrains.add(this.terrainCombo, BorderLayout.CENTER);
+    JPanel terrainButtons = new JPanel();
+    terrainButtons.setLayout(new BoxLayout(terrainButtons, BoxLayout.X_AXIS));
+    terrainButtons.setOpaque(false);
+    terrainButtons.add(this.terrainColorButton);
+    terrainButtons.add(javax.swing.Box.createHorizontalStrut(4));
+    terrainButtons.add(addTerrain);
+    terrainButtons.add(javax.swing.Box.createHorizontalStrut(4));
+    terrainButtons.add(removeTerrain);
+    terrains.add(terrainButtons, BorderLayout.EAST);
+
+    JPanel terrainMetadata = new JPanel(new GridLayout(3, 1, 0, 4));
+    terrainMetadata.setOpaque(false);
+    terrainMetadata.add(labeledField("Set Name", this.terrainSetNameField));
+    terrainMetadata.add(labeledField("Name", this.terrainNameField));
+    JPanel terrainProbability = labeledField("Probability", this.terrainProbabilityField);
+    terrainMetadata.add(terrainProbability);
+
+    JPanel slots = new JPanel(new GridLayout(3, 3, 3, 3));
+    slots.setOpaque(false);
+    String[] labels = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+    int[] layout = {7, 0, 1, 6, -1, 2, 5, 4, 3};
+    for (int index : layout) {
+      if (index < 0) {
+        slots.add(new JLabel("", SwingConstants.CENTER));
+        continue;
+      }
+      JButton slot = new JButton(labels[index]);
+      slot.setFocusable(false);
+      slot.addActionListener(_ -> applyTerrainSlot(index));
+      this.terrainSlots[index] = slot;
+      slots.add(slot);
+    }
+    slots.setPreferredSize(new Dimension(132, 96));
+    slots.setMaximumSize(new Dimension(132, 96));
+
+    JPanel selectors = new JPanel(new GridLayout(2, 1, 0, 4));
+    selectors.setOpaque(false);
+    selectors.add(sets);
+    selectors.add(terrains);
+
+    JPanel details = new JPanel(new BorderLayout(10, 0));
+    details.setOpaque(false);
+    details.add(slots, BorderLayout.WEST);
+    details.add(terrainMetadata, BorderLayout.CENTER);
+
+    JPanel content = new JPanel(new BorderLayout(0, 8));
+    content.setOpaque(false);
+    content.add(selectors, BorderLayout.NORTH);
+    content.add(details, BorderLayout.CENTER);
+    ExpandableCard panel = new ExpandableCard("Terrain Editing", content, false);
+    panel.setContentInsets(8, 0, 8, 0);
+    return panel;
+  }
+
+  private static JLabel fieldLabel(String text, int width) {
+    JLabel label = new JLabel(text);
+    label.setForeground(Style.COLOR_TEXT);
+    label.setPreferredSize(new Dimension(width, 24));
+    return label;
+  }
+
+  private void addTerrainSet() {
+    if (this.tileset == null) {
+      return;
+    }
+    WangSet terrainSet = new WangSet("Terrain Set " + (this.tileset.getOrCreateTerrainSets().size() + 1), TerrainType.MIXED);
+    changeTileset(() -> this.tileset.getOrCreateTerrainSets().add(terrainSet));
+    updateTerrainSets(terrainSet);
+  }
+
+  private void removeTerrainSet() {
+    WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+    if (this.tileset == null || terrainSet == null) {
+      return;
+    }
+    changeTileset(() -> this.tileset.getOrCreateTerrainSets().remove(terrainSet));
+    updateTerrainSets(null);
+  }
+
+  private void addTerrain() {
+    WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+    if (terrainSet == null) {
+      return;
+    }
+    WangColor terrain = new WangColor("Terrain " + (terrainSet.getTerrains().size() + 1), Style.COLOR_GREEN);
+    changeTileset(() -> terrainSet.getTerrains().add(terrain));
+    updateTerrainControls();
+    this.terrainCombo.setSelectedItem(terrain);
+  }
+
+  private void removeTerrain() {
+    WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+    WangColor terrain = (WangColor) this.terrainCombo.getSelectedItem();
+    if (terrainSet == null || terrain == null) {
+      return;
+    }
+    int removed = terrainSet.getTerrains().indexOf(terrain) + 1;
+    changeTileset(() -> {
+      terrainSet.getTerrains().remove(terrain);
+      for (var wangTile : terrainSet.getWangTiles()) {
+        int[] wangId = wangTile.getWangId();
+        for (int i = 0; i < wangId.length; i++) {
+          if (wangId[i] == removed) {
+            wangId[i] = 0;
+          } else if (wangId[i] > removed) {
+            wangId[i]--;
+          }
+        }
+        wangTile.setWangId(wangId);
+      }
+      terrainSet.getWangTiles().removeIf(wangTile -> java.util.Arrays.stream(wangTile.getWangId()).allMatch(id -> id == 0));
+    });
+    updateTerrainControls();
+  }
+
+  private void updateTerrainSets(WangSet selected) {
+    this.binding = true;
+    try {
+      this.terrainSetCombo.removeAllItems();
+      if (this.tileset != null && this.tileset.getTerrainSets() != null) {
+        for (ITerrainSet terrainSet : this.tileset.getTerrainSets()) {
+          if (terrainSet instanceof WangSet wangSet) {
+            this.terrainSetCombo.addItem(wangSet);
+          }
+        }
+      }
+      this.terrainSetCombo.setSelectedItem(selected);
+      if (selected == null && this.terrainSetCombo.getItemCount() > 0) {
+        this.terrainSetCombo.setSelectedIndex(0);
+      }
+    } finally {
+      this.binding = false;
+    }
+    updateTerrainControls();
+  }
+
+  private void updateTerrainControls() {
+    if (this.binding) {
+      return;
+    }
+    this.binding = true;
+    try {
+      WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+      WangColor selected = (WangColor) this.terrainCombo.getSelectedItem();
+      this.terrainTypeCombo.setSelectedItem(terrainSet != null ? terrainSet.getType() : TerrainType.MIXED);
+      this.terrainSetNameField.setText(terrainSet != null && terrainSet.getName() != null ? terrainSet.getName() : "");
+      this.terrainCombo.removeAllItems();
+      if (terrainSet != null) {
+        for (var terrain : terrainSet.getTerrains()) {
+          if (terrain instanceof WangColor color) {
+            this.terrainCombo.addItem(color);
+          }
+        }
+      }
+      if (selected != null && terrainSet != null && terrainSet.getTerrains().contains(selected)) {
+        this.terrainCombo.setSelectedItem(selected);
+      } else if (this.terrainCombo.getItemCount() > 0) {
+        this.terrainCombo.setSelectedIndex(0);
+      }
+    } finally {
+      this.binding = false;
+    }
+    updateTerrainSelectionControls();
+  }
+
+  private void updateTerrainSelectionControls() {
+    WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+    this.tileGrid.setTerrainSet(terrainSet);
+    WangColor terrain = (WangColor) this.terrainCombo.getSelectedItem();
+    ToolManager.instance().setSelectedTerrain(terrainSet, terrain);
+    this.binding = true;
+    try {
+      this.terrainNameField.setText(terrain != null && terrain.getName() != null ? terrain.getName() : "");
+      this.terrainProbabilityField.setText(terrain != null ? String.valueOf(terrain.getProbability()) : "");
+      this.terrainColorButton.setBackground(terrain != null && terrain.getColor() != null ? terrain.getColor() : Style.COLOR_SURFACE);
+      this.terrainColorButton.setEnabled(terrain != null);
+    } finally {
+      this.binding = false;
+    }
+    updateTerrainSlots();
+  }
+
+  private void applyTerrainSetType() {
+    if (this.binding) {
+      return;
+    }
+    WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+    TerrainType type = (TerrainType) this.terrainTypeCombo.getSelectedItem();
+    if (terrainSet == null || type == null || terrainSet.getType() == type) {
+      return;
+    }
+    changeTileset(() -> terrainSet.setType(type));
+    updateTerrainSlots();
+  }
+
+  private void applyTerrainSetName() {
+    if (this.binding) {
+      return;
+    }
+    WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+    if (terrainSet == null) {
+      return;
+    }
+    changeTileset(() -> terrainSet.setName(this.terrainSetNameField.getText().trim()));
+    this.terrainSetCombo.repaint();
+  }
+
+  private void applyTerrainName() {
+    if (this.binding) {
+      return;
+    }
+    WangColor terrain = (WangColor) this.terrainCombo.getSelectedItem();
+    if (terrain == null) {
+      return;
+    }
+    changeTileset(() -> terrain.setName(this.terrainNameField.getText().trim()));
+    this.terrainCombo.repaint();
+    updateTerrainSlots();
+  }
+
+  private void applyTerrainProbability() {
+    if (this.binding) {
+      return;
+    }
+    WangColor terrain = (WangColor) this.terrainCombo.getSelectedItem();
+    if (terrain == null) {
+      return;
+    }
+    double probability = parseDouble(this.terrainProbabilityField.getText(), 1.0);
+    if (!Double.isFinite(probability) || probability < 0) {
+      this.terrainProbabilityField.setText(String.valueOf(terrain.getProbability()));
+      return;
+    }
+    changeTileset(() -> terrain.setProbability(probability));
+  }
+
+  private void chooseTerrainColor() {
+    WangColor terrain = (WangColor) this.terrainCombo.getSelectedItem();
+    if (terrain == null) {
+      return;
+    }
+    Color color = javax.swing.JColorChooser.showDialog(this, "Terrain Color", terrain.getColor());
+    if (color == null) {
+      return;
+    }
+    changeTileset(() -> terrain.setColor(color));
+    this.terrainColorButton.setBackground(color);
+  }
+
+  private void updateTerrainSlots() {
+    WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+    if (terrainSet == null || this.tileset == null || this.tileGrid.selectedTile < 0) {
+      for (JButton slot : this.terrainSlots) {
+        slot.setText("");
+        slot.setEnabled(false);
+      }
+      return;
+    }
+    var terrains = terrainSet.getTerrains(this.tileGrid.selectedTile);
+    for (int index = 0; index < this.terrainSlots.length; index++) {
+      boolean enabled = terrainSet.getType() == TerrainType.MIXED
+        || terrainSet.getType() == TerrainType.EDGE && index % 2 == 0
+        || terrainSet.getType() == TerrainType.CORNER && index % 2 == 1;
+      WangColor terrain = terrains[index] instanceof WangColor color ? color : null;
+      this.terrainSlots[index].setEnabled(enabled);
+      this.terrainSlots[index].setText(terrain != null && terrain.getName() != null && !terrain.getName().isEmpty()
+        ? terrain.getName().substring(0, 1).toUpperCase() : "-");
+      this.terrainSlots[index].setToolTipText(terrain != null ? terrain.getName() : "Empty terrain");
+    }
+  }
+
+  private void applyTerrainSlot(int index) {
+    WangSet terrainSet = (WangSet) this.terrainSetCombo.getSelectedItem();
+    WangColor terrain = (WangColor) this.terrainCombo.getSelectedItem();
+    if (terrainSet == null || terrain == null || this.tileGrid.selectedTile < 0) {
+      return;
+    }
+    int terrainIndex = terrainSet.getTerrains().indexOf(terrain) + 1;
+    changeTileset(() -> {
+      var wangTile = terrainSet.getOrCreateWangTile(this.tileGrid.selectedTile);
+      wangTile.setTerrain(index, wangTile.getWangId()[index] == terrainIndex ? 0 : terrainIndex);
+      terrainSet.removeWangTileIfEmpty(this.tileGrid.selectedTile);
+    });
+    updateTerrainSlots();
+  }
+
   private void clearTilesetControls() {
     this.binding = true;
     try {
@@ -500,6 +902,7 @@ public class TilesetEditorPanel extends JPanel {
     }
 
     updateSelectedTilePreview();
+    updateTerrainSlots();
     publishSelectedTile();
   }
 
@@ -509,13 +912,13 @@ public class TilesetEditorPanel extends JPanel {
       return;
     }
     ToolManager.instance().setSelectedTileGid(this.tileset.getFirstGridId() + this.tileGrid.selectedTile);
-    if (ToolManager.instance().getActiveTileLayer() == null) {
-      return;
-    }
-    ToolManager.instance().getTools().stream()
-      .filter(tool -> tool instanceof de.gurkenlabs.utiliti.controller.tool.StampBrushTool)
-      .findFirst()
-      .ifPresent(ToolManager.instance()::setActiveTool);
+  }
+
+  void publishToolSelection() {
+    ToolManager.instance().setSelectedTerrain(
+      (WangSet) this.terrainSetCombo.getSelectedItem(),
+      (WangColor) this.terrainCombo.getSelectedItem());
+    publishSelectedTile();
   }
 
   private void updateSelectedTilePreview() {
@@ -606,6 +1009,7 @@ public class TilesetEditorPanel extends JPanel {
     }
     changeTileset(() -> this.tileset.setName(this.tilesetNameField.getText().trim()));
     this.titleLabel.setText(this.tileset.getName() != null && !this.tileset.getName().isBlank() ? this.tileset.getName() : "Unnamed tileset");
+    this.tilesetNameChanged.run();
   }
 
   private void applyTilesetRenderSettings() {
@@ -731,6 +1135,7 @@ public class TilesetEditorPanel extends JPanel {
     private static final Color SELECTED_ANIMATION_FRAME_FILL = new Color(155, 95, 255, 70);
     private static final Color SELECTED_ANIMATION_FRAME_BORDER = new Color(190, 150, 255);
     private Tileset tileset;
+    private WangSet terrainSet;
     private int selectedTile = -1;
     private Runnable selectionChanged;
     private float zoom = 1f;
@@ -756,6 +1161,11 @@ public class TilesetEditorPanel extends JPanel {
       repaint();
     }
 
+    private void setTerrainSet(WangSet terrainSet) {
+      this.terrainSet = terrainSet;
+      repaint();
+    }
+
     private void selectTileAt(int x, int y) {
       if (this.tileset == null || this.tileset.getTileCount() <= 0) {
         return;
@@ -765,6 +1175,10 @@ public class TilesetEditorPanel extends JPanel {
       int col = x / cell;
       int row = y / cell;
       int tile = row * columns + col;
+      selectTile(tile);
+    }
+
+    private void selectTile(int tile) {
       if (tile < 0 || tile >= this.tileset.getTileCount()) {
         return;
       }
@@ -802,6 +1216,7 @@ public class TilesetEditorPanel extends JPanel {
         if (image != null) {
           g2.drawImage(image, x + CELL_PADDING, y + CELL_PADDING, cell - CELL_PADDING * 2, cell - CELL_PADDING * 2, null);
         }
+        paintTerrain(g2, i, x, y, cell);
         if (selectedAnimationFrames.contains(i)) {
           g2.setColor(SELECTED_ANIMATION_FRAME_FILL);
           g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
@@ -812,7 +1227,12 @@ public class TilesetEditorPanel extends JPanel {
         }
         if (definesAnimation(i)) {
           g2.setColor(ANIMATION_TILE_COLOR);
-          g2.fillOval(x + cell - 10, y + 3, 6, 6);
+          int triangleX = x + cell - 10;
+          int triangleY = y + 4;
+          g2.fillPolygon(
+            new int[] {triangleX, triangleX, triangleX + 6},
+            new int[] {triangleY, triangleY + 8, triangleY + 4},
+            3);
         }
         if (i == this.selectedTile) {
           g2.setColor(new Color(80, 145, 255, 50));
@@ -822,6 +1242,27 @@ public class TilesetEditorPanel extends JPanel {
         g2.drawRect(x, y, cell - 1, cell - 1);
       }
       g2.dispose();
+    }
+
+    private void paintTerrain(Graphics2D g2, int tile, int x, int y, int cell) {
+      if (this.terrainSet == null) {
+        return;
+      }
+      var terrains = this.terrainSet.getTerrains(tile);
+      int markerSize = Math.max(4, Math.round(cell * 0.16f));
+      int[] offsetsX = {50, 78, 94, 78, 50, 22, 6, 22};
+      int[] offsetsY = {6, 22, 50, 78, 94, 78, 50, 22};
+      for (int index = 0; index < terrains.length; index++) {
+        if (!(terrains[index] instanceof WangColor terrain) || terrain.getColor() == null) {
+          continue;
+        }
+        int markerX = x + offsetsX[index] * (cell - markerSize) / 100;
+        int markerY = y + offsetsY[index] * (cell - markerSize) / 100;
+        g2.setColor(terrain.getColor());
+        g2.fillOval(markerX, markerY, markerSize, markerSize);
+        g2.setColor(Color.BLACK);
+        g2.drawOval(markerX, markerY, markerSize, markerSize);
+      }
     }
 
     private boolean definesAnimation(int tile) {

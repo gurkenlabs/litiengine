@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
@@ -11,6 +12,8 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.awt.Color;
+import de.gurkenlabs.litiengine.environment.tilemap.TerrainType;
 import org.junit.jupiter.api.Test;
 
 class TilesetEditingTests {
@@ -106,6 +109,8 @@ class TilesetEditingTests {
     assertEquals(99, external.getFirstGridId());
     assertEquals("shared.tsx", field(external, "source"));
     assertEquals(7, mapReference.getFirstGridId());
+    assertNotNull(mapReference.getTile(0));
+    assertEquals(2, ((List<?>) field(external, "allTiles")).size());
   }
 
   @Test
@@ -118,6 +123,54 @@ class TilesetEditingTests {
     tileset.setValue("theme", "after");
 
     assertEquals("before", snapshot.getStringValue("theme", null));
+  }
+
+  @Test
+  void tilesetCanRestoreNamedTerrainDefinitions() throws Exception {
+    Tileset bundled = tilesetWithEntry();
+    WangSet generated = new WangSet("Terrains", TerrainType.CORNER);
+    generated.getTerrains().add(new WangColor("Terrain 1", Color.RED));
+    bundled.getOrCreateTerrainSets().add(generated);
+    Tileset source = tilesetWithEntry();
+    WangSet named = new WangSet("Terrains", TerrainType.CORNER);
+    named.getTerrains().add(new WangColor("gravel", Color.GRAY));
+    source.getOrCreateTerrainSets().add(named);
+
+    bundled.copyTerrainSetsFrom(source);
+
+    assertEquals("gravel", bundled.getTerrainSets().getFirst().getTerrains().getFirst().getName());
+  }
+
+  @Test
+  void tilesetEnrichmentOnlyRestoresGeneratedTerrainMetadata() throws Exception {
+    Tileset bundled = tilesetWithEntry();
+    WangSet generated = new WangSet("Terrains", TerrainType.CORNER);
+    generated.getTerrains().add(new WangColor("Terrain 1", Color.RED));
+    generated.getWangTiles().add(new WangTile(0, new int[] {0, 1, 0, 0, 0, 0, 0, 0}));
+    bundled.getOrCreateTerrainSets().add(generated);
+    Tileset source = tilesetWithEntry();
+    WangSet named = new WangSet("Terrains", TerrainType.CORNER);
+    WangColor gravel = new WangColor("gravel", Color.GRAY);
+    gravel.setTileId(1);
+    named.getTerrains().add(gravel);
+    named.getWangTiles().add(new WangTile(0, new int[] {0, 0, 0, 1, 0, 0, 0, 0}));
+    source.getOrCreateTerrainSets().add(named);
+
+    bundled.enrichTerrainMetadataFrom(source);
+
+    WangColor enriched = (WangColor) bundled.getTerrainSets().getFirst().getTerrains().getFirst();
+    assertEquals("gravel", enriched.getName());
+    assertEquals(1, enriched.getTileId());
+    assertEquals(1, ((WangSet) bundled.getTerrainSets().getFirst()).getWangId(0)[1]);
+    assertEquals(0, ((WangSet) bundled.getTerrainSets().getFirst()).getWangId(0)[3]);
+  }
+
+  @Test
+  void wangTileNormalizesMalformedIds() {
+    WangTile tile = new WangTile(0, new int[] {-1, 2, 3});
+
+    assertEquals(List.of(0, 2, 3, 0, 0, 0, 0, 0), java.util.Arrays.stream(tile.getWangId()).boxed().toList());
+    assertThrows(IllegalArgumentException.class, () -> tile.setTerrain(0, -1));
   }
 
   @Test
