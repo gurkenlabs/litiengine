@@ -15,8 +15,19 @@ final class SearchableSpriteComboBox extends JComboBox<JLabel> {
   SearchableSpriteComboBox() {
     setEditable(true);
     setEditor(new BasicComboBoxEditor() {
+      private Object currentItem;
+
       @Override public void setItem(Object item) {
+        this.currentItem = item;
         this.editor.setText(item instanceof JLabel label ? label.getText() : item == null ? "" : item.toString());
+      }
+
+      @Override public Object getItem() {
+        String text = this.editor.getText();
+        if (this.currentItem instanceof JLabel label && label.getText().equals(text)) {
+          return this.currentItem;
+        }
+        return items.stream().filter(item -> item.getText().equals(text)).findFirst().orElse(null);
       }
     });
     ((JTextComponent) getEditor().getEditorComponent()).addKeyListener(new java.awt.event.KeyAdapter() {
@@ -44,5 +55,13 @@ final class SearchableSpriteComboBox extends JComboBox<JLabel> {
     for (JLabel item : this.items) if (query.isEmpty() || item.getText().toLowerCase().contains(query)) super.addItem(item);
     this.filtering = false;
     if (getItemCount() > 0) showPopup();
+  }
+
+  static String selectedText(JComboBox<?> comboBox) {
+    Object selected = comboBox.getSelectedItem();
+    if (selected instanceof JLabel label) {
+      return label.getText();
+    }
+    return selected instanceof String text && !text.isBlank() ? text : null;
   }
 }

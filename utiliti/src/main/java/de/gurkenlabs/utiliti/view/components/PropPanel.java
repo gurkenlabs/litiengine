@@ -11,7 +11,6 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.util.Map;
@@ -20,7 +19,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 public class PropPanel extends PropertyPanel {
@@ -31,7 +29,6 @@ public class PropPanel extends PropertyPanel {
   private final JCheckBox checkBoxHorizontalFlip;
   private final JCheckBox checkBoxVerticalFlip;
   private final JCheckBox checkBoxScale;
-  private final JLabel spritePreview;
   private final SpriteAnimationPreview animationPreview;
 
   private boolean propsLoaded;
@@ -45,8 +42,6 @@ public class PropPanel extends PropertyPanel {
 
     this.comboBoxSpriteSheets = new SearchableSpriteComboBox();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
-    this.spritePreview = new JLabel("", JLabel.CENTER);
-    this.spritePreview.setPreferredSize(new Dimension(96, 96));
     this.animationPreview = new SpriteAnimationPreview();
 
     this.comboBoxMaterial = new JComboBox<>();
@@ -159,12 +154,9 @@ public class PropPanel extends PropertyPanel {
   }
 
   private void updateSpritePreview() {
-    Object selected = this.comboBoxSpriteSheets.getSelectedItem();
-    String name = selected instanceof JLabel label ? label.getText() : null;
+    String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
     String source = name != null ? SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name) : null;
     var spritesheet = source != null ? Resources.spritesheets().get(source) : null;
-    var preview = spritesheet != null ? spritesheet.getPreview(96) : null;
-    this.spritePreview.setIcon(preview != null ? new ImageIcon(preview) : null);
     this.animationPreview.setSpritesheet(spritesheet);
   }
 

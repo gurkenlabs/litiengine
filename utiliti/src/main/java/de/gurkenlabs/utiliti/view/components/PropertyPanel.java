@@ -388,15 +388,19 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     comboBox.addActionListener(new MapObjectPropertyActionListener(m -> {
+      String value = SearchableSpriteComboBox.selectedText(comboBox);
+      if (value == null) {
+        return false;
+      }
       if (!m.hasCustomProperty(property) || m.getStringValue(property, null) == null) {
         return true;
       }
-
-      JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-      return value != null && !m.getStringValue(property, null).equals(value.getText());
+      return !m.getStringValue(property, null).equals(value);
     }, m -> {
-      JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-      m.setValue(property, value != null ? value.getText() : null);
+      String value = SearchableSpriteComboBox.selectedText(comboBox);
+      if (value != null) {
+        m.setValue(property, value);
+      }
     }));
   }
 
