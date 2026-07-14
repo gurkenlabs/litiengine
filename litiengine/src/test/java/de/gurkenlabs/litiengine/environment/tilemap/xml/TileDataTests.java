@@ -135,6 +135,19 @@ class TileDataTests {
     assertEquals(expectedEncoded, actualEncoded);
   }
 
+  @Test
+  void csvEncodingWithoutDimensionsPreservesTiles() throws IOException, TmxException {
+    TileData data =
+        new TileData(
+            List.of(new Tile(1), new Tile(2)),
+            0,
+            0,
+            TileData.Encoding.CSV,
+            TileData.Compression.NONE);
+
+    assertEquals("\n1,2", TileData.encode(data));
+  }
+
   /**
    * Supplies the arguments for the parameterized test {@link #testEncode(String, String, String, String)}
    *

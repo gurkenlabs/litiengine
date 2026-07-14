@@ -193,6 +193,9 @@ public class TileLayer extends Layer implements ITileLayer {
   @Override
   void finish(URL location) throws TmxException {
     super.finish(location);
+    if (this.data != null && !this.data.isInfinite()) {
+      this.data.setDimensions(getWidth(), getHeight());
+    }
     this.tileList = new CopyOnWriteArrayList<>();
     this.tiles = new Tile[getHeight()][getWidth()];
     for (int i = 0; i < getData().size(); i++) {

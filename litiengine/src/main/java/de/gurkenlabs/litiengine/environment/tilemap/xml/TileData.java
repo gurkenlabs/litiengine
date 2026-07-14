@@ -318,7 +318,7 @@ public class TileData {
         sb.append(',');
       }
 
-      if (i != 0 && (i + 1) % data.getWidth() == 0) {
+      if (data.getWidth() > 0 && i != 0 && (i + 1) % data.getWidth() == 0) {
         sb.append('\n');
       }
     }
@@ -414,6 +414,11 @@ public class TileData {
     }
 
     return this.height;
+  }
+
+  void setDimensions(int width, int height) {
+    this.width = width;
+    this.height = height;
   }
 
   /**
