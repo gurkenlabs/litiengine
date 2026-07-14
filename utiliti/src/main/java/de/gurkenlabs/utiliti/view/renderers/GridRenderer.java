@@ -5,20 +5,17 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
-import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.utiliti.controller.Editor;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
 
 public class GridRenderer implements IEditorRenderer {
 
@@ -26,8 +23,10 @@ public class GridRenderer implements IEditorRenderer {
   private static final int MAJOR_GRID_INTERVAL = 4;
   private static final float MIN_LINE_WIDTH = 0.25f;
   private static final float MAJOR_LINE_WIDTH_FACTOR = 1.75f;
+  private static final double MIN_PROJECTED_GRID_SPACING = 4.0;
 
-  private final Map<GridCacheKey, GridGeometry> gridCache = new ConcurrentHashMap<>();
+  private GridCacheKey cachedGeometryKey;
+  private GridGeometry cachedGeometry;
 
   @Override
   public String getName() {
@@ -38,13 +37,24 @@ public class GridRenderer implements IEditorRenderer {
   public void render(Graphics2D graphics) {
     ICamera camera = Game.world().camera();
     if (!Editor.preferences().showGrid()
-        || camera.getRenderScale() < 1
         || Game.world().environment() == null) {
       return;
     }
 
     IMap map = Game.world().environment().getMap();
     if (map == null || map.getOrientation() == null) {
+      return;
+    }
+
+    double renderScale = camera.getRenderScale();
+    GridDetail horizontalDetail = gridDetail(map.getTileHeight() * renderScale);
+    GridDetail verticalDetail = gridDetail(map.getTileWidth() * renderScale);
+    boolean orthogonal = isOrthogonal(map);
+    GridDetail orientedDetail =
+        gridDetail(Math.min(map.getTileWidth(), map.getTileHeight()) * renderScale);
+    if (orthogonal
+        ? horizontalDetail == GridDetail.NONE && verticalDetail == GridDetail.NONE
+        : !rendersOrientedGrid(orientedDetail)) {
       return;
     }
 
@@ -55,15 +65,11 @@ public class GridRenderer implements IEditorRenderer {
 
     Color preferenceColor = Editor.preferences().getGridColor();
     float preferenceLineWidth = Editor.preferences().getGridLineWidth();
-    GridCacheKey cacheKey = GridCacheKey.from(map, preferenceColor, preferenceLineWidth);
-    GridGeometry geometry = gridCache.computeIfAbsent(cacheKey, ignored -> GridGeometry.from(map));
-
     float lineWidth =
         Float.isFinite(preferenceLineWidth)
             ? Math.max(MIN_LINE_WIDTH, preferenceLineWidth)
             : MIN_LINE_WIDTH;
     Color renderColor = withLimitedAlpha(preferenceColor);
-    double renderScale = camera.getRenderScale();
     AffineTransform mapToScreen = new AffineTransform();
     mapToScreen.scale(renderScale, renderScale);
     mapToScreen.translate(camera.getPixelOffsetX(), camera.getPixelOffsetY());
@@ -73,18 +79,59 @@ public class GridRenderer implements IEditorRenderer {
       gridGraphics.clip(mapToScreen.createTransformedShape(map.getBounds()));
       gridGraphics.setColor(renderColor);
 
-      if (isOrthogonal(map)) {
-        renderOrthogonalGrid(gridGraphics, map, visibleTiles, mapToScreen, lineWidth);
+      if (orthogonal) {
+        renderOrthogonalGrid(
+            gridGraphics,
+            map,
+            visibleTiles,
+            mapToScreen,
+            horizontalDetail,
+            verticalDetail,
+            lineWidth);
       } else {
-        renderOrientedGrid(gridGraphics, map, visibleTiles, mapToScreen, geometry, lineWidth);
+        renderOrientedGrid(
+            gridGraphics,
+            map,
+            visibleTiles,
+            mapToScreen,
+            geometryFor(map),
+            lineWidth);
       }
     } finally {
       gridGraphics.dispose();
     }
   }
 
-  public void clearCache() {
-    gridCache.clear();
+  public synchronized void clearCache() {
+    cachedGeometryKey = null;
+    cachedGeometry = null;
+  }
+
+  private synchronized GridGeometry geometryFor(IMap map) {
+    GridCacheKey key = GridCacheKey.from(map);
+    if (!key.equals(cachedGeometryKey)) {
+      cachedGeometry = GridGeometry.from(map);
+      cachedGeometryKey = key;
+    }
+
+    return cachedGeometry;
+  }
+
+  static GridDetail gridDetail(double projectedTileSpacing) {
+    if (!Double.isFinite(projectedTileSpacing) || projectedTileSpacing <= 0) {
+      return GridDetail.NONE;
+    }
+    if (projectedTileSpacing >= MIN_PROJECTED_GRID_SPACING) {
+      return GridDetail.ALL;
+    }
+    if (projectedTileSpacing * MAJOR_GRID_INTERVAL >= MIN_PROJECTED_GRID_SPACING) {
+      return GridDetail.MAJOR_ONLY;
+    }
+    return GridDetail.NONE;
+  }
+
+  static boolean rendersOrientedGrid(GridDetail detail) {
+    return detail == GridDetail.ALL;
   }
 
   static TileRange calculateVisibleTileRange(
@@ -186,42 +233,57 @@ public class GridRenderer implements IEditorRenderer {
       IMap map,
       TileRange range,
       AffineTransform mapToScreen,
+      GridDetail horizontalDetail,
+      GridDetail verticalDetail,
       float lineWidth) {
-    graphics.setStroke(new BasicStroke(lineWidth));
-    renderOrthogonalLines(graphics, map, range, mapToScreen, false);
+    Path2D.Double minorLines = new Path2D.Double();
+    Path2D.Double majorLines = new Path2D.Double();
+    boolean hasMinorLines = false;
+    boolean hasMajorLines = false;
 
-    graphics.setStroke(new BasicStroke(lineWidth * MAJOR_LINE_WIDTH_FACTOR));
-    renderOrthogonalLines(graphics, map, range, mapToScreen, true);
-  }
-
-  private static void renderOrthogonalLines(
-      Graphics2D graphics,
-      IMap map,
-      TileRange range,
-      AffineTransform mapToScreen,
-      boolean major) {
-    double minMapY = (double) range.minY() * map.getTileHeight();
-    double maxMapY = (double) (range.maxY() + 1) * map.getTileHeight();
-    for (int x = range.minX(); x <= range.maxX() + 1; x++) {
-      if (isMajorLine(x) != major) {
-        continue;
+    double minScreenY = mapToScreenY(mapToScreen, (double) range.minY() * map.getTileHeight());
+    double maxScreenY =
+        mapToScreenY(mapToScreen, (double) (range.maxY() + 1) * map.getTileHeight());
+    if (verticalDetail != GridDetail.NONE) {
+      for (int x = range.minX(); x <= range.maxX() + 1; x++) {
+        boolean major = isMajorLine(x);
+        if (!major && verticalDetail != GridDetail.ALL) {
+          continue;
+        }
+        double screenX = mapToScreenX(mapToScreen, (double) x * map.getTileWidth());
+        Path2D.Double path = major ? majorLines : minorLines;
+        path.moveTo(screenX, minScreenY);
+        path.lineTo(screenX, maxScreenY);
+        hasMajorLines |= major;
+        hasMinorLines |= !major;
       }
-      double mapX = (double) x * map.getTileWidth();
-      graphics.draw(
-          mapToScreen.createTransformedShape(
-              new Line2D.Double(mapX, minMapY, mapX, maxMapY)));
     }
 
-    double minMapX = (double) range.minX() * map.getTileWidth();
-    double maxMapX = (double) (range.maxX() + 1) * map.getTileWidth();
-    for (int y = range.minY(); y <= range.maxY() + 1; y++) {
-      if (isMajorLine(y) != major) {
-        continue;
+    double minScreenX = mapToScreenX(mapToScreen, (double) range.minX() * map.getTileWidth());
+    double maxScreenX =
+        mapToScreenX(mapToScreen, (double) (range.maxX() + 1) * map.getTileWidth());
+    if (horizontalDetail != GridDetail.NONE) {
+      for (int y = range.minY(); y <= range.maxY() + 1; y++) {
+        boolean major = isMajorLine(y);
+        if (!major && horizontalDetail != GridDetail.ALL) {
+          continue;
+        }
+        double screenY = mapToScreenY(mapToScreen, (double) y * map.getTileHeight());
+        Path2D.Double path = major ? majorLines : minorLines;
+        path.moveTo(minScreenX, screenY);
+        path.lineTo(maxScreenX, screenY);
+        hasMajorLines |= major;
+        hasMinorLines |= !major;
       }
-      double mapY = (double) y * map.getTileHeight();
-      graphics.draw(
-          mapToScreen.createTransformedShape(
-              new Line2D.Double(minMapX, mapY, maxMapX, mapY)));
+    }
+
+    if (hasMinorLines) {
+      graphics.setStroke(new BasicStroke(lineWidth));
+      graphics.draw(minorLines);
+    }
+    if (hasMajorLines) {
+      graphics.setStroke(new BasicStroke(lineWidth * MAJOR_LINE_WIDTH_FACTOR));
+      graphics.draw(majorLines);
     }
   }
 
@@ -232,15 +294,23 @@ public class GridRenderer implements IEditorRenderer {
       AffineTransform mapToScreen,
       GridGeometry geometry,
       float lineWidth) {
+    Path2D.Double tileOutlines = new Path2D.Double();
     graphics.setStroke(new BasicStroke(lineWidth));
     for (int x = range.minX(); x <= range.maxX(); x++) {
       for (int y = range.minY(); y <= range.maxY(); y++) {
         Point tileLocation = map.getOrientation().getLocation(x, y, map);
-        AffineTransform tileToScreen = new AffineTransform(mapToScreen);
-        tileToScreen.translate(tileLocation.x, tileLocation.y);
-        graphics.draw(tileToScreen.createTransformedShape(geometry.relativeTileShape()));
+        geometry.appendTranslated(tileOutlines, tileLocation, mapToScreen);
       }
     }
+    graphics.draw(tileOutlines);
+  }
+
+  private static double mapToScreenX(AffineTransform mapToScreen, double mapX) {
+    return mapX * mapToScreen.getScaleX() + mapToScreen.getTranslateX();
+  }
+
+  private static double mapToScreenY(AffineTransform mapToScreen, double mapY) {
+    return mapY * mapToScreen.getScaleY() + mapToScreen.getTranslateY();
   }
 
   private static boolean isMajorLine(int tileBoundary) {
@@ -253,7 +323,7 @@ public class GridRenderer implements IEditorRenderer {
 
   private static Color withLimitedAlpha(Color color) {
     if (color == null) {
-      return new Color(255, 255, 255, 65);
+      return new Color(255, 255, 255, MAX_GRID_ALPHA);
     }
 
     return new Color(
@@ -270,34 +340,33 @@ public class GridRenderer implements IEditorRenderer {
     }
   }
 
+  enum GridDetail {
+    NONE,
+    MAJOR_ONLY,
+    ALL
+  }
+
   record GridCacheKey(
-      String mapName,
-      int mapWidth,
-      int mapHeight,
       int tileWidth,
       int tileHeight,
       IMapOrientation orientation,
-      String orientationName,
       StaggerAxis staggerAxis,
-      StaggerIndex staggerIndex,
-      int hexSideLength,
-      int color,
-      float lineWidth) {
+      int hexSideLength) {
 
-    static GridCacheKey from(IMap map, Color color, float lineWidth) {
+    static GridCacheKey from(IMap map) {
       return new GridCacheKey(
-          map.getName(),
-          map.getWidth(),
-          map.getHeight(),
           map.getTileWidth(),
           map.getTileHeight(),
           map.getOrientation(),
-          map.getOrientation().getName(),
-          map.getStaggerAxis(),
-          map.getStaggerIndex(),
-          hexSideLength(map),
-          color != null ? color.getRGB() : 0,
-          lineWidth);
+          staggerAxis(map),
+          hexSideLength(map));
+    }
+
+    private static StaggerAxis staggerAxis(IMap map) {
+      if (!MapOrientations.HEXAGONAL.getName().equals(map.getOrientation().getName())) {
+        return null;
+      }
+      return map.getStaggerAxis();
     }
 
     private static int hexSideLength(IMap map) {
@@ -308,14 +377,82 @@ public class GridRenderer implements IEditorRenderer {
     }
   }
 
-  private record GridGeometry(Shape relativeTileShape) {
+  private record GridGeometry(byte[] segmentTypes, double[] coordinates) {
     private static GridGeometry from(IMap map) {
       Point tileLocation = map.getOrientation().getLocation(0, 0, map);
-      AffineTransform relativeTransform =
-          AffineTransform.getTranslateInstance(-tileLocation.x, -tileLocation.y);
-      Shape relativeShape =
-          relativeTransform.createTransformedShape(map.getOrientation().getShape(0, 0, map));
-      return new GridGeometry(new Path2D.Double(relativeShape));
+      PathIterator iterator = map.getOrientation().getShape(0, 0, map).getPathIterator(null);
+      byte[] segmentTypes = new byte[8];
+      double[] coordinates = new double[segmentTypes.length * 6];
+      double[] segmentCoordinates = new double[6];
+      int segmentCount = 0;
+      while (!iterator.isDone()) {
+        if (segmentCount == segmentTypes.length) {
+          segmentTypes = Arrays.copyOf(segmentTypes, segmentTypes.length * 2);
+          coordinates = Arrays.copyOf(coordinates, segmentTypes.length * 6);
+        }
+
+        int segmentType = iterator.currentSegment(segmentCoordinates);
+        segmentTypes[segmentCount] = (byte) segmentType;
+        int coordinateCount = coordinateCount(segmentType);
+        int coordinateOffset = segmentCount * 6;
+        for (int i = 0; i < coordinateCount; i += 2) {
+          coordinates[coordinateOffset + i] = segmentCoordinates[i] - tileLocation.x;
+          coordinates[coordinateOffset + i + 1] = segmentCoordinates[i + 1] - tileLocation.y;
+        }
+        segmentCount++;
+        iterator.next();
+      }
+
+      return new GridGeometry(
+          Arrays.copyOf(segmentTypes, segmentCount),
+          Arrays.copyOf(coordinates, segmentCount * 6));
+    }
+
+    private void appendTranslated(
+        Path2D.Double path, Point tileLocation, AffineTransform mapToScreen) {
+      double scaleX = mapToScreen.getScaleX();
+      double scaleY = mapToScreen.getScaleY();
+      double screenX = mapToScreenX(mapToScreen, tileLocation.x);
+      double screenY = mapToScreenY(mapToScreen, tileLocation.y);
+      for (int i = 0; i < segmentTypes.length; i++) {
+        int offset = i * 6;
+        switch (segmentTypes[i]) {
+          case PathIterator.SEG_MOVETO ->
+              path.moveTo(
+                  screenX + coordinates[offset] * scaleX,
+                  screenY + coordinates[offset + 1] * scaleY);
+          case PathIterator.SEG_LINETO ->
+              path.lineTo(
+                  screenX + coordinates[offset] * scaleX,
+                  screenY + coordinates[offset + 1] * scaleY);
+          case PathIterator.SEG_QUADTO ->
+              path.quadTo(
+                  screenX + coordinates[offset] * scaleX,
+                  screenY + coordinates[offset + 1] * scaleY,
+                  screenX + coordinates[offset + 2] * scaleX,
+                  screenY + coordinates[offset + 3] * scaleY);
+          case PathIterator.SEG_CUBICTO ->
+              path.curveTo(
+                  screenX + coordinates[offset] * scaleX,
+                  screenY + coordinates[offset + 1] * scaleY,
+                  screenX + coordinates[offset + 2] * scaleX,
+                  screenY + coordinates[offset + 3] * scaleY,
+                  screenX + coordinates[offset + 4] * scaleX,
+                  screenY + coordinates[offset + 5] * scaleY);
+          case PathIterator.SEG_CLOSE -> path.closePath();
+          default -> throw new IllegalStateException("Unsupported path segment: " + segmentTypes[i]);
+        }
+      }
+    }
+
+    private static int coordinateCount(int segmentType) {
+      return switch (segmentType) {
+        case PathIterator.SEG_MOVETO, PathIterator.SEG_LINETO -> 2;
+        case PathIterator.SEG_QUADTO -> 4;
+        case PathIterator.SEG_CUBICTO -> 6;
+        case PathIterator.SEG_CLOSE -> 0;
+        default -> throw new IllegalStateException("Unsupported path segment: " + segmentType);
+      };
     }
   }
 }

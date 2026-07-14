@@ -2,11 +2,11 @@ package de.gurkenlabs.utiliti.view.renderers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
-
 import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,32 @@ class GridRendererTest {
   void orthogonalMapDoesNotRequireHexSideLength() {
     TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
 
-    assertDoesNotThrow(() -> GridRenderer.GridCacheKey.from(map, java.awt.Color.WHITE, 1f));
+    assertDoesNotThrow(() -> GridRenderer.GridCacheKey.from(map));
+  }
+
+  @Test
+  void gridDetailIncludesMinorLinesAtMinimumProjectedSpacing() {
+    assertEquals(GridRenderer.GridDetail.ALL, GridRenderer.gridDetail(4.0));
+  }
+
+  @Test
+  void gridDetailIncludesOnlyMajorLinesWhenMinorLinesAreTooDense() {
+    assertEquals(GridRenderer.GridDetail.MAJOR_ONLY, GridRenderer.gridDetail(3.999));
+    assertEquals(GridRenderer.GridDetail.MAJOR_ONLY, GridRenderer.gridDetail(1.0));
+  }
+
+  @Test
+  void gridDetailSkipsGridWhenMajorLinesAreTooDense() {
+    assertEquals(GridRenderer.GridDetail.NONE, GridRenderer.gridDetail(0.999));
+    assertEquals(GridRenderer.GridDetail.NONE, GridRenderer.gridDetail(0));
+    assertEquals(GridRenderer.GridDetail.NONE, GridRenderer.gridDetail(Double.NaN));
+  }
+
+  @Test
+  void orientedGridSkipsDisconnectedMajorOnlyOutlines() {
+    assertTrue(GridRenderer.rendersOrientedGrid(GridRenderer.GridDetail.ALL));
+    assertFalse(GridRenderer.rendersOrientedGrid(GridRenderer.GridDetail.MAJOR_ONLY));
+    assertFalse(GridRenderer.rendersOrientedGrid(GridRenderer.GridDetail.NONE));
   }
 
   @Test
