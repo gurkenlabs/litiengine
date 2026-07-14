@@ -37,4 +37,17 @@ class ZoomTests {
     assertEquals(0.1f, Zoom.get(matched4));
     assertEquals(3f, Zoom.get(matched5));
   }
+
+  @Test
+  void zoomInSelectsNextPresetFromArbitraryZoom() {
+    assertEquals(0.25f, Zoom.nextPreset(0.2f));
+    assertEquals(0.5f, Zoom.nextPreset(0.25f));
+  }
+
+  @Test
+  void zoomOutSelectsPreviousPresetFromArbitraryZoom() {
+    assertEquals(0.1f, Zoom.previousPreset(0.2f));
+    assertEquals(0.25f, Zoom.previousPreset(0.5f));
+    assertEquals(0.05f, Zoom.previousPreset(0.05f));
+  }
 }

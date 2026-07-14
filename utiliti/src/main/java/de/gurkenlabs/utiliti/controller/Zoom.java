@@ -83,19 +83,55 @@ public record Zoom(float value) implements Comparable<Zoom> {
   }
 
   public static void in() {
-    if (currentZoomIndex < zooms.length - 1) {
-      currentZoomIndex++;
+    Editor.instance().getMapComponent().exitFitMode();
+    float actualZoom = actualZoom();
+    float nextZoom = nextPreset(actualZoom);
+    if (nextZoom == actualZoom) {
+      return;
     }
 
+    currentZoomIndex = match(nextZoom);
     apply();
   }
 
   public static void out() {
-    if (currentZoomIndex > 0) {
-      currentZoomIndex--;
+    Editor.instance().getMapComponent().exitFitMode();
+    float actualZoom = actualZoom();
+    float previousZoom = previousPreset(actualZoom);
+    if (previousZoom == actualZoom) {
+      return;
     }
 
+    currentZoomIndex = match(previousZoom);
     apply();
+  }
+
+  static float nextPreset(float zoom) {
+    int index = Arrays.binarySearch(zooms, new Zoom(zoom));
+    if (index >= 0) {
+      return index < zooms.length - 1 ? get(index + 1) : zoom;
+    }
+
+    int insertionPoint = -(index + 1);
+    return insertionPoint < zooms.length ? get(insertionPoint) : zoom;
+  }
+
+  static float previousPreset(float zoom) {
+    int index = Arrays.binarySearch(zooms, new Zoom(zoom));
+    if (index >= 0) {
+      return index > 0 ? get(index - 1) : zoom;
+    }
+
+    int insertionPoint = -(index + 1);
+    return insertionPoint > 0 ? get(insertionPoint - 1) : zoom;
+  }
+
+  private static float actualZoom() {
+    if (Game.world() != null && Game.world().camera() != null) {
+      return Game.world().camera().getZoom();
+    }
+
+    return get();
   }
 
   public static float get() {

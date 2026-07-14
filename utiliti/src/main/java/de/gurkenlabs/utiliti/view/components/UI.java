@@ -5,8 +5,6 @@ import com.github.weisj.darklaf.theme.IntelliJTheme;
 import com.github.weisj.darklaf.theme.OneDarkTheme;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
-import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.environment.EnvironmentListener;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
@@ -49,13 +47,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -69,10 +72,10 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public final class UI {
-  private static final int INSPECTOR_MIN_WIDTH = 560;
-  private static final int SCENE_GRAPH_MIN_WIDTH = 250;
-  private static final int SCENE_GRAPH_MAX_WIDTH = 330;
-  private static final int SPLITTER_SIZE = 6;
+  private static final int INSPECTOR_BASE_WIDTH = 380;
+  private static final int SCENE_GRAPH_MIN_WIDTH = 260;
+  private static final int SCENE_GRAPH_MAX_WIDTH = 340;
+  private static final int SPLITTER_SIZE = 4;
 
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static JPopupMenu canvasPopup;
@@ -92,10 +95,12 @@ public final class UI {
   private static SceneGraph sceneGraph;
   private static JComboBox<TmxMap> mapCombo;
   private static ViewportToolbar viewportToolbar;
+  private static ViewportPanel viewportPanel;
 
   private static boolean initialized;
 
   private static volatile boolean loadingTheme;
+  private static final Set<Object> themeOverrideKeys = new HashSet<>();
 
   private UI() {
   }
@@ -358,35 +363,6 @@ public final class UI {
     return mapCombo;
   }
 
-  private static void initScrollBars(JPanel renderPane) {
-    ScrollHandlerBar horizontalScroll = new ScrollHandlerBar(java.awt.Adjustable.HORIZONTAL);
-    ScrollHandlerBar verticalScroll = new ScrollHandlerBar(java.awt.Adjustable.VERTICAL);
-
-    EnvironmentListener environmentListener = new EnvironmentListener() {
-      @Override public void loaded(Environment environment) {
-        boolean hasMap = environment != null && environment.getMap() != null;
-        horizontalScroll.setVisible(hasMap);
-        verticalScroll.setVisible(hasMap);
-      }
-
-      @Override public void unloaded(Environment environment) {
-        // prevent this event handler from blocking the UI thread while the game is shutting down
-        if (!Game.hasStarted()) {
-          return;
-        }
-
-        horizontalScroll.setVisible(false);
-        verticalScroll.setVisible(false);
-      }
-    };
-    environmentListener.loaded(Game.world().environment());
-    Game.world().addListener(environmentListener);
-    renderPane.add(horizontalScroll, BorderLayout.SOUTH);
-    renderPane.add(verticalScroll, BorderLayout.EAST);
-
-    Scroll.init(verticalScroll, horizontalScroll);
-  }
-
   private static void setupInterface() {
     JFrame window = initWindow();
     int winW = window.getSize().width;
@@ -397,37 +373,32 @@ public final class UI {
     canvas.setSize((int) (winW * 0.75), winH);
 
     window.remove(canvas);
-    JPanel renderPanel;
-    renderPanel = new JPanel(new BorderLayout());
-    renderPanel.add(canvas);
-    renderPanel.setMinimumSize(new Dimension(250, 100));
-    initScrollBars(renderPanel);
-
     initTools();
     viewportToolbar = new ViewportToolbar();
-    renderPanel.add(viewportToolbar, BorderLayout.NORTH);
-    initDropTarget(renderPanel);
+    viewportPanel = new ViewportPanel(canvas, viewportToolbar);
+    initDropTarget(viewportPanel);
 
     Component leftPanel = initLeftPanel();
-    Component renderSplitPanel = initRenderSplitPanel(renderPanel, winH);
+    Component renderSplitPanel = initRenderSplitPanel(viewportPanel, winH);
 
+    int inspectorMinWidth = inspectorMinimumWidth();
     mapObjectPanel = new MapObjectInspector();
-    mapObjectPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    mapObjectPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     mapPropertyPanel = new MapPropertyPanel();
-    mapPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    mapPropertyPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     layerPropertyPanel = new LayerPropertyPanel();
-    layerPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    layerPropertyPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     tileLayerPropertyPanel = new LayerPropertyPanel();
-    tileLayerPropertyPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    tileLayerPropertyPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     tilesetEditorPanel = new TilesetEditorPanel();
-    tilesetEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    tilesetEditorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     tileLayerTilesetEditorPanel = new TilesetTabsPanel();
-    tileLayerTilesetEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    tileLayerTilesetEditorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     ExpandableCard tileLayerTilesets = tileLayerPropertyPanel.addSection("Tilesets", tileLayerTilesetEditorPanel, true);
     tileLayerTilesets.setFillsAvailableHeight(true);
     tileLayerTilesets.setHeaderTrailing(tileLayerTilesetEditorPanel.getCommands());
     spriteEditorPanel = new SpriteEditorPanel();
-    spriteEditorPanel.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    spriteEditorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     inspectorCards = new CardLayout();
     inspectorHost = new JPanel(inspectorCards);
     inspectorHost.add(mapObjectPanel, "objects");
@@ -440,23 +411,35 @@ public final class UI {
     inspectorHost.add(tilesetInspectorScroll, "tilesets");
     inspectorHost.add(tileLayerPropertyPanel, "tileLayers");
     inspectorHost.add(spriteEditorPanel, "sprites");
-    inspectorHost.setMinimumSize(new Dimension(INSPECTOR_MIN_WIDTH, 0));
+    inspectorHost.setMinimumSize(new Dimension(inspectorMinWidth, 0));
 
-    int prefInspectorW = Math.max(INSPECTOR_MIN_WIDTH, (int) (winW * 0.20));
-    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, inspectorHost);
+    JLabel inspectorTitle = new JLabel("Inspector");
+    inspectorTitle.setFont(inspectorTitle.getFont().deriveFont(Font.BOLD));
+    JPanel inspectorHeader = new JPanel(new BorderLayout());
+    inspectorHeader.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
+        BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+    inspectorHeader.add(inspectorTitle, BorderLayout.WEST);
+    JPanel inspectorPanel = new JPanel(new BorderLayout());
+    inspectorPanel.add(inspectorHeader, BorderLayout.NORTH);
+    inspectorPanel.add(inspectorHost, BorderLayout.CENTER);
+    inspectorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
+
+    int prefInspectorW = Math.max(inspectorMinWidth, (int) (winW * 0.20));
+    int prefHierarchyW = Math.max(SCENE_GRAPH_MIN_WIDTH, Math.min(SCENE_GRAPH_MAX_WIDTH, (int) (winW * 0.18)));
+    int initialHierarchyW = Editor.preferences().getMainSplitterPosition() != 0
+        ? Math.min(Editor.preferences().getMainSplitterPosition(), SCENE_GRAPH_MAX_WIDTH)
+        : prefHierarchyW;
+    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, inspectorPanel);
     configureSplitPane(centerRightSplit);
     centerRightSplit.setContinuousLayout(true);
     centerRightSplit.setResizeWeight(1.0);
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
         evt -> Editor.preferences().setSelectionEditSplitter(centerRightSplit.getDividerLocation()));
-    if (Editor.preferences().getSelectionEditSplitter() != 0) {
-      centerRightSplit.setDividerLocation(
-          Math.max(0, Math.min(Editor.preferences().getSelectionEditSplitter(), winW - INSPECTOR_MIN_WIDTH)));
-    } else {
-      centerRightSplit.setDividerLocation(winW - prefInspectorW);
-    }
+    centerRightSplit.setDividerLocation(initialInspectorDivider(
+        winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
+        Editor.preferences().getSelectionEditSplitter()));
 
-    int prefHierarchyW = Math.max(SCENE_GRAPH_MIN_WIDTH, Math.min(SCENE_GRAPH_MAX_WIDTH, (int) (winW * 0.18)));
     JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
     configureSplitPane(mainSplit);
     mainSplit.setContinuousLayout(true);
@@ -479,11 +462,7 @@ public final class UI {
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
     rootPanel.add(mainSplit, BorderLayout.CENTER);
-    rootPanel.add(StatusBar.create(), BorderLayout.SOUTH);
-    mainSplit.setDividerLocation(
-        Editor.preferences().getMainSplitterPosition() != 0
-            ? Math.min(Editor.preferences().getMainSplitterPosition(), SCENE_GRAPH_MAX_WIDTH)
-            : prefHierarchyW);
+    mainSplit.setDividerLocation(initialHierarchyW);
 
     initPopupMenu(canvas);
     window.getRootPane().setBackground(Style.COLOR_BG);
@@ -557,10 +536,10 @@ public final class UI {
 
     JComboBox<TmxMap> leftMapCombo = new JComboBox<>();
     leftMapCombo.setRenderer(new de.gurkenlabs.utiliti.view.renderers.MapListCellRenderer());
-    leftMapCombo.setFont(leftMapCombo.getFont().deriveFont(15f));
-    leftMapCombo.setPreferredSize(new Dimension(0, 36));
-    leftMapCombo.setMinimumSize(new Dimension(100, 36));
-    leftMapCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+    leftMapCombo.setFont(Style.getDefaultFont());
+    leftMapCombo.setPreferredSize(new Dimension(0, Style.CONTROL_HEIGHT));
+    leftMapCombo.setMinimumSize(new Dimension(100, Style.CONTROL_HEIGHT));
+    leftMapCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, Style.CONTROL_HEIGHT));
     leftMapCombo.addActionListener(e -> {
       if (Boolean.TRUE.equals(leftMapCombo.getClientProperty("updating"))
           || Editor.instance().isLoading() || Editor.instance().getMapComponent().isLoading()) {
@@ -587,9 +566,11 @@ public final class UI {
     });
     UI.setMapCombo(leftMapCombo);
 
-    JPanel headerPanel = new JPanel(new BorderLayout(4, 6));
+    JPanel headerPanel = new JPanel(new BorderLayout(Style.SPACE_SMALL, Style.SPACE_SMALL));
     headerPanel.setOpaque(false);
-    headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 8, 5, 8));
+    headerPanel.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
+        BorderFactory.createEmptyBorder(6, 8, 6, 8)));
     headerPanel.add(leftMapCombo, BorderLayout.CENTER);
 
     JPanel leftPanel = new JPanel(new BorderLayout());
@@ -688,28 +669,36 @@ public final class UI {
 
     System.setProperty("darklaf.animatedLafChange", "false");
     loadingTheme = true;
+    clearThemeOverrides();
 
     switch (theme) {
       case DARK -> {
         LafManager.install(new OneDarkTheme());
-        applyTokyoNightOverrides();
+        applyAndTrackThemeOverrides(UI::applyTokyoNightOverrides);
       }
       case LIGHT -> {
         LafManager.install(new IntelliJTheme());
-        applyLightOverrides();
+        applyAndTrackThemeOverrides(UI::applyLightOverrides);
       }
     }
 
     if (Game.window() != null && Game.window().getRenderComponent() != null) {
-      Game.window().getRenderComponent().setBackground(UIManager.getColor("Panel.background"));
+      Game.window().getRenderComponent().setBackground(Style.workspaceBottom());
     }
     Editor.preferences().setTheme(theme);
+    if (Game.window() != null && Game.window().getHostControl() != null) {
+      SwingUtilities.updateComponentTreeUI(Game.window().getHostControl());
+    }
+    if (viewportPanel != null) {
+      viewportPanel.refreshTheme();
+    }
     updateOrphanComponents();
     loadingTheme = false;
   }
 
   private static void applyTokyoNightOverrides() {
     // Rounded corners for modern look
+    applyCompactMetrics();
     UIManager.put("Button.arc", 6);
     UIManager.put("Component.arc", 6);
     UIManager.put("TextComponent.arc", 5);
@@ -718,6 +707,17 @@ public final class UI {
     // Panels - borderless design with subtle contrast
     UIManager.put("Panel.background", Style.COLOR_BG);
     UIManager.put("Panel.foreground", Style.COLOR_TEXT);
+    UIManager.put("Editor.surface", Style.COLOR_SURFACE);
+    UIManager.put("Editor.surfaceRaised", Style.COLOR_SURFACE2);
+    UIManager.put("Editor.border", Style.COLOR_BORDER);
+    UIManager.put("Editor.mutedText", Style.COLOR_SUBTEXT);
+    UIManager.put("Editor.accent", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("Editor.hover", Style.COLOR_HOVER);
+    UIManager.put("Editor.selection", Style.COLOR_SELECTION_INACTIVE);
+    UIManager.put("Editor.workspaceTop", Style.COLOR_WORKSPACE_TOP);
+    UIManager.put("Editor.workspaceBottom", Style.COLOR_WORKSPACE_BOTTOM);
+    UIManager.put("Editor.mapBacking", Style.COLOR_MAP_BACKING);
+    UIManager.put("Editor.mapBorder", Style.COLOR_MAP_BORDER);
     Color INPUT_BG = Style.COLOR_INPUT_BG;
     UIManager.put("TextField.background", INPUT_BG);
     UIManager.put("TextField.foreground", Style.COLOR_TEXT);
@@ -828,8 +828,75 @@ public final class UI {
   }
 
   private static void applyLightOverrides() {
-    // Light theme keeps the IntelliJ defaults, just ensure consistency
+    applyCompactMetrics();
+    UIManager.put("Button.arc", Style.CORNER_RADIUS);
+    UIManager.put("Component.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextComponent.arc", Style.CORNER_RADIUS);
+    UIManager.put("TabbedPane.arc", Style.CORNER_RADIUS);
+    Color panel = UIManager.getColor("Panel.background");
+    Color control = UIManager.getColor("TextField.background");
+    Color separator = UIManager.getColor("Separator.foreground");
+    Color text = UIManager.getColor("Label.foreground");
+    UIManager.put("Editor.surface", control != null ? control : new Color(248, 248, 248));
+    UIManager.put("Editor.surfaceRaised", panel != null ? panel.brighter() : Color.WHITE);
+    UIManager.put("Editor.border", separator != null ? separator : new Color(205, 205, 205));
+    UIManager.put("Editor.mutedText", text != null ? new Color(text.getRed(), text.getGreen(), text.getBlue(), 170) : Color.GRAY);
+    UIManager.put("Editor.accent", new Color(53, 116, 242));
+    UIManager.put("Editor.hover", new Color(53, 116, 242, 24));
+    UIManager.put("Editor.selection", new Color(53, 116, 242, 40));
+    UIManager.put("Editor.workspaceTop", new Color(226, 232, 239));
+    UIManager.put("Editor.workspaceBottom", new Color(205, 214, 224));
+    UIManager.put("Editor.mapBacking", Color.WHITE);
+    UIManager.put("Editor.mapBorder", new Color(105, 120, 136, 180));
     UIManager.put("Table.gridColor", Style.COLOR_LIGHT_GRID);
+  }
+
+  private static void applyCompactMetrics() {
+    UIManager.put("Component.minimumHeight", Style.CONTROL_HEIGHT);
+    UIManager.put("Button.minimumHeight", Style.CONTROL_HEIGHT);
+    UIManager.put("ComboBox.minimumHeight", Style.CONTROL_HEIGHT);
+    UIManager.put("Spinner.minimumHeight", Style.CONTROL_HEIGHT);
+    UIManager.put("TextField.minimumHeight", Style.CONTROL_HEIGHT);
+    UIManager.put("Tree.rowHeight", Style.TREE_ROW_HEIGHT);
+    UIManager.put("Table.rowHeight", 24);
+    UIManager.put("TabbedPane.tabHeight", Style.CONTROL_HEIGHT);
+    UIManager.put("ScrollBar.width", 10);
+  }
+
+  private static void clearThemeOverrides() {
+    for (Object key : themeOverrideKeys) {
+      UIManager.put(key, null);
+    }
+    themeOverrideKeys.clear();
+  }
+
+  private static void applyAndTrackThemeOverrides(Runnable overrides) {
+    Map<Object, Object> before = new HashMap<>();
+    for (Object key : UIManager.getDefaults().keySet()) {
+      before.put(key, UIManager.get(key));
+    }
+    overrides.run();
+    Set<Object> keys = new HashSet<>(before.keySet());
+    keys.addAll(UIManager.getDefaults().keySet());
+    for (Object key : keys) {
+      if (!java.util.Objects.equals(before.get(key), UIManager.get(key))) {
+        themeOverrideKeys.add(key);
+      }
+    }
+  }
+
+  private static int inspectorMinimumWidth() {
+    return Math.max(320, Math.round(INSPECTOR_BASE_WIDTH * Editor.preferences().getUiScale()));
+  }
+
+  static int initialInspectorDivider(
+      int windowWidth, int hierarchyWidth, int inspectorWidth, int preferredInspectorWidth, int persistedDivider) {
+    int centerWidth = Math.max(inspectorWidth, windowWidth - hierarchyWidth - SPLITTER_SIZE);
+    int maximumDivider = Math.max(0, centerWidth - inspectorWidth);
+    if (persistedDivider > 0) {
+      return Math.min(persistedDivider, maximumDivider);
+    }
+    return Math.max(0, centerWidth - preferredInspectorWidth);
   }
 
   private static void updateOrphanComponents() {

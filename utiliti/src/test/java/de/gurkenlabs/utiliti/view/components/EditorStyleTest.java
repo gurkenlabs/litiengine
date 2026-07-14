@@ -1,0 +1,115 @@
+package de.gurkenlabs.utiliti.view.components;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import de.gurkenlabs.litiengine.test.SwingTestSuite;
+import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.controller.Editor;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.SwingUtilities;
+import javax.swing.plaf.UIResource;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+@ExtendWith(SwingTestSuite.class)
+class EditorStyleTest {
+
+  @Test
+  void toolbarButtonsUseCompactFocusableContract() {
+    JButton button = Style.iconButton(new ImageIcon(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)));
+
+    assertTrue(button.isFocusable());
+    assertEquals(Style.TOOLBAR_BUTTON_SIZE, button.getPreferredSize().width);
+    assertEquals(Style.TOOLBAR_BUTTON_SIZE, button.getPreferredSize().height);
+    assertEquals(Style.ButtonVariant.TOOLBAR, button.getClientProperty("Editor.buttonVariant"));
+
+    button.setToolTipText("Add layer");
+    assertEquals("Add layer", button.getAccessibleContext().getAccessibleName());
+  }
+
+  @Test
+  void textButtonTooltipReplacesGenericAccessibleName() {
+    JButton button = Style.textButton("+");
+
+    assertEquals("Add", button.getAccessibleContext().getAccessibleName());
+    button.setToolTipText("Add terrain set");
+
+    assertEquals("Add terrain set", button.getAccessibleContext().getAccessibleName());
+  }
+
+  @Test
+  void searchBoxUsesCompactControlHeight() {
+    RoundedSearchBox searchBox = new RoundedSearchBox(new JTextField(), 200);
+
+    assertEquals(Style.CONTROL_HEIGHT, searchBox.getPreferredSize().height);
+    assertTrue(searchBox.getClearButton().isFocusable());
+    assertTrue(Style.mutedText() instanceof UIResource);
+  }
+
+  @Test
+  void expandableCardHeaderSupportsKeyboardToggle() {
+    ExpandableCard card = new ExpandableCard("General", new JPanel(), true);
+    JPanel header = (JPanel) card.getComponent(0);
+
+    header.getActionMap().get("toggle").actionPerformed(null);
+
+    assertFalse(card.isExpanded());
+    assertTrue(header.isFocusable());
+
+    card.setTitle("Transform");
+    assertEquals("Transform", header.getAccessibleContext().getAccessibleName());
+  }
+
+  @Test
+  void inspectorDividerReservesSpaceInsideNestedSplit() {
+    int divider = UI.initialInspectorDivider(1920, 300, 380, 380, 0);
+
+    assertEquals(380, 1920 - 300 - 4 - divider);
+  }
+
+  @Test
+  void themeSwitchReplacesDarkOverridesAndKeepsCompactMetrics() {
+    Style.Theme original = Editor.preferences().getTheme();
+    try {
+      UI.setTheme(Style.Theme.DARK);
+      Object darkBackground = UIManager.get("Panel.background");
+
+      UI.setTheme(Style.Theme.LIGHT);
+
+      assertNotEquals(darkBackground, UIManager.get("Panel.background"));
+      assertEquals(Style.CONTROL_HEIGHT, UIManager.get("Button.minimumHeight"));
+    } finally {
+      UI.setTheme(original);
+    }
+  }
+
+  @Test
+  void customInspectorSurfacesRefreshAcrossThemes() {
+    Style.Theme original = Editor.preferences().getTheme();
+    TagPanel tags = new TagPanel();
+    TilesetEditorPanel tilesetEditor = new TilesetEditorPanel();
+    try {
+      UI.setTheme(Style.Theme.LIGHT);
+      SwingUtilities.updateComponentTreeUI(tags);
+      SwingUtilities.updateComponentTreeUI(tilesetEditor);
+
+      UI.setTheme(Style.Theme.DARK);
+      SwingUtilities.updateComponentTreeUI(tags);
+      SwingUtilities.updateComponentTreeUI(tilesetEditor);
+
+      assertEquals(Style.raisedSurface(), tags.getBackground());
+      assertEquals(Style.background(), tilesetEditor.getBackground());
+    } finally {
+      UI.setTheme(original);
+      tilesetEditor.dispose();
+    }
+  }
+}

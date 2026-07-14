@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
@@ -35,7 +34,7 @@ import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.UserPreferences;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.view.components.SpritesheetImportPanel;
-import de.gurkenlabs.utiliti.view.components.StatusBar;
+import de.gurkenlabs.utiliti.view.renderers.WorkspaceRenderer;
 import de.gurkenlabs.utiliti.view.components.Tray;
 import de.gurkenlabs.utiliti.view.components.UI;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
@@ -43,8 +42,6 @@ import de.gurkenlabs.utiliti.view.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.view.dialogs.EditorFileSaver;
 import de.gurkenlabs.utiliti.view.dialogs.XmlImportDialog;
 import jakarta.xml.bind.JAXBException;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -65,7 +62,6 @@ import java.util.stream.Stream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -120,7 +116,7 @@ public class Editor extends Screen {
   }
 
   @Override public void render(final Graphics2D g) {
-
+    WorkspaceRenderer.renderBackground(g);
     if (Game.world().environment() != null) {
       Game.world().environment().render(g);
     }
@@ -140,36 +136,7 @@ public class Editor extends Screen {
     }
 
     super.render(g);
-
-    // render fps
-    g.setFont(Style.getDefaultFont());
-    g.setColor(Color.WHITE);
-    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 4, Game.window().getResolution().getHeight() - 6, true);
-
-    if (Game.time().now() % 4 == 0) {
-      SwingUtilities.invokeLater(StatusBar::update);
-    }
-
-    // render status
-    if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
-      long deltaTime = Game.time().since(this.statusTick);
-      if (deltaTime > STATUS_DURATION) {
-        this.currentStatus = null;
-      }
-
-      // fade out status color
-      final double fadeOutTime = 0.75 * STATUS_DURATION;
-      if (deltaTime > fadeOutTime) {
-        double fade = deltaTime - fadeOutTime;
-        int alpha = (int) (255 - (fade / (STATUS_DURATION - fadeOutTime)) * 255);
-        g.setColor(new Color(Style.COLOR_STATUS.getRed(), Style.COLOR_STATUS.getGreen(), Style.COLOR_STATUS.getBlue(), Math.clamp(alpha, 0, 255)));
-      }
-
-      Font old = g.getFont();
-      g.setFont(g.getFont().deriveFont(20.0f * Editor.preferences().getUiScale()));
-      TextRenderer.render(g, this.currentStatus, 10, Game.window().getResolution().getHeight() - 60, true);
-      g.setFont(old);
-    }
+    WorkspaceRenderer.renderMapBounds(g);
   }
 
   public ResourceBundle getGameFile() {
@@ -757,7 +724,10 @@ public class Editor extends Screen {
     return currentResourceFile;
   }
 
-  public String getCurrentStatus() {
+  public synchronized String getCurrentStatus() {
+    if (this.currentStatus != null && Game.time().since(this.statusTick) > STATUS_DURATION) {
+      this.currentStatus = null;
+    }
     return currentStatus;
   }
 
@@ -765,7 +735,7 @@ public class Editor extends Screen {
     return this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().toList();
   }
 
-  public void setCurrentStatus(String currentStatus) {
+  public synchronized void setCurrentStatus(String currentStatus) {
     this.currentStatus = currentStatus;
     this.statusTick = Game.time().now();
   }

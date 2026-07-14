@@ -46,6 +46,8 @@ import de.gurkenlabs.utiliti.view.renderers.Renderers;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -77,6 +79,8 @@ import javax.swing.SwingUtilities;
 public class MapComponent extends GuiComponent {
 
   private static final Logger log = Logger.getLogger(MapComponent.class.getName());
+  private static final int FIT_PADDING = 32;
+  private static final float MIN_FIT_ZOOM = 0.01f;
 
   private final List<Consumer<TransformMode>> transformModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
@@ -128,6 +132,7 @@ public class MapComponent extends GuiComponent {
    * Ensures that various initialization processes are only carried out once.
    */
   private boolean initialized;
+  private boolean fitMode;
 
   public MapComponent() {
     super(0, 0);
@@ -283,6 +288,12 @@ public class MapComponent extends GuiComponent {
 
       this.setupKeyboardControls();
       this.setupMouseControls();
+      Game.window().getRenderComponent().addComponentListener(new ComponentAdapter() {
+        @Override
+        public void componentResized(ComponentEvent e) {
+          refitMapIfNeeded();
+        }
+      });
       this.initialized = true;
     }
 
@@ -294,6 +305,9 @@ public class MapComponent extends GuiComponent {
       UI.getMapController().setSelection(null);
       return;
     }
+    boolean refitAfterLoad = this.fitMode
+      && Game.world().environment() != null
+      && Game.world().environment().getMap() == map;
     this.loading = true;
     try {
       if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
@@ -334,17 +348,18 @@ public class MapComponent extends GuiComponent {
 
       Game.world().loadEnvironment(this.environments.get(map.getName()));
 
-      if (!fitOnLoad && this.cameraZoom.containsKey(map.getName())) {
+      if (!fitOnLoad && !refitAfterLoad && this.cameraZoom.containsKey(map.getName())) {
+        this.fitMode = false;
         Game.world().camera().setZoom(this.cameraZoom.get(map.getName()), 0);
         if (UI.getViewportToolbar() != null) {
           UI.getViewportToolbar().refreshZoomLabel();
         }
       }
 
-      if (fitOnLoad && UI.getViewportToolbar() != null) {
+      if (fitOnLoad || refitAfterLoad) {
         SwingUtilities.invokeLater(() -> {
           if (Game.world().environment() != null && Game.world().environment().getMap() == map) {
-            UI.getViewportToolbar().fitMap();
+            this.fitMap();
           }
         });
       }
@@ -364,6 +379,7 @@ public class MapComponent extends GuiComponent {
 
     } finally {
       this.loading = false;
+      Scroll.updateScrollHandlers();
     }
   }
 
@@ -691,6 +707,7 @@ public class MapComponent extends GuiComponent {
         return;
       }
 
+      this.exitFitMode();
       Game.world().camera().setFocus(new Point2D.Double(focus.getCenterX(), focus.getCenterY()));
     }
   }
@@ -701,7 +718,54 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
+    this.exitFitMode();
     Game.world().camera().setFocus(env.getCenter());
+  }
+
+  public void fitMap() {
+    if (Game.world() == null
+      || Game.world().environment() == null
+      || Game.world().environment().getMap() == null
+      || Game.world().camera() == null
+      || Game.window() == null
+      || Game.window().getRenderComponent() == null) {
+      return;
+    }
+
+    Dimension mapSize = Game.world().environment().getMap().getSizeInPixels();
+    Dimension viewportSize = Game.window().getRenderComponent().getSize();
+    if (mapSize.width <= 0 || mapSize.height <= 0
+      || viewportSize.width <= 0 || viewportSize.height <= 0) {
+      return;
+    }
+
+    float zoom = calculateFitZoom(mapSize, viewportSize, Editor.preferences().getUiScale());
+    this.fitMode = true;
+    Game.world().camera().setZoom(zoom, 0);
+    Editor.preferences().setZoom(zoom);
+    Game.world().camera().setFocus(Game.world().environment().getCenter());
+    if (UI.getViewportToolbar() != null) {
+      UI.getViewportToolbar().refreshZoomLabel();
+    }
+  }
+
+  public void refitMapIfNeeded() {
+    if (this.fitMode) {
+      this.fitMap();
+    }
+  }
+
+  public void exitFitMode() {
+    this.fitMode = false;
+  }
+
+  static float calculateFitZoom(Dimension mapSize, Dimension viewportSize, float uiScale) {
+    double padding = FIT_PADDING * uiScale;
+    double availableWidth = Math.max(1, viewportSize.getWidth() - 2 * padding);
+    double availableHeight = Math.max(1, viewportSize.getHeight() - 2 * padding);
+    float zoom = (float) Math.min(
+      availableWidth / mapSize.getWidth(), availableHeight / mapSize.getHeight());
+    return Math.max(MIN_FIT_ZOOM, Math.min(Zoom.getMax(), zoom));
   }
 
   public TransformMode getTransformMode() {

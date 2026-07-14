@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrainSet;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -28,6 +27,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
@@ -41,7 +41,7 @@ import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 
 public class ViewportToolbar extends JPanel {
-  private static final Dimension BUTTON_SIZE = new Dimension(36, 32);
+  private static final Dimension BUTTON_SIZE = new Dimension(Style.TOOLBAR_BUTTON_SIZE, Style.TOOLBAR_BUTTON_SIZE);
   private final JLabel zoomLabel;
   private final JButton btnUndo;
   private final JButton btnRedo;
@@ -54,19 +54,20 @@ public class ViewportToolbar extends JPanel {
   private final JToggleButton btnGrid;
   private final JToggleButton btnSnap;
   private final JToggleButton btnCollision;
+  private final List<JPanel> separators = new ArrayList<>();
 
   public ViewportToolbar() {
     super(new BorderLayout());
     setOpaque(true);
-    setBackground(Style.COLOR_BG);
+    setBackground(Style.background());
     setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.COLOR_BORDER),
-        BorderFactory.createEmptyBorder(6, 8, 6, 8)));
+        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
+        BorderFactory.createEmptyBorder(4, 8, 4, 8)));
 
-    JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
+    JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
     left.setOpaque(false);
 
-    JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, 6, 0));
+    JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 0));
     right.setOpaque(false);
 
     ButtonGroup toolButtons = new ButtonGroup();
@@ -77,6 +78,7 @@ public class ViewportToolbar extends JPanel {
         left.add(tool instanceof TerrainBrushTool ? terrainSplitButton(button, tool) : button);
       }
     }
+    left.add(separator());
     this.btnUndo = button("Undo", Icons.UNDO_24, () -> UndoManager.instance().undo(), shortcut(KeyEvent.VK_Z));
     this.btnUndoHistory = button("Undo history", new DropdownArrowIcon(), () -> {});
     this.btnUndoHistory.addActionListener(e -> showHistory(this.btnUndoHistory, true));
@@ -164,6 +166,20 @@ public class ViewportToolbar extends JPanel {
     syncToggle(this.btnCollision, Editor.preferences().renderBoundingBoxes());
   }
 
+  void refreshTheme() {
+    setBackground(Style.background());
+    setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
+        BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+    this.zoomLabel.setForeground(Style.text());
+    this.zoomLabel.setBackground(Style.surface());
+    this.zoomLabel.setBorder(new RoundedBorder(Style.border(), Style.CORNER_RADIUS, 4));
+    for (JPanel separator : this.separators) {
+      separator.setBackground(Style.border());
+    }
+    repaint();
+  }
+
   private static void syncToggle(JToggleButton button, boolean selected) {
     if (button.isSelected() != selected) {
       button.setSelected(selected);
@@ -174,7 +190,7 @@ public class ViewportToolbar extends JPanel {
 
   private JButton addButton() {
     JButton button = button("Add", new DropdownIcon(Icons.ADD_24), () -> {});
-    button.setPreferredSize(new Dimension(44, BUTTON_SIZE.height));
+    button.setPreferredSize(new Dimension(38, BUTTON_SIZE.height));
     button.addActionListener(e -> createAddPopup().show(button, 0, button.getHeight()));
     return button;
   }
@@ -182,7 +198,8 @@ public class ViewportToolbar extends JPanel {
   private JToggleButton toolButton(Tool tool) {
     JToggleButton button = new ToolbarToggleButton(tool.getIcon(), tool.equals(ToolManager.instance().getActiveTool()));
     button.setToolTipText(tool.getName());
-    button.setFocusable(false);
+    button.getAccessibleContext().setAccessibleName(tool.getName());
+    button.setFocusable(true);
     button.setPreferredSize(BUTTON_SIZE);
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setFocusPainted(false);
@@ -199,8 +216,8 @@ public class ViewportToolbar extends JPanel {
   private JPanel terrainSplitButton(JToggleButton main, Tool tool) {
     JButton arrow = button("Select terrain", new DropdownArrowIcon(), () -> {});
     main.setIcon(selectedTerrainIcon(tool));
-    main.setPreferredSize(new Dimension(28, BUTTON_SIZE.height));
-    arrow.setPreferredSize(new Dimension(14, BUTTON_SIZE.height));
+    main.setPreferredSize(new Dimension(24, BUTTON_SIZE.height));
+    arrow.setPreferredSize(new Dimension(12, BUTTON_SIZE.height));
     arrow.addActionListener(e -> createTerrainPopup(tool).show(arrow, 0, arrow.getHeight()));
     ToolManager.instance().addListener(() -> javax.swing.SwingUtilities.invokeLater(() -> {
       main.setIcon(selectedTerrainIcon(tool));
@@ -256,8 +273,8 @@ public class ViewportToolbar extends JPanel {
   }
 
   private static JPanel splitButton(JButton main, JButton arrow) {
-    main.setPreferredSize(new Dimension(28, BUTTON_SIZE.height));
-    arrow.setPreferredSize(new Dimension(14, BUTTON_SIZE.height));
+    main.setPreferredSize(new Dimension(24, BUTTON_SIZE.height));
+    arrow.setPreferredSize(new Dimension(12, BUTTON_SIZE.height));
     JPanel split = new JPanel(new BorderLayout(1, 0));
     split.setOpaque(false);
     split.add(main, BorderLayout.WEST);
@@ -353,7 +370,8 @@ public class ViewportToolbar extends JPanel {
   private JButton button(String text, javax.swing.Icon icon, Runnable action, KeyStroke shortcut) {
     JButton button = new ToolbarButton(icon);
     button.setToolTipText(tooltip(text, shortcut));
-    button.setFocusable(false);
+    button.getAccessibleContext().setAccessibleName(text);
+    Style.styleButton(button, Style.ButtonVariant.TOOLBAR);
     button.setPreferredSize(BUTTON_SIZE);
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setFocusPainted(false);
@@ -369,7 +387,8 @@ public class ViewportToolbar extends JPanel {
   private JToggleButton toggle(String text, javax.swing.Icon icon, boolean selected, java.util.function.Consumer<Boolean> consumer, KeyStroke shortcut) {
     JToggleButton button = new ToolbarToggleButton(icon, selected);
     button.setToolTipText(tooltip(text, shortcut));
-    button.setFocusable(false);
+    button.getAccessibleContext().setAccessibleName(text);
+    Style.styleButton(button, Style.ButtonVariant.TOOLBAR);
     button.setPreferredSize(BUTTON_SIZE);
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setFocusPainted(false);
@@ -382,16 +401,16 @@ public class ViewportToolbar extends JPanel {
   }
 
   private static void styleToggle(JToggleButton button) {
-    button.setBackground(button.isSelected() ? Style.COLOR_ACCENT_BLUE : Style.COLOR_SURFACE);
-    button.setForeground(button.isSelected() ? Style.COLOR_STATUS : Style.COLOR_TEXT);
+    button.setBackground(button.isSelected() ? Style.accent() : Style.surface());
+    button.setForeground(button.isSelected() ? Style.COLOR_STATUS : Style.text());
     button.setBorder(BorderFactory.createEmptyBorder());
     button.setContentAreaFilled(false);
     button.setOpaque(false);
   }
 
   private static void styleButton(JButton button) {
-    button.setBackground(Style.COLOR_SURFACE);
-    button.setForeground(Style.COLOR_TEXT);
+    button.setBackground(Style.surface());
+    button.setForeground(Style.text());
     button.setBorder(BorderFactory.createEmptyBorder());
     button.setContentAreaFilled(false);
     button.setOpaque(false);
@@ -408,17 +427,18 @@ public class ViewportToolbar extends JPanel {
     out.setFont(out.getFont().deriveFont(18f));
     in.setFont(in.getFont().deriveFont(18f));
     this.zoomLabel.setHorizontalAlignment(JLabel.CENTER);
-    this.zoomLabel.setForeground(Style.COLOR_TEXT);
-    this.zoomLabel.setBackground(Style.COLOR_SURFACE);
+    this.zoomLabel.setForeground(Style.text());
+    this.zoomLabel.setBackground(Style.surface());
     this.zoomLabel.setOpaque(true);
-    this.zoomLabel.setPreferredSize(new Dimension(74, 32));
-    this.zoomLabel.setBorder(new RoundedBorder(Style.COLOR_BORDER, 10, 4));
+    this.zoomLabel.getAccessibleContext().setAccessibleName("Zoom level");
+    this.zoomLabel.setPreferredSize(new Dimension(58, Style.CONTROL_HEIGHT));
+    this.zoomLabel.setBorder(new RoundedBorder(Style.border(), Style.CORNER_RADIUS, 4));
 
     group.add(out, BorderLayout.WEST);
     group.add(this.zoomLabel, BorderLayout.CENTER);
     group.add(in, BorderLayout.EAST);
 
-    JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
+    JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 0));
     wrapper.setOpaque(false);
     wrapper.add(group);
     wrapper.add(button("Fit", new FitIcon(), this::fitMap));
@@ -426,29 +446,15 @@ public class ViewportToolbar extends JPanel {
   }
 
   public void fitMap() {
-    if (Game.world() == null || Game.world().environment() == null || Game.world().camera() == null) {
-      return;
-    }
-    IMap map = Game.world().environment().getMap();
-    if (map == null || map.getSizeInPixels().width <= 0 || map.getSizeInPixels().height <= 0) {
-      return;
-    }
-    java.awt.Component renderComponent = Game.window().getRenderComponent();
-    double availableW = Math.max(1, renderComponent.getWidth());
-    double availableH = Math.max(1, renderComponent.getHeight());
-    float zoom = (float) Math.min(availableW / map.getSizeInPixels().width, availableH / map.getSizeInPixels().height);
-    zoom = Math.max(Zoom.getMin(), Math.min(Zoom.getMax(), zoom));
-    Game.world().camera().setZoom(zoom, 0);
-    Editor.preferences().setZoom(zoom);
-    Editor.instance().getMapComponent().centerCameraOnMap();
-    updateZoomLabel();
+    Editor.instance().getMapComponent().fitMap();
   }
 
-  private static JPanel separator() {
+  private JPanel separator() {
     JPanel panel = new JPanel();
     panel.setOpaque(true);
-    panel.setBackground(Style.COLOR_BORDER);
+    panel.setBackground(Style.border());
     panel.setPreferredSize(new java.awt.Dimension(1, 22));
+    this.separators.add(panel);
     return panel;
   }
 
@@ -526,7 +532,7 @@ public class ViewportToolbar extends JPanel {
     @Override public void paintIcon(java.awt.Component component, Graphics g, int x, int y) {
       this.primary.paintIcon(component, g, x, y + (getIconHeight() - this.primary.getIconHeight()) / 2);
       Graphics2D g2 = (Graphics2D) g.create();
-      g2.setColor(component.isEnabled() ? Style.COLOR_TEXT : Style.COLOR_DISABLED_TEXT);
+      g2.setColor(component.isEnabled() ? Style.text() : Style.COLOR_DISABLED_TEXT);
       int arrowX = x + this.primary.getIconWidth() + 3;
       int arrowY = y + getIconHeight() / 2 - 2;
       g2.fillPolygon(new int[] {arrowX, arrowX + 6, arrowX + 3}, new int[] {arrowY, arrowY, arrowY + 5}, 3);
@@ -541,7 +547,7 @@ public class ViewportToolbar extends JPanel {
 
     @Override public void paintIcon(java.awt.Component component, Graphics g, int x, int y) {
       Graphics2D g2 = (Graphics2D) g.create();
-      g2.setColor(component.isEnabled() ? Style.COLOR_TEXT : Style.COLOR_DISABLED_TEXT);
+      g2.setColor(component.isEnabled() ? Style.text() : Style.COLOR_DISABLED_TEXT);
       g2.fillPolygon(new int[] {x, x + 8, x + 4}, new int[] {y + 6, y + 6, y + 10}, 3);
       g2.dispose();
     }
@@ -558,7 +564,7 @@ public class ViewportToolbar extends JPanel {
       if (!c.isEnabled()) {
         g2.setColor(Style.COLOR_DISABLED_TEXT);
       } else {
-        g2.setColor(c instanceof JToggleButton toggle && toggle.isSelected() ? Style.COLOR_STATUS : Style.COLOR_TEXT);
+        g2.setColor(c instanceof JToggleButton toggle && toggle.isSelected() ? Style.COLOR_STATUS : Style.text());
       }
       paint(g2, x, y);
       g2.dispose();
