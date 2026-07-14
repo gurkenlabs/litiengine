@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.TerrainType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.tool.TileStamp;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,60 @@ class TilesetEditorPanelTest {
     panel.bind(null);
 
     assertEquals(-1, panel.getSelectedTileIdForTest());
+  }
+
+  @Test
+  void dragSelectionCreatesRowMajorStamp() throws Exception {
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset("world", "tiles/world.png", 6, 3));
+
+    panel.selectTilesForTest(0, 4, false, false);
+
+    assertEquals(new TileStamp(2, 2, List.of(1, 2, 4, 5)), panel.getSelectedTileStampForTest());
+  }
+
+  @Test
+  void reverseDragSelectionUsesSameSpatialOrder() throws Exception {
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset("world", "tiles/world.png", 6, 3));
+
+    panel.selectTilesForTest(4, 0, false, false);
+
+    assertEquals(new TileStamp(2, 2, List.of(1, 2, 4, 5)), panel.getSelectedTileStampForTest());
+  }
+
+  @Test
+  void controlSelectionPreservesTransparentHoles() throws Exception {
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset("world", "tiles/world.png", 6, 3));
+
+    panel.selectTilesForTest(4, 5, true, false);
+
+    assertEquals(
+        new TileStamp(3, 2, List.of(1, 0, 0, 0, 5, 6)),
+        panel.getSelectedTileStampForTest());
+  }
+
+  @Test
+  void controlSelectionCanRemoveTiles() throws Exception {
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset("world", "tiles/world.png", 6, 3));
+    panel.selectTilesForTest(0, 4, false, false);
+
+    panel.selectTilesForTest(0, 0, true, false);
+
+    assertEquals(new TileStamp(2, 2, List.of(0, 2, 4, 5)), panel.getSelectedTileStampForTest());
+  }
+
+  @Test
+  void shiftSelectionCreatesRectangleFromAnchor() throws Exception {
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset("world", "tiles/world.png", 6, 3));
+    panel.selectTileForTest(1);
+
+    panel.selectTilesForTest(1, 5, false, true);
+
+    assertEquals(new TileStamp(2, 2, List.of(2, 3, 5, 6)), panel.getSelectedTileStampForTest());
   }
 
   @Test

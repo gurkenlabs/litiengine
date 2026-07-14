@@ -120,6 +120,34 @@ class ToolManagerTests {
     assertTrue(instance2.getTools().isEmpty());
   }
 
+  @Test
+  void selectedTileGidCreatesSingleTileStamp() {
+    manager.setSelectedTileGid(42);
+
+    assertEquals(new TileStamp(1, 1, List.of(42)), manager.getSelectedTileStamp());
+    assertEquals(42, manager.getSelectedTileGid());
+  }
+
+  @Test
+  void multiTileStampPreservesPatternAndPrimaryTile() {
+    TileStamp stamp = new TileStamp(2, 2, List.of(10, 11, 0, 13));
+
+    manager.setSelectedTileStamp(stamp, 11);
+
+    assertEquals(stamp, manager.getSelectedTileStamp());
+    assertEquals(11, manager.getSelectedTileGid());
+  }
+
+  @Test
+  void clearSelectionsClearsTileStamp() {
+    manager.setSelectedTileStamp(new TileStamp(2, 1, List.of(10, 11)), 10);
+
+    manager.clearSelections();
+
+    assertTrue(manager.getSelectedTileStamp().isEmpty());
+    assertEquals(0, manager.getSelectedTileGid());
+  }
+
   private static class DummyTool implements Tool {
     boolean activatedCalled;
     boolean deactivatedCalled;

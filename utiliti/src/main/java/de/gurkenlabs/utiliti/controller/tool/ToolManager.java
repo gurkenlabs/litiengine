@@ -15,6 +15,7 @@ public final class ToolManager {
   private Tool activeTool;
   private ITileLayer activeTileLayer;
   private int selectedTileGid;
+  private TileStamp selectedTileStamp = TileStamp.empty();
   private WangSet selectedTerrainSet;
   private WangColor selectedTerrain;
 
@@ -75,6 +76,24 @@ public final class ToolManager {
 
   public void setSelectedTileGid(int selectedTileGid) {
     this.selectedTileGid = selectedTileGid;
+    this.selectedTileStamp = TileStamp.single(selectedTileGid);
+  }
+
+  public TileStamp getSelectedTileStamp() {
+    return this.selectedTileStamp;
+  }
+
+  public void setSelectedTileStamp(TileStamp stamp, int primaryGid) {
+    this.selectedTileStamp = stamp != null ? stamp : TileStamp.empty();
+    this.selectedTileGid = this.selectedTileStamp.isEmpty() ? 0 : primaryGid;
+  }
+
+  public void setToolSelection(
+      TileStamp stamp, int primaryGid, WangSet terrainSet, WangColor terrain) {
+    setSelectedTileStamp(stamp, primaryGid);
+    this.selectedTerrainSet = terrainSet;
+    this.selectedTerrain = terrain;
+    notifyListeners();
   }
 
   public WangSet getSelectedTerrainSet() {
@@ -88,6 +107,10 @@ public final class ToolManager {
   public void setSelectedTerrain(WangSet terrainSet, WangColor terrain) {
     this.selectedTerrainSet = terrainSet;
     this.selectedTerrain = terrain;
+    notifyListeners();
+  }
+
+  private void notifyListeners() {
     for (Runnable listener : this.listeners) {
       listener.run();
     }
@@ -96,6 +119,7 @@ public final class ToolManager {
   public void clearSelections() {
     this.activeTileLayer = null;
     this.selectedTileGid = 0;
+    this.selectedTileStamp = TileStamp.empty();
     this.selectedTerrainSet = null;
     this.selectedTerrain = null;
     for (Runnable listener : this.listeners) {

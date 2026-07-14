@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
+import de.gurkenlabs.utiliti.controller.tool.TileStamp;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Icons;
@@ -33,6 +34,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -172,7 +175,7 @@ public class TilesetEditorPanel extends JPanel {
     zoomControls.add(zoomIn);
     zoomControls.add(fit);
     renderSettings.add(labeledOffsets(), BorderLayout.CENTER);
-    renderSettings.add(zoomControls, BorderLayout.SOUTH);
+    renderSettings.add(zoomControls, BorderLayout.EAST);
     JPanel bodyPanel = new JPanel();
     bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
     bodyPanel.setOpaque(false);
@@ -365,6 +368,14 @@ public class TilesetEditorPanel extends JPanel {
     this.tileGrid.selectTile(tile);
   }
 
+  void selectTilesForTest(int anchor, int lead, boolean control, boolean shift) {
+    this.tileGrid.selectTiles(anchor, lead, control, shift);
+  }
+
+  TileStamp getSelectedTileStampForTest() {
+    return selectedTileStamp();
+  }
+
   String getDetailTextForTest() {
     return this.detailLabel.getText();
   }
@@ -493,12 +504,15 @@ public class TilesetEditorPanel extends JPanel {
     JLabel yLabel = new JLabel("y");
     xLabel.setForeground(Style.mutedText());
     yLabel.setForeground(Style.mutedText());
-    this.tileOffsetXSpinner.setMaximumSize(new Dimension(112, this.tileOffsetXSpinner.getPreferredSize().height));
-    this.tileOffsetYSpinner.setMaximumSize(new Dimension(112, this.tileOffsetYSpinner.getPreferredSize().height));
+    Dimension offsetSize = new Dimension(72, Style.CONTROL_HEIGHT);
+    this.tileOffsetXSpinner.setPreferredSize(offsetSize);
+    this.tileOffsetXSpinner.setMaximumSize(offsetSize);
+    this.tileOffsetYSpinner.setPreferredSize(offsetSize);
+    this.tileOffsetYSpinner.setMaximumSize(offsetSize);
     values.add(xLabel);
     values.add(javax.swing.Box.createHorizontalStrut(4));
     values.add(this.tileOffsetXSpinner);
-    values.add(javax.swing.Box.createHorizontalStrut(12));
+    values.add(javax.swing.Box.createHorizontalStrut(8));
     values.add(yLabel);
     values.add(javax.swing.Box.createHorizontalStrut(4));
     values.add(this.tileOffsetYSpinner);
@@ -941,17 +955,28 @@ public class TilesetEditorPanel extends JPanel {
 
   private void publishSelectedTile() {
     if (this.tileset == null || this.tileGrid.selectedTile < 0) {
-      ToolManager.instance().setSelectedTileGid(0);
+      ToolManager.instance().setSelectedTileStamp(TileStamp.empty(), 0);
       return;
     }
-    ToolManager.instance().setSelectedTileGid(this.tileset.getFirstGridId() + this.tileGrid.selectedTile);
+    ToolManager.instance().setSelectedTileStamp(
+        selectedTileStamp(), this.tileset.getFirstGridId() + this.tileGrid.selectedTile);
   }
 
   void publishToolSelection() {
-    ToolManager.instance().setSelectedTerrain(
-      (WangSet) this.terrainSetCombo.getSelectedItem(),
-      (WangColor) this.terrainCombo.getSelectedItem());
-    publishSelectedTile();
+    int primaryGid = this.tileset != null && this.tileGrid.selectedTile >= 0
+        ? this.tileset.getFirstGridId() + this.tileGrid.selectedTile
+        : 0;
+    ToolManager.instance().setToolSelection(
+        selectedTileStamp(),
+        primaryGid,
+        (WangSet) this.terrainSetCombo.getSelectedItem(),
+        (WangColor) this.terrainCombo.getSelectedItem());
+  }
+
+  private TileStamp selectedTileStamp() {
+    return this.tileset != null
+        ? this.tileGrid.createStamp(this.tileset.getFirstGridId())
+        : TileStamp.empty();
   }
 
   private void updateSelectedTilePreview() {
@@ -1170,6 +1195,12 @@ public class TilesetEditorPanel extends JPanel {
     private Tileset tileset;
     private WangSet terrainSet;
     private int selectedTile = -1;
+    private int selectionAnchor = -1;
+    private final Set<Integer> selectedTiles = new TreeSet<>();
+    private Set<Integer> selectionBeforeDrag = Set.of();
+    private int dragStart = -1;
+    private DragMode dragMode = DragMode.REPLACE;
+    private boolean dragging;
     private Runnable selectionChanged;
     private float zoom = 1f;
 
@@ -1177,8 +1208,38 @@ public class TilesetEditorPanel extends JPanel {
       setOpaque(true);
       setBackground(Style.surface());
       addMouseListener(new MouseAdapter() {
-        @Override public void mouseClicked(MouseEvent e) {
-          selectTileAt(e.getX(), e.getY());
+        @Override public void mousePressed(MouseEvent e) {
+          if (!javax.swing.SwingUtilities.isLeftMouseButton(e)) {
+            return;
+          }
+          int tile = tileAt(e.getX(), e.getY(), false);
+          if (tile < 0) {
+            return;
+          }
+          beginSelection(tile, e.isControlDown(), e.isShiftDown());
+        }
+
+        @Override public void mouseReleased(MouseEvent e) {
+          if (!dragging) {
+            return;
+          }
+          int tile = tileAt(e.getX(), e.getY(), true);
+          if (tile >= 0) {
+            updateDragSelection(tile);
+          }
+          dragging = false;
+          fireSelectionChanged();
+        }
+      });
+      addMouseMotionListener(new MouseMotionAdapter() {
+        @Override public void mouseDragged(MouseEvent e) {
+          if (!dragging) {
+            return;
+          }
+          int tile = tileAt(e.getX(), e.getY(), true);
+          if (tile >= 0) {
+            updateDragSelection(tile);
+          }
         }
       });
     }
@@ -1195,6 +1256,11 @@ public class TilesetEditorPanel extends JPanel {
     private void bind(Tileset tileset) {
       this.tileset = tileset;
       this.selectedTile = tileset != null && tileset.getTileCount() > 0 ? 0 : -1;
+      this.selectionAnchor = this.selectedTile;
+      this.selectedTiles.clear();
+      if (this.selectedTile >= 0) {
+        this.selectedTiles.add(this.selectedTile);
+      }
       revalidate();
       repaint();
     }
@@ -1204,16 +1270,20 @@ public class TilesetEditorPanel extends JPanel {
       repaint();
     }
 
-    private void selectTileAt(int x, int y) {
+    private int tileAt(int x, int y, boolean clamp) {
       if (this.tileset == null || this.tileset.getTileCount() <= 0) {
-        return;
+        return -1;
       }
       int cell = cellSize();
       int columns = columns();
-      int col = x / cell;
-      int row = y / cell;
+      int rows = (int) Math.ceil(this.tileset.getTileCount() / (double) columns);
+      if (!clamp && (x < 0 || y < 0 || x >= columns * cell || y >= rows * cell)) {
+        return -1;
+      }
+      int col = Math.clamp(Math.floorDiv(x, cell), 0, columns - 1);
+      int row = Math.clamp(Math.floorDiv(y, cell), 0, rows - 1);
       int tile = row * columns + col;
-      selectTile(tile);
+      return Math.min(tile, this.tileset.getTileCount() - 1);
     }
 
     private void selectTile(int tile) {
@@ -1221,7 +1291,110 @@ public class TilesetEditorPanel extends JPanel {
         return;
       }
       this.selectedTile = tile;
+      this.selectionAnchor = tile;
+      this.selectedTiles.clear();
+      this.selectedTiles.add(tile);
       repaint();
+      fireSelectionChanged();
+    }
+
+    private void selectTiles(int anchor, int lead, boolean control, boolean shift) {
+      if (this.tileset == null
+          || anchor < 0
+          || anchor >= this.tileset.getTileCount()
+          || lead < 0
+          || lead >= this.tileset.getTileCount()) {
+        return;
+      }
+      this.selectionAnchor = anchor;
+      this.selectionBeforeDrag = control ? new TreeSet<>(this.selectedTiles) : Set.of();
+      this.dragStart = anchor;
+      this.dragMode = shift
+          ? DragMode.REPLACE
+          : control && this.selectedTiles.contains(anchor) ? DragMode.REMOVE
+          : control ? DragMode.ADD
+          : DragMode.REPLACE;
+      updateDragSelection(lead);
+      fireSelectionChanged();
+    }
+
+    private void beginSelection(int tile, boolean control, boolean shift) {
+      this.selectionBeforeDrag = new TreeSet<>(this.selectedTiles);
+      this.dragStart = tile;
+      if (shift && this.selectionAnchor >= 0) {
+        this.dragStart = this.selectionAnchor;
+        this.dragMode = DragMode.REPLACE;
+      } else if (control) {
+        this.selectionAnchor = tile;
+        this.dragMode = this.selectedTiles.contains(tile) ? DragMode.REMOVE : DragMode.ADD;
+      } else {
+        this.selectionAnchor = tile;
+        this.dragMode = DragMode.REPLACE;
+      }
+      this.dragging = true;
+      updateDragSelection(tile);
+    }
+
+    private void updateDragSelection(int lead) {
+      Set<Integer> updated = this.dragMode == DragMode.REPLACE
+          ? new TreeSet<>()
+          : new TreeSet<>(this.selectionBeforeDrag);
+      Set<Integer> rectangle = rectangularTiles(this.dragStart, lead);
+      if (this.dragMode == DragMode.REMOVE) {
+        updated.removeAll(rectangle);
+      } else {
+        updated.addAll(rectangle);
+      }
+      this.selectedTiles.clear();
+      this.selectedTiles.addAll(updated);
+      this.selectedTile = this.selectedTiles.contains(lead)
+          ? lead
+          : this.selectedTiles.stream().findFirst().orElse(-1);
+      repaint();
+    }
+
+    private Set<Integer> rectangularTiles(int first, int second) {
+      Set<Integer> rectangle = new TreeSet<>();
+      int columns = columns();
+      int minColumn = Math.min(first % columns, second % columns);
+      int maxColumn = Math.max(first % columns, second % columns);
+      int minRow = Math.min(first / columns, second / columns);
+      int maxRow = Math.max(first / columns, second / columns);
+      for (int row = minRow; row <= maxRow; row++) {
+        for (int column = minColumn; column <= maxColumn; column++) {
+          int tile = row * columns + column;
+          if (tile < this.tileset.getTileCount()) {
+            rectangle.add(tile);
+          }
+        }
+      }
+      return rectangle;
+    }
+
+    private TileStamp createStamp(int firstGid) {
+      if (this.selectedTiles.isEmpty()) {
+        return TileStamp.empty();
+      }
+      int columns = columns();
+      int minColumn = this.selectedTiles.stream().mapToInt(tile -> tile % columns).min().orElse(0);
+      int maxColumn = this.selectedTiles.stream().mapToInt(tile -> tile % columns).max().orElse(0);
+      int minRow = this.selectedTiles.stream().mapToInt(tile -> tile / columns).min().orElse(0);
+      int maxRow = this.selectedTiles.stream().mapToInt(tile -> tile / columns).max().orElse(0);
+      int width = maxColumn - minColumn + 1;
+      int height = maxRow - minRow + 1;
+      List<Integer> gids = new ArrayList<>(width * height);
+      for (int row = minRow; row <= maxRow; row++) {
+        for (int column = minColumn; column <= maxColumn; column++) {
+          int tile = row * columns + column;
+          gids.add(tile < this.tileset.getTileCount() && this.selectedTiles.contains(tile)
+              ? firstGid + tile
+              : 0);
+        }
+      }
+      return new TileStamp(width, height, gids);
+    }
+
+    private void fireSelectionChanged() {
       if (this.selectionChanged != null) {
         this.selectionChanged.run();
       }
@@ -1272,12 +1445,15 @@ public class TilesetEditorPanel extends JPanel {
             new int[] {triangleY, triangleY + 8, triangleY + 4},
             3);
         }
-        if (i == this.selectedTile) {
+        boolean selected = this.selectedTiles.contains(i);
+        if (selected) {
           g2.setColor(new Color(80, 145, 255, 50));
           g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
         }
-        g2.setColor(i == this.selectedTile ? Style.accent() : Style.border());
+        g2.setColor(selected ? Style.accent() : Style.border());
+        g2.setStroke(new BasicStroke(i == this.selectedTile ? 2f : 1f));
         g2.drawRect(x, y, cell - 1, cell - 1);
+        g2.setStroke(new BasicStroke(1f));
       }
       g2.dispose();
     }
@@ -1356,6 +1532,12 @@ public class TilesetEditorPanel extends JPanel {
         return 1;
       }
       return this.tileset.getColumns();
+    }
+
+    private enum DragMode {
+      REPLACE,
+      ADD,
+      REMOVE
     }
   }
 }
