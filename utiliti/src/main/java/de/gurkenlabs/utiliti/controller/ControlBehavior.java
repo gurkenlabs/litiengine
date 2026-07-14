@@ -19,8 +19,8 @@ public final class ControlBehavior {
   public static <T extends Component> T apply(T component) {
     if (component instanceof JTextField jTextField) {
       applyRoundedControlShape(jTextField);
-      jTextField.setBackground(INPUT_BG);
-      jTextField.setCaretColor(Style.COLOR_ACCENT_BLUE);
+      jTextField.setBackground(inputBackground());
+      jTextField.setCaretColor(Style.accent());
       jTextField.addFocusListener(
           new FocusAdapter() {
             @Override
@@ -32,15 +32,15 @@ public final class ControlBehavior {
     }
 
     if (component instanceof JComponent jComponent) {
-      applySquareControlShape(jComponent);
+      applyRoundedControlShape(jComponent);
     }
 
     if (component instanceof JSpinner spinner) {
       JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
       JTextField textField = editor.getTextField();
-      applySquareControlShape(textField);
-      textField.setBackground(INPUT_BG);
-      textField.setCaretColor(Style.COLOR_ACCENT_BLUE);
+      applyRoundedControlShape(textField);
+      textField.setBackground(inputBackground());
+      textField.setCaretColor(Style.accent());
       textField.addFocusListener(
           new FocusAdapter() {
             @Override
@@ -58,7 +58,7 @@ public final class ControlBehavior {
     if (component instanceof JComboBox<?> comboBox && comboBox.getEditor() != null) {
       Component editor = comboBox.getEditor().getEditorComponent();
       if (editor instanceof JComponent jComponent) {
-        applySquareControlShape(jComponent);
+        applyRoundedControlShape(jComponent);
       }
     }
 
@@ -66,21 +66,18 @@ public final class ControlBehavior {
   }
 
   public static void applyRoundedBorder(JComponent component) {
-    component.putClientProperty("JComponent.arc", 8);
+    component.putClientProperty("JComponent.arc", Style.CORNER_RADIUS);
     component.putClientProperty("JComponent.roundRect", true);
   }
 
   private static void applyRoundedControlShape(JComponent component) {
-    component.putClientProperty("JComponent.arc", 8);
+    component.putClientProperty("JComponent.arc", Style.CORNER_RADIUS);
     component.putClientProperty("JComponent.roundRect", true);
-    component.putClientProperty("JTextField.arc", 8);
+    component.putClientProperty("JTextField.arc", Style.CORNER_RADIUS);
   }
 
-  private static void applySquareControlShape(JComponent component) {
-    component.putClientProperty("JComponent.arc", 0);
-    component.putClientProperty("JComponent.roundRect", false);
-    component.putClientProperty("JTextField.arc", 0);
-    component.putClientProperty("JComboBox.arc", 0);
-    component.putClientProperty("JSpinner.arc", 0);
+  private static Color inputBackground() {
+    Color color = javax.swing.UIManager.getColor("TextField.background");
+    return color != null ? color : INPUT_BG;
   }
 }

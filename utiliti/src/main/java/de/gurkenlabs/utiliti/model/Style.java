@@ -12,16 +12,27 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.util.Objects;
 import javax.swing.Action;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
 
 /**
  * The Style class provides various constants and methods related to the visual style of the application. It includes color definitions, font
  * settings, and methods to retrieve scaled fonts.
  */
 public final class Style {
+  public enum ButtonVariant {
+    PRIMARY,
+    SECONDARY,
+    TOOLBAR,
+    GHOST,
+    DESTRUCTIVE
+  }
+
   public enum Theme {
     LIGHT,
     DARK
@@ -86,6 +97,19 @@ public final class Style {
   public static final Color COLOR_LIGHT_GRID = new Color(220, 220, 220);
   public static final Color COLOR_SCENE_ROW_HOVER = new Color(COLOR_BG.getRed(), COLOR_BG.getGreen(), COLOR_BG.getBlue(), 200);
   public static final Color COLOR_SCENE_ROW_SELECTED = new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 30);
+  public static final Color COLOR_WORKSPACE_TOP = new Color(24, 24, 28);
+  public static final Color COLOR_WORKSPACE_BOTTOM = new Color(14, 14, 17);
+  public static final Color COLOR_MAP_BACKING = new Color(10, 10, 12);
+  public static final Color COLOR_MAP_BORDER = new Color(92, 92, 104, 180);
+
+  public static final int CONTROL_HEIGHT = 28;
+  public static final int TOOLBAR_BUTTON_SIZE = 28;
+  public static final int TREE_ROW_HEIGHT = 26;
+  public static final int ICON_SIZE = 16;
+  public static final int CORNER_RADIUS = 6;
+  public static final int SPACE_SMALL = 4;
+  public static final int SPACE_MEDIUM = 8;
+  public static final int SPACE_LARGE = 12;
 
   // --- Shared icon button hover painting ---
 
@@ -95,17 +119,45 @@ public final class Style {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       boolean enabled = c.isEnabled();
       boolean selected = model.isSelected();
-      boolean active = selected || model.isPressed();
-      Color fill = !enabled ? COLOR_SURFACE : active ? COLOR_ACCENT_BLUE : model.isRollover() ? COLOR_HOVER : COLOR_SURFACE;
-      Color border = !enabled ? COLOR_BORDER.darker() : selected ? COLOR_ACCENT_BLUE : COLOR_BORDER;
-      g2.setColor(fill);
-      g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
-      g2.setColor(border);
-      g2.setStroke(new java.awt.BasicStroke(1.2f));
-      g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
+      boolean pressed = model.isPressed();
+      ButtonVariant variant = c instanceof javax.swing.JComponent component
+          && component.getClientProperty("Editor.buttonVariant") instanceof ButtonVariant value
+          ? value
+          : ButtonVariant.TOOLBAR;
+      Color surface = surface();
+      Color hover = hover();
+      Color accent = accent();
+      Color fill = switch (variant) {
+        case PRIMARY -> enabled ? (pressed ? accent.darker() : accent) : surface;
+        case DESTRUCTIVE -> enabled && (selected || pressed)
+            ? COLOR_RED.darker()
+            : enabled && model.isRollover() ? new Color(COLOR_RED.getRed(), COLOR_RED.getGreen(), COLOR_RED.getBlue(), 55) : surface;
+        case GHOST -> pressed || selected ? selection() : model.isRollover() ? hover : COLOR_TRANSPARENT;
+        case SECONDARY, TOOLBAR -> selected ? accent : pressed ? selection() : model.isRollover() ? hover : surface;
+      };
+      Color border = switch (variant) {
+        case PRIMARY -> accent;
+        case DESTRUCTIVE -> enabled && (model.isRollover() || selected) ? COLOR_RED : border();
+        case GHOST -> COLOR_TRANSPARENT;
+        case SECONDARY, TOOLBAR -> selected ? accent : border();
+      };
+      if (fill.getAlpha() > 0) {
+        g2.setColor(fill);
+        g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, CORNER_RADIUS, CORNER_RADIUS);
+      }
+      if (border.getAlpha() > 0) {
+        g2.setColor(border);
+        g2.setStroke(new java.awt.BasicStroke(1f));
+        g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, CORNER_RADIUS, CORNER_RADIUS);
+      }
       if (!enabled) {
         g2.setColor(COLOR_DISABLED_OVERLAY);
-        g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, 8, 8);
+        g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, CORNER_RADIUS, CORNER_RADIUS);
+      }
+      if (enabled && c.isFocusOwner()) {
+        g2.setColor(accent);
+        g2.setStroke(new java.awt.BasicStroke(2f));
+        g2.drawRoundRect(2, 2, c.getWidth() - 5, c.getHeight() - 5, CORNER_RADIUS - 1, CORNER_RADIUS - 1);
       }
     } finally {
       g2.dispose();
@@ -119,7 +171,7 @@ public final class Style {
         super.paintComponent(g);
       }
     };
-    styleIconButton(button);
+    styleButton(button, ButtonVariant.TOOLBAR);
     return button;
   }
 
@@ -130,7 +182,7 @@ public final class Style {
         super.paintComponent(g);
       }
     };
-    styleIconButton(button);
+    styleButton(button, ButtonVariant.TOOLBAR);
     return button;
   }
 
@@ -141,13 +193,13 @@ public final class Style {
         super.paintComponent(g);
       }
     };
-    styleIconButton(button);
-    Dimension size = new Dimension(36, 32);
+    styleButton(button, ButtonVariant.SECONDARY);
+    Dimension size = new Dimension(CONTROL_HEIGHT, CONTROL_HEIGHT);
     button.setPreferredSize(size);
     button.setMinimumSize(size);
     button.setMaximumSize(size);
     button.setForeground(COLOR_TEXT);
-    button.setFont(button.getFont().deriveFont(18f));
+    button.setFont(button.getFont().deriveFont(16f));
     button.setMargin(new Insets(0, 0, 0, 0));
     return button;
   }
@@ -159,17 +211,57 @@ public final class Style {
         super.paintComponent(g);
       }
     };
-    styleIconButton(button);
+    styleButton(button, ButtonVariant.TOOLBAR);
     return button;
   }
 
-  private static void styleIconButton(javax.swing.AbstractButton button) {
-    button.setFocusable(false);
+  public static void styleButton(AbstractButton button, ButtonVariant variant) {
+    button.putClientProperty("Editor.buttonVariant", variant);
+    button.setFocusable(true);
+    button.setRequestFocusEnabled(true);
     button.setOpaque(false);
     button.setContentAreaFilled(false);
     button.setBorderPainted(false);
     button.setFocusPainted(false);
-    button.setMargin(new java.awt.Insets(2, 2, 2, 2));
+    button.setMargin(new Insets(2, 2, 2, 2));
+    button.setForeground(variant == ButtonVariant.PRIMARY ? Color.WHITE : text());
+    Dimension size = new Dimension(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE);
+    button.setPreferredSize(size);
+    button.setMinimumSize(size);
+    button.setMaximumSize(size);
+    updateAccessibleName(button, null);
+    if (!Boolean.TRUE.equals(button.getClientProperty("Editor.accessibleNameListener"))) {
+      button.putClientProperty("Editor.accessibleNameListener", true);
+      button.addPropertyChangeListener("ToolTipText", event -> updateAccessibleName(button, event.getOldValue()));
+    }
+  }
+
+  private static void updateAccessibleName(AbstractButton button, Object previousTooltip) {
+    String current = button.getAccessibleContext().getAccessibleName();
+    Object generatedValue = button.getClientProperty("Editor.generatedAccessibleName");
+    String generated = generatedValue instanceof String value ? value : null;
+    if (current != null && !current.isBlank()
+        && !Objects.equals(current, previousTooltip) && !Objects.equals(current, generated)
+        && !Objects.equals(current, button.getText())) {
+      return;
+    }
+    String name = button.getToolTipText();
+    if (name == null || name.isBlank()) {
+      name = button.getText();
+    }
+    if ((name == null || name.isBlank()) && button.getAction() != null) {
+      Object actionName = button.getAction().getValue(Action.NAME);
+      name = actionName instanceof String value ? value : null;
+    }
+    if ("+".equals(name)) {
+      name = "Add";
+    } else if ("-".equals(name) || "−".equals(name)) {
+      name = "Remove";
+    }
+    if (name != null && !name.isBlank()) {
+      button.getAccessibleContext().setAccessibleName(name);
+      button.putClientProperty("Editor.generatedAccessibleName", name);
+    }
   }
 
   /**
@@ -179,21 +271,70 @@ public final class Style {
   public static JButton clearButton(Icon icon) {
     JButton button = new JButton(icon) {
       @Override protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        try {
-          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-          if (getModel().isRollover() || getModel().isPressed()) {
-            g2.setColor(COLOR_HOVER);
-            g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 6, 6);
-          }
-        } finally {
-          g2.dispose();
-        }
+        paintButtonBackground(this, getModel(), g);
         super.paintComponent(g);
       }
     };
-    styleIconButton(button);
+    styleButton(button, ButtonVariant.GHOST);
     return button;
+  }
+
+  public static Color background() {
+    return uiColor("Panel.background", COLOR_BG);
+  }
+
+  public static Color surface() {
+    return uiColor("Editor.surface", COLOR_SURFACE);
+  }
+
+  public static Color raisedSurface() {
+    return uiColor("Editor.surfaceRaised", COLOR_SURFACE2);
+  }
+
+  public static Color border() {
+    return uiColor("Editor.border", COLOR_BORDER);
+  }
+
+  public static Color text() {
+    return uiColor("Label.foreground", COLOR_TEXT);
+  }
+
+  public static Color mutedText() {
+    return uiColor("Editor.mutedText", COLOR_SUBTEXT);
+  }
+
+  public static Color accent() {
+    return uiColor("Editor.accent", COLOR_ACCENT_BLUE);
+  }
+
+  public static Color hover() {
+    return uiColor("Editor.hover", COLOR_HOVER);
+  }
+
+  public static Color selection() {
+    return uiColor("Editor.selection", COLOR_SELECTION_INACTIVE);
+  }
+
+  public static Color workspaceTop() {
+    return uiColor("Editor.workspaceTop", COLOR_WORKSPACE_TOP);
+  }
+
+  public static Color workspaceBottom() {
+    return uiColor("Editor.workspaceBottom", COLOR_WORKSPACE_BOTTOM);
+  }
+
+  public static Color mapBacking() {
+    return uiColor("Editor.mapBacking", COLOR_MAP_BACKING);
+  }
+
+  public static Color mapBorder() {
+    return uiColor("Editor.mapBorder", COLOR_MAP_BORDER);
+  }
+
+  private static Color uiColor(String key, Color fallback) {
+    Color value = UIManager.getColor(key);
+    Color resolved = value != null ? value : fallback;
+    return resolved instanceof ColorUIResource ? resolved : new ColorUIResource(resolved);
   }
 
   public static final float FONT_DEFAULT_SIZE = 12;
