@@ -9,21 +9,15 @@ import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.HierarchyBoundsAdapter;
-import java.awt.event.HierarchyEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /** Owns all fixed chrome around the heavyweight map Canvas. */
 public final class ViewportPanel extends JPanel {
-  private final Canvas canvas;
-  private final JPanel canvasHost;
   private final CoordinateRuler horizontalRuler;
   private final CoordinateRuler verticalRuler;
   private final StatusBar statusBar;
@@ -33,7 +27,6 @@ public final class ViewportPanel extends JPanel {
 
   public ViewportPanel(Canvas canvas) {
     super(new BorderLayout());
-    this.canvas = canvas;
     this.horizontalRuler = new CoordinateRuler(Adjustable.HORIZONTAL);
     this.verticalRuler = new CoordinateRuler(Adjustable.VERTICAL);
     this.statusBar = new StatusBar();
@@ -52,16 +45,16 @@ public final class ViewportPanel extends JPanel {
     rulerHeader.add(this.corner, BorderLayout.WEST);
     rulerHeader.add(this.horizontalRuler, BorderLayout.CENTER);
 
-    this.canvasHost = new JPanel(new BorderLayout());
-    this.canvasHost.setOpaque(true);
-    this.canvasHost.add(canvas, BorderLayout.CENTER);
-    this.canvasHost.add(this.horizontalScroll, BorderLayout.SOUTH);
-    this.canvasHost.add(this.verticalScroll, BorderLayout.EAST);
+    JPanel canvasHost = new JPanel(new BorderLayout());
+    canvasHost.setOpaque(true);
+    canvasHost.add(canvas, BorderLayout.CENTER);
+    canvasHost.add(this.horizontalScroll, BorderLayout.SOUTH);
+    canvasHost.add(this.verticalScroll, BorderLayout.EAST);
 
     JPanel stage = new JPanel(new BorderLayout());
     stage.add(rulerHeader, BorderLayout.NORTH);
     stage.add(this.verticalRuler, BorderLayout.WEST);
-    stage.add(this.canvasHost, BorderLayout.CENTER);
+    stage.add(canvasHost, BorderLayout.CENTER);
 
     add(stage, BorderLayout.CENTER);
     add(this.statusBar, BorderLayout.SOUTH);
@@ -90,25 +83,6 @@ public final class ViewportPanel extends JPanel {
       @Override public void componentResized(ComponentEvent event) {
         Scroll.updateScrollHandlers();
         repaintRulers();
-        validateCanvasHierarchy();
-      }
-    });
-    canvas.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
-      @Override public void ancestorMoved(HierarchyEvent event) {
-        validateCanvasHierarchy();
-      }
-
-      @Override public void ancestorResized(HierarchyEvent event) {
-        validateCanvasHierarchy();
-      }
-    });
-    addComponentListener(new ComponentAdapter() {
-      @Override public void componentResized(ComponentEvent event) {
-        validateCanvasHierarchy();
-      }
-
-      @Override public void componentMoved(ComponentEvent event) {
-        validateCanvasHierarchy();
       }
     });
     refreshTheme();
@@ -153,19 +127,6 @@ public final class ViewportPanel extends JPanel {
     SwingUtilities.invokeLater(() -> {
       this.horizontalRuler.repaint();
       this.verticalRuler.repaint();
-    });
-  }
-
-  private void validateCanvasHierarchy() {
-    SwingUtilities.invokeLater(() -> {
-      Container canvasParent = this.canvas.getParent();
-      if (canvasParent != null) {
-        canvasParent.validate();
-      }
-      Window window = SwingUtilities.getWindowAncestor(this.canvasHost);
-      if (window != null) {
-        window.validate();
-      }
     });
   }
 }

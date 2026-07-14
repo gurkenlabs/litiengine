@@ -378,8 +378,7 @@ public final class UI {
 
     Canvas canvas = Game.window().getRenderComponent();
     canvas.setFocusable(true);
-    canvas.setSize((int) (winW * 0.75), winH);
-
+    canvas.setVisible(false);
     window.remove(canvas);
     initTools();
     Component leftPanel = initLeftPanel();
@@ -440,7 +439,7 @@ public final class UI {
         : prefHierarchyW;
     JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, renderSplitPanel);
     configureSplitPane(mainSplit);
-    mainSplit.setContinuousLayout(true);
+    mainSplit.setContinuousLayout(false);
     mainSplit.setResizeWeight(0.0);
     mainSplit.addComponentListener(new ComponentAdapter() {
       @Override public void componentResized(ComponentEvent e) {
@@ -463,7 +462,7 @@ public final class UI {
 
     JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, workspacePanel, inspectorPanel);
     configureSplitPane(centerRightSplit);
-    centerRightSplit.setContinuousLayout(true);
+    centerRightSplit.setContinuousLayout(false);
     centerRightSplit.setResizeWeight(1.0);
     int initialInspectorDivider = initialInspectorDivider(
         winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
@@ -483,6 +482,8 @@ public final class UI {
     initPopupMenu(canvas);
     window.getRootPane().setBackground(Style.COLOR_BG);
     window.setJMenuBar(new MainMenuBar());
+    canvas.setVisible(true);
+    window.invalidate();
     window.validate();
   }
 
@@ -536,7 +537,7 @@ public final class UI {
           renderSplitPanel.getHeight(), renderSplitPanel.getDividerSize(), renderSplitPanel.getDividerLocation()));
       }
     });
-    renderSplitPanel.setContinuousLayout(true);
+    renderSplitPanel.setContinuousLayout(false);
     return renderSplitPanel;
   }
 
