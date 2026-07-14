@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
@@ -53,29 +54,30 @@ public class SpriteEditorPanel extends JPanel {
   public SpriteEditorPanel() {
     super(new BorderLayout(0, 8));
     setOpaque(true);
-    setBackground(Style.COLOR_BG);
-    setBorder(BorderFactory.createEmptyBorder(8, 10, 10, 10));
+    setBackground(Style.background());
+    setBorder(BorderFactory.createEmptyBorder(8, 8, 10, 8));
 
     this.titleLabel = new JLabel("No sprite selected");
-    this.titleLabel.setForeground(Style.COLOR_TEXT);
+    this.titleLabel.setForeground(Style.text());
     this.titleLabel.setFont(this.titleLabel.getFont().deriveFont(java.awt.Font.BOLD));
     add(this.titleLabel, BorderLayout.NORTH);
 
     this.animationPreviewLabel = new JLabel("", SwingConstants.CENTER);
     this.animationPreviewLabel.setOpaque(true);
-    this.animationPreviewLabel.setBackground(Style.COLOR_SURFACE);
-    this.animationPreviewLabel.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
+    this.animationPreviewLabel.setBackground(Style.surface());
+    this.animationPreviewLabel.setBorder(BorderFactory.createLineBorder(Style.border()));
     this.animationPreviewLabel.setPreferredSize(new Dimension(0, 112));
 
     this.previewLabel = new JLabel("", SwingConstants.CENTER);
     this.previewLabel.setOpaque(true);
-    this.previewLabel.setBackground(Style.COLOR_SURFACE);
-    this.previewLabel.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
+    this.previewLabel.setBackground(Style.surface());
+    this.previewLabel.setBorder(BorderFactory.createLineBorder(Style.border()));
     this.previewLabel.setPreferredSize(new Dimension(0, 152));
 
     this.imageSizeLabel = new JLabel("-");
     this.frameSizeLabel = new JLabel("-");
     this.nameField = new JTextField();
+    ControlBehavior.apply(this.nameField);
     this.nameField.addActionListener(_ -> applyName());
     this.nameField.addFocusListener(new FocusAdapter() {
       @Override public void focusLost(FocusEvent e) {
@@ -85,6 +87,8 @@ public class SpriteEditorPanel extends JPanel {
 
     this.columnsSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 1, 1));
     this.rowsSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 1, 1));
+    ControlBehavior.apply(this.columnsSpinner);
+    ControlBehavior.apply(this.rowsSpinner);
     ChangeListener gridChanged = _ -> applyGrid();
     this.columnsSpinner.addChangeListener(gridChanged);
     this.rowsSpinner.addChangeListener(gridChanged);
@@ -103,6 +107,7 @@ public class SpriteEditorPanel extends JPanel {
     this.keyframeTable.setFillsViewportHeight(true);
     this.keyframeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.keyframeTable.getTableHeader().setReorderingAllowed(false);
+    this.keyframeTable.setRowHeight(24);
 
     JPanel details = new JPanel(new GridLayout(4, 1, 0, 6));
     details.setOpaque(false);
@@ -132,11 +137,11 @@ public class SpriteEditorPanel extends JPanel {
     JPanel frames = new JPanel(new BorderLayout(0, 4));
     frames.setOpaque(false);
     JLabel framesLabel = new JLabel("Keyframes");
-    framesLabel.setForeground(Style.COLOR_TEXT);
+    framesLabel.setForeground(Style.text());
     frames.add(framesLabel, BorderLayout.NORTH);
     JScrollPane frameScroll = new JScrollPane(this.keyframeTable);
     frameScroll.setPreferredSize(new Dimension(0, 180));
-    frameScroll.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
+    frameScroll.setBorder(BorderFactory.createLineBorder(Style.border()));
     frames.add(frameScroll, BorderLayout.CENTER);
     frames.setMaximumSize(new Dimension(Integer.MAX_VALUE, frames.getPreferredSize().height));
     form.add(frames);
@@ -190,8 +195,8 @@ public class SpriteEditorPanel extends JPanel {
     JPanel row = new JPanel(new BorderLayout(8, 0));
     row.setOpaque(false);
     JLabel label = new JLabel(labelText);
-    label.setForeground(Style.COLOR_TEXT);
-    label.setPreferredSize(new Dimension(84, 24));
+    label.setForeground(Style.text());
+    label.setPreferredSize(new Dimension(84, Style.CONTROL_HEIGHT));
     row.add(label, BorderLayout.WEST);
     row.add(component, BorderLayout.CENTER);
     return row;
@@ -201,7 +206,7 @@ public class SpriteEditorPanel extends JPanel {
     JPanel panel = new JPanel(new BorderLayout(0, 4));
     panel.setOpaque(false);
     JLabel label = new JLabel(labelText);
-    label.setForeground(Style.COLOR_TEXT);
+    label.setForeground(Style.text());
     panel.add(label, BorderLayout.NORTH);
     panel.add(preview, BorderLayout.CENTER);
     return panel;

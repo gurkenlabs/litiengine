@@ -42,8 +42,9 @@ public class AssetPanel extends JPanel {
 
   public AssetPanel() {
     this.setLayout(createLayout());
-    this.setBorder(new EmptyBorder(8, 8, 8, 8));
-    this.setBackground(Style.COLOR_BG);
+    this.setBorder(new EmptyBorder(
+      Style.SPACE_MEDIUM, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM));
+    this.setBackground(Style.background());
     this.setOpaque(true);
 
     MouseAdapter popupHandler = new MouseAdapter() {
@@ -56,6 +57,12 @@ public class AssetPanel extends JPanel {
       }
     };
     this.addMouseListener(popupHandler);
+  }
+
+  @Override
+  public void updateUI() {
+    super.updateUI();
+    setBackground(Style.background());
   }
 
   public AssetType getCurrentType() {
@@ -98,8 +105,8 @@ public class AssetPanel extends JPanel {
       return new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS);
     }
     WrapLayout layout = new WrapLayout();
-    layout.setVgap(8);
-    layout.setHgap(8);
+    layout.setVgap(Style.SPACE_MEDIUM);
+    layout.setHgap(Style.SPACE_MEDIUM);
     layout.setAlignment(LEFT);
     return layout;
   }

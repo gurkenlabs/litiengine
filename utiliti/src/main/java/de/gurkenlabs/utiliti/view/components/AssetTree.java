@@ -12,13 +12,19 @@ import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -38,11 +44,13 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeCreatures;
   private final DefaultMutableTreeNode nodeAnimations;
   private String currentBreadcrumb = "Resources";
+  private int hoveredRow = -1;
 
   public AssetTree(AssetPanel assetPanel) {
     this.setRootVisible(false);
     this.setShowsRootHandles(true);
-    this.setBackground(Style.COLOR_SURFACE);
+    this.setBackground(Style.surface());
+    this.getAccessibleContext().setAccessibleName("Resource categories");
 
     this.assetPanel = assetPanel;
 
@@ -71,14 +79,51 @@ public class AssetTree extends JTree {
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
     this.setModel(this.entitiesTreeModel);
-    this.setCellRenderer(new IconTreeListRenderer());
+    this.setCellRenderer(new IconTreeListRenderer() {
+      @Override
+      public Component getTreeCellRendererComponent(
+          JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        Component component = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+        if (component instanceof JComponent cell) {
+          cell.setForeground(Style.text());
+          cell.setBackground(selected ? Style.selection() : row == hoveredRow ? Style.hover() : Style.surface());
+          cell.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(hasFocus ? Style.accent() : cell.getBackground()),
+            BorderFactory.createEmptyBorder(1, 5, 1, 5)));
+        }
+        return component;
+      }
+    });
     this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
-    this.setRowHeight((int) (28 * Editor.preferences().getUiScale()));
+    this.setRowHeight((int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale()));
     for (int i = 0; i < getRowCount(); i++) {
       this.expandRow(i);
     }
 
     this.addTreeSelectionListener(e -> loadAssetsOfCurrentSelection(e.getPath()));
+    this.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        int row = getRowForLocation(e.getX(), e.getY());
+        if (row != hoveredRow) {
+          hoveredRow = row;
+          repaint();
+        }
+      }
+    });
+    this.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseExited(MouseEvent e) {
+        hoveredRow = -1;
+        repaint();
+      }
+    });
+  }
+
+  @Override
+  public void updateUI() {
+    super.updateUI();
+    setBackground(Style.surface());
   }
 
   public void forceUpdate() {

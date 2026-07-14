@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
@@ -56,12 +57,12 @@ public abstract class PropertyPanel extends JPanel {
   /**
    * Fixed label column width (100px at 1x scale).
    */
-  public static final int LABEL_WIDTH = (int) (100 * Editor.preferences().getUiScale());
+  public static final int LABEL_WIDTH = (int) (92 * Editor.preferences().getUiScale());
 
   /**
    * Gutter between label column and input column.
    */
-  public static final int GUTTER_WIDTH = (int) (12 * Editor.preferences().getUiScale());
+  public static final int GUTTER_WIDTH = (int) (8 * Editor.preferences().getUiScale());
 
   /**
    * The minimum width of the control in pixels, scaled by the UI scale factor.
@@ -71,7 +72,7 @@ public abstract class PropertyPanel extends JPanel {
   /**
    * The width of the control in pixels, scaled by the UI scale factor.
    */
-  public static final int CONTROL_WIDTH = (int) (220 * Editor.preferences().getUiScale());
+  public static final int CONTROL_WIDTH = (int) (200 * Editor.preferences().getUiScale());
 
   /**
    * The width of the spinner in pixels, scaled by the UI scale factor.
@@ -81,12 +82,12 @@ public abstract class PropertyPanel extends JPanel {
   /**
    * The height of the control in pixels, scaled by the UI scale factor.
    */
-  public static final int CONTROL_HEIGHT = (int) (32 * Editor.preferences().getUiScale());
+  public static final int CONTROL_HEIGHT = (int) (Style.CONTROL_HEIGHT * Editor.preferences().getUiScale());
 
   /**
    * The margin between controls in pixels, scaled by the UI scale factor.
    */
-  public static final int CONTROL_MARGIN = (int) (6 * Editor.preferences().getUiScale());
+  public static final int CONTROL_MARGIN = (int) (4 * Editor.preferences().getUiScale());
 
   /**
    * The width of the panel in pixels, calculated based on control and label widths.

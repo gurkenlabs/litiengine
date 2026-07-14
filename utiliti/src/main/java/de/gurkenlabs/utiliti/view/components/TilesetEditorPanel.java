@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Icons;
@@ -91,21 +92,22 @@ public class TilesetEditorPanel extends JPanel {
   public TilesetEditorPanel() {
     super(new BorderLayout(0, 8));
     setOpaque(true);
-    setBackground(Style.COLOR_BG);
-    setBorder(BorderFactory.createEmptyBorder(8, 10, 10, 10));
+    setBackground(Style.background());
+    setBorder(BorderFactory.createEmptyBorder(8, 8, 10, 8));
 
     JPanel info = new JPanel();
     info.setOpaque(false);
     info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
     this.titleLabel = new JLabel("No tileset selected");
-    this.titleLabel.setForeground(Style.COLOR_TEXT);
+    this.titleLabel.setForeground(Style.text());
     this.titleLabel.setFont(this.titleLabel.getFont().deriveFont(Font.BOLD));
     this.metaLabel = new JLabel("Select a tileset asset to inspect its tiles.");
-    this.metaLabel.setForeground(Style.COLOR_SUBTEXT);
+    this.metaLabel.setForeground(Style.mutedText());
     info.add(this.titleLabel);
     info.add(this.metaLabel);
 
     this.tilesetNameField = new JTextField();
+    ControlBehavior.apply(this.tilesetNameField);
     this.tilesetNameField.addActionListener(_ -> applyTilesetName());
     this.tilesetNameField.addFocusListener(new FocusAdapter() {
       @Override public void focusLost(FocusEvent e) {
@@ -116,9 +118,11 @@ public class TilesetEditorPanel extends JPanel {
 
     this.tileOffsetXSpinner = new JSpinner(new SpinnerNumberModel(0, -100000, 100000, 1));
     this.tileOffsetYSpinner = new JSpinner(new SpinnerNumberModel(0, -100000, 100000, 1));
+    ControlBehavior.apply(this.tileOffsetXSpinner);
+    ControlBehavior.apply(this.tileOffsetYSpinner);
     this.tileOffsetXSpinner.addChangeListener(_ -> applyTilesetRenderSettings());
     this.tileOffsetYSpinner.addChangeListener(_ -> applyTilesetRenderSettings());
-    JPanel renderSettings = new JPanel(new BorderLayout(8, 0));
+    JPanel renderSettings = new JPanel(new BorderLayout(0, 4));
     renderSettings.setOpaque(false);
     JPanel terrainHost = new JPanel(new BorderLayout());
     terrainHost.setOpaque(false);
@@ -146,11 +150,11 @@ public class TilesetEditorPanel extends JPanel {
     this.tileGrid.setSelectionChanged(this::updateSelectedTileControls);
     this.gridScroll = new JScrollPane(this.tileGrid);
     this.gridScroll.setMinimumSize(new Dimension(0, 180));
-    this.gridScroll.setPreferredSize(new Dimension(0, 560));
-    this.gridScroll.setMaximumSize(new Dimension(Short.MAX_VALUE, 620));
+    this.gridScroll.setPreferredSize(new Dimension(0, 360));
+    this.gridScroll.setMaximumSize(new Dimension(Short.MAX_VALUE, 520));
     this.gridScroll.setAlignmentX(LEFT_ALIGNMENT);
-    this.gridScroll.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
-    this.gridScroll.getViewport().setBackground(Style.COLOR_SURFACE);
+    this.gridScroll.setBorder(BorderFactory.createLineBorder(Style.border()));
+    this.gridScroll.getViewport().setBackground(Style.surface());
     JButton zoomOut = Style.iconButton(Icons.MINUS_16);
     JButton zoomIn = Style.iconButton(Icons.ADD_16);
     JButton fit = Style.iconButton(Icons.FIT_16);
@@ -168,7 +172,7 @@ public class TilesetEditorPanel extends JPanel {
     zoomControls.add(zoomIn);
     zoomControls.add(fit);
     renderSettings.add(labeledOffsets(), BorderLayout.CENTER);
-    renderSettings.add(zoomControls, BorderLayout.EAST);
+    renderSettings.add(zoomControls, BorderLayout.SOUTH);
     JPanel bodyPanel = new JPanel();
     bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
     bodyPanel.setOpaque(false);
@@ -177,14 +181,15 @@ public class TilesetEditorPanel extends JPanel {
 
     this.previewLabel = new JLabel("", SwingConstants.CENTER);
     this.previewLabel.setOpaque(true);
-    this.previewLabel.setBackground(Style.COLOR_SURFACE);
-    this.previewLabel.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
+    this.previewLabel.setBackground(Style.surface());
+    this.previewLabel.setBorder(BorderFactory.createLineBorder(Style.border()));
     this.previewLabel.setPreferredSize(new Dimension(0, 112));
 
     this.detailLabel = new JLabel(" ");
-    this.detailLabel.setForeground(Style.COLOR_SUBTEXT);
+    this.detailLabel.setForeground(Style.mutedText());
 
     this.typeField = new JTextField();
+    ControlBehavior.apply(this.typeField);
     this.typeField.addActionListener(_ -> applyType());
     this.typeField.addFocusListener(new FocusAdapter() {
       @Override public void focusLost(FocusEvent e) {
@@ -207,13 +212,17 @@ public class TilesetEditorPanel extends JPanel {
     this.terrainSetCombo = new JComboBox<>();
     this.terrainCombo = new JComboBox<>();
     this.terrainTypeCombo = new JComboBox<>(TerrainType.values());
+    ControlBehavior.apply(this.terrainSetCombo);
+    ControlBehavior.apply(this.terrainCombo);
+    ControlBehavior.apply(this.terrainTypeCombo);
     this.terrainSetNameField = metadataField(this::applyTerrainSetName);
     this.terrainNameField = metadataField(this::applyTerrainName);
     this.terrainProbabilityField = metadataField(this::applyTerrainProbability);
     this.terrainColorButton = new JButton();
     this.terrainColorButton.setToolTipText("Choose terrain color");
     this.terrainColorButton.setPreferredSize(new Dimension(36, 24));
-    this.terrainColorButton.setFocusable(false);
+    this.terrainColorButton.setFocusable(true);
+    this.terrainColorButton.getAccessibleContext().setAccessibleName("Terrain color");
     this.terrainColorButton.addActionListener(_ -> chooseTerrainColor());
     this.terrainSlots = new JButton[8];
     this.terrainSetCombo.addActionListener(_ -> updateTerrainControls());
@@ -261,6 +270,28 @@ public class TilesetEditorPanel extends JPanel {
   @Override public void addNotify() {
     super.addNotify();
     this.animationTimer.start();
+  }
+
+  @Override public void updateUI() {
+    super.updateUI();
+    setBackground(Style.background());
+    if (this.titleLabel != null) {
+      this.titleLabel.setForeground(Style.text());
+    }
+    if (this.metaLabel != null) {
+      this.metaLabel.setForeground(Style.mutedText());
+    }
+    if (this.gridScroll != null) {
+      this.gridScroll.setBorder(BorderFactory.createLineBorder(Style.border()));
+      this.gridScroll.getViewport().setBackground(Style.surface());
+    }
+    if (this.previewLabel != null) {
+      this.previewLabel.setBackground(Style.surface());
+      this.previewLabel.setBorder(BorderFactory.createLineBorder(Style.border()));
+    }
+    if (this.detailLabel != null) {
+      this.detailLabel.setForeground(Style.mutedText());
+    }
   }
 
   @Override public void removeNotify() {
@@ -420,12 +451,13 @@ public class TilesetEditorPanel extends JPanel {
     table.setFillsViewportHeight(true);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     table.getTableHeader().setReorderingAllowed(false);
-    table.setRowHeight((int) (table.getRowHeight() * 1.1));
+    table.setRowHeight(24);
     return table;
   }
 
   private static JTextField metadataField(Runnable apply) {
     JTextField field = new JTextField();
+    ControlBehavior.apply(field);
     field.addActionListener(_ -> apply.run());
     field.addFocusListener(new FocusAdapter() {
       @Override public void focusLost(FocusEvent e) {
@@ -439,8 +471,8 @@ public class TilesetEditorPanel extends JPanel {
     JPanel panel = new JPanel(new BorderLayout(6, 0));
     panel.setOpaque(false);
     JLabel label = new JLabel(labelText);
-    label.setForeground(Style.COLOR_TEXT);
-    label.setPreferredSize(new Dimension(72, 24));
+    label.setForeground(Style.text());
+    label.setPreferredSize(new Dimension(82, Style.CONTROL_HEIGHT));
     panel.add(label, BorderLayout.WEST);
     panel.add(field, BorderLayout.CENTER);
     return panel;
@@ -450,8 +482,8 @@ public class TilesetEditorPanel extends JPanel {
     JPanel panel = new JPanel(new BorderLayout(6, 0));
     panel.setOpaque(false);
     JLabel label = new JLabel("Offset");
-    label.setForeground(Style.COLOR_TEXT);
-    label.setPreferredSize(new Dimension(72, 24));
+    label.setForeground(Style.text());
+    label.setPreferredSize(new Dimension(82, Style.CONTROL_HEIGHT));
     panel.add(label, BorderLayout.WEST);
 
     JPanel values = new JPanel();
@@ -459,8 +491,8 @@ public class TilesetEditorPanel extends JPanel {
     values.setLayout(new BoxLayout(values, BoxLayout.X_AXIS));
     JLabel xLabel = new JLabel("x");
     JLabel yLabel = new JLabel("y");
-    xLabel.setForeground(Style.COLOR_SUBTEXT);
-    yLabel.setForeground(Style.COLOR_SUBTEXT);
+    xLabel.setForeground(Style.mutedText());
+    yLabel.setForeground(Style.mutedText());
     this.tileOffsetXSpinner.setMaximumSize(new Dimension(112, this.tileOffsetXSpinner.getPreferredSize().height));
     this.tileOffsetYSpinner.setMaximumSize(new Dimension(112, this.tileOffsetYSpinner.getPreferredSize().height));
     values.add(xLabel);
@@ -494,7 +526,7 @@ public class TilesetEditorPanel extends JPanel {
     propertyPanel.add(propertyActions, BorderLayout.NORTH);
     JScrollPane propertyScroll = new JScrollPane(table);
     propertyScroll.setPreferredSize(new Dimension(0, 96));
-    propertyScroll.setBorder(BorderFactory.createLineBorder(Style.COLOR_BORDER));
+    propertyScroll.setBorder(BorderFactory.createLineBorder(Style.border()));
     propertyPanel.add(propertyScroll, BorderLayout.CENTER);
     return propertyPanel;
   }
@@ -560,7 +592,8 @@ public class TilesetEditorPanel extends JPanel {
         continue;
       }
       JButton slot = new JButton(labels[index]);
-      slot.setFocusable(false);
+      Style.styleButton(slot, Style.ButtonVariant.SECONDARY);
+      slot.getAccessibleContext().setAccessibleName("Assign terrain " + labels[index]);
       slot.addActionListener(_ -> applyTerrainSlot(index));
       this.terrainSlots[index] = slot;
       slots.add(slot);
@@ -589,8 +622,8 @@ public class TilesetEditorPanel extends JPanel {
 
   private static JLabel fieldLabel(String text, int width) {
     JLabel label = new JLabel(text);
-    label.setForeground(Style.COLOR_TEXT);
-    label.setPreferredSize(new Dimension(width, 24));
+    label.setForeground(Style.text());
+    label.setPreferredSize(new Dimension(width, Style.CONTROL_HEIGHT));
     return label;
   }
 
@@ -1142,12 +1175,17 @@ public class TilesetEditorPanel extends JPanel {
 
     private TileGrid() {
       setOpaque(true);
-      setBackground(Style.COLOR_SURFACE);
+      setBackground(Style.surface());
       addMouseListener(new MouseAdapter() {
         @Override public void mouseClicked(MouseEvent e) {
           selectTileAt(e.getX(), e.getY());
         }
       });
+    }
+
+    @Override public void updateUI() {
+      super.updateUI();
+      setBackground(Style.surface());
     }
 
     private void setSelectionChanged(Runnable selectionChanged) {
@@ -1238,7 +1276,7 @@ public class TilesetEditorPanel extends JPanel {
           g2.setColor(new Color(80, 145, 255, 50));
           g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
         }
-        g2.setColor(i == this.selectedTile ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER);
+        g2.setColor(i == this.selectedTile ? Style.accent() : Style.border());
         g2.drawRect(x, y, cell - 1, cell - 1);
       }
       g2.dispose();

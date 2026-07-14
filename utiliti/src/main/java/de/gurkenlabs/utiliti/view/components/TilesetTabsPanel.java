@@ -23,7 +23,7 @@ final class TilesetTabsPanel extends JPanel {
   TilesetTabsPanel() {
     super(new BorderLayout(0, 6));
     setOpaque(true);
-    setBackground(Style.COLOR_BG);
+    setBackground(Style.background());
     setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
     this.commands = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
     this.commands.setOpaque(false);
@@ -37,6 +37,7 @@ final class TilesetTabsPanel extends JPanel {
     create.setToolTipText("Create a new tileset for this map");
     create.addActionListener(e -> UI.createMapTileset());
     JButton remove = Style.iconButton(Icons.DELETE_16);
+    Style.styleButton(remove, Style.ButtonVariant.DESTRUCTIVE);
     remove.setToolTipText("Remove selected tileset from this map only");
     remove.addActionListener(e -> UI.removeSelectedMapTileset(this));
     this.commands.add(add);

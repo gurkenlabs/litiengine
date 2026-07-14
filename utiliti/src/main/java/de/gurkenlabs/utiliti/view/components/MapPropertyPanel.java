@@ -86,7 +86,7 @@ public class MapPropertyPanel extends JPanel {
     setBorder(null);
     setLayout(new BorderLayout());
     setOpaque(true);
-    setBackground(Style.COLOR_BG);
+    setBackground(Style.background());
     this.tilesetPanel = new TilesetTabsPanel();
 
     this.textFieldName = ControlBehavior.apply(new JTextField());
@@ -94,17 +94,17 @@ public class MapPropertyPanel extends JPanel {
     this.textFieldDesc = new JTextArea() {
       @Override public void updateUI() {
         super.updateUI();
-        setBackground(Style.COLOR_SURFACE2);
-        setForeground(Style.COLOR_TEXT);
-        setCaretColor(Style.COLOR_TEXT);
+        setBackground(Style.raisedSurface());
+        setForeground(Style.text());
+        setCaretColor(Style.text());
       }
     };
     this.textFieldDesc.setLineWrap(true);
     this.textFieldDesc.setWrapStyleWord(true);
     this.textFieldDesc.setMargin(new java.awt.Insets(4, 4, 4, 4));
     JScrollPane scrollPaneDesc = new JScrollPane(this.textFieldDesc);
-    scrollPaneDesc.setBorder(new RoundedBorder(Style.COLOR_BORDER, 8, 1));
-    scrollPaneDesc.getViewport().setBackground(Style.COLOR_SURFACE2);
+    scrollPaneDesc.setBorder(new RoundedBorder(Style.border(), Style.CORNER_RADIUS, 1));
+    scrollPaneDesc.getViewport().setBackground(Style.raisedSurface());
 
     this.spinnerGravity = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
     ControlBehavior.apply(this.spinnerGravity);
@@ -151,7 +151,7 @@ public class MapPropertyPanel extends JPanel {
     JPanel accordion = new JPanel();
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
-    accordion.setBackground(Style.COLOR_BG);
+    accordion.setBackground(Style.background());
     accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
     this.generalCard = new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), false);
@@ -176,7 +176,7 @@ public class MapPropertyPanel extends JPanel {
     JScrollPane hostScrollPane = new JScrollPane(accordion);
     hostScrollPane.setBorder(null);
     hostScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    hostScrollPane.getViewport().setBackground(Style.COLOR_BG);
+    hostScrollPane.getViewport().setBackground(Style.background());
     add(hostScrollPane, BorderLayout.CENTER);
 
     this.setupChangeListeners();
@@ -221,7 +221,7 @@ public class MapPropertyPanel extends JPanel {
     remove.setToolTipText("Remove the selected tileset from this map only");
     remove.addActionListener(e -> removeSelectedTileset(this.tilesetPanel.getSelectedTileset()));
     JLabel hint = new JLabel("Map tilesets");
-    hint.setForeground(Style.COLOR_SUBTEXT);
+    hint.setForeground(Style.mutedText());
     commands.add(hint);
     commands.add(add);
     commands.add(addAll);
@@ -353,7 +353,7 @@ public class MapPropertyPanel extends JPanel {
 
   private static JLabel createLabel(String text) {
     JLabel label = new JLabel(text);
-    label.setForeground(Style.COLOR_TEXT);
+    label.setForeground(Style.text());
     label.setHorizontalAlignment(SwingConstants.TRAILING);
     return label;
   }
@@ -379,7 +379,7 @@ public class MapPropertyPanel extends JPanel {
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     table.setShowHorizontalLines(true);
     table.setShowVerticalLines(false);
-    table.setGridColor(Style.COLOR_BORDER);
+    table.setGridColor(Style.border());
     table.setIntercellSpacing(new Dimension(0, 1));
     table.setFillsViewportHeight(true);
     table.setModel(

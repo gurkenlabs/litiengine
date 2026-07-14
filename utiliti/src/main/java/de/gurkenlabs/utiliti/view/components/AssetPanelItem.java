@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti.view.components;
 
-import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -28,7 +27,8 @@ import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.view.menus.AssetPanelItemPopupMenu;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -68,18 +68,14 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class AssetPanelItem extends JPanel {
   private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
-  private static final int CORNER_RADIUS = 8;
-  private static final int PADDING = 8;
-  private static final int ICON_SIZE = 64;
-  private static final int BUTTON_SIZE = 24;
-  private static final Color HOVER_COLOR = Style.COLOR_CARD_HOVER;
-  private static final Color SELECTED_COLOR = Style.COLOR_CARD_SELECTED;
+  private static final int PADDING = Style.SPACE_SMALL;
+  private static final int BUTTON_SIZE = Style.TOOLBAR_BUTTON_SIZE;
+  private static final int COMPACT_HEIGHT = Style.CONTROL_HEIGHT + Style.SPACE_LARGE;
   private static final BasicStroke FOCUS_STROKE = new BasicStroke(2.0f);
   private static final BasicStroke BORDER_STROKE = new BasicStroke(1.0f);
   private static final Dimension PREFERRED_SIZE = new Dimension(118, 118);
@@ -101,6 +97,7 @@ public class AssetPanelItem extends JPanel {
   private Icon rawIcon;
   private int cardSize = PREFERRED_SIZE.width;
   private Consumer<AssetPanelItem> focusCallback;
+  private MouseAdapter mouseHandler;
 
   public AssetPanelItem(Object origin) {
     this.origin = origin;
@@ -138,7 +135,7 @@ public class AssetPanelItem extends JPanel {
     label.setHorizontalAlignment(SwingConstants.CENTER);
     label.setVerticalAlignment(SwingConstants.TOP);
     label.setFont(label.getFont().deriveFont(Font.PLAIN, 11f));
-    label.setForeground(Style.COLOR_TEXT);
+    label.setForeground(Style.text());
     return label;
   }
 
@@ -146,7 +143,7 @@ public class AssetPanelItem extends JPanel {
     JLabel label = new JLabel();
     label.setHorizontalAlignment(SwingConstants.LEFT);
     label.setFont(label.getFont().deriveFont(Font.PLAIN, 10f));
-    label.setForeground(Style.COLOR_SUBTEXT);
+    label.setForeground(Style.mutedText());
     return label;
   }
 
@@ -180,21 +177,27 @@ public class AssetPanelItem extends JPanel {
     buttonPanel.add(button);
     button.setPreferredSize(new Dimension(BUTTON_SIZE, BUTTON_SIZE));
     button.setMaximumSize(new Dimension(BUTTON_SIZE, BUTTON_SIZE));
-    button.setToolTipText(Resources.strings().get(tooltipKey));
+    String tooltip = Resources.strings().get(tooltipKey);
+    button.setToolTipText(tooltip);
+    button.getAccessibleContext().setAccessibleName(tooltip);
+    if ("assetpanel_delete".equals(tooltipKey)) {
+      Style.styleButton(button, Style.ButtonVariant.DESTRUCTIVE);
+    }
     button.setVisible(false);
     return button;
   }
 
   private void setupLayout() {
     if (compact) {
-      setLayout(new BorderLayout(6, 0));
+      setLayout(new BorderLayout(Style.SPACE_MEDIUM, 0));
       iconLabel.setHorizontalAlignment(SwingConstants.LEFT);
-      iconLabel.setPreferredSize(new Dimension(40, 40));
-      iconLabel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+      iconLabel.setPreferredSize(new Dimension(COMPACT_HEIGHT, COMPACT_HEIGHT));
+      iconLabel.setBorder(BorderFactory.createEmptyBorder(
+        Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL));
       nameLabel.setHorizontalAlignment(SwingConstants.LEFT);
       JPanel centerPanel = new JPanel(new BorderLayout());
       centerPanel.setOpaque(false);
-      centerPanel.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 0));
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
       centerPanel.add(nameLabel, BorderLayout.CENTER);
       centerPanel.add(detailsLabel, BorderLayout.SOUTH);
       add(iconLabel, BorderLayout.WEST);
@@ -218,7 +221,7 @@ public class AssetPanelItem extends JPanel {
   private JPanel createContentPanel() {
     JPanel contentPanel = new JPanel(new BorderLayout());
     contentPanel.setOpaque(false);
-    contentPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING / 2, PADDING));
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
     contentPanel.add(iconPanel, BorderLayout.NORTH);
     contentPanel.add(createTextPanel(), BorderLayout.CENTER);
@@ -230,8 +233,8 @@ public class AssetPanelItem extends JPanel {
   private JPanel createIconPanel() {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(false);
-    int iconArea = Math.max(8, cardSize - 2 * PADDING - 20);
-    panel.setPreferredSize(new Dimension(iconArea + 8, iconArea + 2));
+    int iconArea = getCardIconArea();
+    panel.setPreferredSize(new Dimension(iconArea, iconArea));
     panel.add(iconLabel, BorderLayout.CENTER);
     return panel;
   }
@@ -294,7 +297,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void setupFocusHandling() {
-    addFocusListener(new FocusAdapter() {
+    FocusAdapter focusHandler = new FocusAdapter() {
       @Override public void focusGained(FocusEvent e) {
         isSelected = true;
         updateButtonVisibility(true);
@@ -305,15 +308,26 @@ public class AssetPanelItem extends JPanel {
       }
 
       @Override public void focusLost(FocusEvent e) {
-        isSelected = false;
-        updateButtonVisibility(false);
-        repaint();
+        SwingUtilities.invokeLater(() -> {
+          Component focusOwner = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+          if (focusOwner == AssetPanelItem.this || focusOwner != null && SwingUtilities.isDescendingFrom(focusOwner, AssetPanelItem.this)) {
+            return;
+          }
+          isSelected = false;
+          updateButtonVisibility(isHovered);
+          repaint();
+        });
       }
-    });
+    };
+    addFocusListener(focusHandler);
+    btnAdd.addFocusListener(focusHandler);
+    btnEdit.addFocusListener(focusHandler);
+    btnExport.addFocusListener(focusHandler);
+    btnDelete.addFocusListener(focusHandler);
   }
 
   private void setupMouseHandling() {
-    MouseAdapter mouseHandler = new MouseAdapter() {
+    this.mouseHandler = new MouseAdapter() {
       @Override public void mouseEntered(MouseEvent e) {
         isHovered = true;
         updateButtonVisibility(true);
@@ -326,7 +340,7 @@ public class AssetPanelItem extends JPanel {
           return;
         }
         isHovered = false;
-        updateButtonVisibility(false);
+        updateButtonVisibility(isSelected);
         repaint();
       }
 
@@ -346,15 +360,19 @@ public class AssetPanelItem extends JPanel {
         }
       }
     };
+    installMouseHandler(this);
+  }
 
-    addMouseListener(mouseHandler);
-    iconLabel.addMouseListener(mouseHandler);
-    nameLabel.addMouseListener(mouseHandler);
-    buttonPanel.addMouseListener(mouseHandler);
-    btnAdd.addMouseListener(mouseHandler);
-    btnEdit.addMouseListener(mouseHandler);
-    btnExport.addMouseListener(mouseHandler);
-    btnDelete.addMouseListener(mouseHandler);
+  private void installMouseHandler(Component component) {
+    boolean installed = java.util.Arrays.stream(component.getMouseListeners()).anyMatch(listener -> listener == this.mouseHandler);
+    if (!installed) {
+      component.addMouseListener(this.mouseHandler);
+    }
+    if (component instanceof Container container) {
+      for (Component child : container.getComponents()) {
+        installMouseHandler(child);
+      }
+    }
   }
 
   private void maybeShowPopup(MouseEvent e) {
@@ -381,12 +399,14 @@ public class AssetPanelItem extends JPanel {
     this.assetName = text;
     this.rawIcon = icon;
     updateScaledIcon();
-    nameLabel.setText(wrapText(text, 16));
+    updateNameLabel();
     detailsLabel.setText(getDetailsSummary());
     String tooltip = createTooltip(text);
     setToolTipText(tooltip);
     iconLabel.setToolTipText(tooltip);
     nameLabel.setToolTipText(tooltip);
+    getAccessibleContext().setAccessibleName(text);
+    getAccessibleContext().setAccessibleDescription(getDetailsSummary());
   }
 
   private void updateScaledIcon() {
@@ -394,7 +414,7 @@ public class AssetPanelItem extends JPanel {
       iconLabel.setIcon(null);
       return;
     }
-    int iconArea = compact ? 32 : Math.max(8, cardSize - 2 * PADDING - 20);
+    int iconArea = compact ? 32 : getCardIconArea();
     if (rawIcon instanceof ImageIcon imgIcon && imgIcon.getImage() instanceof java.awt.image.BufferedImage bi) {
       java.awt.image.BufferedImage scaled = de.gurkenlabs.litiengine.util.Imaging.scale(bi, iconArea, iconArea, true);
       if (scaled != null) {
@@ -403,6 +423,14 @@ public class AssetPanelItem extends JPanel {
       }
     }
     iconLabel.setIcon(rawIcon);
+  }
+
+  private int getCardIconArea() {
+    return Math.max(32, cardSize - 2 * PADDING - BUTTON_SIZE - 24);
+  }
+
+  private void updateNameLabel() {
+    nameLabel.setText(compact ? assetName : wrapText(assetName, Math.max(12, cardSize / 7)));
   }
 
   private String createTooltip(String text) {
@@ -444,27 +472,39 @@ public class AssetPanelItem extends JPanel {
   }
 
   @Override protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g.create();
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, getWidth() - 1f, getHeight() - 1f, CORNER_RADIUS, CORNER_RADIUS);
+    RoundRectangle2D roundRect = new RoundRectangle2D.Float(
+      0, 0, getWidth() - 1f, getHeight() - 1f, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
 
-    g2d.setColor(Style.COLOR_SURFACE);
+    g2d.setColor(Style.surface());
     g2d.fill(roundRect);
     if (isSelected) {
-      g2d.setColor(SELECTED_COLOR);
+      g2d.setColor(Style.selection());
       g2d.fill(roundRect);
     } else if (isHovered) {
-      g2d.setColor(HOVER_COLOR);
+      g2d.setColor(Style.hover());
       g2d.fill(roundRect);
     }
 
-    g2d.setColor(isSelected ? Style.COLOR_ACCENT_BLUE : Style.COLOR_BORDER);
+    g2d.setColor(isSelected ? Style.accent() : Style.border());
     g2d.setStroke(isSelected ? FOCUS_STROKE : BORDER_STROKE);
     g2d.draw(roundRect);
 
     g2d.dispose();
-    super.paintComponent(g);
+  }
+
+  @Override
+  public void updateUI() {
+    super.updateUI();
+    if (this.nameLabel != null) {
+      this.nameLabel.setForeground(Style.text());
+    }
+    if (this.detailsLabel != null) {
+      this.detailsLabel.setForeground(Style.mutedText());
+    }
   }
 
   public static Map<String, String> getDetails(Object origin) {
@@ -512,12 +552,20 @@ public class AssetPanelItem extends JPanel {
     this.compact = compact;
     removeAll();
     setupLayout();
-    setPreferredSize(compact ? new Dimension(PREFERRED_SIZE.width, 48) : new Dimension(cardSize, cardSize));
-    setMinimumSize(compact ? new Dimension(PREFERRED_SIZE.width, 48) : new Dimension(cardSize, cardSize));
-    iconLabel.setPreferredSize(compact ? new Dimension(40, 40) : null);
+    setPreferredSize(compact ? new Dimension(PREFERRED_SIZE.width, COMPACT_HEIGHT) : new Dimension(cardSize, cardSize));
+    setMinimumSize(compact ? new Dimension(0, COMPACT_HEIGHT) : new Dimension(cardSize, cardSize));
+    setMaximumSize(compact
+      ? new Dimension(Integer.MAX_VALUE, COMPACT_HEIGHT)
+      : new Dimension(cardSize, cardSize));
+    setAlignmentX(LEFT_ALIGNMENT);
+    iconLabel.setPreferredSize(compact ? new Dimension(COMPACT_HEIGHT, COMPACT_HEIGHT) : null);
     iconLabel.setHorizontalAlignment(compact ? SwingConstants.LEFT : SwingConstants.CENTER);
     nameLabel.setHorizontalAlignment(compact ? SwingConstants.LEFT : SwingConstants.CENTER);
+    updateNameLabel();
     updateScaledIcon();
+    if (this.mouseHandler != null) {
+      installMouseHandler(this);
+    }
     revalidate();
     repaint();
   }
@@ -527,8 +575,10 @@ public class AssetPanelItem extends JPanel {
     if (!compact) {
       setPreferredSize(new Dimension(cardSize, cardSize));
       setMinimumSize(new Dimension(cardSize, cardSize));
-      int iconArea = Math.max(8, cardSize - 2 * PADDING - 20);
-      iconPanel.setPreferredSize(new Dimension(iconArea + 8, iconArea + 2));
+      setMaximumSize(new Dimension(cardSize, cardSize));
+      int iconArea = getCardIconArea();
+      iconPanel.setPreferredSize(new Dimension(iconArea, iconArea));
+      updateNameLabel();
       updateScaledIcon();
       revalidate();
       repaint();

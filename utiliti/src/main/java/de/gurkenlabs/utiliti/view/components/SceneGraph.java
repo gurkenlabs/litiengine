@@ -57,8 +57,9 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Consumer;
-import javax.swing.Icon;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -156,16 +157,16 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.searchPanel.setBorder(BorderFactory.createEmptyBorder(7, 8, 3, 8));
 
     this.btnAddLayer = createToolButton(new AddDropdownIcon(Icons.ADD_24));
-    this.btnAddLayer.setPreferredSize(new Dimension(44, 28));
-    this.btnAddLayer.setToolTipText("Add Layer");
+    this.btnAddLayer.setPreferredSize(new Dimension(44, Style.CONTROL_HEIGHT));
+    configureActionButton(this.btnAddLayer, "Add Layer");
     this.btnAddLayer.addActionListener(e -> showAddLayerMenu(this.btnAddLayer));
 
     this.btnAddTileLayer = createToolButton(Icons.TILESET_24);
-    this.btnAddTileLayer.setToolTipText("Add Tile Layer");
+    configureActionButton(this.btnAddTileLayer, "Add Tile Layer");
     this.btnAddTileLayer.addActionListener(e -> addTileLayer(getSelectedOrLastLayerNode()));
 
     this.btnRemoveLayer = createToolButton(Icons.DELETE_24);
-    this.btnRemoveLayer.setToolTipText("Remove Selected Layer");
+    configureActionButton(this.btnRemoveLayer, "Remove Selected Layer");
     this.btnRemoveLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (node != null) {
@@ -174,7 +175,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnRaiseLayer = createToolButton(Icons.LIFT_24);
-    this.btnRaiseLayer.setToolTipText("Raise Layer");
+    configureActionButton(this.btnRaiseLayer, "Raise Layer");
     this.btnRaiseLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (node != null) {
@@ -183,7 +184,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnLowerLayer = createToolButton(Icons.LOWER_24);
-    this.btnLowerLayer.setToolTipText("Lower Layer");
+    configureActionButton(this.btnLowerLayer, "Lower Layer");
     this.btnLowerLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (node != null) {
@@ -192,11 +193,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnTilesets = createToolButton(Icons.SPRITESHEET_24);
-    this.btnTilesets.setToolTipText("Select Map Tileset");
+    configureActionButton(this.btnTilesets, "Select Map Tileset");
     this.btnTilesets.addActionListener(e -> showTilesetMenu(this.btnTilesets));
 
     this.btnShowAllLayers = Style.iconToggleButton(Icons.HIDEOTHER_24, false);
-    this.btnShowAllLayers.setToolTipText("Hide Other Layers");
+    configureActionButton(this.btnShowAllLayers, "Hide Other Layers");
     this.btnShowAllLayers.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (this.btnShowAllLayers.isSelected() && node != null) {
@@ -207,11 +208,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnCollapse = Style.iconButton(Icons.COLLAPSE_24);
-    this.btnCollapse.setToolTipText("Collapse All");
+    configureActionButton(this.btnCollapse, "Collapse All");
     this.btnCollapse.addActionListener(e -> collapseAll());
 
     this.btnDuplicateLayer = createToolButton(Icons.COPY_24);
-    this.btnDuplicateLayer.setToolTipText("Duplicate selected layer");
+    configureActionButton(this.btnDuplicateLayer, "Duplicate Selected Layer");
     this.btnDuplicateLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (node != null) {
@@ -220,7 +221,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnMore = createToolButton(Icons.MISC_24);
-    this.btnMore.setToolTipText("Scene Graph Actions");
+    configureActionButton(this.btnMore, "Scene Graph Actions");
     this.btnMore.addActionListener(e -> showHeaderMenu(this.btnMore));
 
     final String searchDefault = "Search scene...";
@@ -241,6 +242,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     };
     this.textField.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, searchDefault);
     this.textField.setToolTipText(Resources.strings().get("panel_entities_search_hint"));
+    this.textField.getAccessibleContext().setAccessibleName("Search scene");
     this.textField.setColumns(10);
     this.textField.setBorder(BorderFactory.createEmptyBorder());
     this.textField.setOpaque(false);
@@ -258,6 +260,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     RoundedSearchBox searchBox = new RoundedSearchBox(this.textField, 0);
+    configureActionButton(searchBox.getClearButton(), "Clear Scene Search");
     searchBox.getClearButton().addActionListener(e -> {
       this.textField.setText("");
       this.searchDebounce.stop();
@@ -307,8 +310,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
     });
     this.tree.setCellRenderer(new SceneGraphRenderer());
-    this.tree.setRowHeight((int) (26 * Editor.preferences().getUiScale()));
-    this.tree.setBackground(Style.COLOR_BG);
+    this.tree.setRowHeight((int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale()));
+    this.tree.setBackground(Style.background());
+    this.tree.getAccessibleContext().setAccessibleName("Scene hierarchy");
+    this.tree.getAccessibleContext().setAccessibleDescription(
+        "Scene hierarchy. Press Shift+F10 for actions on the selected item.");
 
     this.nodeRoot = new DefaultMutableTreeNode("root");
     this.treeModel = new DefaultTreeModel(this.nodeRoot);
@@ -419,6 +425,16 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         }
       }
     });
+    this.tree.getInputMap(JComponent.WHEN_FOCUSED).put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0), "showSceneNodeActions");
+    this.tree.getInputMap(JComponent.WHEN_FOCUSED).put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.SHIFT_DOWN_MASK), "showSceneNodeActions");
+    this.tree.getActionMap().put("showSceneNodeActions", new javax.swing.AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent e) {
+        showSelectedRowActionMenu();
+      }
+    });
     this.tree.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
@@ -455,6 +471,13 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     chipScroll.getHorizontalScrollBar().setUnitIncrement(24);
     chipScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     chipScroll.setPreferredSize(new Dimension(0, 30));
+    chipScroll.addMouseWheelListener(e -> {
+      var horizontalBar = chipScroll.getHorizontalScrollBar();
+      if (horizontalBar.getMaximum() > horizontalBar.getVisibleAmount()) {
+        horizontalBar.setValue(horizontalBar.getValue() + e.getWheelRotation() * horizontalBar.getUnitIncrement());
+        e.consume();
+      }
+    });
     topPanel.add(chipScroll, BorderLayout.CENTER);
 
     this.treeScroll = new JScrollPane(
@@ -464,7 +487,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     treeScroll.setBorder(null);
     treeScroll.setOpaque(false);
     treeScroll.getViewport().setOpaque(true);
-    treeScroll.getViewport().setBackground(Style.COLOR_BG);
+    treeScroll.getViewport().setBackground(Style.background());
     treeScroll.getVerticalScrollBar().setUnitIncrement(tree.getRowHeight());
     this.add(treeScroll, BorderLayout.CENTER);
     this.add(topPanel, BorderLayout.NORTH);
@@ -502,11 +525,18 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     return Style.iconButton(icon);
   }
 
+  private static void configureActionButton(AbstractButton button, String purpose) {
+    button.setToolTipText(purpose);
+    button.setFocusable(true);
+    button.setRequestFocusEnabled(true);
+    button.getAccessibleContext().setAccessibleName(purpose);
+  }
+
   private JPanel createLayerCommandStrip() {
     JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 4));
     commands.setOpaque(true);
-    commands.setBackground(Style.COLOR_SURFACE);
-    commands.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.COLOR_BORDER));
+    commands.setBackground(Style.surface());
+    commands.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()));
     commands.add(this.btnAddLayer);
     commands.add(this.btnRaiseLayer);
     commands.add(this.btnLowerLayer);
@@ -529,14 +559,21 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   }
 
   private JToggleButton createFilterButton(FilterChip chip) {
-    JToggleButton button = new FilterPillButton(chip.icon);
-    button.setFocusable(false);
-    button.setToolTipText(chip.label);
+    JToggleButton button = Style.iconToggleButton(chip.icon, false);
+    Style.styleButton(button, Style.ButtonVariant.GHOST);
+    configureActionButton(button, chip.label);
+    button.getAccessibleContext().setAccessibleName("Filter scene by " + chip.label);
     button.setMargin(new Insets(2, 2, 2, 2));
-    button.setPreferredSize(new Dimension(22, 22));
-    button.setBorderPainted(false);
-    button.setContentAreaFilled(false);
-    button.setOpaque(false);
+    Dimension size = new Dimension(22, 22);
+    button.setPreferredSize(size);
+    button.setMinimumSize(size);
+    button.setMaximumSize(size);
+    button.addFocusListener(new java.awt.event.FocusAdapter() {
+      @Override
+      public void focusGained(java.awt.event.FocusEvent e) {
+        button.scrollRectToVisible(new Rectangle(0, 0, button.getWidth(), button.getHeight()));
+      }
+    });
     button.addActionListener(e -> {
       this.activeFilter = chip;
       for (java.util.Map.Entry<FilterChip, JToggleButton> entry : this.filterButtons.entrySet()) {
@@ -552,27 +589,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     for (java.util.Map.Entry<FilterChip, JToggleButton> entry : this.filterButtons.entrySet()) {
       boolean selected = entry.getKey() == this.activeFilter;
       JToggleButton button = entry.getValue();
-      button.setBackground(selected ? Style.COLOR_SELECTION_INACTIVE : Style.COLOR_SURFACE2);
-      button.setForeground(selected ? Style.COLOR_STATUS : Style.COLOR_TEXT);
+      button.setBackground(selected ? Style.selection() : Style.raisedSurface());
+      button.setForeground(Style.text());
       button.repaint();
-    }
-  }
-
-  private static final class FilterPillButton extends JToggleButton {
-    private FilterPillButton(Icon icon) {
-      super(icon);
-      setFocusable(false);
-      setOpaque(false);
-      setContentAreaFilled(false);
-      setBorderPainted(false);
-      setFocusPainted(false);
-      setMargin(new Insets(2, 2, 2, 2));
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-      Style.paintButtonBackground(this, getModel(), g);
-      super.paintComponent(g);
     }
   }
 
@@ -606,13 +625,16 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         }
         boolean hovered = this.tree.getClientProperty("SceneGraph.hoverRow") instanceof Integer hover && hover == row;
         boolean selected = this.tree.isRowSelected(row);
-        if (hovered || selected) {
-          g2.setColor(selected ? Style.COLOR_SELECTION_INACTIVE : Style.COLOR_SURFACE2);
-          g2.fillRoundRect(buttonX, bounds.y + 3, 22, bounds.height - 6, 7, 7);
-          g2.setColor(Style.COLOR_BORDER);
-          g2.drawRoundRect(buttonX, bounds.y + 3, 22, bounds.height - 6, 7, 7);
+        if (!hovered && !selected) {
+          continue;
         }
-        g2.setColor(selected ? Style.COLOR_TEXT : Style.COLOR_SUBTEXT);
+        g2.setColor(hovered ? Style.hover() : Style.raisedSurface());
+        g2.fillRoundRect(buttonX, bounds.y + 3, 22, bounds.height - 6,
+            Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        g2.setColor(Style.border());
+        g2.drawRoundRect(buttonX, bounds.y + 3, 22, bounds.height - 6,
+            Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        g2.setColor(Style.text());
         int cy = bounds.y + bounds.height / 2;
         int x = buttonX + 10;
         g2.fillOval(x, cy - 5, 2, 2);
@@ -849,7 +871,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     boolean isolated = hasLayer && isLayerIsolated(map, node.getLayer());
     this.btnShowAllLayers.setEnabled(hasLayer);
     this.btnShowAllLayers.setSelected(isolated);
-    this.btnShowAllLayers.setToolTipText(isolated ? "Show All Layers" : "Hide Other Layers");
+    configureActionButton(this.btnShowAllLayers, isolated ? "Show All Layers" : "Hide Other Layers");
   }
 
   void refreshLayerCommandState() {
@@ -1323,6 +1345,30 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     } else if (node.getMapObject() != null) {
       showMapObjectMenu(e, node.getMapObject());
     }
+  }
+
+  private void showSelectedRowActionMenu() {
+    int row = this.tree.getLeadSelectionRow();
+    TreePath path = row >= 0 ? this.tree.getPathForRow(row) : null;
+    Rectangle bounds = row >= 0 ? this.tree.getRowBounds(row) : null;
+    if (path == null || bounds == null
+        || !(path.getLastPathComponent() instanceof DefaultMutableTreeNode treeNode)
+        || !(treeNode.getUserObject() instanceof SceneNode node)
+        || node.isSection() || node.isMap()) {
+      return;
+    }
+    Rectangle visible = this.tree.getVisibleRect();
+    MouseEvent event = new MouseEvent(
+        this.tree,
+        MouseEvent.MOUSE_RELEASED,
+        System.currentTimeMillis(),
+        0,
+        visible.x + visible.width - 8,
+        bounds.y + bounds.height / 2,
+        1,
+        false,
+        MouseEvent.BUTTON1);
+    showRowActionMenu(event, node);
   }
 
   private void showMapObjectMenu(MouseEvent e, IMapObject mapObject) {
@@ -2155,7 +2201,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     public void paintIcon(Component component, Graphics graphics, int x, int y) {
       this.primary.paintIcon(component, graphics, x, y + (getIconHeight() - this.primary.getIconHeight()) / 2);
       Graphics2D g2 = (Graphics2D) graphics.create();
-      g2.setColor(component.isEnabled() ? Style.COLOR_TEXT : Style.COLOR_DISABLED_TEXT);
+      g2.setColor(component.isEnabled() ? Style.text() : Style.mutedText());
       int arrowX = x + this.primary.getIconWidth() + 3;
       int arrowY = y + getIconHeight() / 2 - 2;
       g2.fillPolygon(new int[] {arrowX, arrowX + 6, arrowX + 3}, new int[] {arrowY, arrowY, arrowY + 5}, 3);

@@ -73,7 +73,7 @@ public class LayerPropertyPanel extends JPanel {
     setBorder(null);
     setLayout(new BorderLayout());
     setOpaque(true);
-    setBackground(Style.COLOR_BG);
+    setBackground(Style.background());
 
     this.textFieldName = ControlBehavior.apply(new JTextField());
     this.imageSourceCombo = new SearchableResourceComboBox();
@@ -101,7 +101,7 @@ public class LayerPropertyPanel extends JPanel {
     ControlBehavior.apply(this.spinnerOpacity);
     this.checkBoxVisible = new JCheckBox("Visible");
     checkBoxVisible.setOpaque(false);
-    checkBoxVisible.setForeground(Style.COLOR_TEXT);
+    checkBoxVisible.setForeground(Style.text());
 
     this.tintColorComponent = new ColorComponent(java.awt.Color.WHITE);
     this.tintColorComponent.addActionListener(a -> saveChanges());
@@ -139,7 +139,7 @@ public class LayerPropertyPanel extends JPanel {
     this.accordion = new JPanel();
     this.accordion.setLayout(new BoxLayout(this.accordion, BoxLayout.Y_AXIS));
     this.accordion.setOpaque(true);
-    this.accordion.setBackground(Style.COLOR_BG);
+    this.accordion.setBackground(Style.background());
     this.accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
     this.generalCard = new ExpandableCard("General", createGeneralPanel(), false);
@@ -161,7 +161,7 @@ public class LayerPropertyPanel extends JPanel {
     JScrollPane hostScrollPane = new JScrollPane(this.accordion);
     hostScrollPane.setBorder(null);
     hostScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    hostScrollPane.getViewport().setBackground(Style.COLOR_BG);
+    hostScrollPane.getViewport().setBackground(Style.background());
     add(hostScrollPane, BorderLayout.CENTER);
 
     this.setupChangeListeners();
@@ -290,7 +290,7 @@ public class LayerPropertyPanel extends JPanel {
 
   private static JLabel createLabel(String text) {
     JLabel label = new JLabel(text);
-    label.setForeground(Style.COLOR_TEXT);
+    label.setForeground(Style.text());
     label.setHorizontalAlignment(SwingConstants.TRAILING);
     return label;
   }
@@ -316,7 +316,7 @@ public class LayerPropertyPanel extends JPanel {
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     table.setShowHorizontalLines(true);
     table.setShowVerticalLines(false);
-    table.setGridColor(Style.COLOR_BORDER);
+    table.setGridColor(Style.border());
     table.setIntercellSpacing(new Dimension(0, 1));
     table.setFillsViewportHeight(true);
     table.setModel(

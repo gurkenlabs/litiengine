@@ -29,12 +29,12 @@ public class TagPanel extends JPanel {
   private static final int INLINE_INPUT_COLLAPSED_WIDTH = 18;
   private final JTextField textFieldInput;
 
-  private static final int PANEL_ARC = 8;
+  private static final int PANEL_ARC = Style.CORNER_RADIUS;
 
   public TagPanel() {
-    setBackground(Style.COLOR_SURFACE2);
+    setBackground(Style.raisedSurface());
     setOpaque(false);
-    setBorder(new RoundedBorder(Style.COLOR_BORDER, PANEL_ARC, 5));
+    setBorder(new RoundedBorder(Style.border(), PANEL_ARC, 5));
     WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 4, 0);
     this.addContainerListener(
         new ContainerListener() {
@@ -57,13 +57,18 @@ public class TagPanel extends JPanel {
     this.textFieldInput = new JTextField();
     this.textFieldInput.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
     this.textFieldInput.setOpaque(false);
-    this.textFieldInput.setForeground(Style.COLOR_TEXT);
-    this.textFieldInput.setCaretColor(Style.COLOR_ACCENT_BLUE);
+    this.textFieldInput.setForeground(Style.text());
+    this.textFieldInput.setCaretColor(Style.accent());
+    this.textFieldInput.getAccessibleContext().setAccessibleName("Add tag");
     this.textFieldInput.putClientProperty("JComponent.outline", "none");
     this.textFieldInput.setPreferredSize(new Dimension(INLINE_INPUT_WIDTH, Tag.CHIP_HEIGHT));
     this.textFieldInput.setMinimumSize(new Dimension(48, Tag.CHIP_HEIGHT));
     add(textFieldInput);
     this.textFieldInput.setColumns(7);
+    this.textFieldInput.addFocusListener(new java.awt.event.FocusAdapter() {
+      @Override public void focusGained(java.awt.event.FocusEvent e) { repaint(); }
+      @Override public void focusLost(java.awt.event.FocusEvent e) { repaint(); }
+    });
     this.textFieldInput.addActionListener(
         e -> {
           boolean isEmpty =
@@ -132,11 +137,27 @@ public class TagPanel extends JPanel {
   }
 
   @Override
+  public void updateUI() {
+    super.updateUI();
+    setBackground(Style.raisedSurface());
+    setBorder(new RoundedBorder(Style.border(), PANEL_ARC, 5));
+    if (this.textFieldInput != null) {
+      this.textFieldInput.setForeground(Style.text());
+      this.textFieldInput.setCaretColor(Style.accent());
+    }
+  }
+
+  @Override
   protected void paintComponent(Graphics g) {
     Graphics2D g2 = (Graphics2D) g.create();
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g2.setColor(getBackground());
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), PANEL_ARC, PANEL_ARC);
+    if (this.textFieldInput != null && this.textFieldInput.isFocusOwner()) {
+      g2.setColor(Style.accent());
+      g2.setStroke(new java.awt.BasicStroke(2f));
+      g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, PANEL_ARC, PANEL_ARC);
+    }
     g2.dispose();
   }
 

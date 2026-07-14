@@ -13,7 +13,6 @@ import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -38,8 +37,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
-  private static final int SECTION_LABEL_WIDTH = 100;
-  private static final Color BG = Style.COLOR_BG;
+  private static final int SECTION_LABEL_WIDTH = PropertyPanel.LABEL_WIDTH;
 
   private final Map<MapObjectType, PropertyPanel> panels;
   private MapObjectType type;
@@ -113,8 +111,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.infoPanel = new JPanel(new BorderLayout());
     this.infoPanel.setOpaque(true);
-    this.infoPanel.setBackground(Style.COLOR_SURFACE);
-    this.infoPanel.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
+    this.infoPanel.setBackground(Style.surface());
+    this.infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
     JPanel headerContent = new JPanel();
     headerContent.setLayout(new BoxLayout(headerContent, BoxLayout.X_AXIS));
@@ -122,11 +120,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     JLabel lblEntityId = new JLabel(Resources.strings().get("panel_ID"));
     lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD));
-    lblEntityId.setForeground(Style.COLOR_SUBTEXT);
+    lblEntityId.setForeground(Style.mutedText());
 
     this.labelEntityID = new JLabel("####");
     this.labelEntityID.setFont(labelEntityID.getFont());
-    this.labelEntityID.setForeground(Style.COLOR_TEXT);
+    this.labelEntityID.setForeground(Style.text());
 
     this.labelTypeIcon = new JLabel(Icons.ENTITY_16);
 
@@ -162,8 +160,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JPanel accordion = new JPanel();
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
-    accordion.setBackground(BG);
-    accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+    accordion.setBackground(Style.background());
+    accordion.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
 
     infoPanel.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, infoPanel.getPreferredSize().height));
@@ -225,7 +223,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JScrollPane scrollPane = new JScrollPane(accordion);
     scrollPane.setBorder(null);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    scrollPane.getViewport().setBackground(BG);
+    scrollPane.getViewport().setBackground(Style.background());
     add(scrollPane, BorderLayout.CENTER);
 
     this.setupChangedListeners();
@@ -301,7 +299,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     panel.setOpaque(false);
     JLabel title = new JLabel(label);
     title.setFont(title.getFont().deriveFont(10f));
-    title.setForeground(Style.COLOR_SUBTEXT);
+    title.setForeground(Style.mutedText());
     title.setBorder(BorderFactory.createEmptyBorder(6, 0, 4, 0));
     title.setHorizontalAlignment(SwingConstants.TRAILING);
     JPanel wrapper = new JPanel(new BorderLayout());

@@ -55,7 +55,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
 
     this.rowPanel = new JPanel(new BorderLayout(6, 0));
     this.rowPanel.setOpaque(false);
-    this.rowPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 4));
+    this.rowPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 36));
 
     JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
     left.setOpaque(false);
@@ -103,9 +103,8 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     this.selectedRow = selected && node != null && !node.isSection();
     this.hoverRow = hover && node != null && !node.isSection();
     this.sectionRow = node != null && node.isSection();
-    Color foreground = selected ? Color.WHITE : Style.COLOR_TEXT;
-    this.nameLabel.setForeground(node != null && node.isSection() ? Style.COLOR_SUBTEXT : foreground);
-    int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : 26;
+    this.nameLabel.setForeground(node != null && node.isSection() ? Style.mutedText() : Style.text());
+    int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : Style.TREE_ROW_HEIGHT;
     setPreferredSize(new Dimension(Math.max(tree.getWidth() - 4, getPreferredSize().width), rowHeight));
 
     return this;
@@ -120,8 +119,9 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     Graphics2D g2 = (Graphics2D) g.create();
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setColor(this.selectedRow ? Style.COLOR_SCENE_ROW_SELECTED : Style.COLOR_SCENE_ROW_HOVER);
-      g2.fillRoundRect(0, 2, getWidth() - 34, getHeight() - 4, 7, 7);
+      g2.setColor(this.selectedRow ? Style.selection() : Style.hover());
+      g2.fillRoundRect(0, 2, getWidth(), getHeight() - 4,
+          Style.CORNER_RADIUS, Style.CORNER_RADIUS);
     } finally {
       g2.dispose();
     }
@@ -194,7 +194,11 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     String base = name.substring(0, hashIdx);
     String id = name.substring(hashIdx + 2);
     return "<html>" + escapeHtml(base)
-        + " <span style='color:#969EB9'>#" + escapeHtml(id) + "</span></html>";
+        + " <span style='color:" + toHtmlColor(Style.mutedText()) + "'>#" + escapeHtml(id) + "</span></html>";
+  }
+
+  private static String toHtmlColor(Color color) {
+    return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
   }
 
   private static String escapeHtml(String value) {
@@ -293,7 +297,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
       Graphics2D g = (Graphics2D) Objects.requireNonNull(newImg).getGraphics();
       g.setColor(lightColor);
       g.fillRect(0, 0, 9, 9);
-      g.setColor(Color.BLACK);
+      g.setColor(Style.border());
       g.drawRect(0, 0, 9, 9);
       g.dispose();
       return newImg;
@@ -304,7 +308,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   private static final class BadgeLabel extends JLabel {
     BadgeLabel() {
       setOpaque(false);
-      setForeground(Style.COLOR_TEXT);
+      setForeground(Style.text());
       setBorder(BorderFactory.createEmptyBorder(1, 6, 1, 6));
     }
 
@@ -314,7 +318,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
       try {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Object kind = getClientProperty("badgeKind");
-        g2.setColor(kind == BadgeKind.ID ? Style.COLOR_BADGE_ID : Style.COLOR_SELECTION_INACTIVE);
+        g2.setColor(kind == BadgeKind.ID ? Style.COLOR_BADGE_ID : Style.selection());
         g2.fillRoundRect(0, 2, getWidth(), getHeight() - 4, 10, 10);
       } finally {
         g2.dispose();
