@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.model;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -10,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.util.Objects;
 import javax.swing.Action;
 import javax.swing.AbstractButton;
@@ -99,6 +101,8 @@ public final class Style {
   public static final Color COLOR_SCENE_ROW_SELECTED = new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 30);
   public static final Color COLOR_WORKSPACE_TOP = new Color(24, 24, 28);
   public static final Color COLOR_WORKSPACE_BOTTOM = new Color(14, 14, 17);
+  public static final Color COLOR_ASSET_EXPLORER = new Color(14, 14, 16);
+  public static final Color COLOR_ASSET_EXPLORER_LIGHT = new Color(245, 245, 247);
   public static final Color COLOR_MAP_BACKING = new Color(10, 10, 12);
   public static final Color COLOR_MAP_BORDER = new Color(92, 92, 104, 180);
 
@@ -120,10 +124,17 @@ public final class Style {
       boolean enabled = c.isEnabled();
       boolean selected = model.isSelected();
       boolean pressed = model.isPressed();
+      boolean grouped = c instanceof javax.swing.JComponent component
+          && Boolean.TRUE.equals(component.getClientProperty("Editor.groupedToolbarButton"));
+      boolean subtleToggle = c instanceof javax.swing.JComponent component
+          && Boolean.TRUE.equals(component.getClientProperty("Editor.subtleToolbarToggle"));
       ButtonVariant variant = c instanceof javax.swing.JComponent component
           && component.getClientProperty("Editor.buttonVariant") instanceof ButtonVariant value
           ? value
           : ButtonVariant.TOOLBAR;
+      if (variant == ButtonVariant.DESTRUCTIVE && c instanceof AbstractButton button) {
+        button.setForeground(enabled ? COLOR_RED : COLOR_DISABLED_TEXT);
+      }
       Color surface = surface();
       Color hover = hover();
       Color accent = accent();
@@ -135,29 +146,51 @@ public final class Style {
         case GHOST -> pressed || selected ? selection() : model.isRollover() ? hover : COLOR_TRANSPARENT;
         case SECONDARY, TOOLBAR -> selected ? accent : pressed ? selection() : model.isRollover() ? hover : surface;
       };
+      if (selected && subtleToggle) {
+        fill = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 48);
+      }
       Color border = switch (variant) {
         case PRIMARY -> accent;
-        case DESTRUCTIVE -> enabled && (model.isRollover() || selected) ? COLOR_RED : border();
+        case DESTRUCTIVE -> enabled ? COLOR_RED : border();
         case GHOST -> COLOR_TRANSPARENT;
         case SECONDARY, TOOLBAR -> selected ? accent : border();
       };
+      if (grouped && variant != ButtonVariant.DESTRUCTIVE) {
+        border = COLOR_TRANSPARENT;
+      } else if (grouped && !enabled) {
+        border = COLOR_TRANSPARENT;
+      }
+      int inset = grouped ? 2 : 0;
+      int arc = CORNER_RADIUS * 2;
       if (fill.getAlpha() > 0) {
         g2.setColor(fill);
-        g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, CORNER_RADIUS, CORNER_RADIUS);
+        g2.fillRoundRect(
+            inset,
+            inset,
+            c.getWidth() - 1 - inset * 2,
+            c.getHeight() - 1 - inset * 2,
+            arc,
+            arc);
       }
       if (border.getAlpha() > 0) {
         g2.setColor(border);
         g2.setStroke(new java.awt.BasicStroke(1f));
-        g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, CORNER_RADIUS, CORNER_RADIUS);
+        g2.drawRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, arc, arc);
       }
       if (!enabled) {
         g2.setColor(COLOR_DISABLED_OVERLAY);
-        g2.fillRoundRect(0, 0, c.getWidth() - 1, c.getHeight() - 1, CORNER_RADIUS, CORNER_RADIUS);
+        g2.fillRoundRect(
+            inset,
+            inset,
+            c.getWidth() - 1 - inset * 2,
+            c.getHeight() - 1 - inset * 2,
+            arc,
+            arc);
       }
-      if (enabled && c.isFocusOwner()) {
+      if (enabled && c.isFocusOwner() && !subtleToggle) {
         g2.setColor(accent);
         g2.setStroke(new java.awt.BasicStroke(2f));
-        g2.drawRoundRect(2, 2, c.getWidth() - 5, c.getHeight() - 5, CORNER_RADIUS - 1, CORNER_RADIUS - 1);
+        g2.drawRoundRect(2, 2, c.getWidth() - 5, c.getHeight() - 5, arc - 2, arc - 2);
       }
     } finally {
       g2.dispose();
@@ -217,6 +250,11 @@ public final class Style {
 
   public static void styleButton(AbstractButton button, ButtonVariant variant) {
     button.putClientProperty("Editor.buttonVariant", variant);
+    if (variant == ButtonVariant.DESTRUCTIVE
+        && button.getIcon() != null
+        && !(button.getIcon() instanceof ForegroundIcon)) {
+      button.setIcon(new ForegroundIcon(button.getIcon()));
+    }
     button.setFocusable(true);
     button.setRequestFocusEnabled(true);
     button.setOpaque(false);
@@ -261,6 +299,39 @@ public final class Style {
     if (name != null && !name.isBlank()) {
       button.getAccessibleContext().setAccessibleName(name);
       button.putClientProperty("Editor.generatedAccessibleName", name);
+    }
+  }
+
+  private static final class ForegroundIcon implements Icon {
+    private final Icon delegate;
+
+    private ForegroundIcon(Icon delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public int getIconWidth() {
+      return this.delegate.getIconWidth();
+    }
+
+    @Override
+    public int getIconHeight() {
+      return this.delegate.getIconHeight();
+    }
+
+    @Override
+    public void paintIcon(Component component, Graphics graphics, int x, int y) {
+      BufferedImage image = new BufferedImage(getIconWidth(), getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+      Graphics2D imageGraphics = image.createGraphics();
+      try {
+        this.delegate.paintIcon(component, imageGraphics, 0, 0);
+        imageGraphics.setComposite(AlphaComposite.SrcIn);
+        imageGraphics.setColor(component.getForeground());
+        imageGraphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+      } finally {
+        imageGraphics.dispose();
+      }
+      graphics.drawImage(image, x, y, null);
     }
   }
 
@@ -321,6 +392,13 @@ public final class Style {
 
   public static Color workspaceBottom() {
     return uiColor("Editor.workspaceBottom", COLOR_WORKSPACE_BOTTOM);
+  }
+
+  public static Color assetExplorerBackground() {
+    Color color = Editor.preferences().getTheme() == Theme.DARK
+      ? COLOR_ASSET_EXPLORER
+      : COLOR_ASSET_EXPLORER_LIGHT;
+    return new ColorUIResource(color);
   }
 
   public static Color mapBacking() {

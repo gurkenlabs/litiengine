@@ -271,7 +271,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
     this.chipPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 3, 2));
     this.chipPanel.setOpaque(false);
-    this.chipPanel.setBorder(BorderFactory.createEmptyBorder(1, 0, 3, 0));
+    this.chipPanel.setBorder(BorderFactory.createEmptyBorder(1, 8, 3, 8));
     for (FilterChip chip : FilterChip.values()) {
       JToggleButton button = createFilterButton(chip);
       this.filterButtons.put(chip, button);

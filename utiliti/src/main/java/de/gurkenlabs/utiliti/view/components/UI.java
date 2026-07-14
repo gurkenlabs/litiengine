@@ -39,8 +39,13 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -55,6 +60,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -63,7 +69,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
@@ -75,6 +81,8 @@ public final class UI {
   private static final int INSPECTOR_BASE_WIDTH = 380;
   private static final int SCENE_GRAPH_MIN_WIDTH = 260;
   private static final int SCENE_GRAPH_MAX_WIDTH = 340;
+  private static final int ASSET_PANEL_MIN_HEIGHT = 180;
+  private static final int ASSET_PANEL_MAX_HEIGHT = 420;
   private static final int SPLITTER_SIZE = 4;
 
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
@@ -374,11 +382,11 @@ public final class UI {
 
     window.remove(canvas);
     initTools();
-    viewportToolbar = new ViewportToolbar();
-    viewportPanel = new ViewportPanel(canvas, viewportToolbar);
+    Component leftPanel = initLeftPanel();
+    viewportToolbar = new ViewportToolbar(mapCombo);
+    viewportPanel = new ViewportPanel(canvas);
     initDropTarget(viewportPanel);
 
-    Component leftPanel = initLeftPanel();
     Component renderSplitPanel = initRenderSplitPanel(viewportPanel, winH);
 
     int inspectorMinWidth = inspectorMinimumWidth();
@@ -430,17 +438,7 @@ public final class UI {
     int initialHierarchyW = Editor.preferences().getMainSplitterPosition() != 0
         ? Math.min(Editor.preferences().getMainSplitterPosition(), SCENE_GRAPH_MAX_WIDTH)
         : prefHierarchyW;
-    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderSplitPanel, inspectorPanel);
-    configureSplitPane(centerRightSplit);
-    centerRightSplit.setContinuousLayout(true);
-    centerRightSplit.setResizeWeight(1.0);
-    centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-        evt -> Editor.preferences().setSelectionEditSplitter(centerRightSplit.getDividerLocation()));
-    centerRightSplit.setDividerLocation(initialInspectorDivider(
-        winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
-        Editor.preferences().getSelectionEditSplitter()));
-
-    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
+    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, renderSplitPanel);
     configureSplitPane(mainSplit);
     mainSplit.setContinuousLayout(true);
     mainSplit.setResizeWeight(0.0);
@@ -459,14 +457,33 @@ public final class UI {
       Editor.preferences().setMainSplitter(location);
     });
 
+    JPanel workspacePanel = new JPanel(new BorderLayout());
+    workspacePanel.add(viewportToolbar, BorderLayout.NORTH);
+    workspacePanel.add(mainSplit, BorderLayout.CENTER);
+
+    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, workspacePanel, inspectorPanel);
+    configureSplitPane(centerRightSplit);
+    centerRightSplit.setContinuousLayout(true);
+    centerRightSplit.setResizeWeight(1.0);
+    int initialInspectorDivider = initialInspectorDivider(
+        winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
+        Editor.preferences().getSelectionEditSplitter());
+
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
-    rootPanel.add(mainSplit, BorderLayout.CENTER);
+    rootPanel.add(centerRightSplit, BorderLayout.CENTER);
     mainSplit.setDividerLocation(initialHierarchyW);
+    centerRightSplit.setDividerLocation(initialInspectorDivider);
+    centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
+      int viewportDivider = centerRightSplit.getDividerLocation()
+          - mainSplit.getDividerLocation() - SPLITTER_SIZE;
+      Editor.preferences().setSelectionEditSplitter(Math.max(0, viewportDivider));
+    });
 
     initPopupMenu(canvas);
     window.getRootPane().setBackground(Style.COLOR_BG);
     window.setJMenuBar(new MainMenuBar());
+    window.validate();
   }
 
   private static JFrame initWindow() {
@@ -503,10 +520,34 @@ public final class UI {
     } else {
       renderSplitPanel.setDividerLocation((int) (winH * 0.72));
     }
-    renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-        evt -> Editor.preferences().setBottomSplitter(renderSplitPanel.getDividerLocation()));
+    renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
+      int location = constrainBottomDivider(
+        renderSplitPanel.getHeight(), renderSplitPanel.getDividerSize(), renderSplitPanel.getDividerLocation());
+      if (location != renderSplitPanel.getDividerLocation()) {
+        renderSplitPanel.setDividerLocation(location);
+      } else {
+        Editor.preferences().setBottomSplitter(location);
+      }
+    });
+    renderSplitPanel.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent event) {
+        renderSplitPanel.setDividerLocation(constrainBottomDivider(
+          renderSplitPanel.getHeight(), renderSplitPanel.getDividerSize(), renderSplitPanel.getDividerLocation()));
+      }
+    });
     renderSplitPanel.setContinuousLayout(true);
     return renderSplitPanel;
+  }
+
+  static int constrainBottomDivider(int splitHeight, int dividerSize, int dividerLocation) {
+    if (splitHeight <= 0 || dividerLocation < 0) {
+      return dividerLocation;
+    }
+    int availableHeight = Math.max(0, splitHeight - dividerSize);
+    int minimumLocation = Math.max(0, availableHeight - ASSET_PANEL_MAX_HEIGHT);
+    int maximumLocation = Math.max(minimumLocation, availableHeight - ASSET_PANEL_MIN_HEIGHT);
+    return Math.max(minimumLocation, Math.min(maximumLocation, dividerLocation));
   }
 
   static void configureSplitPane(JSplitPane splitPane) {
@@ -566,17 +607,9 @@ public final class UI {
     });
     UI.setMapCombo(leftMapCombo);
 
-    JPanel headerPanel = new JPanel(new BorderLayout(Style.SPACE_SMALL, Style.SPACE_SMALL));
-    headerPanel.setOpaque(false);
-    headerPanel.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
-        BorderFactory.createEmptyBorder(6, 8, 6, 8)));
-    headerPanel.add(leftMapCombo, BorderLayout.CENTER);
-
     JPanel leftPanel = new JPanel(new BorderLayout());
     leftPanel.setOpaque(true);
     leftPanel.setBackground(Style.COLOR_BG);
-    leftPanel.add(headerPanel, BorderLayout.NORTH);
     leftPanel.add(sceneGraph, BorderLayout.CENTER);
     leftPanel.setMinimumSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 120));
     leftPanel.setPreferredSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 0));
@@ -621,19 +654,101 @@ public final class UI {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     bottomPanel.setOpaque(true);
     bottomPanel.setBackground(Style.COLOR_BG);
-    JTabbedPane bottomTab = new JTabbedPane();
-    bottomTab.setFont(Style.getHeaderFont());
-    bottomTab.setBorder(null);
-    bottomTab.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-    bottomTab.setBackground(Style.COLOR_BG);
+    bottomPanel.setMinimumSize(new Dimension(600, ASSET_PANEL_MIN_HEIGHT));
+    bottomPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, ASSET_PANEL_MAX_HEIGHT));
 
     assetComponent = new AssetList();
-    bottomTab.addTab(Resources.strings().get("assettree_assets"), assetComponent);
-    bottomTab.addTab(Resources.strings().get("assettree_console"), new ConsoleComponent());
+    JPanel content = new JPanel(new CardLayout());
+    content.add(assetComponent, "resources");
+    content.add(new ConsoleComponent(), "console");
 
-    bottomPanel.add(bottomTab, BorderLayout.CENTER);
+    JToggleButton resourcesTab = createBottomTab(Resources.strings().get("assettree_assets"), true);
+    JToggleButton consoleTab = createBottomTab(Resources.strings().get("assettree_console"), false);
+    ButtonGroup tabs = new ButtonGroup();
+    tabs.add(resourcesTab);
+    tabs.add(consoleTab);
+
+    JPanel tabButtons = new JPanel(new GridBagLayout());
+    tabButtons.setOpaque(false);
+    GridBagConstraints tabConstraints = new GridBagConstraints();
+    tabConstraints.fill = GridBagConstraints.BOTH;
+    tabConstraints.weighty = 1.0;
+    tabButtons.add(resourcesTab, tabConstraints);
+    tabButtons.add(consoleTab, tabConstraints);
+
+    JPanel header = new JPanel(new BorderLayout()) {
+      @Override
+      public void updateUI() {
+        super.updateUI();
+        setBackground(Style.background());
+        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
+      }
+    };
+    header.setOpaque(true);
+    Dimension headerSize = new Dimension(0, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
+    header.setMinimumSize(headerSize);
+    header.setPreferredSize(headerSize);
+    header.add(tabButtons, BorderLayout.WEST);
+    header.add(assetComponent.getToolbar(), BorderLayout.CENTER);
+
+    resourcesTab.addActionListener(e -> {
+      ((CardLayout) content.getLayout()).show(content, "resources");
+      assetComponent.getToolbar().setVisible(true);
+    });
+    consoleTab.addActionListener(e -> {
+      ((CardLayout) content.getLayout()).show(content, "console");
+      assetComponent.getToolbar().setVisible(false);
+    });
+
+    bottomPanel.add(header, BorderLayout.NORTH);
+    bottomPanel.add(content, BorderLayout.CENTER);
 
     return bottomPanel;
+  }
+
+  private static JToggleButton createBottomTab(String text, boolean selected) {
+    JToggleButton tab = new JToggleButton(text, selected) {
+      @Override
+      protected void paintComponent(Graphics graphics) {
+        Graphics2D g2 = (Graphics2D) graphics.create();
+        try {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+          if (getModel().isRollover() || isSelected()) {
+            g2.setColor(isSelected() ? Style.selection() : Style.hover());
+            g2.fillRect(0, 0, getWidth(), getHeight());
+          }
+          g2.setColor(isSelected() ? Style.text() : Style.mutedText());
+          g2.setFont(getFont());
+          java.awt.FontMetrics metrics = g2.getFontMetrics();
+          int textX = Math.max(0, (getWidth() - metrics.stringWidth(getText())) / 2);
+          int textY = (getHeight() - metrics.getHeight()) / 2 + metrics.getAscent();
+          g2.drawString(getText(), textX, textY);
+          if (isSelected()) {
+            g2.setColor(Style.accent());
+            g2.fillRect(0, getHeight() - 2, getWidth(), 2);
+          }
+        } finally {
+          g2.dispose();
+        }
+      }
+    };
+    tab.setFont(Style.getHeaderFont());
+    int horizontalPadding = Style.SPACE_MEDIUM;
+    tab.setMargin(new java.awt.Insets(0, horizontalPadding, 0, horizontalPadding));
+    tab.setBorder(BorderFactory.createEmptyBorder());
+    tab.setOpaque(false);
+    tab.setContentAreaFilled(false);
+    tab.setBorderPainted(false);
+    tab.setFocusPainted(false);
+    tab.setRolloverEnabled(true);
+    int textWidth = tab.getFontMetrics(tab.getFont()).stringWidth(text);
+    int width = textWidth + horizontalPadding * 2;
+    Dimension size = new Dimension(width, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
+    tab.setPreferredSize(size);
+    tab.setMinimumSize(size);
+    tab.setMaximumSize(size);
+    return tab;
   }
 
   private static void initPopupMenu(Canvas canvas) {
@@ -692,6 +807,9 @@ public final class UI {
     if (viewportPanel != null) {
       viewportPanel.refreshTheme();
     }
+    if (viewportToolbar != null) {
+      viewportToolbar.refreshTheme();
+    }
     updateOrphanComponents();
     loadingTheme = false;
   }
@@ -716,6 +834,7 @@ public final class UI {
     UIManager.put("Editor.selection", Style.COLOR_SELECTION_INACTIVE);
     UIManager.put("Editor.workspaceTop", Style.COLOR_WORKSPACE_TOP);
     UIManager.put("Editor.workspaceBottom", Style.COLOR_WORKSPACE_BOTTOM);
+    UIManager.put("Editor.assetExplorerBackground", Style.COLOR_ASSET_EXPLORER);
     UIManager.put("Editor.mapBacking", Style.COLOR_MAP_BACKING);
     UIManager.put("Editor.mapBorder", Style.COLOR_MAP_BORDER);
     Color INPUT_BG = Style.COLOR_INPUT_BG;
@@ -770,28 +889,17 @@ public final class UI {
     UIManager.put("RadioButton.foreground", Style.COLOR_TEXT);
 
     // Menus
-    UIManager.put("MenuBar.background", Style.COLOR_BG);
-    UIManager.put("MenuBar.foreground", Style.COLOR_TEXT);
-    UIManager.put("MenuBar.borderColor", Style.COLOR_BG);
-    UIManager.put("MenuBar.border", BorderFactory.createEmptyBorder());
+    applyMenuOverrides(
+        Style.COLOR_SURFACE,
+        Style.COLOR_SELECT,
+        Style.COLOR_TEXT,
+        Style.COLOR_DISABLED_TEXT,
+        Style.COLOR_BORDER);
     UIManager.put("Windows.TitlePane.background", Style.COLOR_BG);
     UIManager.put("Windows.TitlePane.inactiveBackground", Style.COLOR_BG);
     UIManager.put("Windows.TitlePane.foreground", Style.COLOR_TEXT);
     UIManager.put("Windows.TitlePane.inactiveForeground", Style.COLOR_SUBTEXT);
     UIManager.put("Windows.TitlePane.borderColor", Style.COLOR_BG);
-    UIManager.put("Menu.background", Style.COLOR_BG);
-    UIManager.put("Menu.foreground", Style.COLOR_TEXT);
-    UIManager.put("Menu.selectionBackground", Style.COLOR_SELECT);
-    UIManager.put("Menu.selectionForeground", Style.COLOR_TEXT);
-    UIManager.put("MenuItem.background", Style.COLOR_BG);
-    UIManager.put("MenuItem.foreground", Style.COLOR_TEXT);
-    UIManager.put("MenuItem.selectionBackground", Style.COLOR_SELECT);
-    UIManager.put("MenuItem.selectionForeground", Style.COLOR_TEXT);
-    UIManager.put("MenuItem.disabledForeground", Style.COLOR_DISABLED_TEXT);
-    UIManager.put("Menu.disabledForeground", Style.COLOR_DISABLED_TEXT);
-    UIManager.put("PopupMenu.background", Style.COLOR_SURFACE);
-    UIManager.put("PopupMenu.foreground", Style.COLOR_TEXT);
-
     // ScrollBars - thinner, cleaner
     UIManager.put("ScrollBar.background", Style.COLOR_BG);
     UIManager.put("ScrollBar.foreground", Style.COLOR_BORDER);
@@ -846,9 +954,46 @@ public final class UI {
     UIManager.put("Editor.selection", new Color(53, 116, 242, 40));
     UIManager.put("Editor.workspaceTop", new Color(226, 232, 239));
     UIManager.put("Editor.workspaceBottom", new Color(205, 214, 224));
+    UIManager.put("Editor.assetExplorerBackground", Style.COLOR_ASSET_EXPLORER_LIGHT);
     UIManager.put("Editor.mapBacking", Color.WHITE);
     UIManager.put("Editor.mapBorder", new Color(105, 120, 136, 180));
     UIManager.put("Table.gridColor", Style.COLOR_LIGHT_GRID);
+    applyMenuOverrides(
+        panel != null ? panel : new Color(248, 248, 248),
+        new Color(53, 116, 242, 48),
+        text != null ? text : Color.DARK_GRAY,
+        new Color(120, 120, 120),
+        separator != null ? separator : new Color(205, 205, 205));
+  }
+
+  private static void applyMenuOverrides(
+      Color background, Color selection, Color text, Color disabledText, Color border) {
+    UIManager.put("MenuBar.background", Style.background());
+    UIManager.put("MenuBar.foreground", text);
+    UIManager.put("MenuBar.borderColor", Style.background());
+    UIManager.put("MenuBar.border", BorderFactory.createEmptyBorder());
+    for (String prefix : List.of("Menu", "MenuItem", "CheckBoxMenuItem", "RadioButtonMenuItem")) {
+      UIManager.put(prefix + ".background", background);
+      UIManager.put(prefix + ".foreground", text);
+      UIManager.put(prefix + ".disabledForeground", disabledText);
+      UIManager.put(prefix + ".selectionBackground", selection);
+      UIManager.put(prefix + ".selectionForeground", text);
+      UIManager.put(prefix + ".acceleratorForeground", Style.mutedText());
+      UIManager.put(prefix + ".acceleratorSelectionForeground", text);
+    }
+    UIManager.put("MenuItem.arc", Style.CORNER_RADIUS * 2);
+    UIManager.put("Menu.arc", Style.CORNER_RADIUS * 2);
+    UIManager.put("Menu.minPrefHeight", Style.CONTROL_HEIGHT);
+    UIManager.put("MenuItem.minPrefHeight", Style.CONTROL_HEIGHT);
+    UIManager.put("Menu.gap", Style.SPACE_MEDIUM);
+    UIManager.put("PopupMenu.background", background);
+    UIManager.put("PopupMenu.foreground", text);
+    UIManager.put("PopupMenu.translucentBackground", background);
+    UIManager.put("PopupMenu.borderColor", border);
+    UIManager.put("PopupMenu.borderThickness", 1);
+    UIManager.put("PopupMenu.borderRadius", Style.CORNER_RADIUS * 2);
+    UIManager.put("PopupMenuSeparator.foreground", border);
+    UIManager.put("PopupMenuSeparator.background", background);
   }
 
   private static void applyCompactMetrics() {
@@ -891,12 +1036,11 @@ public final class UI {
 
   static int initialInspectorDivider(
       int windowWidth, int hierarchyWidth, int inspectorWidth, int preferredInspectorWidth, int persistedDivider) {
-    int centerWidth = Math.max(inspectorWidth, windowWidth - hierarchyWidth - SPLITTER_SIZE);
-    int maximumDivider = Math.max(0, centerWidth - inspectorWidth);
+    int maximumDivider = Math.max(0, windowWidth - inspectorWidth);
     if (persistedDivider > 0) {
-      return Math.min(persistedDivider, maximumDivider);
+      return Math.min(persistedDivider + hierarchyWidth + SPLITTER_SIZE, maximumDivider);
     }
-    return Math.max(0, centerWidth - preferredInspectorWidth);
+    return Math.max(0, windowWidth - preferredInspectorWidth);
   }
 
   private static void updateOrphanComponents() {

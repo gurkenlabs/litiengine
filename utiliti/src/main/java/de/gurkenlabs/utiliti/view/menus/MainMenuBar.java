@@ -26,6 +26,7 @@ public class MainMenuBar extends JMenuBar {
     for (Component component : getComponents()) {
       if (component instanceof JMenu menu) {
         menu.setFont(menu.getFont().deriveFont(13f));
+        menu.setOpaque(false);
         menu.setMargin(new Insets(6, 12, 6, 12));
         menu.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
       }

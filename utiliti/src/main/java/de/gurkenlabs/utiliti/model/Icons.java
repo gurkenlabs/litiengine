@@ -56,6 +56,7 @@ public final class Icons {
 
   // 16px variants
   public static final Icon ADD_16 = IconLoader.get().getUIAwareIcon("add.svg", 16, 16);
+  public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 16, 16);
   public static final Icon ASSET_16 = IconLoader.get().getUIAwareIcon("asset.svg", 16, 16);
   public static final Icon ASSET_BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("asset_blueprint.svg", 16, 16);
   public static final Icon ASSET_EMITTER_16 = IconLoader.get().getUIAwareIcon("asset_emitter.svg", 16, 16);
@@ -93,6 +94,7 @@ public final class Icons {
   public static final Icon PLAY_16 = IconLoader.get().getUIAwareIcon("play.svg", 16, 16);
   public static final Icon PROP_16 = IconLoader.get().getUIAwareIcon("prop.svg", 16, 16);
   public static final Icon RENAME_16 = IconLoader.get().getUIAwareIcon("rename.svg", 16, 16);
+  public static final Icon REDO_16 = IconLoader.get().getUIAwareIcon("redo.svg", 16, 16);
   public static final Icon REWIND_16 = IconLoader.get().getUIAwareIcon("rewind.svg", 16, 16);
   public static final Icon SCROLL_DOWN_16 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 16, 16);
   public static final Icon SEARCH_16 = IconLoader.get().getUIAwareIcon("search.svg", 16, 16);
@@ -104,6 +106,7 @@ public final class Icons {
   public static final Icon TILESET_16 = IconLoader.get().getUIAwareIcon("tileset.svg", 16, 16);
   public static final Icon TERRAIN_16 = IconLoader.get().getUIAwareIcon("terrain.svg", 16, 16);
   public static final Icon TRIGGER_16 = IconLoader.get().getUIAwareIcon("trigger.svg", 16, 16);
+  public static final Icon UNDO_16 = IconLoader.get().getUIAwareIcon("undo.svg", 16, 16);
 
 
   // 24px variants

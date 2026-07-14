@@ -16,7 +16,7 @@ import javax.swing.Icon;
 public class TerrainBrushTool extends TileBrushTool {
   @Override
   public String getName() {
-    return "Terrain Brush";
+    return "Terrain";
   }
 
   @Override

@@ -11,7 +11,6 @@ import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -33,12 +32,17 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class AssetList extends JSplitPane implements Controller {
+  private static final int RESOURCE_EXPLORER_MIN_WIDTH = 180;
+  private static final int RESOURCE_EXPLORER_MAX_WIDTH = 320;
+  private static final int RESOURCE_EXPLORER_DEFAULT_WIDTH = 220;
+  private static final int ASSET_CONTENT_MIN_WIDTH = 360;
+  private static final int SEARCH_WIDTH = 340;
   private final AssetPanel assetPanel;
   private final AssetTree assetTree;
   private final JTextField searchField;
   private final JSlider zoomSlider;
-  private final JLabel titleLabel;
   private final JLabel summaryLabel;
+  private final JPanel toolbar;
   private final JScrollPane scrollPane;
 
   public AssetList() {
@@ -50,11 +54,20 @@ public class AssetList extends JSplitPane implements Controller {
     this.assetPanel.setChangedCallback(this::updateSummary);
 
     this.assetTree.setBorder(javax.swing.BorderFactory.createEmptyBorder(
-      Style.SPACE_MEDIUM, Style.SPACE_SMALL, Style.SPACE_MEDIUM, Style.SPACE_SMALL));
+      Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL));
 
-    JPanel leftPanel = new JPanel(new BorderLayout());
-    leftPanel.setOpaque(false);
+    JPanel leftPanel = new JPanel(new BorderLayout()) {
+      @Override
+      public void updateUI() {
+        super.updateUI();
+        setBackground(Style.assetExplorerBackground());
+      }
+    };
+    leftPanel.setOpaque(true);
     leftPanel.setBorder(null);
+    leftPanel.setMinimumSize(new Dimension(RESOURCE_EXPLORER_MIN_WIDTH, 0));
+    leftPanel.setPreferredSize(new Dimension(RESOURCE_EXPLORER_DEFAULT_WIDTH, 0));
+    leftPanel.setMaximumSize(new Dimension(RESOURCE_EXPLORER_MAX_WIDTH, Integer.MAX_VALUE));
     leftPanel.add(assetTree, BorderLayout.CENTER);
     this.setLeftComponent(leftPanel);
 
@@ -113,27 +126,19 @@ public class AssetList extends JSplitPane implements Controller {
       }
     });
 
-    RoundedSearchBox searchBox = new RoundedSearchBox(this.searchField, 240);
-    searchBox.setMinimumSize(new Dimension(80, Style.CONTROL_HEIGHT));
+    RoundedSearchBox searchBox = new RoundedSearchBox(this.searchField, SEARCH_WIDTH);
+    searchBox.setMinimumSize(new Dimension(200, Style.CONTROL_HEIGHT));
+    searchBox.setMaximumSize(new Dimension(SEARCH_WIDTH, Style.CONTROL_HEIGHT));
     searchBox.getClearButton().addActionListener(e -> {
       searchField.setText("");
       assetPanel.setFilterText("");
       updateSummary();
     });
 
-    this.titleLabel = new JLabel("Resources");
-    this.titleLabel.setForeground(Style.text());
-    this.titleLabel.setFont(this.titleLabel.getFont().deriveFont(Font.BOLD));
-
     this.summaryLabel = new JLabel();
     this.summaryLabel.setForeground(Style.mutedText());
     this.summaryLabel.setFont(this.summaryLabel.getFont().deriveFont(
       Math.max(10f, this.summaryLabel.getFont().getSize2D() - 1f)));
-
-    JPanel heading = new JPanel(new BorderLayout(0, 1));
-    heading.setOpaque(false);
-    heading.add(this.titleLabel, BorderLayout.NORTH);
-    heading.add(this.summaryLabel, BorderLayout.SOUTH);
 
     this.zoomSlider = new JSlider(96, 150, Editor.preferences().getAssetCardSize());
     this.zoomSlider.setPreferredSize(new Dimension(100, Style.CONTROL_HEIGHT));
@@ -162,22 +167,18 @@ public class AssetList extends JSplitPane implements Controller {
     assetPanel.setCompact(initialCompact);
     this.zoomSlider.setEnabled(!initialCompact);
 
-    JPanel tools = new JPanel(new FlowLayout(FlowLayout.TRAILING, Style.SPACE_SMALL, 0));
-    tools.setOpaque(false);
-    tools.add(densityToggle);
-    tools.add(this.zoomSlider);
-
-    JPanel topBar = new JPanel(new BorderLayout(Style.SPACE_LARGE, 0));
-    topBar.setOpaque(false);
-    topBar.setBorder(javax.swing.BorderFactory.createEmptyBorder(
-      Style.SPACE_SMALL, Style.SPACE_MEDIUM, Style.SPACE_SMALL, Style.SPACE_MEDIUM));
-    topBar.add(heading, BorderLayout.WEST);
-    topBar.add(searchBox, BorderLayout.CENTER);
-    topBar.add(tools, BorderLayout.EAST);
+    this.toolbar = new JPanel(new FlowLayout(
+      FlowLayout.TRAILING, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM));
+    this.toolbar.setOpaque(false);
+    this.toolbar.add(this.summaryLabel);
+    this.toolbar.add(searchBox);
+    this.toolbar.add(densityToggle);
+    this.toolbar.add(this.zoomSlider);
 
     JPanel rightPanel = new JPanel(new BorderLayout());
     rightPanel.setOpaque(false);
-    rightPanel.add(topBar, BorderLayout.NORTH);
+    rightPanel.setMinimumSize(new Dimension(ASSET_CONTENT_MIN_WIDTH, 0));
+    rightPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
     this.scrollPane =
       new JScrollPane(
@@ -190,13 +191,22 @@ public class AssetList extends JSplitPane implements Controller {
     this.scrollPane.getViewport().setBackground(Style.background());
     rightPanel.add(this.scrollPane, BorderLayout.CENTER);
 
-    this.addPropertyChangeListener(
-      JSplitPane.DIVIDER_LOCATION_PROPERTY,
-      evt -> Editor.preferences().setAssetsSplitter(this.getDividerLocation()));
-    this.setDividerLocation(
-      Editor.preferences().getAssetsSplitter() != 0
-        ? Editor.preferences().getAssetsSplitter()
-        : 200);
+    this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
+      int location = Math.max(
+        RESOURCE_EXPLORER_MIN_WIDTH,
+        Math.min(RESOURCE_EXPLORER_MAX_WIDTH, this.getDividerLocation()));
+      if (location != this.getDividerLocation()) {
+        this.setDividerLocation(location);
+      } else {
+        Editor.preferences().setAssetsSplitter(location);
+      }
+    });
+    int preferredDivider = Editor.preferences().getAssetsSplitter() != 0
+      ? Editor.preferences().getAssetsSplitter()
+      : RESOURCE_EXPLORER_DEFAULT_WIDTH;
+    this.setDividerLocation(Math.max(
+      RESOURCE_EXPLORER_MIN_WIDTH,
+      Math.min(RESOURCE_EXPLORER_MAX_WIDTH, preferredDivider)));
 
     this.setRightComponent(rightPanel);
     this.assetTree.selectDefault();
@@ -207,12 +217,13 @@ public class AssetList extends JSplitPane implements Controller {
     return this.assetTree;
   }
 
+  public JPanel getToolbar() {
+    return this.toolbar;
+  }
+
   @Override
   public void updateUI() {
     super.updateUI();
-    if (this.titleLabel != null) {
-      this.titleLabel.setForeground(Style.text());
-    }
     if (this.summaryLabel != null) {
       this.summaryLabel.setForeground(Style.mutedText());
     }
@@ -229,21 +240,6 @@ public class AssetList extends JSplitPane implements Controller {
   }
 
   public void updateSummary() {
-    if (this.titleLabel != null) {
-      String breadcrumb = this.assetTree.getCurrentBreadcrumb();
-      AssetPanelItem focused = this.assetPanel.getFocusedItem();
-      this.titleLabel.setText(breadcrumb);
-      if (focused != null) {
-        String details = focused.getDetailsSummary();
-        String tooltip = focused.getName();
-        if (!details.isBlank()) {
-          tooltip += " - " + details;
-        }
-        this.titleLabel.setToolTipText(tooltip);
-      } else {
-        this.titleLabel.setToolTipText(breadcrumb);
-      }
-    }
     if (this.summaryLabel != null) {
       int visible = this.assetPanel.getVisibleItemCount();
       int total = this.assetPanel.getTotalItemCount();

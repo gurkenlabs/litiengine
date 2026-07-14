@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 public class MapListCellRenderer extends JLabel implements ListCellRenderer<IMap> {
   public MapListCellRenderer() {
     setOpaque(true);
-    setBorder(new EmptyBorder(2, 5, 3, 5));
+    setBorder(new EmptyBorder(2, 10, 3, 10));
   }
 
   @Override

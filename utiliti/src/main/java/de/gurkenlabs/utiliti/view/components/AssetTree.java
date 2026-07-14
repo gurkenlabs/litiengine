@@ -11,23 +11,31 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
-import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 public class AssetTree extends JTree {
@@ -35,6 +43,7 @@ public class AssetTree extends JTree {
   private final DefaultTreeModel entitiesTreeModel;
   private final DefaultMutableTreeNode nodeRoot;
   private final DefaultMutableTreeNode nodeSpritesheets;
+  private final DefaultMutableTreeNode nodeResources;
   private final DefaultMutableTreeNode nodeSpriteProps;
   private final DefaultMutableTreeNode nodeSpriteMisc;
   private final DefaultMutableTreeNode nodeTileSets;
@@ -43,59 +52,50 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeBlueprints;
   private final DefaultMutableTreeNode nodeCreatures;
   private final DefaultMutableTreeNode nodeAnimations;
-  private String currentBreadcrumb = "Resources";
+  private final Map<DefaultMutableTreeNode, Integer> categoryCounts = new IdentityHashMap<>();
   private int hoveredRow = -1;
 
   public AssetTree(AssetPanel assetPanel) {
     this.setRootVisible(false);
     this.setShowsRootHandles(true);
-    this.setBackground(Style.surface());
+    this.setBackground(Style.assetExplorerBackground());
+    this.setOpaque(false);
+    this.putClientProperty("JTree.lineStyle", "None");
     this.getAccessibleContext().setAccessibleName("Resource categories");
 
     this.assetPanel = assetPanel;
 
-    this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_assets"), Icons.ASSET_8));
-    this.nodeSpritesheets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets"), Icons.SPRITESHEET_24));
-    this.nodeSpriteProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_props"), Icons.PROP_24));
-    this.nodeSpriteMisc = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_misc"), Icons.MISC_24));
-    this.nodeTileSets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_tilesets"), Icons.TILESET_24));
-    this.nodeSounds = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_sounds"), Icons.SOUND_24));
-    this.nodeEmitters = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_emitters"), Icons.EMITTER_24));
-    this.nodeBlueprints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_blueprints"), Icons.BLUEPRINT_24));
-    this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_creatures"), Icons.CREATURE_24));
-    this.nodeAnimations = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_animations"), Icons.ANIMATION_24));
+    this.nodeRoot = categoryNode(Resources.strings().get("assettree_assets"), Icons.ASSET_8, true);
+    this.nodeSpritesheets = categoryNode(Resources.strings().get("assettree_spritesheets"), Icons.SPRITESHEET_16, true);
+    this.nodeResources = categoryNode("Resources", Icons.ASSET_16, true);
+    this.nodeSpriteProps = categoryNode(Resources.strings().get("assettree_spritesheets_props"), Icons.PROP_16, false);
+    this.nodeSpriteMisc = categoryNode(Resources.strings().get("assettree_spritesheets_misc"), Icons.MISC_16, false);
+    this.nodeTileSets = categoryNode(Resources.strings().get("assettree_tilesets"), Icons.TILESET_16, false);
+    this.nodeSounds = categoryNode(Resources.strings().get("assettree_sounds"), Icons.SOUND_16, false);
+    this.nodeEmitters = categoryNode(Resources.strings().get("assettree_emitters"), Icons.EMITTER_16, false);
+    this.nodeBlueprints = categoryNode(Resources.strings().get("assettree_blueprints"), Icons.BLUEPRINT_16, false);
+    this.nodeCreatures = categoryNode(Resources.strings().get("assettree_creatures"), Icons.CREATURE_16, false);
+    this.nodeAnimations = categoryNode(Resources.strings().get("assettree_animations"), Icons.ANIMATION_16, false);
 
     this.nodeSpritesheets.add(this.nodeSpriteProps);
     this.nodeSpritesheets.add(this.nodeCreatures);
     this.nodeSpritesheets.add(this.nodeSpriteMisc);
 
     this.nodeRoot.add(this.nodeSpritesheets);
-    this.nodeRoot.add(this.nodeEmitters);
-    this.nodeRoot.add(this.nodeBlueprints);
-    this.nodeRoot.add(this.nodeTileSets);
-    this.nodeRoot.add(this.nodeSounds);
-    this.nodeRoot.add(this.nodeAnimations);
+    this.nodeResources.add(this.nodeEmitters);
+    this.nodeResources.add(this.nodeBlueprints);
+    this.nodeResources.add(this.nodeTileSets);
+    this.nodeResources.add(this.nodeSounds);
+    this.nodeResources.add(this.nodeAnimations);
+    this.nodeRoot.add(this.nodeResources);
 
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
     this.setModel(this.entitiesTreeModel);
-    this.setCellRenderer(new IconTreeListRenderer() {
-      @Override
-      public Component getTreeCellRendererComponent(
-          JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        Component component = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
-        if (component instanceof JComponent cell) {
-          cell.setForeground(Style.text());
-          cell.setBackground(selected ? Style.selection() : row == hoveredRow ? Style.hover() : Style.surface());
-          cell.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(hasFocus ? Style.accent() : cell.getBackground()),
-            BorderFactory.createEmptyBorder(1, 5, 1, 5)));
-        }
-        return component;
-      }
-    });
+    this.setCellRenderer(new AssetCategoryRenderer());
     this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
     this.setRowHeight((int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale()));
+    refreshCounts();
     for (int i = 0; i < getRowCount(); i++) {
       this.expandRow(i);
     }
@@ -123,10 +123,19 @@ public class AssetTree extends JTree {
   @Override
   public void updateUI() {
     super.updateUI();
-    setBackground(Style.surface());
+    setBackground(Style.assetExplorerBackground());
+    setOpaque(false);
+  }
+
+  @Override
+  protected void paintComponent(Graphics graphics) {
+    graphics.setColor(Style.assetExplorerBackground());
+    graphics.fillRect(0, 0, getWidth(), getHeight());
+    super.paintComponent(graphics);
   }
 
   public void forceUpdate() {
+    refreshCounts();
     if (getSelectionPath() == null) {
       selectDefault();
       return;
@@ -141,15 +150,10 @@ public class AssetTree extends JTree {
     loadAssetsOfCurrentSelection(propPath);
   }
 
-  public String getCurrentBreadcrumb() {
-    return this.currentBreadcrumb;
-  }
-
   private void loadAssetsOfCurrentSelection(TreePath selectedPath) {
     if (selectedPath == null) {
       return;
     }
-    this.currentBreadcrumb = breadcrumb(selectedPath);
 
     // Precompute TreePaths once
     final TreePath spritePath = new TreePath(this.nodeSpritesheets.getPath());
@@ -205,18 +209,6 @@ public class AssetTree extends JTree {
     if (selectedPath.equals(soundPath)) {
       this.assetPanel.loadSounds(gameFile.getSounds());
     }
-  }
-
-  private static String breadcrumb(TreePath path) {
-    Object[] parts = path.getPath();
-    StringBuilder sb = new StringBuilder("Resources");
-    for (int i = 1; i < parts.length; i++) {
-      Object part = parts[i];
-      if (part instanceof DefaultMutableTreeNode node) {
-        sb.append("  ›  ").append(node.getUserObject());
-      }
-    }
-    return sb.toString();
   }
 
   // --- Sprite classification helpers -----------------------------------------------------------
@@ -330,5 +322,100 @@ public class AssetTree extends JTree {
       }
     }
     return all;
+  }
+
+  private static DefaultMutableTreeNode categoryNode(String label, javax.swing.Icon icon, boolean group) {
+    return new DefaultMutableTreeNode(new AssetCategory(label, icon, group));
+  }
+
+  private void refreshCounts() {
+    this.categoryCounts.clear();
+    ResourceBundle gameFile = Editor.instance().getGameFile();
+    if (gameFile != null) {
+      this.categoryCounts.put(this.nodeSpriteProps, getBasePropSprites(gameFile).size());
+      this.categoryCounts.put(this.nodeCreatures, getBaseCreatureSprites(gameFile).size());
+      this.categoryCounts.put(this.nodeSpriteMisc, getMiscSprites(gameFile).size());
+      this.categoryCounts.put(this.nodeEmitters, gameFile.getEmitters().size());
+      this.categoryCounts.put(this.nodeBlueprints, gameFile.getBluePrints().size());
+      this.categoryCounts.put(this.nodeTileSets, collectAllTilesets(gameFile).size());
+      this.categoryCounts.put(this.nodeSounds, gameFile.getSounds().size());
+    }
+    this.categoryCounts.put(this.nodeAnimations, Resources.animations().getAll().size());
+    repaint();
+  }
+
+  private record AssetCategory(String label, javax.swing.Icon icon, boolean group) {
+    @Override
+    public String toString() {
+      return this.label;
+    }
+  }
+
+  private final class AssetCategoryRenderer extends JPanel implements TreeCellRenderer {
+    private final JLabel name = new JLabel();
+    private final JLabel count = new JLabel();
+    private boolean selectedRow;
+    private boolean hovered;
+
+    private AssetCategoryRenderer() {
+      super(new BorderLayout(8, 0));
+      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 8));
+      this.name.setIconTextGap(8);
+      this.count.setHorizontalAlignment(JLabel.RIGHT);
+      add(this.name, BorderLayout.CENTER);
+      add(this.count, BorderLayout.EAST);
+    }
+
+    @Override
+    public Component getTreeCellRendererComponent(
+        JTree tree,
+        Object value,
+        boolean selected,
+        boolean expanded,
+        boolean leaf,
+        int row,
+        boolean hasFocus) {
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+      AssetCategory category = (AssetCategory) node.getUserObject();
+      this.name.setText(category.label());
+      this.name.setIcon(category.icon());
+      this.name.setFont(tree.getFont().deriveFont(category.group() ? Font.BOLD : Font.PLAIN));
+      this.count.setFont(tree.getFont().deriveFont(Font.PLAIN));
+      this.count.setText(category.group() ? "" : Integer.toString(categoryCounts.getOrDefault(node, 0)));
+
+      java.awt.Color foreground = Style.text();
+      this.name.setForeground(foreground);
+      this.count.setForeground(selected ? Style.text() : Style.mutedText());
+      this.selectedRow = selected;
+      this.hovered = row == hoveredRow;
+      setBackground(Style.assetExplorerBackground());
+      setOpaque(true);
+
+      int depthInset = Math.max(0, node.getLevel() - 1) * 20;
+      int width = Math.max(120, tree.getWidth() - 34 - depthInset);
+      setPreferredSize(new Dimension(width, tree.getRowHeight()));
+      return this;
+    }
+
+    @Override
+    protected void paintComponent(Graphics graphics) {
+      super.paintComponent(graphics);
+      if (this.selectedRow || this.hovered) {
+        Graphics2D g2 = (Graphics2D) graphics.create();
+        try {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          g2.setColor(this.selectedRow ? Style.raisedSurface() : Style.hover());
+          g2.fillRoundRect(
+              0,
+              1,
+              getWidth(),
+              Math.max(0, getHeight() - 2),
+              Style.CORNER_RADIUS * 2,
+              Style.CORNER_RADIUS * 2);
+        } finally {
+          g2.dispose();
+        }
+      }
+    }
   }
 }
