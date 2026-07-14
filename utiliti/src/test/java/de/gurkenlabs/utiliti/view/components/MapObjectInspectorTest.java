@@ -8,12 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import java.awt.Component;
 import java.awt.Container;
 import javax.swing.JCheckBox;
 import javax.swing.SpinnerNumberModel;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(SwingTestSuite.class)
 class MapObjectInspectorTest {
 
   @Test
