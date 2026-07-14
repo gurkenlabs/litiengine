@@ -56,6 +56,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -82,12 +83,17 @@ public class Editor extends Screen {
 
   private long statusTick;
   private String currentStatus;
+  private String displayedWindowTitle;
+  private String displayedTrayTooltip;
+  private String displayedMapName;
+  private final AtomicBoolean windowMetadataDirty = new AtomicBoolean(true);
   private boolean loading;
 
   private Editor() {
     super("Editor");
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
     this.mapComponent = new MapComponent();
+    this.mapComponent.onMapLoaded(map -> this.windowMetadataDirty.set(true));
   }
 
   public static Editor instance() {
@@ -121,22 +127,45 @@ public class Editor extends Screen {
       Game.world().environment().render(g);
     }
 
-    if (this.currentResourceFile != null) {
-      Game.window().setTitle(Game.info().getName() + " " + Game.info().getVersion() + " - " + this.currentResourceFile);
-
-      String mapName = Game.world().environment() != null && Game.world().environment().getMap() != null
-        ? "\nMap: " + Game.world().environment().getMap().getName()
-        : "";
-      Tray.setToolTip(Game.info().getName() + " " + Game.info().getVersion() + "\n" + this.currentResourceFile + mapName);
-    } else if (this.getProjectPath() != null) {
-      Game.window().setTitle(Game.info().getTitle() + " - " + NEW_GAME_STRING);
-      Tray.setToolTip(Game.info().getTitle() + "\n" + NEW_GAME_STRING);
-    } else {
-      Game.window().setTitle(Game.info().getTitle());
+    String mapName = Game.world().environment() != null && Game.world().environment().getMap() != null
+      ? Game.world().environment().getMap().getName()
+      : null;
+    if (!Objects.equals(this.displayedMapName, mapName)) {
+      this.windowMetadataDirty.set(true);
+    }
+    if (this.windowMetadataDirty.getAndSet(false)) {
+      updateWindowMetadata(mapName);
     }
 
     super.render(g);
     WorkspaceRenderer.renderMapBounds(g);
+  }
+
+  private void updateWindowMetadata(String mapName) {
+    String title;
+    String tooltip;
+    if (this.currentResourceFile != null) {
+      title = Game.info().getName() + " " + Game.info().getVersion() + " - " + this.currentResourceFile;
+      String mapDescription = mapName != null ? "\nMap: " + mapName : "";
+      tooltip = Game.info().getName() + " " + Game.info().getVersion()
+        + "\n" + this.currentResourceFile + mapDescription;
+    } else if (this.getProjectPath() != null) {
+      title = Game.info().getTitle() + " - " + NEW_GAME_STRING;
+      tooltip = Game.info().getTitle() + "\n" + NEW_GAME_STRING;
+    } else {
+      title = Game.info().getTitle();
+      tooltip = title;
+    }
+
+    if (!Objects.equals(this.displayedWindowTitle, title)) {
+      Game.window().setTitle(title);
+      this.displayedWindowTitle = title;
+    }
+    if (!Objects.equals(this.displayedTrayTooltip, tooltip)) {
+      Tray.setToolTip(tooltip);
+      this.displayedTrayTooltip = tooltip;
+    }
+    this.displayedMapName = mapName;
   }
 
   public ResourceBundle getGameFile() {
@@ -153,6 +182,7 @@ public class Editor extends Screen {
 
   public void setProjectPath(Path projectPath) {
     this.projectPath = projectPath;
+    this.windowMetadataDirty.set(true);
   }
 
   public void create() {
@@ -759,6 +789,7 @@ public class Editor extends Screen {
 
       getGameFile().save(target.toString(), preferences().compressFile());
       this.currentResourceFile = target;
+      this.windowMetadataDirty.set(true);
       preferences().addOpenedFile(target);
       gamefileLoaded();
       log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",

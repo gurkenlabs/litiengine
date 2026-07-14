@@ -892,7 +892,9 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    getMaps().removeIf(x -> x.getName().equals(Game.world().environment().getMap().getName()));
+    String deletedMapName = Game.world().environment().getMap().getName();
+    getMaps().removeIf(x -> x.getName().equals(deletedMapName));
+    clearMapObjectState(deletedMapName);
 
     // TODO: remove all tile sets from the game file that are no longer needed
     // by any other map.
@@ -940,6 +942,7 @@ public class MapComponent extends GuiComponent {
           if (ConfirmDialog.show(
             Resources.strings().get("input_replace_map_title"),
             Resources.strings().get("input_replace_map", map.getName()))) {
+            clearMapObjectState(map.getName());
             getMaps().remove(current.get());
           } else {
             return;
@@ -1107,6 +1110,21 @@ public class MapComponent extends GuiComponent {
   public void setCreateDefinition(ProjectCodeIntegration.Definition definition) {
     this.createDefinition = definition;
     this.setTransformMode(TransformMode.CREATE);
+  }
+
+  private void clearMapObjectState(String mapName) {
+    if (mapName == null) {
+      return;
+    }
+    boolean activeMap = Game.world().environment() != null
+      && Game.world().environment().getMap() != null
+      && mapName.equals(Game.world().environment().getMap().getName());
+    if (activeMap) {
+      setFocus(null, true);
+      setSelection((IMapObject) null, true);
+    }
+    this.focusedObjects.remove(mapName);
+    this.selectedObjects.remove(mapName);
   }
 
   public void setCreateMapObjectType(MapObjectType type) {

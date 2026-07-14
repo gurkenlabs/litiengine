@@ -1,21 +1,16 @@
 package de.gurkenlabs.utiliti.view.renderers;
 
 import java.awt.Graphics2D;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Renderers {
-  private static final List<IEditorRenderer> editorRenderers;
-
-  static {
-    editorRenderers = new CopyOnWriteArrayList<>();
-    editorRenderers.add(new GridRenderer());
-    editorRenderers.add(new MapObjectsRenderer());
-    editorRenderers.add(new SelectionRenderer());
-    editorRenderers.add(new FocusRenderer());
-    editorRenderers.add(new NewObjectAreaRenderer());
-    editorRenderers.add(new MouseSelectAreaRenderer());
-  }
+  private static final IEditorRenderer[] editorRenderers = {
+    new GridRenderer(),
+    new MapObjectsRenderer(),
+    new SelectionRenderer(),
+    new FocusRenderer(),
+    new NewObjectAreaRenderer(),
+    new MouseSelectAreaRenderer()
+  };
 
   private Renderers() {}
 

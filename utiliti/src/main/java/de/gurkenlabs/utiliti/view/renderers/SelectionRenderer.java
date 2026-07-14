@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.view.renderers;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.utiliti.controller.Editor;
@@ -13,9 +12,11 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
+import java.util.List;
 import java.util.Objects;
 
 public class SelectionRenderer implements IEditorRenderer {
+  private static final Stroke SELECTION_STROKE = new BasicStroke(1.5f);
   private Color colorSelectionBorder;
   private float selectionBorderBrightness = 0;
   private boolean selectionBorderBrightnessIncreasing = true;
@@ -27,41 +28,27 @@ public class SelectionRenderer implements IEditorRenderer {
 
   @Override
   public void render(Graphics2D g) {
+    List<IMapObject> selectedMapObjects = Editor.instance().getMapComponent().getSelectedMapObjects();
+    if (selectedMapObjects.isEmpty()) {
+      return;
+    }
     this.updateSelectionColor();
+    IMapObject focusedMapObject = Editor.instance().getMapComponent().getFocusedMapObject();
 
-    for (IMapObject mapObject : Editor.instance().getMapComponent().getSelectedMapObjects()) {
-      if (!isInCurrentMap(mapObject)) {
-        continue;
-      }
-
+    for (IMapObject mapObject : selectedMapObjects) {
       renderObjectId(g, mapObject);
 
-      if (mapObject.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
+      if (mapObject.equals(focusedMapObject)) {
         continue;
       }
 
-      Stroke stroke = new BasicStroke(1.5f);
-
       g.setColor(colorSelectionBorder);
-      g.setStroke(stroke);
+      g.setStroke(SELECTION_STROKE);
       java.awt.geom.Rectangle2D bb = mapObject.getBoundingBox();
       java.awt.geom.Rectangle2D screenBounds = EditorRenderHelper.toScreen(bb);
       double arc = 4.0;
       g.draw(new RoundRectangle2D.Double(screenBounds.getX(), screenBounds.getY(), screenBounds.getWidth(), screenBounds.getHeight(), arc, arc));
     }
-  }
-
-  static boolean isInCurrentMap(IMapObject mapObject) {
-    if (mapObject == null || Game.world().environment() == null || Game.world().environment().getMap() == null) {
-      return false;
-    }
-
-    for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
-      if (layer != null && layer.getMapObjects().contains(mapObject)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private void updateSelectionColor() {
