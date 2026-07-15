@@ -54,6 +54,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -146,7 +147,7 @@ public class Editor extends Screen {
     String tooltip;
     if (this.currentResourceFile != null) {
       title = Game.info().getName() + " " + Game.info().getVersion() + " - " + this.currentResourceFile;
-      String mapDescription = mapName != null ? "\nMap: " + mapName : "";
+      String mapDescription = mapName != null ? "\n" + Resources.strings().get("tray_map", mapName) : "";
       tooltip = Game.info().getName() + " " + Game.info().getVersion()
         + "\n" + this.currentResourceFile + mapDescription;
     } else if (this.getProjectPath() != null) {
@@ -231,7 +232,7 @@ public class Editor extends Screen {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
 
-    this.setCurrentStatus("created new project");
+    this.setCurrentStatus(Resources.strings().get("status_project_created"));
   }
 
   public void load() {
@@ -282,9 +283,7 @@ public class Editor extends Screen {
     }
 
     final long currentTime = System.nanoTime();
-    Game.window().cursor().set(Cursors.LOAD, 0, 0);
-    Game.window().cursor().setOffsetX(0);
-    Game.window().cursor().setOffsetY(0);
+    Cursors.apply(Cursors.LOAD);
 
     this.loading = true;
     try {
@@ -341,7 +340,7 @@ public class Editor extends Screen {
       this.gamefileLoaded();
       this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
     } finally {
-      Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
+      Cursors.apply(Cursors.DEFAULT);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] {gameFile, (System.nanoTime() - currentTime) / 1000000.0});
       this.loading = false;
     }
@@ -352,7 +351,6 @@ public class Editor extends Screen {
   }
 
   public void importSpriteFile() {
-
     if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, Resources.strings().get(IMPORT_DIALOGUE, SPRITE_FILE_NAME), false,
       SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       File spriteFile = EditorFileChooser.instance().getSelectedFile();
@@ -360,8 +358,14 @@ public class Editor extends Screen {
         return;
       }
 
-      List<Spritesheet> loaded = Resources.spritesheets().loadFrom(spriteFile.toString());
-      List<SpritesheetResource> infos = new ArrayList<>();
+      this.importSpriteFile(spriteFile.toPath());
+    }
+  }
+
+  public void importSpriteFile(Path... files) {
+    List<SpritesheetResource> infos = new ArrayList<>();
+    for (Path file : files) {
+      List<Spritesheet> loaded = Resources.spritesheets().loadFrom(file.toString());
       for (Spritesheet sprite : loaded) {
         SpritesheetResource info = new SpritesheetResource(sprite);
         infos.add(info);
@@ -369,8 +373,8 @@ public class Editor extends Screen {
         this.getGameFile().getSpriteSheets().add(info);
       }
 
-      this.loadSpriteSheets(infos, true);
     }
+    this.loadSpriteSheets(infos, true);
   }
 
   public void importSpriteSheets() {
@@ -464,7 +468,7 @@ public class Editor extends Screen {
     this.processSpritesheets(spritePanel);
   }
 
-  private void importSounds(Path... selectedFiles) {
+  public void importSounds(Path... selectedFiles) {
     for (Path file : selectedFiles) {
       try (InputStream stream = Files.newInputStream(file)) {
         SoundFormat format = SoundFormat.get(FileUtilities.getExtension(file));
@@ -581,80 +585,153 @@ public class Editor extends Screen {
   }
 
   public void importEmitters() {
-    XmlImportDialog.importXml("Emitter", file -> {
-      EmitterAttributes emitter;
-      try {
-        emitter = XmlUtilities.read(EmitterAttributes.class, file.toUri().toURL());
-      } catch (IOException | JAXBException e) {
-        log.log(Level.SEVERE, String.format("could not load emitter data from %s", file), e);
+    XmlImportDialog.importXml(Resources.strings().get("resource_emitter"), this::importEmitter);
+  }
+
+  public void importEmitters(Path... files) {
+    Stream.of(files).forEach(this::importEmitter);
+    UI.getAssetController().refresh();
+  }
+
+  private void importEmitter(Path file) {
+    EmitterAttributes emitter;
+    try {
+      emitter = XmlUtilities.read(EmitterAttributes.class, file.toUri().toURL());
+    } catch (IOException | JAXBException e) {
+      log.log(Level.SEVERE, String.format("could not load emitter data from %s", file), e);
+      return;
+    }
+
+    if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(Objects.requireNonNull(emitter).getName()))) {
+      if (!ConfirmDialog.show(Resources.strings().get("import_emitter_title"),
+        Resources.strings().get("import_emitter_question", emitter.getName()))) {
         return;
       }
 
-      if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(Objects.requireNonNull(emitter).getName()))) {
-        if (!ConfirmDialog.show(Resources.strings().get("import_emitter_title"),
-          Resources.strings().get("import_emitter_question", emitter.getName()))) {
-          return;
-        }
+      this.gameFile.getEmitters().removeIf(x -> x.getName().equals(emitter.getName()));
+    }
 
-        this.gameFile.getEmitters().removeIf(x -> x.getName().equals(emitter.getName()));
-      }
-
-      this.gameFile.getEmitters().add(emitter);
-      UI.getAssetController().refresh();
-      log.log(Level.INFO, "imported emitter {0} from {1}", new Object[] {Objects.requireNonNull(emitter).getName(), file});
-    });
+    this.gameFile.getEmitters().add(emitter);
+    log.log(Level.INFO, "imported emitter {0} from {1}", new Object[] {Objects.requireNonNull(emitter).getName(), file});
   }
 
   public void importBlueprints() {
-    XmlImportDialog.importXml("Blueprint", file -> {
-      Blueprint blueprint;
-      try {
-        blueprint = XmlUtilities.read(Blueprint.class, file.toUri().toURL());
-      } catch (IOException | JAXBException e) {
-        log.log(Level.SEVERE, String.format("could not load blueprint from %s", file), e);
-        return;
-      }
-      if (blueprint == null) {
-        return;
-      }
+    XmlImportDialog.importXml(Resources.strings().get("resource_blueprint"), this::importBlueprint, Blueprint.BLUEPRINT_FILE_EXTENSION,
+      Blueprint.TEMPLATE_FILE_EXTENSION);
+  }
 
-      if (blueprint.getName() == null || blueprint.getName().isEmpty()) {
-        blueprint.setName(FileUtilities.getFileName(file.getFileName().toString()));
-      }
+  public void importBlueprints(Path... files) {
+    Stream.of(files).forEach(this::importBlueprint);
+    UI.getAssetController().refresh();
+  }
 
-      if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName())) && !ConfirmDialog.show(
-        Resources.strings().get("import_blueprint_title"), Resources.strings().get("import_blueprint_question", blueprint.getName()))) {
-        return;
-      }
+  private void importBlueprint(Path file) {
+    Blueprint blueprint;
+    try {
+      blueprint = XmlUtilities.read(Blueprint.class, file.toUri().toURL());
+    } catch (IOException | JAXBException e) {
+      log.log(Level.SEVERE, String.format("could not load blueprint from %s", file), e);
+      return;
+    }
+    if (blueprint == null) {
+      return;
+    }
 
-      this.gameFile.getBluePrints().add(blueprint);
-      Resources.blueprints().add(blueprint.getName(), blueprint);
-      UI.getAssetController().refresh();
+    if (blueprint.getName() == null || blueprint.getName().isEmpty()) {
+      blueprint.setName(FileUtilities.getFileName(file.getFileName().toString()));
+    }
 
-      log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] {blueprint.getName(), file});
-    }, Blueprint.BLUEPRINT_FILE_EXTENSION, Blueprint.TEMPLATE_FILE_EXTENSION);
+    if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName())) && !ConfirmDialog.show(
+      Resources.strings().get("import_blueprint_title"), Resources.strings().get("import_blueprint_question", blueprint.getName()))) {
+      return;
+    }
+
+    this.gameFile.getBluePrints().add(blueprint);
+    Resources.blueprints().add(blueprint.getName(), blueprint);
+    log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] {blueprint.getName(), file});
   }
 
   public void importTilesets() {
-    XmlImportDialog.importXml("Tilesets", file -> {
-      Tileset tileset;
-      try {
-        URL path = file.toUri().toURL();
-        tileset = XmlUtilities.read(Tileset.class, path);
-        Objects.requireNonNull(tileset).finish(path);
-      } catch (IOException | JAXBException e) {
-        log.log(Level.SEVERE, String.format("could not load tileset from %s", file), e);
-        return;
-      }
+    XmlImportDialog.importXml(Resources.strings().get("resource_tilesets"), this::importTileset, Tileset.FILE_EXTENSION);
+  }
 
-      if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName())) && !ConfirmDialog.show(
-        Resources.strings().get("import_tileset_title"), Resources.strings().get("import_tileset_title", tileset.getName()))) {
-        return;
-      }
+  public void importTilesets(Path... files) {
+    Stream.of(files).forEach(this::importTileset);
+    UI.getAssetController().refresh();
+  }
 
-      loadTileset(tileset, false);
-      log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] {tileset.getName(), file});
-    }, Tileset.FILE_EXTENSION);
+  private void importTileset(Path file) {
+    Tileset tileset;
+    try {
+      URL path = file.toUri().toURL();
+      tileset = XmlUtilities.read(Tileset.class, path);
+      Objects.requireNonNull(tileset).finish(path);
+    } catch (IOException | JAXBException e) {
+      log.log(Level.SEVERE, String.format("could not load tileset from %s", file), e);
+      return;
+    }
+
+    if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName())) && !ConfirmDialog.show(
+      Resources.strings().get("import_tileset_title"), Resources.strings().get("import_tileset_title", tileset.getName()))) {
+      return;
+    }
+
+    loadTileset(tileset, false);
+    log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] {tileset.getName(), file});
+  }
+
+  public void importResources(Path... files) {
+    List<Path> spritesheets = new ArrayList<>();
+    List<Path> sounds = new ArrayList<>();
+    List<Path> animations = new ArrayList<>();
+    List<Path> spriteDefinitions = new ArrayList<>();
+    List<Path> emitters = new ArrayList<>();
+    List<Path> blueprints = new ArrayList<>();
+    List<Path> tilesets = new ArrayList<>();
+
+    for (Path file : files) {
+      if (file == null || !Files.isRegularFile(file)) {
+        continue;
+      }
+      String extension = FileUtilities.getExtension(file).toLowerCase(Locale.ROOT);
+      if (ImageFormat.isSupported(file)) {
+        spritesheets.add(file);
+      } else if (SoundFormat.isSupported(file)) {
+        sounds.add(file);
+      } else if (extension.equals("json")) {
+        animations.add(file);
+      } else if (extension.equals(SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION)) {
+        spriteDefinitions.add(file);
+      } else if (extension.equals(Blueprint.BLUEPRINT_FILE_EXTENSION) || extension.equals(Blueprint.TEMPLATE_FILE_EXTENSION)) {
+        blueprints.add(file);
+      } else if (extension.equals(Tileset.FILE_EXTENSION)) {
+        tilesets.add(file);
+      } else if (extension.equals("xml")) {
+        emitters.add(file);
+      }
+    }
+
+    if (!spritesheets.isEmpty()) {
+      importSpriteSheets(spritesheets.toArray(Path[]::new));
+    }
+    if (!sounds.isEmpty()) {
+      importSounds(sounds.toArray(Path[]::new));
+    }
+    if (!animations.isEmpty()) {
+      importAnimations(animations.toArray(Path[]::new));
+    }
+    if (!spriteDefinitions.isEmpty()) {
+      importSpriteFile(spriteDefinitions.toArray(Path[]::new));
+    }
+    if (!emitters.isEmpty()) {
+      importEmitters(emitters.toArray(Path[]::new));
+    }
+    if (!blueprints.isEmpty()) {
+      importBlueprints(blueprints.toArray(Path[]::new));
+    }
+    if (!tilesets.isEmpty()) {
+      importTilesets(tilesets.toArray(Path[]::new));
+    }
   }
 
   public boolean isLoading() {
@@ -807,7 +884,7 @@ public class Editor extends Screen {
       this.saveMaps();
     } catch (IOException e) {
       log.log(Level.SEVERE, "Failed to save game file: " + e.getMessage(), e);
-      this.setCurrentStatus("Error saving game file: " + e.getMessage());
+      this.setCurrentStatus(Resources.strings().get("status_gamefile_save_error", e.getMessage()));
     }
   }
 

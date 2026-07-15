@@ -61,13 +61,13 @@ public class AssetTree extends JTree {
     this.setBackground(Style.assetExplorerBackground());
     this.setOpaque(false);
     this.putClientProperty("JTree.lineStyle", "None");
-    this.getAccessibleContext().setAccessibleName("Resource categories");
+    this.getAccessibleContext().setAccessibleName(Resources.strings().get("assettree_categories"));
 
     this.assetPanel = assetPanel;
 
     this.nodeRoot = categoryNode(Resources.strings().get("assettree_assets"), Icons.ASSET_8, true);
     this.nodeSpritesheets = categoryNode(Resources.strings().get("assettree_spritesheets"), Icons.SPRITESHEET_16, true);
-    this.nodeResources = categoryNode("Resources", Icons.ASSET_16, true);
+    this.nodeResources = categoryNode(Resources.strings().get("assettree_assets"), Icons.ASSET_16, true);
     this.nodeSpriteProps = categoryNode(Resources.strings().get("assettree_spritesheets_props"), Icons.PROP_16, false);
     this.nodeSpriteMisc = categoryNode(Resources.strings().get("assettree_spritesheets_misc"), Icons.MISC_16, false);
     this.nodeTileSets = categoryNode(Resources.strings().get("assettree_tilesets"), Icons.TILESET_16, false);
@@ -381,7 +381,8 @@ public class AssetTree extends JTree {
       this.name.setIcon(category.icon());
       this.name.setFont(tree.getFont().deriveFont(category.group() ? Font.BOLD : Font.PLAIN));
       this.count.setFont(tree.getFont().deriveFont(Font.PLAIN));
-      this.count.setText(category.group() ? "" : Integer.toString(categoryCounts.getOrDefault(node, 0)));
+      this.count.setText(category.group() ? "" : Resources.strings().get(
+          "assettree_category_count", categoryCounts.getOrDefault(node, 0)));
 
       java.awt.Color foreground = Style.text();
       this.name.setForeground(foreground);

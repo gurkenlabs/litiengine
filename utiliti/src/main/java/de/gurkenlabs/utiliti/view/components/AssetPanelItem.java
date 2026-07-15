@@ -1,10 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -18,7 +14,6 @@ import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.utiliti.controller.Editor;
-import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
@@ -48,7 +43,6 @@ import java.awt.geom.RoundRectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -98,6 +92,7 @@ public class AssetPanelItem extends JPanel {
   private int cardSize = PREFERRED_SIZE.width;
   private Consumer<AssetPanelItem> focusCallback;
   private MouseAdapter mouseHandler;
+  private boolean dragStarted;
 
   public AssetPanelItem(Object origin) {
     this.origin = origin;
@@ -345,8 +340,18 @@ public class AssetPanelItem extends JPanel {
       }
 
       @Override public void mousePressed(MouseEvent e) {
+        dragStarted = false;
         requestFocus();
         maybeShowPopup(e);
+      }
+
+      @Override public void mouseDragged(MouseEvent e) {
+        if (dragStarted || (e.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) == 0) {
+          return;
+        }
+        dragStarted = true;
+        MouseEvent event = SwingUtilities.convertMouseEvent(e.getComponent(), e, AssetPanelItem.this);
+        getTransferHandler().exportAsDrag(AssetPanelItem.this, event, TransferHandler.COPY);
       }
 
       @Override public void mouseReleased(MouseEvent e) {
@@ -367,6 +372,10 @@ public class AssetPanelItem extends JPanel {
     boolean installed = java.util.Arrays.stream(component.getMouseListeners()).anyMatch(listener -> listener == this.mouseHandler);
     if (!installed) {
       component.addMouseListener(this.mouseHandler);
+    }
+    boolean motionInstalled = java.util.Arrays.stream(component.getMouseMotionListeners()).anyMatch(listener -> listener == this.mouseHandler);
+    if (!motionInstalled) {
+      component.addMouseMotionListener(this.mouseHandler);
     }
     if (component instanceof Container container) {
       for (Component child : container.getComponents()) {
@@ -510,18 +519,23 @@ public class AssetPanelItem extends JPanel {
   public static Map<String, String> getDetails(Object origin) {
     Map<String, String> details = new java.util.LinkedHashMap<>();
     if (origin instanceof SpritesheetResource spritesheetResource) {
-      details.put("Size", spritesheetResource.getWidth() + "x" + spritesheetResource.getHeight() + "px");
+      details.put(Resources.strings().get("emitter_size"), Resources.strings().get(
+        "assetpanel_pixel_dimensions", spritesheetResource.getWidth(), spritesheetResource.getHeight()));
     } else if (origin instanceof Animation animation) {
-      details.put("Frames", String.valueOf(animation.getKeyframes().size()));
-      details.put("Duration", animation.getTotalDuration() + "ms");
+      details.put(Resources.strings().get("assetpanel_animation_frames"), Resources.strings().get(
+        "assetpanel_metadata_count", animation.getKeyframes().size()));
+      details.put(Resources.strings().get("assetpanel_animation_duration"), Resources.strings().get(
+        "assetpanel_metadata_count", animation.getTotalDuration()));
       if (animation.getSpritesheet() != null) {
-        details.put("Spritesheet", animation.getSpritesheet().getName());
+        details.put(Resources.strings().get("assetpanel_animation_spritesheet"), animation.getSpritesheet().getName());
       }
     } else if (origin instanceof Tileset tileset) {
-      details.put("Tiles", String.valueOf(tileset.getTileCount()));
-      details.put("Tile size", tileset.getTileWidth() + "x" + tileset.getTileHeight());
+      details.put(Resources.strings().get("assetpanel_metadata_tiles"), Resources.strings().get(
+        "assetpanel_metadata_count", tileset.getTileCount()));
+      details.put(Resources.strings().get("assetpanel_metadata_tile_size"), Resources.strings().get(
+        "assetpanel_dimensions", tileset.getTileWidth(), tileset.getTileHeight()));
       if (tileset.getImage() != null) {
-        details.put("Image", tileset.getImage().getSource());
+        details.put(Resources.strings().get("assetpanel_metadata_image"), tileset.getImage().getSource());
       }
     }
     return details;
@@ -661,61 +675,7 @@ public class AssetPanelItem extends JPanel {
     if (Game.world().environment() == null || Game.world().camera() == null) {
       return;
     }
-
-    if (origin instanceof SpritesheetResource spritesheetResource) {
-      addSpriteEntity(spritesheetResource);
-    } else if (origin instanceof EmitterAttributes) {
-      addEmitterEntity();
-    } else if (origin instanceof Blueprint blueprint) {
-      addBlueprintEntity(blueprint);
-    }
-  }
-
-  private void addSpriteEntity(SpritesheetResource spritesheetResource) {
-    String propName = PropPanel.getIdentifierBySpriteName(spritesheetResource.getName());
-    String creatureName = CreaturePanel.getCreatureSpriteName(spritesheetResource.getName());
-    if (propName == null && creatureName == null) {
-      return;
-    }
-
-    MapObject mo = new MapObject();
-    mo.setType(propName != null ? MapObjectType.PROP.name() : MapObjectType.CREATURE.name());
-    mo.setValue(MapObjectProperty.SPRITESHEETNAME, propName != null ? propName : creatureName);
-
-    mo.setX((int) Game.world().camera().getFocus().getX() - spritesheetResource.getWidth() / 2f);
-    mo.setY((int) Game.world().camera().getFocus().getY() - spritesheetResource.getHeight() / 2f);
-    mo.setWidth(spritesheetResource.getWidth());
-    mo.setHeight(spritesheetResource.getHeight());
-    mo.setId(Game.world().environment().getNextMapId());
-    mo.setName("");
-    mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, spritesheetResource.getWidth() * 0.4);
-    mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, spritesheetResource.getHeight() * 0.4);
-    mo.setValue(MapObjectProperty.COLLISION, true);
-    mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
-    mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
-
-    Editor.instance().getMapComponent().add(mo);
-  }
-
-  private void addEmitterEntity() {
-    MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterAttributes) origin);
-    newEmitter.setX((int) (Game.world().camera().getFocus().getX() - newEmitter.getWidth()));
-    newEmitter.setY((int) (Game.world().camera().getFocus().getY() - newEmitter.getHeight()));
-    newEmitter.setId(Game.world().environment().getNextMapId());
-    Editor.instance().getMapComponent().add(newEmitter);
-  }
-
-  private void addBlueprintEntity(Blueprint blueprint) {
-    UndoManager.instance().beginOperation();
-    try {
-      List<IMapObject> newObjects = blueprint.build((int) Game.world().camera().getFocus().getX() - blueprint.getWidth() / 2,
-        (int) Game.world().camera().getFocus().getY() - blueprint.getHeight() / 2);
-
-      newObjects.forEach(obj -> Editor.instance().getMapComponent().add(obj));
-      newObjects.forEach(obj -> Editor.instance().getMapComponent().setSelection(obj, false));
-    } finally {
-      UndoManager.instance().endOperation();
-    }
+    Editor.instance().getMapComponent().addMapObjectFromAsset(origin, Game.world().camera().getFocus());
   }
 
   public void editAsset() {
@@ -771,11 +731,13 @@ public class AssetPanelItem extends JPanel {
     Object[] options = {".xml", format.toFileExtension()};
 
     int answer =
-      JOptionPane.showOptionDialog(Game.window().getRenderComponent(), "Select an export format:", "Export Spritesheet", JOptionPane.DEFAULT_OPTION,
+      JOptionPane.showOptionDialog(Game.window().getRenderComponent(),
+        Resources.strings().get("assetpanel_export_format_prompt"),
+        Resources.strings().get("contextmenu_resource_export_spritesheet"), JOptionPane.DEFAULT_OPTION,
         JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
     if (answer == 0) {
-      XmlExportDialog.export(spritesheetResource, "Spritesheet", spritesheetResource.getName());
+      XmlExportDialog.export(spritesheetResource, Resources.strings().get("panel_spritesheet"), spritesheetResource.getName());
     } else if (answer == 1) {
       exportImage(sprite, format, spritesheetResource.getName());
     }
@@ -783,7 +745,7 @@ public class AssetPanelItem extends JPanel {
 
   private void exportImage(Spritesheet sprite, ImageFormat format, String name) {
     JFileChooser chooser = createFileChooser(format.toString(), format.toFileExtension(), name + format.toFileExtension());
-    chooser.setDialogTitle("Export Spritesheet");
+    chooser.setDialogTitle(Resources.strings().get("contextmenu_resource_export_spritesheet"));
 
     if (chooser.showSaveDialog(Game.window().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
       try {
@@ -796,15 +758,16 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportTileset(Tileset tileset) {
-    XmlExportDialog.export(tileset, "Tileset", tileset.getName(), Tileset.FILE_EXTENSION);
+    XmlExportDialog.export(tileset, Resources.strings().get("assetpanel_type_tileset"), tileset.getName(), Tileset.FILE_EXTENSION);
   }
 
   private void exportEmitter(EmitterAttributes emitter) {
-    XmlExportDialog.export(emitter, "Emitter", emitter.getName());
+    XmlExportDialog.export(emitter, Resources.strings().get("panel_emitter"), emitter.getName());
   }
 
   private void exportBlueprint(Blueprint blueprint) {
-    XmlExportDialog.export(blueprint, "Blueprint", blueprint.getName(), Blueprint.BLUEPRINT_FILE_EXTENSION);
+    XmlExportDialog.export(blueprint, Resources.strings().get("assetpanel_type_blueprint"), blueprint.getName(),
+      Blueprint.BLUEPRINT_FILE_EXTENSION);
   }
 
   private void exportSound(SoundResource sound) {
@@ -815,7 +778,7 @@ public class AssetPanelItem extends JPanel {
     try {
       JFileChooser chooser =
         createFileChooser(sound.getFormat().toString(), sound.getFormat().toString(), sound.getName() + sound.getFormat().toFileExtension());
-      chooser.setDialogTitle("Export Sound");
+      chooser.setDialogTitle(Resources.strings().get("contextmenu_resource_export_sound"));
 
       if (chooser.showSaveDialog(Game.window().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
         try (FileOutputStream fos = new FileOutputStream(chooser.getSelectedFile().toString())) {
@@ -829,8 +792,9 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportAnimation(Animation animation) {
-    JFileChooser chooser = createFileChooser("Aseprite JSON", "json", animation.getName() + ".json");
-    chooser.setDialogTitle("Export Aseprite Animation");
+    JFileChooser chooser = createFileChooser(
+      Resources.strings().get("assetpanel_aseprite_json"), "json", animation.getName() + ".json");
+    chooser.setDialogTitle(Resources.strings().get("contextmenu_resource_export_animation"));
 
     if (chooser.showSaveDialog(Game.window().getRenderComponent()) != JFileChooser.APPROVE_OPTION) {
       return;
@@ -849,7 +813,8 @@ public class AssetPanelItem extends JPanel {
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 
-    FileFilter filter = new FileNameExtensionFilter(description + " - File", extension);
+    FileFilter filter = new FileNameExtensionFilter(
+      Resources.strings().get("assetpanel_file_filter", description), extension);
     chooser.setFileFilter(filter);
     chooser.addChoosableFileFilter(filter);
     chooser.setSelectedFile(new File(defaultFileName));

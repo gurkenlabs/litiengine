@@ -2,7 +2,7 @@ package de.gurkenlabs.utiliti.view.components;
 
 import com.github.weisj.darklaf.ui.text.DarkTextUI;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-import de.gurkenlabs.litiengine.resources.ImageFormat;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Controller;
 import de.gurkenlabs.utiliti.controller.Editor;
@@ -15,10 +15,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -71,27 +67,8 @@ public class AssetList extends JSplitPane implements Controller {
     leftPanel.add(assetTree, BorderLayout.CENTER);
     this.setLeftComponent(leftPanel);
 
-    new FileDrop(
-      assetPanel,
-      files -> {
-        List<Path> droppedImages = new ArrayList<>();
-        List<Path> droppedAnimations = new ArrayList<>();
-        for (Path file : files) {
-          if (ImageFormat.isSupported(file)) {
-            droppedImages.add(file);
-          } else if (file.getFileName() != null
-            && file.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json")) {
-            droppedAnimations.add(file);
-          }
-        }
-
-        if (!droppedImages.isEmpty()) {
-          Editor.instance().importSpriteSheets(droppedImages.toArray(new Path[0]));
-        }
-        if (!droppedAnimations.isEmpty()) {
-          Editor.instance().importAnimations(droppedAnimations.toArray(new Path[0]));
-        }
-      });
+    new FileDrop(assetPanel, files -> Editor.instance().importResources(files));
+    new FileDrop(assetTree, files -> Editor.instance().importResources(files));
 
     // Search field
     this.searchField = new JTextField() {
@@ -108,10 +85,13 @@ public class AssetList extends JSplitPane implements Controller {
         // The parent search box owns the only visible border.
       }
     };
-    this.searchField.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, "Search assets...");
-    this.searchField.setToolTipText("Search assets...");
-    this.searchField.getAccessibleContext().setAccessibleName("Search assets");
-    this.searchField.getAccessibleContext().setAccessibleDescription("Filter the visible assets by name");
+    this.searchField.putClientProperty(
+      DarkTextUI.KEY_DEFAULT_TEXT, Resources.strings().get("assetlist_search_placeholder"));
+    this.searchField.setToolTipText(Resources.strings().get("assetlist_search_placeholder"));
+    this.searchField.getAccessibleContext().setAccessibleName(
+      Resources.strings().get("assetlist_search"));
+    this.searchField.getAccessibleContext().setAccessibleDescription(
+      Resources.strings().get("assetlist_search_description"));
     this.searchField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
     this.searchField.setOpaque(false);
     this.searchField.putClientProperty("JComponent.outline", "none");
@@ -143,9 +123,11 @@ public class AssetList extends JSplitPane implements Controller {
     this.zoomSlider = new JSlider(96, 150, Editor.preferences().getAssetCardSize());
     this.zoomSlider.setPreferredSize(new Dimension(100, Style.CONTROL_HEIGHT));
     this.zoomSlider.setOpaque(false);
-    this.zoomSlider.setToolTipText("Asset card size");
-    this.zoomSlider.getAccessibleContext().setAccessibleName("Asset card size");
-    this.zoomSlider.getAccessibleContext().setAccessibleDescription("Adjust the size of cards in the asset grid");
+    this.zoomSlider.setToolTipText(Resources.strings().get("assetlist_card_size"));
+    this.zoomSlider.getAccessibleContext().setAccessibleName(
+      Resources.strings().get("assetlist_card_size"));
+    this.zoomSlider.getAccessibleContext().setAccessibleDescription(
+      Resources.strings().get("assetlist_card_size_description"));
     this.zoomSlider.addChangeListener(e -> {
       assetPanel.setCardSize(this.zoomSlider.getValue());
       Editor.preferences().setAssetCardSize(this.zoomSlider.getValue());
@@ -153,9 +135,10 @@ public class AssetList extends JSplitPane implements Controller {
 
     boolean initialCompact = Editor.preferences().isCompactMode();
     JToggleButton densityToggle = Style.iconToggleButton(initialCompact ? new ListIcon() : new GridIcon(), initialCompact);
-    densityToggle.setToolTipText("Compact asset list");
-    densityToggle.getAccessibleContext().setAccessibleName("Compact asset list");
-    densityToggle.getAccessibleContext().setAccessibleDescription("Toggle between the compact list and card grid");
+    densityToggle.setToolTipText(Resources.strings().get("assetlist_compact"));
+    densityToggle.getAccessibleContext().setAccessibleName(Resources.strings().get("assetlist_compact"));
+    densityToggle.getAccessibleContext().setAccessibleDescription(
+      Resources.strings().get("assetlist_compact_description"));
     densityToggle.addActionListener(e -> {
       assetPanel.setCompact(densityToggle.isSelected());
       densityToggle.setIcon(densityToggle.isSelected() ? new ListIcon() : new GridIcon());
@@ -243,7 +226,9 @@ public class AssetList extends JSplitPane implements Controller {
     if (this.summaryLabel != null) {
       int visible = this.assetPanel.getVisibleItemCount();
       int total = this.assetPanel.getTotalItemCount();
-      String count = visible == total ? total + " assets" : visible + " of " + total + " assets";
+      String count = visible == total
+        ? Resources.strings().get("assetlist_asset_count", total)
+        : Resources.strings().get("assetlist_filtered_asset_count", visible, total);
       this.summaryLabel.setText(count);
     }
     updateAssetInspector();

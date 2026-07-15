@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
@@ -29,7 +30,6 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
-import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.controller.tool.PointerTool;
 import de.gurkenlabs.utiliti.controller.tool.Tool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
@@ -148,9 +148,6 @@ public class MapComponent extends GuiComponent {
     this.maps = new CopyOnWriteArrayList<>();
     this.cameraFocus = new ConcurrentHashMap<>();
     this.cameraZoom = new ConcurrentHashMap<>();
-    this.onMouseEnter(e -> Game.window().cursor().setVisible(true));
-    this.onMouseLeave(e -> Game.window().cursor().setVisible(false));
-
     UndoManager.onUndoStackChanged(e -> Transform.updateAnchors());
   }
 
@@ -426,30 +423,44 @@ public class MapComponent extends GuiComponent {
     this.setTransformMode(TransformMode.NONE);
   }
 
-  public void addMapObjectAt(Object asset, Point dropPoint) {
-    if (asset == null || Game.world().environment() == null || Game.world().camera() == null) {
-      return;
+  public boolean addMapObjectAt(Object asset, Point dropPoint) {
+    ICamera camera = Game.world().camera();
+    if (asset == null || dropPoint == null || Game.world().environment() == null || camera == null) {
+      return false;
     }
-    Point2D mapLocation = Game.world().camera().getMapLocation(
-        new Point2D.Double(dropPoint.getX(), dropPoint.getY()));
-    addMapObjectFromAsset(asset, mapLocation);
+    return addMapObjectFromAsset(asset, toMapLocation(dropPoint, camera));
   }
 
-  private void addMapObjectFromAsset(Object asset, Point2D location) {
+  static Point2D toMapLocation(Point2D canvasLocation, ICamera camera) {
+    double renderScale = camera.getRenderScale();
+    if (!Double.isFinite(renderScale) || renderScale <= 0) {
+      renderScale = 1;
+    }
+    return camera.getMapLocation(new Point2D.Double(
+      canvasLocation.getX() / renderScale,
+      canvasLocation.getY() / renderScale));
+  }
+
+  public boolean addMapObjectFromAsset(Object asset, Point2D location) {
+    if (asset == null || location == null || UI.getLayerController() == null
+      || UI.getLayerController().getCurrentLayer() == null) {
+      return false;
+    }
     if (asset instanceof SpritesheetResource spritesheetResource) {
-      addSpriteFromDrop(spritesheetResource, location);
+      return addSpriteFromDrop(spritesheetResource, location);
     } else if (asset instanceof EmitterAttributes emitterData) {
-      addEmitterFromDrop(emitterData, location);
+      return addEmitterFromDrop(emitterData, location);
     } else if (asset instanceof Blueprint blueprint) {
-      addBlueprintFromDrop(blueprint, location);
+      return addBlueprintFromDrop(blueprint, location);
     }
+    return false;
   }
 
-  private void addSpriteFromDrop(SpritesheetResource spritesheetResource, Point2D location) {
+  private boolean addSpriteFromDrop(SpritesheetResource spritesheetResource, Point2D location) {
     String propName = PropPanel.getIdentifierBySpriteName(spritesheetResource.getName());
     String creatureName = CreaturePanel.getCreatureSpriteName(spritesheetResource.getName());
     if (propName == null && creatureName == null) {
-      return;
+      return false;
     }
 
     MapObject mo = new MapObject();
@@ -469,27 +480,33 @@ public class MapComponent extends GuiComponent {
     mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
 
     this.add(mo);
+    return true;
   }
 
-  private void addEmitterFromDrop(EmitterAttributes emitterData, Point2D location) {
+  private boolean addEmitterFromDrop(EmitterAttributes emitterData, Point2D location) {
     MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject(emitterData);
     newEmitter.setX((float) (location.getX() - newEmitter.getWidth()));
     newEmitter.setY((float) (location.getY() - newEmitter.getHeight()));
     newEmitter.setId(Game.world().environment().getNextMapId());
     this.add(newEmitter);
+    return true;
   }
 
-  private void addBlueprintFromDrop(Blueprint blueprint, Point2D location) {
+  private boolean addBlueprintFromDrop(Blueprint blueprint, Point2D location) {
+    List<IMapObject> newObjects = blueprint.build(
+      (int) location.getX() - blueprint.getWidth() / 2,
+      (int) location.getY() - blueprint.getHeight() / 2);
+    if (newObjects.isEmpty()) {
+      return false;
+    }
     UndoManager.instance().beginOperation();
     try {
-      List<IMapObject> newObjects = blueprint.build(
-          (int) location.getX() - blueprint.getWidth() / 2,
-          (int) location.getY() - blueprint.getHeight() / 2);
       newObjects.forEach(obj -> this.add(obj));
       newObjects.forEach(obj -> this.setSelection(obj, false));
     } finally {
       UndoManager.instance().endOperation();
     }
+    return true;
   }
 
   public void delete(IMapObjectLayer layer) {
@@ -781,10 +798,10 @@ public class MapComponent extends GuiComponent {
       case CREATE -> {
         this.setFocus(null, true);
         UI.getInspector().bind(null);
-        Game.window().cursor().set(Cursors.ADD, 0, 0);
+        Cursors.apply(Cursors.ADD);
       }
-      case NONE -> Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
-      case MOVE -> Game.window().cursor().set(Cursors.MOVE, 0, 0);
+      case NONE -> Cursors.apply(Cursors.DEFAULT);
+      case MOVE -> Cursors.apply(Cursors.MOVE);
       case RESIZE -> { /* transitional state handled by transform logic */ }
     }
 
@@ -917,7 +934,7 @@ public class MapComponent extends GuiComponent {
     }
 
     XmlImportDialog.importXml(
-      "Tilemap",
+      Resources.strings().get("resource_tilemap"),
       file -> {
         String mapPath = file.toUri().toString();
         Resources.maps().clear();
@@ -999,7 +1016,7 @@ public class MapComponent extends GuiComponent {
 
     XmlExportDialog.export(
       map,
-      "Map",
+      Resources.strings().get("resource_map"),
       map.getName(),
       TmxMap.FILE_EXTENSION,
       dirStr -> {
@@ -1158,11 +1175,21 @@ public class MapComponent extends GuiComponent {
         EmitterMapObjectLoader.updateMapObject(defaultData, mo);
         break;
       case PROP:
+        String propSprite = getDefaultSpriteName(MapObjectType.PROP, Resources.spritesheets().getAll());
+        if (propSprite != null) {
+          mo.setValue(MapObjectProperty.SPRITESHEETNAME, propSprite);
+        }
         mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, (newObjectArea.getWidth() * 0.4));
         mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, (newObjectArea.getHeight() * 0.4));
         mo.setValue(MapObjectProperty.COLLISION, true);
         mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
         mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
+        break;
+      case CREATURE:
+        String creatureSprite = getDefaultSpriteName(MapObjectType.CREATURE, Resources.spritesheets().getAll());
+        if (creatureSprite != null) {
+          mo.setValue(MapObjectProperty.SPRITESHEETNAME, creatureSprite);
+        }
         break;
       case LIGHTSOURCE:
         mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
@@ -1191,6 +1218,15 @@ public class MapComponent extends GuiComponent {
 
     this.add(mo);
     return mo;
+  }
+
+  static String getDefaultSpriteName(MapObjectType type, java.util.Collection<Spritesheet> spritesheets) {
+    java.util.Set<String> names = switch (type) {
+      case PROP -> SpriteVariantSelector.selectBasePropSpriteNames(spritesheets).keySet();
+      case CREATURE -> SpriteVariantSelector.selectBaseCreatureSpriteNames(spritesheets).keySet();
+      default -> java.util.Set.of();
+    };
+    return names.stream().sorted().findFirst().orElse(null);
   }
 
   private static void setDefaultValue(IMapObject mapObject, de.gurkenlabs.litiengine.environment.tilemap.MapObjectPropertyDefinition property) {
@@ -1355,8 +1391,11 @@ public class MapComponent extends GuiComponent {
    * @param e
    *          The mouse event of the calling {@link GuiComponent}
    */
-  private void handleMouseMoved(ComponentMouseEvent e) {
+  void handleMouseMoved(ComponentMouseEvent e) {
     Tool active = ToolManager.instance().getActiveTool();
+    if (active == null) {
+      return;
+    }
     if (!(active instanceof PointerTool)) {
       active.mouseMoved(e);
       return;
@@ -1364,8 +1403,11 @@ public class MapComponent extends GuiComponent {
     Transform.updateTransform();
   }
 
-  private void handleMousePressed(ComponentMouseEvent e) {
+  void handleMousePressed(ComponentMouseEvent e) {
     Tool active = ToolManager.instance().getActiveTool();
+    if (active == null) {
+      return;
+    }
     if (!(active instanceof PointerTool)) {
       active.mousePressed(e);
       return;
@@ -1398,8 +1440,11 @@ public class MapComponent extends GuiComponent {
     }
   }
 
-  private void handleMouseDragged(ComponentMouseEvent e) {
+  void handleMouseDragged(ComponentMouseEvent e) {
     Tool active = ToolManager.instance().getActiveTool();
+    if (active == null) {
+      return;
+    }
     if (!(active instanceof PointerTool)) {
       active.mouseDragged(e);
       return;
@@ -1438,8 +1483,11 @@ public class MapComponent extends GuiComponent {
     }
   }
 
-  private void handleMouseReleased(ComponentMouseEvent e) {
+  void handleMouseReleased(ComponentMouseEvent e) {
     Tool active = ToolManager.instance().getActiveTool();
+    if (active == null) {
+      return;
+    }
     if (!(active instanceof PointerTool)) {
       active.mouseReleased(e);
       return;

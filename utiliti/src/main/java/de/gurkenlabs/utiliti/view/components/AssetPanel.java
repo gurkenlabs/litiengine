@@ -146,15 +146,15 @@ public class AssetPanel extends JPanel {
 
   public String getCurrentTitle() {
     if (this.currentType == null) {
-      return "Resources";
+      return Resources.strings().get("assettree_assets");
     }
     return switch (this.currentType) {
-      case SPRITESHEET -> "Spritesheets";
-      case TILESET -> "Tilesets";
-      case EMITTER -> "Emitters";
-      case BLUEPRINT -> "Blueprints";
-      case SOUND -> "Sounds";
-      case ANIMATION -> "Animations";
+      case SPRITESHEET -> Resources.strings().get("assettree_spritesheets");
+      case TILESET -> Resources.strings().get("assettree_tilesets");
+      case EMITTER -> Resources.strings().get("assettree_emitters");
+      case BLUEPRINT -> Resources.strings().get("assettree_blueprints");
+      case SOUND -> Resources.strings().get("assettree_sounds");
+      case ANIMATION -> Resources.strings().get("assettree_animations");
     };
   }
 
