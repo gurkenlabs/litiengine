@@ -144,7 +144,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     this.nameLabel.setText(node.getName());
     this.badgeLabel.setVisible(node.getObjectCount() > 0);
     this.badgeLabel.putClientProperty("badgeKind", BadgeKind.COUNT);
-    this.badgeLabel.setText(node.getObjectCount() + " items");
+    this.badgeLabel.setText(Resources.strings().get("scenegraph_item_count", node.getObjectCount()));
   }
 
   private void renderMap(SceneGraph.SceneNode node) {

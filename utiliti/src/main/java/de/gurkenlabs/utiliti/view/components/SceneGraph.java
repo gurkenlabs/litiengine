@@ -32,6 +32,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.view.renderers.SceneGraphRenderer;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -87,25 +88,29 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private static final String LAYER_OBJECT = "object";
 
   private enum FilterChip {
-    ALL("All", Icons.POINTER_16),
-    TILES("Tiles", Icons.TILESET_16),
-    PROPS("Props", Icons.PROP_16),
-    CREATURES("Creatures", Icons.CREATURE_16),
-    COLLISION("Collision", Icons.COLLISIONBOX_16),
-    TRIGGERS("Triggers", Icons.TRIGGER_16),
-    SPAWNS("Spawns", Icons.SPAWNPOINT_16),
-    AREAS("Areas", Icons.MAPAREA_16),
-    LIGHTS("Lights", Icons.BULB_16),
-    EMITTERS("Emitters", Icons.EMITTER_16),
-    SOUNDS("Sounds", Icons.SOUND_16),
-    SHADOWS("Shadows", Icons.SHADOWBOX_16);
+    ALL("scenegraph_filter_all", Icons.POINTER_16),
+    TILES("scenegraph_filter_tiles", Icons.TILESET_16),
+    PROPS("assettree_spritesheets_props", Icons.PROP_16),
+    CREATURES("assettree_creatures", Icons.CREATURE_16),
+    COLLISION("panel_collision", Icons.COLLISIONBOX_16),
+    TRIGGERS("panel_mapselection_triggers", Icons.TRIGGER_16),
+    SPAWNS("panel_mapselection_spawnpoints", Icons.SPAWNPOINT_16),
+    AREAS("panel_mapselection_areas", Icons.MAPAREA_16),
+    LIGHTS("panel_mapselection_lights", Icons.BULB_16),
+    EMITTERS("assettree_emitters", Icons.EMITTER_16),
+    SOUNDS("assettree_sounds", Icons.SOUND_16),
+    SHADOWS("panel_mapselection_shadow", Icons.SHADOWBOX_16);
 
-    private final String label;
+    private final String labelKey;
     private final Icon icon;
 
-    FilterChip(String label, Icon icon) {
-      this.label = label;
+    FilterChip(String labelKey, Icon icon) {
+      this.labelKey = labelKey;
       this.icon = icon;
+    }
+
+    private String getLabel() {
+      return Resources.strings().get(this.labelKey);
     }
   }
 
@@ -145,7 +150,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   public SceneGraph() {
     super(new BorderLayout(0, 0));
-    this.setName("Scene");
+    this.setName(Resources.strings().get("scenegraph_name"));
     this.selectedLayers = new java.util.concurrent.ConcurrentHashMap<>();
     this.expandedLayers = new java.util.concurrent.ConcurrentHashMap<>();
     this.layerChangedListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
@@ -158,15 +163,15 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
     this.btnAddLayer = createToolButton(new AddDropdownIcon(Icons.ADD_24));
     this.btnAddLayer.setPreferredSize(new Dimension(44, Style.CONTROL_HEIGHT));
-    configureActionButton(this.btnAddLayer, "Add Layer");
+    configureActionButton(this.btnAddLayer, Resources.strings().get("panel_addLayer"));
     this.btnAddLayer.addActionListener(e -> showAddLayerMenu(this.btnAddLayer));
 
     this.btnAddTileLayer = createToolButton(Icons.TILESET_24);
-    configureActionButton(this.btnAddTileLayer, "Add Tile Layer");
+    configureActionButton(this.btnAddTileLayer, Resources.strings().get("scenegraph_add_tile_layer"));
     this.btnAddTileLayer.addActionListener(e -> addTileLayer(getSelectedOrLastLayerNode()));
 
     this.btnRemoveLayer = createToolButton(Icons.DELETE_24);
-    configureActionButton(this.btnRemoveLayer, "Remove Selected Layer");
+    configureActionButton(this.btnRemoveLayer, Resources.strings().get("panel_removeLayer"));
     this.btnRemoveLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (node != null) {
@@ -175,7 +180,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnRaiseLayer = createToolButton(Icons.LIFT_24);
-    configureActionButton(this.btnRaiseLayer, "Raise Layer");
+    configureActionButton(this.btnRaiseLayer, Resources.strings().get("panel_moveLayerUp"));
     this.btnRaiseLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (node != null) {
@@ -184,7 +189,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnLowerLayer = createToolButton(Icons.LOWER_24);
-    configureActionButton(this.btnLowerLayer, "Lower Layer");
+    configureActionButton(this.btnLowerLayer, Resources.strings().get("panel_moveLayerDown"));
     this.btnLowerLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (node != null) {
@@ -193,11 +198,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnTilesets = createToolButton(Icons.SPRITESHEET_24);
-    configureActionButton(this.btnTilesets, "Select Map Tileset");
+    configureActionButton(this.btnTilesets, Resources.strings().get("scenegraph_select_map_tileset"));
     this.btnTilesets.addActionListener(e -> showTilesetMenu(this.btnTilesets));
 
     this.btnShowAllLayers = Style.iconToggleButton(Icons.HIDEOTHER_24, false);
-    configureActionButton(this.btnShowAllLayers, "Hide Other Layers");
+    configureActionButton(this.btnShowAllLayers, Resources.strings().get("panel_hideOtherLayers"));
     this.btnShowAllLayers.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (this.btnShowAllLayers.isSelected() && node != null) {
@@ -208,11 +213,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnCollapse = Style.iconButton(Icons.COLLAPSE_24);
-    configureActionButton(this.btnCollapse, "Collapse All");
+    configureActionButton(this.btnCollapse, Resources.strings().get("scenegraph_collapse_all"));
     this.btnCollapse.addActionListener(e -> collapseAll());
 
     this.btnDuplicateLayer = createToolButton(Icons.COPY_24);
-    configureActionButton(this.btnDuplicateLayer, "Duplicate Selected Layer");
+    configureActionButton(this.btnDuplicateLayer, Resources.strings().get("panel_duplicateLayer"));
     this.btnDuplicateLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
       if (node != null) {
@@ -221,10 +226,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.btnMore = createToolButton(Icons.MISC_24);
-    configureActionButton(this.btnMore, "Scene Graph Actions");
+    configureActionButton(this.btnMore, Resources.strings().get("scenegraph_actions"));
     this.btnMore.addActionListener(e -> showHeaderMenu(this.btnMore));
 
-    final String searchDefault = "Search scene...";
+    final String searchDefault = Resources.strings().get("scenegraph_search_placeholder");
 
     this.textField = new JTextField() {
       @Override
@@ -242,7 +247,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     };
     this.textField.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, searchDefault);
     this.textField.setToolTipText(Resources.strings().get("panel_entities_search_hint"));
-    this.textField.getAccessibleContext().setAccessibleName("Search scene");
+    this.textField.getAccessibleContext().setAccessibleName(Resources.strings().get("scenegraph_search"));
     this.textField.setColumns(10);
     this.textField.setBorder(BorderFactory.createEmptyBorder());
     this.textField.setOpaque(false);
@@ -260,7 +265,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     RoundedSearchBox searchBox = new RoundedSearchBox(this.textField, 0);
-    configureActionButton(searchBox.getClearButton(), "Clear Scene Search");
+    configureActionButton(searchBox.getClearButton(), Resources.strings().get("scenegraph_clear_search"));
     searchBox.getClearButton().addActionListener(e -> {
       this.textField.setText("");
       this.searchDebounce.stop();
@@ -300,7 +305,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.tree.setRootVisible(false);
     this.tree.setShowsRootHandles(true);
     this.tree.setToggleClickCount(0);
-    this.tree.setDropMode(javax.swing.DropMode.ON);
+    this.tree.setDropMode(javax.swing.DropMode.ON_OR_INSERT);
     this.renameField = new JTextField();
     this.renameField.addActionListener(e -> commitRename());
     this.renameField.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -312,9 +317,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.tree.setCellRenderer(new SceneGraphRenderer());
     this.tree.setRowHeight((int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale()));
     this.tree.setBackground(Style.background());
-    this.tree.getAccessibleContext().setAccessibleName("Scene hierarchy");
+    this.tree.getAccessibleContext().setAccessibleName(Resources.strings().get("scenegraph_hierarchy"));
     this.tree.getAccessibleContext().setAccessibleDescription(
-        "Scene hierarchy. Press Shift+F10 for actions on the selected item.");
+        Resources.strings().get("scenegraph_hierarchy_description"));
 
     this.nodeRoot = new DefaultMutableTreeNode("root");
     this.treeModel = new DefaultTreeModel(this.nodeRoot);
@@ -516,8 +521,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   private void showHeaderMenu(Component owner) {
     JPopupMenu popup = new JPopupMenu();
-    addContextMenuItem(popup, "Show All Layers", Icons.SHOW_24, () -> setAllLayersVisible(true));
-    addContextMenuItem(popup, "Collapse All", Icons.COLLAPSE_24, this::collapseAll);
+    addContextMenuItem(popup, Resources.strings().get("scenegraph_show_all_layers"), Icons.SHOW_24,
+        () -> setAllLayersVisible(true));
+    addContextMenuItem(popup, Resources.strings().get("scenegraph_collapse_all"), Icons.COLLAPSE_24,
+        this::collapseAll);
     popup.show(owner, 0, owner.getHeight());
   }
 
@@ -551,18 +558,23 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private void showAddLayerMenu(Component anchor) {
     JPopupMenu popup = new JPopupMenu();
     SceneNode afterNode = getSelectedOrLastLayerNode();
-    addContextMenuItem(popup, "Tile Layer", Icons.TILESET_16, () -> addTileLayer(afterNode));
-    addContextMenuItem(popup, "Object Layer", Icons.LAYER_16, () -> addLayer(afterNode));
-    addContextMenuItem(popup, "Image Layer", Icons.ASSET_16, () -> addImageLayer(afterNode));
-    addContextMenuItem(popup, "Group", Icons.GROUP_16, () -> addGroup(afterNode));
+    addContextMenuItem(popup, Resources.strings().get("scenegraph_tile_layer"), Icons.TILESET_16,
+        () -> addTileLayer(afterNode));
+    addContextMenuItem(popup, Resources.strings().get("scenegraph_object_layer"), Icons.LAYER_16,
+        () -> addLayer(afterNode));
+    addContextMenuItem(popup, Resources.strings().get("scenegraph_image_layer"), Icons.ASSET_16,
+        () -> addImageLayer(afterNode));
+    addContextMenuItem(popup, Resources.strings().get("scenegraph_group"), Icons.GROUP_16,
+        () -> addGroup(afterNode));
     popup.show(anchor, 0, anchor.getHeight());
   }
 
   private JToggleButton createFilterButton(FilterChip chip) {
     JToggleButton button = Style.iconToggleButton(chip.icon, false);
     Style.styleButton(button, Style.ButtonVariant.GHOST);
-    configureActionButton(button, chip.label);
-    button.getAccessibleContext().setAccessibleName("Filter scene by " + chip.label);
+    configureActionButton(button, chip.getLabel());
+    button.getAccessibleContext().setAccessibleName(
+        Resources.strings().get("scenegraph_filter_accessible", chip.getLabel()));
     button.setMargin(new Insets(2, 2, 2, 2));
     Dimension size = new Dimension(22, 22);
     button.setPreferredSize(size);
@@ -871,7 +883,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     boolean isolated = hasLayer && isLayerIsolated(map, node.getLayer());
     this.btnShowAllLayers.setEnabled(hasLayer);
     this.btnShowAllLayers.setSelected(isolated);
-    configureActionButton(this.btnShowAllLayers, isolated ? "Show All Layers" : "Hide Other Layers");
+    configureActionButton(this.btnShowAllLayers, Resources.strings().get(
+        isolated ? "scenegraph_show_all_layers" : "panel_hideOtherLayers"));
   }
 
   void refreshLayerCommandState() {
@@ -1052,7 +1065,6 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
     } else if (layer instanceof IMapObjectLayer objLayer) {
       List<IMapObject> objects = new ArrayList<>(objLayer.getMapObjects());
-      objects.sort((a, b) -> Integer.compare(a.getId(), b.getId()));
       for (IMapObject obj : objects) {
         if (obj == null) {
           continue;
@@ -1324,11 +1336,14 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
 
     JPopupMenu popup = new JPopupMenu();
-    String toggleLabel = node.isVisible() ? "Hide Layer" : "Show Layer";
+    String toggleLabel = Resources.strings().get(
+        node.isVisible() ? "scenegraph_hide_layer" : "scenegraph_show_layer");
     Icon toggleIcon = node.isVisible() ? Icons.HIDE_24 : Icons.SHOW_24;
     addContextMenuItem(popup, toggleLabel, toggleIcon, () -> toggleLayerVisibility(node));
-    addContextMenuItem(popup, "Show All Layers", Icons.SHOW_24, () -> setAllLayersVisible(true));
-    addContextMenuItem(popup, "Hide Other Layers", Icons.HIDEOTHER_24, () -> hideOtherLayers(node));
+    addContextMenuItem(popup, Resources.strings().get("scenegraph_show_all_layers"), Icons.SHOW_24,
+        () -> setAllLayersVisible(true));
+    addContextMenuItem(popup, Resources.strings().get("panel_hideOtherLayers"), Icons.HIDEOTHER_24,
+        () -> hideOtherLayers(node));
     popup.show(tree, e.getX(), e.getY());
   }
 
@@ -1374,9 +1389,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private void showMapObjectMenu(MouseEvent e, IMapObject mapObject) {
     Editor.instance().getMapComponent().setFocus(mapObject, true);
     JPopupMenu popup = new JPopupMenu();
-    addContextMenuItem(popup, "Focus Object", Icons.POINTER_16,
+    addContextMenuItem(popup, Resources.strings().get("scenegraph_focus_object"), Icons.POINTER_16,
         () -> Editor.instance().getMapComponent().setFocus(mapObject, true));
-    addContextMenuItem(popup, "Center Camera", Icons.SEARCH_16,
+    addContextMenuItem(popup, Resources.strings().get("menu_view_center"), Icons.SEARCH_16,
         () -> Editor.instance().getMapComponent().centerCameraOnFocus());
     popup.addSeparator();
     addContextMenuItem(popup, Resources.strings().get("menu_edit_copy"), Icons.COPY_16,
@@ -1566,13 +1581,16 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     for (var tileset : map.getTilesets()) {
       if (tileset instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset editableTileset) {
         String name = editableTileset.getName();
-        javax.swing.JMenuItem item = new javax.swing.JMenuItem(name == null || name.isBlank() ? "Unnamed Tileset" : name, Icons.TILESET_16);
+        javax.swing.JMenuItem item = new javax.swing.JMenuItem(
+            name == null || name.isBlank() ? Resources.strings().get("scenegraph_unnamed_tileset") : name,
+            Icons.TILESET_16);
         item.addActionListener(e -> UI.showTileLayerTilesetInspector(editableTileset));
         popup.add(item);
       }
     }
     if (popup.getComponentCount() == 0) {
-      javax.swing.JMenuItem empty = new javax.swing.JMenuItem("This map has no editable tilesets");
+      javax.swing.JMenuItem empty = new javax.swing.JMenuItem(
+          Resources.strings().get("scenegraph_no_editable_tilesets"));
       empty.setEnabled(false);
       popup.add(empty);
     }
@@ -1851,7 +1869,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
 
     SceneNode(IMap map) {
-      this.name = map.getName() == null || map.getName().isBlank() ? "Map" : map.getName();
+      this.name = map.getName() == null || map.getName().isBlank()
+          ? Resources.strings().get("scenegraph_unnamed_map") : map.getName();
       this.icon = Icons.MAP_16;
       this.layer = null;
       this.map = map;
@@ -1922,7 +1941,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
     public static String getEntityLabel(IEntity entity) {
       if (entity == null) {
-        return "null";
+        return Resources.strings().get("scenegraph_null_entity");
       }
       String name = entity.getName();
       int id = entity.getMapId();
@@ -1939,7 +1958,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
       if (isLayer()) {
         if (objectCount > 0) {
-          return name + " (" + objectCount + ")";
+          return Resources.strings().get("scenegraph_node_count", name, objectCount);
         }
         return name;
       }
@@ -1949,6 +1968,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   private static class SceneTransferHandler extends TransferHandler {
     static final DataFlavor SCENE_NODE_FLAVOR = new DataFlavor(SceneNode.class, "SceneNode");
+    private DropPlan dropPlan;
 
     @Override
     protected Transferable createTransferable(JComponent c) {
@@ -1983,77 +2003,45 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
     @Override
     protected void exportDone(JComponent c, Transferable t, int action) {
+      setDropPlan(null, c);
     }
 
     @Override
     public boolean canImport(TransferSupport support) {
-      if (!support.isDrop()) {
-        return false;
+      if (support.isDrop()) {
+        support.setShowDropLocation(false);
       }
-      if (!support.isDataFlavorSupported(SCENE_NODE_FLAVOR)) {
-        return false;
-      }
-
-      TreePath dropPath = ((JTree.DropLocation) support.getDropLocation()).getPath();
-      if (dropPath == null) {
-        return false;
-      }
-      Object last = dropPath.getLastPathComponent();
-      if (!(last instanceof DefaultMutableTreeNode dmtn)) {
-        return false;
-      }
-      if (!(dmtn.getUserObject() instanceof SceneNode targetNode)) {
-        return false;
-      }
-
-      // drop target must be a layer node
-      return targetNode.isLayer();
+      DropPlan plan = createDropPlan(support);
+      setDropPlan(plan, support.getComponent());
+      return plan != null;
     }
 
     @Override
     public boolean importData(TransferSupport support) {
-      if (!canImport(support)) {
+      if (support.isDrop()) {
+        support.setShowDropLocation(false);
+      }
+      DropPlan plan = createDropPlan(support);
+      setDropPlan(null, support.getComponent());
+      if (plan == null) {
         return false;
       }
 
       try {
-        Transferable t = support.getTransferable();
-        Object data = t.getTransferData(SCENE_NODE_FLAVOR);
-        if (!(data instanceof SceneNode draggedNode)) {
-          return false;
-        }
-
-        TreePath dropPath = ((JTree.DropLocation) support.getDropLocation()).getPath();
-        Object last = dropPath.getLastPathComponent();
-        if (!(last instanceof DefaultMutableTreeNode dmtn)) {
-          return false;
-        }
-        if (!(dmtn.getUserObject() instanceof SceneNode targetNode)) {
-          return false;
-        }
-        if (!targetNode.isLayer() || targetNode.getLayer() == null) {
-          return false;
-        }
-
+        SceneNode draggedNode = plan.draggedNode();
+        SceneNode targetNode = plan.targetNode();
         if (draggedNode.isLayer() && draggedNode.getLayer() != null) {
-          if (draggedNode.getLayer() == targetNode.getLayer()) {
+          if (targetNode.getLayer() == null || draggedNode.getLayer() == targetNode.getLayer()) {
             return false;
           }
           return moveLayer(draggedNode.getLayer(), targetNode.getLayer(), support.getComponent());
         } else if (!draggedNode.isLayer() && draggedNode.getMapObject() != null) {
-          // map object move to layer
-          IMapObject draggedObj = draggedNode.getMapObject();
-          if (!(targetNode.getLayer() instanceof IMapObjectLayer targetLayer)) {
+          if (!moveMapObject(draggedNode.getMapObject(), plan.targetLayer(), plan.targetIndex())) {
             return false;
           }
-          if (draggedObj.getLayer() == targetLayer) {
-            return false;
-          }
-          moveMapObjectToLayer(draggedObj, targetLayer);
-          // refresh tree to reflect the move
           SceneGraph graph = findSceneGraph(support.getComponent());
           if (graph != null) {
-            graph.refresh();
+            javax.swing.SwingUtilities.invokeLater(graph::refresh);
           }
           return true;
         }
@@ -2061,6 +2049,89 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         return false;
       } catch (Exception ex) {
         return false;
+      }
+    }
+
+    private DropPlan createDropPlan(TransferSupport support) {
+      if (!support.isDrop() || !support.isDataFlavorSupported(SCENE_NODE_FLAVOR)
+        || !(support.getComponent() instanceof JTree tree)) {
+        return null;
+      }
+
+      JTree.DropLocation location = (JTree.DropLocation) support.getDropLocation();
+      TreePath path = location.getPath();
+      if (path == null || !(path.getLastPathComponent() instanceof DefaultMutableTreeNode treeNode)
+        || !(treeNode.getUserObject() instanceof SceneNode targetNode)) {
+        return null;
+      }
+
+      SceneNode draggedNode = getDraggedNode(support);
+      if (draggedNode == null) {
+        return null;
+      }
+      if (draggedNode.isLayer()) {
+        return targetNode.isLayer()
+          ? new DropPlan(draggedNode, targetNode, null, -1, path, IndicatorPosition.ON)
+          : null;
+      }
+
+      if (targetNode.getMapObject() != null
+        && treeNode.getParent() instanceof DefaultMutableTreeNode parent
+        && parent.getUserObject() instanceof SceneNode parentNode
+        && parentNode.getLayer() instanceof IMapObjectLayer targetLayer) {
+        int targetIndex = targetLayer.getMapObjects().indexOf(targetNode.getMapObject());
+        Rectangle bounds = tree.getPathBounds(path);
+        boolean after = bounds != null && location.getDropPoint().y >= bounds.y + bounds.height / 2;
+        if (after) {
+          targetIndex++;
+        }
+        return targetIndex >= 0
+          ? new DropPlan(draggedNode, targetNode, targetLayer, targetIndex, path,
+            after ? IndicatorPosition.AFTER : IndicatorPosition.BEFORE)
+          : null;
+      }
+
+      if (targetNode.getLayer() instanceof IMapObjectLayer targetLayer) {
+        return new DropPlan(draggedNode, targetNode, targetLayer, targetLayer.getMapObjects().size(), path, IndicatorPosition.ON);
+      }
+      return null;
+    }
+
+    private void setDropPlan(DropPlan plan, Component component) {
+      this.dropPlan = plan;
+      if (component instanceof JTree tree) {
+        tree.repaint();
+      }
+    }
+
+    private void paintDropIndicator(JTree tree, Graphics graphics) {
+      DropPlan plan = this.dropPlan;
+      if (plan == null) {
+        return;
+      }
+      Rectangle bounds = tree.getPathBounds(plan.indicatorPath());
+      if (bounds == null) {
+        return;
+      }
+
+      Graphics2D g = (Graphics2D) graphics.create();
+      g.setColor(Style.accent());
+      if (plan.indicatorPosition() == IndicatorPosition.ON) {
+        g.setStroke(new BasicStroke(2f));
+        g.drawRoundRect(bounds.x, bounds.y, Math.max(1, tree.getWidth() - bounds.x - 4), bounds.height - 1, 4, 4);
+      } else {
+        int y = plan.indicatorPosition() == IndicatorPosition.BEFORE ? bounds.y : bounds.y + bounds.height - 1;
+        g.fillRoundRect(bounds.x, y - 1, Math.max(1, tree.getWidth() - bounds.x - 4), 3, 3, 3);
+      }
+      g.dispose();
+    }
+
+    private static SceneNode getDraggedNode(TransferSupport support) {
+      try {
+        Object data = support.getTransferable().getTransferData(SCENE_NODE_FLAVOR);
+        return data instanceof SceneNode node ? node : null;
+      } catch (Exception ex) {
+        return null;
       }
     }
 
@@ -2100,8 +2171,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       // refresh tree to reflect new order
       SceneGraph graph = findSceneGraph(treeComponent);
       if (graph != null) {
-        graph.refresh();
-        graph.fireLayerStructureChanged();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+          graph.refresh();
+          graph.fireLayerStructureChanged();
+        });
       }
       return true;
     }
@@ -2130,20 +2203,29 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       return false;
     }
 
-    private static void moveMapObjectToLayer(IMapObject mapObject, IMapObjectLayer targetLayer) {
+    private static boolean moveMapObject(IMapObject mapObject, IMapObjectLayer targetLayer, int targetIndex) {
+      IMapObjectLayer sourceLayer = mapObject.getLayer();
+      int sourceIndex = sourceLayer != null ? sourceLayer.getMapObjects().indexOf(mapObject) : -1;
+      if (sourceLayer == targetLayer && sourceIndex < targetIndex) {
+        targetIndex--;
+      }
+      if (sourceLayer == targetLayer && sourceIndex == targetIndex) {
+        return false;
+      }
+
       UndoManager.instance().beginOperation();
       try {
         UndoManager.instance().mapObjectChanging(mapObject);
-        if (mapObject.getLayer() != null) {
-          mapObject.getLayer().removeMapObject(mapObject);
+        if (sourceLayer != null) {
+          sourceLayer.removeMapObject(mapObject);
         }
-        targetLayer.addMapObject(mapObject);
+        targetLayer.addMapObject(Math.min(targetIndex, targetLayer.getMapObjects().size()), mapObject);
         Game.world().environment().reloadFromMap(mapObject.getId());
         UndoManager.instance().mapObjectChanged(mapObject);
       } finally {
         UndoManager.instance().endOperation();
       }
-      UI.getInspector().bind(Editor.instance().getMapComponent().getFocusedMapObject());
+      return true;
     }
 
     private static SceneGraph findSceneGraph(Component c) {
@@ -2154,6 +2236,21 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         c = c.getParent();
       }
       return null;
+    }
+
+    private enum IndicatorPosition {
+      BEFORE,
+      AFTER,
+      ON
+    }
+
+    private record DropPlan(
+      SceneNode draggedNode,
+      SceneNode targetNode,
+      IMapObjectLayer targetLayer,
+      int targetIndex,
+      TreePath indicatorPath,
+      IndicatorPosition indicatorPosition) {
     }
   }
 
