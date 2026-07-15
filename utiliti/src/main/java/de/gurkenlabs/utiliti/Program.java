@@ -11,6 +11,7 @@ import de.gurkenlabs.utiliti.view.components.UI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.Locale;
 
 public class Program {
 
@@ -20,15 +21,16 @@ public class Program {
 
         // setup basic settings
         Game.info().setName("utiLITI");
-        Game.info().setSubTitle("LITIENGINE Creation Kit");
-        Game.info().setVersion(Resources.strings().getFrom("licensing", "version"));
         Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
         // hook up configuration
         Game.config().add(Editor.preferences());
 
         Game.config().load();
+        applyPreferredLocale();
 
+        Game.info().setSubTitle(Resources.strings().get("app_subtitle"));
+        Game.info().setVersion(Resources.strings().getFrom("licensing", "version"));
         UI.initLookAndFeel();
 
       }, () -> { // postInitialization
@@ -58,6 +60,18 @@ public class Program {
     } catch (Throwable e) {
       throw new UtiLITIInitializationError("UtiLITI failed to initialize, see the stacktrace below for more information", e);
     }
+  }
+
+  private static void applyPreferredLocale() {
+    String language = Editor.preferences().getPreferredLanguage();
+    String country = Editor.preferences().getPreferredCountry();
+    if (language != null && !language.isBlank() && country != null && !country.isBlank()
+      && (!language.equals(Game.config().client().getLanguage()) || !country.equals(Game.config().client().getCountry()))) {
+      Game.config().client().setLanguage(language);
+      Game.config().client().setCountry(country);
+      Game.config().save();
+    }
+    Locale.setDefault(Game.config().client().getLocale());
   }
 
   private static void forceBasicEditorConfiguration() {

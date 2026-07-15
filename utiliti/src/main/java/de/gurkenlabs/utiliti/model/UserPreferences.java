@@ -50,6 +50,8 @@ public class UserPreferences extends ConfigurationGroup {
   private float uiScale;
 
   private Theme theme;
+  private String preferredLanguage;
+  private String preferredCountry;
 
   /**
    * Constructs a new UserPreferences object with default settings. Initializes various user preference settings such as zoom, grid visibility,
@@ -104,6 +106,22 @@ public class UserPreferences extends ConfigurationGroup {
    */
   public void setZoom(float zoom) {
     this.zoom = zoom;
+  }
+
+  public String getPreferredLanguage() {
+    return this.preferredLanguage;
+  }
+
+  public void setPreferredLanguage(String preferredLanguage) {
+    this.preferredLanguage = preferredLanguage;
+  }
+
+  public String getPreferredCountry() {
+    return this.preferredCountry;
+  }
+
+  public void setPreferredCountry(String preferredCountry) {
+    this.preferredCountry = preferredCountry;
   }
 
   /**

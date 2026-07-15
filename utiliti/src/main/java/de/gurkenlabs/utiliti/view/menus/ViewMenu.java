@@ -13,6 +13,7 @@ import de.gurkenlabs.utiliti.view.renderers.GridRenderer;
 import de.gurkenlabs.utiliti.view.renderers.Renderers;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Locale;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -24,7 +25,7 @@ import javax.swing.KeyStroke;
 @SuppressWarnings("serial") public final class ViewMenu extends JMenu {
   public ViewMenu() {
     super(Resources.strings().get("menu_view"));
-    this.setMnemonic('V');
+    this.setMnemonic(this.getText().charAt(0));
 
     JMenu themeMenu = new JMenu(Resources.strings().get("menu_view_theme"));
     ButtonGroup themegroup = new ButtonGroup();
@@ -35,6 +36,13 @@ import javax.swing.KeyStroke;
       themegroup.add(menuItem);
       themeMenu.add(menuItem);
     }
+
+    JMenu languageMenu = new JMenu(Resources.strings().get("menu_view_language"));
+    ButtonGroup languageGroup = new ButtonGroup();
+    addLanguageItem(languageMenu, languageGroup, "en", "US");
+    addLanguageItem(languageMenu, languageGroup, "de", "DE");
+    addLanguageItem(languageMenu, languageGroup, "es", "ES");
+    addLanguageItem(languageMenu, languageGroup, "fr", "FR");
 
     JCheckBoxMenuItem clampToMap = new JCheckBoxMenuItem(Resources.strings().get("menu_view_clampMap"));
     clampToMap.setState(Editor.preferences().clampToMap());
@@ -119,6 +127,7 @@ import javax.swing.KeyStroke;
     Editor.instance().getMapComponent().onFocusChanged(mo -> centerFocus.setEnabled(mo != null));
 
     this.add(themeMenu);
+    this.add(languageMenu);
     this.addSeparator();
     this.add(renderGrid);
     this.add(renderCollision);
@@ -136,6 +145,31 @@ import javax.swing.KeyStroke;
     this.add(snapToGrid);
     this.addSeparator();
     this.add(setGrid);
+  }
+
+  private static void addLanguageItem(JMenu menu, ButtonGroup group, String language, String country) {
+    Locale locale = Locale.of(language, country);
+    JRadioButtonMenuItem menuItem =
+      new JRadioButtonMenuItem(Resources.strings().get("menu_view_language_" + locale));
+    String preferredLanguage = Editor.preferences().getPreferredLanguage();
+    String preferredCountry = Editor.preferences().getPreferredCountry();
+    Locale selectedLocale = preferredLanguage != null && preferredCountry != null
+      ? Locale.of(preferredLanguage, preferredCountry)
+      : Game.config().client().getLocale();
+    menuItem.setSelected(selectedLocale.equals(locale));
+    menuItem.addActionListener(e -> selectLanguage(language, country));
+    group.add(menuItem);
+    menu.add(menuItem);
+  }
+
+  private static void selectLanguage(String language, String country) {
+    String message = Resources.strings().get("language_restart_message");
+    String title = Resources.strings().get("language_restart_title");
+    Editor.preferences().setPreferredLanguage(language);
+    Editor.preferences().setPreferredCountry(country);
+    Game.config().save();
+    JOptionPane.showMessageDialog(
+      Game.window().getRenderComponent(), message, title, JOptionPane.INFORMATION_MESSAGE);
   }
 
   private void configureCustomCheckBoxMenuItem(JCheckBoxMenuItem menuItem, boolean initialState) {
