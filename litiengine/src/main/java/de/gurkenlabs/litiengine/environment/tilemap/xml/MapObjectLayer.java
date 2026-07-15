@@ -88,15 +88,21 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   @Override
   public void addMapObject(IMapObject mapObject) {
     loadMapObjects();
-    this.mapObjects.add(mapObject);
+    addMapObject(this.mapObjects.size(), mapObject);
+  }
+
+  @Override
+  public void addMapObject(int index, IMapObject mapObject) {
+    loadMapObjects();
     if (mapObject instanceof MapObject mo) {
       if (mo.getLayer() != null && !mo.getLayer().equals(this)) {
         mo.getLayer().removeMapObject(mo);
       }
 
-      this.objects.add(mo);
+      this.objects.add(index, mo);
       mo.setLayer(this);
     }
+    this.mapObjects.add(index, mapObject);
   }
 
   @Override
