@@ -14,7 +14,7 @@ public class BucketFillTool extends TileBrushTool {
 
   @Override
   public Icon getIcon() {
-    return Icons.COLOR_24;
+    return Icons.FILL_24;
   }
 
   @Override
@@ -61,6 +61,6 @@ public class BucketFillTool extends TileBrushTool {
 
   @Override
   public boolean showInToolbar() {
-    return false;
+    return true;
   }
 }

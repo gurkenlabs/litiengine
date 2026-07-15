@@ -14,7 +14,7 @@ public class EraserTool extends TileBrushTool {
 
   @Override
   public Icon getIcon() {
-    return Icons.DELETE_24;
+    return Icons.ERASER_24;
   }
 
   @Override

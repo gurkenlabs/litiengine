@@ -3,9 +3,12 @@ package de.gurkenlabs.utiliti.controller.tool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gurkenlabs.utiliti.model.Icons;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Icon;
@@ -146,6 +149,22 @@ class ToolManagerTests {
 
     assertTrue(manager.getSelectedTileStamp().isEmpty());
     assertEquals(0, manager.getSelectedTileGid());
+  }
+
+  @Test
+  void fillToolIsAvailableInToolbarWithDedicatedIcon() {
+    BucketFillTool fill = new BucketFillTool();
+
+    assertTrue(fill.showInToolbar());
+    assertSame(Icons.FILL_24, fill.getIcon());
+  }
+
+  @Test
+  void eraserUsesDedicatedIconInsteadOfDelete() {
+    EraserTool eraser = new EraserTool();
+
+    assertSame(Icons.ERASER_24, eraser.getIcon());
+    assertNotSame(Icons.DELETE_24, eraser.getIcon());
   }
 
   private static class DummyTool implements Tool {

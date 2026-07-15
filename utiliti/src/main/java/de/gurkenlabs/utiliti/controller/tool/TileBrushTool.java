@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.utiliti.controller.UndoManager;
@@ -67,7 +68,7 @@ abstract class TileBrushTool implements Tool {
       return false;
     }
     if (gid != 0 && Game.world().environment().getMap().getTilesetEntry(gid) == null) {
-      Editor.instance().setCurrentStatus("Selected tile is not part of the active map");
+      Editor.instance().setCurrentStatus(Resources.strings().get("status_tileNotInMap"));
       return false;
     }
     int previousGid = tile.getGridId();
@@ -75,7 +76,8 @@ abstract class TileBrushTool implements Tool {
     UndoManager.instance().resourceChanged(
       () -> layer.setTile(x, y, previousGid),
       () -> layer.setTile(x, y, gid));
-    Editor.instance().setCurrentStatus("Painted tile " + x + ", " + y);
+    Editor.instance().setCurrentStatus(Resources.strings().get(
+      "status_paintedTile", Integer.toString(x), Integer.toString(y)));
     return true;
   }
 
@@ -85,7 +87,7 @@ abstract class TileBrushTool implements Tool {
       && Game.world().environment().getMap().getTileLayers().contains(selectedLayer)) {
       return selectedLayer;
     }
-    Editor.instance().setCurrentStatus("Select a tile layer before painting");
+    Editor.instance().setCurrentStatus(Resources.strings().get("status_selectTileLayer"));
     return null;
   }
 

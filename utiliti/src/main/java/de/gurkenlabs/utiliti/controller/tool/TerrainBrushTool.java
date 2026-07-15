@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.WangColor;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.Cursor;
@@ -16,7 +17,7 @@ import javax.swing.Icon;
 public class TerrainBrushTool extends TileBrushTool {
   @Override
   public String getName() {
-    return "Terrain";
+    return Resources.strings().get("tool_terrain");
   }
 
   @Override
@@ -52,7 +53,7 @@ public class TerrainBrushTool extends TileBrushTool {
     WangSet terrainSet = ToolManager.instance().getSelectedTerrainSet();
     WangColor terrain = ToolManager.instance().getSelectedTerrain();
     if (terrainSet == null || terrain == null) {
-      Editor.instance().setCurrentStatus("Select a terrain first");
+      Editor.instance().setCurrentStatus(Resources.strings().get("status_selectTerrainFirst"));
       return;
     }
 
@@ -63,7 +64,7 @@ public class TerrainBrushTool extends TileBrushTool {
     var map = Game.world().environment().getMap();
     if (map.getOrientation() == MapOrientations.ISOMETRIC_STAGGERED
         || map.getOrientation() == MapOrientations.HEXAGONAL) {
-      Editor.instance().setCurrentStatus("Terrain Brush does not support staggered or hexagonal maps");
+      Editor.instance().setCurrentStatus(Resources.strings().get("status_terrainUnsupportedMap"));
       return;
     }
 
@@ -78,7 +79,7 @@ public class TerrainBrushTool extends TileBrushTool {
 
     int terrainIndex = terrainSet.getTerrains().indexOf(terrain) + 1;
     if (terrainIndex <= 0) {
-      Editor.instance().setCurrentStatus("Select a terrain from the active terrain set");
+      Editor.instance().setCurrentStatus(Resources.strings().get("status_selectActiveTerrain"));
       return;
     }
     TerrainResolver.Result result = TerrainResolver.resolve(layer, tileset, terrainSet, terrainIndex, location);
@@ -86,7 +87,7 @@ public class TerrainBrushTool extends TileBrushTool {
       repaintTile(layer, change.getKey(), change.getValue());
     }
     if (result.invalidCells() > 0) {
-      Editor.instance().setCurrentStatus("Missing terrain transition");
+      Editor.instance().setCurrentStatus(Resources.strings().get("status_missingTerrainTransition"));
     }
   }
 }
