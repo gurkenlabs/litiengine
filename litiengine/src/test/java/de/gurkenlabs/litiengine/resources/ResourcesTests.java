@@ -171,10 +171,14 @@ class ResourcesTests {
     try {
       String myString = Resources.strings().getFrom(bundleName, "mystring");
       String myOtherString = Resources.strings().getFrom(bundleName, "myOtherString");
+      Resources.strings().setEncoding(java.nio.charset.StandardCharsets.UTF_8);
+      String unicode = Resources.strings().getFrom(bundleName, "unicode");
 
       assertEquals("teste mich mal", myString);
       assertEquals("teste mich ein zweites Mal", myOtherString);
+      assertEquals("ÄÖÜ äöü ß €", unicode);
     } finally {
+      Resources.strings().setEncoding(java.nio.charset.StandardCharsets.ISO_8859_1);
       Game.config().client().setLanguage(oldLang);
       Game.config().client().setCountry(oldCountry);
     }
