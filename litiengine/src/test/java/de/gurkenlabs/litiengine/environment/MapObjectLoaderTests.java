@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -28,6 +29,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.SoundSource;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
+import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -38,6 +40,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
+import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -329,6 +334,37 @@ class MapObjectLoaderTests {
     assertEquals(8f, data.getParticleOffsetX().getMax());
     assertEquals(100L, data.getParticleTTL().getMin());
     assertEquals(900L, data.getParticleTTL().getMax());
+  }
+
+  @Test
+  void emitterMapObjectUsesDefaultsForNullableImportedValues() {
+    EmitterAttributes attributes = new EmitterAttributes();
+    attributes.setParticleType(null);
+    attributes.setOriginAlign(null);
+    attributes.setOriginValign(null);
+    attributes.setCollision(null);
+    attributes.setRequiredQuality(null);
+    attributes.setSpritesheet((String) null);
+
+    IMapObject mapObject = assertDoesNotThrow(() -> EmitterMapObjectLoader.createMapObject(attributes));
+
+    assertEquals(ParticleType.RECTANGLE,
+      mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class));
+    assertEquals(Align.CENTER,
+      mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class));
+    assertEquals(Valign.MIDDLE,
+      mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class));
+    assertEquals(Collision.NONE,
+      mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class));
+    assertEquals(Quality.VERYLOW,
+      mapObject.getEnumValue(MapObjectProperty.REQUIRED_QUALITY, Quality.class));
+    assertEquals("", mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
+    assertEquals(EmitterAttributes.DEFAULT_MAX_ACCELERATION_X,
+      mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_X_MAX));
+    assertEquals(EmitterAttributes.DEFAULT_MIN_OFFSET_Y,
+      mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MIN));
+    assertEquals(EmitterAttributes.DEFAULT_MAX_PARTICLE_TTL,
+      mapObject.getLongValue(MapObjectProperty.Particle.TTL_MAX));
   }
 
   @Test
