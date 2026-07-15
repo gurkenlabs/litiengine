@@ -119,12 +119,19 @@ public final class LayerList extends JPanel implements LayerController {
     box.add(Box.createHorizontalGlue());
 
     box.add(createAddLayerButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createRemoveLayerButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createDuplicateLayerButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createSetColorButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createRenameLayerButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createHideOtherLayersButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createMoveLayerUpButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createMoveLayerDownButton());
 
     box.add(Box.createHorizontalGlue());
@@ -133,7 +140,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createAddLayerButton() {
     return createButton(
-      Icons.ADD_24, Resources.strings().get("panel_addLayer"),
+      Icons.ADD_16, Resources.strings().get("panel_addLayer"),
         (map, selectedLayer) -> {
           MapObjectLayer layer = new MapObjectLayer();
           layer.setName("new layer");
@@ -152,7 +159,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createRemoveLayerButton() {
     return createButton(
-      Icons.DELETE_24, Resources.strings().get("panel_removeLayer"),
+      Icons.DELETE_16, Resources.strings().get("panel_removeLayer"),
         (map, selectedLayer) -> {
           if (map.getMapObjectLayers().size() <= 1) {
             return;
@@ -179,7 +186,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createDuplicateLayerButton() {
     return createButton(
-      Icons.COPY_24, Resources.strings().get("panel_duplicateLayer"),
+      Icons.COPY_16, Resources.strings().get("panel_duplicateLayer"),
         (map, selectedLayer) -> {
           IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
           map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), copiedLayer);
@@ -190,7 +197,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createSetColorButton() {
     return createButton(
-      Icons.COLOR_24, Resources.strings().get("panel_selectLayerColor"),
+      Icons.COLOR_16, Resources.strings().get("panel_selectLayerColor"),
         (map, selectedLayer) -> {
           Color newColor =
               JColorChooser.showDialog(
@@ -206,7 +213,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createRenameLayerButton() {
     return createButton(
-      Icons.RENAME_24, Resources.strings().get("panel_renameLayer"),
+      Icons.RENAME_16, Resources.strings().get("panel_renameLayer"),
         (map, selectedLayer) -> {
           String newLayerName =
               JOptionPane.showInputDialog(
@@ -221,7 +228,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createHideOtherLayersButton() {
     return createButton(
-      Icons.HIDEOTHER_24, Resources.strings().get("panel_hideOtherLayers"),
+      Icons.HIDEOTHER_16, Resources.strings().get("panel_hideOtherLayers"),
         (map, selectedLayer) -> {
           for (int i = 0; i < map.getMapObjectLayers().size(); i++) {
             if (i != this.layerTable.getSelectedRow()) {
@@ -238,7 +245,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createMoveLayerUpButton() {
     return createButton(
-      Icons.LIFT_24, Resources.strings().get("panel_moveLayerUp"),
+      Icons.LIFT_16, Resources.strings().get("panel_moveLayerUp"),
         (map, selectedLayer) -> {
           final int selLayerIndex = this.layerTable.getSelectedRow();
           if (selLayerIndex < 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
@@ -253,7 +260,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createMoveLayerDownButton() {
     return createButton(
-      Icons.LOWER_24, Resources.strings().get("panel_moveLayerDown"),
+      Icons.LOWER_16, Resources.strings().get("panel_moveLayerDown"),
         (map, selectedLayer) -> {
           int selLayerIndex = this.layerTable.getSelectedRow();
           if (selLayerIndex <= 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
