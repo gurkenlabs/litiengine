@@ -177,10 +177,9 @@ public class TilesetEditorPanel extends JPanel {
     zoomControls.add(fit);
     renderSettings.add(labeledOffsets(), BorderLayout.CENTER);
     renderSettings.add(zoomControls, BorderLayout.EAST);
-    JPanel bodyPanel = new JPanel();
-    bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
+    JPanel bodyPanel = new JPanel(new BorderLayout(0, 8));
     bodyPanel.setOpaque(false);
-    bodyPanel.add(this.gridScroll);
+    bodyPanel.add(this.gridScroll, BorderLayout.CENTER);
     add(bodyPanel, BorderLayout.CENTER);
 
     this.previewLabel = new JLabel("", SwingConstants.CENTER);
@@ -242,31 +241,26 @@ public class TilesetEditorPanel extends JPanel {
     selectedTilePanel.setOpaque(false);
     selectedTilePanel.setAlignmentX(LEFT_ALIGNMENT);
     selectedTilePanel.add(this.previewLabel, BorderLayout.NORTH);
-    JPanel controls = new JPanel(new BorderLayout(0, 6));
+    JPanel controls = new JPanel();
+    controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
     controls.setOpaque(false);
-    controls.add(this.detailLabel, BorderLayout.NORTH);
-    JPanel tileMetadata = new JPanel(new GridLayout(2, 1, 0, 4));
-    tileMetadata.setOpaque(false);
-    tileMetadata.add(typePanel);
-    tileMetadata.add(probabilityPanel);
-    controls.add(tileMetadata, BorderLayout.CENTER);
+    controls.add(this.detailLabel);
+    controls.add(javax.swing.Box.createVerticalStrut(4));
+    controls.add(typePanel);
+    controls.add(javax.swing.Box.createVerticalStrut(4));
+    controls.add(probabilityPanel);
+    controls.add(javax.swing.Box.createVerticalStrut(6));
     ExpandableCard propertyPanel = new ExpandableCard(Resources.strings().get("tilesetEditor_tileProperties"), createTablePanel(this.tilePropertyTable, this.tilePropertyModel,
       () -> this.tilePropertyModel.addRow(new Object[] {"", ""})), false);
     propertyPanel.setContentInsets(8, 0, 8, 0);
     ExpandableCard animationPanel = new ExpandableCard(Resources.strings().get("tilesetEditor_tileAnimation"), createTablePanel(this.animationTable, this.animationModel,
       () -> this.animationModel.addRow(new Object[] {String.valueOf(Math.max(0, this.tileGrid.selectedTile)), "100"})), false);
     animationPanel.setContentInsets(8, 0, 8, 0);
-    JPanel lowerTileControls = new JPanel();
-    lowerTileControls.setLayout(new BoxLayout(lowerTileControls, BoxLayout.Y_AXIS));
-    lowerTileControls.setOpaque(false);
-    lowerTileControls.add(propertyPanel);
-    lowerTileControls.add(javax.swing.Box.createVerticalStrut(6));
-    lowerTileControls.add(animationPanel);
-    controls.add(lowerTileControls, BorderLayout.SOUTH);
+    controls.add(propertyPanel);
+    controls.add(javax.swing.Box.createVerticalStrut(6));
+    controls.add(animationPanel);
     selectedTilePanel.add(controls, BorderLayout.CENTER);
-    bodyPanel.add(javax.swing.Box.createVerticalStrut(8));
-    bodyPanel.add(selectedTilePanel);
-    bodyPanel.add(javax.swing.Box.createVerticalGlue());
+    bodyPanel.add(selectedTilePanel, BorderLayout.SOUTH);
 
     this.animationTimer = new Timer(80, _ -> updateSelectedTilePreview());
     updateZoomLabel();
