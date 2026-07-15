@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Adjustable;
@@ -28,7 +29,8 @@ final class CoordinateRuler extends JPanel {
         ? new Dimension(0, horizontalHeight())
         : new Dimension(verticalWidth(), 0));
     getAccessibleContext().setAccessibleName(
-        orientation == Adjustable.HORIZONTAL ? "Horizontal map ruler" : "Vertical map ruler");
+        Resources.strings().get(orientation == Adjustable.HORIZONTAL
+            ? "coordinate_ruler_horizontal" : "coordinate_ruler_vertical"));
   }
 
   @Override public void updateUI() {
@@ -117,6 +119,6 @@ final class CoordinateRuler extends JPanel {
   private static String coordinateLabel(double coordinate) {
     return Math.abs(coordinate - Math.rint(coordinate)) < 0.001
         ? Long.toString(Math.round(coordinate))
-        : String.format("%.1f", coordinate);
+        : Resources.strings().get("coordinate_ruler_decimal", coordinate);
   }
 }

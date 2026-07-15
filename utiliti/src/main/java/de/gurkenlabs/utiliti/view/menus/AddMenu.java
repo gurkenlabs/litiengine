@@ -104,8 +104,9 @@ public final class AddMenu extends JMenu {
   }
 
   private void refreshProjectTypes() {
+    String projectTypesLabel = Resources.strings().get("menu_add_gameImplementations");
     for (int i = getItemCount() - 1; i >= 0; i--) {
-      if (getItem(i) instanceof JMenu menu && "Game Implementations".equals(menu.getText())) {
+      if (getItem(i) instanceof JMenu menu && projectTypesLabel.equals(menu.getText())) {
         remove(i);
       }
     }
@@ -113,7 +114,7 @@ public final class AddMenu extends JMenu {
     if (definitions.isEmpty()) {
       return;
     }
-    JMenu projectTypes = new JMenu("Game Implementations");
+    JMenu projectTypes = new JMenu(projectTypesLabel);
     for (ProjectCodeIntegration.Definition definition : definitions) {
       JMenuItem item = new JMenuItem(definition.displayName(), Icons.forMapObjectType(definition.baseType()));
       item.setToolTipText(definition.id());

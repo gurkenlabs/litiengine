@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -930,23 +931,28 @@ public class UndoManager {
         String name = target.getName();
         String object = name != null && !name.isBlank()
           ? name
-          : (target.getType() != null && !target.getType().isBlank() ? target.getType() : "Object") + " #" + target.getId();
+          : Resources.strings().get(
+              "history_objectFallback",
+              target.getType() != null && !target.getType().isBlank()
+                  ? target.getType()
+                  : Resources.strings().get("history_object"),
+              Integer.toString(target.getId()));
         return switch (this.operationType) {
-          case ADD -> "Add " + object;
-          case DELETE -> "Delete " + object;
-          default -> "Change " + object;
+          case ADD -> Resources.strings().get("history_addObject", object);
+          case DELETE -> Resources.strings().get("history_deleteObject", object);
+          default -> Resources.strings().get("history_changeObject", object);
         };
       }
       if (targetLayer != null) {
-        return "Change layer " + targetLayer.getName();
+        return Resources.strings().get("history_changeLayer", targetLayer.getName());
       }
       if (targetMap != null) {
-        return "Change map " + targetMap.getName();
+        return Resources.strings().get("history_changeMap", targetMap.getName());
       }
       if (targetLayerStructureMap != null) {
-        return "Change layer order in " + targetLayerStructureMap.getName();
+        return Resources.strings().get("history_changeLayerOrder", targetLayerStructureMap.getName());
       }
-      return "Edit resource";
+      return Resources.strings().get("history_editResource");
     }
 
     public int getOperation() {

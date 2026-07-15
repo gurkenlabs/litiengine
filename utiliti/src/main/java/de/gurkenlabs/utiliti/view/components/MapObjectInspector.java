@@ -100,7 +100,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.checkBoxRenderWithLayer = new JCheckBox(Resources.strings().get("panel_renderwithlayer"));
     this.checkBoxRenderWithLayer.setOpaque(false);
     this.checkBoxRenderWithLayer.addActionListener(e -> updateRenderTypeEnabled());
-    this.labelImplementation = new JLabel("Implementation");
+    this.labelImplementation = new JLabel(Resources.strings().get("mapObjectInspector_implementation"));
     this.labelImplementation.setHorizontalAlignment(SwingConstants.TRAILING);
     this.implementation = new JComboBox<>();
     ControlBehavior.apply(this.implementation);
@@ -167,7 +167,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         new Dimension(Integer.MAX_VALUE, infoPanel.getPreferredSize().height));
     accordion.add(infoPanel);
 
-    JPanel sepGeneral = createSectionSeparator("GENERAL");
+    JPanel sepGeneral = createSectionSeparator(Resources.strings().get("panel_general").toUpperCase(java.util.Locale.ROOT));
     sepGeneral.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, sepGeneral.getPreferredSize().height));
     accordion.add(sepGeneral);
@@ -177,7 +177,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         new Dimension(Integer.MAX_VALUE, entityPanel.getPreferredSize().height));
     accordion.add(entityPanel);
 
-    JPanel sepTransform = createSectionSeparator("TRANSFORM");
+    JPanel sepTransform = createSectionSeparator(Resources.strings().get("panel_transform").toUpperCase(java.util.Locale.ROOT));
     sepTransform.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, sepTransform.getPreferredSize().height));
     accordion.add(sepTransform);
@@ -316,13 +316,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     GroupLayout gl = new GroupLayout(grid);
     grid.setLayout(gl);
 
-    JLabel lblX = new JLabel("x");
+    JLabel lblX = new JLabel(Resources.strings().get("panel_x"));
     lblX.setHorizontalAlignment(SwingConstants.TRAILING);
-    JLabel lblY = new JLabel("y");
+    JLabel lblY = new JLabel(Resources.strings().get("panel_y"));
     lblY.setHorizontalAlignment(SwingConstants.TRAILING);
-    JLabel lblW = new JLabel("w");
+    JLabel lblW = new JLabel(Resources.strings().get("mapObjectInspector_widthShort"));
     lblW.setHorizontalAlignment(SwingConstants.TRAILING);
-    JLabel lblH = new JLabel("h");
+    JLabel lblH = new JLabel(Resources.strings().get("mapObjectInspector_heightShort"));
     lblH.setHorizontalAlignment(SwingConstants.TRAILING);
 
     int transformLabelWidth = SECTION_LABEL_WIDTH;
@@ -504,7 +504,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
     this.labelTypeIcon.setIcon(Icons.forMapObjectType(this.type));
     this.labelTypeIcon.setToolTipText(this.type != null ? this.type.name() : null);
-    this.lblLayer.setText("Layer: " + mapObject.getLayer());
+    this.lblLayer.setText(Resources.strings().get("panel_layer") + ": " + mapObject.getLayer());
 
     RenderType rt =
         mapObject.getEnumValue(
@@ -536,7 +536,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.updatingImplementation = true;
     try {
       this.implementation.removeAllItems();
-      this.implementation.addItem(new ImplementationOption(null, "Built-in default", null, null));
+      this.implementation.addItem(new ImplementationOption(
+        null, Resources.strings().get("mapObjectInspector_builtinDefault"), null, null));
       Editor.instance().getProjectCodeIntegration().getDefinitions().stream()
         .filter(definition -> definition.baseType() == this.type)
         .forEach(definition -> this.implementation.addItem(new ImplementationOption(definition.id(), definition.displayName(), compactPackage(definition.className()), definition.className())));

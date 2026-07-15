@@ -15,7 +15,7 @@ public final class HelpMenu extends JMenu {
 
   public HelpMenu() {
     super(Resources.strings().get("menu_help"));
-    this.setMnemonic('H');
+    this.setMnemonic(this.getText().charAt(0));
 
     JMenuItem docsMenuItem = new JMenuItem(Resources.strings().get("menu_help_docs"));
     docsMenuItem.addActionListener(
@@ -53,11 +53,11 @@ public final class HelpMenu extends JMenu {
       event -> UriUtilities.openWebpage(
         URI.create(Resources.strings().getFrom(LINKS, "link_opencollective"))));
 
-    String javaVersion =
-      System.getProperty("java.version") + " (vendor: " + System.getProperty("java.vendor") + ")";
+    String javaVersion = Resources.strings().get(
+      "menu_help_java_details", System.getProperty("java.version"), System.getProperty("java.vendor"));
     String aboutMessage =
       String.format(
-        "%s%n%n%s%n%nJava: %s",
+        "%s%n%n%s%n%n%s",
         Resources.strings().get("menu_help_abouttext"),
         Resources.strings().get("copyright", new SimpleDateFormat("yyyy").format(new Date())),
         javaVersion);

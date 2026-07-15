@@ -14,7 +14,7 @@ import javax.swing.KeyStroke;
 public final class EditMenu extends JMenu {
   public EditMenu() {
     super(Resources.strings().get("menu_edit"));
-    this.setMnemonic('E');
+    this.setMnemonic(this.getText().charAt(0));
 
     JMenu addMenu = new AddMenu();
 

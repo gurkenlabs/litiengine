@@ -120,9 +120,11 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
           try {
             SpriteFileWrapper file = fileList.getSelectedValue();
             labelImage.setIcon(file.getIcon());
-            labelImageSize.setText(file.getWidth() + " x " + file.getHeight() + " px");
+            labelImageSize.setText(
+              Resources.strings().get("size_pixels", String.valueOf(file.getWidth()), String.valueOf(file.getHeight())));
             labelFrameSize.setText(
-              file.getWidth() / (int) spinnerColumns.getValue() + " x " + file.getHeight() / (int) spinnerRows.getValue() + " px");
+              Resources.strings().get("size_pixels", String.valueOf(file.getWidth() / (int) spinnerColumns.getValue()),
+                String.valueOf(file.getHeight() / (int) spinnerRows.getValue())));
             spinnerColumns.setModel(
               new SpinnerNumberModel(1, 1, file.getWidth(), 1));
             spinnerRows.setModel(
@@ -153,29 +155,29 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     panel.setBorder(null);
     add(panel, BorderLayout.CENTER);
 
-    JLabel lblSpritecolumns = new JLabel("spriteColumns:");
+    JLabel lblSpritecolumns = new JLabel(Resources.strings().get("spritesheet_import_columns"));
 
     spinnerColumns = new JSpinner();
     spinnerColumns.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerColumns.getPreferredSize().height));
     spinnerColumns.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
     spinnerColumns.addChangeListener(e -> updateGrid());
 
-    JLabel lblSpriterows = new JLabel("spriteRows:");
+    JLabel lblSpriterows = new JLabel(Resources.strings().get("spritesheet_import_rows"));
 
     spinnerRows = new JSpinner();
     spinnerRows.setPreferredSize(new Dimension(SPINNER_WIDTH, spinnerRows.getPreferredSize().height));
     spinnerRows.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
     spinnerRows.addChangeListener(e -> updateGrid());
 
-    JLabel lblNewLabel = new JLabel("Image Size:");
+    JLabel lblNewLabel = new JLabel(Resources.strings().get("spritesheet_import_image_size"));
 
-    labelImageSize = new JLabel("XXX");
+    labelImageSize = new JLabel();
 
-    labelFrameSize = new JLabel("XXX");
+    labelFrameSize = new JLabel();
 
-    JLabel lblHeightText = new JLabel("Frame Size:");
+    JLabel lblHeightText = new JLabel(Resources.strings().get("spritesheet_import_frame_size"));
 
-    JLabel lblName = new JLabel("name:");
+    JLabel lblName = new JLabel(Resources.strings().get("spritesheet_import_name"));
 
     textField = new JTextField();
     ControlBehavior.apply(textField);
@@ -197,7 +199,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       }
     });
 
-    JLabel lblKeyframes = new JLabel("keyframes:");
+    JLabel lblKeyframes = new JLabel(Resources.strings().get("spritesheet_import_keyframes"));
 
     labelImage = new JLabel("");
     labelImage.setHorizontalAlignment(SwingConstants.CENTER);
@@ -391,7 +393,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     tableKeyFrames = new JTable();
     scrollPane1.setViewportView(tableKeyFrames);
     treeModel =
-      new DefaultTableModel(new Object[][] {}, new String[] {"sprite", "duration"}) {
+      new DefaultTableModel(new Object[][] {},
+        new String[] {Resources.strings().get("panel_sprite"), Resources.strings().get("assetpanel_animation_duration")}) {
         final Class<?>[] columnTypes = new Class<?>[] {Integer.class, Integer.class};
 
         @Override
@@ -508,7 +511,9 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
   private void updateGrid() {
     SpriteFileWrapper file = fileList.getSelectedValue();
-    labelFrameSize.setText(file.getWidth() / (int) spinnerColumns.getValue() + " x " + file.getHeight() / (int) spinnerRows.getValue() + " px");
+    labelFrameSize.setText(Resources.strings().get("size_pixels",
+      String.valueOf(file.getWidth() / (int) spinnerColumns.getValue()),
+      String.valueOf(file.getHeight() / (int) spinnerRows.getValue())));
 
     if (this.isUpdating) {
       return;

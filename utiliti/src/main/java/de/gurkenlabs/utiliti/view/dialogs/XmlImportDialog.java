@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.view.dialogs;
 
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.io.File;
 import java.nio.file.Path;
@@ -26,8 +27,9 @@ public final class XmlImportDialog {
       }
     }
 
-    sb.append(" - " + name + " XML");
-    if (EditorFileChooser.showFileDialog(sb.toString(), "Import " + name + " XML", true, extensions) == JFileChooser.APPROVE_OPTION) {
+    String filter = Resources.strings().get("file_filter_xml", sb, name);
+    String title = Resources.strings().get("dialog_import_xml", name);
+    if (EditorFileChooser.showFileDialog(filter, title, true, extensions) == JFileChooser.APPROVE_OPTION) {
       for (Path file : Stream.of(EditorFileChooser.instance().getSelectedFiles()).map(File::toPath).toList()) {
         consumer.accept(file);
       }

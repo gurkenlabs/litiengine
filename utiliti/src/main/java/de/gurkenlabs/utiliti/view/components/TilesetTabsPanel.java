@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BorderLayout;
@@ -28,17 +29,17 @@ final class TilesetTabsPanel extends JPanel {
     this.commands = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
     this.commands.setOpaque(false);
     JButton add = Style.iconButton(Icons.ADD_16);
-    add.setToolTipText("Add a project tileset to this map");
+    add.setToolTipText(Resources.strings().get("mapTilesets_add"));
     add.addActionListener(e -> UI.showMapTilesetMenu(add));
     JButton addAll = Style.iconButton(Icons.COPY_16);
-    addAll.setToolTipText("Add all project tilesets to this map");
+    addAll.setToolTipText(Resources.strings().get("mapTilesets_addAll"));
     addAll.addActionListener(e -> UI.addAllMapTilesets());
     JButton create = Style.iconButton(Icons.ASSET_16);
-    create.setToolTipText("Create a new tileset for this map");
+    create.setToolTipText(Resources.strings().get("mapTilesets_create"));
     create.addActionListener(e -> UI.createMapTileset());
     JButton remove = Style.iconButton(Icons.DELETE_16);
     Style.styleButton(remove, Style.ButtonVariant.DESTRUCTIVE);
-    remove.setToolTipText("Remove selected tileset from this map only");
+    remove.setToolTipText(Resources.strings().get("mapTilesets_remove"));
     remove.addActionListener(e -> UI.removeSelectedMapTileset(this));
     this.commands.add(add);
     this.commands.add(addAll);
@@ -117,6 +118,7 @@ final class TilesetTabsPanel extends JPanel {
   }
 
   private static String tabName(Tileset tileset) {
-    return tileset.getName() == null || tileset.getName().isBlank() ? "Tileset" : tileset.getName();
+    return tileset.getName() == null || tileset.getName().isBlank()
+      ? Resources.strings().get("tilesetEditor_tileset") : tileset.getName();
   }
 }

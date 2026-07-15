@@ -89,7 +89,7 @@ public class CustomPanel extends PropertyPanel {
             .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
     this.tableCustomProperties = new JTable() {
-      private static final String EMPTY_TEXT = "No properties defined";
+      private static final String EMPTY_TEXT = Resources.strings().get("panel_noPropertiesDefined");
       @Override
       protected void paintComponent(Graphics g) {
         super.paintComponent(g);

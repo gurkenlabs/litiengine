@@ -46,6 +46,11 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.RenderingHints;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -71,7 +76,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -154,6 +158,7 @@ public final class UI {
       return;
     }
 
+    initTools();
     Game.screens().display(Editor.instance());
 
     javax.swing.JComponent.setDefaultLocale(Locale.getDefault());
@@ -161,9 +166,7 @@ public final class UI {
     setDefaultSwingFont(Style.getDefaultFont());
 
     Tray.init();
-    Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
-    Game.window().cursor().setOffsetX(0);
-    Game.window().cursor().setOffsetY(0);
+    Cursors.initialize();
     setupInterface();
     Game.window().getHostControl().revalidate();
 
@@ -380,11 +383,10 @@ public final class UI {
     canvas.setFocusable(true);
     canvas.setVisible(false);
     window.remove(canvas);
-    initTools();
     Component leftPanel = initLeftPanel();
     viewportToolbar = new ViewportToolbar(mapCombo);
     viewportPanel = new ViewportPanel(canvas);
-    initDropTarget(viewportPanel);
+    initDropTarget(canvas);
 
     Component renderSplitPanel = initRenderSplitPanel(viewportPanel, winH);
 
@@ -401,7 +403,8 @@ public final class UI {
     tilesetEditorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     tileLayerTilesetEditorPanel = new TilesetTabsPanel();
     tileLayerTilesetEditorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
-    ExpandableCard tileLayerTilesets = tileLayerPropertyPanel.addSection("Tilesets", tileLayerTilesetEditorPanel, true);
+    ExpandableCard tileLayerTilesets = tileLayerPropertyPanel.addSection(
+        Resources.strings().get("assettree_tilesets"), tileLayerTilesetEditorPanel, true);
     tileLayerTilesets.setFillsAvailableHeight(true);
     tileLayerTilesets.setHeaderTrailing(tileLayerTilesetEditorPanel.getCommands());
     spriteEditorPanel = new SpriteEditorPanel();
@@ -420,7 +423,7 @@ public final class UI {
     inspectorHost.add(spriteEditorPanel, "sprites");
     inspectorHost.setMinimumSize(new Dimension(inspectorMinWidth, 0));
 
-    JLabel inspectorTitle = new JLabel("Inspector");
+    JLabel inspectorTitle = new JLabel(Resources.strings().get("panel_inspector"));
     inspectorTitle.setFont(inspectorTitle.getFont().deriveFont(Font.BOLD));
     JPanel inspectorHeader = new JPanel(new BorderLayout());
     inspectorHeader.setBorder(BorderFactory.createCompoundBorder(
@@ -623,32 +626,39 @@ public final class UI {
     ToolManager tm = ToolManager.instance();
     tm.register(new PointerTool());
     tm.register(new StampBrushTool());
+    tm.register(new BucketFillTool());
     tm.register(new TerrainBrushTool());
     tm.register(new EraserTool());
-    tm.register(new BucketFillTool());
   }
 
-  private static void initDropTarget(JPanel renderPanel) {
-    Canvas canvas = Game.window().getRenderComponent();
-    renderPanel.setTransferHandler(new TransferHandler() {
-      @Override public boolean canImport(TransferHandler.TransferSupport support) {
-        return support.isDataFlavorSupported(AssetTransferable.ASSET_FLAVOR);
-      }
-      @Override public boolean importData(TransferHandler.TransferSupport support) {
-        if (!canImport(support)) {
-          return false;
+  private static void initDropTarget(Canvas canvas) {
+    new DropTarget(canvas, DnDConstants.ACTION_COPY, new DropTargetAdapter() {
+      @Override public void dragEnter(DropTargetDragEvent event) {
+        if (event.isDataFlavorSupported(AssetTransferable.ASSET_FLAVOR)) {
+          event.acceptDrag(DnDConstants.ACTION_COPY);
+        } else {
+          event.rejectDrag();
         }
+      }
+
+      @Override public void drop(DropTargetDropEvent event) {
+        if (!event.isDataFlavorSupported(AssetTransferable.ASSET_FLAVOR)) {
+          event.rejectDrop();
+          return;
+        }
+
+        event.acceptDrop(DnDConstants.ACTION_COPY);
+        boolean created = false;
         try {
-          Object asset = support.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
-          java.awt.Point dropPoint = support.getDropLocation().getDropPoint();
-          java.awt.Point canvasPoint = SwingUtilities.convertPoint(renderPanel, dropPoint, canvas);
-          Editor.instance().getMapComponent().addMapObjectAt(asset, canvasPoint);
-          return true;
+          Object asset = event.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
+          created = Editor.instance().getMapComponent().addMapObjectAt(asset, event.getLocation());
         } catch (Exception ex) {
-          return false;
+          created = false;
+        } finally {
+          event.dropComplete(created);
         }
       }
-    });
+    }, true);
   }
 
   private static JPanel initBottomPanel() {

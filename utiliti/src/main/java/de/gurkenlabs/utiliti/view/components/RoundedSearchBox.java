@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
@@ -41,7 +42,9 @@ public class RoundedSearchBox extends JPanel {
     this.clearButton.setPreferredSize(new Dimension(24, 24));
     this.clearButton.setMinimumSize(new Dimension(24, 24));
     this.clearButton.setMaximumSize(new Dimension(24, 24));
-    this.clearButton.setToolTipText("Clear search");
+    String clearSearch = Resources.strings().get("search_clear");
+    this.clearButton.setToolTipText(clearSearch);
+    this.clearButton.getAccessibleContext().setAccessibleName(clearSearch);
     add(this.clearButton, BorderLayout.EAST);
 
     this.textField.addFocusListener(new FocusAdapter() {

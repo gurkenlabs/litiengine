@@ -54,8 +54,8 @@ public class ColorComponent extends JPanel {
     this.btnSelectColor = new ColorSwatchButton();
     this.btnSelectColor.setIcon(Icons.COLOR_16);
     styleColorActionButton(this.btnSelectColor);
-    this.btnSelectColor.setToolTipText("Select color");
-    this.btnSelectColor.getAccessibleContext().setAccessibleName("Select color");
+    this.btnSelectColor.setToolTipText(Resources.strings().get("colorComponent_selectColor"));
+    this.btnSelectColor.getAccessibleContext().setAccessibleName(Resources.strings().get("colorComponent_selectColor"));
     this.btnSelectColor.addActionListener(
         a -> {
           final Color result =
@@ -65,8 +65,8 @@ public class ColorComponent extends JPanel {
 
     this.btnClearColor = Style.iconButton(Icons.DELETE_16);
     Style.styleButton(this.btnClearColor, Style.ButtonVariant.DESTRUCTIVE);
-    this.btnClearColor.setToolTipText("Clear color");
-    this.btnClearColor.getAccessibleContext().setAccessibleName("Clear color");
+    this.btnClearColor.setToolTipText(Resources.strings().get("colorComponent_clearColor"));
+    this.btnClearColor.getAccessibleContext().setAccessibleName(Resources.strings().get("colorComponent_clearColor"));
     this.btnClearColor.addActionListener(a -> this.clear());
 
     final JLabel lblAlpha = new JLabel(Resources.strings().get("panel_alpha"));

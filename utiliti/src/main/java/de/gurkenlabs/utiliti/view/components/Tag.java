@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
@@ -35,7 +36,7 @@ public class Tag extends JPanel {
     setBackground(Style.COLOR_DEFAULT_TAG);
     setOpaque(false);
 
-    this.lblText = new JLabel("New label");
+    this.lblText = new JLabel(Resources.strings().get("tag_newLabel"));
     this.lblText.setForeground(Style.COLOR_TEXT);
     this.lblText.setFont(
       this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.8f));

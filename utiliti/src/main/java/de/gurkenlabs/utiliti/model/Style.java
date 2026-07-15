@@ -292,9 +292,9 @@ public final class Style {
       name = actionName instanceof String value ? value : null;
     }
     if ("+".equals(name)) {
-      name = "Add";
+      name = Resources.strings().get("accessibility_add");
     } else if ("-".equals(name) || "−".equals(name)) {
-      name = "Remove";
+      name = Resources.strings().get("accessibility_remove");
     }
     if (name != null && !name.isBlank()) {
       button.getAccessibleContext().setAccessibleName(name);

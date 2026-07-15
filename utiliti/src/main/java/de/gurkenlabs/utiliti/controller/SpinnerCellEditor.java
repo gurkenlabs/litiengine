@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.controller;
 
+import de.gurkenlabs.litiengine.resources.Resources;
 import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -78,7 +79,7 @@ public class SpinnerCellEditor extends DefaultCellEditor {
       editor.commitEdit();
       spinner.commitEdit();
     } catch (java.text.ParseException e) {
-      JOptionPane.showMessageDialog(null, "Invalid value, discarding.");
+      JOptionPane.showMessageDialog(null, Resources.strings().get("input_invalid_value"));
     }
     return super.stopCellEditing();
   }

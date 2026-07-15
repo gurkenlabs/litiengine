@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.WrapLayout;
 import de.gurkenlabs.utiliti.model.Style;
@@ -59,7 +60,7 @@ public class TagPanel extends JPanel {
     this.textFieldInput.setOpaque(false);
     this.textFieldInput.setForeground(Style.text());
     this.textFieldInput.setCaretColor(Style.accent());
-    this.textFieldInput.getAccessibleContext().setAccessibleName("Add tag");
+    this.textFieldInput.getAccessibleContext().setAccessibleName(Resources.strings().get("tagPanel_addTag"));
     this.textFieldInput.putClientProperty("JComponent.outline", "none");
     this.textFieldInput.setPreferredSize(new Dimension(INLINE_INPUT_WIDTH, Tag.CHIP_HEIGHT));
     this.textFieldInput.setMinimumSize(new Dimension(48, Tag.CHIP_HEIGHT));

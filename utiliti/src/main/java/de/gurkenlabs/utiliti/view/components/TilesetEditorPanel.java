@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.WangColor;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.tool.TileStamp;
@@ -101,10 +102,10 @@ public class TilesetEditorPanel extends JPanel {
     JPanel info = new JPanel();
     info.setOpaque(false);
     info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
-    this.titleLabel = new JLabel("No tileset selected");
+    this.titleLabel = new JLabel(Resources.strings().get("tilesetEditor_noTilesetSelected"));
     this.titleLabel.setForeground(Style.text());
     this.titleLabel.setFont(this.titleLabel.getFont().deriveFont(Font.BOLD));
-    this.metaLabel = new JLabel("Select a tileset asset to inspect its tiles.");
+    this.metaLabel = new JLabel(Resources.strings().get("tilesetEditor_selectTilesetHint"));
     this.metaLabel.setForeground(Style.mutedText());
     info.add(this.titleLabel);
     info.add(this.metaLabel);
@@ -117,7 +118,7 @@ public class TilesetEditorPanel extends JPanel {
         applyTilesetName();
       }
     });
-    JPanel namePanel = labeledField("Name", this.tilesetNameField);
+    JPanel namePanel = labeledField(Resources.strings().get("panel_name"), this.tilesetNameField);
 
     this.tileOffsetXSpinner = new JSpinner(new SpinnerNumberModel(0, -100000, 100000, 1));
     this.tileOffsetYSpinner = new JSpinner(new SpinnerNumberModel(0, -100000, 100000, 1));
@@ -133,7 +134,7 @@ public class TilesetEditorPanel extends JPanel {
     this.tilesetPropertyModel = createPropertyModel();
     this.tilesetPropertyModel.addTableModelListener(_ -> applyTilesetProperties());
     this.tilesetPropertyTable = createPropertyTable(this.tilesetPropertyModel);
-    ExpandableCard tilesetProperties = new ExpandableCard("Tileset Properties", createTablePanel(this.tilesetPropertyTable, this.tilesetPropertyModel,
+    ExpandableCard tilesetProperties = new ExpandableCard(Resources.strings().get("tilesetEditor_tilesetProperties"), createTablePanel(this.tilesetPropertyTable, this.tilesetPropertyModel,
       () -> this.tilesetPropertyModel.addRow(new Object[] {"", ""})), false);
     tilesetProperties.setContentInsets(8, 0, 8, 0);
 
@@ -165,9 +166,9 @@ public class TilesetEditorPanel extends JPanel {
     zoomOut.addActionListener(e -> setGridZoom(this.tileGrid.zoom * 0.8f));
     zoomIn.addActionListener(e -> setGridZoom(this.tileGrid.zoom * 1.25f));
     fit.addActionListener(e -> fitGrid());
-    zoomOut.setToolTipText("Zoom out");
-    zoomIn.setToolTipText("Zoom in");
-    fit.setToolTipText("Fit tileset");
+    zoomOut.setToolTipText(Resources.strings().get("menu_view_zoomOut"));
+    zoomIn.setToolTipText(Resources.strings().get("menu_view_zoomIn"));
+    fit.setToolTipText(Resources.strings().get("tilesetEditor_fitTileset"));
     JPanel zoomControls = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 4, 0));
     zoomControls.setOpaque(false);
     zoomControls.add(zoomOut);
@@ -205,7 +206,8 @@ public class TilesetEditorPanel extends JPanel {
     this.tilePropertyModel = createPropertyModel();
     this.tilePropertyModel.addTableModelListener(_ -> applyTileProperties());
     this.tilePropertyTable = createPropertyTable(this.tilePropertyModel);
-    this.animationModel = new DefaultTableModel(new Object[][] {}, new String[] {"Tile", "Duration"}) {
+    this.animationModel = new DefaultTableModel(new Object[][] {}, new String[] {
+      Resources.strings().get("tilesetEditor_tile"), Resources.strings().get("tilesetEditor_duration")}) {
       @Override public Class<?> getColumnClass(int columnIndex) {
         return String.class;
       }
@@ -222,10 +224,10 @@ public class TilesetEditorPanel extends JPanel {
     this.terrainNameField = metadataField(this::applyTerrainName);
     this.terrainProbabilityField = metadataField(this::applyTerrainProbability);
     this.terrainColorButton = new JButton();
-    this.terrainColorButton.setToolTipText("Choose terrain color");
+    this.terrainColorButton.setToolTipText(Resources.strings().get("tilesetEditor_chooseTerrainColor"));
     this.terrainColorButton.setPreferredSize(new Dimension(36, 24));
     this.terrainColorButton.setFocusable(true);
-    this.terrainColorButton.getAccessibleContext().setAccessibleName("Terrain color");
+    this.terrainColorButton.getAccessibleContext().setAccessibleName(Resources.strings().get("tilesetEditor_terrainColor"));
     this.terrainColorButton.addActionListener(_ -> chooseTerrainColor());
     this.terrainSlots = new JButton[8];
     this.terrainSetCombo.addActionListener(_ -> updateTerrainControls());
@@ -233,8 +235,8 @@ public class TilesetEditorPanel extends JPanel {
     this.terrainTypeCombo.addActionListener(_ -> applyTerrainSetType());
     terrainHost.add(createTerrainPanel(), BorderLayout.CENTER);
 
-    JPanel typePanel = labeledField("Class", this.typeField);
-    JPanel probabilityPanel = labeledField("Probability", this.probabilityField);
+    JPanel typePanel = labeledField(Resources.strings().get("tilesetEditor_class"), this.typeField);
+    JPanel probabilityPanel = labeledField(Resources.strings().get("tilesetEditor_probability"), this.probabilityField);
 
     JPanel selectedTilePanel = new JPanel(new BorderLayout(0, 8));
     selectedTilePanel.setOpaque(false);
@@ -248,10 +250,10 @@ public class TilesetEditorPanel extends JPanel {
     tileMetadata.add(typePanel);
     tileMetadata.add(probabilityPanel);
     controls.add(tileMetadata, BorderLayout.CENTER);
-    ExpandableCard propertyPanel = new ExpandableCard("Tile Properties", createTablePanel(this.tilePropertyTable, this.tilePropertyModel,
+    ExpandableCard propertyPanel = new ExpandableCard(Resources.strings().get("tilesetEditor_tileProperties"), createTablePanel(this.tilePropertyTable, this.tilePropertyModel,
       () -> this.tilePropertyModel.addRow(new Object[] {"", ""})), false);
     propertyPanel.setContentInsets(8, 0, 8, 0);
-    ExpandableCard animationPanel = new ExpandableCard("Tile Animation", createTablePanel(this.animationTable, this.animationModel,
+    ExpandableCard animationPanel = new ExpandableCard(Resources.strings().get("tilesetEditor_tileAnimation"), createTablePanel(this.animationTable, this.animationModel,
       () -> this.animationModel.addRow(new Object[] {String.valueOf(Math.max(0, this.tileGrid.selectedTile)), "100"})), false);
     animationPanel.setContentInsets(8, 0, 8, 0);
     JPanel lowerTileControls = new JPanel();
@@ -309,18 +311,18 @@ public class TilesetEditorPanel extends JPanel {
     javax.swing.SwingUtilities.invokeLater(this::fitGrid);
     publishSelectedTile();
     if (tileset == null) {
-      this.titleLabel.setText("No tileset selected");
-      this.metaLabel.setText("Select a tileset asset to inspect its tiles.");
+      this.titleLabel.setText(Resources.strings().get("tilesetEditor_noTilesetSelected"));
+      this.metaLabel.setText(Resources.strings().get("tilesetEditor_selectTilesetHint"));
       clearTilesetControls();
       clearSelectedTileControls();
       return;
     }
 
-    this.titleLabel.setText(tileset.getName() != null ? tileset.getName() : "Unnamed tileset");
-    String source = tileset.getImage() != null ? tileset.getImage().getSource() : "No image";
-    this.metaLabel.setText(
-      source + "  •  " + tileset.getTileWidth() + "x" + tileset.getTileHeight()
-        + "  •  " + tileset.getTileCount() + " tiles");
+    this.titleLabel.setText(tileset.getName() != null ? tileset.getName() : Resources.strings().get("tilesetEditor_unnamedTileset"));
+    String source = tileset.getImage() != null ? tileset.getImage().getSource() : Resources.strings().get("tilesetEditor_noImage");
+    this.metaLabel.setText(Resources.strings().get("tilesetEditor_tilesetSummary", source,
+      String.valueOf(tileset.getTileWidth()), String.valueOf(tileset.getTileHeight()),
+      String.valueOf(tileset.getTileCount())));
     bindTilesetControls();
     updateSelectedTileControls();
   }
@@ -450,7 +452,8 @@ public class TilesetEditorPanel extends JPanel {
   }
 
   private static DefaultTableModel createPropertyModel() {
-    return new DefaultTableModel(new Object[][] {}, new String[] {"Name", "Value"}) {
+    return new DefaultTableModel(new Object[][] {}, new String[] {
+      Resources.strings().get("panel_name"), Resources.strings().get("panel_value")}) {
       @Override public Class<?> getColumnClass(int columnIndex) {
         return String.class;
       }
@@ -492,7 +495,7 @@ public class TilesetEditorPanel extends JPanel {
   private JPanel labeledOffsets() {
     JPanel panel = new JPanel(new BorderLayout(6, 0));
     panel.setOpaque(false);
-    JLabel label = new JLabel("Offset");
+    JLabel label = new JLabel(Resources.strings().get("panel_offset"));
     label.setForeground(Style.text());
     label.setPreferredSize(new Dimension(82, Style.CONTROL_HEIGHT));
     panel.add(label, BorderLayout.WEST);
@@ -500,8 +503,8 @@ public class TilesetEditorPanel extends JPanel {
     JPanel values = new JPanel();
     values.setOpaque(false);
     values.setLayout(new BoxLayout(values, BoxLayout.X_AXIS));
-    JLabel xLabel = new JLabel("x");
-    JLabel yLabel = new JLabel("y");
+    JLabel xLabel = new JLabel(Resources.strings().get("panel_x"));
+    JLabel yLabel = new JLabel(Resources.strings().get("panel_y"));
     xLabel.setForeground(Style.mutedText());
     yLabel.setForeground(Style.mutedText());
     Dimension offsetSize = new Dimension(72, Style.CONTROL_HEIGHT);
@@ -547,21 +550,21 @@ public class TilesetEditorPanel extends JPanel {
 
   private JPanel createTerrainPanel() {
     JButton addSet = Style.textButton("+");
-    addSet.setToolTipText("Add terrain set");
+    addSet.setToolTipText(Resources.strings().get("tilesetEditor_addTerrainSet"));
     addSet.addActionListener(_ -> addTerrainSet());
     JButton removeSet = Style.textButton("-");
-    removeSet.setToolTipText("Remove terrain set");
+    removeSet.setToolTipText(Resources.strings().get("tilesetEditor_removeTerrainSet"));
     removeSet.addActionListener(_ -> removeTerrainSet());
     JButton addTerrain = Style.textButton("+");
-    addTerrain.setToolTipText("Add terrain");
+    addTerrain.setToolTipText(Resources.strings().get("tilesetEditor_addTerrain"));
     addTerrain.addActionListener(_ -> addTerrain());
     JButton removeTerrain = Style.textButton("-");
-    removeTerrain.setToolTipText("Remove terrain");
+    removeTerrain.setToolTipText(Resources.strings().get("tilesetEditor_removeTerrain"));
     removeTerrain.addActionListener(_ -> removeTerrain());
 
     JPanel sets = new JPanel(new BorderLayout(6, 0));
     sets.setOpaque(false);
-    JLabel setLabel = fieldLabel("Set", 56);
+    JLabel setLabel = fieldLabel(Resources.strings().get("tilesetEditor_set"), 56);
     sets.add(setLabel, BorderLayout.WEST);
     sets.add(this.terrainSetCombo, BorderLayout.CENTER);
     JPanel setButtons = new JPanel();
@@ -577,7 +580,7 @@ public class TilesetEditorPanel extends JPanel {
 
     JPanel terrains = new JPanel(new BorderLayout(6, 0));
     terrains.setOpaque(false);
-    terrains.add(fieldLabel("Terrain", 56), BorderLayout.WEST);
+    terrains.add(fieldLabel(Resources.strings().get("tilesetEditor_terrain"), 56), BorderLayout.WEST);
     terrains.add(this.terrainCombo, BorderLayout.CENTER);
     JPanel terrainButtons = new JPanel();
     terrainButtons.setLayout(new BoxLayout(terrainButtons, BoxLayout.X_AXIS));
@@ -591,14 +594,22 @@ public class TilesetEditorPanel extends JPanel {
 
     JPanel terrainMetadata = new JPanel(new GridLayout(3, 1, 0, 4));
     terrainMetadata.setOpaque(false);
-    terrainMetadata.add(labeledField("Set Name", this.terrainSetNameField));
-    terrainMetadata.add(labeledField("Name", this.terrainNameField));
-    JPanel terrainProbability = labeledField("Probability", this.terrainProbabilityField);
+    terrainMetadata.add(labeledField(Resources.strings().get("tilesetEditor_setName"), this.terrainSetNameField));
+    terrainMetadata.add(labeledField(Resources.strings().get("panel_name"), this.terrainNameField));
+    JPanel terrainProbability = labeledField(Resources.strings().get("tilesetEditor_probability"), this.terrainProbabilityField);
     terrainMetadata.add(terrainProbability);
 
     JPanel slots = new JPanel(new GridLayout(3, 3, 3, 3));
     slots.setOpaque(false);
-    String[] labels = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+    String[] labels = {
+      Resources.strings().get("tilesetEditor_northShort"),
+      Resources.strings().get("tilesetEditor_northEastShort"),
+      Resources.strings().get("tilesetEditor_eastShort"),
+      Resources.strings().get("tilesetEditor_southEastShort"),
+      Resources.strings().get("tilesetEditor_southShort"),
+      Resources.strings().get("tilesetEditor_southWestShort"),
+      Resources.strings().get("tilesetEditor_westShort"),
+      Resources.strings().get("tilesetEditor_northWestShort")};
     int[] layout = {7, 0, 1, 6, -1, 2, 5, 4, 3};
     for (int index : layout) {
       if (index < 0) {
@@ -607,7 +618,7 @@ public class TilesetEditorPanel extends JPanel {
       }
       JButton slot = new JButton(labels[index]);
       Style.styleButton(slot, Style.ButtonVariant.SECONDARY);
-      slot.getAccessibleContext().setAccessibleName("Assign terrain " + labels[index]);
+      slot.getAccessibleContext().setAccessibleName(Resources.strings().get("tilesetEditor_assignTerrain", labels[index]));
       slot.addActionListener(_ -> applyTerrainSlot(index));
       this.terrainSlots[index] = slot;
       slots.add(slot);
@@ -629,7 +640,7 @@ public class TilesetEditorPanel extends JPanel {
     content.setOpaque(false);
     content.add(selectors, BorderLayout.NORTH);
     content.add(details, BorderLayout.CENTER);
-    ExpandableCard panel = new ExpandableCard("Terrain Editing", content, false);
+    ExpandableCard panel = new ExpandableCard(Resources.strings().get("tilesetEditor_terrainEditing"), content, false);
     panel.setContentInsets(8, 0, 8, 0);
     return panel;
   }
@@ -821,7 +832,7 @@ public class TilesetEditorPanel extends JPanel {
     if (terrain == null) {
       return;
     }
-    Color color = javax.swing.JColorChooser.showDialog(this, "Terrain Color", terrain.getColor());
+    Color color = javax.swing.JColorChooser.showDialog(this, Resources.strings().get("tilesetEditor_terrainColorTitle"), terrain.getColor());
     if (color == null) {
       return;
     }
@@ -847,7 +858,7 @@ public class TilesetEditorPanel extends JPanel {
       this.terrainSlots[index].setEnabled(enabled);
       this.terrainSlots[index].setText(terrain != null && terrain.getName() != null && !terrain.getName().isEmpty()
         ? terrain.getName().substring(0, 1).toUpperCase() : "-");
-      this.terrainSlots[index].setToolTipText(terrain != null ? terrain.getName() : "Empty terrain");
+      this.terrainSlots[index].setToolTipText(terrain != null ? terrain.getName() : Resources.strings().get("tilesetEditor_emptyTerrain"));
     }
   }
 
@@ -897,7 +908,7 @@ public class TilesetEditorPanel extends JPanel {
   private void clearSelectedTileControls() {
     this.binding = true;
     try {
-      this.detailLabel.setText("No tile selected");
+      this.detailLabel.setText(Resources.strings().get("tilesetEditor_noTileSelected"));
       this.previewLabel.setIcon(null);
       this.previewLabel.setText("");
       this.typeField.setText("");
@@ -919,15 +930,15 @@ public class TilesetEditorPanel extends JPanel {
     ITilesetEntry entry = this.tileset.getTile(localId);
     String type = entry != null && entry.getType() != null && !entry.getType().isBlank() ? entry.getType() : "";
     String collision = entry != null && entry.getCollisionInfo() != null
-      ? entry.getCollisionInfo().getMapObjects().size() + " shapes"
-      : "none";
+      ? Resources.strings().get("tilesetEditor_collisionShapes",
+        String.valueOf(entry.getCollisionInfo().getMapObjects().size()))
+      : Resources.strings().get("tilesetEditor_none");
     String animation = animationSummary(entry);
 
     this.binding = true;
     try {
-      this.detailLabel.setText(
-        "Tile " + localId + "  •  gid " + (this.tileset.getFirstGridId() + localId)
-          + "  •  collision " + collision + "  •  animation " + animation);
+      this.detailLabel.setText(Resources.strings().get("tilesetEditor_tileSummary", String.valueOf(localId),
+        "gid " + (this.tileset.getFirstGridId() + localId), collision, animation));
       this.typeField.setText(type);
       this.probabilityField.setText(entry instanceof TilesetEntry tilesetEntry ? String.valueOf(tilesetEntry.getProbability()) : "1.0");
       this.tilePropertyModel.setRowCount(0);
@@ -1030,11 +1041,11 @@ public class TilesetEditorPanel extends JPanel {
 
   private static String animationSummary(ITilesetEntry entry) {
     if (entry == null || entry.getAnimation() == null) {
-      return "none";
+      return Resources.strings().get("tilesetEditor_none");
     }
     ITileAnimation animation = entry.getAnimation();
     if (animation.getFrames() == null || animation.getFrames().isEmpty()) {
-      return "0 frames / 0ms";
+      return Resources.strings().get("tilesetEditor_animationSummary", "0", "0ms");
     }
     int duration = 0;
     for (ITileAnimationFrame frame : animation.getFrames()) {
@@ -1042,7 +1053,8 @@ public class TilesetEditorPanel extends JPanel {
         duration += frame.getDuration();
       }
     }
-    return animation.getFrames().size() + " frames / " + duration + "ms";
+    return Resources.strings().get("tilesetEditor_animationSummary",
+      String.valueOf(animation.getFrames().size()), duration + "ms");
   }
 
   private static String valueOrEmpty(String value) {
@@ -1066,7 +1078,8 @@ public class TilesetEditorPanel extends JPanel {
       return;
     }
     changeTileset(() -> this.tileset.setName(this.tilesetNameField.getText().trim()));
-    this.titleLabel.setText(this.tileset.getName() != null && !this.tileset.getName().isBlank() ? this.tileset.getName() : "Unnamed tileset");
+    this.titleLabel.setText(this.tileset.getName() != null && !this.tileset.getName().isBlank()
+      ? this.tileset.getName() : Resources.strings().get("tilesetEditor_unnamedTileset"));
     this.tilesetNameChanged.run();
   }
 

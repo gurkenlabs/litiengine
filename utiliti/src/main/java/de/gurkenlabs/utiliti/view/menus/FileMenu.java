@@ -19,7 +19,7 @@ public final class FileMenu extends JMenu {
 
   public FileMenu() {
     super(Resources.strings().get("menu_file"));
-    this.setMnemonic('F');
+    this.setMnemonic(this.getText().charAt(0));
 
     JMenuItem create = new JMenuItem(Resources.strings().get("menu_file_new"));
     create.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));

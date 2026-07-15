@@ -14,7 +14,7 @@ public final class ResourcesMenu extends JMenu {
 
   public ResourcesMenu() {
     super(Resources.strings().get("menu_resources"));
-    this.setMnemonic('P');
+    this.setMnemonic(this.getText().charAt(0));
 
     JCheckBoxMenuItem compress =
         new JCheckBoxMenuItem(Resources.strings().get("menu_compressResourceFile"));

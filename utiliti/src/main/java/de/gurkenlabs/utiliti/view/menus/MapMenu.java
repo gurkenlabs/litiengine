@@ -18,7 +18,7 @@ public final class MapMenu extends JMenu {
 
   public MapMenu() {
     super(Resources.strings().get("menu_map"));
-    this.setMnemonic('M');
+    this.setMnemonic(this.getText().charAt(0));
 
     JMenuItem imp = new JMenuItem(Resources.strings().get("menu_map_import"));
     imp.addActionListener(a -> Editor.instance().getMapComponent().importMap());

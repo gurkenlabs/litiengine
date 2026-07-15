@@ -156,14 +156,14 @@ public class MapPropertyPanel extends JPanel {
 
     this.generalCard = new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), false);
     ExpandableCard lightingCard =
-        new ExpandableCard("Lighting", createLightingPanel(), false);
+        new ExpandableCard(Resources.strings().get("mapProperties_lighting"), createLightingPanel(), false);
     ExpandableCard propertiesCard =
         new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), false);
 
     this.generalCard.setContentInsets(8, 0, 8, 0);
     lightingCard.setContentInsets(8, 0, 8, 0);
     propertiesCard.setContentInsets(8, 0, 8, 0);
-    ExpandableCard tilesetsCard = new ExpandableCard("Tilesets", createTilesetsPanel(), true);
+    ExpandableCard tilesetsCard = new ExpandableCard(Resources.strings().get("assettree_tilesets"), createTilesetsPanel(), true);
     tilesetsCard.setContentInsets(8, 0, 8, 0);
     tilesetsCard.setFillsAvailableHeight(true);
     tilesetsCard.setHeaderTrailing(this.tilesetPanel.getCommands());
@@ -209,18 +209,18 @@ public class MapPropertyPanel extends JPanel {
       }
     });
     JButton add = Style.iconButton(Icons.ADD_16);
-    add.setToolTipText("Add a project tileset to this map");
+    add.setToolTipText(Resources.strings().get("mapTilesets_add"));
     add.addActionListener(e -> showAddTilesetMenu(add));
     JButton addAll = Style.iconButton(Icons.COPY_16);
-    addAll.setToolTipText("Add all project tilesets to this map");
+    addAll.setToolTipText(Resources.strings().get("mapTilesets_addAll"));
     addAll.addActionListener(e -> addAllTilesets());
     JButton create = Style.iconButton(Icons.ASSET_16);
-    create.setToolTipText("Create a new tileset and add it to this map");
+    create.setToolTipText(Resources.strings().get("mapTilesets_createAndAdd"));
     create.addActionListener(e -> createTileset());
     JButton remove = Style.iconButton(Icons.DELETE_16);
-    remove.setToolTipText("Remove the selected tileset from this map only");
+    remove.setToolTipText(Resources.strings().get("mapTilesets_removeSelected"));
     remove.addActionListener(e -> removeSelectedTileset(this.tilesetPanel.getSelectedTileset()));
-    JLabel hint = new JLabel("Map tilesets");
+    JLabel hint = new JLabel(Resources.strings().get("mapTilesets_title"));
     hint.setForeground(Style.mutedText());
     commands.add(hint);
     commands.add(add);
@@ -361,7 +361,7 @@ public class MapPropertyPanel extends JPanel {
   private JTable createPropertiesTable() {
     JTable table =
         new JTable() {
-          private static final String EMPTY_TEXT = "No properties defined";
+          private static final String EMPTY_TEXT = Resources.strings().get("panel_noPropertiesDefined");
 
           @Override
           protected void paintComponent(Graphics g) {
@@ -413,7 +413,8 @@ public class MapPropertyPanel extends JPanel {
     }
 
     this.setControlValues(map);
-    String mapName = map.getName() != null && !map.getName().isBlank() ? map.getName() : "Unnamed map";
+    String mapName = map.getName() != null && !map.getName().isBlank()
+      ? map.getName() : Resources.strings().get("mapProperties_unnamedMap");
     this.generalCard.setTitle(Resources.strings().get("panel_general") + "  ·  " + mapName);
     refreshTilesets();
   }
@@ -447,7 +448,7 @@ public class MapPropertyPanel extends JPanel {
       menu.add(item);
     }
     if (menu.getComponentCount() == 0) {
-      JMenuItem empty = new JMenuItem("All project tilesets are already assigned");
+      JMenuItem empty = new JMenuItem(Resources.strings().get("mapTilesets_allAssigned"));
       empty.setEnabled(false);
       menu.add(empty);
     }
@@ -499,13 +500,14 @@ public class MapPropertyPanel extends JPanel {
     JSpinner height = new JSpinner(new SpinnerNumberModel(16, 1, 4096, 1));
     JSpinner margin = new JSpinner(new SpinnerNumberModel(0, 0, 4096, 1));
     JSpinner spacing = new JSpinner(new SpinnerNumberModel(0, 0, 4096, 1));
-    JCheckBox transparent = new JCheckBox("Transparent color");
-    JButton color = new JButton("Choose color");
+    JCheckBox transparent = new JCheckBox(Resources.strings().get("tilesetDialog_transparentColor"));
+    JButton color = new JButton(Resources.strings().get("tilesetDialog_chooseColor"));
     final Color[] transparentColor = {null};
     color.setEnabled(false);
     transparent.addActionListener(e -> color.setEnabled(transparent.isSelected()));
-    color.addActionListener(e -> transparentColor[0] = JColorChooser.showDialog(this, "Transparent color", transparentColor[0]));
-    JButton browse = new JButton("Browse...");
+    color.addActionListener(e -> transparentColor[0] = JColorChooser.showDialog(
+      this, Resources.strings().get("tilesetDialog_transparentColor"), transparentColor[0]));
+    JButton browse = new JButton(Resources.strings().get("tilesetDialog_browse"));
     browse.addActionListener(e -> {
       JFileChooser chooser = new JFileChooser();
       if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -527,14 +529,15 @@ public class MapPropertyPanel extends JPanel {
     imageRow.add(sourceField, BorderLayout.CENTER);
     imageRow.add(browse, BorderLayout.EAST);
     JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
-    form.add(new JLabel("Name")); form.add(nameField);
-    form.add(new JLabel("Image source")); form.add(imageRow);
-    form.add(new JLabel("Tile width")); form.add(width);
-    form.add(new JLabel("Tile height")); form.add(height);
-    form.add(new JLabel("Margin")); form.add(margin);
-    form.add(new JLabel("Spacing")); form.add(spacing);
+    form.add(new JLabel(Resources.strings().get("panel_name"))); form.add(nameField);
+    form.add(new JLabel(Resources.strings().get("tilesetDialog_imageSource"))); form.add(imageRow);
+    form.add(new JLabel(Resources.strings().get("tilesetDialog_tileWidth"))); form.add(width);
+    form.add(new JLabel(Resources.strings().get("tilesetDialog_tileHeight"))); form.add(height);
+    form.add(new JLabel(Resources.strings().get("tilesetDialog_margin"))); form.add(margin);
+    form.add(new JLabel(Resources.strings().get("tilesetDialog_spacing"))); form.add(spacing);
     form.add(transparent); form.add(color);
-    if (JOptionPane.showConfirmDialog(this, form, "New Tileset", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) != JOptionPane.OK_OPTION) {
+    if (JOptionPane.showConfirmDialog(this, form, Resources.strings().get("tilesetDialog_newTileset"),
+      JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) != JOptionPane.OK_OPTION) {
       return;
     }
     Tileset tileset = new Tileset();

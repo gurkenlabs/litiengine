@@ -57,7 +57,7 @@ public class SpriteEditorPanel extends JPanel {
     setBackground(Style.background());
     setBorder(BorderFactory.createEmptyBorder(8, 8, 10, 8));
 
-    this.titleLabel = new JLabel("No sprite selected");
+    this.titleLabel = new JLabel(Resources.strings().get("spriteEditor_noSpriteSelected"));
     this.titleLabel.setForeground(Style.text());
     this.titleLabel.setFont(this.titleLabel.getFont().deriveFont(java.awt.Font.BOLD));
     add(this.titleLabel, BorderLayout.NORTH);
@@ -93,7 +93,9 @@ public class SpriteEditorPanel extends JPanel {
     this.columnsSpinner.addChangeListener(gridChanged);
     this.rowsSpinner.addChangeListener(gridChanged);
 
-    this.keyframeModel = new DefaultTableModel(new Object[][] {}, new String[] {"Frame", "Duration (ms)"}) {
+    this.keyframeModel = new DefaultTableModel(new Object[][] {}, new String[] {
+      Resources.strings().get("assetpanel_animation_frame"),
+      Resources.strings().get("assetpanel_animation_duration")}) {
       @Override public Class<?> getColumnClass(int columnIndex) {
         return Integer.class;
       }
@@ -111,13 +113,13 @@ public class SpriteEditorPanel extends JPanel {
 
     JPanel details = new JPanel(new GridLayout(4, 1, 0, 6));
     details.setOpaque(false);
-    details.add(row("Image Size", this.imageSizeLabel));
-    details.add(row("Frame Size", this.frameSizeLabel));
-    details.add(row("Name", this.nameField));
+    details.add(row(Resources.strings().get("spriteEditor_imageSize"), this.imageSizeLabel));
+    details.add(row(Resources.strings().get("spriteEditor_frameSize"), this.frameSizeLabel));
+    details.add(row(Resources.strings().get("panel_name"), this.nameField));
     JPanel grid = new JPanel(new GridLayout(1, 2, 8, 0));
     grid.setOpaque(false);
-    grid.add(row("Columns", this.columnsSpinner));
-    grid.add(row("Rows", this.rowsSpinner));
+    grid.add(row(Resources.strings().get("spriteEditor_columns"), this.columnsSpinner));
+    grid.add(row(Resources.strings().get("spriteEditor_rows"), this.rowsSpinner));
     details.add(grid);
 
     JPanel content = new JPanel(new BorderLayout());
@@ -128,15 +130,15 @@ public class SpriteEditorPanel extends JPanel {
     this.animationPreviewLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 112));
     this.previewLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 152));
     details.setMaximumSize(new Dimension(Integer.MAX_VALUE, details.getPreferredSize().height));
-    form.add(labeledPreview("Animation Preview", this.animationPreviewLabel));
+    form.add(labeledPreview(Resources.strings().get("spriteEditor_animationPreview"), this.animationPreviewLabel));
     form.add(Box.createVerticalStrut(8));
-    form.add(labeledPreview("Sprite Grid", this.previewLabel));
+    form.add(labeledPreview(Resources.strings().get("spriteEditor_spriteGrid"), this.previewLabel));
     form.add(Box.createVerticalStrut(8));
     form.add(details);
     form.add(Box.createVerticalStrut(8));
     JPanel frames = new JPanel(new BorderLayout(0, 4));
     frames.setOpaque(false);
-    JLabel framesLabel = new JLabel("Keyframes");
+    JLabel framesLabel = new JLabel(Resources.strings().get("spriteEditor_keyframes"));
     framesLabel.setForeground(Style.text());
     frames.add(framesLabel, BorderLayout.NORTH);
     JScrollPane frameScroll = new JScrollPane(this.keyframeTable);
@@ -163,7 +165,7 @@ public class SpriteEditorPanel extends JPanel {
     try {
       this.keyframeModel.setRowCount(0);
       if (this.spritesheetResource == null || this.image == null) {
-        this.titleLabel.setText("No sprite selected");
+        this.titleLabel.setText(Resources.strings().get("spriteEditor_noSpriteSelected"));
         this.animationPreviewLabel.setIcon(null);
         this.previewLabel.setIcon(null);
         this.imageSizeLabel.setText("-");
@@ -171,14 +173,17 @@ public class SpriteEditorPanel extends JPanel {
         this.nameField.setText("");
         return;
       }
-      this.titleLabel.setText("Sprite: " + this.spritesheetResource.getName());
+      this.titleLabel.setText(Resources.strings().get("panel_sprite") + ": " + this.spritesheetResource.getName());
       this.nameField.setText(this.spritesheetResource.getName());
       int columns = Math.max(1, this.image.getWidth() / this.spritesheetResource.getWidth());
       int rows = Math.max(1, this.image.getHeight() / this.spritesheetResource.getHeight());
       this.columnsSpinner.setModel(new SpinnerNumberModel(columns, 1, this.image.getWidth(), 1));
       this.rowsSpinner.setModel(new SpinnerNumberModel(rows, 1, this.image.getHeight(), 1));
-      this.imageSizeLabel.setText(this.image.getWidth() + " x " + this.image.getHeight() + " px");
-      this.frameSizeLabel.setText(this.spritesheetResource.getWidth() + " x " + this.spritesheetResource.getHeight() + " px");
+      this.imageSizeLabel.setText(Resources.strings().get("spriteEditor_dimensions",
+        String.valueOf(this.image.getWidth()), String.valueOf(this.image.getHeight())) + " px");
+      this.frameSizeLabel.setText(Resources.strings().get("spriteEditor_dimensions",
+        String.valueOf(this.spritesheetResource.getWidth()),
+        String.valueOf(this.spritesheetResource.getHeight())) + " px");
       for (int i = 0; i < columns * rows; i++) {
         int[] durations = this.spritesheetResource.getKeyframes();
         int duration = i < durations.length ? durations[i] : Animation.DEFAULT_FRAME_DURATION;

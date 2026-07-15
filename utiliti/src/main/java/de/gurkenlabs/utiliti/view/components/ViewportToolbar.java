@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.WangColor;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.Zoom;
@@ -101,7 +102,7 @@ public class ViewportToolbar extends JPanel {
     mapSelector.putClientProperty("JComponent.arc", Style.CORNER_RADIUS * 2);
     mapSelector.putClientProperty("JComponent.roundRect", true);
     mapSelector.putClientProperty("JComponent.outline", "none");
-    mapSelector.getAccessibleContext().setAccessibleName("Active map");
+    mapSelector.getAccessibleContext().setAccessibleName(Resources.strings().get("toolbar_activeMap"));
     left.add(controlGroup(mapSelector));
 
     ButtonGroup toolButtons = new ButtonGroup();
@@ -115,34 +116,34 @@ public class ViewportToolbar extends JPanel {
       }
     }
     left.add(toolGroup);
-    this.btnUndo = button("Undo", Icons.UNDO_16, () -> UndoManager.instance().undo(), shortcut(KeyEvent.VK_Z));
-    this.btnUndoHistory = button("Undo history", new DropdownArrowIcon(), () -> {});
+    this.btnUndo = button(Resources.strings().get("menu_edit_undo"), Icons.UNDO_16, () -> UndoManager.instance().undo(), shortcut(KeyEvent.VK_Z));
+    this.btnUndoHistory = button(Resources.strings().get("toolbar_undoHistory"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(this.btnUndoHistory, DROPDOWN_BUTTON_WIDTH);
     this.btnUndoHistory.addActionListener(e -> showHistory(this.btnUndoHistory, true));
-    this.btnRedo = button("Redo", Icons.REDO_16, () -> UndoManager.instance().redo(), shortcut(KeyEvent.VK_Y));
-    this.btnRedoHistory = button("Redo history", new DropdownArrowIcon(), () -> {});
+    this.btnRedo = button(Resources.strings().get("menu_edit_redo"), Icons.REDO_16, () -> UndoManager.instance().redo(), shortcut(KeyEvent.VK_Y));
+    this.btnRedoHistory = button(Resources.strings().get("toolbar_redoHistory"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(this.btnRedoHistory, DROPDOWN_BUTTON_WIDTH);
     this.btnRedoHistory.addActionListener(e -> showHistory(this.btnRedoHistory, false));
     left.add(controlGroup(splitButton(this.btnUndo, this.btnUndoHistory), splitButton(this.btnRedo, this.btnRedoHistory)));
     left.add(controlGroup(addButton()));
-    this.btnCopy = button("Copy", Icons.COPY_16, () -> {
+    this.btnCopy = button(Resources.strings().get("menu_edit_copy"), Icons.COPY_16, () -> {
       if (Editor.instance().getMapComponent() != null) {
         Editor.instance().getMapComponent().copy();
       }
     }, shortcut(KeyEvent.VK_C));
-    this.btnCut = button("Cut", Icons.CUT_16, () -> {
+    this.btnCut = button(Resources.strings().get("menu_edit_cut"), Icons.CUT_16, () -> {
       if (Editor.instance().getMapComponent() != null) {
         Editor.instance().getMapComponent().cut();
       }
     }, shortcut(KeyEvent.VK_X));
-    this.btnDelete = button("Delete", Icons.DELETE_16, () -> {
+    this.btnDelete = button(Resources.strings().get("menu_edit_delete"), Icons.DELETE_16, () -> {
       if (Editor.instance().getMapComponent() != null) {
         Editor.instance().getMapComponent().delete();
       }
     }, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     Style.styleButton(this.btnDelete, Style.ButtonVariant.DESTRUCTIVE);
     sizeLabeledButton(this.btnDelete);
-    this.btnPaste = button("Paste", Icons.PASTE_16, () -> {
+    this.btnPaste = button(Resources.strings().get("menu_edit_paste"), Icons.PASTE_16, () -> {
       if (Editor.instance().getMapComponent() != null) {
         Editor.instance().getMapComponent().paste();
       }
@@ -180,9 +181,9 @@ public class ViewportToolbar extends JPanel {
       });
     }
 
-    this.btnGrid = viewToggle("Grid", new GridIcon(), Editor.preferences().showGrid(), selected -> Editor.preferences().setShowGrid(selected), shortcut(KeyEvent.VK_G));
-    this.btnSnap = viewToggle("Snap", new SnapIcon(), Editor.preferences().snapToGrid(), selected -> Editor.preferences().setSnapToGrid(selected), null);
-    this.btnCollision = viewToggle("Collision", new CollisionIcon(), Editor.preferences().renderBoundingBoxes(), selected -> Editor.preferences().setRenderBoundingBoxes(selected), shortcut(KeyEvent.VK_H));
+    this.btnGrid = viewToggle(Resources.strings().get("toolbar_grid"), new GridIcon(), Editor.preferences().showGrid(), selected -> Editor.preferences().setShowGrid(selected), shortcut(KeyEvent.VK_G));
+    this.btnSnap = viewToggle(Resources.strings().get("toolbar_snap"), new SnapIcon(), Editor.preferences().snapToGrid(), selected -> Editor.preferences().setSnapToGrid(selected), null);
+    this.btnCollision = viewToggle(Resources.strings().get("panel_collision"), new CollisionIcon(), Editor.preferences().renderBoundingBoxes(), selected -> Editor.preferences().setRenderBoundingBoxes(selected), shortcut(KeyEvent.VK_H));
     JPanel viewControls = controlGroup(this.btnGrid, this.btnSnap, this.btnCollision);
 
     this.zoomLabel = new JLabel(formatZoom());
@@ -229,8 +230,8 @@ public class ViewportToolbar extends JPanel {
   }
 
   private JPanel addButton() {
-    JButton main = button("Add", Icons.ADD_16, () -> {});
-    JButton arrow = button("Add menu", new DropdownArrowIcon(), () -> {});
+    JButton main = button(Resources.strings().get("toolbar_add"), Icons.ADD_16, () -> {});
+    JButton arrow = button(Resources.strings().get("toolbar_addMenu"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(arrow, DROPDOWN_BUTTON_WIDTH);
     main.addActionListener(e -> createAddPopup().show(main, 0, main.getHeight()));
     arrow.addActionListener(e -> createAddPopup().show(arrow, 0, arrow.getHeight()));
@@ -258,7 +259,7 @@ public class ViewportToolbar extends JPanel {
   }
 
   private JPanel terrainSplitButton(JToggleButton main, Tool tool) {
-    JButton arrow = button("Select terrain", new DropdownArrowIcon(), () -> {});
+    JButton arrow = button(Resources.strings().get("toolbar_selectTerrain"), new DropdownArrowIcon(), () -> {});
     main.setIcon(selectedTerrainIcon(tool));
     makeIconOnly(arrow, DROPDOWN_BUTTON_WIDTH);
     arrow.addActionListener(e -> createTerrainPopup(tool).show(arrow, 0, arrow.getHeight()));
@@ -276,7 +277,7 @@ public class ViewportToolbar extends JPanel {
   private static JPopupMenu createTerrainPopup(Tool tool) {
     JPopupMenu popup = new JPopupMenu();
     if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
-      JMenuItem empty = new JMenuItem("No map loaded");
+      JMenuItem empty = new JMenuItem(Resources.strings().get("toolbar_noMapLoaded"));
       empty.setEnabled(false);
       popup.add(empty);
       return popup;
@@ -294,9 +295,9 @@ public class ViewportToolbar extends JPanel {
           if (!(terrain instanceof WangColor wangColor)) {
             continue;
           }
-          String tilesetName = tileset.getName() != null ? tileset.getName() : "Tileset";
+          String tilesetName = tileset.getName() != null ? tileset.getName() : Resources.strings().get("toolbar_unnamedTileset");
           JMenuItem item = new JMenuItem(
-            tilesetName + " - " + (wangColor.getName() != null ? wangColor.getName() : "Terrain"),
+            tilesetName + " - " + (wangColor.getName() != null ? wangColor.getName() : Resources.strings().get("tool_terrain")),
             terrainIcon(tileset, wangColor));
           item.addActionListener(e -> {
             ToolManager.instance().setSelectedTerrain(wangSet, wangColor);
@@ -308,7 +309,7 @@ public class ViewportToolbar extends JPanel {
       }
     }
     if (!found) {
-      JMenuItem empty = new JMenuItem("No terrains in this map");
+      JMenuItem empty = new JMenuItem(Resources.strings().get("toolbar_noTerrains"));
       empty.setEnabled(false);
       popup.add(empty);
     }
@@ -356,16 +357,19 @@ public class ViewportToolbar extends JPanel {
     List<UndoManager.HistoryEntry> history = undo ? manager.getUndoHistory() : manager.getRedoHistory();
     JPopupMenu popup = new JPopupMenu();
     if (history.isEmpty()) {
-      JMenuItem empty = new JMenuItem(undo ? "Nothing to undo" : "Nothing to redo");
+      JMenuItem empty = new JMenuItem(Resources.strings().get(
+        undo ? "history_nothingToUndo" : "history_nothingToRedo"));
       empty.setEnabled(false);
       popup.add(empty);
     } else {
       for (int index = 0; index < history.size(); index++) {
         UndoManager.HistoryEntry entry = history.get(index);
         int operations = index + 1;
-        String label = (undo ? "Undo " : "Redo ") + entry.description();
+        String label = Resources.strings().get(
+          undo ? "history_undoEntry" : "history_redoEntry", entry.description());
         if (operations > 1) {
-          label += " (" + operations + " operations)";
+          label = Resources.strings().get(
+            "history_multipleOperations", label, Integer.toString(operations));
         }
         JMenuItem item = new JMenuItem(label);
         item.addActionListener(e -> {
@@ -385,16 +389,16 @@ public class ViewportToolbar extends JPanel {
 
   private static JPopupMenu createAddPopup() {
     JPopupMenu popup = new JPopupMenu();
-    addCreateItem(popup, "Prop", Icons.PROP_16, MapObjectType.PROP, KeyEvent.VK_1);
-    addCreateItem(popup, "Creature", Icons.CREATURE_16, MapObjectType.CREATURE, KeyEvent.VK_2);
-    addCreateItem(popup, "Collisionbox", Icons.COLLISIONBOX_16, MapObjectType.COLLISIONBOX, KeyEvent.VK_3);
-    addCreateItem(popup, "Trigger", Icons.TRIGGER_16, MapObjectType.TRIGGER, KeyEvent.VK_4);
-    addCreateItem(popup, "Spawnpoint", Icons.SPAWNPOINT_16, MapObjectType.SPAWNPOINT, KeyEvent.VK_5);
-    addCreateItem(popup, "Area", Icons.MAPAREA_16, MapObjectType.AREA, KeyEvent.VK_6);
-    addCreateItem(popup, "Light", Icons.BULB_16, MapObjectType.LIGHTSOURCE, KeyEvent.VK_7);
-    addCreateItem(popup, "Static Shadow", Icons.SHADOWBOX_16, MapObjectType.STATICSHADOW, KeyEvent.VK_8);
-    addCreateItem(popup, "Emitter", Icons.EMITTER_16, MapObjectType.EMITTER, KeyEvent.VK_9);
-    addCreateItem(popup, "Sound", Icons.SOUND_16, MapObjectType.SOUNDSOURCE, KeyEvent.VK_0);
+    addCreateItem(popup, Resources.strings().get("menu_add_prop"), Icons.PROP_16, MapObjectType.PROP, KeyEvent.VK_1);
+    addCreateItem(popup, Resources.strings().get("menu_add_creature"), Icons.CREATURE_16, MapObjectType.CREATURE, KeyEvent.VK_2);
+    addCreateItem(popup, Resources.strings().get("menu_add_collisionbox"), Icons.COLLISIONBOX_16, MapObjectType.COLLISIONBOX, KeyEvent.VK_3);
+    addCreateItem(popup, Resources.strings().get("menu_add_trigger"), Icons.TRIGGER_16, MapObjectType.TRIGGER, KeyEvent.VK_4);
+    addCreateItem(popup, Resources.strings().get("menu_add_spawnpoint"), Icons.SPAWNPOINT_16, MapObjectType.SPAWNPOINT, KeyEvent.VK_5);
+    addCreateItem(popup, Resources.strings().get("menu_add_area"), Icons.MAPAREA_16, MapObjectType.AREA, KeyEvent.VK_6);
+    addCreateItem(popup, Resources.strings().get("menu_add_light"), Icons.BULB_16, MapObjectType.LIGHTSOURCE, KeyEvent.VK_7);
+    addCreateItem(popup, Resources.strings().get("menu_add_shadow"), Icons.SHADOWBOX_16, MapObjectType.STATICSHADOW, KeyEvent.VK_8);
+    addCreateItem(popup, Resources.strings().get("menu_add_emitter"), Icons.EMITTER_16, MapObjectType.EMITTER, KeyEvent.VK_9);
+    addCreateItem(popup, Resources.strings().get("menu_add_soundsource"), Icons.SOUND_16, MapObjectType.SOUNDSOURCE, KeyEvent.VK_0);
     return popup;
   }
 
@@ -480,8 +484,8 @@ public class ViewportToolbar extends JPanel {
     JPanel group = controlGroup();
     group.setLayout(new BorderLayout(0, 0));
 
-    JButton out = button("Zoom out", null, () -> { Zoom.out(); updateZoomLabel(); }, shortcut(KeyEvent.VK_MINUS));
-    JButton in = button("Zoom in", null, () -> { Zoom.in(); updateZoomLabel(); }, shortcut(KeyEvent.VK_PLUS));
+    JButton out = button(Resources.strings().get("menu_view_zoomOut"), null, () -> { Zoom.out(); updateZoomLabel(); }, shortcut(KeyEvent.VK_MINUS));
+    JButton in = button(Resources.strings().get("menu_view_zoomIn"), null, () -> { Zoom.in(); updateZoomLabel(); }, shortcut(KeyEvent.VK_PLUS));
     out.setText("−");
     in.setText("+");
     out.setMargin(new Insets(0, 0, 0, 0));
@@ -494,7 +498,7 @@ public class ViewportToolbar extends JPanel {
     this.zoomLabel.setForeground(Style.text());
     this.zoomLabel.setBackground(Style.surface());
     this.zoomLabel.setOpaque(true);
-    this.zoomLabel.getAccessibleContext().setAccessibleName("Zoom level");
+    this.zoomLabel.getAccessibleContext().setAccessibleName(Resources.strings().get("toolbar_zoomLevel"));
     this.zoomLabel.setPreferredSize(new Dimension(58, Style.CONTROL_HEIGHT));
     this.zoomLabel.setBorder(zoomLabelBorder());
 
@@ -509,7 +513,7 @@ public class ViewportToolbar extends JPanel {
     wrapper.setOpaque(false);
     wrapper.add(group);
     wrapper.add(Box.createHorizontalStrut(Style.SPACE_MEDIUM));
-    wrapper.add(controlGroup(button("Fit", Icons.FIT_16, this::fitMap)));
+    wrapper.add(controlGroup(button(Resources.strings().get("toolbar_fit"), Icons.FIT_16, this::fitMap)));
     return wrapper;
   }
 
@@ -587,10 +591,10 @@ public class ViewportToolbar extends JPanel {
       return Icons.TERRAIN_16;
     }
     if (tool instanceof EraserTool) {
-      return Icons.DELETE_16;
+      return Icons.ERASER_16;
     }
     if (tool instanceof BucketFillTool) {
-      return Icons.COLOR_16;
+      return Icons.FILL_16;
     }
     return tool.getIcon();
   }

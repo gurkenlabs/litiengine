@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.tool.PointerTool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
@@ -102,47 +103,54 @@ public final class StatusBar extends JPanel {
 
   void updateValues() {
     String currentStatus = Editor.instance().getCurrentStatus();
-    this.stateLabel.setText(currentStatus == null || currentStatus.isBlank() ? "Ready" : currentStatus);
+    this.stateLabel.setText(currentStatus == null || currentStatus.isBlank()
+        ? Resources.strings().get("status_ready")
+        : currentStatus);
     this.toolLabel.setText(getToolDisplayName());
 
     IMap map = Game.world() != null && Game.world().environment() != null
         ? Game.world().environment().getMap()
         : null;
     if (map == null) {
-      this.positionLabel.setText("X: --  Y: --");
-      this.tileLabel.setText("Tile: --, --");
-      this.gridLabel.setText("Grid: --");
+      this.positionLabel.setText(Resources.strings().get("status_position", "--", "--"));
+      this.tileLabel.setText(Resources.strings().get("status_tile", "--", "--"));
+      this.gridLabel.setText(Resources.strings().get("status_grid", "--"));
     } else {
-      this.positionLabel.setText(String.format(
-          "X: %d  Y: %d",
-          (int) Input.mouse().getMapLocation().getX(),
-          (int) Input.mouse().getMapLocation().getY()));
-      this.tileLabel.setText(String.format("Tile: %d, %d", Input.mouse().getTile().x, Input.mouse().getTile().y));
-      this.gridLabel.setText(map.getTileWidth() == map.getTileHeight()
-          ? "Grid: " + map.getTileWidth() + " px"
-          : "Grid: " + map.getTileWidth() + "x" + map.getTileHeight());
+      this.positionLabel.setText(Resources.strings().get(
+          "status_position",
+          Integer.toString((int) Input.mouse().getMapLocation().getX()),
+          Integer.toString((int) Input.mouse().getMapLocation().getY())));
+      this.tileLabel.setText(Resources.strings().get(
+          "status_tile",
+          Integer.toString(Input.mouse().getTile().x),
+          Integer.toString(Input.mouse().getTile().y)));
+      String gridSize = map.getTileWidth() == map.getTileHeight()
+          ? map.getTileWidth() + " px"
+          : map.getTileWidth() + "x" + map.getTileHeight();
+      this.gridLabel.setText(Resources.strings().get("status_grid", gridSize));
     }
     this.snapLabel.setText(Editor.preferences().snapToGrid()
-        ? "Snap: On (1/" + Editor.preferences().getSnapDivision() + ")"
-        : "Snap: Off");
+        ? Resources.strings().get(
+            "status_snapOn", Integer.toString(Editor.preferences().getSnapDivision()))
+        : Resources.strings().get("status_snapOff"));
   }
 
   private static String getToolDisplayName() {
     if (ToolManager.instance().getActiveTool() == null) {
-      return "Select Tool";
+      return Resources.strings().get("tool_select");
     }
     if (!(ToolManager.instance().getActiveTool() instanceof PointerTool)) {
       var layer = ToolManager.instance().getActiveTileLayer();
       String layerName = layer != null && layer.getName() != null && !layer.getName().isBlank()
           ? layer.getName()
-          : "No tile layer";
+          : Resources.strings().get("status_noTileLayer");
       return ToolManager.instance().getActiveTool().getName() + "  |  " + layerName;
     }
     return switch (Editor.instance().getMapComponent().getTransformMode()) {
-      case NONE -> "Select Tool";
-      case MOVE -> "Move Tool";
-      case RESIZE -> "Resize Tool";
-      case CREATE -> "Create Tool";
+      case NONE -> Resources.strings().get("tool_select");
+      case MOVE -> Resources.strings().get("tool_move");
+      case RESIZE -> Resources.strings().get("tool_resize");
+      case CREATE -> Resources.strings().get("tool_create");
     };
   }
 

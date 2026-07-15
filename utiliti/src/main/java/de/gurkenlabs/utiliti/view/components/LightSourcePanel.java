@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.LayoutManager;
@@ -30,7 +31,7 @@ public class LightSourcePanel extends PropertyPanel {
         new DefaultComboBoxModel<>(new String[] {"ellipse", "rectangle"}));
 
     this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 5));
-    this.checkBoxIsActive = new JCheckBox("is active");
+    this.checkBoxIsActive = new JCheckBox(Resources.strings().get("lightSource_isActive"));
     this.checkBoxIsActive.setSelected(true);
 
     setLayout(this.createLayout());

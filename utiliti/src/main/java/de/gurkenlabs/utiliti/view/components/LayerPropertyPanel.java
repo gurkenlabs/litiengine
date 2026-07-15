@@ -96,10 +96,10 @@ public class LayerPropertyPanel extends JPanel {
     this.imageSourceControl.setOpaque(false);
     this.imageSourceControl.add(this.imageSourceCombo, BorderLayout.CENTER);
     this.imageSourceControl.add(this.imagePreview, BorderLayout.EAST);
-    this.labelImageSource = createLabel("Image Source");
+    this.labelImageSource = createLabel(Resources.strings().get("layerProperties_imageSource"));
     this.spinnerOpacity = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 1.0, 0.05));
     ControlBehavior.apply(this.spinnerOpacity);
-    this.checkBoxVisible = new JCheckBox("Visible");
+    this.checkBoxVisible = new JCheckBox(Resources.strings().get("layerProperties_visible"));
     checkBoxVisible.setOpaque(false);
     checkBoxVisible.setForeground(Style.text());
 
@@ -111,7 +111,7 @@ public class LayerPropertyPanel extends JPanel {
 
     this.layerColorComponent = new ColorComponent(java.awt.Color.WHITE);
     this.layerColorComponent.addActionListener(a -> saveChanges());
-    this.labelLayerColor = createLabel("Color");
+    this.labelLayerColor = createLabel(Resources.strings().get("panel_color"));
     this.labelLayerColor.setVisible(false);
     this.layerColorComponent.setVisible(false);
 
@@ -142,13 +142,13 @@ public class LayerPropertyPanel extends JPanel {
     this.accordion.setBackground(Style.background());
     this.accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    this.generalCard = new ExpandableCard("General", createGeneralPanel(), false);
+    this.generalCard = new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(), false);
     this.imageSourceControl.setVisible(false);
     this.labelImageSource.setVisible(false);
     ExpandableCard renderingCard =
-        new ExpandableCard("Rendering", createRenderingPanel(), false);
+        new ExpandableCard(Resources.strings().get("layerProperties_rendering"), createRenderingPanel(), false);
     ExpandableCard propertiesCard =
-        new ExpandableCard("Custom Properties", createPropertiesPanel(buttonAdd, buttonRemove), false);
+        new ExpandableCard(Resources.strings().get("layerProperties_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), false);
 
     this.generalCard.setContentInsets(8, 0, 8, 0);
     renderingCard.setContentInsets(8, 0, 8, 0);
@@ -178,9 +178,9 @@ public class LayerPropertyPanel extends JPanel {
   private JPanel createGeneralPanel() {
     return createForm(
         new JLabel[] {
-            createLabel("Name"),
-            createLabel("Opacity"),
-            createLabel("Visible"),
+            createLabel(Resources.strings().get("panel_name")),
+            createLabel(Resources.strings().get("layerProperties_opacity")),
+            createLabel(Resources.strings().get("layerProperties_visible")),
             this.labelLayerColor,
             this.labelImageSource,
         },
@@ -206,7 +206,9 @@ public class LayerPropertyPanel extends JPanel {
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
     JPanel renderTypeRow = createForm(
-        new JLabel[] { createLabel("Render Type"), createLabel("Tint Color") },
+        new JLabel[] {
+          createLabel(Resources.strings().get("layerProperties_renderType")),
+          createLabel(Resources.strings().get("layerProperties_tintColor")) },
         new JComponent[] { this.comboRenderType, this.tintColorComponent },
         new int[] { PropertyPanel.CONTROL_HEIGHT, this.tintColorComponent.getPreferredSize().height });
     panel.add(renderTypeRow);
@@ -298,7 +300,7 @@ public class LayerPropertyPanel extends JPanel {
   private JTable createPropertiesTable() {
     JTable table =
         new JTable() {
-          private static final String EMPTY_TEXT = "No properties defined";
+          private static final String EMPTY_TEXT = Resources.strings().get("panel_noPropertiesDefined");
 
           @Override
           protected void paintComponent(Graphics g) {
@@ -322,7 +324,7 @@ public class LayerPropertyPanel extends JPanel {
     table.setModel(
         new DefaultTableModel(
             new Object[][] {},
-            new String[] {"Name", "Value"}));
+            new String[] {Resources.strings().get("panel_name"), Resources.strings().get("panel_value")}));
     return table;
   }
 
@@ -370,15 +372,16 @@ public class LayerPropertyPanel extends JPanel {
       this.generalCard.revalidate();
 
       this.setControlValues(layer);
-      String layerName = layer.getName() != null && !layer.getName().isBlank() ? layer.getName() : "Unnamed layer";
-      this.generalCard.setTitle("General  ·  " + layerName);
+      String layerName = layer.getName() != null && !layer.getName().isBlank()
+        ? layer.getName() : Resources.strings().get("layerProperties_unnamedLayer");
+      this.generalCard.setTitle(Resources.strings().get("panel_general") + "  ·  " + layerName);
     } finally {
       this.binding = false;
     }
   }
 
   public void clearControls() {
-    this.generalCard.setTitle("General");
+    this.generalCard.setTitle(Resources.strings().get("panel_general"));
     this.textFieldName.setText("");
     this.imageSourceCombo.removeAllItems();
     this.imagePreview.setIcon(null);
