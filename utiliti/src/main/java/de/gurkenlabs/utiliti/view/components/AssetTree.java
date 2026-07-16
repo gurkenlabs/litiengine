@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
+import de.gurkenlabs.utiliti.controller.tool.AssetImportTransferHandler;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
@@ -32,7 +33,10 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.TransferHandler;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
@@ -62,6 +66,14 @@ public class AssetTree extends JTree {
     this.setOpaque(true);
     this.putClientProperty("JTree.lineStyle", "None");
     this.getAccessibleContext().setAccessibleName(Resources.strings().get("assettree_categories"));
+    this.setTransferHandler(new AssetImportTransferHandler(
+        files -> Editor.instance().importResources(files),
+        image -> Editor.instance().importSpriteSheets(
+            new SpritesheetResource(image, "clipboard", image.getWidth(), image.getHeight()))));
+    this.getInputMap(JComponent.WHEN_FOCUSED).put(
+        KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.CTRL_DOWN_MASK),
+        "pasteResources");
+    this.getActionMap().put("pasteResources", TransferHandler.getPasteAction());
 
     this.assetPanel = assetPanel;
 

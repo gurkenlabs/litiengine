@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -91,6 +92,9 @@ public class AssetPanelItem extends JPanel {
   private Icon rawIcon;
   private int cardSize = PREFERRED_SIZE.width;
   private Consumer<AssetPanelItem> focusCallback;
+  private Consumer<MouseEvent> selectionPressedCallback;
+  private Consumer<MouseEvent> selectionClickedCallback;
+  private Supplier<java.util.List<Object>> transferAssetsSupplier;
   private MouseAdapter mouseHandler;
   private boolean dragStarted;
 
@@ -161,7 +165,10 @@ public class AssetPanelItem extends JPanel {
         return COPY;
       }
       @Override protected Transferable createTransferable(JComponent c) {
-        return new AssetTransferable(origin);
+        java.util.List<Object> assets = transferAssetsSupplier != null
+            ? transferAssetsSupplier.get()
+            : java.util.List.of(origin);
+        return assets.isEmpty() ? null : new AssetTransferable(assets);
       }
     });
     btnAdd.setEnabled(canAdd());
@@ -258,6 +265,10 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void setupKeyboardShortcuts() {
+    getInputMap(JComponent.WHEN_FOCUSED).put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copyAsset");
+    getActionMap().put("copyAsset", TransferHandler.getCopyAction());
+
     getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
     getActionMap().put("deleteAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
@@ -294,7 +305,6 @@ public class AssetPanelItem extends JPanel {
   private void setupFocusHandling() {
     FocusAdapter focusHandler = new FocusAdapter() {
       @Override public void focusGained(FocusEvent e) {
-        isSelected = true;
         updateButtonVisibility(true);
         if (focusCallback != null) {
           focusCallback.accept(AssetPanelItem.this);
@@ -308,7 +318,6 @@ public class AssetPanelItem extends JPanel {
           if (focusOwner == AssetPanelItem.this || focusOwner != null && SwingUtilities.isDescendingFrom(focusOwner, AssetPanelItem.this)) {
             return;
           }
-          isSelected = false;
           updateButtonVisibility(isHovered);
           repaint();
         });
@@ -341,6 +350,9 @@ public class AssetPanelItem extends JPanel {
 
       @Override public void mousePressed(MouseEvent e) {
         dragStarted = false;
+        if (selectionPressedCallback != null) {
+          selectionPressedCallback.accept(e);
+        }
         requestFocus();
         maybeShowPopup(e);
       }
@@ -355,10 +367,16 @@ public class AssetPanelItem extends JPanel {
       }
 
       @Override public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger() && selectionPressedCallback != null) {
+          selectionPressedCallback.accept(e);
+        }
         maybeShowPopup(e);
       }
 
       @Override public void mouseClicked(MouseEvent e) {
+        if (selectionClickedCallback != null) {
+          selectionClickedCallback.accept(e);
+        }
         requestFocus();
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
           addEntity();
@@ -545,6 +563,18 @@ public class AssetPanelItem extends JPanel {
     return origin;
   }
 
+  public boolean isSelected() {
+    return this.isSelected;
+  }
+
+  public void setSelected(boolean selected) {
+    if (this.isSelected == selected) {
+      return;
+    }
+    this.isSelected = selected;
+    repaint();
+  }
+
   public String getDetailsSummary() {
     Map<String, String> details = getDetails(origin);
     if (details.isEmpty()) {
@@ -557,6 +587,16 @@ public class AssetPanelItem extends JPanel {
 
   public void setFocusCallback(Consumer<AssetPanelItem> focusCallback) {
     this.focusCallback = focusCallback;
+  }
+
+  public void setSelectionCallbacks(
+      Consumer<MouseEvent> pressedCallback, Consumer<MouseEvent> clickedCallback) {
+    this.selectionPressedCallback = pressedCallback;
+    this.selectionClickedCallback = clickedCallback;
+  }
+
+  public void setTransferAssetsSupplier(Supplier<java.util.List<Object>> supplier) {
+    this.transferAssetsSupplier = supplier;
   }
 
   public void setCompact(boolean compact) {

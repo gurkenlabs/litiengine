@@ -650,8 +650,10 @@ public final class UI {
         event.acceptDrop(DnDConstants.ACTION_COPY);
         boolean created = false;
         try {
-          Object asset = event.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
-          created = Editor.instance().getMapComponent().addMapObjectAt(asset, event.getLocation());
+          Object payload = event.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
+          for (Object asset : AssetTransferable.getAssets(payload)) {
+            created |= Editor.instance().getMapComponent().addMapObjectAt(asset, event.getLocation());
+          }
         } catch (Exception ex) {
           created = false;
         } finally {

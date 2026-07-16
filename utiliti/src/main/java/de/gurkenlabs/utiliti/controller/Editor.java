@@ -468,6 +468,11 @@ public class Editor extends Screen {
     this.processSpritesheets(spritePanel);
   }
 
+  public void importSpriteSheets(SpritesheetResource... resources) {
+    SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(resources);
+    this.processSpritesheets(spritePanel);
+  }
+
   public void importSounds(Path... selectedFiles) {
     for (Path file : selectedFiles) {
       try (InputStream stream = Files.newInputStream(file)) {

@@ -19,6 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -35,10 +36,12 @@ public class AssetPanel extends JPanel {
   private String filterText = "";
   private boolean compact;
   private final List<AssetPanelItem> allItems = new ArrayList<>();
+  private final LinkedHashSet<AssetPanelItem> selectedItems = new LinkedHashSet<>();
   private int visibleItemCount;
   private Runnable changedCallback;
   private int cardSize = 118;
   private AssetPanelItem focusedItem;
+  private AssetPanelItem selectionAnchor;
 
   public AssetPanel() {
     this.setLayout(createLayout());
@@ -49,6 +52,9 @@ public class AssetPanel extends JPanel {
 
     MouseAdapter popupHandler = new MouseAdapter() {
       @Override public void mousePressed(MouseEvent e) {
+        if (javax.swing.SwingUtilities.isLeftMouseButton(e)) {
+          clearSelection();
+        }
         maybeShowPopup(e);
       }
 
@@ -121,6 +127,12 @@ public class AssetPanel extends JPanel {
         item.validate();
       }
     }
+    List<AssetPanelItem> visibleItems = visibleItems();
+    this.selectedItems.removeIf(item -> !visibleItems.contains(item));
+    if (!visibleItems.contains(this.selectionAnchor)) {
+      this.selectionAnchor = null;
+    }
+    updateSelectedStates();
     this.revalidate();
     this.repaint();
     if (this.changedCallback != null) {
@@ -142,6 +154,14 @@ public class AssetPanel extends JPanel {
 
   public AssetPanelItem getFocusedItem() {
     return this.focusedItem;
+  }
+
+  public List<AssetPanelItem> getSelectedItems() {
+    return this.allItems.stream().filter(this.selectedItems::contains).toList();
+  }
+
+  public List<Object> getSelectedOrigins() {
+    return getSelectedItems().stream().map(AssetPanelItem::getOrigin).toList();
   }
 
   public String getCurrentTitle() {
@@ -248,6 +268,8 @@ public class AssetPanel extends JPanel {
 
   private void loadItems(Runnable runnable) {
     allItems.clear();
+    selectedItems.clear();
+    selectionAnchor = null;
     focusedItem = null;
     this.removeAll();
     runnable.run();
@@ -264,7 +286,98 @@ public class AssetPanel extends JPanel {
         this.changedCallback.run();
       }
     });
+    item.setSelectionCallbacks(
+        event -> handleSelectionPressed(item, event),
+        event -> handleSelectionClicked(item, event));
+    item.setTransferAssetsSupplier(() -> {
+      List<Object> selection = getSelectedOrigins();
+      return this.selectedItems.contains(item) && !selection.isEmpty()
+          ? selection
+          : List.of(item.getOrigin());
+    });
     return item;
+  }
+
+  private void handleSelectionPressed(AssetPanelItem item, MouseEvent event) {
+    if (!javax.swing.SwingUtilities.isLeftMouseButton(event) && !event.isPopupTrigger()) {
+      return;
+    }
+    boolean control = event.isControlDown();
+    boolean shift = event.isShiftDown();
+    if (shift) {
+      selectRange(item, control);
+    } else if (control) {
+      toggleSelection(item);
+    } else if (!this.selectedItems.contains(item)) {
+      selectOnly(item);
+    }
+    this.focusedItem = item;
+  }
+
+  private void handleSelectionClicked(AssetPanelItem item, MouseEvent event) {
+    if (javax.swing.SwingUtilities.isLeftMouseButton(event)
+        && !event.isControlDown() && !event.isShiftDown()) {
+      selectOnly(item);
+    }
+  }
+
+  private void selectOnly(AssetPanelItem item) {
+    this.selectedItems.clear();
+    this.selectedItems.add(item);
+    this.selectionAnchor = item;
+    this.focusedItem = item;
+    selectionChanged();
+  }
+
+  private void toggleSelection(AssetPanelItem item) {
+    if (!this.selectedItems.remove(item)) {
+      this.selectedItems.add(item);
+    }
+    this.selectionAnchor = item;
+    this.focusedItem = item;
+    selectionChanged();
+  }
+
+  private void selectRange(AssetPanelItem item, boolean additive) {
+    List<AssetPanelItem> visible = visibleItems();
+    AssetPanelItem anchor = visible.contains(this.selectionAnchor) ? this.selectionAnchor : item;
+    int start = visible.indexOf(anchor);
+    int end = visible.indexOf(item);
+    if (!additive) {
+      this.selectedItems.clear();
+    }
+    for (int i = Math.min(start, end); i <= Math.max(start, end); i++) {
+      this.selectedItems.add(visible.get(i));
+    }
+    this.focusedItem = item;
+    selectionChanged();
+  }
+
+  private void clearSelection() {
+    this.selectedItems.clear();
+    this.selectionAnchor = null;
+    this.focusedItem = null;
+    selectionChanged();
+  }
+
+  private List<AssetPanelItem> visibleItems() {
+    return java.util.Arrays.stream(getComponents())
+        .filter(AssetPanelItem.class::isInstance)
+        .map(AssetPanelItem.class::cast)
+        .toList();
+  }
+
+  private void selectionChanged() {
+    updateSelectedStates();
+    if (this.changedCallback != null) {
+      this.changedCallback.run();
+    }
+  }
+
+  private void updateSelectedStates() {
+    for (AssetPanelItem item : this.allItems) {
+      item.setSelected(this.selectedItems.contains(item));
+    }
   }
 
   private static String getDisplayName(SpritesheetResource info) {
@@ -289,5 +402,18 @@ public class AssetPanel extends JPanel {
 
     // default: original name (e.g., misc sprites not following prop/creature conventions)
     return name;
+  }
+
+  List<AssetPanelItem> getItemsForTest() {
+    return List.copyOf(this.allItems);
+  }
+
+  void selectItemForTest(int index, boolean control, boolean shift) {
+    AssetPanelItem item = this.allItems.get(index);
+    int modifiers = (control ? MouseEvent.CTRL_DOWN_MASK : 0)
+        | (shift ? MouseEvent.SHIFT_DOWN_MASK : 0);
+    handleSelectionPressed(item, new MouseEvent(
+        item, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), modifiers,
+        1, 1, 1, false, MouseEvent.BUTTON1));
   }
 }

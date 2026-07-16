@@ -197,11 +197,14 @@ public class MapPropertyPanel extends JPanel {
 
       @Override public boolean importData(TransferSupport support) {
         try {
-          Object asset = support.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
-          if (asset instanceof Tileset tileset) {
-            addTileset(tileset);
-            return true;
+          Object payload = support.getTransferable().getTransferData(AssetTransferable.ASSET_FLAVOR);
+          boolean added = false;
+          for (Object asset : AssetTransferable.getAssets(payload)) {
+            if (asset instanceof Tileset tileset) {
+              added |= addTileset(tileset);
+            }
           }
+          return added;
         } catch (Exception ignored) {
           // Invalid drops leave the map unchanged.
         }
@@ -455,15 +458,16 @@ public class MapPropertyPanel extends JPanel {
     menu.show(owner, 0, owner.getHeight());
   }
 
-  void addTileset(Tileset tileset) {
+  boolean addTileset(Tileset tileset) {
     if (this.dataSource == null || this.dataSource.getTilesets().stream()
         .anyMatch(existing -> java.util.Objects.equals(existing.getName(), tileset.getName()))) {
-      return;
+      return false;
     }
     UndoManager.instance().mapChanging(this.dataSource);
     this.dataSource.getTilesets().add(tileset);
     UndoManager.instance().mapChanged(this.dataSource);
     this.tilesetsChanged.accept(this.dataSource);
+    return true;
   }
 
   void addAllTilesets() {
