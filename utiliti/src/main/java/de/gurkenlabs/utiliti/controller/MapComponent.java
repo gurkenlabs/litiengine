@@ -3,13 +3,17 @@ package de.gurkenlabs.utiliti.controller;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
+import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
+import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
@@ -39,6 +43,7 @@ import de.gurkenlabs.utiliti.view.components.PropPanel;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.Point;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
+import de.gurkenlabs.utiliti.view.dialogs.NewMapDialog;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.view.dialogs.XmlImportDialog;
 import de.gurkenlabs.utiliti.view.renderers.GridRenderer;
@@ -446,14 +451,18 @@ public class MapComponent extends GuiComponent {
       || UI.getLayerController().getCurrentLayer() == null) {
       return false;
     }
+    boolean added = false;
     if (asset instanceof SpritesheetResource spritesheetResource) {
-      return addSpriteFromDrop(spritesheetResource, location);
+      added = addSpriteFromDrop(spritesheetResource, location);
     } else if (asset instanceof EmitterAttributes emitterData) {
-      return addEmitterFromDrop(emitterData, location);
+      added = addEmitterFromDrop(emitterData, location);
     } else if (asset instanceof Blueprint blueprint) {
-      return addBlueprintFromDrop(blueprint, location);
+      added = addBlueprintFromDrop(blueprint, location);
     }
-    return false;
+    if (added) {
+      this.activatePointerTool();
+    }
+    return added;
   }
 
   private boolean addSpriteFromDrop(SpritesheetResource spritesheetResource, Point2D location) {
@@ -1004,6 +1013,68 @@ public class MapComponent extends GuiComponent {
       TmxMap.FILE_EXTENSION);
   }
 
+  public void newMap() {
+    if (getMaps() == null) {
+      return;
+    }
+
+    NewMapDialog dialog = new NewMapDialog(Game.window().getHostControl());
+    dialog.setVisible(true);
+    if (!dialog.isConfirmed()) {
+      return;
+    }
+
+    IMapOrientation orientation = dialog.getOrientation();
+    int mapWidth = dialog.getMapWidth();
+    int mapHeight = dialog.getMapHeight();
+    int tileWidth = dialog.getTileWidth();
+    int tileHeight = dialog.getTileHeight();
+    String mapName = dialog.getName().trim();
+    if (mapName.isEmpty()) {
+      return;
+    }
+
+    Optional<TmxMap> existing = this.maps.stream().filter(m -> m.getName().equals(mapName)).findFirst();
+    if (existing.isPresent()) {
+      clearMapObjectState(mapName);
+      getMaps().remove(existing.get());
+    }
+
+    TmxMap map = new TmxMap(orientation);
+    map.setName(mapName);
+    map.setTileWidth(tileWidth);
+    map.setTileHeight(tileHeight);
+    map.setWidth(mapWidth);
+    map.setHeight(mapHeight);
+
+    // Set stagger properties for Staggered and Hexagonal orientations
+    if (orientation == MapOrientations.ISOMETRIC_STAGGERED || orientation == MapOrientations.HEXAGONAL) {
+      map.setStaggerAxis(dialog.getStaggerAxis());
+      map.setStaggerIndex(dialog.getStaggerIndex());
+    }
+
+    // Set hex side length for Hexagonal orientation
+    if (orientation == MapOrientations.HEXAGONAL) {
+      map.setHexSideLength(dialog.getHexSideLength());
+    }
+
+    // Add a default map object layer
+    MapObjectLayer layer = new MapObjectLayer();
+    layer.setName(MapObjectLayer.DEFAULT_MAPOBJECTLAYER_NAME);
+    map.addLayer(layer);
+
+    getMaps().add(map);
+    Collections.sort(getMaps());
+
+    Editor.instance().updateGameFileMaps();
+    Objects.requireNonNull(Renderers.get(GridRenderer.class)).clearCache();
+    this.environments.remove(map.getName());
+
+    UI.getMapController().bind(getMaps(), true);
+    this.loadEnvironment(map);
+    log.log(Level.INFO, "created new map {0}", new Object[] {map.getName()});
+  }
+
   public void exportMap() {
     if (getMaps() == null || getMaps().isEmpty()) {
       return;
@@ -1125,6 +1196,7 @@ public class MapComponent extends GuiComponent {
   }
 
   public void setCreateDefinition(ProjectCodeIntegration.Definition definition) {
+    this.activatePointerTool();
     this.createDefinition = definition;
     this.setTransformMode(TransformMode.CREATE);
   }
@@ -1145,9 +1217,20 @@ public class MapComponent extends GuiComponent {
   }
 
   public void setCreateMapObjectType(MapObjectType type) {
+    this.activatePointerTool();
     this.createDefinition = null;
     this.setTransformMode(TransformMode.CREATE);
     UI.getInspector().setMapObjectType(type);
+  }
+
+  private void activatePointerTool() {
+    if (ToolManager.instance().getActiveTool() instanceof PointerTool) {
+      return;
+    }
+    PointerTool pointer = ToolManager.instance().getTool(PointerTool.class);
+    if (pointer != null) {
+      ToolManager.instance().setActiveTool(pointer);
+    }
   }
 
   private IMapObject createNewMapObject(MapObjectType type) {
@@ -1330,7 +1413,7 @@ public class MapComponent extends GuiComponent {
       SwingUtilities.invokeLater(
         () -> {
           for (IMapObject selected : getSelectedMapObjects()) {
-            UndoManager.instance().mapObjectChanged(selected);
+            UndoManager.instance().mapObjectMoved(selected);
           }
 
           UndoManager.instance().endOperation();
@@ -1500,19 +1583,24 @@ public class MapComponent extends GuiComponent {
 
     switch (this.transformMode) {
       case CREATE -> {
-        MapObjectType type = this.createDefinition == null ? UI.getInspector().getObjectType() : this.createDefinition.baseType();
-        IMapObject mo = this.createNewMapObject(type);
+        UndoManager undoManager = UndoManager.instance();
+        undoManager.beginOperation();
+        try {
+          MapObjectType type = this.createDefinition == null ? UI.getInspector().getObjectType() : this.createDefinition.baseType();
+          IMapObject mo = this.createNewMapObject(type);
 
-        this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-        UI.getInspector().bind(mo);
-        this.setTransformMode(TransformMode.NONE);
+          this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
+          this.setTransformMode(TransformMode.NONE);
+        } finally {
+          undoManager.endOperation();
+        }
       }
       case MOVE -> {
         if (isMoving) {
           isMoving = false;
 
           for (IMapObject selected : getSelectedMapObjects()) {
-            UndoManager.instance().mapObjectChanged(selected);
+            UndoManager.instance().mapObjectMoved(selected);
           }
 
           UndoManager.instance().endOperation();
@@ -1524,9 +1612,15 @@ public class MapComponent extends GuiComponent {
       }
       case NONE -> {
         if (isMoving || isResizing) {
+          boolean moved = isMoving;
           isMoving = false;
           isResizing = false;
-          UndoManager.instance().mapObjectChanged(getFocusedMapObject());
+          if (moved) {
+            UndoManager.instance().mapObjectMoved(getFocusedMapObject());
+          } else {
+            UndoManager.instance().mapObjectResized(getFocusedMapObject());
+          }
+          UndoManager.instance().endOperation();
         }
 
         if (this.startPoint == null) {

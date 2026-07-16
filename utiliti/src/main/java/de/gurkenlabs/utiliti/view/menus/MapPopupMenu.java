@@ -17,6 +17,9 @@ public class MapPopupMenu extends JPopupMenu {
   private static final Logger log = Logger.getLogger(MapPopupMenu.class.getName());
 
   public MapPopupMenu() {
+    JMenuItem create = new JMenuItem(Resources.strings().get("menu_map_new"));
+    create.addActionListener(a -> Editor.instance().getMapComponent().newMap());
+
     JMenuItem exp = new JMenuItem(Resources.strings().get("menu_map_export"));
     exp.addActionListener(a -> Editor.instance().getMapComponent().exportMap());
 
@@ -49,6 +52,7 @@ public class MapPopupMenu extends JPopupMenu {
     JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_map_delete"));
     del2.addActionListener(a -> Editor.instance().getMapComponent().deleteMap());
 
+    this.add(create);
     this.add(exp);
     this.add(del2);
     this.addSeparator();

@@ -234,6 +234,37 @@ class UndoManagerTest {
     assertEquals(2, manager.getRedoHistory().getFirst().steps());
   }
 
+  @Test
+  void historyDescribesMapObjectTransforms() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("undo-transform-history-test");
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    MapObjectLayer layer = new MapObjectLayer();
+    MapObject object = new MapObject();
+    object.setId(1);
+    object.setType("PROP");
+    layer.addMapObject(object);
+    map.addLayer(layer);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+
+    manager.mapObjectChanging(object);
+    object.setX(10);
+    manager.mapObjectMoved(object);
+
+    assertEquals("Move PROP #1", manager.getUndoHistory().getFirst().description());
+
+    manager.mapObjectChanging(object);
+    object.setWidth(32);
+    manager.mapObjectResized(object);
+
+    assertEquals("Resize PROP #1", manager.getUndoHistory().getFirst().description());
+  }
+
   private static void restoreState(IMapObject target, IMapObject snapshot) throws Exception {
     Method restoreState = UndoManager.class.getDeclaredMethod("restoreState", IMapObject.class, IMapObject.class);
     restoreState.setAccessible(true);

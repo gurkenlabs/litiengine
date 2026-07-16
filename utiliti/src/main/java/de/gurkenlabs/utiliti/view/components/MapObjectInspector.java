@@ -590,7 +590,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
             UndoManager.instance().mapObjectChanging(getDataSource());
             getDataSource().setX((float) val);
             Transform.updateAnchors();
-            UndoManager.instance().mapObjectChanged(getDataSource());
+            UndoManager.instance().mapObjectMoved(getDataSource());
             updateEnvironment();
           }
         });
@@ -604,7 +604,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
             UndoManager.instance().mapObjectChanging(getDataSource());
             getDataSource().setY((float) val);
             Transform.updateAnchors();
-            UndoManager.instance().mapObjectChanged(getDataSource());
+            UndoManager.instance().mapObjectMoved(getDataSource());
             updateEnvironment();
           }
         });
@@ -618,7 +618,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
             UndoManager.instance().mapObjectChanging(getDataSource());
             getDataSource().setWidth((float) val);
             Transform.updateAnchors();
-            UndoManager.instance().mapObjectChanged(getDataSource());
+            UndoManager.instance().mapObjectResized(getDataSource());
             updateEnvironment();
           }
         });
@@ -632,7 +632,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
             UndoManager.instance().mapObjectChanging(getDataSource());
             getDataSource().setHeight((float) val);
             Transform.updateAnchors();
-            UndoManager.instance().mapObjectChanged(getDataSource());
+            UndoManager.instance().mapObjectResized(getDataSource());
             updateEnvironment();
           }
         });

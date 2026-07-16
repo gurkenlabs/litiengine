@@ -20,6 +20,10 @@ public final class MapMenu extends JMenu {
     super(Resources.strings().get("menu_map"));
     this.setMnemonic(this.getText().charAt(0));
 
+    JMenuItem create = new JMenuItem(Resources.strings().get("menu_map_new"));
+    create.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+    create.addActionListener(a -> Editor.instance().getMapComponent().newMap());
+
     JMenuItem imp = new JMenuItem(Resources.strings().get("menu_map_import"));
     imp.addActionListener(a -> Editor.instance().getMapComponent().importMap());
 
@@ -59,6 +63,7 @@ public final class MapMenu extends JMenu {
     sync.setState(Editor.preferences().syncMaps());
     sync.addItemListener(e -> Editor.preferences().setSyncMaps(sync.getState()));
 
+    this.add(create);
     this.add(imp);
     this.add(exp);
     this.add(del2);

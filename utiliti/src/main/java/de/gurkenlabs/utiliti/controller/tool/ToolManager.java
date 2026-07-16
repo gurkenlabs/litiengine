@@ -42,6 +42,15 @@ public final class ToolManager {
     return Collections.unmodifiableList(tools);
   }
 
+  public <T extends Tool> T getTool(Class<T> type) {
+    for (Tool tool : tools) {
+      if (type.isInstance(tool)) {
+        return type.cast(tool);
+      }
+    }
+    return null;
+  }
+
   public Tool getActiveTool() {
     return activeTool;
   }

@@ -136,7 +136,7 @@ public class UndoManager {
 
         switch (state.operationType) {
           case ADD -> Editor.instance().getMapComponent().delete(state.target);
-          case CHANGE -> restoreState(state.target, Objects.requireNonNull(state.oldMapObject));
+          case CHANGE, MOVE, RESIZE -> restoreState(state.target, Objects.requireNonNull(state.oldMapObject));
           case DELETE -> Editor.instance().getMapComponent().add(state.target, state.layer);
           case LAYER_CHANGE -> restoreLayerProperties(state.targetLayer, state.oldLayerProperties);
           case MAP_CHANGE -> restoreMapProperties(state.targetMap, state.oldMapProperties);
@@ -205,7 +205,7 @@ public class UndoManager {
 
         switch (state.operationType) {
           case ADD -> Editor.instance().getMapComponent().add(state.target, state.layer);
-          case CHANGE -> restoreState(state.target, Objects.requireNonNull(state.newMapObject));
+          case CHANGE, MOVE, RESIZE -> restoreState(state.target, Objects.requireNonNull(state.newMapObject));
           case DELETE -> Editor.instance().getMapComponent().delete(state.target);
           case LAYER_CHANGE -> restoreLayerProperties(state.targetLayer, state.newLayerProperties);
           case MAP_CHANGE -> restoreMapProperties(state.targetMap, state.newMapProperties);
@@ -323,7 +323,19 @@ public class UndoManager {
       return;
     }
 
-    this.mapObjectChanged(mapObject, mapObject.getId());
+    this.mapObjectChanged(mapObject, mapObject.getId(), OperationType.CHANGE);
+  }
+
+  public void mapObjectMoved(IMapObject mapObject) {
+    if (mapObject != null) {
+      this.mapObjectChanged(mapObject, mapObject.getId(), OperationType.MOVE);
+    }
+  }
+
+  public void mapObjectResized(IMapObject mapObject) {
+    if (mapObject != null) {
+      this.mapObjectChanged(mapObject, mapObject.getId(), OperationType.RESIZE);
+    }
   }
 
   /**
@@ -333,6 +345,10 @@ public class UndoManager {
    * @param previousMapId The previous ID of the map object before the change.
    */
   public void mapObjectChanged(IMapObject mapObject, int previousMapId) {
+    this.mapObjectChanged(mapObject, previousMapId, OperationType.CHANGE);
+  }
+
+  private void mapObjectChanged(IMapObject mapObject, int previousMapId, OperationType operationType) {
     if (executing || mapObject == null) {
       return;
     }
@@ -354,7 +370,7 @@ public class UndoManager {
         mapObject,
         this.changing.remove(this.changing.indexOf(trackedMapObject.get())),
         new MapObject((MapObject) mapObject, true),
-        OperationType.CHANGE,
+        operationType,
         this.operation);
     fireUndoStackChangedEvent(this);
   }
@@ -740,6 +756,8 @@ public class UndoManager {
    */
   private enum OperationType {
     CHANGE,
+    MOVE,
+    RESIZE,
     ADD,
     DELETE,
     LAYER_CHANGE,
@@ -940,6 +958,8 @@ public class UndoManager {
         return switch (this.operationType) {
           case ADD -> Resources.strings().get("history_addObject", object);
           case DELETE -> Resources.strings().get("history_deleteObject", object);
+          case MOVE -> Resources.strings().get("history_moveObject", object);
+          case RESIZE -> Resources.strings().get("history_resizeObject", object);
           default -> Resources.strings().get("history_changeObject", object);
         };
       }
