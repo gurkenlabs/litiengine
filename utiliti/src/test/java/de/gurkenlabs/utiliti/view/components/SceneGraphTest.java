@@ -1,14 +1,47 @@
 package de.gurkenlabs.utiliti.view.components;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import javax.swing.tree.TreeSelectionModel;
 import org.junit.jupiter.api.Test;
 
 class SceneGraphTest {
+
+  @Test
+  void supportsDiscontiguousSelection() {
+    SceneGraph sceneGraph = new SceneGraph();
+
+    assertEquals(
+        TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION,
+        sceneGraph.getSelectionModeForTest());
+  }
+
+  @Test
+  void displaysLastRenderedLayerOnTop() {
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    MapObjectLayer bottom = new MapObjectLayer();
+    MapObjectLayer middle = new MapObjectLayer();
+    GroupLayer top = new GroupLayer();
+    MapObjectLayer bottomChild = new MapObjectLayer();
+    MapObjectLayer topChild = new MapObjectLayer();
+    top.addLayer(bottomChild);
+    top.addLayer(topChild);
+    map.addLayer(bottom);
+    map.addLayer(middle);
+    map.addLayer(top);
+
+    assertSame(top, SceneGraph.layersInDisplayOrder(map).get(0));
+    assertSame(middle, SceneGraph.layersInDisplayOrder(map).get(1));
+    assertSame(bottom, SceneGraph.layersInDisplayOrder(map).get(2));
+    assertSame(topChild, SceneGraph.layersInDisplayOrder(top).get(0));
+    assertSame(bottomChild, SceneGraph.layersInDisplayOrder(top).get(1));
+  }
 
   @Test
   void selectNullDoesNotClearSelectionDuringTreeFocusChange() {

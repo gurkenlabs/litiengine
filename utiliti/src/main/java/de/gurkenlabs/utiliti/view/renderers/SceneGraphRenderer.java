@@ -41,7 +41,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   private enum BadgeKind { COUNT, ID }
 
   private final JPanel rowPanel;
-  private final JLabel visibilityLabel;
   private final JLabel typeLabel;
   private final JLabel nameLabel;
   private final JLabel badgeLabel;
@@ -55,18 +54,16 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
 
     this.rowPanel = new JPanel(new BorderLayout(6, 0));
     this.rowPanel.setOpaque(false);
-    this.rowPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 36));
+    this.rowPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 62));
 
     JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
     left.setOpaque(false);
 
-    this.visibilityLabel = fixedLabel(18);
     this.typeLabel = fixedLabel(18);
     this.nameLabel = new JLabel();
     this.nameLabel.setOpaque(false);
     this.badgeLabel = new BadgeLabel();
 
-    left.add(this.visibilityLabel);
     left.add(this.typeLabel);
     left.add(this.nameLabel);
     left.add(this.badgeLabel);
@@ -128,7 +125,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private void renderSection(SceneGraph.SceneNode node) {
-    this.visibilityLabel.setVisible(false);
     this.typeLabel.setVisible(false);
     this.badgeLabel.setVisible(false);
     this.nameLabel.setText(node.getName());
@@ -136,7 +132,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private void renderLayer(SceneGraph.SceneNode node) {
-    this.visibilityLabel.setIcon(node.isVisible() ? Icons.SHOW_16 : Icons.HIDE_16);
     Color color = node.getLayerColor();
     this.typeLabel.setIcon(color != null
         ? new ColoredLayerIcon(color)
@@ -148,7 +143,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private void renderMap(SceneGraph.SceneNode node) {
-    this.visibilityLabel.setVisible(false);
     this.typeLabel.setIcon(node.getIcon());
     this.nameLabel.setText(node.getName());
     this.nameLabel.setFont(this.nameLabel.getFont().deriveFont(java.awt.Font.BOLD));
@@ -156,7 +150,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private void renderEntity(SceneGraph.SceneNode node) {
-    this.visibilityLabel.setIcon(null);
     Icon entityIcon = getEntityIcon(node);
     this.typeLabel.setIcon(entityIcon != null ? entityIcon : getDefaultEntityIcon(node));
     this.nameLabel.setText(formatEntityName(node.getName()));
@@ -164,8 +157,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private void reset() {
-    this.visibilityLabel.setVisible(true);
-    this.visibilityLabel.setIcon(null);
     this.typeLabel.setVisible(true);
     this.typeLabel.setIcon(null);
     this.nameLabel.setText("");
