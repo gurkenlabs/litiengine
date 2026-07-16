@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.utiliti.controller.LogHandler;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
@@ -22,6 +23,7 @@ public class ConsoleActionPanel extends JPanel {
     LayoutManager layout = new BoxLayout(this, BoxLayout.Y_AXIS);
 
     this.setLayout(layout);
+    this.setBackground(Style.assetExplorerBackground());
     this.setVisible(true); // Could be used to toggle the visibility of the action panel
     this.setAlignmentY(Component.TOP_ALIGNMENT);
 

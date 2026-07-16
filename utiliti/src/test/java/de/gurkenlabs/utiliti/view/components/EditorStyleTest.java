@@ -103,7 +103,7 @@ class EditorStyleTest {
     assertTrue(cell.getBorder() instanceof EmptyBorder);
     assertEquals("None", tree.getClientProperty("JTree.lineStyle"));
     assertEquals(Style.assetExplorerBackground(), tree.getBackground());
-    assertFalse(tree.isOpaque());
+    assertTrue(tree.isOpaque());
   }
 
   @Test

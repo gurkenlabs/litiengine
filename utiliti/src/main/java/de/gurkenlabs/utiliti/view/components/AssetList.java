@@ -171,7 +171,7 @@ public class AssetList extends JSplitPane implements Controller {
     this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
     this.scrollPane.getVerticalScrollBar().setBlockIncrement(48);
     this.scrollPane.setBorder(null);
-    this.scrollPane.getViewport().setBackground(Style.background());
+    this.scrollPane.getViewport().setBackground(Style.assetExplorerBackground());
     rightPanel.add(this.scrollPane, BorderLayout.CENTER);
 
     this.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
@@ -211,7 +211,7 @@ public class AssetList extends JSplitPane implements Controller {
       this.summaryLabel.setForeground(Style.mutedText());
     }
     if (this.scrollPane != null) {
-      this.scrollPane.getViewport().setBackground(Style.background());
+      this.scrollPane.getViewport().setBackground(Style.assetExplorerBackground());
     }
   }
 

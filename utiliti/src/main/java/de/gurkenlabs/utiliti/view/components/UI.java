@@ -854,6 +854,8 @@ public final class UI {
     UIManager.put("TextField.caretForeground", Style.COLOR_ACCENT_BLUE);
     UIManager.put("TextArea.background", INPUT_BG);
     UIManager.put("TextArea.foreground", Style.COLOR_TEXT);
+    UIManager.put("TextPane.background", Style.COLOR_ASSET_EXPLORER);
+    UIManager.put("TextPane.foreground", Style.COLOR_TEXT);
     UIManager.put("FormattedTextField.background", INPUT_BG);
     UIManager.put("FormattedTextField.foreground", Style.COLOR_TEXT);
     UIManager.put("PasswordField.background", INPUT_BG);
@@ -966,6 +968,7 @@ public final class UI {
     UIManager.put("Editor.workspaceTop", new Color(226, 232, 239));
     UIManager.put("Editor.workspaceBottom", new Color(205, 214, 224));
     UIManager.put("Editor.assetExplorerBackground", Style.COLOR_ASSET_EXPLORER_LIGHT);
+    UIManager.put("TextPane.background", Style.COLOR_ASSET_EXPLORER_LIGHT);
     UIManager.put("Editor.mapBacking", Color.WHITE);
     UIManager.put("Editor.mapBorder", new Color(105, 120, 136, 180));
     UIManager.put("Table.gridColor", Style.COLOR_LIGHT_GRID);

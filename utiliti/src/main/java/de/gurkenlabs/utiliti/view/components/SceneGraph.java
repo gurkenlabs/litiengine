@@ -117,6 +117,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private final JPanel searchPanel;
   private final JPanel chipPanel;
   private final JButton btnAddLayer;
+  private final JButton btnAddLayerMenu;
   private final JButton btnAddTileLayer;
   private final JButton btnRemoveLayer;
   private final JButton btnRaiseLayer;
@@ -161,16 +162,33 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.searchPanel.setOpaque(false);
     this.searchPanel.setBorder(BorderFactory.createEmptyBorder(7, 8, 3, 8));
 
-    this.btnAddLayer = createToolButton(new AddDropdownIcon(Icons.ADD_24));
-    this.btnAddLayer.setPreferredSize(new Dimension(44, Style.CONTROL_HEIGHT));
+    this.btnAddLayer = createToolButton(Icons.ADD_16);
+    this.btnAddLayer.setText(Resources.strings().get("toolbar_add"));
+    this.btnAddLayer.setIconTextGap(5);
+    this.btnAddLayer.setMargin(new Insets(0, 10, 0, 10));
+    this.btnAddLayer.setPreferredSize(null);
+    this.btnAddLayer.setMinimumSize(null);
+    this.btnAddLayer.setMaximumSize(null);
+    Dimension addLayerButtonSize = new Dimension(
+        this.btnAddLayer.getPreferredSize().width, Style.CONTROL_HEIGHT);
+    this.btnAddLayer.setPreferredSize(addLayerButtonSize);
+    this.btnAddLayer.setMinimumSize(addLayerButtonSize);
+    this.btnAddLayer.setMaximumSize(addLayerButtonSize);
     configureActionButton(this.btnAddLayer, Resources.strings().get("panel_addLayer"));
     this.btnAddLayer.addActionListener(e -> showAddLayerMenu(this.btnAddLayer));
+
+    this.btnAddLayerMenu = createToolButton(new DropdownArrowIcon());
+    this.btnAddLayerMenu.setPreferredSize(new Dimension(22, Style.CONTROL_HEIGHT));
+    this.btnAddLayerMenu.setMinimumSize(this.btnAddLayerMenu.getPreferredSize());
+    this.btnAddLayerMenu.setMaximumSize(this.btnAddLayerMenu.getPreferredSize());
+    configureActionButton(this.btnAddLayerMenu, Resources.strings().get("panel_addLayer"));
+    this.btnAddLayerMenu.addActionListener(e -> showAddLayerMenu(this.btnAddLayerMenu));
 
     this.btnAddTileLayer = createToolButton(Icons.TILESET_24);
     configureActionButton(this.btnAddTileLayer, Resources.strings().get("scenegraph_add_tile_layer"));
     this.btnAddTileLayer.addActionListener(e -> addTileLayer(getSelectedOrLastLayerNode()));
 
-    this.btnRemoveLayer = createToolButton(Icons.DELETE_24);
+    this.btnRemoveLayer = createToolButton(Icons.DELETE_16);
     configureActionButton(this.btnRemoveLayer, Resources.strings().get("panel_removeLayer"));
     this.btnRemoveLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
@@ -179,7 +197,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
     });
 
-    this.btnRaiseLayer = createToolButton(Icons.LIFT_24);
+    this.btnRaiseLayer = createToolButton(Icons.LIFT_16);
     configureActionButton(this.btnRaiseLayer, Resources.strings().get("panel_moveLayerUp"));
     this.btnRaiseLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
@@ -188,7 +206,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
     });
 
-    this.btnLowerLayer = createToolButton(Icons.LOWER_24);
+    this.btnLowerLayer = createToolButton(Icons.LOWER_16);
     configureActionButton(this.btnLowerLayer, Resources.strings().get("panel_moveLayerDown"));
     this.btnLowerLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
@@ -197,11 +215,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
     });
 
-    this.btnTilesets = createToolButton(Icons.SPRITESHEET_24);
+    this.btnTilesets = createToolButton(Icons.SPRITESHEET_16);
     configureActionButton(this.btnTilesets, Resources.strings().get("scenegraph_select_map_tileset"));
     this.btnTilesets.addActionListener(e -> showTilesetMenu(this.btnTilesets));
 
-    this.btnShowAllLayers = Style.iconToggleButton(Icons.HIDEOTHER_24, false);
+    this.btnShowAllLayers = Style.iconToggleButton(Icons.HIDEOTHER_16, false);
     configureActionButton(this.btnShowAllLayers, Resources.strings().get("panel_hideOtherLayers"));
     this.btnShowAllLayers.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
@@ -216,7 +234,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     configureActionButton(this.btnCollapse, Resources.strings().get("scenegraph_collapse_all"));
     this.btnCollapse.addActionListener(e -> collapseAll());
 
-    this.btnDuplicateLayer = createToolButton(Icons.COPY_24);
+    this.btnDuplicateLayer = createToolButton(Icons.COPY_16);
     configureActionButton(this.btnDuplicateLayer, Resources.strings().get("panel_duplicateLayer"));
     this.btnDuplicateLayer.addActionListener(e -> {
       SceneNode node = getSelectedLayerNode();
@@ -540,19 +558,43 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   }
 
   private JPanel createLayerCommandStrip() {
-    JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 4));
+    JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
     commands.setOpaque(true);
     commands.setBackground(Style.surface());
-    commands.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()));
-    commands.add(this.btnAddLayer);
+    commands.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+    commands.add(createAddLayerControl());
     commands.add(this.btnRaiseLayer);
     commands.add(this.btnLowerLayer);
     commands.add(this.btnDuplicateLayer);
     commands.add(this.btnRemoveLayer);
-    commands.add(javax.swing.Box.createHorizontalStrut(8));
     commands.add(this.btnShowAllLayers);
     commands.add(this.btnTilesets);
     return commands;
+  }
+
+  private JPanel createAddLayerControl() {
+    JPanel control = new JPanel(new BorderLayout(0, 0)) {
+      @Override
+      protected void paintComponent(Graphics graphics) {
+        Graphics2D g2 = (Graphics2D) graphics.create();
+        try {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          g2.setColor(Style.surface());
+          g2.fillRoundRect(0, 0, getWidth(), getHeight(), Style.CORNER_RADIUS * 2, Style.CORNER_RADIUS * 2);
+          g2.setColor(Style.border());
+          g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, Style.CORNER_RADIUS * 2, Style.CORNER_RADIUS * 2);
+        } finally {
+          g2.dispose();
+        }
+        super.paintComponent(graphics);
+      }
+    };
+    control.setOpaque(false);
+    this.btnAddLayer.putClientProperty("Editor.groupedToolbarButton", true);
+    this.btnAddLayerMenu.putClientProperty("Editor.groupedToolbarButton", true);
+    control.add(this.btnAddLayer, BorderLayout.WEST);
+    control.add(this.btnAddLayerMenu, BorderLayout.CENTER);
+    return control;
   }
 
   private void showAddLayerMenu(Component anchor) {
@@ -2277,31 +2319,22 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
   }
 
-  private static final class AddDropdownIcon implements Icon {
-    private final Icon primary;
-
-    private AddDropdownIcon(Icon primary) {
-      this.primary = primary;
-    }
-
+  private static final class DropdownArrowIcon implements Icon {
     @Override
     public int getIconWidth() {
-      return this.primary.getIconWidth() + 10;
+      return 8;
     }
 
     @Override
     public int getIconHeight() {
-      return Math.max(this.primary.getIconHeight(), 16);
+      return 6;
     }
 
     @Override
     public void paintIcon(Component component, Graphics graphics, int x, int y) {
-      this.primary.paintIcon(component, graphics, x, y + (getIconHeight() - this.primary.getIconHeight()) / 2);
       Graphics2D g2 = (Graphics2D) graphics.create();
       g2.setColor(component.isEnabled() ? Style.text() : Style.mutedText());
-      int arrowX = x + this.primary.getIconWidth() + 3;
-      int arrowY = y + getIconHeight() / 2 - 2;
-      g2.fillPolygon(new int[] {arrowX, arrowX + 6, arrowX + 3}, new int[] {arrowY, arrowY, arrowY + 5}, 3);
+      g2.fillPolygon(new int[] {x, x + 8, x + 4}, new int[] {y, y, y + 6}, 3);
       g2.dispose();
     }
   }

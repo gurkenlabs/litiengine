@@ -84,7 +84,7 @@ public class ViewportToolbar extends JPanel {
     setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
         BorderFactory.createEmptyBorder(
-            TOOLBAR_VERTICAL_PADDING, 0, TOOLBAR_VERTICAL_PADDING, 0)));
+            0, 0, TOOLBAR_VERTICAL_PADDING, 0)));
 
     JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
     left.setOpaque(false);
@@ -207,7 +207,7 @@ public class ViewportToolbar extends JPanel {
     setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
         BorderFactory.createEmptyBorder(
-            TOOLBAR_VERTICAL_PADDING, 0, TOOLBAR_VERTICAL_PADDING, 0)));
+            0, 0, TOOLBAR_VERTICAL_PADDING, 0)));
     this.zoomLabel.setForeground(Style.text());
     this.zoomLabel.setBackground(Style.surface());
     this.zoomLabel.setBorder(zoomLabelBorder());

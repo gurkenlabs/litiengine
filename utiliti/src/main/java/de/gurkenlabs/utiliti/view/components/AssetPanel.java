@@ -44,7 +44,7 @@ public class AssetPanel extends JPanel {
     this.setLayout(createLayout());
     this.setBorder(new EmptyBorder(
       Style.SPACE_MEDIUM, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM));
-    this.setBackground(Style.background());
+    this.setBackground(Style.assetExplorerBackground());
     this.setOpaque(true);
 
     MouseAdapter popupHandler = new MouseAdapter() {
@@ -62,7 +62,7 @@ public class AssetPanel extends JPanel {
   @Override
   public void updateUI() {
     super.updateUI();
-    setBackground(Style.background());
+    setBackground(Style.assetExplorerBackground());
   }
 
   public AssetType getCurrentType() {

@@ -59,7 +59,7 @@ public class AssetTree extends JTree {
     this.setRootVisible(false);
     this.setShowsRootHandles(true);
     this.setBackground(Style.assetExplorerBackground());
-    this.setOpaque(false);
+    this.setOpaque(true);
     this.putClientProperty("JTree.lineStyle", "None");
     this.getAccessibleContext().setAccessibleName(Resources.strings().get("assettree_categories"));
 
@@ -124,7 +124,7 @@ public class AssetTree extends JTree {
   public void updateUI() {
     super.updateUI();
     setBackground(Style.assetExplorerBackground());
-    setOpaque(false);
+    setOpaque(true);
   }
 
   @Override

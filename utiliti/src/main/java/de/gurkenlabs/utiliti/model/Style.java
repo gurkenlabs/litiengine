@@ -395,10 +395,9 @@ public final class Style {
   }
 
   public static Color assetExplorerBackground() {
-    Color color = Editor.preferences().getTheme() == Theme.DARK
+    return Editor.preferences().getTheme() == Theme.DARK
       ? COLOR_ASSET_EXPLORER
       : COLOR_ASSET_EXPLORER_LIGHT;
-    return new ColorUIResource(color);
   }
 
   public static Color mapBacking() {
