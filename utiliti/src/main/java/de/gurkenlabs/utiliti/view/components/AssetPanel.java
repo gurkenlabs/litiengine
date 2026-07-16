@@ -132,6 +132,9 @@ public class AssetPanel extends JPanel {
     if (!visibleItems.contains(this.selectionAnchor)) {
       this.selectionAnchor = null;
     }
+    if (!visibleItems.contains(this.focusedItem)) {
+      this.focusedItem = null;
+    }
     updateSelectedStates();
     this.revalidate();
     this.repaint();
@@ -282,6 +285,7 @@ public class AssetPanel extends JPanel {
     item.setCardSize(this.cardSize);
     item.setFocusCallback(focused -> {
       this.focusedItem = focused;
+      updateSelectedStates();
       if (this.changedCallback != null) {
         this.changedCallback.run();
       }
@@ -377,6 +381,7 @@ public class AssetPanel extends JPanel {
   private void updateSelectedStates() {
     for (AssetPanelItem item : this.allItems) {
       item.setSelected(this.selectedItems.contains(item));
+      item.setFocused(item == this.focusedItem);
     }
   }
 

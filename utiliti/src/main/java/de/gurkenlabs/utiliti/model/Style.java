@@ -386,6 +386,18 @@ public final class Style {
     return uiColor("Editor.selection", COLOR_SELECTION_INACTIVE);
   }
 
+  public static Color cardSelected() {
+    return Editor.preferences().getTheme() == Theme.DARK
+        ? COLOR_CARD_SELECTED
+        : new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 24);
+  }
+
+  public static Color cardHover() {
+    return Editor.preferences().getTheme() == Theme.DARK
+        ? new Color(255, 255, 255, 18)
+        : new Color(0, 0, 0, 12);
+  }
+
   public static Color workspaceTop() {
     return uiColor("Editor.workspaceTop", COLOR_WORKSPACE_TOP);
   }

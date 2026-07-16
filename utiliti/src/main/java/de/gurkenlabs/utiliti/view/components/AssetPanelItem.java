@@ -88,6 +88,7 @@ public class AssetPanelItem extends JPanel {
   private String assetName;
   private boolean isHovered;
   private boolean isSelected;
+  private boolean isFocused;
   private boolean compact;
   private Icon rawIcon;
   private int cardSize = PREFERRED_SIZE.width;
@@ -509,18 +510,34 @@ public class AssetPanelItem extends JPanel {
     g2d.setColor(Style.surface());
     g2d.fill(roundRect);
     if (isSelected) {
-      g2d.setColor(Style.selection());
+      g2d.setColor(Style.cardSelected());
       g2d.fill(roundRect);
     } else if (isHovered) {
-      g2d.setColor(Style.hover());
+      g2d.setColor(Style.cardHover());
       g2d.fill(roundRect);
     }
 
-    g2d.setColor(isSelected ? Style.accent() : Style.border());
-    g2d.setStroke(isSelected ? FOCUS_STROKE : BORDER_STROKE);
-    g2d.draw(roundRect);
-
     g2d.dispose();
+  }
+
+  @Override
+  protected void paintChildren(Graphics graphics) {
+    super.paintChildren(graphics);
+    Graphics2D g2d = (Graphics2D) graphics.create();
+    try {
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      if (this.isSelected) {
+        g2d.setColor(Style.accent());
+        g2d.fillRoundRect(3, 8, 3, Math.max(4, getHeight() - 16), 3, 3);
+      }
+      RoundRectangle2D roundRect = new RoundRectangle2D.Float(
+          0, 0, getWidth() - 1f, getHeight() - 1f, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+      g2d.setColor(this.isFocused ? Style.accent() : Style.border());
+      g2d.setStroke(this.isFocused ? FOCUS_STROKE : BORDER_STROKE);
+      g2d.draw(roundRect);
+    } finally {
+      g2d.dispose();
+    }
   }
 
   @Override
@@ -572,6 +589,18 @@ public class AssetPanelItem extends JPanel {
       return;
     }
     this.isSelected = selected;
+    repaint();
+  }
+
+  public boolean isFocused() {
+    return this.isFocused;
+  }
+
+  public void setFocused(boolean focused) {
+    if (this.isFocused == focused) {
+      return;
+    }
+    this.isFocused = focused;
     repaint();
   }
 

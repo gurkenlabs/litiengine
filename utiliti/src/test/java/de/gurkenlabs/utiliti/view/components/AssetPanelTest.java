@@ -23,6 +23,7 @@ class AssetPanelTest {
         .map(AssetPanelItem::getName).toList());
     assertTrue(panel.getItemsForTest().get(0).isSelected());
     assertTrue(panel.getItemsForTest().get(2).isSelected());
+    assertTrue(panel.getItemsForTest().get(2).isFocused());
   }
 
   @Test
