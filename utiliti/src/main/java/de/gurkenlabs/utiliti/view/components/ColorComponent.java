@@ -22,6 +22,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
 public class ColorComponent extends JPanel {
   private final JButton btnSelectColor;
@@ -37,11 +38,17 @@ public class ColorComponent extends JPanel {
   }
 
   public ColorComponent(Color clearColor) {
+    this(clearColor, null);
+  }
+
+  public ColorComponent(Color clearColor, String labelKey) {
     this.clearColor = clearColor;
     int height = (PropertyPanel.CONTROL_HEIGHT + PropertyPanel.CONTROL_MARGIN) * 2;
+    int width = PropertyPanel.CONTROL_WIDTH
+        + (labelKey != null ? PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH : 0);
     this.setOpaque(false);
-    this.setSize(PropertyPanel.CONTROL_WIDTH, height);
-    this.setPreferredSize(new Dimension(PropertyPanel.CONTROL_WIDTH, height));
+    this.setSize(width, height);
+    this.setPreferredSize(new Dimension(width, height));
     this.listeners = new java.util.concurrent.CopyOnWriteArrayList<>();
     this.textFieldColor = ControlBehavior.apply(new JTextField());
     this.textFieldColor.setBackground(Style.raisedSurface());
@@ -70,6 +77,13 @@ public class ColorComponent extends JPanel {
     this.btnClearColor.addActionListener(a -> this.clear());
 
     final JLabel lblAlpha = new JLabel(Resources.strings().get("panel_alpha"));
+    final JLabel lblColor = labelKey != null ? new JLabel(Resources.strings().get(labelKey)) : null;
+    if (lblColor != null) {
+      lblColor.setHorizontalAlignment(SwingConstants.TRAILING);
+      lblColor.setVerticalAlignment(SwingConstants.CENTER);
+      lblAlpha.setHorizontalAlignment(SwingConstants.TRAILING);
+      lblAlpha.setVerticalAlignment(SwingConstants.CENTER);
+    }
 
     this.spinnerAlpha = new JSpinner();
 
@@ -93,55 +107,65 @@ public class ColorComponent extends JPanel {
     ControlBehavior.apply(this.spinnerAlpha);
 
     GroupLayout groupLayout = new GroupLayout(this);
+    GroupLayout.SequentialGroup colorRow = groupLayout.createSequentialGroup();
+    GroupLayout.SequentialGroup alphaRow = groupLayout.createSequentialGroup();
+    if (lblColor != null) {
+      colorRow.addComponent(
+              lblColor, PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH)
+          .addGap(PropertyPanel.GUTTER_WIDTH);
+      alphaRow.addComponent(
+              lblAlpha, PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH)
+          .addGap(PropertyPanel.GUTTER_WIDTH);
+    } else {
+      alphaRow.addComponent(lblAlpha).addPreferredGap(ComponentPlacement.RELATED);
+    }
+    colorRow
+        .addComponent(
+            btnSelectColor,
+            PropertyPanel.CONTROL_HEIGHT,
+            GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(ComponentPlacement.RELATED)
+        .addComponent(
+            btnClearColor,
+            PropertyPanel.CONTROL_HEIGHT,
+            GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(ComponentPlacement.RELATED)
+        .addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE);
+    alphaRow.addComponent(spinnerAlpha, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE);
     groupLayout.setHorizontalGroup(
         groupLayout
             .createParallelGroup(Alignment.LEADING)
-            .addGroup(
-                groupLayout
-                    .createSequentialGroup()
-                    .addComponent(
-                        btnSelectColor,
-                        PropertyPanel.CONTROL_HEIGHT,
-                        GroupLayout.PREFERRED_SIZE,
-                        GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(
-                        btnClearColor,
-                        PropertyPanel.CONTROL_HEIGHT,
-                        GroupLayout.PREFERRED_SIZE,
-                        GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
-            .addGroup(
-                groupLayout
-                    .createSequentialGroup()
-                    .addComponent(lblAlpha)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(spinnerAlpha, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)));
+            .addGroup(colorRow)
+            .addGroup(alphaRow));
+    GroupLayout.ParallelGroup colorComponents = groupLayout
+        .createParallelGroup(Alignment.BASELINE)
+        .addComponent(
+            btnSelectColor,
+            PropertyPanel.CONTROL_HEIGHT,
+            GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE)
+        .addComponent(
+            btnClearColor,
+            PropertyPanel.CONTROL_HEIGHT,
+            GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE)
+        .addComponent(
+            textFieldColor,
+            GroupLayout.PREFERRED_SIZE,
+            PropertyPanel.CONTROL_HEIGHT,
+            GroupLayout.PREFERRED_SIZE);
+    if (lblColor != null) {
+      colorComponents.addComponent(lblColor);
+    }
     groupLayout.setVerticalGroup(
         groupLayout
             .createParallelGroup(Alignment.LEADING)
             .addGroup(
                 groupLayout
                     .createSequentialGroup()
-                    .addGroup(
-                        groupLayout
-                            .createParallelGroup(Alignment.BASELINE)
-                            .addComponent(
-                                btnSelectColor,
-                                PropertyPanel.CONTROL_HEIGHT,
-                                GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.PREFERRED_SIZE)
-                            .addComponent(
-                                btnClearColor,
-                                PropertyPanel.CONTROL_HEIGHT,
-                                GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.PREFERRED_SIZE)
-                            .addComponent(
-                                textFieldColor,
-                                GroupLayout.PREFERRED_SIZE,
-                                PropertyPanel.CONTROL_HEIGHT,
-                                GroupLayout.PREFERRED_SIZE))
+                    .addGroup(colorComponents)
                     .addGap(PropertyPanel.CONTROL_MARGIN)
                     .addGroup(
                         groupLayout

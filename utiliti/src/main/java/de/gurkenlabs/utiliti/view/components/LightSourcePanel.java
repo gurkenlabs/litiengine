@@ -24,7 +24,7 @@ public class LightSourcePanel extends PropertyPanel {
   public LightSourcePanel() {
     super("panel_lightSource", Icons.BULB_24);
 
-    this.colorControl = new ColorComponent(Color.WHITE);
+    this.colorControl = new ColorComponent(Color.WHITE, "panel_color");
 
     this.comboBoxLightShape = new JComboBox<>();
     this.comboBoxLightShape.setModel(
@@ -110,8 +110,7 @@ public class LightSourcePanel extends PropertyPanel {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
             new LayoutItem("panel_shape", this.comboBoxLightShape),
-            new LayoutItem(
-                "panel_color", this.colorControl, this.colorControl.getPreferredSize().height),
+            new LayoutItem(this.colorControl, this.colorControl.getPreferredSize().height),
             new LayoutItem("panel_intensity", this.spinnerIntensity),
         };
 
