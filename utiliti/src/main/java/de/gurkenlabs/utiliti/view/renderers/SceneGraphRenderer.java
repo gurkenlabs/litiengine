@@ -21,7 +21,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -29,6 +28,8 @@ import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Objects;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -44,9 +45,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   private final JLabel typeLabel;
   private final JLabel nameLabel;
   private final JLabel badgeLabel;
-  private boolean selectedRow;
-  private boolean hoverRow;
-  private boolean sectionRow;
 
   public SceneGraphRenderer() {
     super(new BorderLayout(0, 0));
@@ -56,16 +54,22 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     this.rowPanel.setOpaque(false);
     this.rowPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 62));
 
-    JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
+    JPanel left = new JPanel();
+    left.setLayout(new BoxLayout(left, BoxLayout.X_AXIS));
     left.setOpaque(false);
 
     this.typeLabel = fixedLabel(18);
     this.nameLabel = new JLabel();
     this.nameLabel.setOpaque(false);
     this.badgeLabel = new BadgeLabel();
+    this.typeLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+    this.nameLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+    this.badgeLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
 
     left.add(this.typeLabel);
+    left.add(Box.createHorizontalStrut(6));
     left.add(this.nameLabel);
+    left.add(Box.createHorizontalStrut(6));
     left.add(this.badgeLabel);
 
     this.rowPanel.add(left, BorderLayout.CENTER);
@@ -95,33 +99,11 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
       renderEntity(node);
     }
 
-    Object hoverRow = tree.getClientProperty("SceneGraph.hoverRow");
-    boolean hover = hoverRow instanceof Integer hovered && hovered == row;
-    this.selectedRow = selected && node != null && !node.isSection();
-    this.hoverRow = hover && node != null && !node.isSection();
-    this.sectionRow = node != null && node.isSection();
     this.nameLabel.setForeground(node != null && node.isSection() ? Style.mutedText() : Style.text());
     int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : Style.TREE_ROW_HEIGHT;
     setPreferredSize(new Dimension(Math.max(tree.getWidth() - 4, getPreferredSize().width), rowHeight));
 
     return this;
-  }
-
-  @Override
-  protected void paintComponent(Graphics g) {
-    if (this.sectionRow || (!this.selectedRow && !this.hoverRow)) {
-      return;
-    }
-
-    Graphics2D g2 = (Graphics2D) g.create();
-    try {
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setColor(this.selectedRow ? Style.selection() : Style.hover());
-      g2.fillRoundRect(0, 2, getWidth(), getHeight() - 4,
-          Style.CORNER_RADIUS, Style.CORNER_RADIUS);
-    } finally {
-      g2.dispose();
-    }
   }
 
   private void renderSection(SceneGraph.SceneNode node) {
@@ -164,9 +146,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     this.badgeLabel.setVisible(false);
     this.badgeLabel.setText("");
     this.badgeLabel.putClientProperty("badgeKind", BadgeKind.COUNT);
-    this.selectedRow = false;
-    this.hoverRow = false;
-    this.sectionRow = false;
   }
 
   private static JLabel fixedLabel(int width) {

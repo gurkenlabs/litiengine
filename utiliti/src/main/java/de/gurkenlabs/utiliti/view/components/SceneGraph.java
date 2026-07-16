@@ -151,6 +151,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   private final java.util.Map<String, Integer> selectedLayers;
   private final java.util.Map<String, java.util.Set<Integer>> expandedLayers;
+  private final java.util.Map<Integer, Integer> hierarchyGuideXs;
   private final java.util.List<Consumer<IMap>> layerChangedListeners;
   private final java.util.List<Consumer<IMap>> layerStructureChangedListeners;
 
@@ -159,6 +160,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.setName(Resources.strings().get("scenegraph_name"));
     this.selectedLayers = new java.util.concurrent.ConcurrentHashMap<>();
     this.expandedLayers = new java.util.concurrent.ConcurrentHashMap<>();
+    this.hierarchyGuideXs = new java.util.HashMap<>();
     this.layerChangedListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
     this.layerStructureChangedListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
     this.filterButtons = new java.util.EnumMap<>(FilterChip.class);
@@ -318,10 +320,49 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     });
 
     this.tree = new JTree() {
+      private boolean paintingBaseRows;
+
+      @Override
+      public boolean isPathSelected(TreePath path) {
+        return !this.paintingBaseRows && super.isPathSelected(path);
+      }
+
+      @Override
+      public boolean isRowSelected(int row) {
+        return !this.paintingBaseRows && super.isRowSelected(row);
+      }
+
+      @Override
+      public boolean hasFocus() {
+        return !this.paintingBaseRows && super.hasFocus();
+      }
+
+      @Override
+      public int getLeadSelectionRow() {
+        return this.paintingBaseRows ? -1 : super.getLeadSelectionRow();
+      }
+
+      @Override
+      public TreePath getLeadSelectionPath() {
+        return this.paintingBaseRows ? null : super.getLeadSelectionPath();
+      }
+
+      @Override
+      public TreePath getAnchorSelectionPath() {
+        return this.paintingBaseRows ? null : super.getAnchorSelectionPath();
+      }
+
       @Override
       protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
         paintHierarchyConnectors(g);
+        this.paintingBaseRows = true;
+        try {
+          super.paintComponent(g);
+        } finally {
+          this.paintingBaseRows = false;
+        }
+        paintRowStateBackgrounds(g);
+        paintSelectionIndicators(g);
         paintRowActions(g);
         if (getTransferHandler() instanceof SceneTransferHandler handler) {
           handler.paintDropIndicator(this, g);
@@ -346,6 +387,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.tree.setCellRenderer(new SceneGraphRenderer());
     this.tree.setRowHeight((int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale()));
     this.tree.setBackground(Style.background());
+    this.tree.setOpaque(false);
     this.tree.getAccessibleContext().setAccessibleName(Resources.strings().get("scenegraph_hierarchy"));
     this.tree.getAccessibleContext().setAccessibleDescription(
         Resources.strings().get("scenegraph_hierarchy_description"));
@@ -466,7 +508,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         Object old = tree.getClientProperty("SceneGraph.hoverRow");
         if (!(old instanceof Integer hovered) || hovered != row) {
           tree.putClientProperty("SceneGraph.hoverRow", row);
-          tree.repaint();
+          if (old instanceof Integer oldRow) {
+            repaintTreeRow(oldRow);
+          }
+          repaintTreeRow(row);
         }
         showHoverPreview(e, row);
       }
@@ -474,8 +519,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.tree.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseExited(MouseEvent e) {
+        Object old = tree.getClientProperty("SceneGraph.hoverRow");
         tree.putClientProperty("SceneGraph.hoverRow", -1);
-        tree.repaint();
+        if (old instanceof Integer oldRow) {
+          repaintTreeRow(oldRow);
+        }
         hideHoverPreview();
       }
     });
@@ -657,6 +705,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   }
 
   private void paintHierarchyConnectors(Graphics graphics) {
+    this.hierarchyGuideXs.clear();
     Graphics2D g2 = (Graphics2D) graphics.create();
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -698,6 +747,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         for (int i = 0; i < childBounds.size(); i++) {
           Rectangle child = childBounds.get(i);
           DefaultMutableTreeNode childNode = visibleChildren.get(i);
+          int childRow = this.tree.getRowForPath(parentPath.pathByAddingChild(childNode));
+          if (childRow >= 0) {
+            this.hierarchyGuideXs.put(childRow, trunkX);
+          }
           int childY = child.y + child.height / 2;
           int endpoint = childNode.isLeaf() ? child.x + 16 : child.x - 3;
           g2.drawLine(trunkX, childY, endpoint, childY);
@@ -743,17 +796,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
               visibilityBounds.x + (visibilityBounds.width - visibilityIcon.getIconWidth()) / 2,
               visibilityBounds.y + (visibilityBounds.height - visibilityIcon.getIconHeight()) / 2);
         }
-        if (!hovered && !selected) {
-          continue;
-        }
         Rectangle miscBounds = miscActionBounds(row);
-        g2.setColor(hovered ? Style.hover() : Style.raisedSurface());
-        g2.fillRoundRect(miscBounds.x, miscBounds.y, miscBounds.width, miscBounds.height,
-            Style.CORNER_RADIUS, Style.CORNER_RADIUS);
-        g2.setColor(Style.border());
-        g2.drawRoundRect(miscBounds.x, miscBounds.y, miscBounds.width, miscBounds.height,
-            Style.CORNER_RADIUS, Style.CORNER_RADIUS);
-        g2.setColor(Style.text());
+        g2.setColor(hovered || selected ? Style.text() : Style.mutedText());
         int cy = miscBounds.y + miscBounds.height / 2;
         int x = miscBounds.x + miscBounds.width / 2;
         g2.fillOval(x, cy - 5, 2, 2);
@@ -763,6 +807,184 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     } finally {
       g2.dispose();
     }
+  }
+
+  private void paintRowStateBackgrounds(Graphics graphics) {
+    if (this.tree.getRowCount() == 0) {
+      return;
+    }
+    Graphics2D g2 = (Graphics2D) graphics.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      Rectangle visible = this.tree.getVisibleRect();
+      Object hoverValue = this.tree.getClientProperty("SceneGraph.hoverRow");
+      int hoveredRow = hoverValue instanceof Integer row ? row : -1;
+      if (hoveredRow >= 0 && !this.tree.isRowSelected(hoveredRow)) {
+        Rectangle bounds = this.tree.getRowBounds(hoveredRow);
+        if (bounds != null && isPaintableSceneRow(hoveredRow)) {
+          Rectangle action = miscActionBounds(hoveredRow);
+          g2.setColor(Style.sceneRowHover());
+          g2.fillRoundRect(
+              bounds.x, bounds.y + 2,
+              Math.max(1, action.x - bounds.x - 4),
+              Math.max(1, bounds.height - 4),
+              Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        }
+      }
+
+      int groupStart = -1;
+      for (int row = 0; row <= this.tree.getRowCount(); row++) {
+        boolean selected = row < this.tree.getRowCount()
+            && this.tree.isRowSelected(row) && isPaintableSceneRow(row);
+        if (selected && groupStart < 0) {
+          groupStart = row;
+        } else if (!selected && groupStart >= 0) {
+          paintSelectionGroup(g2, groupStart, row - 1);
+          groupStart = -1;
+        }
+      }
+
+    } finally {
+      g2.dispose();
+    }
+  }
+
+  private void paintSelectionGroup(Graphics2D graphics, int firstRow, int lastRow) {
+    for (int row = firstRow; row <= lastRow; row++) {
+      Rectangle bounds = this.tree.getRowBounds(row);
+      if (bounds == null) {
+        continue;
+      }
+      Rectangle action = miscActionBounds(row);
+      int x = bounds.x;
+      int y = bounds.y + 2;
+      int width = Math.max(1, action.x - x - 4);
+      int height = Math.max(1, bounds.height - 4);
+      graphics.setColor(Style.sceneRowSelected());
+      graphics.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+    }
+  }
+
+  private void paintSelectionIndicators(Graphics graphics) {
+    Graphics2D g2 = (Graphics2D) graphics.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      Rectangle visible = this.tree.getVisibleRect();
+      int leadRow = this.tree.getLeadSelectionRow();
+      int groupStart = -1;
+      for (int row = 0; row <= this.tree.getRowCount(); row++) {
+        boolean selected = row < this.tree.getRowCount()
+            && this.tree.isRowSelected(row) && isPaintableSceneRow(row);
+        if (selected && groupStart < 0) {
+          groupStart = row;
+        } else if (!selected && groupStart >= 0) {
+          paintSelectionGroupOutline(g2, visible, groupStart, row - 1);
+          groupStart = -1;
+        }
+      }
+      for (int row = 0; row < this.tree.getRowCount(); row++) {
+        if (!this.tree.isRowSelected(row) || !isPaintableSceneRow(row)) {
+          continue;
+        }
+        Rectangle bounds = this.tree.getRowBounds(row);
+        TreePath path = this.tree.getPathForRow(row);
+        if (bounds == null || path == null
+            || !(path.getLastPathComponent() instanceof DefaultMutableTreeNode treeNode)
+            || !(treeNode.getUserObject() instanceof SceneNode node)) {
+          continue;
+        }
+        if (node.getMapObject() != null) {
+          int size = 12;
+          int x = hierarchyGuideX(row, bounds) - size / 2;
+          int y = bounds.y + (bounds.height - size) / 2;
+          g2.setColor(Style.accent());
+          g2.fillRoundRect(x, y, size, size, 3, 3);
+          g2.setColor(Color.WHITE);
+          g2.setStroke(new BasicStroke(1.1f));
+          g2.drawLine(x + 3, y + size / 2, x + 6, y + size - 3);
+          g2.drawLine(x + 6, y + size - 3, x + size - 3, y + 3);
+        } else {
+          g2.setColor(row == leadRow ? Style.accent() : Style.border());
+          g2.fillRoundRect(
+              visible.x + 4, bounds.y + 5, row == leadRow ? 3 : 2,
+              Math.max(4, bounds.height - 10), 3, 3);
+        }
+      }
+      if (leadRow >= 0 && this.tree.isRowSelected(leadRow)) {
+        Rectangle bounds = this.tree.getRowBounds(leadRow);
+        if (bounds != null) {
+          int right = miscActionBounds(leadRow).x - 4;
+          g2.setColor(Style.accent());
+          g2.setStroke(new BasicStroke(1f));
+          g2.drawRoundRect(
+              bounds.x, bounds.y + 1, Math.max(1, right - bounds.x),
+              Math.max(1, bounds.height - 2), Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        }
+      }
+    } finally {
+      g2.dispose();
+    }
+  }
+
+  private void paintSelectionGroupOutline(
+      Graphics2D graphics, Rectangle visible, int firstRow, int lastRow) {
+    Rectangle first = this.tree.getRowBounds(firstRow);
+    Rectangle last = this.tree.getRowBounds(lastRow);
+    if (first == null || last == null) {
+      return;
+    }
+    int left = Integer.MAX_VALUE;
+    for (int row = firstRow; row <= lastRow; row++) {
+      Rectangle bounds = this.tree.getRowBounds(row);
+      if (bounds != null) {
+        left = Math.min(left, hierarchyGuideX(row, bounds) - 18);
+      }
+    }
+    int x = Math.max(visible.x + 3, left);
+    int y = first.y + 1;
+    int width = Math.max(1, visible.x + visible.width - x - 4);
+    int height = Math.max(1, last.y + last.height - y - 1);
+    graphics.setColor(Style.selectionOutline());
+    graphics.setStroke(new BasicStroke(1f));
+    graphics.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS * 2, Style.CORNER_RADIUS * 2);
+  }
+
+  private int hierarchyGuideX(int row, Rectangle bounds) {
+    Integer paintedGuide = this.hierarchyGuideXs.get(row);
+    if (paintedGuide != null) {
+      return paintedGuide;
+    }
+    TreePath path = this.tree.getPathForRow(row);
+    TreePath parentPath = path != null ? path.getParentPath() : null;
+    while (parentPath != null
+        && (!(parentPath.getLastPathComponent() instanceof DefaultMutableTreeNode parentNode)
+            || !(parentNode.getUserObject() instanceof SceneNode parentSceneNode)
+            || !parentSceneNode.isLayer())) {
+      parentPath = parentPath.getParentPath();
+    }
+    Rectangle parentBounds = parentPath != null ? this.tree.getPathBounds(parentPath) : null;
+    if (parentBounds == null) {
+      return bounds.x - 16;
+    }
+    int indent = Math.max(12, bounds.x - parentBounds.x);
+    return bounds.x - indent / 2;
+  }
+
+  private void repaintTreeRow(int row) {
+    Rectangle bounds = this.tree.getRowBounds(row);
+    if (bounds == null) {
+      return;
+    }
+    Rectangle visible = this.tree.getVisibleRect();
+    this.tree.repaint(visible.x, bounds.y, visible.width, bounds.height);
+  }
+
+  private boolean isPaintableSceneRow(int row) {
+    TreePath path = this.tree.getPathForRow(row);
+    return path != null
+        && path.getLastPathComponent() instanceof DefaultMutableTreeNode treeNode
+        && treeNode.getUserObject() instanceof SceneNode node
+        && !node.isSection();
   }
 
   private Rectangle visibilityActionBounds(int row) {

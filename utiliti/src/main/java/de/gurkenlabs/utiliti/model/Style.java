@@ -386,6 +386,22 @@ public final class Style {
     return uiColor("Editor.selection", COLOR_SELECTION_INACTIVE);
   }
 
+  public static Color sceneRowSelected() {
+    return Editor.preferences().getTheme() == Theme.DARK
+        ? new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 48)
+        : new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 30);
+  }
+
+  public static Color sceneRowHover() {
+    return Editor.preferences().getTheme() == Theme.DARK
+        ? new Color(255, 255, 255, 20)
+        : new Color(0, 0, 0, 14);
+  }
+
+  public static Color selectionOutline() {
+    return new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 150);
+  }
+
   public static Color cardSelected() {
     return Editor.preferences().getTheme() == Theme.DARK
         ? COLOR_CARD_SELECTED
