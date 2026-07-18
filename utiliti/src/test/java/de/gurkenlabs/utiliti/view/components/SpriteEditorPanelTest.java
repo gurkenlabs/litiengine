@@ -68,4 +68,28 @@ class SpriteEditorPanelTest {
     assertEquals(4, sprite.getWidth());
     assertEquals(2, sprite.getHeight());
   }
+
+  @Test
+  void keyframeDurationsAreUndoable() throws Exception {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("sprite-duration-undo-test");
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    Game.world().loadEnvironment(map);
+    SpritesheetResource sprite = new SpritesheetResource(
+        new BufferedImage(6, 2, BufferedImage.TYPE_INT_ARGB), "duration", 2, 2);
+    sprite.setKeyframes(new int[] {100, 120, 140});
+    Editor.instance().getGameFile().getSpriteSheets().add(sprite);
+    SpriteEditorPanel panel = new SpriteEditorPanel();
+    panel.bind(sprite);
+
+    panel.setDurationForTest(1, 250);
+
+    assertEquals(250, sprite.getKeyframes()[1]);
+    UndoManager.instance().undo();
+    assertEquals(120, sprite.getKeyframes()[1]);
+  }
 }

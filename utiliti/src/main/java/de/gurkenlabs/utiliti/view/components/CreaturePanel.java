@@ -179,11 +179,16 @@ public class CreaturePanel extends PropertyPanel {
   private void updateSpritePreview() {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
     String source = name != null ? SpriteVariantSelector.selectBaseCreatureSpriteNames(Resources.spritesheets().getAll()).get(name) : null;
+    String previewSource = null;
     var spritesheet = this.checkBoxStartDead.isSelected() && name != null
         ? Resources.spritesheets().get(name + "-" + CreatureAnimationState.DEAD.spriteString()) : null;
+    if (spritesheet != null) {
+      previewSource = name + "-" + CreatureAnimationState.DEAD.spriteString();
+    }
     if (spritesheet == null) {
       spritesheet = source != null ? Resources.spritesheets().get(source) : null;
+      previewSource = source;
     }
-    this.animationPreview.setSpritesheet(spritesheet);
+    this.animationPreview.setSpritesheet(spritesheet, previewSource);
   }
 }

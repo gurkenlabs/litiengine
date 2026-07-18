@@ -157,7 +157,7 @@ public class PropPanel extends PropertyPanel {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
     String source = name != null ? SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name) : null;
     var spritesheet = source != null ? Resources.spritesheets().get(source) : null;
-    this.animationPreview.setSpritesheet(spritesheet);
+    this.animationPreview.setSpritesheet(spritesheet, source);
   }
 
   private LayoutManager createLayout() {
