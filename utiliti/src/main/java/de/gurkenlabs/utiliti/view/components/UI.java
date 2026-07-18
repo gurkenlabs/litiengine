@@ -33,6 +33,7 @@ import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Style.Theme;
 import de.gurkenlabs.utiliti.view.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.view.menus.MainMenuBar;
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.CardLayout;
@@ -46,6 +47,7 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
@@ -548,6 +550,18 @@ public final class UI {
         Editor.instance().getMapComponent().navigateInspectorForward();
       }
     });
+    Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
+      if (!(event instanceof MouseEvent mouseEvent)
+        || !(mouseEvent.getSource() instanceof Component source)
+        || SwingUtilities.getWindowAncestor(source) != window) {
+        return;
+      }
+      if (mouseEvent.getID() == MouseEvent.MOUSE_PRESSED) {
+        Editor.instance().getMapComponent().handleInspectorNavigationMousePressed(mouseEvent);
+      } else if (mouseEvent.getID() == MouseEvent.MOUSE_RELEASED) {
+        Editor.instance().getMapComponent().handleInspectorNavigationMouseReleased(mouseEvent);
+      }
+    }, AWTEvent.MOUSE_EVENT_MASK);
   }
 
   private static JFrame initWindow() {

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
@@ -23,6 +24,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import java.awt.Dimension;
 import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -144,6 +146,21 @@ class MapComponentTest {
     assertEquals(-1, MapComponent.inspectorNavigationDirection(4));
     assertEquals(1, MapComponent.inspectorNavigationDirection(5));
     assertEquals(0, MapComponent.inspectorNavigationDirection(1));
+  }
+
+  @Test
+  void consumesMouseSideButtonEvents() {
+    MapComponent component = new MapComponent();
+    MouseEvent press = mock(MouseEvent.class);
+    when(press.getButton()).thenReturn(4);
+    when(press.getWhen()).thenReturn(123L);
+    MouseEvent release = mock(MouseEvent.class);
+    when(release.getButton()).thenReturn(4);
+
+    assertTrue(component.handleInspectorNavigationMousePressed(press));
+    assertTrue(component.handleInspectorNavigationMouseReleased(release));
+    verify(press).consume();
+    verify(release).consume();
   }
 
   @Test

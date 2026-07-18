@@ -137,6 +137,7 @@ public class MapComponent extends GuiComponent {
   private boolean isFocussing;
   private boolean navigatingInspector;
   private int inspectorNavigationMouseButton;
+  private long inspectorNavigationMousePressedAt;
   private InspectorNavigationTarget currentInspectorTarget;
 
   /**
@@ -1636,18 +1637,8 @@ public class MapComponent extends GuiComponent {
   }
 
   void handleMousePressed(ComponentMouseEvent e) {
-    if (e != null && e.getEvent() != null) {
-      int direction = inspectorNavigationDirection(e.getEvent().getButton());
-      if (direction != 0) {
-        this.inspectorNavigationMouseButton = e.getEvent().getButton();
-        if (direction < 0) {
-          this.navigateInspectorBack();
-        } else {
-          this.navigateInspectorForward();
-        }
-        e.getEvent().consume();
-        return;
-      }
+    if (e != null && this.handleInspectorNavigationMousePressed(e.getEvent())) {
+      return;
     }
 
     Tool active = ToolManager.instance().getActiveTool();
@@ -1692,6 +1683,39 @@ public class MapComponent extends GuiComponent {
       case 5 -> 1;
       default -> 0;
     };
+  }
+
+  public boolean handleInspectorNavigationMousePressed(MouseEvent event) {
+    if (event == null) {
+      return false;
+    }
+    int direction = inspectorNavigationDirection(event.getButton());
+    if (direction == 0) {
+      return false;
+    }
+    if (event.getButton() != this.inspectorNavigationMouseButton
+      || event.getWhen() != this.inspectorNavigationMousePressedAt) {
+      this.inspectorNavigationMouseButton = event.getButton();
+      this.inspectorNavigationMousePressedAt = event.getWhen();
+      if (direction < 0) {
+        this.navigateInspectorBack();
+      } else {
+        this.navigateInspectorForward();
+      }
+    }
+    event.consume();
+    return true;
+  }
+
+  public boolean handleInspectorNavigationMouseReleased(MouseEvent event) {
+    if (event == null || inspectorNavigationDirection(event.getButton()) == 0) {
+      return false;
+    }
+    if (event.getButton() == this.inspectorNavigationMouseButton) {
+      this.inspectorNavigationMouseButton = MouseEvent.NOBUTTON;
+    }
+    event.consume();
+    return true;
   }
 
   public void inspectorMapShown(IMap map) {
@@ -1850,12 +1874,7 @@ public class MapComponent extends GuiComponent {
   }
 
   void handleMouseReleased(ComponentMouseEvent e) {
-    if (e != null && e.getEvent() != null
-      && inspectorNavigationDirection(e.getEvent().getButton()) != 0) {
-      if (e.getEvent().getButton() == this.inspectorNavigationMouseButton) {
-        this.inspectorNavigationMouseButton = MouseEvent.NOBUTTON;
-      }
-      e.getEvent().consume();
+    if (e != null && this.handleInspectorNavigationMouseReleased(e.getEvent())) {
       return;
     }
 
