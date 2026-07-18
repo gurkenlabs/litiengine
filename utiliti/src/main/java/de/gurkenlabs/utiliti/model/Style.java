@@ -321,17 +321,26 @@ public final class Style {
 
     @Override
     public void paintIcon(Component component, Graphics graphics, int x, int y) {
-      BufferedImage image = new BufferedImage(getIconWidth(), getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+      double scaleX = 1;
+      double scaleY = 1;
+      if (graphics instanceof Graphics2D graphics2D) {
+        scaleX = Math.abs(graphics2D.getTransform().getScaleX());
+        scaleY = Math.abs(graphics2D.getTransform().getScaleY());
+      }
+      int imageWidth = Math.max(1, (int) Math.ceil(getIconWidth() * scaleX));
+      int imageHeight = Math.max(1, (int) Math.ceil(getIconHeight() * scaleY));
+      BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
       Graphics2D imageGraphics = image.createGraphics();
       try {
+        imageGraphics.scale(scaleX, scaleY);
         this.delegate.paintIcon(component, imageGraphics, 0, 0);
         imageGraphics.setComposite(AlphaComposite.SrcIn);
         imageGraphics.setColor(component.getForeground());
-        imageGraphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+        imageGraphics.fillRect(0, 0, getIconWidth(), getIconHeight());
       } finally {
         imageGraphics.dispose();
       }
-      graphics.drawImage(image, x, y, null);
+      graphics.drawImage(image, x, y, getIconWidth(), getIconHeight(), null);
     }
   }
 

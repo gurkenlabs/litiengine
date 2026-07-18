@@ -10,6 +10,7 @@ import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.controller.Editor;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -57,6 +58,42 @@ class EditorStyleTest {
     button.paint(image.getGraphics());
 
     assertEquals(Style.COLOR_DISABLED_TEXT, button.getForeground());
+  }
+
+  @Test
+  void destructiveIconsRenderAtDisplayScale() {
+    double[] renderedScale = new double[2];
+    Icon source = new Icon() {
+      @Override
+      public void paintIcon(java.awt.Component component, java.awt.Graphics graphics, int x, int y) {
+        java.awt.Graphics2D graphics2D = (java.awt.Graphics2D) graphics;
+        renderedScale[0] = graphics2D.getTransform().getScaleX();
+        renderedScale[1] = graphics2D.getTransform().getScaleY();
+        graphics2D.fillRect(x, y, getIconWidth(), getIconHeight());
+      }
+
+      @Override
+      public int getIconWidth() {
+        return 16;
+      }
+
+      @Override
+      public int getIconHeight() {
+        return 16;
+      }
+    };
+    JButton button = Style.iconButton(source);
+    Style.styleButton(button, Style.ButtonVariant.DESTRUCTIVE);
+    BufferedImage image = new BufferedImage(32, 48, BufferedImage.TYPE_INT_ARGB);
+    java.awt.Graphics2D graphics = image.createGraphics();
+    graphics.scale(2, 3);
+
+    button.getIcon().paintIcon(button, graphics, 0, 0);
+    graphics.dispose();
+
+    assertEquals(2.0, renderedScale[0]);
+    assertEquals(3.0, renderedScale[1]);
+    assertEquals(button.getForeground().getRGB(), image.getRGB(24, 36));
   }
 
   @Test

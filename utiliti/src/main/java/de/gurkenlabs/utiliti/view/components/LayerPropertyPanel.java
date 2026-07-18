@@ -142,7 +142,7 @@ public class LayerPropertyPanel extends JPanel {
     this.accordion.setBackground(Style.background());
     this.accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    this.generalCard = new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(), false);
+    this.generalCard = new ExpandableCard(Resources.strings().get("panel_layer"), createGeneralPanel(), false);
     this.imageSourceControl.setVisible(false);
     this.labelImageSource.setVisible(false);
     ExpandableCard renderingCard =
@@ -374,14 +374,14 @@ public class LayerPropertyPanel extends JPanel {
       this.setControlValues(layer);
       String layerName = layer.getName() != null && !layer.getName().isBlank()
         ? layer.getName() : Resources.strings().get("layerProperties_unnamedLayer");
-      this.generalCard.setTitle(Resources.strings().get("panel_general") + "  ·  " + layerName);
+      this.generalCard.setTitle(Resources.strings().get("panel_layer") + "  ·  " + layerName);
     } finally {
       this.binding = false;
     }
   }
 
   public void clearControls() {
-    this.generalCard.setTitle(Resources.strings().get("panel_general"));
+    this.generalCard.setTitle(Resources.strings().get("panel_layer"));
     this.textFieldName.setText("");
     this.imageSourceCombo.removeAllItems();
     this.imagePreview.setIcon(null);

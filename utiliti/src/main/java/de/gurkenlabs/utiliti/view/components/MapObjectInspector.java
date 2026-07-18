@@ -16,6 +16,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,11 +39,14 @@ import javax.swing.SwingConstants;
 
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
   private static final int SECTION_LABEL_WIDTH = PropertyPanel.LABEL_WIDTH;
+  private static final int MAX_LAYER_LABEL_WIDTH =
+      (int) (120 * Editor.preferences().getUiScale());
 
   private final Map<MapObjectType, PropertyPanel> panels;
   private MapObjectType type;
   private PropertyPanel currentPanel;
 
+  private final ExpandableCard generalCard;
   private final ExpandableCard typeCard;
   private final ExpandableCard collisionCard;
   private final ExpandableCard combatCard;
@@ -63,7 +67,6 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final JLabel labelTypeIcon;
   private final TagPanel tagPanel;
   private final JLabel lblLayer;
-  private final JPanel infoPanel;
   private final JSpinner spnX;
   private final JSpinner spnY;
   private final JSpinner spnW;
@@ -109,11 +112,6 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.tagPanel = new TagPanel();
 
-    this.infoPanel = new JPanel(new BorderLayout());
-    this.infoPanel.setOpaque(true);
-    this.infoPanel.setBackground(Style.surface());
-    this.infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-
     JPanel headerContent = new JPanel();
     headerContent.setLayout(new BoxLayout(headerContent, BoxLayout.X_AXIS));
     headerContent.setOpaque(false);
@@ -130,21 +128,17 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.lblLayer = new JLabel("");
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
-    this.lblLayer.setForeground(Style.COLOR_COMMENT);
-    this.lblLayer.setFont(
-        this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
+    this.lblLayer.setForeground(Style.mutedText());
 
     headerContent.add(Box.createHorizontalStrut(6));
     headerContent.add(labelTypeIcon);
-    headerContent.add(Box.createHorizontalStrut(6));
+    headerContent.add(Box.createHorizontalStrut(10));
+    headerContent.add(lblLayer);
+    headerContent.add(Box.createHorizontalStrut(12));
     headerContent.add(lblEntityId);
     headerContent.add(Box.createHorizontalStrut(4));
     headerContent.add(labelEntityID);
-    headerContent.add(Box.createHorizontalGlue());
-    headerContent.add(lblLayer);
     headerContent.add(Box.createHorizontalStrut(6));
-
-    this.infoPanel.add(headerContent, BorderLayout.CENTER);
 
     this.spnX = new JSpinner(createCoordinateSpinnerModel());
     this.spnY = new JSpinner(createCoordinateSpinnerModel());
@@ -163,31 +157,27 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     accordion.setBackground(Style.background());
     accordion.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
 
-    infoPanel.setMaximumSize(
-        new Dimension(Integer.MAX_VALUE, infoPanel.getPreferredSize().height));
-    accordion.add(infoPanel);
-
-    JPanel sepGeneral = createSectionSeparator(Resources.strings().get("panel_general").toUpperCase(java.util.Locale.ROOT));
-    sepGeneral.setMaximumSize(
-        new Dimension(Integer.MAX_VALUE, sepGeneral.getPreferredSize().height));
-    accordion.add(sepGeneral);
-
+    JPanel generalContent = new JPanel();
+    generalContent.setLayout(new BoxLayout(generalContent, BoxLayout.Y_AXIS));
+    generalContent.setOpaque(false);
     JPanel entityPanel = createEntityPanel();
     entityPanel.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, entityPanel.getPreferredSize().height));
-    accordion.add(entityPanel);
+    generalContent.add(entityPanel);
 
     JPanel sepTransform = createSectionSeparator(Resources.strings().get("panel_transform").toUpperCase(java.util.Locale.ROOT));
     sepTransform.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, sepTransform.getPreferredSize().height));
-    accordion.add(sepTransform);
+    generalContent.add(sepTransform);
 
     JPanel tfGrid = createTransformGrid();
     tfGrid.setMaximumSize(
         new Dimension(Integer.MAX_VALUE, tfGrid.getPreferredSize().height));
-    accordion.add(tfGrid);
-    accordion.add(Box.createVerticalStrut(6));
+    generalContent.add(tfGrid);
 
+    this.generalCard =
+        new ExpandableCard(
+            Resources.strings().get("mapObjectInspector_mapObject"), generalContent, true);
     this.typeCard = new ExpandableCard("", new JPanel(), true);
     this.collisionCard =
         new ExpandableCard(
@@ -202,6 +192,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         new ExpandableCard(
             Resources.strings().get("panel_customProperties"), this.customPanel, true);
 
+    generalCard.setContentInsets(8, 0, 8, 0);
+    generalCard.setHeaderTrailing(headerContent);
     typeCard.setContentInsets(8, 0, 8, 0);
     collisionCard.setContentInsets(8, 0, 8, 0);
     combatCard.setContentInsets(8, 0, 8, 0);
@@ -214,6 +206,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     movementCard.setVisible(false);
     customCard.setVisible(false);
 
+    accordion.add(generalCard);
     accordion.add(typeCard);
     accordion.add(collisionCard);
     accordion.add(combatCard);
@@ -327,7 +320,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     int transformLabelWidth = SECTION_LABEL_WIDTH;
     int secondaryLabelWidth = 24;
-    int gap = 8;
+    int gap = CONTROL_MARGIN;
 
     gl.setAutoCreateGaps(false);
     gl.setHorizontalGroup(
@@ -374,7 +367,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
     lblTags.setHorizontalAlignment(SwingConstants.TRAILING);
 
-    int gap = 8;
+    int gap = CONTROL_MARGIN;
 
     gl.setAutoCreateGaps(false);
     gl.setHorizontalGroup(
@@ -478,6 +471,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.labelTypeIcon.setIcon(Icons.ENTITY_16);
     this.labelTypeIcon.setToolTipText(null);
     this.lblLayer.setText("");
+    this.lblLayer.setToolTipText(null);
     this.renderType.setSelectedIndex(0);
     this.renderType.setEnabled(false);
     this.checkBoxRenderWithLayer.setSelected(false);
@@ -504,7 +498,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
     this.labelTypeIcon.setIcon(Icons.forMapObjectType(this.type));
     this.labelTypeIcon.setToolTipText(this.type != null ? this.type.name() : null);
-    this.lblLayer.setText(Resources.strings().get("panel_layer") + ": " + mapObject.getLayer());
+    String layerText = Resources.strings().get("panel_layer") + ": " + mapObject.getLayer();
+    this.lblLayer.setText(elide(layerText, this.lblLayer.getFontMetrics(this.lblLayer.getFont())));
+    this.lblLayer.setToolTipText(layerText);
 
     RenderType rt =
         mapObject.getEnumValue(
@@ -560,6 +556,19 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
       .map(de.gurkenlabs.utiliti.controller.ProjectCodeIntegration.Definition::baseType)
       .findFirst()
       .orElseGet(() -> MapObjectType.get(mapObjectType));
+  }
+
+  private static String elide(String value, FontMetrics metrics) {
+    if (metrics.stringWidth(value) <= MAX_LAYER_LABEL_WIDTH) {
+      return value;
+    }
+    String suffix = "...";
+    int length = value.length();
+    while (length > 0
+        && metrics.stringWidth(value.substring(0, length) + suffix) > MAX_LAYER_LABEL_WIDTH) {
+      length--;
+    }
+    return value.substring(0, length) + suffix;
   }
 
   private static String compactPackage(String className) {

@@ -39,7 +39,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -542,28 +541,30 @@ public abstract class PropertyPanel extends JPanel {
     SequentialGroup seq = groupLayout.createSequentialGroup();
     SequentialGroup current = seq;
 
-    for (LayoutItem item : layoutItems) {
+    for (int i = 0; i < layoutItems.length; i++) {
+      LayoutItem item = layoutItems[i];
       ParallelGroup verGrp = groupLayout.createParallelGroup(Alignment.LEADING);
       if (item.getLabel() != null) {
         verGrp.addComponent(item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight())
-          .addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, item.getMinHeight()).addGap(CONTROL_MARGIN);
+          .addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, item.getMinHeight());
       } else {
         verGrp.addComponent(item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight());
       }
 
       current = current.addGroup(verGrp);
+      if (i < layoutItems.length - 1 || additionalComponents.length > 0) {
+        current = current.addGap(CONTROL_MARGIN);
+      }
     }
 
-    current.addPreferredGap(ComponentPlacement.UNRELATED);
-    for (Component component : additionalComponents) {
+    for (int i = 0; i < additionalComponents.length; i++) {
+      Component component = additionalComponents[i];
       current =
         current
-          .addComponent(
-            component,
-            GroupLayout.PREFERRED_SIZE,
-            GroupLayout.PREFERRED_SIZE,
-            GroupLayout.PREFERRED_SIZE)
-          .addGap(CONTROL_MARGIN);
+          .addComponent(component, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+      if (i < additionalComponents.length - 1) {
+        current = current.addGap(CONTROL_MARGIN);
+      }
     }
 
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(seq));

@@ -154,7 +154,7 @@ public class MapPropertyPanel extends JPanel {
     accordion.setBackground(Style.background());
     accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    this.generalCard = new ExpandableCard(Resources.strings().get("panel_general"), createGeneralPanel(scrollPaneDesc), false);
+    this.generalCard = new ExpandableCard(Resources.strings().get("menu_map"), createGeneralPanel(scrollPaneDesc), false);
     ExpandableCard lightingCard =
         new ExpandableCard(Resources.strings().get("mapProperties_lighting"), createLightingPanel(), false);
     ExpandableCard propertiesCard =
@@ -418,7 +418,7 @@ public class MapPropertyPanel extends JPanel {
     this.setControlValues(map);
     String mapName = map.getName() != null && !map.getName().isBlank()
       ? map.getName() : Resources.strings().get("mapProperties_unnamedMap");
-    this.generalCard.setTitle(Resources.strings().get("panel_general") + "  ·  " + mapName);
+    this.generalCard.setTitle(Resources.strings().get("menu_map") + "  ·  " + mapName);
     refreshTilesets();
   }
 
