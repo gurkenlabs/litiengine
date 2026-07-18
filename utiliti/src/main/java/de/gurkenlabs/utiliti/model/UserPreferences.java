@@ -18,6 +18,8 @@ import java.util.Properties;
 public class UserPreferences extends ConfigurationGroup {
   public static final float UI_SCALE_MAX = 2.0f;
   public static final float UI_SCALE_MIN = 0.5f;
+  public static final int EDITOR_FONT_SIZE_MIN = 8;
+  public static final int EDITOR_FONT_SIZE_MAX = 32;
 
   private float zoom;
   private boolean showGrid;
@@ -52,6 +54,12 @@ public class UserPreferences extends ConfigurationGroup {
   private Theme theme;
   private String preferredLanguage;
   private String preferredCountry;
+  private String keyBindings;
+  private boolean reopenLastProject;
+  private String editorFontFamily;
+  private int editorFontSize;
+  private int settingsDialogX;
+  private int settingsDialogY;
 
   /**
    * Constructs a new UserPreferences object with default settings. Initializes various user preference settings such as zoom, grid visibility,
@@ -74,6 +82,12 @@ public class UserPreferences extends ConfigurationGroup {
     this.setTheme(Theme.DARK);
     this.compactMode = false;
     this.assetCardSize = 118;
+    this.keyBindings = "";
+    this.reopenLastProject = true;
+    this.editorFontFamily = "Roboto";
+    this.editorFontSize = 12;
+    this.settingsDialogX = Integer.MIN_VALUE;
+    this.settingsDialogY = Integer.MIN_VALUE;
   }
 
   /**
@@ -122,6 +136,56 @@ public class UserPreferences extends ConfigurationGroup {
 
   public void setPreferredCountry(String preferredCountry) {
     this.preferredCountry = preferredCountry;
+  }
+
+  public String getKeyBindings() {
+    return this.keyBindings;
+  }
+
+  public void setKeyBindings(String keyBindings) {
+    this.keyBindings = keyBindings;
+  }
+
+  public boolean reopenLastProject() {
+    return this.reopenLastProject;
+  }
+
+  public void setReopenLastProject(boolean reopenLastProject) {
+    this.reopenLastProject = reopenLastProject;
+  }
+
+  public String getEditorFontFamily() {
+    return this.editorFontFamily == null || this.editorFontFamily.isBlank()
+        ? "Roboto" : this.editorFontFamily;
+  }
+
+  public void setEditorFontFamily(String editorFontFamily) {
+    this.editorFontFamily = editorFontFamily == null || editorFontFamily.isBlank()
+        ? "Roboto" : editorFontFamily;
+  }
+
+  public int getEditorFontSize() {
+    return Math.clamp(this.editorFontSize, EDITOR_FONT_SIZE_MIN, EDITOR_FONT_SIZE_MAX);
+  }
+
+  public void setEditorFontSize(int editorFontSize) {
+    this.editorFontSize = Math.clamp(editorFontSize, EDITOR_FONT_SIZE_MIN, EDITOR_FONT_SIZE_MAX);
+  }
+
+  public int getSettingsDialogX() {
+    return this.settingsDialogX;
+  }
+
+  public void setSettingsDialogX(int settingsDialogX) {
+    this.settingsDialogX = settingsDialogX;
+  }
+
+  public int getSettingsDialogY() {
+    return this.settingsDialogY;
+  }
+
+  public void setSettingsDialogY(int settingsDialogY) {
+    this.settingsDialogY = settingsDialogY;
   }
 
   /**

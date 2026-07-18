@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,7 +59,7 @@ public final class RenderMenu extends JMenu {
     // list for the UI reflects this
     Collections.reverse(types);
 
-    JMenuItem layerItem = new JMenuItem(Resources.strings().get("panel_renderwithlayer"));
+    JMenuItem layerItem = new JMenuItem(Resources.strings().get("panel_renderwithlayer"), Icons.LAYER_16);
     boolean canRenderWithLayer = selectedMapObjects.stream().anyMatch(x -> x.getLayer() != null);
 
     layerItem.addActionListener(event -> setRenderWithLayer(selectedMapObjects));
@@ -69,7 +70,8 @@ public final class RenderMenu extends JMenu {
     for (RenderType renderType : types) {
       JMenuItem item = new JMenuItem(
         "[" + renderType.getOrder() + "] "
-          + Resources.strings().get("render_type_" + renderType.name().toLowerCase(Locale.ROOT)));
+          + Resources.strings().get("render_type_" + renderType.name().toLowerCase(Locale.ROOT)),
+        Icons.SHOW_16);
       item.addActionListener(event -> setRenderType(selectedMapObjects, renderType));
       this.add(item);
     }

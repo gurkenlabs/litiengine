@@ -2,16 +2,16 @@ package de.gurkenlabs.utiliti.view.menus;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.model.KeyBindings;
+import de.gurkenlabs.utiliti.model.KeyBindings.Command;
+import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.components.UI;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
 
 public final class MapMenu extends JMenu {
   private static final Logger log = Logger.getLogger(MapMenu.class.getName());
@@ -20,22 +20,21 @@ public final class MapMenu extends JMenu {
     super(Resources.strings().get("menu_map"));
     this.setMnemonic(this.getText().charAt(0));
 
-    JMenuItem create = new JMenuItem(Resources.strings().get("menu_map_new"));
-    create.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+    JMenuItem create = new JMenuItem(Resources.strings().get("menu_map_new"), Icons.MAP_NEW_16);
+    KeyBindings.bind(create, Command.MAP_NEW);
     create.addActionListener(a -> Editor.instance().getMapComponent().newMap());
 
-    JMenuItem imp = new JMenuItem(Resources.strings().get("menu_map_import"));
+    JMenuItem imp = new JMenuItem(Resources.strings().get("menu_map_import"), Icons.MAP_IMPORT_16);
     imp.addActionListener(a -> Editor.instance().getMapComponent().importMap());
 
-    JMenuItem exp = new JMenuItem(Resources.strings().get("menu_map_export"));
+    JMenuItem exp = new JMenuItem(Resources.strings().get("menu_map_export"), Icons.MAP_EXPORT_16);
     exp.addActionListener(a -> Editor.instance().getMapComponent().exportMap());
 
-    JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_map_snapshot"));
-    saveMapSnapshot.setAccelerator(
-        KeyStroke.getKeyStroke(KeyEvent.VK_PRINTSCREEN, InputEvent.SHIFT_DOWN_MASK));
+    JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_map_snapshot"), Icons.MAP_SNAPSHOT_16);
+    KeyBindings.bind(saveMapSnapshot, Command.MAP_SNAPSHOT);
     saveMapSnapshot.addActionListener(a -> Editor.instance().getMapComponent().saveMapSnapshot());
 
-    JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_map_reassignMapIds"));
+    JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_map_reassignMapIds"), Icons.MAP_IDS_16);
     reassignIDs.addActionListener(
         a -> {
           try {
@@ -56,10 +55,11 @@ public final class MapMenu extends JMenu {
           }
         });
 
-    JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_map_delete"));
+    JMenuItem del2 = new JMenuItem(Resources.strings().get("menu_map_delete"), Icons.DELETE_16);
     del2.addActionListener(a -> Editor.instance().getMapComponent().deleteMap());
 
     JCheckBoxMenuItem sync = new JCheckBoxMenuItem(Resources.strings().get("menu_map_syncMaps"));
+    sync.setIcon(Icons.MAP_SYNC_16);
     sync.setState(Editor.preferences().syncMaps());
     sync.addItemListener(e -> Editor.preferences().setSyncMaps(sync.getState()));
 

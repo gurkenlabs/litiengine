@@ -260,7 +260,7 @@ public final class AboutDialog extends JDialog {
     feature.setMaximumSize(new Dimension(COLUMN_WIDTH, 68));
 
     JLabel icon = new JLabel(new LineIcon(symbol, 48));
-    icon.setForeground(ACCENT);
+    icon.setForeground(symbol == Symbol.HEART ? new Color(243, 77, 100) : ACCENT);
     icon.setPreferredSize(new Dimension(48, 48));
     icon.setVerticalAlignment(SwingConstants.TOP);
     feature.add(icon, BorderLayout.WEST);
@@ -507,7 +507,7 @@ public final class AboutDialog extends JDialog {
       heart.curveTo(27, 7, 30, 5, 35, 5);
       heart.curveTo(46, 5, 51, 17, 41, 27);
       heart.closePath();
-      g.draw(heart);
+      g.fill(heart);
     }
 
     private static void paintGlobe(Graphics2D g) {

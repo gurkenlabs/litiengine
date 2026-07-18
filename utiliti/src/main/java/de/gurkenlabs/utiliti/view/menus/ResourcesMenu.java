@@ -2,6 +2,9 @@ package de.gurkenlabs.utiliti.view.menus;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.KeyBindings;
+import de.gurkenlabs.utiliti.model.KeyBindings.Command;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.JCheckBoxMenuItem;
@@ -18,40 +21,42 @@ public final class ResourcesMenu extends JMenu {
 
     JCheckBoxMenuItem compress =
         new JCheckBoxMenuItem(Resources.strings().get("menu_compressResourceFile"));
+    compress.setIcon(Icons.ASSET_16);
     compress.setState(Editor.preferences().compressFile());
     compress.addItemListener(e -> Editor.preferences().setCompressFile(compress.getState()));
 
     JMenu importMenu = new JMenu(Resources.strings().get("menu_assets_import"));
+    importMenu.setIcon(Icons.ADD_16);
 
-    JMenuItem importSpriteFile = new JMenuItem(Resources.strings().get("menu_assets_importSpriteFile"));
+    JMenuItem importSpriteFile = new JMenuItem(Resources.strings().get("menu_assets_importSpriteFile"), Icons.SPRITESHEET_16);
     importSpriteFile.addActionListener(a -> Editor.instance().importSpriteFile());
     importSpriteFile.setEnabled(false);
 
-    JMenuItem importSprite = new JMenuItem(Resources.strings().get("menu_assets_importSprite"));
+    JMenuItem importSprite = new JMenuItem(Resources.strings().get("menu_assets_importSprite"), Icons.SPRITESHEET_16);
     importSprite.addActionListener(a -> Editor.instance().importSpriteSheets());
     importSprite.setEnabled(false);
 
-    JMenuItem importTextureAtlas = new JMenuItem(Resources.strings().get("menu_assets_importTextureAtlas"));
+    JMenuItem importTextureAtlas = new JMenuItem(Resources.strings().get("menu_assets_importTextureAtlas"), Icons.ASSET_16);
     importTextureAtlas.addActionListener(a -> Editor.instance().importTextureAtlas());
     importTextureAtlas.setEnabled(false);
 
-    JMenuItem importEmitters = new JMenuItem(Resources.strings().get("menu_assets_importEmitters"));
+    JMenuItem importEmitters = new JMenuItem(Resources.strings().get("menu_assets_importEmitters"), Icons.EMITTER_16);
     importEmitters.addActionListener(a -> Editor.instance().importEmitters());
     importEmitters.setEnabled(false);
 
-    JMenuItem importBlueprints = new JMenuItem(Resources.strings().get("menu_assets_importBlueprints"));
+    JMenuItem importBlueprints = new JMenuItem(Resources.strings().get("menu_assets_importBlueprints"), Icons.BLUEPRINT_16);
     importBlueprints.addActionListener(a -> Editor.instance().importBlueprints());
     importBlueprints.setEnabled(false);
 
-    JMenuItem importTilesets = new JMenuItem(Resources.strings().get("menu_assets_importTilesets"));
+    JMenuItem importTilesets = new JMenuItem(Resources.strings().get("menu_assets_importTilesets"), Icons.TILESET_16);
     importTilesets.addActionListener(a -> Editor.instance().importTilesets());
     importTilesets.setEnabled(false);
 
-    JMenuItem importSounds = new JMenuItem(Resources.strings().get("menu_assets_importSounds"));
+    JMenuItem importSounds = new JMenuItem(Resources.strings().get("menu_assets_importSounds"), Icons.SOUND_16);
     importSounds.addActionListener(a -> Editor.instance().importSounds());
     importSounds.setEnabled(false);
 
-    JMenuItem importAnimations = new JMenuItem(Resources.strings().get("menu_assets_importAnimations"));
+    JMenuItem importAnimations = new JMenuItem(Resources.strings().get("menu_assets_importAnimations"), Icons.ANIMATION_16);
     importAnimations.addActionListener(a -> Editor.instance().importAnimations());
     // animations live in an in-memory resource container and can be imported without a loaded project
     importAnimations.setEnabled(true);
@@ -68,9 +73,10 @@ public final class ResourcesMenu extends JMenu {
     importMenu.add(importTilesets);
 
     JMenu exportMenu = new JMenu(Resources.strings().get("menu_assets_export"));
+    exportMenu.setIcon(Icons.EXPORT_16);
 
-    JMenuItem exportSpriteSheets = new JMenuItem(Resources.strings().get("menu_export_spriteSheets"));
-    exportSpriteSheets.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
+    JMenuItem exportSpriteSheets = new JMenuItem(Resources.strings().get("menu_export_spriteSheets"), Icons.SPRITESHEET_16);
+    KeyBindings.bind(exportSpriteSheets, Command.EXPORT_SPRITES);
     exportSpriteSheets.addActionListener(a -> Editor.instance().exportSpriteFile());
     exportMenu.add(exportSpriteSheets);
 

@@ -1,7 +1,9 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Direction;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.CombatEntity;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
@@ -20,6 +22,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 public class CreaturePanel extends PropertyPanel {
   public static final String WALK_SPRITE_TOKEN = "walk";
@@ -49,7 +52,8 @@ public class CreaturePanel extends PropertyPanel {
     setLayout(this.createLayout());
     setupChangedListeners();
     this.comboBoxSpriteSheets.addActionListener(e -> updateSpritePreview());
-    this.comboBoxDirection.addActionListener(e -> updateSpritePreview());
+    this.comboBoxDirection.addActionListener(
+        e -> SwingUtilities.invokeLater(this::updateSpritePreview));
     this.checkBoxStartDead.addActionListener(e -> updateSpritePreview());
 
     // if images are cleared (e.g. resource reload), repopulate on next bind
@@ -115,7 +119,7 @@ public class CreaturePanel extends PropertyPanel {
     if (this.comboBoxSpriteSheets.getSelectedItem() == null) {
       String stored = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
       if (stored != null && stored.contains("-")) {
-        String base = stored.split("-")[0];
+        String base = getCreatureSpriteName(stored);
         for (int i = 0; i < this.comboBoxSpriteSheets.getItemCount(); i++) {
           JLabel lbl = this.comboBoxSpriteSheets.getItemAt(i);
           if (lbl != null && lbl.getText().equals(base)) {
@@ -195,13 +199,51 @@ public class CreaturePanel extends PropertyPanel {
     String source = selectPreviewSpriteName(
         name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll());
     Spritesheet spritesheet = source != null ? Resources.spritesheets().get(source) : null;
-    SpritesheetResource resource = source != null && Editor.instance().getGameFile() != null
-        ? Editor.instance().getGameFile().getSpriteSheets().stream()
-            .filter(candidate -> candidate.getName().equalsIgnoreCase(source))
-            .findFirst()
-            .orElse(null)
-        : null;
+    SpritesheetResource resource = resolveOriginalResource(source);
     this.animationPreview.setSpritesheet(spritesheet, resource);
+  }
+
+  @Override
+  protected void updateEnvironment() {
+    super.updateEnvironment();
+    if (getDataSource() == null || Game.world().environment() == null) {
+      return;
+    }
+    Creature creature = Game.world().environment().getCreature(getDataSource().getId());
+    Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
+    if (creature != null && direction != null) {
+      creature.setFacingDirection(direction);
+    }
+  }
+
+  private static SpritesheetResource resolveOriginalResource(String source) {
+    if (source == null || Editor.instance().getGameFile() == null) {
+      return null;
+    }
+    SpritesheetResource resource = findResource(source);
+    if (resource != null) {
+      return resource;
+    }
+    String opposite = oppositeHorizontalDirection(source);
+    return opposite != null ? findResource(opposite) : null;
+  }
+
+  private static SpritesheetResource findResource(String name) {
+    return Editor.instance().getGameFile().getSpriteSheets().stream()
+        .filter(candidate -> candidate.getName().equalsIgnoreCase(name))
+        .findFirst()
+        .orElse(null);
+  }
+
+  private static String oppositeHorizontalDirection(String name) {
+    String lowerName = name.toLowerCase(java.util.Locale.ROOT);
+    if (lowerName.endsWith("-left")) {
+      return name.substring(0, name.length() - "left".length()) + "right";
+    }
+    if (lowerName.endsWith("-right")) {
+      return name.substring(0, name.length() - "right".length()) + "left";
+    }
+    return null;
   }
 
   static String selectPreviewSpriteName(

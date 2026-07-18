@@ -19,6 +19,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -56,6 +57,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -110,14 +112,16 @@ public class MapPropertyPanel extends JPanel {
     ControlBehavior.apply(this.spinnerGravity);
 
     this.ambientlightPreview = new AmbientLightPreviewPanel();
-    this.ambientColorComponent = new ColorComponent(AmbientLight.DEFAULT_COLOR);
+    this.ambientColorComponent =
+        new ColorComponent(AmbientLight.DEFAULT_COLOR, "panel_ambientlight");
     this.ambientColorComponent.addActionListener(
         a -> {
           this.ambientlightPreview.setAmbientColor(this.ambientColorComponent.getColor());
           this.saveChanges();
         });
 
-    this.shadowColorComponent = new ColorComponent(StaticShadow.DEFAULT_COLOR);
+    this.shadowColorComponent =
+        new ColorComponent(StaticShadow.DEFAULT_COLOR, "panel_staticshadows");
     this.shadowColorComponent.addActionListener(
         a -> {
           this.ambientlightPreview.setStaticShadowColor(this.shadowColorComponent.getColor());
@@ -148,7 +152,7 @@ public class MapPropertyPanel extends JPanel {
           this.saveChanges();
         });
 
-    JPanel accordion = new JPanel();
+    JPanel accordion = new ViewportWidthPanel();
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
     accordion.setBackground(Style.background());
@@ -259,20 +263,11 @@ public class MapPropertyPanel extends JPanel {
     JPanel panel = new JPanel();
     panel.setOpaque(false);
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    panel.add(
-        createForm(
-            new JLabel[] {
-                createLabel(Resources.strings().get("panel_ambientlight")),
-                createLabel(Resources.strings().get("panel_staticshadows")),
-            },
-            new JComponent[] {
-                this.ambientColorComponent,
-                this.shadowColorComponent,
-            },
-            new int[] {
-                this.ambientColorComponent.getPreferredSize().height,
-                this.shadowColorComponent.getPreferredSize().height,
-            }));
+    setRowSize(this.ambientColorComponent, this.ambientColorComponent.getPreferredSize().height);
+    setRowSize(this.shadowColorComponent, this.shadowColorComponent.getPreferredSize().height);
+    panel.add(this.ambientColorComponent);
+    panel.add(Box.createVerticalStrut(PropertyPanel.CONTROL_MARGIN));
+    panel.add(this.shadowColorComponent);
     panel.add(Box.createVerticalStrut(6));
     panel.add(createAlignedControl(this.ambientlightPreview, this.ambientlightPreview.getPreferredSize().height));
     return panel;
@@ -359,6 +354,18 @@ public class MapPropertyPanel extends JPanel {
     label.setForeground(Style.text());
     label.setHorizontalAlignment(SwingConstants.TRAILING);
     return label;
+  }
+
+  private static final class ViewportWidthPanel extends JPanel implements Scrollable {
+    @Override public Dimension getPreferredScrollableViewportSize() { return getPreferredSize(); }
+    @Override public int getScrollableUnitIncrement(Rectangle visible, int orientation, int direction) {
+      return 16;
+    }
+    @Override public int getScrollableBlockIncrement(Rectangle visible, int orientation, int direction) {
+      return Math.max(16, visible.height - 16);
+    }
+    @Override public boolean getScrollableTracksViewportWidth() { return true; }
+    @Override public boolean getScrollableTracksViewportHeight() { return false; }
   }
 
   private JTable createPropertiesTable() {

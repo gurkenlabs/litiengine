@@ -26,6 +26,7 @@ class CreaturePanelTest {
     assertEquals("goblin", CreaturePanel.getCreatureSpriteName("goblin-move-left"));
     assertEquals("goblin", CreaturePanel.getCreatureSpriteName("goblin-walk-right"));
     assertEquals("goblin", CreaturePanel.getCreatureSpriteName("goblin-dead"));
+    assertEquals("undead-warrior", CreaturePanel.getCreatureSpriteName("undead-warrior-idle-left"));
   }
 
   @Test
@@ -116,6 +117,28 @@ class CreaturePanelTest {
     panel.doubleClickPreviewForTest();
 
     assertEquals(resource, opened.get());
+    Resources.spritesheets().remove(resource.getName());
+    Editor.instance().getGameFile().getSpriteSheets().remove(resource);
+  }
+
+  @Test
+  void mirroredCreaturePreviewOpensOriginalSpriteOnDoubleClick() {
+    BufferedImage image = new BufferedImage(2, 2, BufferedImage.TYPE_INT_ARGB);
+    SpritesheetResource resource = new SpritesheetResource(image, "zombie12-walk-right", 2, 2);
+    Editor.instance().getGameFile().getSpriteSheets().add(resource);
+    Resources.spritesheets().load(resource);
+    new Spritesheet(image, "zombie12-walk-left.png", 2, 2);
+    AtomicReference<SpritesheetResource> opened = new AtomicReference<>();
+    CreaturePanel panel = new CreaturePanel(opened::set);
+    MapObject mapObject = new MapObject();
+    mapObject.setValue(MapObjectProperty.SPRITESHEETNAME, "zombie12");
+    mapObject.setValue(MapObjectProperty.SPAWN_DIRECTION, Direction.LEFT);
+
+    panel.bind(mapObject);
+    panel.doubleClickPreviewForTest();
+
+    assertEquals(resource, opened.get());
+    Resources.spritesheets().remove("zombie12-walk-left");
     Resources.spritesheets().remove(resource.getName());
     Editor.instance().getGameFile().getSpriteSheets().remove(resource);
   }

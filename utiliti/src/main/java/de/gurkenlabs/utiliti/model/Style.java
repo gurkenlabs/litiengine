@@ -475,8 +475,7 @@ public final class Style {
    */
   public static Font getDefaultFont() {
     if (scaledDefaultFont == null) {
-      scaledDefaultFont =
-        Objects.requireNonNull(FONT_DEFAULT).deriveFont(FONT_DEFAULT_SIZE * Editor.preferences().getUiScale());
+      scaledDefaultFont = editorFont(Font.PLAIN);
     }
 
     return scaledDefaultFont;
@@ -489,10 +488,18 @@ public final class Style {
    */
   public static Font getHeaderFont() {
     if (scaledHeaderFont == null) {
-      scaledHeaderFont =
-        Objects.requireNonNull(FONT_HEADER).deriveFont(FONT_HEADER_SIZE * Editor.preferences().getUiScale());
+      scaledHeaderFont = editorFont(Font.PLAIN);
     }
 
     return scaledHeaderFont;
+  }
+
+  private static Font editorFont(int style) {
+    String family = Editor.preferences().getEditorFontFamily();
+    int size = Editor.preferences().getEditorFontSize();
+    Font base = family == null || family.isBlank() || "Roboto".equals(family)
+        ? Objects.requireNonNull(FONT_DEFAULT).deriveFont(style, (float) size)
+        : new Font(family, style, size);
+    return base.deriveFont(size * Editor.preferences().getUiScale());
   }
 }

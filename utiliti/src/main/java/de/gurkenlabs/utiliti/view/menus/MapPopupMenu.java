@@ -2,6 +2,8 @@ package de.gurkenlabs.utiliti.view.menus;
 
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.model.KeyBindings;
+import de.gurkenlabs.utiliti.model.KeyBindings.Command;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -24,8 +26,7 @@ public class MapPopupMenu extends JPopupMenu {
     exp.addActionListener(a -> Editor.instance().getMapComponent().exportMap());
 
     JMenuItem saveMapSnapshot = new JMenuItem(Resources.strings().get("menu_map_snapshot"));
-    saveMapSnapshot.setAccelerator(
-        KeyStroke.getKeyStroke(KeyEvent.VK_PRINTSCREEN, InputEvent.SHIFT_DOWN_MASK));
+    KeyBindings.bind(saveMapSnapshot, Command.MAP_SNAPSHOT);
     saveMapSnapshot.addActionListener(a -> Editor.instance().getMapComponent().saveMapSnapshot());
 
     JMenuItem reassignIDs = new JMenuItem(Resources.strings().get("menu_map_reassignMapIds"));

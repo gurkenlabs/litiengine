@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.Component;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public final class LayerMenu extends JMenu {
     // list for the UI reflects this
     Collections.reverse(layers);
     for (IMapObjectLayer layer : layers) {
-      JMenuItem item = new JMenuItem(layer.getName());
+      JMenuItem item = new JMenuItem(layer.getName(), Icons.LAYER_16);
       item.addActionListener(event -> moveMapObjects(item.getText()));
       this.add(item);
     }

@@ -44,7 +44,7 @@ public class ConsoleActionPanel extends JPanel {
 
     JButton buttonCreateBug =
         createButton(
-            Icons.CROSS_24,
+            Icons.BUG_24,
             Resources.strings().get("console_create_bug"),
             actionEvent ->
                 UriUtilities.openWebpage(

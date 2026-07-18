@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.Locale;
 
 public class Program {
+  private static final Locale SYSTEM_LOCALE = Locale.getDefault();
 
   public static void main(String[] args) {
     try {
@@ -53,7 +54,7 @@ public class Program {
         // the command line arguments
         handleArgs(args);
         Path gameFile = Editor.preferences().getLastGameFile();
-        if (!Editor.instance().fileLoaded() && gameFile != null) {
+        if (Editor.preferences().reopenLastProject() && !Editor.instance().fileLoaded() && gameFile != null) {
           Editor.instance().load(gameFile, false);
         }
       }, args);
@@ -65,13 +66,15 @@ public class Program {
   private static void applyPreferredLocale() {
     String language = Editor.preferences().getPreferredLanguage();
     String country = Editor.preferences().getPreferredCountry();
-    if (language != null && !language.isBlank() && country != null && !country.isBlank()
-      && (!language.equals(Game.config().client().getLanguage()) || !country.equals(Game.config().client().getCountry()))) {
-      Game.config().client().setLanguage(language);
-      Game.config().client().setCountry(country);
+    Locale locale = language == null || language.isBlank() || country == null || country.isBlank()
+      ? SYSTEM_LOCALE : Locale.of(language, country);
+    if (!locale.getLanguage().equals(Game.config().client().getLanguage())
+      || !locale.getCountry().equals(Game.config().client().getCountry())) {
+      Game.config().client().setLanguage(locale.getLanguage());
+      Game.config().client().setCountry(locale.getCountry());
       Game.config().save();
     }
-    Locale.setDefault(Game.config().client().getLocale());
+    Locale.setDefault(locale);
   }
 
   private static void forceBasicEditorConfiguration() {

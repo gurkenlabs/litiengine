@@ -4,6 +4,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.KeyBindings;
+import de.gurkenlabs.utiliti.model.KeyBindings.Command;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.JMenu;
@@ -16,22 +18,22 @@ public final class CanvasPopupMenu extends JPopupMenu {
   public CanvasPopupMenu() {
     JMenuItem delete = new JMenuItem(Resources.strings().get("menu_edit_delete"), Icons.DELETE_16);
     delete.addActionListener(e -> Editor.instance().getMapComponent().delete());
-    delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+    KeyBindings.bind(delete, Command.DELETE);
     delete.setEnabled(false);
 
     JMenuItem copy = new JMenuItem(Resources.strings().get("menu_edit_copy"), Icons.COPY_16);
     copy.addActionListener(e -> Editor.instance().getMapComponent().copy());
     copy.setEnabled(false);
-    copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+    KeyBindings.bind(copy, Command.COPY);
 
     JMenuItem cut = new JMenuItem(Resources.strings().get("menu_edit_cut"), Icons.CUT_16);
     cut.addActionListener(e -> Editor.instance().getMapComponent().cut());
     cut.setEnabled(false);
-    cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
+    KeyBindings.bind(cut, Command.CUT);
 
     JMenuItem paste = new JMenuItem(Resources.strings().get("menu_edit_paste"), Icons.PASTE_16);
     paste.addActionListener(e -> Editor.instance().getMapComponent().paste());
-    paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
+    KeyBindings.bind(paste, Command.PASTE);
     paste.setEnabled(false);
 
     JMenuItem blueprint =

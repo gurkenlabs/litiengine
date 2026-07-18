@@ -22,6 +22,7 @@ import de.gurkenlabs.utiliti.controller.Scroll;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Cursors;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.KeyBindings;
 import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.controller.tool.BucketFillTool;
 import de.gurkenlabs.utiliti.controller.tool.EraserTool;
@@ -115,6 +116,10 @@ public final class UI {
   private static JComboBox<TmxMap> mapCombo;
   private static ViewportToolbar viewportToolbar;
   private static ViewportPanel viewportPanel;
+  private static JButton inspectorBackButton;
+  private static JButton inspectorForwardButton;
+  private static KeyStroke inspectorBackShortcut;
+  private static KeyStroke inspectorForwardShortcut;
 
   private static boolean initialized;
 
@@ -385,6 +390,18 @@ public final class UI {
     return canvasPopup;
   }
 
+  public static void refreshKeyBindings() {
+    if (Game.window() != null && Game.window().getHostControl() != null) {
+      KeyBindings.refresh(Game.window().getHostControl());
+    }
+    for (JComponent component : orphanComponents) {
+      KeyBindings.refresh(component);
+    }
+    if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window) {
+      refreshInspectorNavigationShortcuts(window);
+    }
+  }
+
   public static MapController getMapController() {
     return mapSelectionPanel;
   }
@@ -454,22 +471,21 @@ public final class UI {
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
         BorderFactory.createEmptyBorder(6, 10, 6, 10)));
     inspectorHeader.add(inspectorTitle, BorderLayout.WEST);
-    JButton inspectorBack = Style.iconButton(Icons.BACK_16);
-    inspectorBack.setToolTipText(Resources.strings().get("inspector_back"));
-    inspectorBack.addActionListener(event -> Editor.instance().getMapComponent().navigateInspectorBack());
-    JButton inspectorForward = Style.iconButton(Icons.FORWARD_16);
-    inspectorForward.setToolTipText(Resources.strings().get("inspector_forward"));
-    inspectorForward.addActionListener(event -> Editor.instance().getMapComponent().navigateInspectorForward());
+    inspectorBackButton = Style.iconButton(Icons.BACK_16);
+    inspectorBackButton.addActionListener(event -> Editor.instance().getMapComponent().navigateInspectorBack());
+    inspectorForwardButton = Style.iconButton(Icons.FORWARD_16);
+    inspectorForwardButton.addActionListener(event -> Editor.instance().getMapComponent().navigateInspectorForward());
+    refreshInspectorNavigationShortcuts(window);
     Runnable updateInspectorNavigation = () -> {
-      inspectorBack.setEnabled(Editor.instance().getMapComponent().canNavigateInspectorBack());
-      inspectorForward.setEnabled(Editor.instance().getMapComponent().canNavigateInspectorForward());
+      inspectorBackButton.setEnabled(Editor.instance().getMapComponent().canNavigateInspectorBack());
+      inspectorForwardButton.setEnabled(Editor.instance().getMapComponent().canNavigateInspectorForward());
     };
     Editor.instance().getMapComponent().onInspectorNavigationChanged(updateInspectorNavigation);
     Editor.instance().getMapComponent().onMapLoaded(ignored -> updateInspectorNavigation.run());
     JPanel inspectorNavigation = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
     inspectorNavigation.setOpaque(false);
-    inspectorNavigation.add(inspectorBack);
-    inspectorNavigation.add(inspectorForward);
+    inspectorNavigation.add(inspectorBackButton);
+    inspectorNavigation.add(inspectorForwardButton);
     inspectorHeader.add(inspectorNavigation, BorderLayout.EAST);
     updateInspectorNavigation.run();
     JPanel inspectorPanel = new JPanel(new BorderLayout());
@@ -534,16 +550,12 @@ public final class UI {
 
   private static void installInspectorNavigationShortcuts(JFrame window) {
     JComponent rootPane = window.getRootPane();
-    rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-      KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.ALT_DOWN_MASK), "inspectorBack");
     rootPane.getActionMap().put("inspectorBack", new AbstractAction() {
       @Override
       public void actionPerformed(java.awt.event.ActionEvent event) {
         Editor.instance().getMapComponent().navigateInspectorBack();
       }
     });
-    rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-      KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.ALT_DOWN_MASK), "inspectorForward");
     rootPane.getActionMap().put("inspectorForward", new AbstractAction() {
       @Override
       public void actionPerformed(java.awt.event.ActionEvent event) {
@@ -562,6 +574,38 @@ public final class UI {
         Editor.instance().getMapComponent().handleInspectorNavigationMouseReleased(mouseEvent);
       }
     }, AWTEvent.MOUSE_EVENT_MASK);
+    refreshInspectorNavigationShortcuts(window);
+  }
+
+  private static void refreshInspectorNavigationShortcuts(JFrame window) {
+    javax.swing.InputMap inputMap = window.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    if (inspectorBackShortcut != null) {
+      inputMap.remove(inspectorBackShortcut);
+    }
+    if (inspectorForwardShortcut != null) {
+      inputMap.remove(inspectorForwardShortcut);
+    }
+    inspectorBackShortcut = KeyBindings.get(KeyBindings.Command.INSPECTOR_BACK);
+    inspectorForwardShortcut = KeyBindings.get(KeyBindings.Command.INSPECTOR_FORWARD);
+    if (inspectorBackShortcut != null) {
+      inputMap.put(inspectorBackShortcut, "inspectorBack");
+    }
+    if (inspectorForwardShortcut != null) {
+      inputMap.put(inspectorForwardShortcut, "inspectorForward");
+    }
+    if (inspectorBackButton != null) {
+      inspectorBackButton.setToolTipText(shortcutTooltip("inspector_back", inspectorBackShortcut));
+    }
+    if (inspectorForwardButton != null) {
+      inspectorForwardButton.setToolTipText(shortcutTooltip("inspector_forward", inspectorForwardShortcut));
+    }
+  }
+
+  private static String shortcutTooltip(String resourceKey, KeyStroke shortcut) {
+    String formatted = KeyBindings.format(shortcut);
+    return formatted.isEmpty()
+        ? Resources.strings().get(resourceKey)
+        : Resources.strings().get(resourceKey) + " (" + formatted + ")";
   }
 
   private static JFrame initWindow() {
