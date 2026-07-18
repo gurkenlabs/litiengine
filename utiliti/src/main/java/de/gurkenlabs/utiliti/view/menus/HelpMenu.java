@@ -3,12 +3,10 @@ package de.gurkenlabs.utiliti.view.menus;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.UriUtilities;
+import de.gurkenlabs.utiliti.view.dialogs.AboutDialog;
 import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 
 public final class HelpMenu extends JMenu {
   private static final String LINKS = "links";
@@ -53,27 +51,9 @@ public final class HelpMenu extends JMenu {
       event -> UriUtilities.openWebpage(
         URI.create(Resources.strings().getFrom(LINKS, "link_opencollective"))));
 
-    String javaVersion = Resources.strings().get(
-      "menu_help_java_details", System.getProperty("java.version"), System.getProperty("java.vendor"));
-    String aboutMessage =
-      String.format(
-        "%s%n%n%s%n%n%s",
-        Resources.strings().get("menu_help_abouttext"),
-        Resources.strings().get("copyright", new SimpleDateFormat("yyyy").format(new Date())),
-        javaVersion);
-    String aboutTitle =
-      String.format(
-        "%s %s, %s",
-        Resources.strings().get("menu_help_about"),
-        Resources.strings().get("menu_help_utiliti"),
-        Game.info().getVersion());
     JMenuItem aboutMenuItem = new JMenuItem(Resources.strings().get("menu_help_about"));
     aboutMenuItem.addActionListener(
-      event -> JOptionPane.showMessageDialog(
-        Game.window().getHostControl(),
-        aboutMessage,
-        aboutTitle,
-        JOptionPane.INFORMATION_MESSAGE));
+      event -> AboutDialog.show(Game.window().getHostControl()));
 
     this.add(docsMenuItem);
     this.add(javadocsMenuItem);
