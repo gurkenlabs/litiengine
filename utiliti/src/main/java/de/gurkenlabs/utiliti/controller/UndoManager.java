@@ -18,11 +18,13 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -45,6 +47,8 @@ public class UndoManager {
   private boolean untrackedChanges;
   private boolean executing;
   private long revision;
+  private int eventAggregationDepth;
+  private boolean undoStackChangedPending;
   private ILayer changingLayer;
   private Map<String, Object> changingLayerSnapshot;
   private IMap changingMap;
@@ -104,15 +108,23 @@ public class UndoManager {
    * Begins a new operation by setting the current operation to the next operation identifier.
    */
   public void beginOperation() {
+    if (this.operation != 0) {
+      return;
+    }
     this.operation = nextOperation;
+    this.beginEventAggregation();
   }
 
   /**
    * Ends the current operation by incrementing the next operation identifier and resetting the current operation.
    */
   public void endOperation() {
+    if (this.operation == 0) {
+      return;
+    }
     ++nextOperation;
     this.operation = 0;
+    this.endEventAggregation();
   }
 
   /**
@@ -177,6 +189,26 @@ public class UndoManager {
       fireUndoStackChangedEvent(this);
     } finally {
       this.executing = false;
+    }
+  }
+
+  /**
+   * Undoes up to the specified number of operations and emits one stack-change event.
+   *
+   * @param operations The number of operations to undo.
+   */
+  public void undo(int operations) {
+    if (operations <= 0) {
+      return;
+    }
+
+    this.beginEventAggregation();
+    try {
+      for (int operationIndex = 0; operationIndex < operations && this.canUndo(); operationIndex++) {
+        this.undo();
+      }
+    } finally {
+      this.endEventAggregation();
     }
   }
 
@@ -299,6 +331,7 @@ public class UndoManager {
     List<HistoryEntry> history = new ArrayList<>();
     for (int index = this.currentIndex; index >= 0; index--) {
       UndoState state = this.undoStack[index];
+      int lastIndex = index;
       int steps = 1;
       if (state.operation != 0) {
         while (index - 1 >= 0 && this.undoStack[index - 1].operation == state.operation) {
@@ -306,7 +339,7 @@ public class UndoManager {
           steps++;
         }
       }
-      history.add(new HistoryEntry(state.description(), steps));
+      history.add(new HistoryEntry(this.historyDescription(index, lastIndex, steps), steps));
     }
     return history;
   }
@@ -315,6 +348,7 @@ public class UndoManager {
     List<HistoryEntry> history = new ArrayList<>();
     for (int index = this.currentIndex + 1; index < MAX_STACK_SIZE && this.undoStack[index] != null; index++) {
       UndoState state = this.undoStack[index];
+      int firstIndex = index;
       int steps = 1;
       if (state.operation != 0) {
         while (index + 1 < MAX_STACK_SIZE
@@ -324,12 +358,41 @@ public class UndoManager {
           steps++;
         }
       }
-      history.add(new HistoryEntry(state.description(), steps));
+      history.add(new HistoryEntry(this.historyDescription(firstIndex, index, steps), steps));
     }
     return history;
   }
 
   public record HistoryEntry(String description, int steps) {
+  }
+
+  private String historyDescription(int firstIndex, int lastIndex, int steps) {
+    UndoState firstState = this.undoStack[firstIndex];
+    if (steps == 1) {
+      return firstState.description();
+    }
+
+    Set<Integer> targetIds = new HashSet<>();
+    for (int index = firstIndex; index <= lastIndex; index++) {
+      UndoState state = this.undoStack[index];
+      if (state.target == null || state.operationType != firstState.operationType) {
+        return Resources.strings().get("history_groupedChanges", Integer.toString(steps));
+      }
+      targetIds.add(state.target.getId());
+    }
+
+    if (targetIds.size() <= 1) {
+      return Resources.strings().get("history_groupedChanges", Integer.toString(steps));
+    }
+
+    String count = Integer.toString(targetIds.size());
+    return switch (firstState.operationType) {
+      case ADD -> Resources.strings().get("history_addObjects", count);
+      case DELETE -> Resources.strings().get("history_deleteObjects", count);
+      case MOVE -> Resources.strings().get("history_moveObjects", count);
+      case RESIZE -> Resources.strings().get("history_resizeObjects", count);
+      default -> Resources.strings().get("history_changeObjects", count);
+    };
   }
 
   /**
@@ -368,6 +431,26 @@ public class UndoManager {
   public void mapObjectMoved(IMapObject mapObject) {
     if (mapObject != null) {
       this.mapObjectChanged(mapObject, mapObject.getId(), OperationType.MOVE);
+    }
+  }
+
+  /**
+   * Redoes up to the specified number of operations and emits one stack-change event.
+   *
+   * @param operations The number of operations to redo.
+   */
+  public void redo(int operations) {
+    if (operations <= 0) {
+      return;
+    }
+
+    this.beginEventAggregation();
+    try {
+      for (int operationIndex = 0; operationIndex < operations && this.canRedo(); operationIndex++) {
+        this.redo();
+      }
+    } finally {
+      this.endEventAggregation();
     }
   }
 
@@ -806,6 +889,15 @@ public class UndoManager {
   }
 
   /**
+   * Unregisters a previously registered undo stack change consumer.
+   *
+   * @param cons The consumer to unregister.
+   */
+  public static void removeUndoStackChanged(Consumer<UndoManager> cons) {
+    undoStackChangedConsumers.remove(cons);
+  }
+
+  /**
    * Registers a consumer to be called whenever a map object is added.
    *
    * @param cons The consumer to be called on map object addition.
@@ -860,7 +952,25 @@ public class UndoManager {
 
   private static void fireUndoStackChangedEvent(UndoManager undoManager) {
     undoManager.revision++;
+    if (undoManager.eventAggregationDepth > 0) {
+      undoManager.undoStackChangedPending = true;
+      return;
+    }
+
     fireUndoManagerEvent(undoStackChangedConsumers, undoManager);
+  }
+
+  private void beginEventAggregation() {
+    this.eventAggregationDepth++;
+  }
+
+  private void endEventAggregation() {
+    if (this.eventAggregationDepth == 0 || --this.eventAggregationDepth > 0 || !this.undoStackChangedPending) {
+      return;
+    }
+
+    this.undoStackChangedPending = false;
+    fireUndoManagerEvent(undoStackChangedConsumers, this);
   }
 
   private static void fireUndoManagerEvent(

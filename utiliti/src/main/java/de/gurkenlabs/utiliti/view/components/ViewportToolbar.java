@@ -373,12 +373,10 @@ public class ViewportToolbar extends JPanel {
         }
         JMenuItem item = new JMenuItem(label);
         item.addActionListener(e -> {
-          for (int operation = 0; operation < operations; operation++) {
-            if (undo) {
-              manager.undo();
-            } else {
-              manager.redo();
-            }
+          if (undo) {
+            manager.undo(operations);
+          } else {
+            manager.redo(operations);
           }
         });
         popup.add(item);

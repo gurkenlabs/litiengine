@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -467,10 +468,94 @@ class UndoManagerTest {
 
     assertEquals(1, manager.getUndoHistory().size());
     assertEquals(2, manager.getUndoHistory().getFirst().steps());
-    assertEquals("Edit resource", manager.getUndoHistory().getFirst().description());
+    assertEquals("2 changes", manager.getUndoHistory().getFirst().description());
     manager.undo();
     assertEquals(1, manager.getRedoHistory().size());
     assertEquals(2, manager.getRedoHistory().getFirst().steps());
+  }
+
+  @Test
+  void historyDescribesGroupedObjectOperationsWithoutNamingOneObject() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-group-description-test");
+    MapObjectLayer layer = new MapObjectLayer();
+    MapObject first = new MapObject();
+    first.setId(20);
+    first.setType("COLLISIONBOX");
+    MapObject second = new MapObject();
+    second.setId(21);
+    second.setType("COLLISIONBOX");
+    layer.addMapObject(first);
+    layer.addMapObject(second);
+    map.addLayer(layer);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+
+    manager.beginOperation();
+    manager.mapObjectChanging(first);
+    first.setX(10);
+    manager.mapObjectMoved(first);
+    manager.mapObjectChanging(second);
+    second.setX(20);
+    manager.mapObjectMoved(second);
+    manager.endOperation();
+
+    assertEquals("Move 2 objects", manager.getUndoHistory().getFirst().description());
+    manager.undo();
+    assertEquals("Move 2 objects", manager.getRedoHistory().getFirst().description());
+  }
+
+  @Test
+  void groupedOperationEmitsOneStackChange() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-event-aggregation-test");
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    AtomicInteger events = new AtomicInteger();
+    Consumer<UndoManager> listener = ignored -> events.incrementAndGet();
+    UndoManager.onUndoStackChanged(listener);
+
+    try {
+      manager.beginOperation();
+      manager.resourceChanged(() -> {}, () -> {});
+      manager.resourceChanged(() -> {}, () -> {});
+
+      assertEquals(0, events.get());
+      manager.endOperation();
+      assertEquals(1, events.get());
+      assertEquals(2, manager.getRevision());
+    } finally {
+      UndoManager.removeUndoStackChanged(listener);
+    }
+  }
+
+  @Test
+  void bulkUndoAndRedoEmitOneStackChangeEach() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-bulk-event-aggregation-test");
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+
+    manager.resourceChanged(() -> {}, () -> {});
+    manager.resourceChanged(() -> {}, () -> {});
+    long recordedRevision = manager.getRevision();
+    AtomicInteger events = new AtomicInteger();
+    Consumer<UndoManager> listener = ignored -> events.incrementAndGet();
+    UndoManager.onUndoStackChanged(listener);
+
+    try {
+      manager.undo(2);
+      assertEquals(recordedRevision + 2, manager.getRevision());
+      assertEquals(1, events.get());
+      assertFalse(manager.canUndo());
+
+      manager.redo(2);
+      assertEquals(recordedRevision + 4, manager.getRevision());
+      assertEquals(2, events.get());
+      assertFalse(manager.canRedo());
+    } finally {
+      UndoManager.removeUndoStackChanged(listener);
+    }
   }
 
   @Test
