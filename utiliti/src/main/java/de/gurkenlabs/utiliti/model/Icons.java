@@ -126,6 +126,7 @@ public final class Icons {
   public static final Icon SETTINGS_24 = IconLoader.get().getUIAwareIcon("settings.svg", 24, 24);
   public static final Icon SETTINGS_APPEARANCE_16 = IconLoader.get().getUIAwareIcon("settings-appearance.svg", 16, 16);
   public static final Icon SETTINGS_APPEARANCE_24 = IconLoader.get().getUIAwareIcon("settings-appearance.svg", 24, 24);
+  public static final Icon SETTINGS_APPEARANCE_40 = IconLoader.get().getUIAwareIcon("settings-appearance.svg", 40, 40);
   public static final Icon SETTINGS_DISPLAY_16 = IconLoader.get().getUIAwareIcon("settings-display.svg", 16, 16);
   public static final Icon SETTINGS_DISPLAY_24 = IconLoader.get().getUIAwareIcon("settings-display.svg", 24, 24);
   public static final Icon SETTINGS_FONT_24 = IconLoader.get().getUIAwareIcon("settings-font.svg", 24, 24);
@@ -146,6 +147,7 @@ public final class Icons {
   public static final Icon SOUND_16 = IconLoader.get().getUIAwareIcon("sound.svg", 16, 16);
   public static final Icon SUPPORT_16 = IconLoader.get().getUIAwareIcon("support.svg", 16, 16);
   public static final Icon SUPPORT_24 = IconLoader.get().getUIAwareIcon("support.svg", 24, 24);
+  public static final Icon SUPPORT_32 = IconLoader.get().getUIAwareIcon("support.svg", 32, 32);
   public static final Icon POWER_16 = IconLoader.get().getUIAwareIcon("power.svg", 16, 16);
   public static final Icon SPAWNPOINT_16 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 16, 16);
   public static final Icon SPRITESHEET_16 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 16, 16);

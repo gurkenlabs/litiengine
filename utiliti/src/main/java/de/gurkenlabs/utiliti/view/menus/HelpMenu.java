@@ -47,7 +47,7 @@ public final class HelpMenu extends JMenu {
         URI.create(Resources.strings().getFrom(LINKS, "link_LITIengine_releasenotes"))));
 
     JMenuItem openCollectiveMenuItem =
-      new JMenuItem(Resources.strings().get("menu_help_opencollective"), Icons.SUPPORT_16);
+      new JMenuItem(Resources.strings().get("support_the_devs"), Icons.SUPPORT_16);
     openCollectiveMenuItem.addActionListener(
       event -> UriUtilities.openWebpage(
         URI.create(Resources.strings().getFrom(LINKS, "link_opencollective"))));

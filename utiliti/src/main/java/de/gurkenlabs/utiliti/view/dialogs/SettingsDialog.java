@@ -332,19 +332,21 @@ public final class SettingsDialog extends JDialog {
   private JPanel createSupportCard() {
     JPanel card = new RoundedSurfacePanel(new BorderLayout(12, 0));
     card.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 14));
-    card.add(new JLabel(Icons.SUPPORT_24), BorderLayout.WEST);
+    card.add(new JLabel(Icons.SUPPORT_32), BorderLayout.WEST);
 
     JPanel copy = new JPanel();
     copy.setOpaque(false);
     copy.setLayout(new BoxLayout(copy, BoxLayout.Y_AXIS));
-    JButton support = new JButton(text("settings_support_title"), Icons.EXPORT_16);
+    JButton support = new JButton(text("support_the_devs"), Icons.EXPORT_16);
     support.setHorizontalTextPosition(SwingConstants.LEFT);
+    support.setHorizontalAlignment(SwingConstants.LEFT);
     support.setIconTextGap(8);
     support.setContentAreaFilled(false);
     support.setBorder(BorderFactory.createEmptyBorder());
     support.setFocusPainted(false);
     support.setFont(support.getFont().deriveFont(Font.BOLD));
     support.setAlignmentX(Component.LEFT_ALIGNMENT);
+    support.setMaximumSize(support.getPreferredSize());
     support.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
     support.addActionListener(event -> UriUtilities.openWebpage(
         URI.create(Resources.strings().getFrom("links", "link_opencollective"))));
@@ -624,8 +626,11 @@ public final class SettingsDialog extends JDialog {
   private static JPanel settingsHeader(Category category) {
     JPanel header = new JPanel(new BorderLayout(14, 0));
     header.setOpaque(false);
-    JLabel icon = new JLabel(category.icon);
-    icon.setVerticalAlignment(SwingConstants.TOP);
+    Icon headerIcon = category == Category.APPEARANCE ? Icons.SETTINGS_APPEARANCE_40 : category.icon;
+    JLabel icon = new JLabel(headerIcon);
+    icon.setHorizontalAlignment(SwingConstants.CENTER);
+    icon.setVerticalAlignment(SwingConstants.CENTER);
+    icon.setPreferredSize(new Dimension(46, 52));
     header.add(icon, BorderLayout.WEST);
     JPanel copy = new JPanel(new GridBagLayout());
     copy.setOpaque(false);

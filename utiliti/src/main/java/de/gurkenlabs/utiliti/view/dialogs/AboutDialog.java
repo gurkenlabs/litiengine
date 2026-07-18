@@ -116,7 +116,7 @@ public final class AboutDialog extends JDialog {
     panel.add(feature(Symbol.CODE, "Open Source", "Built with Java and Swing. 100% open source and community driven."));
     panel.add(gap(14));
 
-    JPanel support = feature(Symbol.HEART, "Support the Devs", "Support the ongoing development of LITIENGINE and utiLITI on OpenCollective.");
+    JPanel support = feature(Symbol.HEART, Resources.strings().get("support_the_devs"), "Support the ongoing development of LITIENGINE and utiLITI on OpenCollective.");
     support.setMaximumSize(new Dimension(COLUMN_WIDTH, 92));
     JPanel supportCopy = (JPanel) support.getComponent(1);
     supportCopy.add(externalLinkButton("opencollective.com/litiengine", link("link_opencollective")));
