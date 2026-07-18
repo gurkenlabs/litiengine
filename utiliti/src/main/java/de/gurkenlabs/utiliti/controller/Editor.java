@@ -520,7 +520,7 @@ public class Editor extends Screen {
   }
 
   private void loadProjectTilesetTerrains(Path projectRoot) {
-    if (projectRoot == null || this.gameFile == null || this.gameFile.getTilesets().isEmpty()) {
+    if (projectRoot == null || this.gameFile == null) {
       return;
     }
     List<Tileset> sources;

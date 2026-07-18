@@ -619,7 +619,9 @@ public class MapPropertyPanel extends JPanel {
     this.dataSource.setValue(MapProperty.GRAVITY, (int) this.spinnerGravity.getValue());
     this.dataSource.setValue(MapProperty.AMBIENTCOLOR, this.ambientColorComponent.getHexColor());
     this.dataSource.setValue(MapProperty.SHADOWCOLOR, this.shadowColorComponent.getHexColor());
-    this.dataSource.setName(this.textFieldName.getText());
+    if (!Editor.instance().getMapComponent().renameMap(this.dataSource, this.textFieldName.getText())) {
+      this.textFieldName.setText(this.dataSource.getName());
+    }
 
     final List<String> setProperties = new ArrayList<>();
     for (int row = 0; row < this.model.getRowCount(); row++) {

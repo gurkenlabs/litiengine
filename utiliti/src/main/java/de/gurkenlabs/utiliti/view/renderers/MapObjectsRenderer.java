@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.MapComponent;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.UserPreferences;
 import java.awt.BasicStroke;
@@ -73,7 +74,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
     final List<IMapObjectLayer> layers = map.getMapObjectLayers();
     for (final IMapObjectLayer layer : layers) {
-      if (layer == null || !layer.isVisible() || layer.getOpacity() <= 0f) {
+      if (layer == null || !MapComponent.isLayerEffectivelyVisible(map, layer)) {
         continue;
       }
 

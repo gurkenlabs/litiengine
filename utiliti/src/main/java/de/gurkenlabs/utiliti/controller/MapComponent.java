@@ -3,8 +3,12 @@ package de.gurkenlabs.utiliti.controller;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayerList;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -67,11 +71,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -94,11 +98,11 @@ public class MapComponent extends GuiComponent {
   private final List<Consumer<TmxMap>> loadedConsumer;
   private final List<Consumer<Blueprint>> copyTargetChangedConsumer;
 
-  private final Map<String, Point2D> cameraFocus;
-  private final Map<String, Float> cameraZoom;
-  private final Map<String, IMapObject> focusedObjects;
-  private final Map<String, List<IMapObject>> selectedObjects;
-  private final Map<String, Environment> environments;
+  private final Map<IMap, Point2D> cameraFocus;
+  private final Map<IMap, Float> cameraZoom;
+  private final Map<IMap, IMapObject> focusedObjects;
+  private final Map<IMap, List<IMapObject>> selectedObjects;
+  private final Map<IMap, Environment> environments;
   private final List<TmxMap> maps;
   private TransformMode transformMode = TransformMode.NONE;
   private Point2D startPoint;
@@ -147,12 +151,12 @@ public class MapComponent extends GuiComponent {
     this.loadingConsumer = new CopyOnWriteArrayList<>();
     this.loadedConsumer = new CopyOnWriteArrayList<>();
     this.copyTargetChangedConsumer = new CopyOnWriteArrayList<>();
-    this.focusedObjects = new ConcurrentHashMap<>();
-    this.selectedObjects = new ConcurrentHashMap<>();
-    this.environments = new ConcurrentHashMap<>();
+    this.focusedObjects = Collections.synchronizedMap(new IdentityHashMap<>());
+    this.selectedObjects = Collections.synchronizedMap(new IdentityHashMap<>());
+    this.environments = Collections.synchronizedMap(new IdentityHashMap<>());
     this.maps = new CopyOnWriteArrayList<>();
-    this.cameraFocus = new ConcurrentHashMap<>();
-    this.cameraZoom = new ConcurrentHashMap<>();
+    this.cameraFocus = Collections.synchronizedMap(new IdentityHashMap<>());
+    this.cameraZoom = Collections.synchronizedMap(new IdentityHashMap<>());
     UndoManager.onUndoStackChanged(e -> Transform.updateAnchors());
   }
 
@@ -237,7 +241,7 @@ public class MapComponent extends GuiComponent {
 
   public IMapObject getFocusedMapObject() {
     if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
-      return this.focusedObjects.get(Game.world().environment().getMap().getName());
+      return this.focusedObjects.get(Game.world().environment().getMap());
     }
 
     return null;
@@ -254,7 +258,7 @@ public class MapComponent extends GuiComponent {
 
   public List<IMapObject> getSelectedMapObjects() {
     if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
-      final String map = Game.world().environment().getMap().getName();
+      final IMap map = Game.world().environment().getMap();
       if (this.selectedObjects.containsKey(map)) {
         return this.selectedObjects.get(map);
       }
@@ -313,12 +317,12 @@ public class MapComponent extends GuiComponent {
     this.loading = true;
     try {
       if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
-        final String mapName = Game.world().environment().getMap().getName();
+        final IMap currentMap = Game.world().environment().getMap();
         double x = Game.world().camera().getFocus().getX();
         double y = Game.world().camera().getFocus().getY();
         Point2D newPoint = new Point2D.Double(x, y);
-        this.cameraFocus.put(mapName, newPoint);
-        this.cameraZoom.put(mapName, Game.world().camera().getZoom());
+        this.cameraFocus.put(currentMap, newPoint);
+        this.cameraZoom.put(currentMap, Game.world().camera().getZoom());
       }
 
       for (Consumer<TmxMap> cons : this.loadingConsumer) {
@@ -330,29 +334,29 @@ public class MapComponent extends GuiComponent {
 
       Point2D newFocus;
 
-      boolean fitOnLoad = !this.cameraFocus.containsKey(map.getName());
+      boolean fitOnLoad = !this.cameraFocus.containsKey(map);
       if (!fitOnLoad) {
-        newFocus = this.cameraFocus.get(map.getName());
+        newFocus = this.cameraFocus.get(map);
       } else {
         newFocus =
           new Point2D.Double(
             map.getSizeInPixels().getWidth() / 2, map.getSizeInPixels().getHeight() / 2);
-        this.cameraFocus.put(map.getName(), newFocus);
+        this.cameraFocus.put(map, newFocus);
       }
 
       Game.world().camera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
 
-      if (!this.environments.containsKey(map.getName())) {
+      if (!this.environments.containsKey(map)) {
         Environment env = new Environment(map);
         env.init();
-        this.environments.put(map.getName(), env);
+        this.environments.put(map, env);
       }
 
-      Game.world().loadEnvironment(this.environments.get(map.getName()));
+      Game.world().loadEnvironment(this.environments.get(map));
 
-      if (!fitOnLoad && !refitAfterLoad && this.cameraZoom.containsKey(map.getName())) {
+      if (!fitOnLoad && !refitAfterLoad && this.cameraZoom.containsKey(map)) {
         this.fitMode = false;
-        Game.world().camera().setZoom(this.cameraZoom.get(map.getName()), 0);
+        Game.world().camera().setZoom(this.cameraZoom.get(map), 0);
         if (UI.getViewportToolbar() != null) {
           UI.getViewportToolbar().refreshZoomLabel();
         }
@@ -412,6 +416,23 @@ public class MapComponent extends GuiComponent {
     }
     Transform.updateAnchors();
     this.setTransformMode(TransformMode.MOVE);
+  }
+
+  public void synchronizeEnvironmentEntities(IMap map) {
+    if (map == null) {
+      return;
+    }
+
+    Environment environment = Game.world().environment();
+    if (environment == null || environment.getMap() != map) {
+      this.environments.remove(map);
+      return;
+    }
+
+    Environment rebuilt = new Environment(map);
+    Game.world().loadEnvironment(rebuilt);
+    this.environments.put(map, rebuilt);
+    Transform.updateAnchors();
   }
 
   public void add(IMapObject mapObject, IMapObjectLayer layer) {
@@ -543,6 +564,23 @@ public class MapComponent extends GuiComponent {
     }
   }
 
+  public static boolean isLayerEffectivelyVisible(IMap map, ILayer target) {
+    return map != null && target != null && isLayerEffectivelyVisible(map, target, true);
+  }
+
+  private static boolean isLayerEffectivelyVisible(ILayerList parent, ILayer target, boolean ancestorsVisible) {
+    for (ILayer layer : parent.getRenderLayers()) {
+      boolean visible = ancestorsVisible && layer.isVisible() && layer.getOpacity() > 0f;
+      if (layer == target) {
+        return visible;
+      }
+      if (layer instanceof IGroupLayer group && isLayerEffectivelyVisible(group, target, visible)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public void copy() {
     this.setCopyBlueprint(
       new Blueprint(
@@ -643,7 +681,7 @@ public class MapComponent extends GuiComponent {
 
     ArrayList<IMapObject> selection = new ArrayList<>();
     for (final IMapObjectLayer layer : layers) {
-      if (layer == null || !layer.isVisible()) {
+      if (layer == null || !isLayerEffectivelyVisible(Game.world().environment().getMap(), layer)) {
         continue;
       }
 
@@ -842,9 +880,9 @@ public class MapComponent extends GuiComponent {
       }
 
       if (mapObject == null) {
-        this.focusedObjects.remove(Game.world().environment().getMap().getName());
+        this.focusedObjects.remove(Game.world().environment().getMap());
       } else {
-        this.focusedObjects.put(Game.world().environment().getMap().getName(), mapObject);
+        this.focusedObjects.put(Game.world().environment().getMap(), mapObject);
       }
 
       this.setSelection(mapObject, clearSelection);
@@ -883,7 +921,7 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    final String map = Game.world().environment().getMap().getName();
+    final IMap map = Game.world().environment().getMap();
     this.selectedObjects.putIfAbsent(map, new CopyOnWriteArrayList<>());
 
     if (clearSelection) {
@@ -918,9 +956,9 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    String deletedMapName = Game.world().environment().getMap().getName();
-    getMaps().removeIf(x -> x.getName().equals(deletedMapName));
-    clearMapObjectState(deletedMapName);
+    IMap deletedMap = Game.world().environment().getMap();
+    getMaps().remove(deletedMap);
+    clearMapObjectState(deletedMap);
 
     // TODO: remove all tile sets from the game file that are no longer needed
     // by any other map.
@@ -968,7 +1006,7 @@ public class MapComponent extends GuiComponent {
           if (ConfirmDialog.show(
             Resources.strings().get("input_replace_map_title"),
             Resources.strings().get("input_replace_map", map.getName()))) {
-            clearMapObjectState(map.getName());
+            clearMapObjectState(current.get());
             getMaps().remove(current.get());
           } else {
             return;
@@ -1004,7 +1042,7 @@ public class MapComponent extends GuiComponent {
         Editor.instance().updateGameFileMaps();
         Resources.images().clear();
         Objects.requireNonNull(Renderers.get(GridRenderer.class)).clearCache();
-        this.environments.remove(map.getName());
+        this.environments.remove(map);
 
         UI.getMapController().bind(getMaps(), true);
         this.loadEnvironment(map);
@@ -1034,10 +1072,9 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    Optional<TmxMap> existing = this.maps.stream().filter(m -> m.getName().equals(mapName)).findFirst();
-    if (existing.isPresent()) {
-      clearMapObjectState(mapName);
-      getMaps().remove(existing.get());
+    if (!isMapNameAvailable(null, mapName)) {
+      log.log(Level.WARNING, "A map named {0} already exists.", mapName);
+      return;
     }
 
     TmxMap map = new TmxMap(orientation);
@@ -1068,11 +1105,40 @@ public class MapComponent extends GuiComponent {
 
     Editor.instance().updateGameFileMaps();
     Objects.requireNonNull(Renderers.get(GridRenderer.class)).clearCache();
-    this.environments.remove(map.getName());
+    this.environments.remove(map);
 
     UI.getMapController().bind(getMaps(), true);
     this.loadEnvironment(map);
+    UndoManager.instance().recordChanges();
     log.log(Level.INFO, "created new map {0}", new Object[] {map.getName()});
+  }
+
+  public boolean renameMap(IMap map, String requestedName) {
+    if (map == null || requestedName == null) {
+      return false;
+    }
+    String name = requestedName.trim();
+    if (!isMapNameAvailable(map, name)) {
+      return false;
+    }
+    if (name.equals(map.getName())) {
+      return true;
+    }
+    map.setName(name);
+    Collections.sort(this.maps);
+    if (UI.getMapController() != null) {
+      UI.getMapController().refresh();
+    }
+    return true;
+  }
+
+  public boolean canRenameMap(IMap map, String requestedName) {
+    return map != null && requestedName != null && isMapNameAvailable(map, requestedName.trim());
+  }
+
+  boolean isMapNameAvailable(IMap map, String name) {
+    return name != null && !name.isBlank()
+      && this.maps.stream().noneMatch(existing -> existing != map && name.equalsIgnoreCase(existing.getName()));
   }
 
   public void exportMap() {
@@ -1201,19 +1267,29 @@ public class MapComponent extends GuiComponent {
     this.setTransformMode(TransformMode.CREATE);
   }
 
-  private void clearMapObjectState(String mapName) {
-    if (mapName == null) {
+  private void clearMapObjectState(IMap map) {
+    if (map == null) {
       return;
     }
     boolean activeMap = Game.world().environment() != null
-      && Game.world().environment().getMap() != null
-      && mapName.equals(Game.world().environment().getMap().getName());
+      && map == Game.world().environment().getMap();
     if (activeMap) {
       setFocus(null, true);
       setSelection((IMapObject) null, true);
     }
-    this.focusedObjects.remove(mapName);
-    this.selectedObjects.remove(mapName);
+    this.focusedObjects.remove(map);
+    this.selectedObjects.remove(map);
+    this.cameraFocus.remove(map);
+    this.cameraZoom.remove(map);
+    this.environments.remove(map);
+    UndoManager.remove(map);
+    if (UI.getLayerController() instanceof de.gurkenlabs.utiliti.view.components.SceneGraph sceneGraph) {
+      sceneGraph.clearMapState(map);
+    }
+  }
+
+  Environment getCachedEnvironmentForTest(IMap map) {
+    return this.environments.get(map);
   }
 
   public void setCreateMapObjectType(MapObjectType type) {
@@ -1645,7 +1721,7 @@ public class MapComponent extends GuiComponent {
     boolean somethingIsFocused = false;
     boolean currentObjectFocused = false;
     for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
-      if (layer == null || !layer.isVisible()) {
+      if (layer == null || !isLayerEffectivelyVisible(Game.world().environment().getMap(), layer)) {
         continue;
       }
 

@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -65,6 +66,30 @@ class SceneGraphTest {
     sceneGraph.selectMap();
 
     assertSame(layer, sceneGraph.getSelectedLayerForTest());
+  }
+
+  @Test
+  void numericSearchOutsideIntegerRangeIsIgnoredSafely() {
+    assertNull(SceneGraph.parseSearchIdForTest("999999999999999999999"));
+    assertEquals(42, SceneGraph.parseSearchIdForTest("42"));
+  }
+
+  @Test
+  void clearRemovesSelectedAndExpandedLayerState() {
+    SceneGraph sceneGraph = new SceneGraph();
+    TmxMap deletedMap = new TmxMap(MapOrientations.ORTHOGONAL);
+    TmxMap retainedMap = new TmxMap(MapOrientations.ORTHOGONAL);
+    sceneGraph.cacheLayerStateForTest(deletedMap);
+    sceneGraph.cacheLayerStateForTest(retainedMap);
+
+    sceneGraph.clearMapState(deletedMap);
+
+    assertTrue(!sceneGraph.hasCachedLayerStateForTest(deletedMap));
+    assertTrue(sceneGraph.hasCachedLayerStateForTest(retainedMap));
+
+    sceneGraph.clear();
+
+    assertTrue(!sceneGraph.hasCachedLayerStateForTest(retainedMap));
   }
 
 }

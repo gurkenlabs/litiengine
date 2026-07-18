@@ -17,7 +17,8 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -36,7 +37,7 @@ public final class LayerList extends JPanel implements LayerController {
   private static final Dimension ICON_SIZE = new Dimension(16, 16);
   private static final Dimension BUTTON_SIZE = new Dimension(28, 28);
 
-  private final Map<String, Integer> selectedLayers;
+  private final Map<IMap, Integer> selectedLayers;
   private final transient List<Consumer<IMap>> layerChangedListeners;
 
   private final LayerTable layerTable;
@@ -48,7 +49,7 @@ public final class LayerList extends JPanel implements LayerController {
     this.setName(Resources.strings().get("panel_mapObjectLayers"));
     this.setMinimumSize(new Dimension(260, 0));
 
-    this.selectedLayers = new ConcurrentHashMap<>();
+    this.selectedLayers = Collections.synchronizedMap(new IdentityHashMap<>());
     this.layerChangedListeners = new CopyOnWriteArrayList<>();
     this.layerTable = new LayerTable();
 
@@ -73,15 +74,15 @@ public final class LayerList extends JPanel implements LayerController {
                 return;
               }
 
-              selectedLayers.put(map.getName(), layerTable.getSelectedRow());
+               selectedLayers.put(map, layerTable.getSelectedRow());
             });
 
     Editor.instance()
         .getMapComponent()
         .onMapLoaded(
             map -> {
-              if (this.selectedLayers.containsKey(map.getName())) {
-                this.layerTable.select(this.selectedLayers.get(map.getName()));
+               if (this.selectedLayers.containsKey(map)) {
+                 this.layerTable.select(this.selectedLayers.get(map));
               }
             });
   }
@@ -165,22 +166,17 @@ public final class LayerList extends JPanel implements LayerController {
             return;
           }
 
-          int index = map.getMapObjectLayers().indexOf(selectedLayer);
-          IMapObjectLayer copy = new MapObjectLayer((MapObjectLayer) selectedLayer);
-
-          Editor.instance().getMapComponent().delete(selectedLayer);
+          UndoManager undoManager = UndoManager.forMap(map);
+          long deletionRevision = undoManager.getRevision() + 1;
           map.removeLayer(selectedLayer);
+          Editor.instance().getMapComponent().synchronizeEnvironmentEntities(map);
           this.layerTable.bind(map);
           Transform.updateAnchors();
 
           Toast.show(
               this.getRootPane(),
               Resources.strings().get("panel_layerDeleted"),
-              () -> {
-                map.addLayer(index, copy);
-                this.refresh();
-                Editor.instance().getMapComponent().add(copy);
-              });
+              () -> undoManager.undoIfRevision(deletionRevision));
         });
   }
 
@@ -191,7 +187,7 @@ public final class LayerList extends JPanel implements LayerController {
           IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
           map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), copiedLayer);
           this.refresh();
-          Editor.instance().getMapComponent().add(copiedLayer);
+          Editor.instance().getMapComponent().synchronizeEnvironmentEntities(map);
         });
   }
 
@@ -304,8 +300,8 @@ public final class LayerList extends JPanel implements LayerController {
       IMap map = getCurrentMap();
       this.layerTable.bind(map);
 
-      if (map != null && this.selectedLayers.containsKey(map.getName())) {
-        this.layerTable.select(this.selectedLayers.get(map.getName()));
+      if (map != null && this.selectedLayers.containsKey(map)) {
+        this.layerTable.select(this.selectedLayers.get(map));
       }
     } finally {
       this.refreshing = false;
@@ -344,9 +340,13 @@ public final class LayerList extends JPanel implements LayerController {
             return;
           }
 
+          UndoManager undoManager = UndoManager.instance();
+          undoManager.layerStructureChanging(currentMap);
+          undoManager.layersChanging(currentMap);
           consumer.accept(currentMap, layer);
+          undoManager.layersChanged(currentMap);
+          undoManager.layerStructureChanged(currentMap);
           this.refresh();
-          UndoManager.instance().recordChanges();
           for (Consumer<IMap> c : this.layerChangedListeners) {
             c.accept(getCurrentMap());
           }

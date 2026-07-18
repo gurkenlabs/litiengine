@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.MapComponent;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -36,6 +37,10 @@ public class SelectionRenderer implements IEditorRenderer {
     IMapObject focusedMapObject = Editor.instance().getMapComponent().getFocusedMapObject();
 
     for (IMapObject mapObject : selectedMapObjects) {
+      if (!MapComponent.isLayerEffectivelyVisible(
+          Game.world().environment().getMap(), mapObject.getLayer())) {
+        continue;
+      }
       renderObjectId(g, mapObject);
 
       if (mapObject.equals(focusedMapObject)) {

@@ -42,6 +42,16 @@ final class SpriteAnimationPreview extends JPanel {
     update();
   }
 
+  void start() {
+    if (!this.timer.isRunning()) {
+      this.timer.start();
+    }
+  }
+
+  void stop() {
+    this.timer.stop();
+  }
+
   private void update() {
     if (this.spritesheet == null || this.spritesheet.getTotalNumberOfSprites() == 0) {
       this.preview.setIcon(null);
@@ -55,5 +65,9 @@ final class SpriteAnimationPreview extends JPanel {
 
   javax.swing.Icon getIconForTest() {
     return this.preview.getIcon();
+  }
+
+  boolean isRunningForTest() {
+    return this.timer.isRunning();
   }
 }

@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,12 +12,16 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapImage;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -72,6 +77,21 @@ class UndoManagerTest {
   @Test
   void hasChangesReturnsFalseForNullMap() {
     assertFalse(UndoManager.hasChanges(null));
+  }
+
+  @Test
+  void undoManagerIdentitySurvivesMapRename() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("before");
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    manager.recordChanges();
+
+    map.setName("after");
+
+    assertSame(manager, UndoManager.instance());
+    assertTrue(UndoManager.hasChanges(map));
+    assertEquals("after", manager.getMapName());
   }
 
   @Test
@@ -187,6 +207,225 @@ class UndoManagerTest {
   }
 
   @Test
+  void layerStructureUndoRestoresNestedGroupOrder() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-nested-layer-structure-test");
+    GroupLayer group = new GroupLayer();
+    MapObjectLayer first = new MapObjectLayer();
+    MapObjectLayer second = new MapObjectLayer();
+    group.addLayer(first);
+    group.addLayer(second);
+    map.addLayer(group);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+
+    manager.layerStructureChanging(map);
+    group.removeLayer(second);
+    group.addLayer(0, second);
+    manager.layerStructureChanged(map);
+
+    manager.undo();
+    assertSame(first, group.getRenderLayers().get(0));
+    assertSame(second, group.getRenderLayers().get(1));
+    manager.redo();
+    assertSame(second, group.getRenderLayers().get(0));
+  }
+
+  @Test
+  void originatingManagerRestoresInactiveMapWithoutTouchingCurrentEnvironment() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap origin = newMap("origin-map");
+    MapObjectLayer originLayer = new MapObjectLayer();
+    origin.addLayer(originLayer);
+    Game.world().loadEnvironment(origin);
+    UndoManager originManager = UndoManager.forMap(origin);
+    originManager.layerStructureChanging(origin);
+    origin.removeLayer(originLayer);
+    originManager.layerStructureChanged(origin);
+
+    TmxMap current = newMap("current-map");
+    MapObjectLayer currentLayer = new MapObjectLayer();
+    current.addLayer(currentLayer);
+    Game.world().loadEnvironment(current);
+    originManager.undo();
+
+    assertSame(current, Game.world().environment().getMap());
+    assertSame(currentLayer, current.getRenderLayers().getFirst());
+    assertSame(originLayer, origin.getRenderLayers().getFirst());
+  }
+
+  @Test
+  void recursiveLayerPropertySnapshotRestoresAllVisibilityChangesAsOneStep() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-layer-visibility-test");
+    GroupLayer group = new GroupLayer();
+    MapObjectLayer child = new MapObjectLayer();
+    MapObjectLayer sibling = new MapObjectLayer();
+    group.addLayer(child);
+    map.addLayer(group);
+    map.addLayer(sibling);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    int historySize = manager.getUndoHistory().size();
+
+    manager.layersChanging(map);
+    group.setVisible(false);
+    child.setVisible(false);
+    sibling.setVisible(false);
+    manager.layersChanged(map);
+
+    assertEquals(historySize + 1, manager.getUndoHistory().size());
+    manager.undo();
+    assertTrue(group.isVisible());
+    assertTrue(child.isVisible());
+    assertTrue(sibling.isVisible());
+  }
+
+  @Test
+  void layerUndoRestoresCompleteImageAndDiscardsNoOpSnapshots() throws Exception {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-image-layer-test");
+    ImageLayer layer = new ImageLayer();
+    MapImage image = new MapImage();
+    image.setSource("before.png");
+    image.setAbsoluteSourcePath(new URL("file:/maps/before.png"));
+    image.setTransparentColor(Color.MAGENTA);
+    image.setWidth(32);
+    image.setHeight(64);
+    image.setValue("custom", "before");
+    layer.setImage(image);
+    map.addLayer(layer);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    int initialHistorySize = manager.getUndoHistory().size();
+
+    manager.layerChanging(layer);
+    manager.layerChanged(layer);
+    assertEquals(initialHistorySize, manager.getUndoHistory().size());
+
+    manager.layerChanging(layer);
+    image.setSource("after.png");
+    image.setAbsoluteSourcePath(new URL("file:/maps/after.png"));
+    image.setTransparentColor(Color.GREEN);
+    image.setWidth(1);
+    image.setValue("custom", "after");
+    manager.layerChanged(layer);
+    manager.undo();
+    assertNotSame(image, layer.getImage());
+    assertEquals("before.png", layer.getImage().getSource());
+    assertEquals(new URL("file:/maps/before.png"), layer.getImage().getAbsoluteSourcePath());
+    assertEquals(Color.MAGENTA, layer.getImage().getTransparentColor());
+    assertEquals(32, layer.getImage().getWidth());
+    assertEquals(64, layer.getImage().getHeight());
+    assertEquals("before", layer.getImage().getStringValue("custom"));
+  }
+
+  @Test
+  void undoingBackToSavedRevisionClearsDirtyState() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("saved-revision-test");
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    AtomicInteger value = new AtomicInteger();
+    manager.resourceChanged(() -> value.set(0), () -> value.set(1));
+    UndoManager.save(map);
+    manager.resourceChanged(() -> value.set(1), () -> value.set(2));
+    assertTrue(UndoManager.hasChanges(map));
+
+    manager.undo();
+
+    assertFalse(UndoManager.hasChanges(map));
+    manager.redo();
+    assertTrue(UndoManager.hasChanges(map));
+  }
+
+  @Test
+  void targetedUndoDoesNotUndoANewerEdit() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("targeted-undo-test");
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    AtomicInteger value = new AtomicInteger(1);
+    manager.resourceChanged(() -> value.set(0), () -> value.set(1));
+    long deletionRevision = manager.getRevision();
+    value.set(2);
+    manager.resourceChanged(() -> value.set(1), () -> value.set(2));
+
+    assertFalse(manager.undoIfRevision(deletionRevision));
+    assertEquals(2, value.get());
+    assertEquals(2, manager.getUndoHistory().size());
+  }
+
+  @Test
+  void targetedUndoUndoesMatchingHistoryHead() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("matching-targeted-undo-test");
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    AtomicInteger value = new AtomicInteger(1);
+    manager.resourceChanged(() -> value.set(0), () -> value.set(1));
+
+    assertTrue(manager.undoIfRevision(manager.getRevision()));
+    assertEquals(0, value.get());
+  }
+
+  @Test
+  void evictingInitialSavedBoundaryKeepsMapDirtyAfterAllAvailableUndos() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("saved-boundary-eviction-test");
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    for (int i = 0; i <= 10000; i++) {
+      manager.resourceChanged(() -> {}, () -> {});
+    }
+
+    while (manager.canUndo()) {
+      manager.undo();
+    }
+
+    assertTrue(UndoManager.hasChanges(map));
+  }
+
+  @Test
+  void renameConflictDoesNotConsumeOrPartiallyApplyUndo() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap renamed = newMap("rename-old");
+    TmxMap other = newMap("rename-other");
+    MapComponent mapComponent = Editor.instance().getMapComponent();
+    mapComponent.getMaps().clear();
+    mapComponent.getMaps().add(renamed);
+    mapComponent.getMaps().add(other);
+    Game.world().loadEnvironment(renamed);
+    UndoManager manager = UndoManager.forMap(renamed);
+    manager.mapChanging(renamed);
+    renamed.setName("rename-new");
+    renamed.setValue("custom", "changed");
+    manager.mapChanged(renamed);
+    other.setName("rename-old");
+
+    manager.undo();
+
+    assertTrue(manager.canUndo());
+    assertEquals("rename-new", renamed.getName());
+    assertEquals("changed", renamed.getStringValue("custom"));
+    mapComponent.getMaps().clear();
+  }
+
+  @Test
+  void mapSnapshotsDiscardNoOpChanges() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-map-no-op-test");
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    int initialHistorySize = manager.getUndoHistory().size();
+
+    manager.mapChanging(map);
+    manager.mapChanged(map);
+
+    assertEquals(initialHistorySize, manager.getUndoHistory().size());
+  }
+
+  @Test
   void resourceUndoRedoExecutesResourceSnapshots() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
@@ -275,5 +514,15 @@ class UndoManagerTest {
     Field layerField = MapObject.class.getDeclaredField("layer");
     layerField.setAccessible(true);
     layerField.set(object, layer);
+  }
+
+  private static TmxMap newMap(String name) {
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName(name);
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    return map;
   }
 }

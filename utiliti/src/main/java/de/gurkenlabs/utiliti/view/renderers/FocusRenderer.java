@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.renderers;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.MapComponent;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Style;
@@ -24,7 +25,9 @@ public class FocusRenderer implements IEditorRenderer {
     // render the focus and the transform rects
     final Rectangle2D focus = Editor.instance().getMapComponent().getFocusBounds();
     final IMapObject focusedMapObject = Editor.instance().getMapComponent().getFocusedMapObject();
-    if (focus != null && focusedMapObject != null) {
+    if (focus != null && focusedMapObject != null
+        && MapComponent.isLayerEffectivelyVisible(
+            Game.world().environment().getMap(), focusedMapObject.getLayer())) {
       final float strokeSize =
           (float) Math.max(1, Math.log(Game.world().camera().getRenderScale()) * 4);
       final float dashPhaseBlack =

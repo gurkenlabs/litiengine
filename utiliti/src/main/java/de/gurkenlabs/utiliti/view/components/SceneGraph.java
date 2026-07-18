@@ -149,8 +149,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   private boolean isFocussing;
   private boolean refreshing;
 
-  private final java.util.Map<String, Integer> selectedLayers;
-  private final java.util.Map<String, java.util.Set<Integer>> expandedLayers;
+  private final java.util.Map<IMap, Integer> selectedLayers;
+  private final java.util.Map<IMap, java.util.Set<Integer>> expandedLayers;
   private final java.util.Map<Integer, Integer> hierarchyGuideXs;
   private final java.util.List<Consumer<IMap>> layerChangedListeners;
   private final java.util.List<Consumer<IMap>> layerStructureChangedListeners;
@@ -158,8 +158,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   public SceneGraph() {
     super(new BorderLayout(0, 0));
     this.setName(Resources.strings().get("scenegraph_name"));
-    this.selectedLayers = new java.util.concurrent.ConcurrentHashMap<>();
-    this.expandedLayers = new java.util.concurrent.ConcurrentHashMap<>();
+    this.selectedLayers = java.util.Collections.synchronizedMap(new java.util.IdentityHashMap<>());
+    this.expandedLayers = java.util.Collections.synchronizedMap(new java.util.IdentityHashMap<>());
     this.hierarchyGuideXs = new java.util.HashMap<>();
     this.layerChangedListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
     this.layerStructureChangedListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
@@ -1029,6 +1029,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       this.hoverPreviewWindow.pack();
     }
     this.hoverPreview.setSpritesheet(spritesheet);
+    this.hoverPreview.start();
     java.awt.Point location = event.getLocationOnScreen();
     this.hoverPreviewWindow.setLocation(location.x + 18, location.y + 18);
     this.hoverPreviewWindow.setVisible(true);
@@ -1038,6 +1039,21 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (this.hoverPreviewWindow != null) {
       this.hoverPreviewWindow.setVisible(false);
     }
+    if (this.hoverPreview != null) {
+      this.hoverPreview.stop();
+    }
+  }
+
+  @Override
+  public void removeNotify() {
+    hideHoverPreview();
+    if (this.hoverPreviewWindow != null) {
+      this.hoverPreviewWindow.dispose();
+      this.hoverPreviewWindow = null;
+      this.hoverPreview = null;
+    }
+    this.searchDebounce.stop();
+    super.removeNotify();
   }
 
   private static Spritesheet getPreviewSpritesheet(IEntity entity) {
@@ -1149,6 +1165,15 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     return this.tree.getSelectionModel().getSelectionMode();
   }
 
+  void cacheLayerStateForTest(IMap map) {
+    this.selectedLayers.put(map, 0);
+    this.expandedLayers.put(map, java.util.Set.of(0));
+  }
+
+  boolean hasCachedLayerStateForTest(IMap map) {
+    return this.selectedLayers.containsKey(map) || this.expandedLayers.containsKey(map);
+  }
+
   static boolean moveMapObjectsForTest(
       List<IMapObject> objects, IMapObjectLayer targetLayer, int targetIndex) {
     return SceneTransferHandler.moveMapObjects(objects, targetLayer, targetIndex);
@@ -1180,7 +1205,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       // save expansion state before reload
       IMap oldMap = Game.world().environment() != null ? Game.world().environment().getMap() : null;
       if (oldMap != null) {
-        saveExpansionState(oldMap.getName());
+        saveExpansionState(oldMap);
       }
 
       this.nodeRoot.removeAllChildren();
@@ -1203,7 +1228,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
       this.treeModel.reload();
       this.tree.expandPath(new TreePath(mapNode.getPath()));
-      restoreExpansionState(map.getName());
+      restoreExpansionState(map);
 
       // select focused object first so we don't flash the layers card
       List<IMapObject> selectedObjects = Editor.instance().getMapComponent().getSelectedMapObjects();
@@ -1213,8 +1238,8 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         UI.showObjectInspector();
       } else {
         // restore per-map layer selection only when no entity is focused
-        if (map != null && this.selectedLayers.containsKey(map.getName())) {
-          int idx = this.selectedLayers.get(map.getName());
+        if (this.selectedLayers.containsKey(map)) {
+          int idx = this.selectedLayers.get(map);
           DefaultMutableTreeNode target = getLayerNodeByRenderIndex(idx);
           if (target != null) {
             tree.setSelectionPath(new TreePath(target.getPath()));
@@ -1339,6 +1364,12 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   @Override
   public void clear() {
     this.selectedLayers.clear();
+    this.expandedLayers.clear();
+  }
+
+  public void clearMapState(IMap map) {
+    this.selectedLayers.remove(map);
+    this.expandedLayers.remove(map);
   }
 
   @Override
@@ -1362,7 +1393,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     int idx = 0;
     for (ILayer renderLayer : map.getRenderLayers()) {
       if (renderLayer == node.getLayer()) {
-        this.selectedLayers.put(map.getName(), idx);
+        this.selectedLayers.put(map, idx);
         break;
       }
       idx++;
@@ -1581,7 +1612,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
   }
 
-  private void saveExpansionState(String mapName) {
+  private void saveExpansionState(IMap map) {
     java.util.Set<Integer> expanded = new java.util.HashSet<>();
     int layerIndex = 0;
     for (int i = 0; i < tree.getRowCount(); i++) {
@@ -1599,14 +1630,14 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         }
       }
     }
-    this.expandedLayers.put(mapName, expanded);
+    this.expandedLayers.put(map, expanded);
   }
 
-  private void restoreExpansionState(String mapName) {
-    java.util.Set<Integer> expanded = this.expandedLayers.get(mapName);
+  private void restoreExpansionState(IMap map) {
+    java.util.Set<Integer> expanded = this.expandedLayers.get(map);
     if (expanded == null || expanded.isEmpty()) {
       expandAllRows();
-      saveExpansionState(mapName);
+      saveExpansionState(map);
       return;
     }
     int layerIndex = 0;
@@ -1632,7 +1663,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
     IMap map = Game.world().environment() != null ? Game.world().environment().getMap() : null;
     if (map != null) {
-      saveExpansionState(map.getName());
+      saveExpansionState(map);
     }
   }
 
@@ -1667,16 +1698,16 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     refresh();
 
     if (query.startsWith("#") && query.length() > 1) {
-      try {
-        searchById(Integer.parseInt(query.substring(1)));
+      Integer id = parseSearchId(query.substring(1));
+      if (id != null) {
+        searchById(id);
         return;
-      } catch (NumberFormatException ex) {
-        // fall through
       }
     }
 
     if (query.matches("-?\\d+")) {
-      if (searchById(Integer.parseInt(query))) {
+      Integer id = parseSearchId(query);
+      if (id != null && searchById(id)) {
         return;
       }
     }
@@ -1684,39 +1715,42 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     searchByName(query);
   }
 
+  private static Integer parseSearchId(String value) {
+    try {
+      return Integer.valueOf(value);
+    } catch (NumberFormatException ex) {
+      return null;
+    }
+  }
+
+  static Integer parseSearchIdForTest(String value) {
+    return parseSearchId(value);
+  }
+
   private boolean searchById(int id) {
-    for (int i = 0; i < nodeRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode layerNode = (DefaultMutableTreeNode) nodeRoot.getChildAt(i);
-      for (int j = 0; j < layerNode.getChildCount(); j++) {
-        DefaultMutableTreeNode child = (DefaultMutableTreeNode) layerNode.getChildAt(j);
-        if (child.getUserObject() instanceof SceneNode sn && sn.getMapObject() != null) {
-          if (sn.getMapObject().getId() == id) {
-            selectAndScroll(child);
-            return true;
-          }
-        }
+    Enumeration<?> nodes = this.nodeRoot.preorderEnumeration();
+    while (nodes.hasMoreElements()) {
+      Object candidate = nodes.nextElement();
+      if (candidate instanceof DefaultMutableTreeNode node
+          && node.getUserObject() instanceof SceneNode sceneNode
+          && sceneNode.getMapObject() != null && sceneNode.getMapObject().getId() == id) {
+        selectAndScroll(node);
+        return true;
       }
     }
     return false;
   }
 
   private void searchByName(String name) {
-    for (int i = 0; i < nodeRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode layerNode = (DefaultMutableTreeNode) nodeRoot.getChildAt(i);
-      if (layerNode.getUserObject() instanceof SceneNode sn) {
-        if (sn.getName() != null && sn.getName().toLowerCase().contains(name.toLowerCase())) {
-          selectAndScroll(layerNode);
-          return;
-        }
-      }
-      for (int j = 0; j < layerNode.getChildCount(); j++) {
-        DefaultMutableTreeNode child = (DefaultMutableTreeNode) layerNode.getChildAt(j);
-        if (child.getUserObject() instanceof SceneNode childNode) {
-          if (childNode.getName() != null && childNode.getName().toLowerCase().contains(name.toLowerCase())) {
-            selectAndScroll(child);
-            return;
-          }
-        }
+    String query = name.toLowerCase();
+    Enumeration<?> nodes = this.nodeRoot.preorderEnumeration();
+    while (nodes.hasMoreElements()) {
+      Object candidate = nodes.nextElement();
+      if (candidate instanceof DefaultMutableTreeNode node
+          && node.getUserObject() instanceof SceneNode sceneNode
+          && sceneNode.getName() != null && sceneNode.getName().toLowerCase().contains(query)) {
+        selectAndScroll(node);
+        return;
       }
     }
   }
@@ -1868,20 +1902,25 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
     if (node.isMap()) {
       UndoManager.instance().mapChanging(node.getMap());
-      node.getMap().setName(name);
+      if (!Editor.instance().getMapComponent().renameMap(node.getMap(), name)) {
+        return;
+      }
       UndoManager.instance().mapChanged(node.getMap());
       fireLayerChanged();
     } else if (node.isLayer()) {
+      UndoManager.instance().layerChanging(node.getLayer());
       node.getLayer().setName(name);
+      UndoManager.instance().layerChanged(node.getLayer());
       fireLayerChanged();
     } else {
+      UndoManager.instance().mapObjectChanging(node.getMapObject());
       node.getMapObject().setName(name);
       if (node.getEntity() != null) {
         node.getEntity().setName(name);
       }
+      UndoManager.instance().mapObjectChanged(node.getMapObject());
       UI.getInspector().bind(node.getMapObject());
     }
-    UndoManager.instance().recordChanges();
     refresh();
   }
 
@@ -1953,39 +1992,20 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       return;
     }
     int index = parent.getRenderLayers().indexOf(node.getLayer());
-    ILayer copy;
-    if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer tileLayer) {
-      copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer(tileLayer);
-    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer mapObjectLayer) {
-      copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer(mapObjectLayer);
-    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer imageLayer) {
-      copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.ImageLayer(imageLayer);
-    } else if (node.getLayer() instanceof de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer groupLayer) {
-      copy = new de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer(groupLayer);
-    } else {
-      return;
-    }
-
-    UndoManager.instance().layerStructureChanging(map);
-    if (node.getLayer() instanceof IMapObjectLayer mapObjectLayer) {
-      Editor.instance().getMapComponent().delete(mapObjectLayer);
-    }
+    UndoManager undoManager = UndoManager.forMap(map);
+    undoManager.layerStructureChanging(map);
     parent.removeLayer(node.getLayer());
+    Editor.instance().getMapComponent().synchronizeEnvironmentEntities(map);
     ToolManager.instance().setActiveTileLayer(null);
     focusLayer(index > 0 ? parent.getRenderLayers().get(index - 1) : parent.getRenderLayers().isEmpty() ? null : parent.getRenderLayers().getFirst());
-    UndoManager.instance().layerStructureChanged(map);
+    undoManager.layerStructureChanged(map);
+    long deletionRevision = undoManager.getRevision();
     fireLayerStructureChanged();
 
     Toast.show(
         this.getRootPane(),
         Resources.strings().get("panel_layerDeleted"),
-        () -> {
-          parent.addLayer(index, copy);
-          this.refresh();
-          if (copy instanceof IMapObjectLayer mapObjectLayer) {
-            Editor.instance().getMapComponent().add(mapObjectLayer);
-          }
-        });
+        () -> undoManager.undoIfRevision(deletionRevision));
   }
 
   private void showTilesetMenu(Component anchor) {
@@ -2038,9 +2058,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     UndoManager.instance().layerStructureChanging(map);
     parent.addLayer(absIdx + 1, copied);
     focusLayer(copied);
-    if (copied instanceof IMapObjectLayer mapObjectLayer) {
-      Editor.instance().getMapComponent().add(mapObjectLayer);
-    }
+    Editor.instance().getMapComponent().synchronizeEnvironmentEntities(map);
     UndoManager.instance().layerStructureChanged(map);
     fireLayerStructureChanged();
   }
@@ -2050,10 +2068,12 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (map == null || node.getLayer() == null) {
       return;
     }
+    UndoManager undoManager = UndoManager.forMap(map);
+    undoManager.layersChanging(map);
     setLayerVisibility(map, node.getLayer());
+    undoManager.layersChanged(map);
     Transform.updateAnchors();
     refresh();
-    UndoManager.instance().recordChanges();
     fireLayerChanged();
   }
 
@@ -2116,9 +2136,15 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (node.getLayer() == null) {
       return;
     }
+    IMap map = getCurrentMap();
+    if (map == null) {
+      return;
+    }
+    UndoManager undoManager = UndoManager.forMap(map);
+    undoManager.layersChanging(map);
     node.getLayer().setVisible(!node.getLayer().isVisible());
+    undoManager.layersChanged(map);
     refresh();
-    UndoManager.instance().recordChanges();
     fireLayerChanged();
   }
 
@@ -2127,9 +2153,11 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (map == null) {
       return;
     }
+    UndoManager undoManager = UndoManager.forMap(map);
+    undoManager.layersChanging(map);
     setAllLayersVisible(map, visible);
+    undoManager.layersChanged(map);
     refresh();
-    UndoManager.instance().recordChanges();
     fireLayerChanged();
     updateLayerCommandState();
   }
