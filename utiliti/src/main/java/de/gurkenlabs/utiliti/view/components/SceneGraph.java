@@ -413,8 +413,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
           if (userObj instanceof SceneNode node) {
             if (node.isLayer()) {
               syncLayerSelection(node);
-              Editor.instance().getMapComponent().setFocus(null, true);
-              UI.showLayerProperties(node.getLayer());
+              Editor.instance().getMapComponent().showLayerInspector(node.getLayer());
             } else if (node.isMap()) {
               Editor.instance().getMapComponent().setFocus(null, true);
               ToolManager.instance().setActiveTileLayer(null);
@@ -1305,6 +1304,23 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     DefaultMutableTreeNode target = findLayerNode(layer);
     if (target != null) {
       tree.setSelectionPath(new TreePath(target.getPath()));
+    }
+  }
+
+  public void selectLayerForInspector(ILayer layer) {
+    DefaultMutableTreeNode target = findLayerNode(layer);
+    if (target == null || !(target.getUserObject() instanceof SceneNode node)) {
+      return;
+    }
+    this.isFocussing = true;
+    try {
+      TreePath path = new TreePath(target.getPath());
+      this.tree.setSelectionPath(path);
+      this.syncLayerSelection(node);
+      this.updateLayerCommandState();
+      this.scrollPathVerticallyToVisible(path);
+    } finally {
+      this.isFocussing = false;
     }
   }
 

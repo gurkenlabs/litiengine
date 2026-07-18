@@ -53,6 +53,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
@@ -64,8 +66,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -75,6 +79,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
@@ -186,10 +191,13 @@ public final class UI {
   }
 
   public static void showObjectInspector() {
-    if (inspectorCards != null && inspectorHost != null) {
-      inspectorCards.show(inspectorHost, "objects");
-      activeInspectorCard = "objects";
+    if (inspectorCards == null || inspectorHost == null) {
+      return;
     }
+    inspectorCards.show(inspectorHost, "objects");
+    activeInspectorCard = "objects";
+    Editor.instance().getMapComponent().inspectorObjectShown(
+      Editor.instance().getMapComponent().getFocusedMapObject());
   }
 
   public static void showMapProperties() {
@@ -206,6 +214,10 @@ public final class UI {
     if (inspectorCards != null && inspectorHost != null) {
       inspectorCards.show(inspectorHost, "map");
       activeInspectorCard = "map";
+    }
+    IMap map = Game.world().environment() == null ? null : Game.world().environment().getMap();
+    if (inspectorCards != null && inspectorHost != null) {
+      Editor.instance().getMapComponent().inspectorMapShown(map);
     }
   }
 
@@ -269,6 +281,9 @@ public final class UI {
         inspectorCards.show(inspectorHost, "tileLayers");
         activeInspectorCard = "tileLayers";
       }
+      if (inspectorCards != null && inspectorHost != null) {
+        Editor.instance().getMapComponent().inspectorLayerShown(layer);
+      }
       return;
     }
 
@@ -276,6 +291,9 @@ public final class UI {
     if (inspectorCards != null && inspectorHost != null) {
       inspectorCards.show(inspectorHost, "layers");
       activeInspectorCard = "layers";
+    }
+    if (inspectorCards != null && inspectorHost != null) {
+      Editor.instance().getMapComponent().inspectorLayerShown(layer);
     }
   }
 
@@ -340,6 +358,9 @@ public final class UI {
       inspectorCards.show(inspectorHost, "sprites");
       activeInspectorCard = "sprites";
     }
+    if (inspectorCards != null && inspectorHost != null) {
+      Editor.instance().getMapComponent().inspectorSpriteShown(spritesheetResource);
+    }
   }
 
   public static LayerController getLayerController() {
@@ -376,6 +397,7 @@ public final class UI {
 
   private static void setupInterface() {
     JFrame window = initWindow();
+    installInspectorNavigationShortcuts(window);
     int winW = window.getSize().width;
     int winH = window.getSize().height;
 
@@ -430,6 +452,24 @@ public final class UI {
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
         BorderFactory.createEmptyBorder(6, 10, 6, 10)));
     inspectorHeader.add(inspectorTitle, BorderLayout.WEST);
+    JButton inspectorBack = Style.iconButton(Icons.BACK_16);
+    inspectorBack.setToolTipText(Resources.strings().get("inspector_back"));
+    inspectorBack.addActionListener(event -> Editor.instance().getMapComponent().navigateInspectorBack());
+    JButton inspectorForward = Style.iconButton(Icons.FORWARD_16);
+    inspectorForward.setToolTipText(Resources.strings().get("inspector_forward"));
+    inspectorForward.addActionListener(event -> Editor.instance().getMapComponent().navigateInspectorForward());
+    Runnable updateInspectorNavigation = () -> {
+      inspectorBack.setEnabled(Editor.instance().getMapComponent().canNavigateInspectorBack());
+      inspectorForward.setEnabled(Editor.instance().getMapComponent().canNavigateInspectorForward());
+    };
+    Editor.instance().getMapComponent().onInspectorNavigationChanged(updateInspectorNavigation);
+    Editor.instance().getMapComponent().onMapLoaded(ignored -> updateInspectorNavigation.run());
+    JPanel inspectorNavigation = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+    inspectorNavigation.setOpaque(false);
+    inspectorNavigation.add(inspectorBack);
+    inspectorNavigation.add(inspectorForward);
+    inspectorHeader.add(inspectorNavigation, BorderLayout.EAST);
+    updateInspectorNavigation.run();
     JPanel inspectorPanel = new JPanel(new BorderLayout());
     inspectorPanel.add(inspectorHeader, BorderLayout.NORTH);
     inspectorPanel.add(inspectorHost, BorderLayout.CENTER);
@@ -488,6 +528,26 @@ public final class UI {
     canvas.setVisible(true);
     window.invalidate();
     window.validate();
+  }
+
+  private static void installInspectorNavigationShortcuts(JFrame window) {
+    JComponent rootPane = window.getRootPane();
+    rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+      KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.ALT_DOWN_MASK), "inspectorBack");
+    rootPane.getActionMap().put("inspectorBack", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent event) {
+        Editor.instance().getMapComponent().navigateInspectorBack();
+      }
+    });
+    rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+      KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.ALT_DOWN_MASK), "inspectorForward");
+    rootPane.getActionMap().put("inspectorForward", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent event) {
+        Editor.instance().getMapComponent().navigateInspectorForward();
+      }
+    });
   }
 
   private static JFrame initWindow() {

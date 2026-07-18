@@ -44,6 +44,7 @@ import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Cursors;
 import de.gurkenlabs.utiliti.view.components.CreaturePanel;
 import de.gurkenlabs.utiliti.view.components.PropPanel;
+import de.gurkenlabs.utiliti.view.components.SceneGraph;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.Point;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
@@ -59,6 +60,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -93,6 +95,7 @@ public class MapComponent extends GuiComponent {
 
   private final List<Consumer<TransformMode>> transformModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
+  private final List<Runnable> inspectorNavigationChangedConsumer;
   private final List<Consumer<List<IMapObject>>> selectionChangedConsumer;
   private final List<Consumer<TmxMap>> loadingConsumer;
   private final List<Consumer<TmxMap>> loadedConsumer;
@@ -101,6 +104,7 @@ public class MapComponent extends GuiComponent {
   private final Map<IMap, Point2D> cameraFocus;
   private final Map<IMap, Float> cameraZoom;
   private final Map<IMap, IMapObject> focusedObjects;
+  private final Map<IMap, InspectorNavigationHistory<InspectorNavigationTarget>> inspectorNavigationHistory;
   private final Map<IMap, List<IMapObject>> selectedObjects;
   private final Map<IMap, Environment> environments;
   private final List<TmxMap> maps;
@@ -131,6 +135,9 @@ public class MapComponent extends GuiComponent {
    * This flag prevents circular focusing approaches while this instance is already performing a focus process.
    */
   private boolean isFocussing;
+  private boolean navigatingInspector;
+  private int inspectorNavigationMouseButton;
+  private InspectorNavigationTarget currentInspectorTarget;
 
   /**
    * This flag prevents certain UI operations from executing while the editor is loading an environment.
@@ -147,11 +154,13 @@ public class MapComponent extends GuiComponent {
     super(0, 0);
     this.transformModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
+    this.inspectorNavigationChangedConsumer = new CopyOnWriteArrayList<>();
     this.selectionChangedConsumer = new CopyOnWriteArrayList<>();
     this.loadingConsumer = new CopyOnWriteArrayList<>();
     this.loadedConsumer = new CopyOnWriteArrayList<>();
     this.copyTargetChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusedObjects = Collections.synchronizedMap(new IdentityHashMap<>());
+    this.inspectorNavigationHistory = Collections.synchronizedMap(new IdentityHashMap<>());
     this.selectedObjects = Collections.synchronizedMap(new IdentityHashMap<>());
     this.environments = Collections.synchronizedMap(new IdentityHashMap<>());
     this.maps = new CopyOnWriteArrayList<>();
@@ -170,6 +179,10 @@ public class MapComponent extends GuiComponent {
 
   public void onFocusChanged(Consumer<IMapObject> cons) {
     this.focusChangedConsumer.add(cons);
+  }
+
+  public void onInspectorNavigationChanged(Runnable runnable) {
+    this.inspectorNavigationChangedConsumer.add(runnable);
   }
 
   public void onSelectionChanged(Consumer<List<IMapObject>> cons) {
@@ -289,6 +302,7 @@ public class MapComponent extends GuiComponent {
             @Override
             public void focusLost(FocusEvent e) {
               startPoint = null;
+              inspectorNavigationMouseButton = MouseEvent.NOBUTTON;
             }
           });
 
@@ -387,6 +401,36 @@ public class MapComponent extends GuiComponent {
       this.loading = false;
       Scroll.updateScrollHandlers();
     }
+  }
+
+  public boolean canNavigateInspectorBack() {
+    InspectorNavigationHistory<InspectorNavigationTarget> history = this.getCurrentInspectorNavigationHistory();
+    return history != null && history.canGoBack(this::isNavigableInspectorHistoryEntry);
+  }
+
+  public boolean canNavigateInspectorForward() {
+    InspectorNavigationHistory<InspectorNavigationTarget> history = this.getCurrentInspectorNavigationHistory();
+    return history != null && history.canGoForward(this::isNavigableInspectorHistoryEntry);
+  }
+
+  public void navigateInspectorBack() {
+    InspectorNavigationHistory<InspectorNavigationTarget> history = this.getCurrentInspectorNavigationHistory();
+    if (isMoving || isResizing
+      || history == null
+      || !history.canGoBack(this::isNavigableInspectorHistoryEntry)) {
+      return;
+    }
+    this.navigateInspectorTo(history.goBack(this::isNavigableInspectorHistoryEntry));
+  }
+
+  public void navigateInspectorForward() {
+    InspectorNavigationHistory<InspectorNavigationTarget> history = this.getCurrentInspectorNavigationHistory();
+    if (isMoving || isResizing
+      || history == null
+      || !history.canGoForward(this::isNavigableInspectorHistoryEntry)) {
+      return;
+    }
+    this.navigateInspectorTo(history.goForward(this::isNavigableInspectorHistoryEntry));
   }
 
   public void reloadEnvironment() {
@@ -568,6 +612,18 @@ public class MapComponent extends GuiComponent {
     return map != null && target != null && isLayerEffectivelyVisible(map, target, true);
   }
 
+  static boolean containsLayer(ILayerList parent, ILayer target) {
+    if (parent == null || target == null) {
+      return false;
+    }
+    for (ILayer layer : parent.getRenderLayers()) {
+      if (layer == target || layer instanceof IGroupLayer group && containsLayer(group, target)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private static boolean isLayerEffectivelyVisible(ILayerList parent, ILayer target, boolean ancestorsVisible) {
     for (ILayer layer : parent.getRenderLayers()) {
       boolean visible = ancestorsVisible && layer.isVisible() && layer.getOpacity() > 0f;
@@ -645,6 +701,9 @@ public class MapComponent extends GuiComponent {
 
   public void clearAll() {
     this.focusedObjects.clear();
+    this.inspectorNavigationHistory.clear();
+    this.currentInspectorTarget = null;
+    this.notifyInspectorNavigationChanged();
     UI.getLayerController().clear();
     this.selectedObjects.clear();
     this.cameraFocus.clear();
@@ -1278,6 +1337,8 @@ public class MapComponent extends GuiComponent {
       setSelection((IMapObject) null, true);
     }
     this.focusedObjects.remove(map);
+    this.inspectorNavigationHistory.remove(map);
+    this.notifyInspectorNavigationChanged();
     this.selectedObjects.remove(map);
     this.cameraFocus.remove(map);
     this.cameraZoom.remove(map);
@@ -1453,10 +1514,22 @@ public class MapComponent extends GuiComponent {
           this.afterArrowKeysReleased();
         });
 
-    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> this.handleKeyboardTransform(1, 0));
-    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> this.handleKeyboardTransform(-1, 0));
+    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
+      if (shouldHandleArrowTransform(e.getModifiersEx())) {
+        this.handleKeyboardTransform(1, 0);
+      }
+    });
+    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
+      if (shouldHandleArrowTransform(e.getModifiersEx())) {
+        this.handleKeyboardTransform(-1, 0);
+      }
+    });
     Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> this.handleKeyboardTransform(0, -1));
     Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> this.handleKeyboardTransform(0, 1));
+  }
+
+  static boolean shouldHandleArrowTransform(int modifiers) {
+    return (modifiers & InputEvent.ALT_DOWN_MASK) == 0;
   }
 
   private void handleKeyboardTransform(int x, int y) {
@@ -1563,6 +1636,20 @@ public class MapComponent extends GuiComponent {
   }
 
   void handleMousePressed(ComponentMouseEvent e) {
+    if (e != null && e.getEvent() != null) {
+      int direction = inspectorNavigationDirection(e.getEvent().getButton());
+      if (direction != 0) {
+        this.inspectorNavigationMouseButton = e.getEvent().getButton();
+        if (direction < 0) {
+          this.navigateInspectorBack();
+        } else {
+          this.navigateInspectorForward();
+        }
+        e.getEvent().consume();
+        return;
+      }
+    }
+
     Tool active = ToolManager.instance().getActiveTool();
     if (active == null) {
       return;
@@ -1599,7 +1686,127 @@ public class MapComponent extends GuiComponent {
     }
   }
 
+  static int inspectorNavigationDirection(int mouseButton) {
+    return switch (mouseButton) {
+      case 4 -> -1;
+      case 5 -> 1;
+      default -> 0;
+    };
+  }
+
+  public void inspectorMapShown(IMap map) {
+    if (map != null) {
+      this.inspectorTargetShown(InspectorNavigationTarget.map(map));
+    }
+  }
+
+  public void inspectorObjectShown(IMapObject mapObject) {
+    if (!mapIsNull() && mapObject != null) {
+      this.inspectorTargetShown(
+        InspectorNavigationTarget.object(Game.world().environment().getMap(), mapObject));
+    }
+  }
+
+  public void inspectorLayerShown(ILayer layer) {
+    if (!mapIsNull() && layer != null) {
+      this.inspectorTargetShown(
+        InspectorNavigationTarget.layer(Game.world().environment().getMap(), layer));
+    }
+  }
+
+  public void showLayerInspector(ILayer layer) {
+    if (layer == null) {
+      return;
+    }
+    this.navigatingInspector = true;
+    try {
+      this.setFocus(null, true);
+    } finally {
+      this.navigatingInspector = false;
+    }
+    UI.showLayerProperties(layer);
+  }
+
+  public void inspectorSpriteShown(SpritesheetResource sprite) {
+    if (!mapIsNull() && sprite != null) {
+      this.inspectorTargetShown(
+        InspectorNavigationTarget.sprite(Game.world().environment().getMap(), sprite));
+    }
+  }
+
+  private void inspectorTargetShown(InspectorNavigationTarget target) {
+    this.currentInspectorTarget = target;
+    if (!this.navigatingInspector) {
+      this.inspectorNavigationHistory
+        .computeIfAbsent(target.map(), ignored -> new InspectorNavigationHistory<>(target))
+        .record(target);
+    }
+    this.notifyInspectorNavigationChanged();
+  }
+
+  private InspectorNavigationHistory<InspectorNavigationTarget> getCurrentInspectorNavigationHistory() {
+    if (mapIsNull()) {
+      return null;
+    }
+    return this.inspectorNavigationHistory.get(Game.world().environment().getMap());
+  }
+
+  private boolean isNavigableInspectorHistoryEntry(InspectorNavigationTarget target) {
+    if (target == null || mapIsNull() || target.map() != Game.world().environment().getMap()) {
+      return false;
+    }
+    boolean exists = switch (target.type()) {
+      case MAP -> true;
+      case OBJECT -> target.value() instanceof IMapObject mapObject
+        && target.map().getMapObjects().contains(mapObject);
+      case LAYER -> target.value() instanceof ILayer layer && containsLayer(target.map(), layer);
+      case SPRITE -> target.value() instanceof SpritesheetResource sprite
+        && Editor.instance().getGameFile().getSpriteSheets().contains(sprite);
+    };
+    return exists && !Objects.equals(target, this.currentInspectorTarget);
+  }
+
+  private void navigateInspectorTo(InspectorNavigationTarget target) {
+    this.navigatingInspector = true;
+    try {
+      switch (target.type()) {
+        case MAP -> {
+          this.setFocus(null, true);
+          UI.showMapProperties();
+        }
+        case OBJECT -> {
+          this.setFocus((IMapObject) target.value(), true);
+          UI.showObjectInspector();
+        }
+        case LAYER -> {
+          this.setFocus(null, true);
+          if (UI.getLayerController() instanceof SceneGraph sceneGraph) {
+            sceneGraph.selectLayerForInspector((ILayer) target.value());
+          }
+          UI.showLayerProperties((ILayer) target.value());
+        }
+        case SPRITE -> UI.showSpriteInspector((SpritesheetResource) target.value());
+      }
+    } finally {
+      this.navigatingInspector = false;
+      this.notifyInspectorNavigationChanged();
+    }
+  }
+
+  private void notifyInspectorNavigationChanged() {
+    for (Runnable runnable : this.inspectorNavigationChangedConsumer) {
+      runnable.run();
+    }
+  }
+
   void handleMouseDragged(ComponentMouseEvent e) {
+    if (this.inspectorNavigationMouseButton != MouseEvent.NOBUTTON) {
+      if (e != null && e.getEvent() != null) {
+        e.getEvent().consume();
+      }
+      return;
+    }
+
     Tool active = ToolManager.instance().getActiveTool();
     if (active == null) {
       return;
@@ -1643,6 +1850,15 @@ public class MapComponent extends GuiComponent {
   }
 
   void handleMouseReleased(ComponentMouseEvent e) {
+    if (e != null && e.getEvent() != null
+      && inspectorNavigationDirection(e.getEvent().getButton()) != 0) {
+      if (e.getEvent().getButton() == this.inspectorNavigationMouseButton) {
+        this.inspectorNavigationMouseButton = MouseEvent.NOBUTTON;
+      }
+      e.getEvent().consume();
+      return;
+    }
+
     Tool active = ToolManager.instance().getActiveTool();
     if (active == null) {
       return;

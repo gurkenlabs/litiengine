@@ -62,6 +62,7 @@ public final class Icons {
   public static final Icon ASSET_EMITTER_16 = IconLoader.get().getUIAwareIcon("asset_emitter.svg", 16, 16);
   public static final Icon ASSET_SOUND_16 = IconLoader.get().getUIAwareIcon("asset_sound.svg", 16, 16);
   public static final Icon ASSET_TILESET_16 = IconLoader.get().getUIAwareIcon("asset_tileset.svg", 16, 16);
+  public static final Icon BACK_16 = IconLoader.get().getUIAwareIcon("back.svg", 16, 16);
   public static final Icon BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("blueprint.svg", 16, 16);
   public static final Icon BULB_16 = IconLoader.get().getUIAwareIcon("bulb.svg", 16, 16);
   public static final Icon CLEAR_CONSOLE_16 = IconLoader.get().getUIAwareIcon("clear-console.svg", 16, 16);
@@ -78,6 +79,7 @@ public final class Icons {
   public static final Icon EXPORT_16 = IconLoader.get().getUIAwareIcon("export.svg", 16, 16);
   public static final Icon ERASER_16 = IconLoader.get().getUIAwareIcon("eraser.svg", 16, 16);
   public static final Icon FILL_16 = IconLoader.get().getUIAwareIcon("fill.svg", 16, 16);
+  public static final Icon FORWARD_16 = IconLoader.get().getUIAwareIcon("forward.svg", 16, 16);
   public static final Icon FIT_16 = IconLoader.get().getUIAwareIcon("fit.svg", 16, 16);
   public static final Icon HIDE_16 = IconLoader.get().getUIAwareIcon("hide.svg", 16, 16);
   public static final Icon HIDEOTHER_16 = IconLoader.get().getUIAwareIcon("hideother.svg", 16, 16);

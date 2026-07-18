@@ -22,6 +22,7 @@ import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import java.awt.Dimension;
+import java.awt.event.InputEvent;
 import java.awt.geom.Point2D;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -136,6 +137,30 @@ class MapComponentTest {
     } finally {
       ToolManager.reset();
     }
+  }
+
+  @Test
+  void mapsMouseSideButtonsToInspectorNavigation() {
+    assertEquals(-1, MapComponent.inspectorNavigationDirection(4));
+    assertEquals(1, MapComponent.inspectorNavigationDirection(5));
+    assertEquals(0, MapComponent.inspectorNavigationDirection(1));
+  }
+
+  @Test
+  void altArrowDoesNotTransformMapObjects() {
+    assertTrue(MapComponent.shouldHandleArrowTransform(0));
+    assertTrue(!MapComponent.shouldHandleArrowTransform(InputEvent.ALT_DOWN_MASK));
+  }
+
+  @Test
+  void findsNestedLayers() {
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    GroupLayer group = new GroupLayer();
+    MapObjectLayer child = new MapObjectLayer();
+    group.addLayer(child);
+    map.addLayer(group);
+
+    assertTrue(MapComponent.containsLayer(map, child));
   }
 
   @Test
