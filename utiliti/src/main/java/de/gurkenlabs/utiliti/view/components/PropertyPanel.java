@@ -21,7 +21,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.GroupLayout;
@@ -162,6 +164,9 @@ public abstract class PropertyPanel extends JPanel {
    * The data source for the property panel, representing a map object.
    */
   protected transient IMapObject dataSource;
+  private transient List<IMapObject> dataSources = List.of();
+  private boolean binding;
+  private long bindingVersion;
 
   /**
    * The identifier for the property panel.
@@ -267,6 +272,10 @@ public abstract class PropertyPanel extends JPanel {
     return this.dataSource;
   }
 
+  protected List<IMapObject> getDataSources() {
+    return this.dataSources;
+  }
+
   /**
    * Retrieves the identifier for the property panel.
    *
@@ -301,14 +310,29 @@ public abstract class PropertyPanel extends JPanel {
    * @param mapObject the map object to bind
    */
   public void bind(IMapObject mapObject) {
-    this.dataSource = mapObject;
+    this.bindTargets(mapObject == null ? List.of() : List.of(mapObject));
+  }
 
-    if (this.dataSource == null) {
-      this.clearControls();
-      return;
+  public void bindAll(List<IMapObject> mapObjects) {
+    this.bindTargets(mapObjects == null ? List.of() : List.copyOf(mapObjects));
+  }
+
+  private void bindTargets(List<IMapObject> mapObjects) {
+    this.bindingVersion++;
+    this.dataSources = mapObjects;
+    this.dataSource = this.dataSources.isEmpty() ? null : this.dataSources.get(0);
+
+    this.binding = true;
+    try {
+      if (this.dataSource == null) {
+        this.clearControls();
+        return;
+      }
+
+      this.setControlValues(this.dataSource);
+    } finally {
+      this.binding = false;
     }
-
-    this.setControlValues(mapObject);
   }
 
   /**
@@ -454,7 +478,9 @@ public abstract class PropertyPanel extends JPanel {
     if (property == null || property.isEmpty()) {
       return;
     }
-    textField.addFocusListener(new MapObjectPropertyFocusListener(m -> m.setValue(property, textField.getText())));
+    textField.addFocusListener(new MapObjectPropertyFocusListener(textField,
+      m -> !Objects.equals(m.getStringValue(property, null), textField.getText()),
+      m -> m.setValue(property, textField.getText())));
     textField.addActionListener(new MapObjectPropertyActionListener(
       m -> !m.hasCustomProperty(property) || m.getStringValue(property, null) == null || !m.getStringValue(property, null)
         .equals(textField.getText()), m -> m.setValue(property, textField.getText())));
@@ -493,8 +519,7 @@ public abstract class PropertyPanel extends JPanel {
    * object, reloads it from the map, and refreshes the entity controller with the map object's ID.
    */
   protected void updateEnvironment() {
-    if (getDataSource() != null) {
-      IMapObject obj = getDataSource();
+    for (IMapObject obj : getDataSources()) {
       Game.world().environment().reloadFromMap(obj.getId());
       UI.getEntityController().refresh(obj.getId());
     }
@@ -584,14 +609,29 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     applying = true;
+    UndoManager undoManager = UndoManager.instance();
+    boolean operationStarted = this.dataSources.size() > 1 && undoManager.tryBeginOperation();
     try {
-      UndoManager.instance().mapObjectChanging(getDataSource());
-      updateAction.accept(getDataSource());
-      UndoManager.instance().mapObjectChanged(getDataSource());
+      for (IMapObject mapObject : this.dataSources) {
+        undoManager.mapObjectChanging(mapObject);
+        updateAction.accept(mapObject);
+        undoManager.mapObjectChanged(mapObject);
+      }
       updateEnvironment();
     } finally {
+      if (operationStarted) {
+        undoManager.endOperation();
+      }
       applying = false;
     }
+  }
+
+  private boolean editingBlocked() {
+    return this.binding || getDataSource() == null || Editor.instance().getMapComponent().isFocussing();
+  }
+
+  private boolean anyDataSourceMatches(Function<IMapObject, Boolean> check) {
+    return this.dataSources.stream().anyMatch(mapObject -> Boolean.TRUE.equals(check.apply(mapObject)));
   }
 
   /**
@@ -719,7 +759,7 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     @Override public void itemStateChanged(ItemEvent arg0) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+      if (editingBlocked()) {
         return;
       }
 
@@ -747,8 +787,7 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     @Override public void actionPerformed(ActionEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing() || Boolean.FALSE.equals(
-        this.newValueCheck.apply(getDataSource()))) {
+      if (editingBlocked() || !anyDataSourceMatches(this.newValueCheck)) {
         return;
       }
 
@@ -773,7 +812,7 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     @Override public void tableChanged(TableModelEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+      if (editingBlocked()) {
         return;
       }
       applyChanges(this.updateAction);
@@ -800,8 +839,7 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     @Override public void stateChanged(ChangeEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing() || Boolean.FALSE.equals(
-        this.newValueCheck.apply(getDataSource()))) {
+      if (editingBlocked() || !anyDataSourceMatches(this.newValueCheck)) {
         return;
       }
 
@@ -887,23 +925,56 @@ public abstract class PropertyPanel extends JPanel {
    */
   protected class MapObjectPropertyFocusListener extends FocusAdapter {
 
+    private final JTextField textField;
     private final Consumer<IMapObject> updateAction;
+    private final Function<IMapObject, Boolean> newValueCheck;
+    private boolean dirty;
+    private long bindingVersionOnFocus;
 
     /**
      * Constructs a MapObjectPropertyFocusListener with the specified update action.
      *
      * @param updateAction the action to apply to the map object
      */
-    MapObjectPropertyFocusListener(Consumer<IMapObject> updateAction) {
+    MapObjectPropertyFocusListener(JTextField textField, Function<IMapObject, Boolean> newValueCheck,
+        Consumer<IMapObject> updateAction) {
+      this.textField = textField;
+      this.newValueCheck = newValueCheck;
       this.updateAction = updateAction;
+      this.textField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        @Override public void insertUpdate(javax.swing.event.DocumentEvent e) {
+          markDirty();
+        }
+
+        @Override public void removeUpdate(javax.swing.event.DocumentEvent e) {
+          markDirty();
+        }
+
+        @Override public void changedUpdate(javax.swing.event.DocumentEvent e) {
+          markDirty();
+        }
+
+        private void markDirty() {
+          if (!binding) {
+            dirty = true;
+          }
+        }
+      });
+    }
+
+    @Override public void focusGained(FocusEvent e) {
+      this.dirty = false;
+      this.bindingVersionOnFocus = bindingVersion;
     }
 
     @Override public void focusLost(FocusEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+      if (editingBlocked() || !this.dirty || this.bindingVersionOnFocus != bindingVersion
+          || !anyDataSourceMatches(this.newValueCheck)) {
         return;
       }
 
       applyChanges(this.updateAction);
+      this.dirty = false;
     }
   }
 }

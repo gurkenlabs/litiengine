@@ -387,7 +387,7 @@ public class MapComponent extends GuiComponent {
 
       UI.getMapController().setSelection(map);
       IMapObject focused = getFocusedMapObject();
-      UI.getInspector().bind(focused);
+      this.refreshInspector();
       if (focused == null) {
         UI.showMapProperties();
       } else {
@@ -948,7 +948,7 @@ public class MapComponent extends GuiComponent {
       this.setSelection(mapObject, clearSelection);
       Transform.updateAnchors();
       UI.getEntityController().select(mapObject);
-      UI.getInspector().bind(mapObject);
+      this.refreshInspector();
       if (mapObject == null) {
         UI.showMapProperties();
       } else {
@@ -978,6 +978,7 @@ public class MapComponent extends GuiComponent {
       for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
         cons.accept(getSelectedMapObjects());
       }
+      this.refreshInspector();
       return;
     }
 
@@ -997,6 +998,22 @@ public class MapComponent extends GuiComponent {
     for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
       cons.accept(getSelectedMapObjects());
     }
+    this.refreshInspector();
+  }
+
+  public void refreshInspector() {
+    UI.getInspector().bindAll(inspectorSelection(getFocusedMapObject()));
+  }
+
+  private List<IMapObject> inspectorSelection(IMapObject focused) {
+    List<IMapObject> selection = new ArrayList<>(getSelectedMapObjects());
+    if (selection.isEmpty() && focused != null) {
+      return List.of(focused);
+    }
+    if (focused != null && selection.remove(focused)) {
+      selection.add(0, focused);
+    }
+    return selection;
   }
 
   public void deleteMap() {

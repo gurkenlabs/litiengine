@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.Component;
+import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
@@ -41,6 +42,13 @@ public class EmitterPanel extends PropertyPanel {
   public void bind(IMapObject mapObject) {
     for (EmitterPropertyGroup e : EmitterPropertyGroup.values()) {
       ((EmitterPropertyPanel) this.propertyGrouptabs.getComponent(e.ordinal())).bind(mapObject);
+    }
+  }
+
+  @Override
+  public void bindAll(List<IMapObject> mapObjects) {
+    for (EmitterPropertyGroup e : EmitterPropertyGroup.values()) {
+      ((EmitterPropertyPanel) this.propertyGrouptabs.getComponent(e.ordinal())).bindAll(mapObjects);
     }
   }
 

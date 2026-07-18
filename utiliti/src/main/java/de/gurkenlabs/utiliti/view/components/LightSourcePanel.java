@@ -9,6 +9,8 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.LayoutManager;
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -41,6 +43,12 @@ public class LightSourcePanel extends PropertyPanel {
   @Override
   public void bind(IMapObject mapObject) {
     super.bind(mapObject);
+    this.updateLighting();
+  }
+
+  @Override
+  public void bindAll(List<IMapObject> mapObjects) {
+    super.bindAll(mapObjects);
     this.updateLighting();
   }
 
@@ -80,7 +88,7 @@ public class LightSourcePanel extends PropertyPanel {
             m -> {
               m.setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
               m.setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
-              Game.world().environment().updateLighting(getDataSource().getBoundingBox());
+              updateLighting();
             }));
     this.setup(this.spinnerIntensity, MapObjectProperty.LIGHT_INTENSITY);
     this.spinnerIntensity.addChangeListener(m -> this.updateLighting());
@@ -97,12 +105,14 @@ public class LightSourcePanel extends PropertyPanel {
       return;
     }
 
-    final IMapObject datasource = getDataSource();
-    if (datasource == null) {
+    if (getDataSources().isEmpty()) {
       return;
     }
-
-    Game.world().environment().updateLighting(getDataSource().getBoundingBox());
+    Rectangle2D bounds = null;
+    for (IMapObject mapObject : getDataSources()) {
+      bounds = bounds == null ? mapObject.getBoundingBox() : bounds.createUnion(mapObject.getBoundingBox());
+    }
+    Game.world().environment().updateLighting(bounds);
   }
 
   private LayoutManager createLayout() {

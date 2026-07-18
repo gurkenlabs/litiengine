@@ -1935,7 +1935,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         node.getEntity().setName(name);
       }
       UndoManager.instance().mapObjectChanged(node.getMapObject());
-      UI.getInspector().bind(node.getMapObject());
+      Editor.instance().getMapComponent().refreshInspector();
     }
     refresh();
   }

@@ -17,6 +17,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -221,7 +222,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.setupChangedListeners();
     if (UI.getLayerController() != null) {
-      UI.getLayerController().onLayersChanged(map -> this.bind(this.getDataSource()));
+      UI.getLayerController().onLayersChanged(map -> Editor.instance().getMapComponent().refreshInspector());
     }
   }
 
@@ -245,32 +246,59 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   @Override
   public void bind(IMapObject mapObject) {
-    super.bind(mapObject);
+    this.bindAll(mapObject == null ? List.of() : List.of(mapObject));
+  }
 
-    if (mapObject != null) {
-      MapObjectType t = resolveType(mapObject.getType());
-      this.setMapObjectType(t);
-    } else {
-      this.setMapObjectType(null);
+  @Override
+  public void bindAll(List<IMapObject> mapObjects) {
+    List<IMapObject> targets = mapObjects == null ? List.of() : List.copyOf(mapObjects);
+    super.bindAll(targets);
+
+    MapObjectType commonType = targets.isEmpty() ? null : resolveType(targets.get(0).getType());
+    MapObjectType candidateType = commonType;
+    if (targets.stream().anyMatch(target -> resolveType(target.getType()) != candidateType)) {
+      commonType = null;
     }
+    this.setMapObjectType(commonType);
 
     if (this.currentPanel != null) {
-      this.currentPanel.bind(this.getDataSource());
+      bindPanel(this.currentPanel, targets);
     }
 
     this.customPanel.setExcludedProperties(this.type == MapObjectType.EMITTER ? emitterProperties() : java.util.Set.of());
 
-    if (this.collisionPanel != null) {
-      this.collisionPanel.bind(this.getDataSource());
-    }
-    if (this.combatPanel != null) {
-      this.combatPanel.bind(this.getDataSource());
-    }
-    if (this.movementPanel != null) {
-      this.movementPanel.bind(this.getDataSource());
-    }
+    boolean supportsCollisionAndCombat = commonType == MapObjectType.PROP || commonType == MapObjectType.CREATURE;
+    bindPanel(this.collisionPanel, supportsCollisionAndCombat ? targets : List.of());
+    bindPanel(this.combatPanel, supportsCollisionAndCombat ? targets : List.of());
+    bindPanel(this.movementPanel, commonType == MapObjectType.CREATURE ? targets : List.of());
 
-    this.customPanel.bind(this.getDataSource());
+    bindPanel(this.customPanel, targets.size() == 1 ? targets : List.of());
+    updateMultiEditState(targets);
+  }
+
+  private static void bindPanel(PropertyPanel panel, List<IMapObject> targets) {
+    if (targets.size() == 1) {
+      panel.bind(targets.get(0));
+    } else {
+      panel.bindAll(targets);
+    }
+  }
+
+  private void updateMultiEditState(List<IMapObject> targets) {
+    boolean multiEdit = targets.size() > 1;
+    this.spnX.setEnabled(!multiEdit);
+    this.spnY.setEnabled(!multiEdit);
+    this.spnW.setEnabled(!multiEdit);
+    this.spnH.setEnabled(!multiEdit);
+    this.customCard.setVisible(!multiEdit && !targets.isEmpty());
+
+    if (multiEdit) {
+      this.labelEntityID.setText(Integer.toString(targets.size()));
+      this.lblLayer.setText("");
+      this.lblLayer.setToolTipText(null);
+    }
+    updateImplementationVisibility();
+    updateRenderTypeEnabled();
   }
 
   private static java.util.Set<String> emitterProperties() {
@@ -514,10 +542,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   }
 
   private void updateRenderTypeEnabled() {
-    boolean supportsRenderType =
-        this.type == MapObjectType.CREATURE
-            || this.type == MapObjectType.EMITTER
-            || this.type == MapObjectType.PROP;
+    boolean supportsRenderType = getDataSources().isEmpty()
+        ? this.type == MapObjectType.CREATURE || this.type == MapObjectType.EMITTER || this.type == MapObjectType.PROP
+        : getDataSources().stream()
+          .map(mapObject -> resolveType(mapObject.getType()))
+          .allMatch(type -> type == MapObjectType.CREATURE || type == MapObjectType.EMITTER || type == MapObjectType.PROP);
     this.renderType.setEnabled(supportsRenderType && !this.checkBoxRenderWithLayer.isSelected());
   }
 
@@ -548,6 +577,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     } finally {
       this.updatingImplementation = false;
     }
+  }
+
+  private void updateImplementationVisibility() {
+    boolean supported = this.type == MapObjectType.CREATURE || this.type == MapObjectType.PROP;
+    this.labelImplementation.setVisible(supported);
+    this.implementation.setVisible(supported);
   }
 
   private static MapObjectType resolveType(String mapObjectType) {
@@ -583,6 +618,22 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   boolean isRenderTypeEnabledForTest() {
     return this.renderType.isEnabled();
+  }
+
+  boolean isTypeCardVisibleForTest() {
+    return this.typeCard.isVisible();
+  }
+
+  boolean isCustomCardVisibleForTest() {
+    return this.customCard.isVisible();
+  }
+
+  boolean areTransformControlsEnabledForTest() {
+    return this.spnX.isEnabled() && this.spnY.isEnabled() && this.spnW.isEnabled() && this.spnH.isEnabled();
+  }
+
+  PropertyPanel getCurrentPanelForTest() {
+    return this.currentPanel;
   }
 
   private void setupChangedListeners() {
@@ -647,7 +698,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         });
 
     this.textFieldName.addFocusListener(
-        new MapObjectPropertyFocusListener(m -> m.setName(textFieldName.getText())));
+        new MapObjectPropertyFocusListener(this.textFieldName,
+          m -> !Objects.equals(m.getName(), textFieldName.getText()),
+          m -> m.setName(textFieldName.getText())));
 
     this.textFieldName.addActionListener(
         new MapObjectPropertyActionListener(

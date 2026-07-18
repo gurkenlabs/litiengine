@@ -92,7 +92,7 @@ public final class RenderMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the ui
-    UI.getInspector().bind(Editor.instance().getMapComponent().getFocusedMapObject());
+    Editor.instance().getMapComponent().refreshInspector();
   }
 
   private static void setRenderType(List<IMapObject> selectedMapObjects, RenderType renderType) {
@@ -116,6 +116,6 @@ public final class RenderMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the ui
-    UI.getInspector().bind(Editor.instance().getMapComponent().getFocusedMapObject());
+    Editor.instance().getMapComponent().refreshInspector();
   }
 }

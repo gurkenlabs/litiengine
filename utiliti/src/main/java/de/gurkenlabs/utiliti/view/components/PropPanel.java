@@ -83,9 +83,6 @@ public class PropPanel extends PropertyPanel {
   @Override
   public void bind(IMapObject mapObject) {
     this.loadAvailableProps();
-    if (mapObject != null) {
-      setControlValues(mapObject);
-    }
     super.bind(mapObject);
   }
 
@@ -140,6 +137,12 @@ public class PropPanel extends PropertyPanel {
     Map<String, String> m = SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll());
     populateComboBoxWithSprites(this.comboBoxSpriteSheets, new TreeMap<>(m)); // TreeMap for sorted order
     this.propsLoaded = true;
+  }
+
+  @Override
+  public void bindAll(java.util.List<IMapObject> mapObjects) {
+    this.loadAvailableProps();
+    super.bindAll(mapObjects);
   }
 
   int getSpriteItemCountForTest() {

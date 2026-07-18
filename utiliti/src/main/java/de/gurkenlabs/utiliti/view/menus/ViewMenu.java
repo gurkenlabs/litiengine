@@ -27,7 +27,7 @@ import javax.swing.JMenuItem;
     snapToPixels.addItemListener(e -> {
       Editor.preferences().setSnapToPixels(snapToPixels.getState());
       UI.getInspector().refresh();
-      UI.getInspector().bind(Editor.instance().getMapComponent().getFocusedMapObject());
+      Editor.instance().getMapComponent().refreshInspector();
     });
 
     JCheckBoxMenuItem snapToGrid = new JCheckBoxMenuItem(Resources.strings().get("menu_view_snapGrid"));

@@ -115,6 +115,14 @@ public class UndoManager {
     this.beginEventAggregation();
   }
 
+  public boolean tryBeginOperation() {
+    if (this.operation != 0) {
+      return false;
+    }
+    this.beginOperation();
+    return true;
+  }
+
   /**
    * Ends the current operation by incrementing the next operation identifier and resetting the current operation.
    */
@@ -1016,7 +1024,7 @@ public class UndoManager {
 
       if (Editor.instance().getMapComponent().getFocusedMapObject() != null
         && Editor.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
-        UI.getInspector().bind(target);
+        Editor.instance().getMapComponent().refreshInspector();
         UI.getEntityController().select(target);
       }
     }

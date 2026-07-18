@@ -101,6 +101,14 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     public void bind(IMapObject mapObject) {
       super.bind(mapObject);
       ttl.bind(mapObject);
+      btnPause.setEnabled(true);
+    }
+
+    @Override
+    public void bindAll(java.util.List<IMapObject> mapObjects) {
+      super.bindAll(mapObjects);
+      ttl.bindAll(mapObjects);
+      btnPause.setEnabled(mapObjects.size() <= 1);
     }
 
     @Override
@@ -206,6 +214,15 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       textPanel.bind(mapObject);
       spritePanel.bind(mapObject);
       outlineThickness.bind(mapObject);
+    }
+
+    @Override
+    public void bindAll(java.util.List<IMapObject> mapObjects) {
+      super.bindAll(mapObjects);
+      colorPanel.bindAll(mapObjects);
+      textPanel.bindAll(mapObjects);
+      spritePanel.bindAll(mapObjects);
+      outlineThickness.bindAll(mapObjects);
     }
 
     @Override
@@ -339,6 +356,15 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
     }
 
     @Override
+    public void bindAll(java.util.List<IMapObject> mapObjects) {
+      super.bindAll(mapObjects);
+      startWidth.bindAll(mapObjects);
+      startHeight.bindAll(mapObjects);
+      deltaWidth.bindAll(mapObjects);
+      deltaHeight.bindAll(mapObjects);
+    }
+
+    @Override
     protected void clearControls() {
       // do nothing
     }
@@ -404,6 +430,13 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       super.bind(mapObject);
       offsetX.bind(mapObject);
       offsetY.bind(mapObject);
+    }
+
+    @Override
+    public void bindAll(java.util.List<IMapObject> mapObjects) {
+      super.bindAll(mapObjects);
+      offsetX.bindAll(mapObjects);
+      offsetY.bindAll(mapObjects);
     }
 
     @Override
@@ -480,6 +513,13 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       super.bind(mapObject);
       startAngle.bind(mapObject);
       deltaAngle.bind(mapObject);
+    }
+
+    @Override
+    public void bindAll(java.util.List<IMapObject> mapObjects) {
+      super.bindAll(mapObjects);
+      startAngle.bindAll(mapObjects);
+      deltaAngle.bindAll(mapObjects);
     }
 
     @Override
@@ -563,6 +603,15 @@ public abstract class EmitterPropertyPanel extends PropertyPanel {
       velocityY.bind(mapObject);
       accelerationX.bind(mapObject);
       accelerationY.bind(mapObject);
+    }
+
+    @Override
+    public void bindAll(java.util.List<IMapObject> mapObjects) {
+      super.bindAll(mapObjects);
+      velocityX.bindAll(mapObjects);
+      velocityY.bindAll(mapObjects);
+      accelerationX.bindAll(mapObjects);
+      accelerationY.bindAll(mapObjects);
     }
 
     @Override

@@ -155,7 +155,7 @@ public final class Transform {
       Game.world().environment().updateLighting();
     }
 
-    UI.getInspector().bind(transformObject);
+    Editor.instance().getMapComponent().refreshInspector();
     updateAnchors();
   }
 
@@ -237,7 +237,7 @@ public final class Transform {
         updateEntityTransform(selected);
 
         if (selected.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
-          UI.getInspector().bind(selected);
+          Editor.instance().getMapComponent().refreshInspector();
         }
       }
     }

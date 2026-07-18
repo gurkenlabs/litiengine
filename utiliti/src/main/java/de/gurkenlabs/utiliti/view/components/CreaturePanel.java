@@ -95,9 +95,6 @@ public class CreaturePanel extends PropertyPanel {
   @Override
   public void bind(IMapObject mapObject) {
     this.loadAvailableCreatureSprites();
-    if (mapObject != null) {
-      setControlValues(mapObject);
-    }
     super.bind(mapObject);
   }
 
@@ -134,6 +131,12 @@ public class CreaturePanel extends PropertyPanel {
       mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
     this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE, false));
     this.checkBoxStartDead.setSelected(isStartDead(mapObject));
+  }
+
+  @Override
+  public void bindAll(java.util.List<IMapObject> mapObjects) {
+    this.loadAvailableCreatureSprites();
+    super.bindAll(mapObjects);
   }
 
   private void setupChangedListeners() {
@@ -206,13 +209,16 @@ public class CreaturePanel extends PropertyPanel {
   @Override
   protected void updateEnvironment() {
     super.updateEnvironment();
-    if (getDataSource() == null || Game.world().environment() == null) {
+    if (Game.world().environment() == null) {
       return;
     }
-    Creature creature = Game.world().environment().getCreature(getDataSource().getId());
-    Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
-    if (creature != null && direction != null) {
-      creature.setFacingDirection(direction);
+    for (IMapObject mapObject : getDataSources()) {
+      Creature creature = Game.world().environment().getCreature(mapObject.getId());
+      Direction direction = mapObject.getEnumValue(
+        MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED);
+      if (creature != null) {
+        creature.setFacingDirection(direction);
+      }
     }
   }
 

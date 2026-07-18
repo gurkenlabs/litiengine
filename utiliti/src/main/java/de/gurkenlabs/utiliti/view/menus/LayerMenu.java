@@ -81,7 +81,7 @@ public final class LayerMenu extends JMenu {
     UndoManager.instance().endOperation();
 
     // rebind to refresh the layer property
-    UI.getInspector().bind(Editor.instance().getMapComponent().getFocusedMapObject());
+    Editor.instance().getMapComponent().refreshInspector();
 
     this.updateMenuItemStates(Editor.instance().getMapComponent().getSelectedMapObjects());
   }
