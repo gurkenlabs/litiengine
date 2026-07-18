@@ -186,8 +186,18 @@ public class TileData {
     this.compression = original.getCompression();
     this.rawValue = original.rawValue != null ? new ArrayList<>(original.rawValue) : null;
     this.value = original.getValue();
-    this.chunks = original.chunks != null ? new ArrayList<>(original.chunks) : null;
-    this.tiles = original.tiles != null ? new CopyOnWriteArrayList<>(original.getTiles()) : null;
+    this.chunks = original.chunks != null ? new ArrayList<>(original.chunks.stream().map(TileChunk::new).toList()) : null;
+    if (this.rawValue != null && this.chunks != null) {
+      for (int i = 0; i < this.rawValue.size(); i++) {
+        if (this.rawValue.get(i) instanceof TileChunk chunk) {
+          int chunkIndex = original.chunks.indexOf(chunk);
+          if (chunkIndex >= 0) {
+            this.rawValue.set(i, this.chunks.get(chunkIndex));
+          }
+        }
+      }
+    }
+    this.tiles = original.tiles != null ? copyTiles(original.getTiles()) : null;
     this.width = original.getWidth();
     this.height = original.getHeight();
     this.offsetX = original.getOffsetX();
@@ -195,6 +205,14 @@ public class TileData {
     this.minChunkOffsetXMap = original.minChunkOffsetXMap;
     this.minChunkOffsetYMap = original.minChunkOffsetYMap;
     this.dirty = original.dirty;
+  }
+
+  private static List<Tile> copyTiles(List<Tile> original) {
+    List<Tile> copy = new CopyOnWriteArrayList<>();
+    for (Tile tile : original) {
+      copy.add(tile == null || tile == Tile.EMPTY ? new Tile(Tile.NONE) : new Tile(tile));
+    }
+    return copy;
   }
 
   @XmlTransient

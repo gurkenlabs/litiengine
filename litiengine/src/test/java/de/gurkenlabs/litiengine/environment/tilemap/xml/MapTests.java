@@ -1,8 +1,10 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
@@ -12,6 +14,7 @@ import de.gurkenlabs.litiengine.util.io.URLAdapter;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -138,6 +141,7 @@ class MapTests {
     IMapObjectLayer layer = map.getMapObjectLayers().getFirst();
     assertEquals("test", layer.getName());
     assertEquals(4, layer.getMapObjects().size());
+    assertThrows(UnsupportedOperationException.class, () -> map.getMapObjectLayers().clear());
     assertEquals(16, layer.getSizeInTiles().width);
     assertEquals(new Color(195, 65, 0, 200), layer.getTintColor());
 
@@ -169,6 +173,36 @@ class MapTests {
     map.removeLayer(1);
 
     assertEquals(0, map.getMapObjectLayers().size());
+  }
+
+  @Test
+  void mapObjectCopiesPreserveTileAndIsolateTextData() {
+    IMap map = Resources.maps().get(
+        "de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
+    MapObject textObject = (MapObject) map.getMapObject(2);
+    MapObject tileObject = (MapObject) map.getMapObject(5);
+
+    MapObject textCopy = new MapObject(textObject, true);
+    MapObject tileCopy = new MapObject(tileObject, true);
+
+    assertNotSame(textObject.getText(), textCopy.getText());
+    assertEquals(textObject.getText().getText(), textCopy.getText().getText());
+    assertEquals(1, tileCopy.getGridId());
+  }
+
+  @Test
+  void mapObjectLayersAreAnUnmodifiableRecursiveSnapshot() {
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    GroupLayer group = new GroupLayer();
+    group.addLayer(new MapObjectLayer());
+    map.addLayer(group);
+
+    List<IMapObjectLayer> snapshot = map.getMapObjectLayers();
+    group.addLayer(new MapObjectLayer());
+
+    assertEquals(1, snapshot.size());
+    assertEquals(2, map.getMapObjectLayers().size());
+    assertThrows(UnsupportedOperationException.class, () -> snapshot.clear());
   }
 
   @ParameterizedTest(name = "testDecimalFloatAdapter value={0}, expected={1}")

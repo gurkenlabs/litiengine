@@ -16,8 +16,6 @@ public class TileAnimation implements ITileAnimation {
   @XmlElement(name = "frame", type = Frame.class)
   private List<ITileAnimationFrame> frames;
 
-  private transient int totalDuration;
-
   public TileAnimation() {
     this.frames = new ArrayList<>();
   }
@@ -40,34 +38,43 @@ public class TileAnimation implements ITileAnimation {
         }
       }
     }
-    this.totalDuration = 0;
   }
 
   @Override
   public int getTotalDuration() {
-    if (this.totalDuration > 0) {
-      return this.totalDuration;
-    }
-
-    if (this.getFrames().isEmpty()) {
-      return 0;
-    }
-
+    int totalDuration = 0;
     for (ITileAnimationFrame frame : this.getFrames()) {
       if (frame != null) {
-        this.totalDuration += frame.getDuration();
+        totalDuration += frame.getDuration();
       }
     }
-
-    return this.totalDuration;
+    return totalDuration;
   }
 
   @Override
   public ITileAnimationFrame getCurrentFrame() {
-    long time = Game.time().sinceEnvironmentLoad() % this.getTotalDuration();
+    if (this.getFrames().isEmpty()) {
+      return null;
+    }
+    if (this.getTotalDuration() <= 0) {
+      return this.getFrames().getFirst();
+    }
+    return this.getFrameAt(Game.time().sinceEnvironmentLoad());
+  }
+
+  ITileAnimationFrame getFrameAt(long elapsed) {
+    int duration = this.getTotalDuration();
+    if (this.getFrames().isEmpty()) {
+      return null;
+    }
+    if (duration <= 0) {
+      return this.getFrames().getFirst();
+    }
+
+    long time = elapsed % duration;
     for (ITileAnimationFrame frame : this.getFrames()) {
       time -= frame.getDuration();
-      if (time <= 0) {
+      if (time < 0) {
         return frame;
       }
     }

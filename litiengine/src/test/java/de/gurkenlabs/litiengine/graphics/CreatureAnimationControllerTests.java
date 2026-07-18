@@ -40,6 +40,18 @@ class CreatureAnimationControllerTests {
     assertEquals("zombie11-walk-right", controller.getCurrent().getName());
   }
 
+  @Test
+  void directionalWalkSpritesParticipateInFlipFallback() {
+    BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+    image.setRGB(0, 0, 0xffffffff);
+    new Spritesheet(image, "flip-walk-right.png", 1, 1);
+    Creature creature = new TestCreature("flip");
+    creature.setAngle(Direction.LEFT.toAngle());
+    CreatureAnimationController<Creature> controller = new CreatureAnimationController<>(creature, true);
+
+    assertTrue(controller.hasAnimation("flip-walk-left"));
+  }
+
   private static class TestCreature extends Creature {
     TestCreature(String spritesheetName) {
       super(spritesheetName);
@@ -48,6 +60,11 @@ class CreatureAnimationControllerTests {
     @Override
     protected IEntityAnimationController<? extends Creature> createAnimationController() {
       return new CreatureAnimationController<>(this, false);
+    }
+
+    @Override
+    public boolean isIdle() {
+      return false;
     }
   }
 }

@@ -52,6 +52,25 @@ public class Text implements IMapObjectText {
   @XmlValue
   private String text;
 
+  public Text() {
+    // Required for JAXB.
+  }
+
+  public Text(Text original) {
+    this.fontfamily = original.fontfamily;
+    this.pixelsize = original.pixelsize;
+    this.wrap = original.wrap;
+    this.color = original.color;
+    this.bold = original.bold;
+    this.italic = original.italic;
+    this.underline = original.underline;
+    this.strikeout = original.strikeout;
+    this.kerning = original.kerning;
+    this.halign = original.halign;
+    this.valign = original.valign;
+    this.text = original.text;
+  }
+
   @Override
   public String getText() {
     return this.text;

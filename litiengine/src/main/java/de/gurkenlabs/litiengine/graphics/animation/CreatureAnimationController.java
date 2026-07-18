@@ -189,6 +189,10 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       for (CreatureAnimationState state : CreatureAnimationState.values()) {
         String spriteName = getSpriteName(state, direction);
         animations.put(spriteName, getAll().stream().filter(x -> x.getName().equals(spriteName)).findFirst());
+        if (state == CreatureAnimationState.MOVE) {
+          String walkSpriteName = getWalkSpriteName(direction);
+          animations.put(walkSpriteName, getAll().stream().filter(x -> x.getName().equals(walkSpriteName)).findFirst());
+        }
       }
     }
 
@@ -265,6 +269,12 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       animName = getSpriteName(state.getOpposite(), d);
       if (hasAnimation(animName)) {
         return animName;
+      }
+      if (state.getOpposite() == CreatureAnimationState.MOVE) {
+        animName = getWalkSpriteName(d);
+        if (hasAnimation(animName)) {
+          return animName;
+        }
       }
     }
 

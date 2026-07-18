@@ -80,17 +80,8 @@ public class TileLayer extends Layer implements ITileLayer {
   public TileLayer(TileLayer original) {
     super(original);
     this.data = original.data != null ? new TileData(original.data) : null;
-    this.tileList = new CopyOnWriteArrayList<>();
-    this.tiles = new Tile[original.getHeight()][original.getWidth()];
-
-    for (int i = 0; i < original.getData().size(); i++) {
-      final int x = i % original.getWidth();
-      final int y = i / original.getWidth();
-      final Tile originalTile = original.getData().get(i);
-      final Tile copiedTile = new Tile(originalTile);
-      copiedTile.setTileCoordinate(new Point(x, y));
-      this.tileList.add(copiedTile);
-      this.tiles[y][x] = copiedTile;
+    if (this.data != null) {
+      this.initializeTileViews();
     }
   }
 
@@ -120,7 +111,7 @@ public class TileLayer extends Layer implements ITileLayer {
 
   @Override
   public void setTile(int x, int y, int gid) {
-    if (getRawTileData() == null) {
+    if (getRawTileData() == null || x < 0 || y < 0 || x >= getWidth() || y >= getHeight()) {
       return;
     }
 
@@ -135,6 +126,9 @@ public class TileLayer extends Layer implements ITileLayer {
       tile = new Tile(gid);
       tile.setTileCoordinate(new Point(x, y));
       getRawTileData().getTiles().set(index, tile);
+      if (this.tileList != null && index < this.tileList.size()) {
+        this.tileList.set(index, tile);
+      }
       if (this.tiles != null && y >= 0 && y < this.tiles.length && x >= 0 && x < this.tiles[y].length) {
         this.tiles[y][x] = tile;
       }
@@ -196,16 +190,29 @@ public class TileLayer extends Layer implements ITileLayer {
     if (this.data != null && !this.data.isInfinite()) {
       this.data.setDimensions(getWidth(), getHeight());
     }
+    this.initializeTileViews();
+    for (Tile tile : getData()) {
+      tile.setTilesetEntry(getMap().getTilesetEntry(tile.getGridId()));
+    }
+  }
+
+  private void initializeTileViews() {
     this.tileList = new CopyOnWriteArrayList<>();
     this.tiles = new Tile[getHeight()][getWidth()];
     for (int i = 0; i < getData().size(); i++) {
       final int x = i % getWidth();
       final int y = i / getWidth();
-      final Tile tile = getData().get(i);
+      if (y >= this.tiles.length) {
+        break;
+      }
+      Tile tile = getData().get(i);
+      if (tile == null || tile == Tile.EMPTY) {
+        tile = new Tile(Tile.NONE);
+        getData().set(i, tile);
+      }
       tile.setTileCoordinate(new Point(x, y));
       this.tileList.add(tile);
       this.tiles[y][x] = tile;
-      getData().get(i).setTilesetEntry(getMap().getTilesetEntry(tile.getGridId()));
     }
   }
 }

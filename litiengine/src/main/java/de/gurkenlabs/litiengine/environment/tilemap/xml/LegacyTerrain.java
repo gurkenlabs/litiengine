@@ -12,6 +12,15 @@ class LegacyTerrain extends CustomPropertyProvider {
   @XmlAttribute
   private int tile;
 
+  LegacyTerrain() {
+  }
+
+  LegacyTerrain(LegacyTerrain original) {
+    super(original);
+    this.name = original.name;
+    this.tile = original.tile;
+  }
+
   String getName() {
     return this.name;
   }

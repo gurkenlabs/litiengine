@@ -111,7 +111,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     this.image = original.image != null ? new MapImage(original.image) : null;
     this.type = original.type;
     this.probability = original.probability;
-    this.collisionData = original.collisionData;
+    this.collisionData = original.collisionData != null ? new MapObjectLayer(original.collisionData, true) : null;
   }
 
   public void setType(String type) {
@@ -156,6 +156,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
 
   boolean shouldBeSaved() {
     return this.terrain != null || this.image != null || this.animation != null || this.type != null || this.probability != null
+      || this.collisionData != null
       || !this.getProperties().isEmpty();
   }
 

@@ -106,6 +106,12 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private List<TilesetEntry> allTiles;
 
   @XmlTransient
+  private boolean legacyTerrainsConverted;
+
+  @XmlTransient
+  private WangSet legacyTerrainSnapshot;
+
+  @XmlTransient
   protected Tileset sourceTileset;
 
   private transient Spritesheet spriteSheet;
@@ -115,6 +121,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * sprite sheet when images are cleared.
    */
   public Tileset() {
+    this.allTiles = new ArrayList<>();
     Resources.images().addClearedListener(() -> this.spriteSheet = null);
   }
 
@@ -125,9 +132,16 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @param original The original {@code Tileset} object to copy from.
    */
   public Tileset(Tileset original) {
-    super(original);
+    super(original.source == null ? original : new CustomPropertyProvider());
 
     this.firstgid = original.getFirstGridId();
+    this.source = original.source;
+    if (this.source != null) {
+      this.allTiles = new ArrayList<>();
+      this.sourceTileset = original.sourceTileset != null ? new Tileset(original.sourceTileset) : null;
+      return;
+    }
+
     this.image = original.getImage() instanceof MapImage mapImage ? new MapImage(mapImage) : null;
     this.margin = original.getMargin();
     this.name = original.getName();
@@ -138,12 +152,14 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     this.tilecount = original.getTileCount();
     this.columns = original.getColumns();
     this.spacing = original.getSpacing();
-    this.source = original.source;
     this.objectalignment = original.getObjectalignment();
     this.tilerendersize = original.getTilerendersize();
     this.fillmode = original.getFillmode();
     this.tiles = null;
     this.wangsets = copyTerrainSets(original.getTerrainSets());
+    this.legacyTerrainsConverted = original.legacyTerrainsConverted;
+    this.legacyTerrainSnapshot = original.legacyTerrainSnapshot != null ? new WangSet(original.legacyTerrainSnapshot) : null;
+    this.terraintypes = copyLegacyTerrains(original.sourceTileset != null ? original.sourceTileset.terraintypes : original.terraintypes);
     this.transformations = original.getTransformations() != null ? new TileTransformations(original.getTransformations()) : null;
     this.allTiles = new ArrayList<>();
     for (int tileId = 0; tileId < original.getTileCount(); tileId++) {
@@ -154,10 +170,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       }
     }
     this.sourceTileset = null;
-    this.spriteSheet = original.getSpritesheet();
+    this.spriteSheet = original.sourceTileset != null ? original.sourceTileset.spriteSheet : original.spriteSheet;
   }
 
   public void copyFrom(Tileset original) {
+    original = unwrapSource(original);
     if (this.sourceTileset != null) {
       int firstGridId = this.sourceTileset.firstgid;
       String source = this.sourceTileset.source;
@@ -183,6 +200,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     this.fillmode = original.fillmode;
     this.transformations = original.transformations != null ? new TileTransformations(original.transformations) : null;
     this.wangsets = copyTerrainSets(original.getTerrainSets());
+    this.legacyTerrainsConverted = original.legacyTerrainsConverted;
+    this.legacyTerrainSnapshot = original.legacyTerrainSnapshot != null ? new WangSet(original.legacyTerrainSnapshot) : null;
+    this.terraintypes = copyLegacyTerrains(original.terraintypes);
     this.setProperties(copyProperties(original.getProperties()));
     this.allTiles = new ArrayList<>();
     if (original.allTiles != null) {
@@ -192,6 +212,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
     this.tiles = null;
     this.spriteSheet = original.spriteSheet;
+  }
+
+  private static Tileset unwrapSource(Tileset tileset) {
+    return tileset.sourceTileset != null ? tileset.sourceTileset : tileset;
   }
 
   private static Map<String, ICustomProperty> copyProperties(Map<String, ICustomProperty> properties) {
@@ -215,7 +239,12 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return copy;
   }
 
+  private static List<LegacyTerrain> copyLegacyTerrains(List<LegacyTerrain> terrains) {
+    return terrains == null ? null : terrains.stream().map(LegacyTerrain::new).toList();
+  }
+
   public void copyTerrainSetsFrom(Tileset original) {
+    original = unwrapSource(original);
     if (this.sourceTileset != null) {
       this.sourceTileset.copyTerrainSetsFrom(original);
       return;
@@ -224,6 +253,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public void enrichTerrainMetadataFrom(Tileset original) {
+    original = unwrapSource(original);
     if (this.sourceTileset != null) {
       this.sourceTileset.enrichTerrainMetadataFrom(original);
       return;
@@ -252,12 +282,29 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   private void convertLegacyTerrains() {
-    if (this.wangsets != null && !this.wangsets.isEmpty()) {
+    if (this.legacyTerrainsConverted) {
       return;
     }
+    WangSet terrainSet = createLegacyTerrainSet();
+    if (terrainSet == null) {
+      return;
+    }
+    if (this.wangsets != null && !this.wangsets.isEmpty()) {
+      if (this.wangsets.size() == 1 && this.wangsets.getFirst() instanceof WangSet existing && terrainSetsEqual(existing, terrainSet)) {
+        this.legacyTerrainsConverted = true;
+        this.legacyTerrainSnapshot = new WangSet(existing);
+      }
+      return;
+    }
+    this.wangsets = new ArrayList<>(List.of(terrainSet));
+    this.legacyTerrainsConverted = true;
+    this.legacyTerrainSnapshot = new WangSet(terrainSet);
+  }
+
+  private WangSet createLegacyTerrainSet() {
     int terrainCount = this.terraintypes != null && !this.terraintypes.isEmpty() ? this.terraintypes.size() : legacyTerrainCount();
     if (terrainCount == 0) {
-      return;
+      return null;
     }
     WangSet terrainSet = new WangSet("Terrains", de.gurkenlabs.litiengine.environment.tilemap.TerrainType.CORNER);
     Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.ORANGE, Color.PINK};
@@ -299,11 +346,46 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
         }
       }
     }
-    this.wangsets = new ArrayList<>(List.of(terrainSet));
+    return terrainSet;
+  }
+
+  private static boolean terrainSetsEqual(WangSet first, WangSet second) {
+    if (!java.util.Objects.equals(first.getName(), second.getName()) || first.getType() != second.getType()
+        || !java.util.Objects.equals(first.getProperties(), second.getProperties())
+        || first.getTerrains().size() != second.getTerrains().size() || first.getWangTiles().size() != second.getWangTiles().size()) {
+      return false;
+    }
+    for (int i = 0; i < first.getTerrains().size(); i++) {
+      if (!(first.getTerrains().get(i) instanceof WangColor firstColor)
+          || !(second.getTerrains().get(i) instanceof WangColor secondColor)
+          || !java.util.Objects.equals(firstColor.getName(), secondColor.getName())
+          || !java.util.Objects.equals(firstColor.getColor(), secondColor.getColor())
+          || firstColor.getTileId() != secondColor.getTileId()
+          || Double.compare(firstColor.getProbability(), secondColor.getProbability()) != 0
+          || !java.util.Objects.equals(firstColor.getProperties(), secondColor.getProperties())) {
+        return false;
+      }
+    }
+    for (int i = 0; i < first.getWangTiles().size(); i++) {
+      WangTile firstTile = first.getWangTiles().get(i);
+      WangTile secondTile = second.getWangTiles().get(i);
+      if (firstTile.getTileId() != secondTile.getTileId() || !java.util.Arrays.equals(firstTile.getWangId(), secondTile.getWangId())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void clearEditedLegacyTerrains() {
+    if (this.legacyTerrainSnapshot == null || this.wangsets != null && this.wangsets.size() == 1
+        && this.wangsets.getFirst() instanceof WangSet current && terrainSetsEqual(current, this.legacyTerrainSnapshot)) {
+      return;
+    }
     this.terraintypes = null;
     if (this.allTiles != null) {
       this.allTiles.forEach(TilesetEntry::clearLegacyTerrain);
     }
+    this.legacyTerrainSnapshot = null;
   }
 
   private int legacyTerrainCount() {
@@ -357,6 +439,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
     this.margin = margin;
+    this.spriteSheet = null;
   }
 
   public void setSpacing(int spacing) {
@@ -365,6 +448,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
     this.spacing = spacing;
+    this.spriteSheet = null;
   }
 
   /**
@@ -420,9 +504,17 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   @XmlTransient
   public Spritesheet getSpritesheet() {
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.getSpritesheet();
+    }
+    if (this.spriteSheet != null && (this.spriteSheet.getSpriteWidth() != this.getTileWidth()
+        || this.spriteSheet.getSpriteHeight() != this.getTileHeight())) {
+      this.spriteSheet = null;
+    }
     if (this.spriteSheet == null && this.getImage() != null) {
       this.spriteSheet = Resources.spritesheets().get(this.getImage().getSource());
-      if (this.spriteSheet == null) {
+      if (this.spriteSheet == null || this.spriteSheet.getSpriteWidth() != this.getTileWidth()
+          || this.spriteSheet.getSpriteHeight() != this.getTileHeight()) {
         this.spriteSheet = Resources.spritesheets().load(this);
         if (this.spriteSheet == null) {
           return null;
@@ -464,6 +556,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
     this.tilewidth = tileWidth;
+    this.spriteSheet = null;
   }
 
   @Override
@@ -477,6 +570,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
     this.tileheight = tileHeight;
+    this.spriteSheet = null;
   }
 
   public void setColumns(int columns) {
@@ -485,6 +579,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
     this.columns = columns;
+    this.spriteSheet = null;
   }
 
   public void setTileCount(int tileCount) {
@@ -492,7 +587,19 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.sourceTileset.setTileCount(tileCount);
       return;
     }
+    if (tileCount < 0) {
+      throw new IllegalArgumentException("Tile count must be non-negative.");
+    }
     this.tilecount = tileCount;
+    if (this.allTiles == null) {
+      this.allTiles = new ArrayList<>(tileCount);
+    }
+    while (this.allTiles.size() < tileCount) {
+      this.allTiles.add(new TilesetEntry(this, this.allTiles.size()));
+    }
+    if (this.allTiles.size() > tileCount) {
+      this.allTiles.subList(tileCount, this.allTiles.size()).clear();
+    }
   }
 
   @Override
@@ -545,7 +652,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the tile transformations
    */
   public TileTransformations getTransformations() {
-    return this.transformations;
+    return this.sourceTileset != null ? this.sourceTileset.getTransformations() : this.transformations;
   }
 
   /**
@@ -554,7 +661,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the tileset class
    */
   public String getTilesetClass() {
-    return this.tilesetClass;
+    return this.sourceTileset != null ? this.sourceTileset.getTilesetClass() : this.tilesetClass;
   }
 
   /**
@@ -563,7 +670,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the object alignment
    */
   public String getObjectalignment() {
-    return this.objectalignment;
+    return this.sourceTileset != null ? this.sourceTileset.getObjectalignment() : this.objectalignment;
   }
 
   public void setObjectalignment(String objectalignment) {
@@ -580,7 +687,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the tile render size
    */
   public String getTilerendersize() {
-    return this.tilerendersize;
+    return this.sourceTileset != null ? this.sourceTileset.getTilerendersize() : this.tilerendersize;
   }
 
   public void setTilerendersize(String tilerendersize) {
@@ -597,7 +704,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the fill mode
    */
   public String getFillmode() {
-    return this.fillmode;
+    return this.sourceTileset != null ? this.sourceTileset.getFillmode() : this.fillmode;
   }
 
   public void setFillmode(String fillmode) {
@@ -771,6 +878,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.tilecount = null;
       this.columns = null;
     } else {
+      clearEditedLegacyTerrains();
+      if (this.allTiles == null) {
+        this.allTiles = new ArrayList<>();
+      }
       this.tiles = new ArrayList<>(this.allTiles);
       this.tiles.removeIf(tilesetEntry -> !tilesetEntry.shouldBeSaved());
     }

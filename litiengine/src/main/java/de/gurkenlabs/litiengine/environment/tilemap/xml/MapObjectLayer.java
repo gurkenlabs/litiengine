@@ -43,10 +43,14 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
    *          the layer we want to copy
    */
   public MapObjectLayer(MapObjectLayer original) {
+    this(original, false);
+  }
+
+  MapObjectLayer(MapObjectLayer original, boolean keepIds) {
     super(original);
-    int mapId = Game.world().environment().getNextMapId();
+    int mapId = keepIds ? 0 : Game.world().environment().getNextMapId();
     for (IMapObject obj : original.getMapObjects()) {
-      this.addMapObject(new MapObject((MapObject) obj, mapId));
+      this.addMapObject(new MapObject((MapObject) obj, keepIds ? obj.getId() : mapId));
       mapId++;
     }
     if (original.getColor() != null) {

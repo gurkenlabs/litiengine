@@ -93,9 +93,13 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    *          the MapObject we want to copy
    */
   public MapObject(MapObject original) {
+    this(original, Game.world().environment().getNextMapId(), true);
+  }
+
+  private MapObject(MapObject original, int id, boolean ignored) {
     super(original);
     this.setName(original.getName());
-    this.setId(Game.world().environment().getNextMapId());
+    this.setId(id);
     this.polyline = (original.getPolyline() != null && !original.getPolyline().getPoints().isEmpty()) ? new PolyShape(original.getPolyline()) : null;
     this.polygon = (original.getPolygon() != null && !original.getPolygon().getPoints().isEmpty()) ? new PolyShape(original.getPolygon()) : null;
     this.setType(original.getType());
@@ -104,7 +108,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     this.setWidth(original.getWidth());
     this.setHeight(original.getHeight());
     this.setLayer(original.layer);
-    this.text = original.text;
+    this.gid = original.gid;
+    this.text = original.text != null ? new Text(original.text) : null;
     this.ellipse = original.ellipse;
     this.point = original.point;
   }
@@ -122,10 +127,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    *          decide if the new instance will adopt the old MapObject's ID or get a new, unique one.
    */
   public MapObject(MapObject original, boolean keepID) {
-    this(original);
-    if (keepID) {
-      this.setId(original.getId());
-    }
+    this(original, keepID ? original.getId() : Game.world().environment().getNextMapId(), true);
   }
 
   /**
@@ -137,8 +139,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    *          The id of this instance.
    */
   public MapObject(MapObject original, int id) {
-    this(original);
-    this.setId(id);
+    this(original, id, true);
   }
 
   public static Rectangle2D getBounds(IMapObject... objects) {

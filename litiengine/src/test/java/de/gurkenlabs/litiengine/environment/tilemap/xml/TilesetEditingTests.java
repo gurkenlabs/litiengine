@@ -5,12 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.awt.Color;
 import de.gurkenlabs.litiengine.environment.tilemap.TerrainType;
@@ -27,6 +33,75 @@ class TilesetEditingTests {
 
     assertEquals(150, animation.getFrames().getFirst().getDuration());
     assertEquals(150, animation.getTotalDuration());
+  }
+
+  @Test
+  void animationDurationTracksMutableFramesAndHandlesNoDuration() {
+    TileAnimation animation = new TileAnimation(List.of(new Frame(2, 100)));
+    ((Frame) animation.getFrames().getFirst()).setDuration(250);
+
+    assertEquals(250, animation.getTotalDuration());
+    animation.getFrames().clear();
+    assertEquals(0, animation.getTotalDuration());
+    assertNull(animation.getCurrentFrame());
+
+    animation.getFrames().add(new Frame(3, 0));
+    assertEquals(3, animation.getCurrentFrame().getTileId());
+  }
+
+  @Test
+  void animationSwitchesFramesAtExactDurationBoundary() {
+    TileAnimation animation = new TileAnimation(List.of(new Frame(2, 100), new Frame(3, 150)));
+
+    assertEquals(2, animation.getFrameAt(99).getTileId());
+    assertEquals(3, animation.getFrameAt(100).getTileId());
+    assertEquals(3, animation.getFrameAt(249).getTileId());
+    assertEquals(2, animation.getFrameAt(250).getTileId());
+  }
+
+  @Test
+  void programmaticTileCountCreatesEntriesAndMarshals() throws Exception {
+    Tileset tileset = new Tileset();
+    tileset.setName("generated");
+    tileset.setTileWidth(16);
+    tileset.setTileHeight(16);
+    tileset.setColumns(2);
+    tileset.setTileCount(2);
+    ((TilesetEntry) tileset.getTile(1)).setType("wall");
+    Path target = Files.createTempFile("generated-tileset", ".tsx");
+
+    try {
+      XmlUtilities.save(tileset, target);
+      String xml = Files.readString(target);
+      assertTrue(xml.contains("tilecount=\"2\""));
+      assertTrue(xml.contains("<tile id=\"1\" type=\"wall\""));
+    } finally {
+      Files.deleteIfExists(target);
+    }
+  }
+
+  @Test
+  void externalTilesetMetadataAndSpritesheetDelegateToSource() throws Exception {
+    Tileset source = tilesetWithEntry();
+    source.setObjectalignment("center");
+    source.setTilerendersize("grid");
+    source.setFillmode("stretch");
+    Spritesheet original = new Spritesheet(new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB), "external-source-a.png", 16, 16);
+    set(source, "spriteSheet", original);
+    Tileset wrapper = new Tileset();
+    set(wrapper, "source", "external.tsx");
+    set(wrapper, "sourceTileset", source);
+
+    assertEquals("center", wrapper.getObjectalignment());
+    assertEquals("grid", wrapper.getTilerendersize());
+    assertEquals("stretch", wrapper.getFillmode());
+    assertSame(original, wrapper.getSpritesheet());
+
+    source.setTileWidth(8);
+    assertNull(field(source, "spriteSheet"));
+    Spritesheet updated = new Spritesheet(new BufferedImage(8, 16, BufferedImage.TYPE_INT_ARGB), "external-source-b.png", 8, 16);
+    set(source, "spriteSheet", updated);
+    assertSame(updated, wrapper.getSpritesheet());
   }
 
   @Test
@@ -111,6 +186,38 @@ class TilesetEditingTests {
     assertEquals(7, mapReference.getFirstGridId());
     assertNotNull(mapReference.getTile(0));
     assertEquals(2, ((List<?>) field(external, "allTiles")).size());
+  }
+
+  @Test
+  void externalWrapperRestoresNestedSourceFromSnapshot() throws Exception {
+    Tileset source = tilesetWithEntry();
+    source.setName("before");
+    source.setObjectalignment("center");
+    ((TilesetEntry) source.getTile(1)).setType("wall");
+    WangSet terrains = new WangSet("Ground", TerrainType.CORNER);
+    terrains.getTerrains().add(new WangColor("grass", Color.GREEN));
+    source.getOrCreateTerrainSets().add(terrains);
+    Tileset wrapper = new Tileset();
+    set(wrapper, "firstgid", 7);
+    set(wrapper, "source", "external.tsx");
+    set(wrapper, "sourceTileset", source);
+    Tileset snapshot = new Tileset(wrapper);
+
+    source.setName("after");
+    source.setObjectalignment("topleft");
+    ((TilesetEntry) source.getTile(1)).setType("floor");
+    source.getTerrainSets().clear();
+    wrapper.copyFrom(snapshot);
+
+    assertSame(source, field(wrapper, "sourceTileset"));
+    assertEquals(7, wrapper.getFirstGridId());
+    assertEquals("external.tsx", field(wrapper, "source"));
+    assertEquals("before", wrapper.getName());
+    assertEquals("center", wrapper.getObjectalignment());
+    assertEquals(2, wrapper.getTileCount());
+    assertEquals("wall", wrapper.getTile(1).getType());
+    assertEquals("Ground", wrapper.getTerrainSets().getFirst().getName());
+    assertEquals("grass", wrapper.getTerrainSets().getFirst().getTerrains().getFirst().getName());
   }
 
   @Test

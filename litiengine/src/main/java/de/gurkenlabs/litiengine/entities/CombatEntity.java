@@ -291,6 +291,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.refreshCollisionBox();
     this.hitPoints.setMax(this.initialHitpoints);
     this.hitPoints.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, this.initialHitpoints));
+    if (this.isDead()) {
+      this.setCollision(false);
+    }
   }
 
   /**

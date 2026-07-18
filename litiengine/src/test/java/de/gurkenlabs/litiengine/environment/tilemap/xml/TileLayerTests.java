@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -21,6 +22,22 @@ class TileLayerTests {
     layer.setTile(2, 1, 17);
 
     assertEquals(17, layer.getTile(2, 1).getGridId());
+  }
+
+  @Test
+  void copiedLayerUsesOneDeeplyIsolatedTileGraph() {
+    TileLayer original = new TileLayer(2, 1);
+    original.setTile(0, 0, 4);
+    TileLayer copy = new TileLayer(original);
+
+    assertSame(copy.getTile(0, 0), copy.getTiles().getFirst());
+    assertSame(copy.getTile(0, 0), copy.getRawTileData().getTiles().getFirst());
+    assertNotSame(original.getTile(0, 0), copy.getTile(0, 0));
+
+    copy.setTile(0, 0, 9);
+    assertEquals(4, original.getTile(0, 0).getGridId());
+    assertEquals(9, copy.getTiles().getFirst().getGridId());
+    assertEquals(9, copy.getRawTileData().getTiles().getFirst().getGridId());
   }
 
   @Test
