@@ -68,7 +68,6 @@ public class AssetList extends JSplitPane implements Controller {
     this.setLeftComponent(leftPanel);
 
     new FileDrop(assetPanel, files -> Editor.instance().importResources(files));
-    new FileDrop(assetTree, files -> Editor.instance().importResources(files));
 
     // Search field
     this.searchField = new JTextField() {
@@ -241,10 +240,13 @@ public class AssetList extends JSplitPane implements Controller {
       UI.showTilesetInspector(tileset);
     } else if (origin instanceof SpritesheetResource spritesheetResource) {
       UI.showSpriteInspector(spritesheetResource);
-    } else if (this.assetPanel.getCurrentType() != AssetPanel.AssetType.TILESET
-      && this.assetPanel.getCurrentType() != AssetPanel.AssetType.SPRITESHEET) {
+    } else if (!hasAssetInspectorTarget(origin)) {
       UI.hideAssetInspector();
     }
+  }
+
+  static boolean hasAssetInspectorTarget(Object origin) {
+    return origin instanceof Tileset || origin instanceof SpritesheetResource;
   }
 
   private static final class GridIcon implements Icon {

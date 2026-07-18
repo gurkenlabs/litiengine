@@ -18,7 +18,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.HeadlessException;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -71,7 +73,7 @@ public class AssetTree extends JTree {
         image -> Editor.instance().importSpriteSheets(
             new SpritesheetResource(image, "clipboard", image.getWidth(), image.getHeight()))));
     this.getInputMap(JComponent.WHEN_FOCUSED).put(
-        KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.CTRL_DOWN_MASK),
+        KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, menuShortcutMask()),
         "pasteResources");
     this.getActionMap().put("pasteResources", TransferHandler.getPasteAction());
 
@@ -148,6 +150,10 @@ public class AssetTree extends JTree {
 
   public void forceUpdate() {
     refreshCounts();
+    if (Editor.instance().getGameFile() == null) {
+      this.assetPanel.clearAssets();
+      return;
+    }
     if (getSelectionPath() == null) {
       selectDefault();
       return;
@@ -178,15 +184,14 @@ public class AssetTree extends JTree {
     final TreePath soundPath = new TreePath(this.nodeSounds.getPath());
     final TreePath animationPath = new TreePath(this.nodeAnimations.getPath());
 
-    // Animations live in the engine's in-memory resource container rather than the resource bundle,
-    // so they can be displayed even when no project (game file) is loaded yet.
-    if (selectedPath.equals(animationPath)) {
-      this.assetPanel.loadAnimations(new ArrayList<>(Resources.animations().getAll()));
+    final ResourceBundle gameFile = Editor.instance().getGameFile();
+    if (gameFile == null) {
+      this.assetPanel.clearAssets();
       return;
     }
 
-    final ResourceBundle gameFile = Editor.instance().getGameFile();
-    if (gameFile == null) {
+    if (selectedPath.equals(animationPath)) {
+      this.assetPanel.loadAnimations(new ArrayList<>(Resources.animations().getAll()));
       return;
     }
 
@@ -340,6 +345,14 @@ public class AssetTree extends JTree {
     return new DefaultMutableTreeNode(new AssetCategory(label, icon, group));
   }
 
+  private static int menuShortcutMask() {
+    try {
+      return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+    } catch (HeadlessException ignored) {
+      return java.awt.event.InputEvent.CTRL_DOWN_MASK;
+    }
+  }
+
   private void refreshCounts() {
     this.categoryCounts.clear();
     ResourceBundle gameFile = Editor.instance().getGameFile();
@@ -351,8 +364,8 @@ public class AssetTree extends JTree {
       this.categoryCounts.put(this.nodeBlueprints, gameFile.getBluePrints().size());
       this.categoryCounts.put(this.nodeTileSets, collectAllTilesets(gameFile).size());
       this.categoryCounts.put(this.nodeSounds, gameFile.getSounds().size());
+      this.categoryCounts.put(this.nodeAnimations, Resources.animations().getAll().size());
     }
-    this.categoryCounts.put(this.nodeAnimations, Resources.animations().getAll().size());
     repaint();
   }
 

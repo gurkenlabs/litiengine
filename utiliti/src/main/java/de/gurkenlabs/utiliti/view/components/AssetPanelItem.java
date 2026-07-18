@@ -14,10 +14,10 @@ import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.tool.AssetFileExporter;
 import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
-import java.awt.datatransfer.Transferable;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.view.menus.AssetPanelItemPopupMenu;
 import java.awt.BasicStroke;
@@ -30,8 +30,12 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -98,6 +102,7 @@ public class AssetPanelItem extends JPanel {
   private Supplier<java.util.List<Object>> transferAssetsSupplier;
   private MouseAdapter mouseHandler;
   private boolean dragStarted;
+  private boolean individualActionsEnabled = true;
 
   public AssetPanelItem(Object origin) {
     this.origin = origin;
@@ -166,10 +171,27 @@ public class AssetPanelItem extends JPanel {
         return COPY;
       }
       @Override protected Transferable createTransferable(JComponent c) {
-        java.util.List<Object> assets = transferAssetsSupplier != null
-            ? transferAssetsSupplier.get()
-            : java.util.List.of(origin);
-        return assets.isEmpty() ? null : new AssetTransferable(assets);
+        return createAssetTransferable();
+      }
+
+      @Override public void exportToClipboard(JComponent component, Clipboard clipboard, int action) {
+        if (action != COPY) {
+          throw new IllegalArgumentException("Asset transfers only support copy");
+        }
+        Transferable data = createTransferable(component);
+        if (data instanceof AssetTransferable assetTransferable) {
+          assetTransferable.ownClipboard();
+          try {
+            clipboard.setContents(data, assetTransferable);
+          } catch (IllegalStateException e) {
+            assetTransferable.lostOwnership(clipboard, data);
+            throw e;
+          }
+        }
+      }
+
+      @Override protected void exportDone(JComponent source, Transferable data, int action) {
+        closeTransfer(data);
       }
     });
     btnAdd.setEnabled(canAdd());
@@ -267,20 +289,22 @@ public class AssetPanelItem extends JPanel {
 
   private void setupKeyboardShortcuts() {
     getInputMap(JComponent.WHEN_FOCUSED).put(
-        KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copyAsset");
+        KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutMask()), "copyAsset");
     getActionMap().put("copyAsset", TransferHandler.getCopyAction());
 
     getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
     getActionMap().put("deleteAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        deleteAsset();
+        if (individualActionsEnabled) {
+          deleteAsset();
+        }
       }
     });
 
     getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "addAsset");
     getActionMap().put("addAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        if (canAdd()) {
+        if (individualActionsEnabled && canAdd()) {
           addEntity();
         }
       }
@@ -289,16 +313,19 @@ public class AssetPanelItem extends JPanel {
     getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "editAsset");
     getActionMap().put("editAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        if (canEdit()) {
+        if (individualActionsEnabled && canEdit()) {
           editAsset();
         }
       }
     });
 
-    getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK), "exportAsset");
+    getInputMap(JComponent.WHEN_FOCUSED).put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutMask()), "exportAsset");
     getActionMap().put("exportAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        exportAsset();
+        if (individualActionsEnabled) {
+          exportAsset();
+        }
       }
     });
   }
@@ -604,6 +631,18 @@ public class AssetPanelItem extends JPanel {
     repaint();
   }
 
+  public boolean isIndividualActionsEnabled() {
+    return this.individualActionsEnabled;
+  }
+
+  public void setIndividualActionsEnabled(boolean enabled) {
+    this.individualActionsEnabled = enabled;
+    this.btnAdd.setEnabled(enabled && canAdd());
+    this.btnEdit.setEnabled(enabled && canEdit());
+    this.btnDelete.setEnabled(enabled);
+    this.btnExport.setEnabled(enabled);
+  }
+
   public String getDetailsSummary() {
     Map<String, String> details = getDetails(origin);
     if (details.isEmpty()) {
@@ -626,6 +665,23 @@ public class AssetPanelItem extends JPanel {
 
   public void setTransferAssetsSupplier(Supplier<java.util.List<Object>> supplier) {
     this.transferAssetsSupplier = supplier;
+  }
+
+  private Transferable createAssetTransferable() {
+    java.util.List<Object> assets = transferAssetsSupplier != null
+        ? transferAssetsSupplier.get()
+        : java.util.List.of(origin);
+    return assets.isEmpty() ? null : new AssetTransferable(assets);
+  }
+
+  Transferable createTransferableForTest() {
+    return createAssetTransferable();
+  }
+
+  static void closeTransfer(Transferable data) {
+    if (data instanceof AssetTransferable assetTransferable) {
+      assetTransferable.close();
+    }
   }
 
   public void setCompact(boolean compact) {
@@ -806,9 +862,10 @@ public class AssetPanelItem extends JPanel {
         JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
     if (answer == 0) {
-      XmlExportDialog.export(spritesheetResource, Resources.strings().get("panel_spritesheet"), spritesheetResource.getName());
+      XmlExportDialog.export(spritesheetResource, Resources.strings().get("panel_spritesheet"),
+          AssetFileExporter.safeFileName(spritesheetResource.getName()));
     } else if (answer == 1) {
-      exportImage(sprite, format, spritesheetResource.getName());
+      exportImage(sprite, format, AssetFileExporter.safeFileName(spritesheetResource.getName()));
     }
   }
 
@@ -827,15 +884,18 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportTileset(Tileset tileset) {
-    XmlExportDialog.export(tileset, Resources.strings().get("assetpanel_type_tileset"), tileset.getName(), Tileset.FILE_EXTENSION);
+    XmlExportDialog.export(tileset, Resources.strings().get("assetpanel_type_tileset"),
+        AssetFileExporter.safeFileName(tileset.getName()), Tileset.FILE_EXTENSION);
   }
 
   private void exportEmitter(EmitterAttributes emitter) {
-    XmlExportDialog.export(emitter, Resources.strings().get("panel_emitter"), emitter.getName());
+    XmlExportDialog.export(emitter, Resources.strings().get("panel_emitter"),
+        AssetFileExporter.safeFileName(emitter.getName()));
   }
 
   private void exportBlueprint(Blueprint blueprint) {
-    XmlExportDialog.export(blueprint, Resources.strings().get("assetpanel_type_blueprint"), blueprint.getName(),
+    XmlExportDialog.export(blueprint, Resources.strings().get("assetpanel_type_blueprint"),
+      AssetFileExporter.safeFileName(blueprint.getName()),
       Blueprint.BLUEPRINT_FILE_EXTENSION);
   }
 
@@ -846,7 +906,8 @@ public class AssetPanelItem extends JPanel {
 
     try {
       JFileChooser chooser =
-        createFileChooser(sound.getFormat().toString(), sound.getFormat().toString(), sound.getName() + sound.getFormat().toFileExtension());
+        createFileChooser(sound.getFormat().toString(), sound.getFormat().toString(),
+          AssetFileExporter.safeFileName(sound.getName()) + sound.getFormat().toFileExtension());
       chooser.setDialogTitle(Resources.strings().get("contextmenu_resource_export_sound"));
 
       if (chooser.showSaveDialog(Game.window().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
@@ -862,7 +923,8 @@ public class AssetPanelItem extends JPanel {
 
   private void exportAnimation(Animation animation) {
     JFileChooser chooser = createFileChooser(
-      Resources.strings().get("assetpanel_aseprite_json"), "json", animation.getName() + ".json");
+      Resources.strings().get("assetpanel_aseprite_json"), "json",
+      AssetFileExporter.safeFileName(animation.getName()) + ".json");
     chooser.setDialogTitle(Resources.strings().get("contextmenu_resource_export_animation"));
 
     if (chooser.showSaveDialog(Game.window().getRenderComponent()) != JFileChooser.APPROVE_OPTION) {
@@ -870,10 +932,15 @@ public class AssetPanelItem extends JPanel {
     }
 
     java.nio.file.Path destination = chooser.getSelectedFile().toPath();
-    if (Resources.animations().exportAseprite(animation, destination)) {
-      log.log(Level.INFO, "exported animation {0} to {1}", new Object[] {animation.getName(), destination});
-    } else {
-      log.log(Level.WARNING, "failed to export animation {0}", animation.getName());
+    try {
+      if (AssetFileExporter.exportAnimation(animation, destination).size() == 2) {
+        log.log(Level.INFO, "exported animation {0} to {1}",
+          new Object[] {animation.getName(), destination});
+      } else {
+        log.log(Level.WARNING, "failed to export animation {0}", animation.getName());
+      }
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -923,5 +990,13 @@ public class AssetPanelItem extends JPanel {
     }
     btnEdit.setVisible(visible && canEdit());
     btnExport.setVisible(visible);
+  }
+
+  private static int menuShortcutMask() {
+    try {
+      return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+    } catch (HeadlessException ignored) {
+      return InputEvent.CTRL_DOWN_MASK;
+    }
   }
 }

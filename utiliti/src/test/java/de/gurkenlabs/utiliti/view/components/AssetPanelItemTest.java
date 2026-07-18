@@ -1,10 +1,20 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
+import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
@@ -40,5 +50,31 @@ class AssetPanelItemTest {
 
     assertEquals(1, exports.get());
     assertEquals(TransferHandler.COPY, action.get());
+  }
+
+  @Test
+  void clipboardExportKeepsExternalFilePayloadAvailable() throws Exception {
+    SpritesheetResource resource = new SpritesheetResource(
+        new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "clipboard-item", 1, 1);
+    AssetPanelItem item = new AssetPanelItem(resource);
+    Clipboard clipboard = new Clipboard("asset-test");
+
+    item.getTransferHandler().exportToClipboard(item, clipboard, TransferHandler.COPY);
+    @SuppressWarnings("unchecked")
+    List<File> files = (List<File>) clipboard.getData(DataFlavor.javaFileListFlavor);
+
+    assertEquals(1, files.size());
+    org.junit.jupiter.api.Assertions.assertTrue(files.getFirst().isFile());
+  }
+
+  @Test
+  void overlappingTransferCompletionClosesTheCompletedData() {
+    AssetTransferable first = mock(AssetTransferable.class);
+    AssetTransferable second = mock(AssetTransferable.class);
+
+    AssetPanelItem.closeTransfer(first);
+
+    verify(first).close();
+    verify(second, never()).close();
   }
 }

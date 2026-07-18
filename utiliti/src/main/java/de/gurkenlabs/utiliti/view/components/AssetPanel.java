@@ -121,7 +121,8 @@ public class AssetPanel extends JPanel {
     this.removeAll();
     this.visibleItemCount = 0;
     for (AssetPanelItem item : allItems) {
-      if (filterText.isEmpty() || item.getName().toLowerCase().contains(filterText)) {
+      String name = item.getName();
+      if (filterText.isEmpty() || name != null && name.toLowerCase().contains(filterText)) {
         this.add(item);
         this.visibleItemCount++;
         item.validate();
@@ -269,6 +270,11 @@ public class AssetPanel extends JPanel {
     });
   }
 
+  public void clearAssets() {
+    this.currentType = null;
+    loadItems(() -> {});
+  }
+
   private void loadItems(Runnable runnable) {
     allItems.clear();
     selectedItems.clear();
@@ -295,9 +301,7 @@ public class AssetPanel extends JPanel {
         event -> handleSelectionClicked(item, event));
     item.setTransferAssetsSupplier(() -> {
       List<Object> selection = getSelectedOrigins();
-      return this.selectedItems.contains(item) && !selection.isEmpty()
-          ? selection
-          : List.of(item.getOrigin());
+      return selection.isEmpty() ? List.of(item.getOrigin()) : selection;
     });
     return item;
   }
@@ -306,11 +310,11 @@ public class AssetPanel extends JPanel {
     if (!javax.swing.SwingUtilities.isLeftMouseButton(event) && !event.isPopupTrigger()) {
       return;
     }
-    boolean control = event.isControlDown();
+    boolean menuShortcut = (event.getModifiersEx() & menuShortcutMask()) != 0;
     boolean shift = event.isShiftDown();
     if (shift) {
-      selectRange(item, control);
-    } else if (control) {
+      selectRange(item, menuShortcut);
+    } else if (menuShortcut) {
       toggleSelection(item);
     } else if (!this.selectedItems.contains(item)) {
       selectOnly(item);
@@ -320,7 +324,7 @@ public class AssetPanel extends JPanel {
 
   private void handleSelectionClicked(AssetPanelItem item, MouseEvent event) {
     if (javax.swing.SwingUtilities.isLeftMouseButton(event)
-        && !event.isControlDown() && !event.isShiftDown()) {
+        && (event.getModifiersEx() & menuShortcutMask()) == 0 && !event.isShiftDown()) {
       selectOnly(item);
     }
   }
@@ -379,9 +383,11 @@ public class AssetPanel extends JPanel {
   }
 
   private void updateSelectedStates() {
+    boolean individualActionsEnabled = this.selectedItems.size() <= 1;
     for (AssetPanelItem item : this.allItems) {
       item.setSelected(this.selectedItems.contains(item));
       item.setFocused(item == this.focusedItem);
+      item.setIndividualActionsEnabled(individualActionsEnabled);
     }
   }
 
@@ -413,12 +419,20 @@ public class AssetPanel extends JPanel {
     return List.copyOf(this.allItems);
   }
 
-  void selectItemForTest(int index, boolean control, boolean shift) {
+  void selectItemForTest(int index, boolean menuShortcut, boolean shift) {
     AssetPanelItem item = this.allItems.get(index);
-    int modifiers = (control ? MouseEvent.CTRL_DOWN_MASK : 0)
+    int modifiers = (menuShortcut ? menuShortcutMask() : 0)
         | (shift ? MouseEvent.SHIFT_DOWN_MASK : 0);
     handleSelectionPressed(item, new MouseEvent(
         item, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), modifiers,
         1, 1, 1, false, MouseEvent.BUTTON1));
+  }
+
+  static int menuShortcutMask() {
+    try {
+      return java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+    } catch (java.awt.HeadlessException ignored) {
+      return MouseEvent.CTRL_DOWN_MASK;
+    }
   }
 }

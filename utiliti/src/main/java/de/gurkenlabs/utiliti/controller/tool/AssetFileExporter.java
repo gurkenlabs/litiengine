@@ -15,9 +15,12 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import javax.imageio.ImageIO;
 
 public final class AssetFileExporter {
@@ -37,27 +40,29 @@ public final class AssetFileExporter {
     if (!supports(asset) || directory == null) {
       return List.of();
     }
-    Files.createDirectories(directory);
+    Path exportDirectory = prepareDirectory(directory);
     if (asset instanceof SpritesheetResource spritesheet) {
-      return exportSpritesheet(spritesheet, directory);
+      return exportSpritesheet(spritesheet, exportDirectory);
     }
     if (asset instanceof Tileset tileset) {
-      return exportXml(tileset, tileset.getName(), Tileset.FILE_EXTENSION, directory);
+      return exportXml(tileset, tileset.getName(), Tileset.FILE_EXTENSION, exportDirectory);
     }
     if (asset instanceof EmitterAttributes emitter) {
-      return exportXml(emitter, emitter.getName(), "xml", directory);
+      return exportXml(emitter, emitter.getName(), "xml", exportDirectory);
     }
     if (asset instanceof Blueprint blueprint) {
       return exportXml(
-          blueprint, blueprint.getName(), Blueprint.BLUEPRINT_FILE_EXTENSION, directory);
+          blueprint, blueprint.getName(), Blueprint.BLUEPRINT_FILE_EXTENSION, exportDirectory);
     }
     if (asset instanceof SoundResource sound) {
-      Path target = directory.resolve(safeName(sound.getName()) + sound.getFormat().toFileExtension());
+      Path target = resolveTarget(exportDirectory,
+          safeFileName(sound.getName()) + sound.getFormat().toFileExtension());
       Files.write(target, Codec.decode(sound.getData()));
       return List.of(target);
     }
     if (asset instanceof Animation animation) {
-      return exportAnimation(animation, directory);
+      return exportAnimation(animation, resolveTarget(
+          exportDirectory, safeFileName(animation.getName()) + ".json"));
     }
     return List.of();
   }
@@ -80,30 +85,104 @@ public final class AssetFileExporter {
     if (format == null || format == ImageFormat.UNSUPPORTED) {
       format = ImageFormat.PNG;
     }
-    Path target = directory.resolve(safeName(resource.getName()) + format.toFileExtension());
+    Path target = resolveTarget(
+        directory, safeFileName(resource.getName()) + format.toFileExtension());
     if (!ImageIO.write(image, format.toString(), target.toFile())) {
       throw new IOException("No image writer for " + format);
     }
     return List.of(target);
   }
 
-  private static List<Path> exportAnimation(Animation animation, Path directory) {
-    Path json = directory.resolve(safeName(animation.getName()) + ".json");
-    if (!Resources.animations().exportAseprite(animation, json)) {
+  public static List<Path> exportAnimation(Animation animation, Path destinationJson)
+      throws IOException {
+    return exportAnimation(animation, destinationJson, AssetFileExporter::moveReplacing);
+  }
+
+  static List<Path> exportAnimation(
+      Animation animation, Path destinationJson, FileMover publisher) throws IOException {
+    return exportAnimation(animation, destinationJson, publisher, AssetFileExporter::moveReplacing);
+  }
+
+  static List<Path> exportAnimation(
+      Animation animation, Path destinationJson, FileMover publisher, FileMover rollbackMover)
+      throws IOException {
+    if (animation == null || destinationJson == null) {
       return List.of();
     }
-    List<Path> files = new ArrayList<>();
-    files.add(json);
-    Path image = directory.resolve(animation.getSpritesheet().getName() + ".png");
-    if (Files.isRegularFile(image)) {
-      files.add(image);
+
+    Spritesheet sheet = animation.getSpritesheet();
+    if (sheet == null) {
+      return List.of();
     }
-    return List.copyOf(files);
+    String sheetName = sheet.getName();
+    if (!isSafeFileName(sheetName)) {
+      return List.of();
+    }
+
+    Path json = destinationJson.toAbsolutePath().normalize();
+    Path directory = json.getParent();
+    if (directory == null) {
+      return List.of();
+    }
+    directory = prepareDirectory(directory);
+    json = resolveTarget(directory, json.getFileName().toString());
+    Path image = resolveTarget(directory, sheetName + ".png");
+    Path staging = Files.createTempDirectory(directory, ".utiliti-animation-");
+    Path stagedJson = resolveTarget(staging, json.getFileName().toString());
+    Path stagedImage = resolveTarget(staging, sheetName + ".png");
+    Path backupDirectory = Files.createDirectory(staging.resolve(".previous"));
+    Path backupJson = backupDirectory.resolve("animation.json");
+    Path backupImage = backupDirectory.resolve("spritesheet.png");
+    boolean jsonBackedUp = false;
+    boolean imageBackedUp = false;
+    boolean imagePublished = false;
+    boolean jsonPublished = false;
+    boolean cleanupStaging = true;
+    try {
+      if (!Resources.animations().exportAseprite(animation, stagedJson)
+          || !Files.isRegularFile(stagedJson)
+          || !Files.isRegularFile(stagedImage)) {
+        return List.of();
+      }
+
+      // Revalidate immediately before publication in case a target was replaced while staging.
+      json = resolveTarget(directory, json.getFileName().toString());
+      image = resolveTarget(directory, image.getFileName().toString());
+      if (Files.exists(image, LinkOption.NOFOLLOW_LINKS)) {
+        moveReplacing(image, backupImage);
+        imageBackedUp = true;
+      }
+      if (Files.exists(json, LinkOption.NOFOLLOW_LINKS)) {
+        moveReplacing(json, backupJson);
+        jsonBackedUp = true;
+      }
+
+      publisher.move(stagedImage, image);
+      imagePublished = true;
+      publisher.move(stagedJson, json);
+      jsonPublished = true;
+      return List.of(json, image);
+    } catch (IOException publicationFailure) {
+      boolean jsonRestored = rollbackTarget(
+          json, backupJson, jsonPublished, jsonBackedUp, rollbackMover, publicationFailure);
+      boolean imageRestored = rollbackTarget(
+          image, backupImage, imagePublished, imageBackedUp, rollbackMover, publicationFailure);
+      cleanupStaging = jsonRestored && imageRestored;
+      if (!cleanupStaging) {
+        publicationFailure.addSuppressed(new IOException(
+            "Animation rollback failed; recoverable files retained at " + staging));
+      }
+      throw publicationFailure;
+    } finally {
+      if (cleanupStaging) {
+        deleteTree(staging);
+      }
+    }
   }
 
   private static List<Path> exportXml(
       Object asset, String name, String extension, Path directory) throws IOException {
-    Path target = directory.resolve(safeName(name) + "." + extension);
+    Path target = resolveTarget(directory, safeFileName(name) + "." + extension);
     XmlUtilities.save(asset, target);
     if (!Files.isRegularFile(target)) {
       throw new IOException("Could not export resource to " + target);
@@ -111,8 +190,104 @@ public final class AssetFileExporter {
     return List.of(target);
   }
 
-  private static String safeName(String name) {
-    String safe = name == null ? "resource" : name.replaceAll("[\\\\/:*?\"<>|]", "_").trim();
-    return safe.isEmpty() || ".".equals(safe) || "..".equals(safe) ? "resource" : safe;
+  public static String safeFileName(String name) {
+    String safe = name == null
+        ? "resource"
+        : name.replaceAll("[\\x00-\\x1f\\\\/:*?\"<>|]", "_").trim().replaceAll("[. ]+$", "");
+    if (safe.isEmpty() || ".".equals(safe) || "..".equals(safe)) {
+      return "resource";
+    }
+    String deviceName = safe.split("\\.", 2)[0].toUpperCase(Locale.ROOT);
+    if (deviceName.matches("CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]")) {
+      safe += "_";
+    }
+    return safe;
+  }
+
+  private static boolean isSafeFileName(String name) {
+    return name != null && name.equals(safeFileName(name));
+  }
+
+  private static Path resolveTarget(Path directory, String fileName) throws IOException {
+    Path normalizedDirectory = directory.toAbsolutePath().normalize();
+    Path target = normalizedDirectory.resolve(fileName).normalize();
+    if (!target.getParent().equals(normalizedDirectory)
+        || !Files.isDirectory(normalizedDirectory, LinkOption.NOFOLLOW_LINKS)
+        || containsSymbolicLink(normalizedDirectory)
+        || Files.isSymbolicLink(target)
+        || Files.exists(target, LinkOption.NOFOLLOW_LINKS)
+            && !Files.isRegularFile(target, LinkOption.NOFOLLOW_LINKS)) {
+      throw new IOException("Export target escapes destination directory");
+    }
+    return target;
+  }
+
+  private static Path prepareDirectory(Path directory) throws IOException {
+    Path normalized = directory.toAbsolutePath().normalize();
+    if (containsSymbolicLink(normalized)) {
+      throw new IOException("Export directory contains a symbolic link");
+    }
+    Files.createDirectories(normalized);
+    if (containsSymbolicLink(normalized)
+        || !Files.isDirectory(normalized, LinkOption.NOFOLLOW_LINKS)) {
+      throw new IOException("Export directory is not a regular directory");
+    }
+    return normalized;
+  }
+
+  private static boolean containsSymbolicLink(Path path) {
+    Path current = path.getRoot();
+    for (Path part : path) {
+      current = current == null ? part : current.resolve(part);
+      if (Files.isSymbolicLink(current)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static void moveReplacing(Path source, Path target) throws IOException {
+    Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  private static boolean rollbackTarget(
+      Path target, Path backup, boolean published, boolean backedUp, FileMover rollbackMover,
+      IOException failure) {
+    try {
+      if (published) {
+        Files.deleteIfExists(target);
+      }
+      if (backedUp) {
+        rollbackMover.move(backup, target);
+      }
+      return true;
+    } catch (IOException rollbackFailure) {
+      failure.addSuppressed(rollbackFailure);
+      return false;
+    }
+  }
+
+  @FunctionalInterface
+  interface FileMover {
+    void move(Path source, Path target) throws IOException;
+  }
+
+  static boolean deleteTree(Path root) {
+    if (root == null || !Files.exists(root)) {
+      return true;
+    }
+    boolean[] deleted = {true};
+    try (var paths = Files.walk(root)) {
+      paths.sorted(Comparator.reverseOrder()).forEach(path -> {
+        try {
+          Files.deleteIfExists(path);
+        } catch (IOException ignored) {
+          deleted[0] = false;
+        }
+      });
+    } catch (IOException ignored) {
+      deleted[0] = false;
+    }
+    return deleted[0] && !Files.exists(root);
   }
 }

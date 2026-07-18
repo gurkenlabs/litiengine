@@ -1,10 +1,17 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
+import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
+import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -13,7 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(SwingTestSuite.class)
 class AssetPanelTest {
   @Test
-  void controlClickCreatesOrderedPersistentSelection() {
+  void menuShortcutClickCreatesOrderedPersistentSelection() {
     AssetPanel panel = panelWithTilesets("a", "b", "c");
 
     panel.selectItemForTest(0, false, false);
@@ -35,6 +42,53 @@ class AssetPanelTest {
 
     assertEquals(List.of("a", "b", "c"), panel.getSelectedItems().stream()
         .map(AssetPanelItem::getName).toList());
+  }
+
+  @Test
+  void multiselectDisablesFocusedOnlyActions() {
+    AssetPanel panel = panelWithTilesets("a", "b");
+
+    panel.selectItemForTest(0, false, false);
+    panel.selectItemForTest(1, true, false);
+
+    assertFalse(panel.getItemsForTest().get(0).isIndividualActionsEnabled());
+    assertFalse(panel.getItemsForTest().get(1).isIndividualActionsEnabled());
+  }
+
+  @Test
+  void deselectingFocusedItemTransfersRemainingSelection() throws Exception {
+    AssetPanel panel = panelWithTilesets("a", "b");
+    panel.selectItemForTest(0, false, false);
+    panel.selectItemForTest(1, true, false);
+    AssetPanelItem deselected = panel.getItemsForTest().get(1);
+
+    panel.selectItemForTest(1, true, false);
+    Transferable transfer = deselected.createTransferableForTest();
+
+    assertEquals(List.of(panel.getItemsForTest().get(0).getOrigin()),
+        transfer.getTransferData(AssetTransferable.ASSET_FLAVOR));
+  }
+
+  @Test
+  void filteringIsNullSafe() {
+    Animation animation = mock(Animation.class);
+    when(animation.getName()).thenReturn(null);
+    when(animation.getSpritesheet()).thenReturn(null);
+    AssetPanel panel = new AssetPanel();
+    panel.loadAnimations(new ArrayList<>(List.of(animation)));
+
+    assertDoesNotThrow(() -> panel.setFilterText("walk"));
+    assertEquals(0, panel.getVisibleItemCount());
+  }
+
+  @Test
+  void clearAssetsRemovesStaleItems() {
+    AssetPanel panel = panelWithTilesets("stale");
+
+    panel.clearAssets();
+
+    assertEquals(0, panel.getTotalItemCount());
+    assertEquals(0, panel.getVisibleItemCount());
   }
 
   private static AssetPanel panelWithTilesets(String... names) {
