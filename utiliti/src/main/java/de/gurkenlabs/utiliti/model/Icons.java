@@ -127,6 +127,7 @@ public final class Icons {
   public static final Icon CONSOLE_24 = IconLoader.get().getUIAwareIcon("console.svg", 24, 24);
   public static final Icon COPY_24 = IconLoader.get().getUIAwareIcon("copy.svg", 24, 24);
   public static final Icon CREATURE_24 = IconLoader.get().getUIAwareIcon("creature.svg", 24, 24);
+  public static final Icon CROSS_24 = IconLoader.get().getUIAwareIcon("cross.svg", 24, 24);
   public static final Icon CUT_24 = IconLoader.get().getUIAwareIcon("cut.svg", 24, 24);
   public static final Icon DELETE_24 = IconLoader.get().getUIAwareIcon("delete.svg", 24, 24);
   public static final Icon EMITTER_24 = IconLoader.get().getUIAwareIcon("emitter.svg", 24, 24);

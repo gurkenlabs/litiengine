@@ -673,10 +673,33 @@ public final class UI {
     assetComponent = new AssetList();
     JPanel content = new JPanel(new CardLayout());
     content.add(assetComponent, "resources");
-    content.add(new ConsoleComponent(), "console");
+    ConsoleComponent consoleComponent = new ConsoleComponent();
+    content.add(consoleComponent, "console");
 
-    JToggleButton resourcesTab = createBottomTab(Resources.strings().get("assettree_assets"), true);
-    JToggleButton consoleTab = createBottomTab(Resources.strings().get("assettree_console"), false);
+    JToggleButton resourcesTab = createBottomTab(Resources.strings().get("assettree_assets"), true, false);
+    JToggleButton consoleTab = createBottomTab(Resources.strings().get("assettree_console"), false, true);
+    Runnable updateConsoleStatus =
+        () -> {
+          Runnable update =
+              () -> {
+                int warnings = consoleComponent.getLogHandler().getWarningCount();
+                int errors = consoleComponent.getLogHandler().getErrorCount();
+                consoleTab.putClientProperty("consoleWarnings", warnings);
+                consoleTab.putClientProperty("consoleErrors", errors);
+                consoleTab.setToolTipText(
+                    warnings > 0 || errors > 0
+                        ? Resources.strings().get("console_status", warnings, errors)
+                        : null);
+                consoleTab.repaint();
+              };
+          if (SwingUtilities.isEventDispatchThread()) {
+            update.run();
+          } else {
+            SwingUtilities.invokeLater(update);
+          }
+        };
+    consoleComponent.getLogHandler().addChangeListener(updateConsoleStatus);
+    updateConsoleStatus.run();
     ButtonGroup tabs = new ButtonGroup();
     tabs.add(resourcesTab);
     tabs.add(consoleTab);
@@ -719,7 +742,7 @@ public final class UI {
     return bottomPanel;
   }
 
-  private static JToggleButton createBottomTab(String text, boolean selected) {
+  private static JToggleButton createBottomTab(String text, boolean selected, boolean showIndicators) {
     JToggleButton tab = new JToggleButton(text, selected) {
       @Override
       protected void paintComponent(Graphics graphics) {
@@ -734,9 +757,26 @@ public final class UI {
           g2.setColor(isSelected() ? Style.text() : Style.mutedText());
           g2.setFont(getFont());
           java.awt.FontMetrics metrics = g2.getFontMetrics();
-          int textX = Math.max(0, (getWidth() - metrics.stringWidth(getText())) / 2);
+          int warnings = showIndicators ? consoleCount(getClientProperty("consoleWarnings")) : 0;
+          int errors = showIndicators ? consoleCount(getClientProperty("consoleErrors")) : 0;
+          int badgeCount = (warnings > 0 ? 1 : 0) + (errors > 0 ? 1 : 0);
+          int indicatorWidth =
+              badgeCount > 0
+                  ? Style.SPACE_MEDIUM + badgeCount * 18 + (badgeCount - 1) * 3
+                  : 0;
+          int contentWidth = metrics.stringWidth(getText()) + indicatorWidth;
+          int textX = Math.max(0, (getWidth() - contentWidth) / 2);
           int textY = (getHeight() - metrics.getHeight()) / 2 + metrics.getAscent();
           g2.drawString(getText(), textX, textY);
+          int indicatorX = textX + metrics.stringWidth(getText()) + Style.SPACE_MEDIUM;
+          if (warnings > 0) {
+            paintConsoleBadge(
+                g2, indicatorX, (getHeight() - 16) / 2, warnings, Style.COLOR_ORANGE);
+            indicatorX += 21;
+          }
+          if (errors > 0) {
+            paintConsoleBadge(g2, indicatorX, (getHeight() - 16) / 2, errors, Style.COLOR_RED);
+          }
           if (isSelected()) {
             g2.setColor(Style.accent());
             g2.fillRect(0, getHeight() - 2, getWidth(), 2);
@@ -756,12 +796,29 @@ public final class UI {
     tab.setFocusPainted(false);
     tab.setRolloverEnabled(true);
     int textWidth = tab.getFontMetrics(tab.getFont()).stringWidth(text);
-    int width = textWidth + horizontalPadding * 2;
+    int width = textWidth + horizontalPadding * 2 + (showIndicators ? 42 : 0);
     Dimension size = new Dimension(width, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
     tab.setPreferredSize(size);
     tab.setMinimumSize(size);
     tab.setMaximumSize(size);
     return tab;
+  }
+
+  private static void paintConsoleBadge(Graphics2D graphics, int x, int y, int count, Color color) {
+    graphics.setColor(color);
+    graphics.fillRoundRect(x, y, 18, 16, 16, 16);
+    graphics.setColor(Color.WHITE);
+    graphics.setFont(Style.getHeaderFont().deriveFont(Font.BOLD, 10f));
+    String text = count > 9 ? "9+" : Integer.toString(count);
+    java.awt.FontMetrics metrics = graphics.getFontMetrics();
+    graphics.drawString(
+        text,
+        x + (18 - metrics.stringWidth(text)) / 2,
+        y + (16 - metrics.getHeight()) / 2 + metrics.getAscent());
+  }
+
+  private static int consoleCount(Object value) {
+    return value instanceof Integer count ? count : 0;
   }
 
   private static void initPopupMenu(Canvas canvas) {

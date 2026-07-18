@@ -11,12 +11,18 @@ import java.util.logging.Logger;
 import javax.swing.JTextPane;
 
 public class ConsolePanel extends NumberedTextComponent {
+  private final LogHandler logHandler;
 
   public ConsolePanel() {
     super(new ConsoleTextPane());
     this.textComponent.setEditable(false);
     applyBackground();
-    Logger.getLogger("").addHandler(new LogHandler((JTextPane) this.textComponent));
+    this.logHandler = new LogHandler((JTextPane) this.textComponent);
+    Logger.getLogger("").addHandler(this.logHandler);
+  }
+
+  public LogHandler getLogHandler() {
+    return this.logHandler;
   }
 
   @Override
