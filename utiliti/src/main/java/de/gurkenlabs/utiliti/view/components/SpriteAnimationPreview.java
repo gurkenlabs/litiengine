@@ -14,7 +14,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.HierarchyEvent;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -33,25 +35,41 @@ final class SpriteAnimationPreview extends JPanel {
     }
   };
   private final Timer timer = new Timer(Animation.DEFAULT_FRAME_DURATION, _ -> advanceFrame());
+  private final Consumer<SpritesheetResource> editAction;
   private Spritesheet spritesheet;
   private String resourceName;
+  private SpritesheetResource spriteResource;
   private int[] frameDurations = new int[0];
   private int currentFrame;
 
   SpriteAnimationPreview() {
+    this(UI::showSpriteInspector);
+  }
+
+  SpriteAnimationPreview(Consumer<SpritesheetResource> editAction) {
     super(new BorderLayout());
+    this.editAction = editAction;
     setOpaque(false);
+    setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    setToolTipText(Resources.strings().get("spriteEditor_doubleClickToEdit"));
     this.preview.setOpaque(false);
     this.preview.setBorder(BorderFactory.createLineBorder(Style.border()));
     this.preview.setPreferredSize(new Dimension(0, 112));
     this.preview.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     this.preview.setToolTipText(Resources.strings().get("spriteEditor_doubleClickToEdit"));
-    this.preview.addMouseListener(new MouseAdapter() {
+    MouseAdapter openOnDoubleClick = new MouseAdapter() {
       @Override
-      public void mouseClicked(MouseEvent event) {
-        if (event.getClickCount() == 2) {
+      public void mousePressed(MouseEvent event) {
+        if (event.getClickCount() == 2 && javax.swing.SwingUtilities.isLeftMouseButton(event)) {
           openSpriteEditor();
         }
+      }
+    };
+    addMouseListener(openOnDoubleClick);
+    this.preview.addMouseListener(openOnDoubleClick);
+    addHierarchyListener(event -> {
+      if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+        updateTimerForVisibility();
       }
     });
     add(this.preview, BorderLayout.CENTER);
@@ -60,9 +78,7 @@ final class SpriteAnimationPreview extends JPanel {
   @Override
   public void addNotify() {
     super.addNotify();
-    if (frameCount() > 1) {
-      this.timer.start();
-    }
+    updateTimerForVisibility();
   }
 
   @Override
@@ -80,6 +96,7 @@ final class SpriteAnimationPreview extends JPanel {
     this.timer.stop();
     this.spritesheet = spritesheet;
     this.resourceName = resourceName;
+    this.spriteResource = resolveSpriteResource().orElse(null);
     this.currentFrame = 0;
     this.frameDurations = loadFrameDurations(spritesheet);
     renderFrame();
@@ -87,6 +104,11 @@ final class SpriteAnimationPreview extends JPanel {
     if ((running || isShowing()) && frameCount() > 1) {
       this.timer.start();
     }
+  }
+
+  void setSpritesheet(Spritesheet spritesheet, SpritesheetResource spriteResource) {
+    setSpritesheet(spritesheet, spriteResource != null ? spriteResource.getName() : null);
+    this.spriteResource = spriteResource;
   }
 
   void start() {
@@ -132,14 +154,26 @@ final class SpriteAnimationPreview extends JPanel {
     if (this.spritesheet == null || Editor.instance().getGameFile() == null) {
       return;
     }
-    resolveSpriteResource().ifPresent(UI::showSpriteInspector);
+    if (this.spriteResource != null) {
+      this.editAction.accept(this.spriteResource);
+    } else {
+      resolveSpriteResource().ifPresent(this.editAction);
+    }
   }
 
   private java.util.Optional<SpritesheetResource> resolveSpriteResource() {
     return Editor.instance().getGameFile().getSpriteSheets().stream()
-        .filter(resource -> resource.getName().equals(this.resourceName)
+        .filter(resource -> resource.getName().equalsIgnoreCase(this.resourceName)
             || Resources.spritesheets().get(resource.getName()) == this.spritesheet)
         .findFirst();
+  }
+
+  private void updateTimerForVisibility() {
+    if (isShowing() && frameCount() > 1) {
+      this.timer.start();
+    } else {
+      this.timer.stop();
+    }
   }
 
   private int frameCount() {
@@ -176,5 +210,19 @@ final class SpriteAnimationPreview extends JPanel {
 
   void advanceFrameForTest() {
     advanceFrame();
+  }
+
+  void doubleClickForTest() {
+    MouseEvent event = new MouseEvent(
+        this.preview,
+        MouseEvent.MOUSE_PRESSED,
+        System.currentTimeMillis(),
+        0,
+        1,
+        1,
+        2,
+        false,
+        MouseEvent.BUTTON1);
+    this.preview.dispatchEvent(event);
   }
 }

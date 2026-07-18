@@ -6,12 +6,16 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
 import java.awt.LayoutManager;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -27,10 +31,14 @@ public class CreaturePanel extends PropertyPanel {
   private boolean creaturesLoaded; // mirrors PropPanel.propsLoaded behavior
 
   public CreaturePanel() {
+    this(UI::showSpriteInspector);
+  }
+
+  CreaturePanel(Consumer<SpritesheetResource> editAction) {
     super("panel_creature", Icons.CREATURE_16);
     this.comboBoxSpriteSheets = new SearchableSpriteComboBox();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
-    this.animationPreview = new SpriteAnimationPreview();
+    this.animationPreview = new SpriteAnimationPreview(editAction);
 
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
@@ -41,6 +49,7 @@ public class CreaturePanel extends PropertyPanel {
     setLayout(this.createLayout());
     setupChangedListeners();
     this.comboBoxSpriteSheets.addActionListener(e -> updateSpritePreview());
+    this.comboBoxDirection.addActionListener(e -> updateSpritePreview());
     this.checkBoxStartDead.addActionListener(e -> updateSpritePreview());
 
     // if images are cleared (e.g. resource reload), repopulate on next bind
@@ -167,6 +176,10 @@ public class CreaturePanel extends PropertyPanel {
     return this.checkBoxStartDead.isSelected();
   }
 
+  void doubleClickPreviewForTest() {
+    this.animationPreview.doubleClickForTest();
+  }
+
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems = new LayoutItem[] {
       new LayoutItem(this.animationPreview, 140),
@@ -178,17 +191,55 @@ public class CreaturePanel extends PropertyPanel {
 
   private void updateSpritePreview() {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
-    String source = name != null ? SpriteVariantSelector.selectBaseCreatureSpriteNames(Resources.spritesheets().getAll()).get(name) : null;
-    String previewSource = null;
-    var spritesheet = this.checkBoxStartDead.isSelected() && name != null
-        ? Resources.spritesheets().get(name + "-" + CreatureAnimationState.DEAD.spriteString()) : null;
-    if (spritesheet != null) {
-      previewSource = name + "-" + CreatureAnimationState.DEAD.spriteString();
+    Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
+    String source = selectPreviewSpriteName(
+        name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll());
+    Spritesheet spritesheet = source != null ? Resources.spritesheets().get(source) : null;
+    SpritesheetResource resource = source != null && Editor.instance().getGameFile() != null
+        ? Editor.instance().getGameFile().getSpriteSheets().stream()
+            .filter(candidate -> candidate.getName().equalsIgnoreCase(source))
+            .findFirst()
+            .orElse(null)
+        : null;
+    this.animationPreview.setSpritesheet(spritesheet, resource);
+  }
+
+  static String selectPreviewSpriteName(
+      String base, Direction direction, boolean startDead, java.util.Collection<Spritesheet> spritesheets) {
+    if (base == null) {
+      return null;
     }
-    if (spritesheet == null) {
-      spritesheet = source != null ? Resources.spritesheets().get(source) : null;
-      previewSource = source;
+    Map<String, String> available = new java.util.HashMap<>();
+    for (Spritesheet spritesheet : spritesheets) {
+      available.put(spritesheet.getName().toLowerCase(), spritesheet.getName());
     }
-    this.animationPreview.setSpritesheet(spritesheet, previewSource);
+    String directionToken = direction != null && direction != Direction.UNDEFINED
+        ? "-" + direction.name().toLowerCase()
+        : "";
+    String state = startDead ? CreatureAnimationState.DEAD.spriteString() : CreatureAnimationState.IDLE.spriteString();
+    java.util.List<String> candidates = new java.util.ArrayList<>();
+    if (!directionToken.isEmpty()) {
+      candidates.add(base + "-" + state + directionToken);
+      if (!startDead) {
+        candidates.add(base + "-" + CreatureAnimationState.MOVE.spriteString() + directionToken);
+        candidates.add(base + "-" + WALK_SPRITE_TOKEN + directionToken);
+      }
+    }
+    candidates.add(base + "-" + state);
+    if (!startDead) {
+      candidates.add(base + "-" + CreatureAnimationState.MOVE.spriteString());
+      candidates.add(base + "-" + WALK_SPRITE_TOKEN);
+    }
+    for (String candidate : candidates) {
+      String source = available.get(candidate.toLowerCase());
+      if (source != null) {
+        return source;
+      }
+    }
+    return SpriteVariantSelector.selectBaseCreatureSpriteNames(spritesheets).entrySet().stream()
+        .filter(entry -> entry.getKey().equalsIgnoreCase(base))
+        .map(Map.Entry::getValue)
+        .findFirst()
+        .orElse(null);
   }
 }
