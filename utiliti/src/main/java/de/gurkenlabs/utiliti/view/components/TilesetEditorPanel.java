@@ -37,6 +37,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -72,6 +74,7 @@ public class TilesetEditorPanel extends JPanel {
   private final JLabel previewLabel;
   private final JLabel detailLabel;
   private final JTextField typeField;
+  private final JSlider probabilitySlider;
   private final JTextField probabilityField;
   private final DefaultTableModel tilePropertyModel;
   private final JTable tilePropertyTable;
@@ -200,6 +203,12 @@ public class TilesetEditorPanel extends JPanel {
       }
     });
 
+    this.probabilitySlider = new JSlider(0, 100, 100);
+    this.probabilitySlider.setOpaque(false);
+    this.probabilitySlider.setToolTipText(Resources.strings().get("tilesetEditor_probability"));
+    this.probabilitySlider.getAccessibleContext().setAccessibleName(
+      Resources.strings().get("tilesetEditor_probability"));
+    this.probabilitySlider.addChangeListener(_ -> applyProbabilitySlider());
     this.probabilityField = metadataField(this::applyProbability);
 
     this.tilePropertyModel = createPropertyModel();
@@ -235,7 +244,7 @@ public class TilesetEditorPanel extends JPanel {
     terrainHost.add(createTerrainPanel(), BorderLayout.CENTER);
 
     JPanel typePanel = labeledField(Resources.strings().get("tilesetEditor_class"), this.typeField);
-    JPanel probabilityPanel = labeledField(Resources.strings().get("tilesetEditor_probability"), this.probabilityField);
+    JPanel probabilityPanel = labeledProbability();
 
     JPanel selectedTilePanel = new JPanel(new BorderLayout(0, 8));
     selectedTilePanel.setOpaque(false);
@@ -398,6 +407,10 @@ public class TilesetEditorPanel extends JPanel {
     return this.probabilityField.getText();
   }
 
+  void setProbabilitySliderForTest(double probability) {
+    this.probabilitySlider.setValue((int) Math.round(probability * 100));
+  }
+
   void setProbabilityTextForTest(String probability) {
     this.probabilityField.setText(probability);
     applyProbability();
@@ -483,6 +496,19 @@ public class TilesetEditorPanel extends JPanel {
     label.setPreferredSize(new Dimension(82, Style.CONTROL_HEIGHT));
     panel.add(label, BorderLayout.WEST);
     panel.add(field, BorderLayout.CENTER);
+    return panel;
+  }
+
+  private JPanel labeledProbability() {
+    JPanel panel = new JPanel(new BorderLayout(6, 0));
+    panel.setOpaque(false);
+    JLabel label = new JLabel(Resources.strings().get("tilesetEditor_probability"));
+    label.setForeground(Style.text());
+    label.setPreferredSize(new Dimension(82, Style.CONTROL_HEIGHT));
+    this.probabilityField.setPreferredSize(new Dimension(120, Style.CONTROL_HEIGHT));
+    panel.add(label, BorderLayout.WEST);
+    panel.add(this.probabilitySlider, BorderLayout.CENTER);
+    panel.add(this.probabilityField, BorderLayout.EAST);
     return panel;
   }
 
@@ -907,6 +933,7 @@ public class TilesetEditorPanel extends JPanel {
       this.previewLabel.setText("");
       this.typeField.setText("");
       this.probabilityField.setText("");
+      this.probabilitySlider.setValue(100);
       this.tilePropertyModel.setRowCount(0);
       this.animationModel.setRowCount(0);
     } finally {
@@ -934,7 +961,9 @@ public class TilesetEditorPanel extends JPanel {
       this.detailLabel.setText(Resources.strings().get("tilesetEditor_tileSummary", String.valueOf(localId),
         "gid " + (this.tileset.getFirstGridId() + localId), collision, animation));
       this.typeField.setText(type);
-      this.probabilityField.setText(entry instanceof TilesetEntry tilesetEntry ? String.valueOf(tilesetEntry.getProbability()) : "1.0");
+      double probability = entry instanceof TilesetEntry tilesetEntry ? tilesetEntry.getProbability() : 1.0;
+      this.probabilityField.setText(formatProbability(probability));
+      this.probabilitySlider.setValue((int) Math.round(Math.clamp(probability, 0.0, 1.0) * 100));
       this.tilePropertyModel.setRowCount(0);
       this.animationModel.setRowCount(0);
       if (entry != null) {
@@ -1097,6 +1126,21 @@ public class TilesetEditorPanel extends JPanel {
     }
     changeTileset(() -> entry.setProbability(parseDouble(this.probabilityField.getText(), 1.0)));
     updateSelectedTileControls();
+  }
+
+  private void applyProbabilitySlider() {
+    if (this.binding) {
+      return;
+    }
+    this.probabilityField.setText(formatProbability(this.probabilitySlider.getValue() / 100.0));
+    if (!this.probabilitySlider.getValueIsAdjusting()) {
+      applyProbability();
+    }
+  }
+
+  private static String formatProbability(double probability) {
+    BigDecimal value = BigDecimal.valueOf(probability);
+    return value.scale() < 2 ? value.setScale(2).toPlainString() : value.toPlainString();
   }
 
   private static int parseInt(String value, int fallback) {

@@ -133,7 +133,7 @@ class TilesetEditorPanelTest {
     TilesetEditorPanel panel = new TilesetEditorPanel();
     panel.bind(tileset);
 
-    panel.setProbabilityTextForTest("0.25");
+    panel.setProbabilitySliderForTest(0.25);
 
     assertEquals(0.25, ((TilesetEntry) tileset.getTile(0)).getProbability(), 0.0001);
     assertEquals("0.25", panel.getProbabilityTextForTest());
