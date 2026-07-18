@@ -1110,8 +1110,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       }
       TreePath path = new TreePath(treeNode.getPath());
       tree.setSelectionPath(path);
-      tree.scrollPathToVisible(path);
-      treeScroll.getHorizontalScrollBar().setValue(0);
+      scrollPathVerticallyToVisible(path);
       return;
     }
   }
@@ -1294,7 +1293,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
     this.tree.setSelectionPaths(paths.toArray(TreePath[]::new));
     if (focusedPath != null) {
-      this.tree.scrollPathToVisible(focusedPath);
+      scrollPathVerticallyToVisible(focusedPath);
     }
   }
 
@@ -1765,14 +1764,15 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     if (selPath == null || !tree.isVisible()) {
       return;
     }
-    Rectangle bounds = tree.getPathBounds(selPath);
+    scrollPathVerticallyToVisible(selPath);
+  }
+
+  private void scrollPathVerticallyToVisible(TreePath path) {
+    Rectangle bounds = tree.getPathBounds(path);
     if (bounds == null) {
       return;
     }
-    bounds.x = 0;
-    bounds.width = 1;
-    tree.scrollRectToVisible(bounds);
-    treeScroll.getHorizontalScrollBar().setValue(0);
+    tree.scrollRectToVisible(new Rectangle(0, bounds.y, 1, bounds.height));
   }
 
   private void showContextMenu(MouseEvent e) {

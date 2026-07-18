@@ -101,7 +101,8 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
 
     this.nameLabel.setForeground(node != null && node.isSection() ? Style.mutedText() : Style.text());
     int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : Style.TREE_ROW_HEIGHT;
-    setPreferredSize(new Dimension(Math.max(tree.getWidth() - 4, getPreferredSize().width), rowHeight));
+    Dimension preferredSize = getPreferredSize();
+    setPreferredSize(new Dimension(preferredSize.width, rowHeight));
 
     return this;
   }
@@ -139,6 +140,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private void reset() {
+    setPreferredSize(null);
     this.typeLabel.setVisible(true);
     this.typeLabel.setIcon(null);
     this.nameLabel.setText("");
