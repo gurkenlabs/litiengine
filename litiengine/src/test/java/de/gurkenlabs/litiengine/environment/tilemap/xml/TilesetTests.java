@@ -9,9 +9,11 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import static junit.framework.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -209,6 +211,85 @@ class TilesetTests {
       Files.deleteIfExists(tilesetFile);
       Files.deleteIfExists(directory);
     }
+  }
+
+  @Test
+  void missingTerrainSetsAreLoadedFromSource() throws Exception {
+    Tileset source = new Tileset();
+    set(source, "tilecount", 64);
+    set(source, "allTiles", new java.util.ArrayList<>());
+    WangSet terrainSet = new WangSet("Terrains", TerrainType.CORNER);
+    terrainSet.getTerrains().add(new WangColor("darksnow", Color.RED));
+    terrainSet.getTerrains().add(new WangColor("water", Color.BLUE));
+    terrainSet.getWangTiles().add(new WangTile(50, new int[] {0, 1, 0, 1, 0, 1, 0, 1}));
+    source.getOrCreateTerrainSets().add(terrainSet);
+
+    Tileset unresolvedReference = new Tileset();
+    set(unresolvedReference, "firstgid", 1);
+    set(unresolvedReference, "tilecount", 64);
+    set(unresolvedReference, "allTiles", new java.util.ArrayList<>());
+    set(unresolvedReference, "source", "naughtytiles.tsx");
+    assertNull(unresolvedReference.getTerrainSets());
+
+    unresolvedReference.copyTerrainSetsFrom(source);
+
+    var loaded = unresolvedReference.getTerrainSets();
+    assertNotNull(loaded);
+    assertEquals(1, loaded.size());
+    assertEquals("Terrains", loaded.getFirst().getName());
+    assertEquals(2, loaded.getFirst().getTerrains().size());
+    assertEquals("darksnow", loaded.getFirst().getTerrains().getFirst().getName());
+    assertEquals("water", loaded.getFirst().getTerrains().get(1).getName());
+    assertEquals(1, ((WangSet) loaded.getFirst()).getWangTiles().size());
+  }
+
+  private static void set(Object target, String fieldName, Object value) throws Exception {
+    java.lang.reflect.Field field = target.getClass().getDeclaredField(fieldName);
+    field.setAccessible(true);
+    field.set(target, value);
+  }
+
+  @Test
+  void externalWrapperResolvesToResourceTilesetWithTerrains() throws Exception {
+    URL tsx = TilesetTests.class.getResource("/de/gurkenlabs/litiengine/environment/tilemap/xml/naughtytiles.tsx");
+    Tileset resource = XmlUtilities.read(Tileset.class, tsx);
+    assertFalse("the loaded .tsx resource must carry wang terrains",
+      resource.getTerrainSets() == null || resource.getTerrainSets().isEmpty());
+
+    Tileset wrapper = new Tileset();
+    set(wrapper, "firstgid", 513);
+    set(wrapper, "source", "naughtytiles.tsx");
+
+    // This is what ResourceBundle.load does to resolve external map tilesets.
+    wrapper.load(List.of(resource));
+
+    var terrains = wrapper.getTerrainSets();
+    assertNotNull(terrains);
+    assertEquals(1, terrains.size());
+    assertEquals(4, terrains.get(0).getTerrains().size());
+  }
+
+  @Test
+  void externalWrapperResolvesToReferenceBySourceFileName() throws Exception {
+    URL tsx = TilesetTests.class.getResource("/de/gurkenlabs/litiengine/environment/tilemap/xml/naughtytiles.tsx");
+    Tileset full = XmlUtilities.read(Tileset.class, tsx);
+
+    // A game-file tileset entry that is itself an external reference (name != file name).
+    Tileset reference = new Tileset();
+    set(reference, "source", "naughtytiles.tsx");
+    reference.copyTerrainSetsFrom(full);
+
+    // The map's tileset wrapper only knows the source file, not the tileset name.
+    Tileset wrapper = new Tileset();
+    set(wrapper, "firstgid", 513);
+    set(wrapper, "source", "naughtytiles.tsx");
+
+    wrapper.load(List.of(reference));
+
+    var terrains = wrapper.getTerrainSets();
+    assertNotNull(terrains);
+    assertEquals(1, terrains.size());
+    assertEquals(4, terrains.get(0).getTerrains().size());
   }
 
 }

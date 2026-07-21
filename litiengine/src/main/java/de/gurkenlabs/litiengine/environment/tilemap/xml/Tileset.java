@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.ResourceLoadException;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import jakarta.xml.bind.Marshaller;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -474,6 +476,14 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.sourceTileset != null ? this.sourceTileset.getName() : this.name;
   }
 
+  public String getSource() {
+    return this.source;
+  }
+
+  public Tileset getSourceTileset() {
+    return this.sourceTileset;
+  }
+
   @Override
   public void setName(String name) {
     if (this.sourceTileset != null) {
@@ -481,6 +491,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     } else {
       this.name = name;
     }
+  }
+
+  public void setSource(String source) {
+    this.source = source;
   }
 
   /**
@@ -820,12 +834,29 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
 
+    String fileName = FileUtilities.getFileName(this.source);
     for (Tileset set : rawTilesets) {
-      String fileName = FileUtilities.getFileName(this.source);
       if (set.getName() != null && set.getName().equals(fileName)) {
         this.sourceTileset = set;
-        break;
+        return;
       }
+      if (set.getSource() != null && FileUtilities.getFileName(set.getSource()).equals(fileName)) {
+        this.sourceTileset = set;
+        return;
+      }
+    }
+    // Fall back to tilesets that are globally loaded as project resources. External
+    // tileset references in a game file may not be registered in the game file's own
+    // tileset list, but they are usually available as loaded resources (e.g. under
+    // "Resources -> Tilesets"). This keeps wang sets hosted only in the external
+    // .tsx available to the map.
+    try {
+      Tileset resolved = Resources.tilesets().get(fileName);
+      if (resolved != null) {
+        this.sourceTileset = resolved;
+      }
+    } catch (final ResourceLoadException e) {
+      // tileset is not available as a loaded resource; leave the reference unresolved
     }
   }
 
