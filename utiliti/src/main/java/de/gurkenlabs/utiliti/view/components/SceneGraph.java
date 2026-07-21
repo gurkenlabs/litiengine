@@ -1895,7 +1895,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.renamedNode = node;
     this.renameField.setText(node.isMap() ? node.getMap().getName() : node.isLayer() ? node.getLayer().getName() : node.getMapObject().getName());
     Rectangle visible = this.tree.getVisibleRect();
-    int nameX = bounds.x + (node.isLayer() ? 48 : 26);
+    int nameX = bounds.x + 26;
     int nameWidth = Math.max(1, visible.x + visible.width - nameX - 36);
     this.renameField.setBounds(nameX, bounds.y + 2, nameWidth, Math.max(1, bounds.height - 4));
     this.tree.add(this.renameField);
