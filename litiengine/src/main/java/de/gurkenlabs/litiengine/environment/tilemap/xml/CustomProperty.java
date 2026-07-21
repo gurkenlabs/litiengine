@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import java.awt.Color;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Objects;
 
@@ -168,7 +169,15 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public long getAsLong() {
-    return Long.parseLong(this.value);
+    try {
+      return Long.parseLong(this.value);
+    } catch (NumberFormatException exception) {
+      try {
+        return new BigDecimal(this.value).longValueExact();
+      } catch (ArithmeticException _) {
+        throw exception;
+      }
+    }
   }
 
   @Override
