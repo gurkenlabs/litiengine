@@ -57,6 +57,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -523,6 +526,10 @@ public class Editor extends Screen {
     if (projectRoot == null || this.gameFile == null) {
       return;
     }
+    loadProjectTilesetTerrains(this.gameFile, projectRoot);
+  }
+
+  static void loadProjectTilesetTerrains(ResourceBundle gameFile, Path projectRoot) {
     List<Tileset> sources;
     try (Stream<Path> paths = Files.walk(projectRoot)) {
       sources = paths.filter(Files::isRegularFile)
@@ -540,19 +547,27 @@ public class Editor extends Screen {
     }
 
     List<Tileset> targets = Stream.concat(
-        this.gameFile.getTilesets().stream(),
-        this.gameFile.getMaps().stream().flatMap(map -> map.getTilesets().stream()).filter(Tileset.class::isInstance).map(Tileset.class::cast))
+        gameFile.getTilesets().stream(),
+        gameFile.getMaps().stream().flatMap(map -> map.getTilesets().stream()).filter(Tileset.class::isInstance).map(Tileset.class::cast))
       .distinct()
       .toList();
     for (Tileset target : targets) {
-      if (!needsTerrainNameEnrichment(target)) {
+      boolean hasTerrains = target.getTerrainSets() != null && !target.getTerrainSets().isEmpty();
+      if (hasTerrains && !needsTerrainNameEnrichment(target)) {
         continue;
       }
       List<Tileset> matches = sources.stream().filter(source -> sameTileset(target, source)).toList();
-      if (!matches.isEmpty() && matches.stream().allMatch(source -> sameTerrainNames(matches.getFirst(), source))) {
-        target.enrichTerrainMetadataFrom(matches.getFirst());
-      } else if (!matches.isEmpty()) {
-        log.log(Level.WARNING, "Skipped ambiguous terrain definitions for tileset {0}", target.getName());
+      if (matches.isEmpty()) {
+        continue;
+      }
+      if (hasTerrains) {
+        if (matches.stream().allMatch(source -> sameTerrainNames(matches.getFirst(), source))) {
+          target.enrichTerrainMetadataFrom(matches.getFirst());
+        } else {
+          log.log(Level.WARNING, "Skipped ambiguous terrain definitions for tileset {0}", target.getName());
+        }
+      } else {
+        target.copyTerrainSetsFrom(matches.getFirst());
       }
     }
   }
@@ -577,10 +592,29 @@ public class Editor extends Screen {
   }
 
   private static boolean sameTileset(Tileset first, Tileset second) {
+    if (tilesetsReferToSameFile(first, second)) {
+      return true;
+    }
     return Objects.equals(first.getName(), second.getName())
       && first.getTileCount() == second.getTileCount()
       && first.getTileWidth() == second.getTileWidth()
       && first.getTileHeight() == second.getTileHeight();
+  }
+
+  static boolean tilesetsReferToSameFile(Tileset first, Tileset second) {
+    return !Collections.disjoint(candidateNames(first), candidateNames(second));
+  }
+
+  private static Set<String> candidateNames(Tileset tileset) {
+    Set<String> names = new HashSet<>();
+    if (tileset.getName() != null) {
+      names.add(tileset.getName());
+    }
+    if (tileset.getSource() != null) {
+      names.add(FileUtilities.getFileName(tileset.getSource()));
+      names.add(FileUtilities.getFileName(tileset.getSource(), false));
+    }
+    return names;
   }
 
   private static boolean sameTerrainNames(Tileset first, Tileset second) {
