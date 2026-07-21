@@ -17,6 +17,7 @@ public class Program {
   private static final Locale SYSTEM_LOCALE = Locale.getDefault();
 
   public static void main(String[] args) {
+    configureGraphicsPipeline();
     try {
       Game.init(() -> { // preInitialization
 
@@ -60,6 +61,19 @@ public class Program {
       }, args);
     } catch (Throwable e) {
       throw new UtiLITIInitializationError("UtiLITI failed to initialize, see the stacktrace below for more information", e);
+    }
+  }
+
+  private static void configureGraphicsPipeline() {
+    if (!System.getProperty("os.name", "").startsWith("Windows")) {
+      return;
+    }
+
+    if (System.getProperty("sun.java2d.d3d") == null
+      && System.getProperty("sun.java2d.opengl") == null) {
+      // D3D surfaces can escape a heavyweight Canvas when it is embedded in the Swing editor UI.
+      System.setProperty("sun.java2d.d3d", "false");
+      System.setProperty("sun.java2d.opengl", "true");
     }
   }
 
