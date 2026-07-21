@@ -17,6 +17,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Rectangle;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -152,7 +154,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     ControlBehavior.apply(this.spnH);
 
     // ---- build accordion ----
-    JPanel accordion = new JPanel();
+    JPanel accordion = new ViewportWidthPanel();
     accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
     accordion.setOpaque(true);
     accordion.setBackground(Style.background());
@@ -447,9 +449,11 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     PropertyPanel panel = this.panels.get(type);
     if (panel != null) {
       typeCard.setTitle(Resources.strings().get(panel.getIdentifier()));
+      typeCard.setHeaderTrailing(panel.getHeaderActions());
       typeCard.setContent(panel);
       typeCard.setVisible(true);
     } else {
+      typeCard.setHeaderTrailing(null);
       typeCard.setVisible(false);
     }
 
@@ -634,6 +638,33 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   PropertyPanel getCurrentPanelForTest() {
     return this.currentPanel;
+  }
+
+  private static final class ViewportWidthPanel extends JPanel implements Scrollable {
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+      return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visible, int orientation, int direction) {
+      return PropertyPanel.CONTROL_HEIGHT;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visible, int orientation, int direction) {
+      return Math.max(PropertyPanel.CONTROL_HEIGHT, visible.height - PropertyPanel.CONTROL_HEIGHT);
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+      return true;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+      return false;
+    }
   }
 
   private void setupChangedListeners() {

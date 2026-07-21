@@ -1,75 +1,71 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.BorderFactory;
+import java.awt.Dimension;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/** A localized inspector section using the same card chrome as the main property inspector. */
 public class CollapsibleSection extends JPanel {
-  private final JPanel contentPanel;
-  private final JLabel headerLabel;
-  private final String title;
-  private boolean expanded;
+  private final ExpandableCard card;
+  private final JPanel headerActions;
 
   public CollapsibleSection(String titleKey, JPanel content) {
     this(titleKey, content, true);
   }
 
   public CollapsibleSection(String titleKey, JPanel content, boolean startExpanded) {
-    this.title = Resources.strings().get(titleKey);
-    this.expanded = startExpanded;
-
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    super(new BorderLayout());
     setOpaque(false);
     setAlignmentX(Component.LEFT_ALIGNMENT);
+    this.card = new ExpandableCard(Resources.strings().get(titleKey), content, startExpanded);
+    this.headerActions = new JPanel();
+    this.headerActions.setOpaque(false);
+    this.headerActions.setLayout(new BoxLayout(this.headerActions, BoxLayout.X_AXIS));
+    this.card.setContentInsets(
+        PropertyPanel.CONTROL_MARGIN * 2,
+        PropertyPanel.CONTROL_MARGIN * 2,
+        PropertyPanel.CONTROL_MARGIN * 2,
+        PropertyPanel.CONTROL_MARGIN * 2);
+    add(this.card, BorderLayout.CENTER);
+  }
 
-    this.headerLabel = new JLabel(this.title);
-    this.headerLabel.setFont(Style.getHeaderFont());
-    this.headerLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    this.headerLabel.setBorder(BorderFactory.createEmptyBorder(6, 4, 6, 4));
-    this.headerLabel.setOpaque(true);
-    this.headerLabel.setBackground(Style.COLOR_SURFACE);
-    this.headerLabel.setForeground(Style.COLOR_TEXT);
-    this.headerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    this.headerLabel.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        toggle();
-      }
-    });
-
-    this.contentPanel = new JPanel(new BorderLayout());
-    this.contentPanel.setOpaque(false);
-    this.contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    this.contentPanel.add(content, BorderLayout.CENTER);
-    this.contentPanel.setVisible(this.expanded);
-
-    add(headerLabel);
-    add(contentPanel);
+  @Override
+  public Dimension getMaximumSize() {
+    return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
   }
 
   public void toggle() {
-    expanded = !expanded;
-    contentPanel.setVisible(expanded);
-    headerLabel.setText(title);
-    revalidate();
-    repaint();
+    this.card.toggle();
   }
 
   public boolean isExpanded() {
-    return expanded;
+    return this.card.isExpanded();
   }
 
   public void setExpanded(boolean expanded) {
-    if (this.expanded != expanded) {
-      toggle();
+    this.card.setExpanded(expanded);
+  }
+
+  public void setHeaderAction(Component action) {
+    if (action != null) {
+      this.headerActions.add(Box.createHorizontalStrut(PropertyPanel.CONTROL_MARGIN));
+      this.headerActions.add(action);
+      this.card.setHeaderTrailing(this.headerActions);
     }
+  }
+
+  public void setInfoText(String resourceKey) {
+    JLabel info = new JLabel(Icons.ABOUT_16);
+    String text = Resources.strings().get(resourceKey);
+    info.setToolTipText(text);
+    info.getAccessibleContext().setAccessibleName(text);
+    this.headerActions.add(info, 0);
+    this.card.setHeaderTrailing(this.headerActions);
   }
 }

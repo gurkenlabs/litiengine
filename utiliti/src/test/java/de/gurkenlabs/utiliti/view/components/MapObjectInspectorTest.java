@@ -16,12 +16,25 @@ import java.awt.Container;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import javax.swing.JCheckBox;
+import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
 import javax.swing.SpinnerNumberModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SwingTestSuite.class)
 class MapObjectInspectorTest {
+
+  @Test
+  void inspectorContentTracksNarrowViewportWidth() {
+    MapObjectInspector inspector = new MapObjectInspector();
+
+    JScrollPane scrollPane = findComponent(inspector, JScrollPane.class);
+
+    assertNotNull(scrollPane);
+    assertTrue(scrollPane.getViewport().getView() instanceof Scrollable scrollable
+        && scrollable.getScrollableTracksViewportWidth());
+  }
 
   @Test
   void coordinateSpinnerModelAllowsNegativeValues() {
@@ -147,6 +160,21 @@ class MapObjectInspectorTest {
       }
       if (component instanceof Container child) {
         JCheckBox found = findCheckBox(child, text);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
+  }
+
+  private static <T extends Component> T findComponent(Container container, Class<T> type) {
+    for (Component component : container.getComponents()) {
+      if (type.isInstance(component)) {
+        return type.cast(component);
+      }
+      if (component instanceof Container child) {
+        T found = findComponent(child, type);
         if (found != null) {
           return found;
         }

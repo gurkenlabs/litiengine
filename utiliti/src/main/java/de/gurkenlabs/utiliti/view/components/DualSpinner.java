@@ -1,11 +1,14 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.resources.Resources;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
@@ -14,6 +17,7 @@ public class DualSpinner extends PropertyPanel {
   private final JLabel lblDim1;
   private final JSpinner spnDim2;
   private final JLabel lblDim2;
+  private final JLabel lblUnit;
 
   private final String dim1Name;
   private final String dim2Name;
@@ -79,6 +83,7 @@ public class DualSpinner extends PropertyPanel {
     this.spnDim1.setMinimumSize(SPINNER_SIZE);
     this.lblDim2 = new JLabel(dim2Lbl);
     this.lblDim2.setMinimumSize(LABEL_SIZE);
+    this.lblUnit = new JLabel();
     this.spnDim2 =
         new JSpinner(
             new SpinnerNumberModel(this.dim2Default, this.lowerBound, this.upperBound, this.step));
@@ -94,14 +99,24 @@ public class DualSpinner extends PropertyPanel {
         .addGap(8)
         .addComponent(lblDim2, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
         .addGap(4)
-        .addComponent(spnDim2, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH));
+        .addComponent(spnDim2, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
+        .addGap(4)
+        .addComponent(lblUnit, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
     gl.setVerticalGroup(
       gl.createParallelGroup(Alignment.CENTER)
         .addComponent(lblDim1)
         .addComponent(spnDim1)
         .addComponent(lblDim2)
-        .addComponent(spnDim2));
+        .addComponent(spnDim2)
+        .addComponent(lblUnit));
     this.setLayout(gl);
+    JPopupMenu contextMenu = new JPopupMenu();
+    JMenuItem reset = new JMenuItem(Resources.strings().get("settings_reset_defaults"));
+    reset.addActionListener(event -> setValues(this.dim1Default, this.dim2Default));
+    contextMenu.add(reset);
+    this.setComponentPopupMenu(contextMenu);
+    this.spnDim1.setComponentPopupMenu(contextMenu);
+    this.spnDim2.setComponentPopupMenu(contextMenu);
     setupChangedListeners();
   }
 
@@ -111,6 +126,21 @@ public class DualSpinner extends PropertyPanel {
 
   public JSpinner getSpinner2() {
     return this.spnDim2;
+  }
+
+  /** Uses the compact artist-facing presentation: value - value unit. */
+  public void setRangePresentation(String unit) {
+    this.lblDim1.setText("");
+    this.lblDim2.setText("-");
+    this.lblUnit.setText(unit == null ? "" : unit);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    for (java.awt.Component component : getComponents()) {
+      component.setEnabled(enabled);
+    }
   }
 
   public void addSpinnerListeners(

@@ -35,7 +35,7 @@ public class EmitterTextPanel extends PropertyPanel {
     table.setTableHeader(null);
     scrollPanel = new JScrollPane(table);
     scrollPanel.setBorder(DarkBorders.createLineBorder(1, 1, 1, 1));
-    scrollPanel.setPreferredSize(new Dimension(CONTROL_WIDTH * 2, CONTROL_HEIGHT * 3));
+    scrollPanel.setPreferredSize(new Dimension(CONTROL_WIDTH, CONTROL_HEIGHT * 3));
 
     ctrlButtonBox = Box.createVerticalBox();
     btnAdd = Style.textButton("+");
@@ -85,7 +85,12 @@ public class EmitterTextPanel extends PropertyPanel {
 
   private void setupChangedListeners() {
     btnAdd.addActionListener(a -> model.addRow(new Object[] {EmitterAttributes.DEFAULT_TEXT}));
-    btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
+    btnRemove.addActionListener(a -> {
+      int row = table.getSelectedRow();
+      if (row >= 0) {
+        model.removeRow(row);
+      }
+    });
     setup(table, MapObjectProperty.Particle.TEXTS);
   }
 }

@@ -57,6 +57,8 @@ public class ColorComponent extends JPanel {
   private final Color clearColor;
   private JWindow colorPickerWindow;
   private boolean updatingControls;
+  private boolean separateAlphaField;
+  private Runnable clearAction;
 
   private final transient List<ActionListener> listeners;
 
@@ -109,7 +111,13 @@ public class ColorComponent extends JPanel {
     Style.styleButton(this.btnClearColor, Style.ButtonVariant.DESTRUCTIVE);
     this.btnClearColor.setToolTipText(Resources.strings().get("colorComponent_clearColor"));
     this.btnClearColor.getAccessibleContext().setAccessibleName(Resources.strings().get("colorComponent_clearColor"));
-    this.btnClearColor.addActionListener(a -> this.clear());
+    this.btnClearColor.addActionListener(a -> {
+      if (this.clearAction != null) {
+        this.clearAction.run();
+      } else {
+        this.clear();
+      }
+    });
 
     final JLabel lblAlpha = new JLabel(Resources.strings().get("panel_alpha"));
     final JLabel lblColor = labelKey != null ? new JLabel(Resources.strings().get(labelKey)) : null;
@@ -377,6 +385,18 @@ public class ColorComponent extends JPanel {
     this.listeners.remove(listener);
   }
 
+  public void setClearAction(Runnable clearAction) {
+    this.clearAction = clearAction;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    for (java.awt.Component component : getComponents()) {
+      component.setEnabled(enabled);
+    }
+  }
+
   public int getAlpha() {
     Color color = this.getColor();
     return color != null ? color.getAlpha() : Math.round(this.getAlphaPercentage() * 255 / 100f);
@@ -391,7 +411,20 @@ public class ColorComponent extends JPanel {
   }
 
   public Color getColor() {
-    return ColorHelper.decode(this.textFieldColor.getText());
+    Color color = ColorHelper.decode(this.textFieldColor.getText());
+    if (!this.separateAlphaField || color == null) {
+      return color;
+    }
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(),
+        Math.round(this.getAlphaPercentage() * 255 / 100f));
+  }
+
+  public void setSeparateAlphaField(boolean separateAlphaField) {
+    this.separateAlphaField = separateAlphaField;
+    Color color = this.getColor();
+    if (color != null) {
+      this.setColor(color);
+    }
   }
 
   public void setColor(Color color) {
@@ -400,7 +433,9 @@ public class ColorComponent extends JPanel {
     }
     this.updatingControls = true;
     try {
-      this.textFieldColor.setText(ColorHelper.encode(color));
+      this.textFieldColor.setText(this.separateAlphaField
+          ? String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue())
+          : ColorHelper.encode(color));
       this.textFieldColor.setBackground(Style.raisedSurface());
       this.textFieldColor.setForeground(Style.text());
       this.btnColorSwatch.setBackground(color);

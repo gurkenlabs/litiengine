@@ -294,6 +294,11 @@ public abstract class PropertyPanel extends JPanel {
     return this.icon;
   }
 
+  /** Optional actions displayed at the trailing edge of the inspector section header. */
+  public Component getHeaderActions() {
+    return null;
+  }
+
   /**
    * Sets the icon for the property panel.
    *

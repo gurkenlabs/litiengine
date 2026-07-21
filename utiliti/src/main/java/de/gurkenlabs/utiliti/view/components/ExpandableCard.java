@@ -30,6 +30,7 @@ public class ExpandableCard extends JPanel {
   private final JLabel arrowLabel;
   private final JLabel titleLabel;
   private final JPanel headerPanel;
+  private Component headerTrailing;
   private boolean expanded;
   private boolean fillsAvailableHeight;
 
@@ -130,7 +131,13 @@ public class ExpandableCard extends JPanel {
   }
 
   public void setHeaderTrailing(Component component) {
-    this.headerPanel.add(component, BorderLayout.EAST);
+    if (this.headerTrailing != null) {
+      this.headerPanel.remove(this.headerTrailing);
+    }
+    this.headerTrailing = component;
+    if (component != null) {
+      this.headerPanel.add(component, BorderLayout.EAST);
+    }
     this.headerPanel.revalidate();
     this.headerPanel.repaint();
   }
