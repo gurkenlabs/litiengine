@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,6 +10,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import org.junit.jupiter.api.Test;
 
@@ -90,6 +93,45 @@ class SceneGraphTest {
     sceneGraph.clear();
 
     assertTrue(!sceneGraph.hasCachedLayerStateForTest(retainedMap));
+  }
+
+  @Test
+  void resolvesRowsByVerticalBounds() {
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+    root.add(new DefaultMutableTreeNode("short"));
+    JTree tree = new JTree(root);
+    tree.setSize(400, 100);
+
+    int y = tree.getRowBounds(1).y + tree.getRowBounds(1).height / 2;
+
+    assertEquals(1, SceneGraph.rowAtY(tree, y));
+    assertEquals(-1, SceneGraph.rowAtY(tree, 99));
+  }
+
+  @Test
+  void isolationChecksLayersAfterSelectedLayer() {
+    SceneGraph sceneGraph = new SceneGraph();
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    MapObjectLayer selected = new MapObjectLayer();
+    MapObjectLayer other = new MapObjectLayer();
+    map.addLayer(selected);
+    map.addLayer(other);
+
+    assertFalse(sceneGraph.isLayerIsolatedForTest(map, selected));
+
+    other.setVisible(false);
+
+    assertTrue(sceneGraph.isLayerIsolatedForTest(map, selected));
+  }
+
+  @Test
+  void singleLayerIsNotConsideredIsolated() {
+    SceneGraph sceneGraph = new SceneGraph();
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    MapObjectLayer selected = new MapObjectLayer();
+    map.addLayer(selected);
+
+    assertFalse(sceneGraph.isLayerIsolatedForTest(map, selected));
   }
 
 }

@@ -446,7 +446,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     MouseListener ml = new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        int selRow = tree.getRowForLocation(e.getX(), e.getY());
+        int selRow = rowAtY(tree, e.getY());
         if (selRow == -1) {
           return;
         }
@@ -984,6 +984,12 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         && path.getLastPathComponent() instanceof DefaultMutableTreeNode treeNode
         && treeNode.getUserObject() instanceof SceneNode node
         && !node.isSection();
+  }
+
+  static int rowAtY(JTree tree, int y) {
+    int row = tree.getClosestRowForLocation(0, y);
+    Rectangle bounds = row >= 0 ? tree.getRowBounds(row) : null;
+    return bounds != null && y >= bounds.y && y < bounds.y + bounds.height ? row : -1;
   }
 
   private Rectangle visibilityActionBounds(int row) {
@@ -2122,21 +2128,44 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   }
 
   private boolean isLayerIsolated(ILayerList parent, ILayer visibleLayer) {
+    return hasOtherLayer(parent, visibleLayer) && hasIsolatedVisibility(parent, visibleLayer);
+  }
+
+  private boolean hasOtherLayer(ILayerList parent, ILayer visibleLayer) {
     for (ILayer layer : parent.getRenderLayers()) {
       if (layer == visibleLayer) {
-        return layer.isVisible() && (!(layer instanceof IGroupLayer group) || allLayersVisible(group));
+        continue;
       }
       if (layer instanceof IGroupLayer group && containsLayer(group, visibleLayer)) {
-        if (!layer.isVisible()) {
+        if (hasOtherLayer(group, visibleLayer)) {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean hasIsolatedVisibility(ILayerList parent, ILayer visibleLayer) {
+    for (ILayer layer : parent.getRenderLayers()) {
+      if (layer == visibleLayer) {
+        if (!layer.isVisible() || layer instanceof IGroupLayer group && !allLayersVisible(group)) {
           return false;
         }
-        return isLayerIsolated(group, visibleLayer);
-      }
-      if (layer.isVisible()) {
+      } else if (layer instanceof IGroupLayer group && containsLayer(group, visibleLayer)) {
+        if (!layer.isVisible() || !hasIsolatedVisibility(group, visibleLayer)) {
+          return false;
+        }
+      } else if (layer.isVisible()) {
         return false;
       }
     }
     return true;
+  }
+
+  boolean isLayerIsolatedForTest(ILayerList parent, ILayer visibleLayer) {
+    return isLayerIsolated(parent, visibleLayer);
   }
 
   private boolean allLayersVisible(ILayerList parent) {
