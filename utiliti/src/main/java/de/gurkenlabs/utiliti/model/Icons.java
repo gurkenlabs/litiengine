@@ -80,6 +80,7 @@ public final class Icons {
   public static final Icon CROSS_16 = IconLoader.get().getUIAwareIcon("cross.svg", 16, 16);
   public static final Icon DELETE_16 = IconLoader.get().getUIAwareIcon("delete.svg", 16, 16);
   public static final Icon DOCUMENTATION_16 = IconLoader.get().getUIAwareIcon("documentation.svg", 16, 16);
+  public static final Icon EYEDROPPER_16 = IconLoader.get().getUIAwareIcon("eyedropper.svg", 16, 16);
   public static final Icon EMITTER_16 = IconLoader.get().getUIAwareIcon("emitter.svg", 16, 16);
   public static final Icon ENTITY_16 = IconLoader.get().getUIAwareIcon("entity.svg", 16, 16);
   public static final Icon EXPORT_16 = IconLoader.get().getUIAwareIcon("export.svg", 16, 16);
