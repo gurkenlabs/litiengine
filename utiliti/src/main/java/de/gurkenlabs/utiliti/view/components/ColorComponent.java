@@ -25,12 +25,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -55,6 +58,7 @@ public class ColorComponent extends JPanel {
   private final JSlider sliderAlpha;
   private final JSpinner spinnerAlpha;
   private final Color clearColor;
+  private final Function<Color, Color> colorChooser;
   private JWindow colorPickerWindow;
   private boolean updatingControls;
   private boolean separateAlphaField;
@@ -71,7 +75,15 @@ public class ColorComponent extends JPanel {
   }
 
   public ColorComponent(Color clearColor, String labelKey) {
+    this(clearColor, labelKey, null);
+  }
+
+  ColorComponent(Color clearColor, String labelKey, Function<Color, Color> colorChooser) {
     this.clearColor = clearColor;
+    this.colorChooser = colorChooser != null
+        ? colorChooser
+        : color -> JColorChooser.showDialog(
+            this, Resources.strings().get("colorComponent_selectColor"), color);
     int height = (PropertyPanel.CONTROL_HEIGHT + PropertyPanel.CONTROL_MARGIN) * 2;
     int width = PropertyPanel.CONTROL_WIDTH
         + (labelKey != null ? PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH : 0);
@@ -89,7 +101,11 @@ public class ColorComponent extends JPanel {
 
     this.btnColorSwatch = new ColorSwatchButton();
     styleColorActionButton(this.btnColorSwatch);
-    this.btnColorSwatch.setFocusable(false);
+    this.btnColorSwatch.setToolTipText(Resources.strings().get("colorComponent_selectColor"));
+    this.btnColorSwatch.getAccessibleContext()
+        .setAccessibleName(Resources.strings().get("colorComponent_selectColor"));
+    this.btnColorSwatch.addActionListener(
+        action -> this.setColor(this.colorChooser.apply(this.getColor())));
 
     this.btnSelectColor = Style.iconToggleButton(Icons.EYEDROPPER_16, false);
     this.btnSelectColor.setToolTipText(Resources.strings().get("colorComponent_selectColor"));
@@ -279,7 +295,7 @@ public class ColorComponent extends JPanel {
         Point location = event.getLocationOnScreen();
         picker.setVisible(false);
         Timer sampleDelay = new Timer(
-            40, action -> applyPickedColor(robot.getPixelColor(location.x, location.y)));
+            40, action -> samplePickedColor(() -> robot.getPixelColor(location.x, location.y)));
         sampleDelay.setRepeats(false);
         sampleDelay.start();
       }
@@ -287,6 +303,15 @@ public class ColorComponent extends JPanel {
     installCancelAction(picker.getRootPane());
     picker.setVisible(true);
     picker.requestFocusInWindow();
+  }
+
+  void samplePickedColor(Supplier<Color> colorSampler) {
+    try {
+      this.applyPickedColor(colorSampler.get());
+    } catch (SecurityException exception) {
+      this.stopColorPicker();
+      Toolkit.getDefaultToolkit().beep();
+    }
   }
 
   private void applyPickedColor(Color pickedColor) {
