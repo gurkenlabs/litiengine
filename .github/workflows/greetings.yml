@@ -10,6 +10,7 @@ on:
 
 jobs:
   greeting:
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -19,4 +20,4 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           issue_message: 'Thank you for your reporting your first LITIENGINE issue! We are looking forward to your further contributions.'
-          pr_message: 'Amazing, your first Pull Request in the LITIENGINE repository! You have earned the rank of "contributor" - let us know your nickname in the Forum and on Discord so we can reward you with the new role :).'
+          pr_message: 'Amazing, your first Pull Request in the LITIENGINE repository! You have earned the rank of "contributor" - let us know your nickname on Discord so we can reward you with the new role :).'
