@@ -156,15 +156,17 @@ class AssetFileExporterTest {
   }
 
   @Test
-  void rejectsSymbolicLinkExportParentWhenSupported() throws Exception {
+  void exportsThroughSymbolicLinkDirectoryWhenSupported() throws Exception {
     Path realDirectory = java.nio.file.Files.createDirectory(this.tempDir.resolve("real"));
     Path linkedDirectory = this.tempDir.resolve("linked");
     assumeTrue(createSymbolicLink(linkedDirectory, realDirectory));
     SpritesheetResource asset = new SpritesheetResource(
         new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "image", 1, 1);
 
-    assertThrows(java.io.IOException.class, () -> AssetFileExporter.export(asset, linkedDirectory));
-    assertFalse(java.nio.file.Files.exists(realDirectory.resolve("image.png")));
+    List<Path> files = AssetFileExporter.export(asset, linkedDirectory);
+
+    assertEquals(List.of(realDirectory.resolve("image.png").toRealPath()), files);
+    assertTrue(java.nio.file.Files.isRegularFile(realDirectory.resolve("image.png")));
   }
 
   @Test

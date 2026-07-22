@@ -26,6 +26,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -219,7 +220,7 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
       return null;
     }
     String cacheKey = Game.world().environment().getMap().getName()
-        + "-" + prop.getSpritesheetName().toLowerCase() + "-scene";
+        + "-" + prop.getSpritesheetName().toLowerCase(Locale.ROOT) + "-scene";
     BufferedImage img = Resources.images().get(cacheKey, () -> {
       String fallbackName = PropAnimationController.getSpriteName(prop, false);
       Spritesheet sprite = Resources.spritesheets()

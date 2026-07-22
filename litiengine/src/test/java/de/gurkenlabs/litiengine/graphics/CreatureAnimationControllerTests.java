@@ -10,9 +10,11 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import java.awt.image.BufferedImage;
+import java.util.Locale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 class CreatureAnimationControllerTests {
 
@@ -50,6 +52,41 @@ class CreatureAnimationControllerTests {
     CreatureAnimationController<Creature> controller = new CreatureAnimationController<>(creature, true);
 
     assertTrue(controller.hasAnimation("flip-walk-left"));
+  }
+
+  @Test
+  @ResourceLock("default-locale")
+  void directionalWalkSpritesAreLocaleIndependent() {
+    Locale originalLocale = Locale.getDefault();
+    try {
+      Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+      new Spritesheet(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "locale-walk-right.png", 1, 1);
+      Creature creature = new TestCreature("locale");
+      creature.setAngle(Direction.RIGHT.toAngle());
+
+      CreatureAnimationController<Creature> controller = new CreatureAnimationController<>(creature, false);
+
+      assertTrue(controller.hasAnimation("locale-walk-right"));
+      controller.update();
+      assertEquals("locale-walk-right", controller.getCurrent().getName());
+    } finally {
+      Locale.setDefault(originalLocale);
+    }
+  }
+
+  @Test
+  @ResourceLock("default-locale")
+  void standardDirectionalSpriteNamesAreLocaleIndependent() {
+    Locale originalLocale = Locale.getDefault();
+    try {
+      Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+      Creature creature = new TestCreature("knight");
+
+      assertEquals("knight-idle-right", CreatureAnimationController.getSpriteName(
+          creature, CreatureAnimationState.IDLE, Direction.RIGHT));
+    } finally {
+      Locale.setDefault(originalLocale);
+    }
   }
 
   private static class TestCreature extends Creature {

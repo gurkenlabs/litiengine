@@ -58,6 +58,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -1555,7 +1556,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     String query = queryOverride != null ? queryOverride : normalizedQuery();
     if (this.activeFilter == FilterChip.TILES) {
       return layer instanceof ITileLayer && (query.isEmpty()
-          || layer.getName() != null && layer.getName().toLowerCase().contains(query));
+          || layer.getName() != null && layer.getName().toLowerCase(Locale.ROOT).contains(query));
     }
     if (this.activeFilter != FilterChip.ALL && !(layer instanceof IMapObjectLayer)) {
       return false;
@@ -1564,7 +1565,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       return this.activeFilter == FilterChip.ALL;
     }
     String name = layer.getName();
-    if (name != null && name.toLowerCase().contains(query)) {
+    if (name != null && name.toLowerCase(Locale.ROOT).contains(query)) {
       return true;
     }
     return this.activeFilter == FilterChip.ALL && layer instanceof IMapObjectLayer;
@@ -1596,9 +1597,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     }
     String entityName = entity != null ? entity.getName() : null;
     String objectName = obj.getName();
-    return (entityName != null && entityName.toLowerCase().contains(query))
-        || (objectName != null && objectName.toLowerCase().contains(query))
-        || SceneNode.getEntityLabel(entity).toLowerCase().contains(query);
+    return (entityName != null && entityName.toLowerCase(Locale.ROOT).contains(query))
+        || (objectName != null && objectName.toLowerCase(Locale.ROOT).contains(query))
+        || SceneNode.getEntityLabel(entity).toLowerCase(Locale.ROOT).contains(query);
   }
 
   private boolean matchesActiveFilter(IMapObject obj) {
@@ -1624,7 +1625,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   private String normalizedQuery() {
     String query = this.textField.getText();
-    return query == null ? "" : query.trim().toLowerCase();
+    return query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
   }
 
   private void expandAllRows() {
@@ -1763,13 +1764,13 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   }
 
   private void searchByName(String name) {
-    String query = name.toLowerCase();
+    String query = name.toLowerCase(Locale.ROOT);
     Enumeration<?> nodes = this.nodeRoot.preorderEnumeration();
     while (nodes.hasMoreElements()) {
       Object candidate = nodes.nextElement();
       if (candidate instanceof DefaultMutableTreeNode node
           && node.getUserObject() instanceof SceneNode sceneNode
-          && sceneNode.getName() != null && sceneNode.getName().toLowerCase().contains(query)) {
+          && sceneNode.getName() != null && sceneNode.getName().toLowerCase(Locale.ROOT).contains(query)) {
         selectAndScroll(node);
         return;
       }

@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.view.components;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JComboBox;
 import javax.swing.text.JTextComponent;
 
@@ -23,10 +24,10 @@ final class SearchableResourceComboBox extends JComboBox<String> {
 
   private void filter() {
     if (this.filtering) return;
-    String query = ((JTextComponent) getEditor().getEditorComponent()).getText().trim().toLowerCase();
+    String query = ((JTextComponent) getEditor().getEditorComponent()).getText().trim().toLowerCase(Locale.ROOT);
     this.filtering = true;
     super.removeAllItems();
-    for (String item : this.items) if (query.isEmpty() || item.toLowerCase().contains(query)) super.addItem(item);
+    for (String item : this.items) if (query.isEmpty() || item.toLowerCase(Locale.ROOT).contains(query)) super.addItem(item);
     this.filtering = false;
     if (getItemCount() > 0) showPopup();
   }

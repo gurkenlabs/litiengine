@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.view.components;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
@@ -49,10 +50,10 @@ final class SearchableSpriteComboBox extends JComboBox<JLabel> {
 
   private void filter() {
     if (this.filtering) return;
-    String query = ((JTextComponent) getEditor().getEditorComponent()).getText().trim().toLowerCase();
+    String query = ((JTextComponent) getEditor().getEditorComponent()).getText().trim().toLowerCase(Locale.ROOT);
     this.filtering = true;
     super.removeAllItems();
-    for (JLabel item : this.items) if (query.isEmpty() || item.getText().toLowerCase().contains(query)) super.addItem(item);
+    for (JLabel item : this.items) if (query.isEmpty() || item.getText().toLowerCase(Locale.ROOT).contains(query)) super.addItem(item);
     this.filtering = false;
     if (getItemCount() > 0) showPopup();
   }

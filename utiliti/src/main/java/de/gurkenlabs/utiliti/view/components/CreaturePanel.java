@@ -16,6 +16,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
 import java.awt.LayoutManager;
 import java.util.Map;
+import java.util.Locale;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import javax.swing.DefaultComboBoxModel;
@@ -259,10 +260,10 @@ public class CreaturePanel extends PropertyPanel {
     }
     Map<String, String> available = new java.util.HashMap<>();
     for (Spritesheet spritesheet : spritesheets) {
-      available.put(spritesheet.getName().toLowerCase(), spritesheet.getName());
+      available.put(spritesheet.getName().toLowerCase(Locale.ROOT), spritesheet.getName());
     }
     String directionToken = direction != null && direction != Direction.UNDEFINED
-        ? "-" + direction.name().toLowerCase()
+        ? "-" + direction.name().toLowerCase(Locale.ROOT)
         : "";
     String state = startDead ? CreatureAnimationState.DEAD.spriteString() : CreatureAnimationState.IDLE.spriteString();
     java.util.List<String> candidates = new java.util.ArrayList<>();
@@ -279,7 +280,7 @@ public class CreaturePanel extends PropertyPanel {
       candidates.add(base + "-" + WALK_SPRITE_TOKEN);
     }
     for (String candidate : candidates) {
-      String source = available.get(candidate.toLowerCase());
+      String source = available.get(candidate.toLowerCase(Locale.ROOT));
       if (source != null) {
         return source;
       }

@@ -15,8 +15,10 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Editor;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 class CreaturePanelTest {
 
@@ -99,6 +101,22 @@ class CreaturePanelTest {
     assertEquals("zombie12-walk-left", source);
     Resources.spritesheets().remove("zombie12-walk-left");
     Resources.spritesheets().remove("zombie12-walk-right");
+  }
+
+  @Test
+  @ResourceLock("default-locale")
+  void previewSpriteLookupIsLocaleIndependent() {
+    Locale originalLocale = Locale.getDefault();
+    try {
+      Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+      Spritesheet right = new Spritesheet(
+          new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "knight-walk-right.png", 1, 1);
+
+      assertEquals("knight-walk-right", CreaturePanel.selectPreviewSpriteName(
+          "KNIGHT", Direction.RIGHT, false, List.of(right)));
+    } finally {
+      Locale.setDefault(originalLocale);
+    }
   }
 
   @Test

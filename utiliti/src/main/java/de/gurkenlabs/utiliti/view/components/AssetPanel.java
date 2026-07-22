@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -76,7 +77,7 @@ public class AssetPanel extends JPanel {
   }
 
   public void setFilterText(String text) {
-    this.filterText = text != null ? text.toLowerCase().trim() : "";
+    this.filterText = text != null ? text.toLowerCase(Locale.ROOT).trim() : "";
     applyFilter();
   }
 
@@ -122,7 +123,7 @@ public class AssetPanel extends JPanel {
     this.visibleItemCount = 0;
     for (AssetPanelItem item : allItems) {
       String name = item.getName();
-      if (filterText.isEmpty() || name != null && name.toLowerCase().contains(filterText)) {
+      if (filterText.isEmpty() || name != null && name.toLowerCase(Locale.ROOT).contains(filterText)) {
         this.add(item);
         this.visibleItemCount++;
         item.validate();

@@ -224,15 +224,12 @@ public final class AssetFileExporter {
 
   private static Path prepareDirectory(Path directory) throws IOException {
     Path normalized = directory.toAbsolutePath().normalize();
-    if (containsSymbolicLink(normalized)) {
-      throw new IOException("Export directory contains a symbolic link");
-    }
     Files.createDirectories(normalized);
-    if (containsSymbolicLink(normalized)
-        || !Files.isDirectory(normalized, LinkOption.NOFOLLOW_LINKS)) {
+    Path realDirectory = normalized.toRealPath();
+    if (!Files.isDirectory(realDirectory, LinkOption.NOFOLLOW_LINKS)) {
       throw new IOException("Export directory is not a regular directory");
     }
-    return normalized;
+    return realDirectory;
   }
 
   private static boolean containsSymbolicLink(Path path) {

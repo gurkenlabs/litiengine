@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -101,7 +102,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
    * @see Creature#getSpritesheetName()
    */
   public static String getSpriteName(Creature creature, CreatureAnimationState state, Direction direction) {
-    return getSpriteName(creature, state) + "-" + direction.name().toLowerCase();
+    return getSpriteName(creature, state) + "-" + direction.name().toLowerCase(Locale.ROOT);
   }
 
   @Override public boolean isAutoScaling() {
@@ -290,7 +291,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   private String getWalkSpriteName(Direction direction) {
-    return this.getEntity().getSpritesheetName() + '-' + WALK_STATE + (direction != null ? '-' + direction.name().toLowerCase() : "");
+    return this.getEntity().getSpritesheetName() + '-' + WALK_STATE
+      + (direction != null ? '-' + direction.name().toLowerCase(Locale.ROOT) : "");
   }
 
   private void init(boolean useFlippedSpritesAsFallback) {

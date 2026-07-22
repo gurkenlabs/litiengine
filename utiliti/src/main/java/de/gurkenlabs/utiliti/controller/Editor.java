@@ -535,7 +535,8 @@ public class Editor extends Screen {
       sources = paths.filter(Files::isRegularFile)
         .filter(path -> {
           String extension = FileUtilities.getExtension(path);
-          return extension.equals(Tileset.FILE_EXTENSION) || extension.equals(TmxMap.FILE_EXTENSION);
+          return extension.equalsIgnoreCase(Tileset.FILE_EXTENSION)
+            || extension.equalsIgnoreCase(TmxMap.FILE_EXTENSION);
         })
         .sorted()
         .flatMap(path -> loadProjectTilesets(path).stream())
@@ -558,11 +559,22 @@ public class Editor extends Screen {
       }
       List<Tileset> matches = sources.stream().filter(source -> sameTileset(target, source)).toList();
       if (matches.isEmpty()) {
+        List<Tileset> caseInsensitiveMatches = sources.stream()
+          .filter(source -> sameTilesetIgnoringCase(target, source))
+          .toList();
+        if (caseInsensitiveMatches.size() > 1) {
+          log.log(Level.WARNING, "Skipped ambiguous case-insensitive terrain definitions for tileset {0}", target.getName());
+          continue;
+        }
+        matches = caseInsensitiveMatches;
+      }
+      if (matches.isEmpty()) {
         continue;
       }
       if (hasTerrains) {
-        if (matches.stream().allMatch(source -> sameTerrainNames(matches.getFirst(), source))) {
-          target.enrichTerrainMetadataFrom(matches.getFirst());
+        Tileset firstMatch = matches.getFirst();
+        if (matches.stream().allMatch(source -> sameTerrainNames(firstMatch, source))) {
+          target.enrichTerrainMetadataFrom(firstMatch);
         } else {
           log.log(Level.WARNING, "Skipped ambiguous terrain definitions for tileset {0}", target.getName());
         }
@@ -574,7 +586,7 @@ public class Editor extends Screen {
 
   private static List<Tileset> loadProjectTilesets(Path path) {
     try {
-      if (FileUtilities.getExtension(path).equals(Tileset.FILE_EXTENSION)) {
+      if (FileUtilities.getExtension(path).equalsIgnoreCase(Tileset.FILE_EXTENSION)) {
         return List.of(XmlUtilities.read(Tileset.class, path.toUri().toURL()));
       }
       TmxMap map = XmlUtilities.read(TmxMap.class, path.toUri().toURL());
@@ -601,6 +613,17 @@ public class Editor extends Screen {
       && first.getTileHeight() == second.getTileHeight();
   }
 
+  private static boolean sameTilesetIgnoringCase(Tileset first, Tileset second) {
+    if (!Collections.disjoint(normalizedCandidateNames(first), normalizedCandidateNames(second))) {
+      return true;
+    }
+    return first.getName() != null && second.getName() != null
+      && first.getName().equalsIgnoreCase(second.getName())
+      && first.getTileCount() == second.getTileCount()
+      && first.getTileWidth() == second.getTileWidth()
+      && first.getTileHeight() == second.getTileHeight();
+  }
+
   static boolean tilesetsReferToSameFile(Tileset first, Tileset second) {
     return !Collections.disjoint(candidateNames(first), candidateNames(second));
   }
@@ -615,6 +638,12 @@ public class Editor extends Screen {
       names.add(FileUtilities.getFileName(tileset.getSource(), false));
     }
     return names;
+  }
+
+  private static Set<String> normalizedCandidateNames(Tileset tileset) {
+    return candidateNames(tileset).stream()
+      .map(name -> name.toLowerCase(Locale.ROOT))
+      .collect(java.util.stream.Collectors.toSet());
   }
 
   private static boolean sameTerrainNames(Tileset first, Tileset second) {

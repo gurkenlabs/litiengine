@@ -14,8 +14,10 @@ import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 @ExtendWith(SwingTestSuite.class)
 class AssetPanelTest {
@@ -79,6 +81,22 @@ class AssetPanelTest {
 
     assertDoesNotThrow(() -> panel.setFilterText("walk"));
     assertEquals(0, panel.getVisibleItemCount());
+  }
+
+  @Test
+  @ResourceLock("default-locale")
+  void filteringIsLocaleIndependent() {
+    Locale originalLocale = Locale.getDefault();
+    try {
+      Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+      AssetPanel panel = panelWithTilesets("Image Tiles");
+
+      panel.setFilterText("image");
+
+      assertEquals(1, panel.getVisibleItemCount());
+    } finally {
+      Locale.setDefault(originalLocale);
+    }
   }
 
   @Test

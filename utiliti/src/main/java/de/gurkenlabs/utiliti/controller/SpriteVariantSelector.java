@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -165,7 +166,8 @@ public final class SpriteVariantSelector {
     // Prefer idle animations by directional priority using Direction enum
     Direction[] pref = {Direction.DOWN, Direction.RIGHT, Direction.LEFT, Direction.UP};
     for (Direction dir : pref) {
-      String expected = base + '-' + CreatureAnimationState.IDLE.spriteString() + '-' + dir.name().toLowerCase();
+      String expected = base + '-' + CreatureAnimationState.IDLE.spriteString() + '-'
+        + dir.name().toLowerCase(Locale.ROOT);
       for (SpritesheetResource v : variants) {
         if (expected.equals(v.getName())) {
           return v;
@@ -198,7 +200,8 @@ public final class SpriteVariantSelector {
   private static String chooseCreatureVariantName(String base, List<String> variants) {
     Direction[] dirPref = {Direction.DOWN, Direction.RIGHT, Direction.LEFT, Direction.UP};
     for (Direction dir : dirPref) {
-      String expected = base + '-' + CreatureAnimationState.IDLE.spriteString() + '-' + dir.name().toLowerCase();
+      String expected = base + '-' + CreatureAnimationState.IDLE.spriteString() + '-'
+        + dir.name().toLowerCase(Locale.ROOT);
       for (String v : variants) {
         if (v.equals(expected)) {
           return v;

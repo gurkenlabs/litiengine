@@ -51,6 +51,21 @@ public class EditorGameFileTerrainTest {
     assertEquals(4, reference.getTerrainSets().get(0).getTerrains().size());
   }
 
+  @Test
+  public void recoversTerrainsFromUppercaseTilesetExtension(@TempDir Path projectDir) throws Exception {
+    URL tsx = EditorTerrainMatchingTest.class.getResource("/de/gurkenlabs/utiliti/controller/naughtytiles.tsx");
+    Files.copy(new File(tsx.toURI()).toPath(), projectDir.resolve("NAUGHTYTILES.TSX"));
+    Tileset reference = new Tileset();
+    reference.setSource("NAUGHTYTILES.TSX");
+    ResourceBundle gameFile = new ResourceBundle();
+    gameFile.getTilesets().add(reference);
+
+    Editor.loadProjectTilesetTerrains(gameFile, projectDir);
+
+    assertNotNull(reference.getTerrainSets());
+    assertEquals(4, reference.getTerrainSets().getFirst().getTerrains().size());
+  }
+
   private static void set(Object target, String fieldName, Object value) throws Exception {
     java.lang.reflect.Field field = target.getClass().getDeclaredField(fieldName);
     field.setAccessible(true);
