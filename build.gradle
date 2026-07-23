@@ -17,9 +17,3 @@ java {
   }
   targetCompatibility = JavaVersion.VERSION_17
 }
-
-subprojects {
-  tasks.withType(JavaCompile).configureEach {
-    options.release = 22
-  }
-}
