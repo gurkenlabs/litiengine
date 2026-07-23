@@ -36,14 +36,20 @@ class IconThemeTest {
     Graphics2D graphics = image.createGraphics();
     icon.paintIcon(null, graphics, 0, 0);
     graphics.dispose();
+    Color foreground = null;
+    int highestAlpha = 0;
     for (int y = 0; y < image.getHeight(); y++) {
       for (int x = 0; x < image.getWidth(); x++) {
         Color color = new Color(image.getRGB(x, y), true);
-        if (color.getAlpha() == 255) {
-          return new Color(color.getRGB());
+        if (color.getAlpha() > highestAlpha) {
+          highestAlpha = color.getAlpha();
+          foreground = new Color(color.getRGB());
         }
       }
     }
-    throw new AssertionError("Icon has no opaque foreground pixel");
+    if (foreground == null) {
+      throw new AssertionError("Icon has no foreground pixel");
+    }
+    return foreground;
   }
 }
