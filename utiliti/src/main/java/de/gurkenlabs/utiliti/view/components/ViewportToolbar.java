@@ -62,7 +62,7 @@ public class ViewportToolbar extends JPanel {
   private static final int TOOLBAR_VERTICAL_PADDING = 8;
   private static final int ICON_TEXT_GAP = 5;
   private static final Insets BUTTON_MARGIN = new Insets(0, BUTTON_HORIZONTAL_PADDING, 0, BUTTON_HORIZONTAL_PADDING);
-  private final JLabel zoomLabel;
+  private final ZoomControls zoomControls;
   private final JButton btnUndo;
   private final JButton btnRedo;
   private final JButton btnUndoHistory;
@@ -181,15 +181,26 @@ public class ViewportToolbar extends JPanel {
       });
     }
 
-    this.btnGrid = viewToggle(Resources.strings().get("toolbar_grid"), new GridIcon(), Editor.preferences().showGrid(), selected -> Editor.preferences().setShowGrid(selected), shortcut(KeyEvent.VK_G));
-    this.btnSnap = viewToggle(Resources.strings().get("toolbar_snap"), new SnapIcon(), Editor.preferences().snapToGrid(), selected -> Editor.preferences().setSnapToGrid(selected), null);
-    this.btnCollision = viewToggle(Resources.strings().get("panel_collision"), new CollisionIcon(), Editor.preferences().renderBoundingBoxes(), selected -> Editor.preferences().setRenderBoundingBoxes(selected), shortcut(KeyEvent.VK_H));
+    this.btnGrid = viewToggle(Resources.strings().get("toolbar_grid"), new MonochromeIcon(Icons.GRID_16), Editor.preferences().showGrid(), selected -> Editor.preferences().setShowGrid(selected), shortcut(KeyEvent.VK_G));
+    this.btnSnap = viewToggle(Resources.strings().get("toolbar_snap"), new MonochromeIcon(Icons.SNAP_GRID_16), Editor.preferences().snapToGrid(), selected -> Editor.preferences().setSnapToGrid(selected), null);
+    this.btnCollision = viewToggle(Resources.strings().get("toolbar_outlines"), new MonochromeIcon(Icons.COLLISIONBOX_16), Editor.preferences().renderBoundingBoxes(), selected -> Editor.preferences().setRenderBoundingBoxes(selected), shortcut(KeyEvent.VK_H));
     JPanel viewControls = controlGroup(this.btnGrid, this.btnSnap, this.btnCollision);
 
-    this.zoomLabel = new JLabel(formatZoom());
+    this.zoomControls = new ZoomControls(
+        () -> {
+          Zoom.out();
+          updateZoomLabel();
+        },
+        () -> {
+          Zoom.in();
+          updateZoomLabel();
+        },
+        this::fitMap,
+        Resources.strings().get("toolbar_fit"));
+    this.zoomControls.setZoomText(formatZoom());
     right.add(viewControls);
     right.add(Box.createHorizontalStrut(Style.SPACE_MEDIUM));
-    right.add(createZoomGroup());
+    right.add(this.zoomControls);
     right.add(Box.createHorizontalStrut(Style.SPACE_MEDIUM));
 
     add(left, BorderLayout.WEST);
@@ -208,9 +219,7 @@ public class ViewportToolbar extends JPanel {
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
         BorderFactory.createEmptyBorder(
             0, 0, TOOLBAR_VERTICAL_PADDING, 0)));
-    this.zoomLabel.setForeground(Style.text());
-    this.zoomLabel.setBackground(Style.surface());
-    this.zoomLabel.setBorder(zoomLabelBorder());
+    this.zoomControls.refreshStyle();
     for (JPanel group : this.controlGroups) {
       group.setBackground(Style.surface());
       group.setBorder(new ToolbarGroupBorder(Style.border()));
@@ -478,43 +487,6 @@ public class ViewportToolbar extends JPanel {
     button.setOpaque(false);
   }
 
-  private JPanel createZoomGroup() {
-    JPanel group = controlGroup();
-    group.setLayout(new BorderLayout(0, 0));
-
-    JButton out = button(Resources.strings().get("menu_view_zoomOut"), null, () -> { Zoom.out(); updateZoomLabel(); }, shortcut(KeyEvent.VK_MINUS));
-    JButton in = button(Resources.strings().get("menu_view_zoomIn"), null, () -> { Zoom.in(); updateZoomLabel(); }, shortcut(KeyEvent.VK_PLUS));
-    out.setText("−");
-    in.setText("+");
-    out.setMargin(new Insets(0, 0, 0, 0));
-    in.setMargin(new Insets(0, 0, 0, 0));
-    out.setPreferredSize(BUTTON_SIZE);
-    in.setPreferredSize(BUTTON_SIZE);
-    out.setFont(out.getFont().deriveFont(18f));
-    in.setFont(in.getFont().deriveFont(18f));
-    this.zoomLabel.setHorizontalAlignment(JLabel.CENTER);
-    this.zoomLabel.setForeground(Style.text());
-    this.zoomLabel.setBackground(Style.surface());
-    this.zoomLabel.setOpaque(true);
-    this.zoomLabel.getAccessibleContext().setAccessibleName(Resources.strings().get("toolbar_zoomLevel"));
-    this.zoomLabel.setPreferredSize(new Dimension(58, Style.CONTROL_HEIGHT));
-    this.zoomLabel.setBorder(zoomLabelBorder());
-
-    markGrouped(out);
-    markGrouped(in);
-    group.add(out, BorderLayout.WEST);
-    group.add(this.zoomLabel, BorderLayout.CENTER);
-    group.add(in, BorderLayout.EAST);
-
-    JPanel wrapper = new JPanel();
-    wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
-    wrapper.setOpaque(false);
-    wrapper.add(group);
-    wrapper.add(Box.createHorizontalStrut(Style.SPACE_MEDIUM));
-    wrapper.add(controlGroup(button(Resources.strings().get("toolbar_fit"), Icons.FIT_16, this::fitMap)));
-    return wrapper;
-  }
-
   public void fitMap() {
     Editor.instance().getMapComponent().fitMap();
   }
@@ -535,12 +507,6 @@ public class ViewportToolbar extends JPanel {
     button.setText(null);
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setPreferredSize(new Dimension(width, BUTTON_SIZE.height));
-  }
-
-  private static javax.swing.border.Border zoomLabelBorder() {
-    return BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 1, 0, 1, Style.border()),
-        BorderFactory.createEmptyBorder(0, Style.SPACE_SMALL, 0, Style.SPACE_SMALL));
   }
 
   private JPanel controlGroup(java.awt.Component... components) {
@@ -611,7 +577,7 @@ public class ViewportToolbar extends JPanel {
   }
 
   private void updateZoomLabel() {
-    this.zoomLabel.setText(formatZoom());
+    this.zoomControls.setZoomText(formatZoom());
   }
 
   public void refreshZoomLabel() {
@@ -716,55 +682,32 @@ public class ViewportToolbar extends JPanel {
     }
   }
 
-  private abstract static class ToolbarIcon implements Icon {
-    @Override public int getIconWidth() { return Style.ICON_SIZE; }
-    @Override public int getIconHeight() { return Style.ICON_SIZE; }
+  private record MonochromeIcon(Icon delegate) implements Icon {
+    @Override public int getIconWidth() { return this.delegate.getIconWidth(); }
 
-    @Override
-    public final void paintIcon(java.awt.Component c, Graphics g, int x, int y) {
-      Graphics2D g2 = (Graphics2D) g.create();
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      if (!c.isEnabled()) {
-        g2.setColor(Style.COLOR_DISABLED_TEXT);
-      } else {
-        g2.setColor(c.getForeground());
+    @Override public int getIconHeight() { return this.delegate.getIconHeight(); }
+
+    @Override public void paintIcon(Component component, Graphics graphics, int x, int y) {
+      double scaleX = 1;
+      double scaleY = 1;
+      if (graphics instanceof Graphics2D graphics2D) {
+        scaleX = Math.abs(graphics2D.getTransform().getScaleX());
+        scaleY = Math.abs(graphics2D.getTransform().getScaleY());
       }
-      paint(g2, x, y);
-      g2.dispose();
-    }
-
-    protected abstract void paint(Graphics2D g2, int x, int y);
-  }
-
-  private static final class GridIcon extends ToolbarIcon {
-    @Override protected void paint(Graphics2D g2, int x, int y) {
-      for (int row = 0; row < 3; row++) {
-        for (int col = 0; col < 3; col++) {
-          g2.fillRoundRect(x + 1 + col * 5, y + 1 + row * 5, 3, 3, 1, 1);
-        }
+      int imageWidth = Math.max(1, (int) Math.ceil(getIconWidth() * scaleX));
+      int imageHeight = Math.max(1, (int) Math.ceil(getIconHeight() * scaleY));
+      BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+      Graphics2D imageGraphics = image.createGraphics();
+      try {
+        imageGraphics.scale(scaleX, scaleY);
+        this.delegate.paintIcon(component, imageGraphics, 0, 0);
+        imageGraphics.setComposite(java.awt.AlphaComposite.SrcIn);
+        imageGraphics.setColor(component.getForeground());
+        imageGraphics.fillRect(0, 0, getIconWidth(), getIconHeight());
+      } finally {
+        imageGraphics.dispose();
       }
-    }
-  }
-
-  private static final class SnapIcon extends ToolbarIcon {
-    @Override protected void paint(Graphics2D g2, int x, int y) {
-      g2.drawOval(x + 3, y + 3, 10, 10);
-      g2.drawLine(x + 8, y + 1, x + 8, y + 5);
-      g2.drawLine(x + 8, y + 11, x + 8, y + 15);
-      g2.drawLine(x + 1, y + 8, x + 5, y + 8);
-      g2.drawLine(x + 11, y + 8, x + 15, y + 8);
-      g2.fillOval(x + 6, y + 6, 5, 5);
-    }
-  }
-
-  private static final class CollisionIcon extends ToolbarIcon {
-    @Override
-    protected void paint(Graphics2D g2, int x, int y) {
-      g2.drawRect(x + 3, y + 3, 10, 10);
-      g2.fillRect(x + 1, y + 1, 3, 3);
-      g2.fillRect(x + 12, y + 1, 3, 3);
-      g2.fillRect(x + 1, y + 12, 3, 3);
-      g2.fillRect(x + 12, y + 12, 3, 3);
+      graphics.drawImage(image, x, y, getIconWidth(), getIconHeight(), null);
     }
   }
 

@@ -1,7 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C9CDD6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="4.25" y="4.25" width="15.5" height="15.5" rx="2" stroke-dasharray="2.4 2.4"/>
-  <rect x="2.75" y="2.75" width="3" height="3" rx=".65" fill="#C9CDD6"/>
-  <rect x="18.25" y="2.75" width="3" height="3" rx=".65" fill="#C9CDD6"/>
-  <rect x="2.75" y="18.25" width="3" height="3" rx=".65" fill="#C9CDD6"/>
-  <rect x="18.25" y="18.25" width="3" height="3" rx=".65" fill="#C9CDD6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#E5E7EB" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4.25" y="4.25" width="15.5" height="15.5" rx="1.5"/>
+  <rect x="2.75" y="2.75" width="3" height="3" rx=".5" stroke="#F7B54A"/><rect x="18.25" y="2.75" width="3" height="3" rx=".5" stroke="#F7B54A"/><rect x="2.75" y="18.25" width="3" height="3" rx=".5" stroke="#F7B54A"/><rect x="18.25" y="18.25" width="3" height="3" rx=".5" stroke="#F7B54A"/>
 </svg>

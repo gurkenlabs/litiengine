@@ -337,7 +337,7 @@ public final class SettingsDialog extends JDialog {
     JPanel copy = new JPanel();
     copy.setOpaque(false);
     copy.setLayout(new BoxLayout(copy, BoxLayout.Y_AXIS));
-    JButton support = new JButton(text("support_the_devs"), Icons.EXPORT_16);
+    JButton support = new JButton(text("support_the_devs"), Icons.EXTERNAL_16);
     support.setHorizontalTextPosition(SwingConstants.LEFT);
     support.setHorizontalAlignment(SwingConstants.LEFT);
     support.setIconTextGap(8);
@@ -969,7 +969,11 @@ public final class SettingsDialog extends JDialog {
       JPanel row = new CategoryRow(selected);
       row.setLayout(new BorderLayout(14, 0));
       row.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 12));
-      row.add(new JLabel(category.icon), BorderLayout.WEST);
+      JLabel icon = new JLabel(category.icon);
+      icon.setHorizontalAlignment(SwingConstants.CENTER);
+      icon.setVerticalAlignment(SwingConstants.TOP);
+      icon.setPreferredSize(new Dimension(28, 28));
+      row.add(icon, BorderLayout.WEST);
       JPanel copy = new JPanel();
       copy.setOpaque(false);
       copy.setLayout(new BoxLayout(copy, BoxLayout.Y_AXIS));

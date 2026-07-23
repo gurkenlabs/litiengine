@@ -57,7 +57,7 @@ public final class Icons {
   // 16px variants
   public static final Icon ADD_16 = IconLoader.get().getUIAwareIcon("add.svg", 16, 16);
   public static final Icon ABOUT_16 = IconLoader.get().getUIAwareIcon("about.svg", 16, 16);
-  public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 16, 16);
+  public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("animation.svg", 16, 16);
   public static final Icon API_16 = IconLoader.get().getUIAwareIcon("api.svg", 16, 16);
   public static final Icon ASSET_16 = IconLoader.get().getUIAwareIcon("asset.svg", 16, 16);
   public static final Icon ASSET_BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("asset_blueprint.svg", 16, 16);
@@ -84,6 +84,7 @@ public final class Icons {
   public static final Icon EMITTER_16 = IconLoader.get().getUIAwareIcon("emitter.svg", 16, 16);
   public static final Icon ENTITY_16 = IconLoader.get().getUIAwareIcon("entity.svg", 16, 16);
   public static final Icon EXPORT_16 = IconLoader.get().getUIAwareIcon("export.svg", 16, 16);
+  public static final Icon EXTERNAL_16 = IconLoader.get().getUIAwareIcon("external.svg", 16, 16);
   public static final Icon FILE_NEW_16 = IconLoader.get().getUIAwareIcon("file-new.svg", 16, 16);
   public static final Icon ERASER_16 = IconLoader.get().getUIAwareIcon("eraser.svg", 16, 16);
   public static final Icon FILL_16 = IconLoader.get().getUIAwareIcon("fill.svg", 16, 16);
@@ -96,8 +97,10 @@ public final class Icons {
   public static final Icon GROUP_16 = IconLoader.get().getUIAwareIcon("group.svg", 16, 16);
   public static final Icon GRID_16 = IconLoader.get().getUIAwareIcon("settings-grid.svg", 16, 16);
   public static final Icon HISTORY_16 = IconLoader.get().getUIAwareIcon("history.svg", 16, 16);
+  public static final Icon IMPORT_16 = IconLoader.get().getUIAwareIcon("import.svg", 16, 16);
   public static final Icon LAYER_16 = IconLoader.get().getUIAwareIcon("layer.svg", 16, 16);
   public static final Icon LIFT_16 = IconLoader.get().getUIAwareIcon("lift.svg", 16, 16);
+  public static final Icon LOOP_16 = IconLoader.get().getUIAwareIcon("loop.svg", 16, 16);
   public static final Icon LOWER_16 = IconLoader.get().getUIAwareIcon("lower.svg", 16, 16);
   public static final Icon MAPAREA_16 = IconLoader.get().getUIAwareIcon("maparea.svg", 16, 16);
   public static final Icon MAP_16 = IconLoader.get().getUIAwareIcon("map.svg", 16, 16);
@@ -149,6 +152,7 @@ public final class Icons {
   public static final Icon SUPPORT_16 = IconLoader.get().getUIAwareIcon("support.svg", 16, 16);
   public static final Icon SUPPORT_24 = IconLoader.get().getUIAwareIcon("support.svg", 24, 24);
   public static final Icon SUPPORT_32 = IconLoader.get().getUIAwareIcon("support.svg", 32, 32);
+  public static final Icon SUPPORT_40 = IconLoader.get().getUIAwareIcon("support.svg", 40, 40);
   public static final Icon POWER_16 = IconLoader.get().getUIAwareIcon("power.svg", 16, 16);
   public static final Icon SPAWNPOINT_16 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 16, 16);
   public static final Icon SPRITESHEET_16 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 16, 16);
@@ -210,7 +214,7 @@ public final class Icons {
   public static final Icon SOUND_24 = IconLoader.get().getUIAwareIcon("sound.svg", 24, 24);
   public static final Icon SPAWNPOINT_24 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 24, 24);
   public static final Icon SPRITESHEET_24 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 24, 24);
-  public static final Icon ANIMATION_24 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 24, 24);
+  public static final Icon ANIMATION_24 = IconLoader.get().getUIAwareIcon("animation.svg", 24, 24);
   public static final Icon TILESET_24 = IconLoader.get().getUIAwareIcon("tileset.svg", 24, 24);
   public static final Icon TERRAIN_24 = IconLoader.get().getUIAwareIcon("terrain.svg", 24, 24);
   public static final Icon TRIGGER_24 = IconLoader.get().getUIAwareIcon("trigger.svg", 24, 24);
@@ -259,7 +263,7 @@ public final class Icons {
   public static final Icon SOUND_32 = IconLoader.get().getUIAwareIcon("sound.svg", 32, 32);
   public static final Icon SPAWNPOINT_32 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 32, 32);
   public static final Icon SPRITESHEET_32 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 32, 32);
-  public static final Icon ASSET_ANIMATION_32 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 32, 32);
+  public static final Icon ASSET_ANIMATION_32 = IconLoader.get().getUIAwareIcon("animation.svg", 32, 32);
   public static final Icon TILESET_32 = IconLoader.get().getUIAwareIcon("tileset.svg", 32, 32);
   public static final Icon TRIGGER_32 = IconLoader.get().getUIAwareIcon("trigger.svg", 32, 32);
 

@@ -90,7 +90,7 @@ public class TilesetEditorPanel extends JPanel {
   private final JButton[] terrainSlots;
   private final TileGrid tileGrid;
   private final JScrollPane gridScroll;
-  private final JLabel zoomLabel;
+  private final ZoomControls zoomControls;
   private final Timer animationTimer;
   private Runnable tilesetNameChanged = () -> {};
   private Tileset tileset;
@@ -162,22 +162,14 @@ public class TilesetEditorPanel extends JPanel {
     this.gridScroll.setAlignmentX(LEFT_ALIGNMENT);
     this.gridScroll.setBorder(BorderFactory.createLineBorder(Style.border()));
     this.gridScroll.getViewport().setBackground(Style.surface());
-    JButton zoomOut = Style.iconButton(Icons.MINUS_16);
-    JButton zoomIn = Style.iconButton(Icons.ADD_16);
-    JButton fit = Style.iconButton(Icons.FIT_16);
-    this.zoomLabel = new JLabel();
-    zoomOut.addActionListener(e -> setGridZoom(this.tileGrid.zoom * 0.8f));
-    zoomIn.addActionListener(e -> setGridZoom(this.tileGrid.zoom * 1.25f));
-    fit.addActionListener(e -> fitGrid());
-    zoomOut.setToolTipText(Resources.strings().get("menu_view_zoomOut"));
-    zoomIn.setToolTipText(Resources.strings().get("menu_view_zoomIn"));
-    fit.setToolTipText(Resources.strings().get("tilesetEditor_fitTileset"));
-    JPanel zoomControls = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 4, 0));
+    this.zoomControls = new ZoomControls(
+        () -> setGridZoom(this.tileGrid.zoom * 0.8f),
+        () -> setGridZoom(this.tileGrid.zoom * 1.25f),
+        this::fitGrid,
+        Resources.strings().get("tilesetEditor_fitTileset"));
+    JPanel zoomControls = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 8, 0));
     zoomControls.setOpaque(false);
-    zoomControls.add(zoomOut);
-    zoomControls.add(this.zoomLabel);
-    zoomControls.add(zoomIn);
-    zoomControls.add(fit);
+    zoomControls.add(this.zoomControls);
     renderSettings.add(labeledOffsets(), BorderLayout.CENTER);
     renderSettings.add(zoomControls, BorderLayout.EAST);
     JPanel bodyPanel = new JPanel(new BorderLayout(0, 8));
@@ -300,6 +292,9 @@ public class TilesetEditorPanel extends JPanel {
     if (this.detailLabel != null) {
       this.detailLabel.setForeground(Style.mutedText());
     }
+    if (this.zoomControls != null) {
+      this.zoomControls.refreshStyle();
+    }
   }
 
   @Override public void removeNotify() {
@@ -362,7 +357,7 @@ public class TilesetEditorPanel extends JPanel {
   }
 
   private void updateZoomLabel() {
-    this.zoomLabel.setText(Math.round(this.tileGrid.zoom * 100) + "%");
+    this.zoomControls.setZoom(this.tileGrid.zoom);
   }
 
   int getSelectedTileIdForTest() {

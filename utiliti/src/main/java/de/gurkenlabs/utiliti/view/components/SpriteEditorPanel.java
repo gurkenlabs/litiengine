@@ -23,6 +23,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -58,6 +60,7 @@ import javax.swing.table.DefaultTableModel;
 public class SpriteEditorPanel extends JPanel {
   private static final int PREVIEW_HEIGHT = 142;
   private static final int TABLE_ROW_HEIGHT = 38;
+  private static final float[] PREVIEW_ZOOM_LEVELS = {1f, 2f, 4f, 8f};
 
   private final JLabel titleLabel;
   private final JLabel metadataLabel;
@@ -77,7 +80,7 @@ public class SpriteEditorPanel extends JPanel {
   private final JSpinner rowsSpinner;
   private final JSpinner defaultDurationSpinner;
   private final JComboBox<String> durationScopeCombo;
-  private final JComboBox<String> zoomCombo;
+  private final ZoomControls zoomControls;
   private final JToggleButton playButton;
   private final JToggleButton loopButton;
   private final DefaultTableModel keyframeModel;
@@ -89,6 +92,8 @@ public class SpriteEditorPanel extends JPanel {
   private boolean binding;
   private int currentFrame;
   private long frameStartedAt;
+  private float previewZoom = 1f;
+  private boolean previewFit = true;
 
   public SpriteEditorPanel() {
     super(new BorderLayout());
@@ -161,10 +166,11 @@ public class SpriteEditorPanel extends JPanel {
       updateDurationSummary();
     });
 
-    this.zoomCombo = new JComboBox<>(new String[] {"1x", "2x", "4x", "8x", "Fit"});
-    this.zoomCombo.setSelectedItem("Fit");
-    this.zoomCombo.setPreferredSize(new Dimension(72, Style.CONTROL_HEIGHT));
-    this.zoomCombo.addActionListener(_ -> this.animationPreview.repaint());
+    this.zoomControls = new ZoomControls(
+        () -> stepPreviewZoom(-1),
+        () -> stepPreviewZoom(1),
+        this::fitPreview,
+        Resources.strings().get("toolbar_fit"));
 
     this.playButton = Style.iconToggleButton(Icons.PAUSE_16, true);
     configureButton(this.playButton, "spriteEditor_playPause");
@@ -172,7 +178,7 @@ public class SpriteEditorPanel extends JPanel {
       this.playButton.setIcon(this.playButton.isSelected() ? Icons.PAUSE_16 : Icons.PLAY_16);
       this.frameStartedAt = System.currentTimeMillis();
     });
-    this.loopButton = Style.iconToggleButton(Icons.REDO_16, true);
+    this.loopButton = Style.iconToggleButton(Icons.LOOP_16, true);
     configureButton(this.loopButton, "spriteEditor_loop");
 
     JPanel cards = new ViewportWidthPanel();
@@ -289,7 +295,7 @@ public class SpriteEditorPanel extends JPanel {
       this.spriteGrid.setCheckerboard(checkerboard.isSelected());
     });
     view.add(checkerboard);
-    view.add(this.zoomCombo);
+    view.add(this.zoomControls);
     toolbar.add(view, BorderLayout.EAST);
     content.add(toolbar, BorderLayout.SOUTH);
 
@@ -433,6 +439,7 @@ public class SpriteEditorPanel extends JPanel {
       updateDurationSummary();
     } finally {
       this.binding = false;
+      updatePreviewZoom();
     }
   }
 
@@ -532,9 +539,53 @@ public class SpriteEditorPanel extends JPanel {
         "spriteEditor_frameIndicator",
         String.valueOf(count == 0 ? 0 : this.currentFrame + 1),
         String.valueOf(count)));
-    this.animationPreview.repaint();
+    updatePreviewZoom();
     this.spriteGrid.repaint();
     this.keyframeTable.repaint();
+  }
+
+  private void stepPreviewZoom(int direction) {
+    float current = currentPreviewZoom();
+    float target = current;
+    if (direction > 0) {
+      for (float level : PREVIEW_ZOOM_LEVELS) {
+        if (level > current + 0.001f) {
+          target = level;
+          break;
+        }
+      }
+    } else {
+      for (int index = PREVIEW_ZOOM_LEVELS.length - 1; index >= 0; index--) {
+        if (PREVIEW_ZOOM_LEVELS[index] < current - 0.001f) {
+          target = PREVIEW_ZOOM_LEVELS[index];
+          break;
+        }
+      }
+    }
+    this.previewFit = false;
+    this.previewZoom = target;
+    updatePreviewZoom();
+  }
+
+  private void fitPreview() {
+    this.previewFit = true;
+    updatePreviewZoom();
+  }
+
+  private float currentPreviewZoom() {
+    BufferedImage frame = frameImage(this.currentFrame);
+    if (!this.previewFit || frame == null) {
+      return this.previewZoom;
+    }
+    float availableWidth = Math.max(1, this.animationPreview.getWidth() - 24);
+    float availableHeight = Math.max(1, this.animationPreview.getHeight() - 24);
+    return Math.max(0.01f, Math.min(
+        availableWidth / frame.getWidth(), availableHeight / frame.getHeight()));
+  }
+
+  private void updatePreviewZoom() {
+    this.zoomControls.setZoom(currentPreviewZoom());
+    this.animationPreview.repaint();
   }
 
   private void applyDurationToSelection() {
@@ -824,6 +875,13 @@ public class SpriteEditorPanel extends JPanel {
       setOpaque(true);
       setBackground(Style.raisedSurface());
       setBorder(BorderFactory.createLineBorder(Style.border()));
+      addComponentListener(new ComponentAdapter() {
+        @Override public void componentResized(ComponentEvent event) {
+          if (previewFit) {
+            updatePreviewZoom();
+          }
+        }
+      });
     }
 
     private void setCheckerboard(boolean checkerboard) {
@@ -840,12 +898,9 @@ public class SpriteEditorPanel extends JPanel {
       }
       BufferedImage frame = frameImage(currentFrame);
       if (frame != null) {
-        String zoom = (String) zoomCombo.getSelectedItem();
-        int scale = "Fit".equals(zoom)
-            ? Math.max(1, Math.min((getWidth() - 24) / frame.getWidth(), (getHeight() - 24) / frame.getHeight()))
-            : Integer.parseInt(zoom.substring(0, zoom.length() - 1));
-        int width = frame.getWidth() * scale;
-        int height = frame.getHeight() * scale;
+        float scale = currentPreviewZoom();
+        int width = Math.max(1, Math.round(frame.getWidth() * scale));
+        int height = Math.max(1, Math.round(frame.getHeight() * scale));
         g.setRenderingHint(
             RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g.drawImage(frame, (getWidth() - width) / 2, (getHeight() - height) / 2, width, height, null);

@@ -19,10 +19,10 @@ class IconThemeTest {
   @Test
   void existingIconUpdatesWhenThemeChanges() {
     Style.Theme original = Editor.preferences().getTheme();
-    Icon icon = Icons.ADD_16;
+    Icon icon = Icons.API_16;
     try {
       UI.setTheme(Style.Theme.DARK);
-      assertEquals(new Color(0xC9CDD6), foregroundColor(icon));
+      assertEquals(new Color(0xE5E7EB), foregroundColor(icon));
 
       UI.setTheme(Style.Theme.LIGHT);
       assertEquals(new Color(0x4B5563), foregroundColor(icon));

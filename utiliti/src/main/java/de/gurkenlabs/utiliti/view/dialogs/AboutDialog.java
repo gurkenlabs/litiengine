@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.dialogs;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.UriUtilities;
+import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -259,8 +260,9 @@ public final class AboutDialog extends JDialog {
     feature.setAlignmentX(Component.LEFT_ALIGNMENT);
     feature.setMaximumSize(new Dimension(COLUMN_WIDTH, 68));
 
-    JLabel icon = new JLabel(new LineIcon(symbol, 48));
-    icon.setForeground(symbol == Symbol.HEART ? new Color(243, 77, 100) : ACCENT);
+    Icon featureIcon = symbol == Symbol.HEART ? Icons.SUPPORT_40 : new LineIcon(symbol, 48);
+    JLabel icon = new JLabel(featureIcon);
+    icon.setForeground(ACCENT);
     icon.setPreferredSize(new Dimension(48, 48));
     icon.setVerticalAlignment(SwingConstants.TOP);
     feature.add(icon, BorderLayout.WEST);

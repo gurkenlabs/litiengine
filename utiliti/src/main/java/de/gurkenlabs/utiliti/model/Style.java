@@ -161,13 +161,31 @@ public final class Style {
         border = COLOR_TRANSPARENT;
       }
       int inset = grouped ? 2 : 0;
-      int arc = CORNER_RADIUS * 2;
+      int arc = c instanceof javax.swing.JComponent component
+          && component.getClientProperty("Editor.buttonArc") instanceof Number value
+          ? value.intValue()
+          : CORNER_RADIUS * 2;
+      String groupedEdge = c instanceof javax.swing.JComponent component
+          && component.getClientProperty("Editor.groupedButtonEdge") instanceof String value
+          ? value
+          : null;
+      if (groupedEdge != null) {
+        inset = 0;
+      }
+      int fillX = inset;
+      int fillWidth = c.getWidth() - 1 - inset * 2;
+      if ("left".equals(groupedEdge)) {
+        fillWidth = c.getWidth() + arc - inset;
+      } else if ("right".equals(groupedEdge)) {
+        fillX = -arc;
+        fillWidth = c.getWidth() + arc - inset;
+      }
       if (fill.getAlpha() > 0) {
         g2.setColor(fill);
         g2.fillRoundRect(
+            fillX,
             inset,
-            inset,
-            c.getWidth() - 1 - inset * 2,
+            fillWidth,
             c.getHeight() - 1 - inset * 2,
             arc,
             arc);
@@ -180,9 +198,9 @@ public final class Style {
       if (!enabled) {
         g2.setColor(COLOR_DISABLED_OVERLAY);
         g2.fillRoundRect(
+            fillX,
             inset,
-            inset,
-            c.getWidth() - 1 - inset * 2,
+            fillWidth,
             c.getHeight() - 1 - inset * 2,
             arc,
             arc);

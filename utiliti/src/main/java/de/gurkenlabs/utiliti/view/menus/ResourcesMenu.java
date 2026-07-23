@@ -26,7 +26,7 @@ public final class ResourcesMenu extends JMenu {
     compress.addItemListener(e -> Editor.preferences().setCompressFile(compress.getState()));
 
     JMenu importMenu = new JMenu(Resources.strings().get("menu_assets_import"));
-    importMenu.setIcon(Icons.ADD_16);
+    importMenu.setIcon(Icons.IMPORT_16);
 
     JMenuItem importSpriteFile = new JMenuItem(Resources.strings().get("menu_assets_importSpriteFile"), Icons.SPRITESHEET_16);
     importSpriteFile.addActionListener(a -> Editor.instance().importSpriteFile());
