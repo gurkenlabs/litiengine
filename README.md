@@ -22,7 +22,8 @@
 ## :gear: Installation
 
 LITIENGINE requires Java 25 or later; Java 22, 23, and 24 are no longer supported. Applications that enable gamepad support should be launched with
-`--enable-native-access=ALL-UNNAMED` to grant Input4j access to the Foreign Function & Memory API.
+`--enable-native-access=ALL-UNNAMED` to grant Input4j access to the Foreign Function & Memory API. Java 25 allows unauthorized native access with a
+warning by default, but `--illegal-native-access=deny` and future Java releases reject it.
 
 ### :elephant: Gradle
 The LITIENGINE Java library is hosted on the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine), i.e. fetching it with Gradle is as simple as configuring your source repository and defining the dependency as shown below.
