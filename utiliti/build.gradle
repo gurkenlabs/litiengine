@@ -23,6 +23,7 @@ application {
   mainClass = "de.gurkenlabs.utiliti.Program"
   applicationName = utiLITI_name
   description = utiLITI_description
+  applicationDefaultJvmArgs = ["--enable-native-access=ALL-UNNAMED"]
   applicationDistribution.into(executableDir) {
     from("src/dist")
   }
