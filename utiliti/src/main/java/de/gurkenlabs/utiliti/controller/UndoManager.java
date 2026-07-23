@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapImage;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
@@ -603,7 +604,7 @@ public class UndoManager {
       props.put("image", imageLayer.getImage() instanceof MapImage image ? new ImageSnapshot(image) : null);
     }
     for (Map.Entry<String, ICustomProperty> entry : layer.getProperties().entrySet()) {
-      props.put("prop:" + entry.getKey(), entry.getValue().getAsString());
+      props.put("prop:" + entry.getKey(), new CustomProperty(entry.getValue()));
     }
     return props;
   }
@@ -624,7 +625,7 @@ public class UndoManager {
     layer.getProperties().keySet().removeIf(k -> true);
     for (Map.Entry<String, Object> entry : props.entrySet()) {
       if (entry.getKey().startsWith("prop:")) {
-        layer.setValue(entry.getKey().substring(5), (String) entry.getValue());
+        layer.setValue(entry.getKey().substring(5), new CustomProperty((ICustomProperty) entry.getValue()));
       }
     }
   }
@@ -634,7 +635,7 @@ public class UndoManager {
     props.put("name", map.getName());
     props.put("tilesets", new ArrayList<>(map.getTilesets()));
     for (Map.Entry<String, ICustomProperty> entry : map.getProperties().entrySet()) {
-      props.put("prop:" + entry.getKey(), entry.getValue().getAsString());
+      props.put("prop:" + entry.getKey(), new CustomProperty(entry.getValue()));
     }
     return props;
   }
@@ -734,7 +735,7 @@ public class UndoManager {
     map.getProperties().keySet().removeIf(k -> !k.equals("name"));
     for (Map.Entry<String, Object> entry : props.entrySet()) {
       if (entry.getKey().startsWith("prop:")) {
-        map.setValue(entry.getKey().substring(5), (String) entry.getValue());
+        map.setValue(entry.getKey().substring(5), new CustomProperty((ICustomProperty) entry.getValue()));
       }
     }
     if (Game.world().environment() != null && Game.world().environment().getMap() == map) {
@@ -839,13 +840,7 @@ public class UndoManager {
     Map<ILayer, Map<String, Object>> secondProperties = new IdentityHashMap<>();
     collectLayerProperties(first, firstProperties);
     collectLayerProperties(second, secondProperties);
-    for (Map.Entry<ILayer, Map<String, Object>> entry : firstProperties.entrySet()) {
-      Map<String, Object> other = secondProperties.get(entry.getKey());
-      if (other != null && !entry.getValue().equals(other)) {
-        return false;
-      }
-    }
-    return true;
+    return firstProperties.equals(secondProperties);
   }
 
   private static void collectLayerProperties(

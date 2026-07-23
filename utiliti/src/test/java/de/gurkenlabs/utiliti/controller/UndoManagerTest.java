@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
@@ -176,6 +177,44 @@ class UndoManagerTest {
   }
 
   @Test
+  void layerUndoRedoPreservesCustomPropertyTypes() throws Exception {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-layer-property-types-test");
+    MapObjectLayer layer = new MapObjectLayer();
+    setTypedProperties(layer);
+    map.addLayer(layer);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+
+    manager.layerChanging(layer);
+    layer.setOpacity(0.5f);
+    manager.layerChanged(layer);
+
+    manager.undo();
+    assertTypedProperties(layer);
+    manager.redo();
+    assertTypedProperties(layer);
+  }
+
+  @Test
+  void mapUndoRedoPreservesCustomPropertyTypes() throws Exception {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("undo-map-property-types-test");
+    setTypedProperties(map);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+
+    manager.mapChanging(map);
+    map.setValue("changed", "after");
+    manager.mapChanged(map);
+
+    manager.undo();
+    assertTypedProperties(map);
+    manager.redo();
+    assertTypedProperties(map);
+  }
+
+  @Test
   void layerStructureUndoRedoRestoresLayerOrder() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
@@ -280,6 +319,25 @@ class UndoManagerTest {
     assertTrue(group.isVisible());
     assertTrue(child.isVisible());
     assertTrue(sibling.isVisible());
+  }
+
+  @Test
+  void recursiveLayerPropertySnapshotDetectsRemovedLayers() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("removed-layer-properties-test");
+    MapObjectLayer first = new MapObjectLayer();
+    MapObjectLayer removed = new MapObjectLayer();
+    map.addLayer(first);
+    map.addLayer(removed);
+    Game.world().loadEnvironment(map);
+    UndoManager manager = UndoManager.instance();
+    int historySize = manager.getUndoHistory().size();
+
+    manager.layersChanging(map);
+    map.removeLayer(removed);
+    manager.layersChanged(map);
+
+    assertEquals(historySize + 1, manager.getUndoHistory().size());
   }
 
   @Test
@@ -599,6 +657,26 @@ class UndoManagerTest {
     Field layerField = MapObject.class.getDeclaredField("layer");
     layerField.setAccessible(true);
     layerField.set(object, layer);
+  }
+
+  private static void setTypedProperties(ICustomPropertyProvider provider) throws Exception {
+    MapObject referencedObject = new MapObject();
+    referencedObject.setId(42);
+    provider.setValue("int", 5);
+    provider.setValue("float", 1.5f);
+    provider.setValue("bool", true);
+    provider.setValue("color", Color.BLUE);
+    provider.setValue("file", new URL("file:/maps/property.txt"));
+    provider.setValue("object", referencedObject);
+  }
+
+  private static void assertTypedProperties(ICustomPropertyProvider provider) {
+    assertEquals("int", provider.getProperty("int").getType());
+    assertEquals("float", provider.getProperty("float").getType());
+    assertEquals("bool", provider.getProperty("bool").getType());
+    assertEquals("color", provider.getProperty("color").getType());
+    assertEquals("file", provider.getProperty("file").getType());
+    assertEquals("object", provider.getProperty("object").getType());
   }
 
   private static TmxMap newMap(String name) {
