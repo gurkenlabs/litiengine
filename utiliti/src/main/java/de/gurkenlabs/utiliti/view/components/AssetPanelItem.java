@@ -1,11 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
-import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -19,21 +14,28 @@ import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.utiliti.controller.Editor;
-import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.tool.AssetFileExporter;
+import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.view.menus.AssetPanelItemPopupMenu;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -45,15 +47,16 @@ import java.awt.geom.RoundRectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -63,36 +66,50 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.TransferHandler;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class AssetPanelItem extends JPanel {
   private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
-  private static final int CORNER_RADIUS = 8;
-  private static final int PADDING = 8;
-  private static final int ICON_SIZE = 64;
-  private static final int BUTTON_SIZE = 24;
-  private static final Color HOVER_COLOR = new Color(255, 255, 255, 20);
-  private static final Color SELECTED_COLOR = new Color(100, 150, 255, 40);
+  private static final int PADDING = Style.SPACE_SMALL;
+  private static final int BUTTON_SIZE = Style.TOOLBAR_BUTTON_SIZE;
+  private static final int COMPACT_HEIGHT = Style.CONTROL_HEIGHT + Style.SPACE_LARGE;
   private static final BasicStroke FOCUS_STROKE = new BasicStroke(2.0f);
-  private static final Dimension PREFERRED_SIZE = new Dimension(140, 140);
+  private static final BasicStroke BORDER_STROKE = new BasicStroke(1.0f);
+  private static final Dimension PREFERRED_SIZE = new Dimension(118, 118);
 
   private final JLabel iconLabel;
   private final JLabel nameLabel;
+  private final JLabel detailsLabel;
+  private final JPanel iconPanel;
   private final JPanel buttonPanel;
   private final JButton btnEdit;
   private final JButton btnDelete;
   private final JButton btnAdd;
   private final JButton btnExport;
   private final Object origin;
+  private String assetName;
   private boolean isHovered;
   private boolean isSelected;
+  private boolean isFocused;
+  private boolean compact;
+  private Icon rawIcon;
+  private int cardSize = PREFERRED_SIZE.width;
+  private Consumer<AssetPanelItem> focusCallback;
+  private Consumer<MouseEvent> selectionPressedCallback;
+  private Consumer<MouseEvent> selectionClickedCallback;
+  private Supplier<java.util.List<Object>> transferAssetsSupplier;
+  private MouseAdapter mouseHandler;
+  private boolean dragStarted;
+  private boolean individualActionsEnabled = true;
 
   public AssetPanelItem(Object origin) {
     this.origin = origin;
     this.iconLabel = createIconLabel();
     this.nameLabel = createNameLabel();
+    this.detailsLabel = createDetailsLabel();
+    this.iconPanel = createIconPanel();
     this.buttonPanel = createButtonPanel();
 
     this.btnAdd = createStyledButton(Icons.ADD_16, "assetpanel_add");
@@ -123,6 +140,15 @@ public class AssetPanelItem extends JPanel {
     label.setHorizontalAlignment(SwingConstants.CENTER);
     label.setVerticalAlignment(SwingConstants.TOP);
     label.setFont(label.getFont().deriveFont(Font.PLAIN, 11f));
+    label.setForeground(Style.text());
+    return label;
+  }
+
+  private JLabel createDetailsLabel() {
+    JLabel label = new JLabel();
+    label.setHorizontalAlignment(SwingConstants.LEFT);
+    label.setFont(label.getFont().deriveFont(Font.PLAIN, 10f));
+    label.setForeground(Style.mutedText());
     return label;
   }
 
@@ -134,56 +160,95 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void initializeComponent() {
-    setPreferredSize(PREFERRED_SIZE);
-    setMinimumSize(PREFERRED_SIZE);
+    setPreferredSize(new Dimension(cardSize, cardSize));
+    setMinimumSize(new Dimension(cardSize, cardSize));
     setOpaque(false);
     setFocusable(true);
     setRequestFocusEnabled(true);
     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    setTransferHandler(new TransferHandler() {
+      @Override public int getSourceActions(JComponent c) {
+        return COPY;
+      }
+      @Override protected Transferable createTransferable(JComponent c) {
+        return createAssetTransferable();
+      }
+
+      @Override public void exportToClipboard(JComponent component, Clipboard clipboard, int action) {
+        if (action != COPY) {
+          throw new IllegalArgumentException("Asset transfers only support copy");
+        }
+        Transferable data = createTransferable(component);
+        if (data instanceof AssetTransferable assetTransferable) {
+          assetTransferable.ownClipboard();
+          try {
+            clipboard.setContents(data, assetTransferable);
+          } catch (IllegalStateException e) {
+            assetTransferable.lostOwnership(clipboard, data);
+            throw e;
+          }
+        }
+      }
+
+      @Override protected void exportDone(JComponent source, Transferable data, int action) {
+        closeTransfer(data);
+      }
+    });
     btnAdd.setEnabled(canAdd());
   }
 
   private JButton createStyledButton(Icon icon, String tooltipKey) {
-    JButton button = new JButton();
+    JButton button = Style.iconButton(icon);
     buttonPanel.add(button);
     button.setPreferredSize(new Dimension(BUTTON_SIZE, BUTTON_SIZE));
     button.setMaximumSize(new Dimension(BUTTON_SIZE, BUTTON_SIZE));
-    button.setIcon(icon);
-    button.setToolTipText(Resources.strings().get(tooltipKey));
-    button.setOpaque(false);
-    button.setContentAreaFilled(false);
+    String tooltip = Resources.strings().get(tooltipKey);
+    button.setToolTipText(tooltip);
+    button.getAccessibleContext().setAccessibleName(tooltip);
+    if ("assetpanel_delete".equals(tooltipKey)) {
+      Style.styleButton(button, Style.ButtonVariant.DESTRUCTIVE);
+    }
     button.setVisible(false);
-    button.setBorder(DarkBorders.createLineBorder(1, 1, 1, 1));
-
-    button.addMouseListener(new MouseAdapter() {
-      @Override public void mouseEntered(MouseEvent e) {
-        super.mouseEntered(e);
-        button.setContentAreaFilled(true);
-        button.setFocusPainted(true);
-      }
-
-      @Override public void mouseExited(MouseEvent e) {
-        super.mouseExited(e);
-        button.setContentAreaFilled(false);
-        button.setFocusPainted(false);
-      }
-    });
-
     return button;
   }
 
   private void setupLayout() {
-    setLayout(new BorderLayout());
-    JPanel contentPanel = createContentPanel();
-    add(contentPanel, BorderLayout.CENTER);
+    if (compact) {
+      setLayout(new BorderLayout(Style.SPACE_MEDIUM, 0));
+      iconLabel.setHorizontalAlignment(SwingConstants.LEFT);
+      iconLabel.setPreferredSize(new Dimension(COMPACT_HEIGHT, COMPACT_HEIGHT));
+      iconLabel.setBorder(BorderFactory.createEmptyBorder(
+        Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL));
+      nameLabel.setHorizontalAlignment(SwingConstants.LEFT);
+      JPanel centerPanel = new JPanel(new BorderLayout());
+      centerPanel.setOpaque(false);
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
+      centerPanel.add(nameLabel, BorderLayout.CENTER);
+      centerPanel.add(detailsLabel, BorderLayout.SOUTH);
+      add(iconLabel, BorderLayout.WEST);
+      add(centerPanel, BorderLayout.CENTER);
+      add(buttonPanel, BorderLayout.EAST);
+    } else {
+      setLayout(new BorderLayout());
+      iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      iconLabel.setPreferredSize(null);
+      iconLabel.setBorder(null);
+      nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      if (iconLabel.getParent() != null) {
+        iconLabel.getParent().remove(iconLabel);
+      }
+      iconPanel.add(iconLabel, BorderLayout.CENTER);
+      JPanel contentPanel = createContentPanel();
+      add(contentPanel, BorderLayout.CENTER);
+    }
   }
 
   private JPanel createContentPanel() {
     JPanel contentPanel = new JPanel(new BorderLayout());
     contentPanel.setOpaque(false);
-    contentPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING / 2, PADDING));
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-    contentPanel.add(createIconPanel(), BorderLayout.NORTH);
+    contentPanel.add(iconPanel, BorderLayout.NORTH);
     contentPanel.add(createTextPanel(), BorderLayout.CENTER);
     contentPanel.add(createBottomPanel(), BorderLayout.SOUTH);
 
@@ -193,7 +258,8 @@ public class AssetPanelItem extends JPanel {
   private JPanel createIconPanel() {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(false);
-    panel.setPreferredSize(new Dimension(ICON_SIZE + 16, ICON_SIZE + 8));
+    int iconArea = getCardIconArea();
+    panel.setPreferredSize(new Dimension(iconArea, iconArea));
     panel.add(iconLabel, BorderLayout.CENTER);
     return panel;
   }
@@ -201,7 +267,7 @@ public class AssetPanelItem extends JPanel {
   private JPanel createTextPanel() {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(false);
-    panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 0));
+    panel.setBorder(BorderFactory.createEmptyBorder(2, 0, 4, 0));
     panel.add(nameLabel, BorderLayout.CENTER);
     return panel;
   }
@@ -222,17 +288,23 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void setupKeyboardShortcuts() {
+    getInputMap(JComponent.WHEN_FOCUSED).put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutMask()), "copyAsset");
+    getActionMap().put("copyAsset", TransferHandler.getCopyAction());
+
     getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
     getActionMap().put("deleteAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        deleteAsset();
+        if (individualActionsEnabled) {
+          deleteAsset();
+        }
       }
     });
 
     getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "addAsset");
     getActionMap().put("addAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        if (canAdd()) {
+        if (individualActionsEnabled && canAdd()) {
           addEntity();
         }
       }
@@ -241,67 +313,121 @@ public class AssetPanelItem extends JPanel {
     getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "editAsset");
     getActionMap().put("editAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        editAsset();
+        if (individualActionsEnabled && canEdit()) {
+          editAsset();
+        }
       }
     });
 
-    getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK), "exportAsset");
+    getInputMap(JComponent.WHEN_FOCUSED).put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutMask()), "exportAsset");
     getActionMap().put("exportAsset", new AbstractAction() {
       @Override public void actionPerformed(ActionEvent ae) {
-        exportAsset();
+        if (individualActionsEnabled) {
+          exportAsset();
+        }
       }
     });
   }
 
   private void setupFocusHandling() {
-    addFocusListener(new FocusAdapter() {
+    FocusAdapter focusHandler = new FocusAdapter() {
       @Override public void focusGained(FocusEvent e) {
-        isSelected = true;
         updateButtonVisibility(true);
+        if (focusCallback != null) {
+          focusCallback.accept(AssetPanelItem.this);
+        }
         repaint();
       }
 
       @Override public void focusLost(FocusEvent e) {
-        isSelected = false;
-        updateButtonVisibility(false);
-        repaint();
+        SwingUtilities.invokeLater(() -> {
+          Component focusOwner = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+          if (focusOwner == AssetPanelItem.this || focusOwner != null && SwingUtilities.isDescendingFrom(focusOwner, AssetPanelItem.this)) {
+            return;
+          }
+          updateButtonVisibility(isHovered);
+          repaint();
+        });
       }
-    });
+    };
+    addFocusListener(focusHandler);
+    btnAdd.addFocusListener(focusHandler);
+    btnEdit.addFocusListener(focusHandler);
+    btnExport.addFocusListener(focusHandler);
+    btnDelete.addFocusListener(focusHandler);
   }
 
   private void setupMouseHandling() {
-    MouseAdapter mouseHandler = new MouseAdapter() {
+    this.mouseHandler = new MouseAdapter() {
       @Override public void mouseEntered(MouseEvent e) {
         isHovered = true;
-        requestFocus();
+        updateButtonVisibility(true);
         repaint();
       }
 
       @Override public void mouseExited(MouseEvent e) {
+        Point p = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), AssetPanelItem.this);
+        if (contains(p)) {
+          return;
+        }
         isHovered = false;
+        updateButtonVisibility(isSelected);
         repaint();
       }
 
       @Override public void mousePressed(MouseEvent e) {
+        dragStarted = false;
+        if (selectionPressedCallback != null) {
+          selectionPressedCallback.accept(e);
+        }
         requestFocus();
         maybeShowPopup(e);
       }
 
+      @Override public void mouseDragged(MouseEvent e) {
+        if (dragStarted || (e.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) == 0) {
+          return;
+        }
+        dragStarted = true;
+        MouseEvent event = SwingUtilities.convertMouseEvent(e.getComponent(), e, AssetPanelItem.this);
+        getTransferHandler().exportAsDrag(AssetPanelItem.this, event, TransferHandler.COPY);
+      }
+
       @Override public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger() && selectionPressedCallback != null) {
+          selectionPressedCallback.accept(e);
+        }
         maybeShowPopup(e);
       }
 
       @Override public void mouseClicked(MouseEvent e) {
+        if (selectionClickedCallback != null) {
+          selectionClickedCallback.accept(e);
+        }
         requestFocus();
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
           addEntity();
         }
       }
     };
+    installMouseHandler(this);
+  }
 
-    addMouseListener(mouseHandler);
-    iconLabel.addMouseListener(mouseHandler);
-    nameLabel.addMouseListener(mouseHandler);
+  private void installMouseHandler(Component component) {
+    boolean installed = java.util.Arrays.stream(component.getMouseListeners()).anyMatch(listener -> listener == this.mouseHandler);
+    if (!installed) {
+      component.addMouseListener(this.mouseHandler);
+    }
+    boolean motionInstalled = java.util.Arrays.stream(component.getMouseMotionListeners()).anyMatch(listener -> listener == this.mouseHandler);
+    if (!motionInstalled) {
+      component.addMouseMotionListener(this.mouseHandler);
+    }
+    if (component instanceof Container container) {
+      for (Component child : container.getComponents()) {
+        installMouseHandler(child);
+      }
+    }
   }
 
   private void maybeShowPopup(MouseEvent e) {
@@ -320,13 +446,46 @@ public class AssetPanelItem extends JPanel {
     btnExport.addActionListener(e -> exportAsset());
   }
 
+  public String getName() {
+    return assetName;
+  }
+
   private void setAssetData(Icon icon, String text) {
-    iconLabel.setIcon(icon);
-    nameLabel.setText(wrapText(text, 16));
+    this.assetName = text;
+    this.rawIcon = icon;
+    updateScaledIcon();
+    updateNameLabel();
+    detailsLabel.setText(getDetailsSummary());
     String tooltip = createTooltip(text);
     setToolTipText(tooltip);
     iconLabel.setToolTipText(tooltip);
     nameLabel.setToolTipText(tooltip);
+    getAccessibleContext().setAccessibleName(text);
+    getAccessibleContext().setAccessibleDescription(getDetailsSummary());
+  }
+
+  private void updateScaledIcon() {
+    if (rawIcon == null) {
+      iconLabel.setIcon(null);
+      return;
+    }
+    int iconArea = compact ? 32 : getCardIconArea();
+    if (rawIcon instanceof ImageIcon imgIcon && imgIcon.getImage() instanceof java.awt.image.BufferedImage bi) {
+      java.awt.image.BufferedImage scaled = de.gurkenlabs.litiengine.util.Imaging.scale(bi, iconArea, iconArea, true);
+      if (scaled != null) {
+        iconLabel.setIcon(new ImageIcon(scaled));
+        return;
+      }
+    }
+    iconLabel.setIcon(rawIcon);
+  }
+
+  private int getCardIconArea() {
+    return Math.max(32, cardSize - 2 * PADDING - BUTTON_SIZE - 24);
+  }
+
+  private void updateNameLabel() {
+    nameLabel.setText(compact ? assetName : wrapText(assetName, Math.max(12, cardSize / 7)));
   }
 
   private String createTooltip(String text) {
@@ -340,7 +499,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private String wrapText(String text, int maxLength) {
-    if (text.length() <= maxLength) {
+    if (text == null || text.length() <= maxLength) {
       return text;
     }
 
@@ -368,36 +527,77 @@ public class AssetPanelItem extends JPanel {
   }
 
   @Override protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g.create();
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, getWidth() - 1f, getHeight() - 1f, CORNER_RADIUS, CORNER_RADIUS);
+    RoundRectangle2D roundRect = new RoundRectangle2D.Float(
+      0, 0, getWidth() - 1f, getHeight() - 1f, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
 
+    g2d.setColor(Style.surface());
+    g2d.fill(roundRect);
     if (isSelected) {
-      g2d.setColor(SELECTED_COLOR);
+      g2d.setColor(Style.cardSelected());
       g2d.fill(roundRect);
     } else if (isHovered) {
-      g2d.setColor(HOVER_COLOR);
+      g2d.setColor(Style.cardHover());
       g2d.fill(roundRect);
     }
 
-    g2d.setColor(isSelected ? UIManager.getColor("Tree.selectionBorderColor") : UIManager.getColor("Component.borderColor"));
-    g2d.setStroke(isSelected ? FOCUS_STROKE : new BasicStroke(1.0f));
-    g2d.draw(roundRect);
-
     g2d.dispose();
-    super.paintComponent(g);
   }
 
-  private static Map<String, String> getDetails(Object origin) {
-    Map<String, String> details = new ConcurrentHashMap<>();
+  @Override
+  protected void paintChildren(Graphics graphics) {
+    super.paintChildren(graphics);
+    Graphics2D g2d = (Graphics2D) graphics.create();
+    try {
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      if (this.isSelected) {
+        g2d.setColor(Style.accent());
+        g2d.fillRoundRect(3, 8, 3, Math.max(4, getHeight() - 16), 3, 3);
+      }
+      RoundRectangle2D roundRect = new RoundRectangle2D.Float(
+          0, 0, getWidth() - 1f, getHeight() - 1f, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+      g2d.setColor(this.isFocused ? Style.accent() : Style.border());
+      g2d.setStroke(this.isFocused ? FOCUS_STROKE : BORDER_STROKE);
+      g2d.draw(roundRect);
+    } finally {
+      g2d.dispose();
+    }
+  }
+
+  @Override
+  public void updateUI() {
+    super.updateUI();
+    if (this.nameLabel != null) {
+      this.nameLabel.setForeground(Style.text());
+    }
+    if (this.detailsLabel != null) {
+      this.detailsLabel.setForeground(Style.mutedText());
+    }
+  }
+
+  public static Map<String, String> getDetails(Object origin) {
+    Map<String, String> details = new java.util.LinkedHashMap<>();
     if (origin instanceof SpritesheetResource spritesheetResource) {
-      details.put("Size", spritesheetResource.getWidth() + "x" + spritesheetResource.getHeight() + "px");
+      details.put(Resources.strings().get("emitter_size"), Resources.strings().get(
+        "assetpanel_pixel_dimensions", spritesheetResource.getWidth(), spritesheetResource.getHeight()));
     } else if (origin instanceof Animation animation) {
-      details.put("Frames", String.valueOf(animation.getKeyframes().size()));
-      details.put("Duration", animation.getTotalDuration() + "ms");
+      details.put(Resources.strings().get("assetpanel_animation_frames"), Resources.strings().get(
+        "assetpanel_metadata_count", animation.getKeyframes().size()));
+      details.put(Resources.strings().get("assetpanel_animation_duration"), Resources.strings().get(
+        "assetpanel_metadata_count", animation.getTotalDuration()));
       if (animation.getSpritesheet() != null) {
-        details.put("Spritesheet", animation.getSpritesheet().getName());
+        details.put(Resources.strings().get("assetpanel_animation_spritesheet"), animation.getSpritesheet().getName());
+      }
+    } else if (origin instanceof Tileset tileset) {
+      details.put(Resources.strings().get("assetpanel_metadata_tiles"), Resources.strings().get(
+        "assetpanel_metadata_count", tileset.getTileCount()));
+      details.put(Resources.strings().get("assetpanel_metadata_tile_size"), Resources.strings().get(
+        "assetpanel_dimensions", tileset.getTileWidth(), tileset.getTileHeight()));
+      if (tileset.getImage() != null) {
+        details.put(Resources.strings().get("assetpanel_metadata_image"), tileset.getImage().getSource());
       }
     }
     return details;
@@ -407,59 +607,186 @@ public class AssetPanelItem extends JPanel {
     return origin;
   }
 
+  public boolean isSelected() {
+    return this.isSelected;
+  }
+
+  public void setSelected(boolean selected) {
+    if (this.isSelected == selected) {
+      return;
+    }
+    this.isSelected = selected;
+    repaint();
+  }
+
+  public boolean isFocused() {
+    return this.isFocused;
+  }
+
+  public void setFocused(boolean focused) {
+    if (this.isFocused == focused) {
+      return;
+    }
+    this.isFocused = focused;
+    repaint();
+  }
+
+  public boolean isIndividualActionsEnabled() {
+    return this.individualActionsEnabled;
+  }
+
+  public void setIndividualActionsEnabled(boolean enabled) {
+    this.individualActionsEnabled = enabled;
+    this.btnAdd.setEnabled(enabled && canAdd());
+    this.btnEdit.setEnabled(enabled && canEdit());
+    this.btnDelete.setEnabled(enabled);
+    this.btnExport.setEnabled(enabled);
+  }
+
+  public String getDetailsSummary() {
+    Map<String, String> details = getDetails(origin);
+    if (details.isEmpty()) {
+      return "";
+    }
+    return String.join("  •  ", details.entrySet().stream()
+        .map(entry -> entry.getKey() + ": " + entry.getValue())
+        .toList());
+  }
+
+  public void setFocusCallback(Consumer<AssetPanelItem> focusCallback) {
+    this.focusCallback = focusCallback;
+  }
+
+  public void setSelectionCallbacks(
+      Consumer<MouseEvent> pressedCallback, Consumer<MouseEvent> clickedCallback) {
+    this.selectionPressedCallback = pressedCallback;
+    this.selectionClickedCallback = clickedCallback;
+  }
+
+  public void setTransferAssetsSupplier(Supplier<java.util.List<Object>> supplier) {
+    this.transferAssetsSupplier = supplier;
+  }
+
+  private Transferable createAssetTransferable() {
+    java.util.List<Object> assets = transferAssetsSupplier != null
+        ? transferAssetsSupplier.get()
+        : java.util.List.of(origin);
+    return assets.isEmpty() ? null : new AssetTransferable(assets);
+  }
+
+  Transferable createTransferableForTest() {
+    return createAssetTransferable();
+  }
+
+  static void closeTransfer(Transferable data) {
+    if (data instanceof AssetTransferable assetTransferable) {
+      assetTransferable.close();
+    }
+  }
+
+  public void setCompact(boolean compact) {
+    if (this.compact == compact) {
+      return;
+    }
+    this.compact = compact;
+    removeAll();
+    setupLayout();
+    setPreferredSize(compact ? new Dimension(PREFERRED_SIZE.width, COMPACT_HEIGHT) : new Dimension(cardSize, cardSize));
+    setMinimumSize(compact ? new Dimension(0, COMPACT_HEIGHT) : new Dimension(cardSize, cardSize));
+    setMaximumSize(compact
+      ? new Dimension(Integer.MAX_VALUE, COMPACT_HEIGHT)
+      : new Dimension(cardSize, cardSize));
+    setAlignmentX(LEFT_ALIGNMENT);
+    iconLabel.setPreferredSize(compact ? new Dimension(COMPACT_HEIGHT, COMPACT_HEIGHT) : null);
+    iconLabel.setHorizontalAlignment(compact ? SwingConstants.LEFT : SwingConstants.CENTER);
+    nameLabel.setHorizontalAlignment(compact ? SwingConstants.LEFT : SwingConstants.CENTER);
+    updateNameLabel();
+    updateScaledIcon();
+    if (this.mouseHandler != null) {
+      installMouseHandler(this);
+    }
+    revalidate();
+    repaint();
+  }
+
+  public void setCardSize(int cardSize) {
+    this.cardSize = cardSize;
+    if (!compact) {
+      setPreferredSize(new Dimension(cardSize, cardSize));
+      setMinimumSize(new Dimension(cardSize, cardSize));
+      setMaximumSize(new Dimension(cardSize, cardSize));
+      int iconArea = getCardIconArea();
+      iconPanel.setPreferredSize(new Dimension(iconArea, iconArea));
+      updateNameLabel();
+      updateScaledIcon();
+      revalidate();
+      repaint();
+    }
+  }
+
+  public boolean isCompact() {
+    return compact;
+  }
+
   public void deleteAsset() {
     if (origin == null) {
       return;
     }
 
     String assetType = "";
-    String assetName = "";
+    String deletedAssetName = "";
+    boolean deleted = false;
 
     switch (origin) {
       case SpritesheetResource spritesheetResource -> {
         assetType = "spritesheet";
-        assetName = spritesheetResource.getName();
-        if (confirmDelete(assetType, assetName)) {
+        deletedAssetName = spritesheetResource.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
           Editor.instance().getGameFile().getSpriteSheets().remove(spritesheetResource);
           Resources.images().clear();
-          Resources.spritesheets().remove(assetName);
+          Resources.spritesheets().remove(deletedAssetName);
+          deleted = true;
         }
       }
       case EmitterAttributes emitterData -> {
         assetType = "emitter";
-        assetName = emitterData.getName();
-        if (confirmDelete(assetType, assetName)) {
+        deletedAssetName = emitterData.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
           Editor.instance().getGameFile().getEmitters().remove(emitterData);
+          deleted = true;
         }
       }
       case Blueprint blueprint -> {
         assetType = "blueprint";
-        assetName = blueprint.getName();
-        if (confirmDelete(assetType, assetName)) {
+        deletedAssetName = blueprint.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
           Editor.instance().getGameFile().getBluePrints().remove(blueprint);
-          Resources.blueprints().remove(assetName);
+          Resources.blueprints().remove(deletedAssetName);
+          deleted = true;
         }
       }
       case SoundResource soundResource -> {
         assetType = "sound";
-        assetName = soundResource.getName();
-        if (confirmDelete(assetType, assetName)) {
+        deletedAssetName = soundResource.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
           Editor.instance().getGameFile().getSounds().remove(soundResource);
-          Resources.sounds().remove(assetName);
+          Resources.sounds().remove(deletedAssetName);
+          deleted = true;
         }
       }
       case Animation animation -> {
         assetType = "animation";
-        assetName = animation.getName();
-        if (confirmDelete(assetType, assetName)) {
-          Resources.animations().remove(assetName);
+        deletedAssetName = animation.getName();
+        if (confirmDelete(assetType, deletedAssetName)) {
+          Resources.animations().remove(deletedAssetName);
+          deleted = true;
         }
       }
       default -> {
       }
     }
 
-    if (!assetName.isEmpty()) {
+    if (deleted && !deletedAssetName.isEmpty()) {
       Editor.instance().getMapComponent().reloadEnvironment();
       UI.getAssetController().refresh();
     }
@@ -473,61 +800,7 @@ public class AssetPanelItem extends JPanel {
     if (Game.world().environment() == null || Game.world().camera() == null) {
       return;
     }
-
-    if (origin instanceof SpritesheetResource spritesheetResource) {
-      addSpriteEntity(spritesheetResource);
-    } else if (origin instanceof EmitterAttributes) {
-      addEmitterEntity();
-    } else if (origin instanceof Blueprint blueprint) {
-      addBlueprintEntity(blueprint);
-    }
-  }
-
-  private void addSpriteEntity(SpritesheetResource spritesheetResource) {
-    String propName = PropPanel.getIdentifierBySpriteName(spritesheetResource.getName());
-    String creatureName = CreaturePanel.getCreatureSpriteName(spritesheetResource.getName());
-    if (propName == null && creatureName == null) {
-      return;
-    }
-
-    MapObject mo = new MapObject();
-    mo.setType(propName != null ? MapObjectType.PROP.name() : MapObjectType.CREATURE.name());
-    mo.setValue(MapObjectProperty.SPRITESHEETNAME, propName != null ? propName : creatureName);
-
-    mo.setX((int) Game.world().camera().getFocus().getX() - spritesheetResource.getWidth() / 2f);
-    mo.setY((int) Game.world().camera().getFocus().getY() - spritesheetResource.getHeight() / 2f);
-    mo.setWidth(spritesheetResource.getWidth());
-    mo.setHeight(spritesheetResource.getHeight());
-    mo.setId(Game.world().environment().getNextMapId());
-    mo.setName("");
-    mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, spritesheetResource.getWidth() * 0.4);
-    mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, spritesheetResource.getHeight() * 0.4);
-    mo.setValue(MapObjectProperty.COLLISION, true);
-    mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
-    mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
-
-    Editor.instance().getMapComponent().add(mo);
-  }
-
-  private void addEmitterEntity() {
-    MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterAttributes) origin);
-    newEmitter.setX((int) (Game.world().camera().getFocus().getX() - newEmitter.getWidth()));
-    newEmitter.setY((int) (Game.world().camera().getFocus().getY() - newEmitter.getHeight()));
-    newEmitter.setId(Game.world().environment().getNextMapId());
-    Editor.instance().getMapComponent().add(newEmitter);
-  }
-
-  private void addBlueprintEntity(Blueprint blueprint) {
-    UndoManager.instance().beginOperation();
-    try {
-      List<IMapObject> newObjects = blueprint.build((int) Game.world().camera().getFocus().getX() - blueprint.getWidth() / 2,
-        (int) Game.world().camera().getFocus().getY() - blueprint.getHeight() / 2);
-
-      newObjects.forEach(obj -> Editor.instance().getMapComponent().add(obj));
-      newObjects.forEach(obj -> Editor.instance().getMapComponent().setSelection(obj, false));
-    } finally {
-      UndoManager.instance().endOperation();
-    }
+    Editor.instance().getMapComponent().addMapObjectFromAsset(origin, Game.world().camera().getFocus());
   }
 
   public void editAsset() {
@@ -539,20 +812,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void editSpritesheet(SpritesheetResource spritesheetResource) {
-    SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(spritesheetResource);
-    int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"),
-      JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-    if (option != JOptionPane.OK_OPTION) {
-      return;
-    }
-
-    spritePanel.getSpriteSheets().forEach(spriteFile -> {
-      Editor.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(spriteFile.getName()));
-      Editor.instance().getGameFile().getSpriteSheets().add(spriteFile);
-    });
-
-    Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
+    UI.showSpriteInspector(spritesheetResource);
   }
 
   private void editAnimation(Animation animation) {
@@ -596,19 +856,22 @@ public class AssetPanelItem extends JPanel {
     Object[] options = {".xml", format.toFileExtension()};
 
     int answer =
-      JOptionPane.showOptionDialog(Game.window().getRenderComponent(), "Select an export format:", "Export Spritesheet", JOptionPane.DEFAULT_OPTION,
+      JOptionPane.showOptionDialog(Game.window().getRenderComponent(),
+        Resources.strings().get("assetpanel_export_format_prompt"),
+        Resources.strings().get("contextmenu_resource_export_spritesheet"), JOptionPane.DEFAULT_OPTION,
         JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
     if (answer == 0) {
-      XmlExportDialog.export(spritesheetResource, "Spritesheet", spritesheetResource.getName());
+      XmlExportDialog.export(spritesheetResource, Resources.strings().get("panel_spritesheet"),
+          AssetFileExporter.safeFileName(spritesheetResource.getName()));
     } else if (answer == 1) {
-      exportImage(sprite, format, spritesheetResource.getName());
+      exportImage(sprite, format, AssetFileExporter.safeFileName(spritesheetResource.getName()));
     }
   }
 
   private void exportImage(Spritesheet sprite, ImageFormat format, String name) {
     JFileChooser chooser = createFileChooser(format.toString(), format.toFileExtension(), name + format.toFileExtension());
-    chooser.setDialogTitle("Export Spritesheet");
+    chooser.setDialogTitle(Resources.strings().get("contextmenu_resource_export_spritesheet"));
 
     if (chooser.showSaveDialog(Game.window().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
       try {
@@ -621,15 +884,19 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportTileset(Tileset tileset) {
-    XmlExportDialog.export(tileset, "Tileset", tileset.getName(), Tileset.FILE_EXTENSION);
+    XmlExportDialog.export(tileset, Resources.strings().get("assetpanel_type_tileset"),
+        AssetFileExporter.safeFileName(tileset.getName()), Tileset.FILE_EXTENSION);
   }
 
   private void exportEmitter(EmitterAttributes emitter) {
-    XmlExportDialog.export(emitter, "Emitter", emitter.getName());
+    XmlExportDialog.export(emitter, Resources.strings().get("panel_emitter"),
+        AssetFileExporter.safeFileName(emitter.getName()));
   }
 
   private void exportBlueprint(Blueprint blueprint) {
-    XmlExportDialog.export(blueprint, "Blueprint", blueprint.getName(), Blueprint.BLUEPRINT_FILE_EXTENSION);
+    XmlExportDialog.export(blueprint, Resources.strings().get("assetpanel_type_blueprint"),
+      AssetFileExporter.safeFileName(blueprint.getName()),
+      Blueprint.BLUEPRINT_FILE_EXTENSION);
   }
 
   private void exportSound(SoundResource sound) {
@@ -639,8 +906,9 @@ public class AssetPanelItem extends JPanel {
 
     try {
       JFileChooser chooser =
-        createFileChooser(sound.getFormat().toString(), sound.getFormat().toString(), sound.getName() + sound.getFormat().toFileExtension());
-      chooser.setDialogTitle("Export Sound");
+        createFileChooser(sound.getFormat().toString(), sound.getFormat().toString(),
+          AssetFileExporter.safeFileName(sound.getName()) + sound.getFormat().toFileExtension());
+      chooser.setDialogTitle(Resources.strings().get("contextmenu_resource_export_sound"));
 
       if (chooser.showSaveDialog(Game.window().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
         try (FileOutputStream fos = new FileOutputStream(chooser.getSelectedFile().toString())) {
@@ -654,18 +922,25 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportAnimation(Animation animation) {
-    JFileChooser chooser = createFileChooser("Aseprite JSON", "json", animation.getName() + ".json");
-    chooser.setDialogTitle("Export Aseprite Animation");
+    JFileChooser chooser = createFileChooser(
+      Resources.strings().get("assetpanel_aseprite_json"), "json",
+      AssetFileExporter.safeFileName(animation.getName()) + ".json");
+    chooser.setDialogTitle(Resources.strings().get("contextmenu_resource_export_animation"));
 
     if (chooser.showSaveDialog(Game.window().getRenderComponent()) != JFileChooser.APPROVE_OPTION) {
       return;
     }
 
     java.nio.file.Path destination = chooser.getSelectedFile().toPath();
-    if (Resources.animations().exportAseprite(animation, destination)) {
-      log.log(Level.INFO, "exported animation {0} to {1}", new Object[] {animation.getName(), destination});
-    } else {
-      log.log(Level.WARNING, "failed to export animation {0}", animation.getName());
+    try {
+      if (AssetFileExporter.exportAnimation(animation, destination).size() == 2) {
+        log.log(Level.INFO, "exported animation {0} to {1}",
+          new Object[] {animation.getName(), destination});
+      } else {
+        log.log(Level.WARNING, "failed to export animation {0}", animation.getName());
+      }
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -674,7 +949,8 @@ public class AssetPanelItem extends JPanel {
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 
-    FileFilter filter = new FileNameExtensionFilter(description + " - File", extension);
+    FileFilter filter = new FileNameExtensionFilter(
+      Resources.strings().get("assetpanel_file_filter", description), extension);
     chooser.setFileFilter(filter);
     chooser.addChoosableFileFilter(filter);
     chooser.setSelectedFile(new File(defaultFileName));
@@ -688,6 +964,10 @@ public class AssetPanelItem extends JPanel {
         || CreaturePanel.getCreatureSpriteName(spritesheetResource.getName()) != null;
     }
     return origin instanceof MapObject || origin instanceof EmitterAttributes;
+  }
+
+  public boolean canEdit() {
+    return origin instanceof Animation;
   }
 
   private static int getDeleteDialog(String assetType, String assetName) {
@@ -708,7 +988,15 @@ public class AssetPanelItem extends JPanel {
       btnAdd.setVisible(false);
       btnDelete.setVisible(visible);
     }
-    btnEdit.setVisible(visible);
+    btnEdit.setVisible(visible && canEdit());
     btnExport.setVisible(visible);
+  }
+
+  private static int menuShortcutMask() {
+    try {
+      return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+    } catch (HeadlessException ignored) {
+      return InputEvent.CTRL_DOWN_MASK;
+    }
   }
 }

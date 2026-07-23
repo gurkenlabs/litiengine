@@ -11,24 +11,28 @@ import de.gurkenlabs.utiliti.view.components.UI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.Locale;
 
 public class Program {
+  private static final Locale SYSTEM_LOCALE = Locale.getDefault();
 
   public static void main(String[] args) {
+    configureGraphicsPipeline();
     try {
       Game.init(() -> { // preInitialization
 
         // setup basic settings
         Game.info().setName("utiLITI");
-        Game.info().setSubTitle("LITIENGINE Creation Kit");
-        Game.info().setVersion(Resources.strings().getFrom("licensing", "version"));
         Resources.strings().setEncoding(StandardCharsets.UTF_8);
 
         // hook up configuration
         Game.config().add(Editor.preferences());
 
         Game.config().load();
+        applyPreferredLocale();
 
+        Game.info().setSubTitle(Resources.strings().get("app_subtitle"));
+        Game.info().setVersion(Resources.strings().getFrom("licensing", "version"));
         UI.initLookAndFeel();
 
       }, () -> { // postInitialization
@@ -51,13 +55,40 @@ public class Program {
         // the command line arguments
         handleArgs(args);
         Path gameFile = Editor.preferences().getLastGameFile();
-        if (!Editor.instance().fileLoaded() && gameFile != null) {
+        if (Editor.preferences().reopenLastProject() && !Editor.instance().fileLoaded() && gameFile != null) {
           Editor.instance().load(gameFile, false);
         }
       }, args);
     } catch (Throwable e) {
       throw new UtiLITIInitializationError("UtiLITI failed to initialize, see the stacktrace below for more information", e);
     }
+  }
+
+  private static void configureGraphicsPipeline() {
+    if (!System.getProperty("os.name", "").startsWith("Windows")) {
+      return;
+    }
+
+    if (System.getProperty("sun.java2d.d3d") == null
+      && System.getProperty("sun.java2d.opengl") == null) {
+      // D3D surfaces can escape a heavyweight Canvas when it is embedded in the Swing editor UI.
+      System.setProperty("sun.java2d.d3d", "false");
+      System.setProperty("sun.java2d.opengl", "true");
+    }
+  }
+
+  private static void applyPreferredLocale() {
+    String language = Editor.preferences().getPreferredLanguage();
+    String country = Editor.preferences().getPreferredCountry();
+    Locale locale = language == null || language.isBlank() || country == null || country.isBlank()
+      ? SYSTEM_LOCALE : Locale.of(language, country);
+    if (!locale.getLanguage().equals(Game.config().client().getLanguage())
+      || !locale.getCountry().equals(Game.config().client().getCountry())) {
+      Game.config().client().setLanguage(locale.getLanguage());
+      Game.config().client().setCountry(locale.getCountry());
+      Game.config().save();
+    }
+    Locale.setDefault(locale);
   }
 
   private static void forceBasicEditorConfiguration() {

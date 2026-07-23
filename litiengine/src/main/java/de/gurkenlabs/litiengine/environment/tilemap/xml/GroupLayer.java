@@ -37,6 +37,13 @@ public class GroupLayer extends Layer implements IGroupLayer {
   private final transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
 
   /**
+   * Creates an empty group for map editors and programmatic map construction.
+   */
+  public GroupLayer() {
+    this.layers = new ArrayList<>();
+  }
+
+  /**
    * Copy constructor for the GroupLayer class. Creates a new instance of the GroupLayer class by copying the properties from the provided GroupLayer
    * object.
    *
@@ -47,13 +54,13 @@ public class GroupLayer extends Layer implements IGroupLayer {
     this.layers = new ArrayList<>();
     for (ILayer layer : original.layers) {
       if (layer instanceof TileLayer tl) {
-        this.layers.add(new TileLayer(tl));
+        this.addLayer(new TileLayer(tl));
       } else if (layer instanceof MapObjectLayer mol) {
-        this.layers.add(new MapObjectLayer(mol));
+        this.addLayer(new MapObjectLayer(mol));
       } else if (layer instanceof ImageLayer il) {
-        this.layers.add(new ImageLayer(il));
+        this.addLayer(new ImageLayer(il));
       } else if (layer instanceof GroupLayer gl) {
-        this.layers.add(new GroupLayer(gl));
+        this.addLayer(new GroupLayer(gl));
       }
     }
   }
@@ -160,11 +167,33 @@ public class GroupLayer extends Layer implements IGroupLayer {
   }
 
   @Override
+  protected void setMap(TmxMap map) {
+    super.setMap(map);
+    for (ILayer layer : this.layers) {
+      if (layer instanceof Layer child) {
+        child.setMap(map);
+      }
+    }
+  }
+
+  @Override
   protected void afterUnmarshal(Unmarshaller u, Object parent) {
     super.afterUnmarshal(u, parent);
+    this.rawTileLayers.clear();
+    this.rawMapObjectLayers.clear();
+    this.rawImageLayers.clear();
+    this.rawGroupLayers.clear();
+    if (this.layers == null) {
+      this.layers = new ArrayList<>();
+    }
     if (getMap() != null) {
       for (ILayer layer : layers) {
+        this.layerAdded(layer);
         ((Layer) layer).setMap((TmxMap) getMap());
+      }
+    } else {
+      for (ILayer layer : layers) {
+        this.layerAdded(layer);
       }
     }
   }

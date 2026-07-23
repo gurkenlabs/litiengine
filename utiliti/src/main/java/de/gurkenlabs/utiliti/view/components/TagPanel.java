@@ -1,11 +1,16 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.WrapLayout;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -15,26 +20,35 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class TagPanel extends JPanel {
   private static final int MAX_TAG_LENGTH = 15;
+  private static final int INLINE_INPUT_WIDTH = 120;
+  private static final int INLINE_INPUT_COLLAPSED_WIDTH = 18;
   private final JTextField textFieldInput;
 
+  private static final int PANEL_ARC = Style.CORNER_RADIUS;
+
   public TagPanel() {
-    setBorder(null);
-    WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 0, 0);
+    setBackground(Style.raisedSurface());
+    setOpaque(false);
+    setBorder(new RoundedBorder(Style.border(), PANEL_ARC, 5));
+    WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 4, 0);
     this.addContainerListener(
         new ContainerListener() {
 
           @Override
           public void componentRemoved(ContainerEvent e) {
+            updateTextFieldWidth();
             fireActionPerformed();
           }
 
           @Override
           public void componentAdded(ContainerEvent e) {
+            updateTextFieldWidth();
             fireActionPerformed();
           }
         });
@@ -42,9 +56,20 @@ public class TagPanel extends JPanel {
     this.setLayout(wrapLayout);
 
     this.textFieldInput = new JTextField();
-    this.textFieldInput.setPreferredSize(new Dimension(6, PropertyPanel.CONTROL_HEIGHT));
+    this.textFieldInput.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+    this.textFieldInput.setOpaque(false);
+    this.textFieldInput.setForeground(Style.text());
+    this.textFieldInput.setCaretColor(Style.accent());
+    this.textFieldInput.getAccessibleContext().setAccessibleName(Resources.strings().get("tagPanel_addTag"));
+    this.textFieldInput.putClientProperty("JComponent.outline", "none");
+    this.textFieldInput.setPreferredSize(new Dimension(INLINE_INPUT_WIDTH, Tag.CHIP_HEIGHT));
+    this.textFieldInput.setMinimumSize(new Dimension(48, Tag.CHIP_HEIGHT));
     add(textFieldInput);
     this.textFieldInput.setColumns(7);
+    this.textFieldInput.addFocusListener(new java.awt.event.FocusAdapter() {
+      @Override public void focusGained(java.awt.event.FocusEvent e) { repaint(); }
+      @Override public void focusLost(java.awt.event.FocusEvent e) { repaint(); }
+    });
     this.textFieldInput.addActionListener(
         e -> {
           boolean isEmpty =
@@ -62,8 +87,9 @@ public class TagPanel extends JPanel {
             return;
           }
 
-          add(new Tag(tag));
+          add(new Tag(tag), Math.max(0, getComponentCount() - 1));
           this.textFieldInput.setText(null);
+          updateTextFieldWidth();
           this.revalidate();
         });
 
@@ -96,7 +122,10 @@ public class TagPanel extends JPanel {
 
           @Override
           public void keyReleased(KeyEvent e) {
-            textFieldInput.setText(textFieldInput.getText().toLowerCase());
+            String text = textFieldInput.getText();
+            if (text != null) {
+              textFieldInput.setText(text.toLowerCase());
+            }
 
             final char c = e.getKeyChar();
             if (c == KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE) {
@@ -106,6 +135,31 @@ public class TagPanel extends JPanel {
             autoComplete();
           }
         });
+  }
+
+  @Override
+  public void updateUI() {
+    super.updateUI();
+    setBackground(Style.raisedSurface());
+    setBorder(new RoundedBorder(Style.border(), PANEL_ARC, 5));
+    if (this.textFieldInput != null) {
+      this.textFieldInput.setForeground(Style.text());
+      this.textFieldInput.setCaretColor(Style.accent());
+    }
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    Graphics2D g2 = (Graphics2D) g.create();
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2.setColor(getBackground());
+    g2.fillRoundRect(0, 0, getWidth(), getHeight(), PANEL_ARC, PANEL_ARC);
+    if (this.textFieldInput != null && this.textFieldInput.isFocusOwner()) {
+      g2.setColor(Style.accent());
+      g2.setStroke(new java.awt.BasicStroke(2f));
+      g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, PANEL_ARC, PANEL_ARC);
+    }
+    g2.dispose();
   }
 
   @Override
@@ -147,6 +201,7 @@ public class TagPanel extends JPanel {
     }
 
     this.textFieldInput.setText(null);
+    updateTextFieldWidth();
     this.revalidate();
   }
 
@@ -166,7 +221,7 @@ public class TagPanel extends JPanel {
         continue;
       }
 
-      this.add(new Tag(tag));
+      this.add(new Tag(tag), Math.max(0, getComponentCount() - 1));
     }
 
     // remove all tags that are no longer present
@@ -176,7 +231,19 @@ public class TagPanel extends JPanel {
       }
     }
 
+    updateTextFieldWidth();
     this.revalidate();
+  }
+
+  private void updateTextFieldWidth() {
+    if (this.textFieldInput == null) {
+      return;
+    }
+
+    int width = this.getTags().isEmpty() ? INLINE_INPUT_WIDTH : INLINE_INPUT_COLLAPSED_WIDTH;
+    Dimension size = new Dimension(width, Tag.CHIP_HEIGHT);
+    this.textFieldInput.setPreferredSize(size);
+    this.textFieldInput.setMinimumSize(size);
   }
 
   private boolean containsTag(String tag) {
@@ -221,6 +288,9 @@ public class TagPanel extends JPanel {
       return null;
     }
 
+    if (Game.world() == null || Game.world().environment() == null) {
+      return null;
+    }
     Optional<String> found =
         Game.world().environment().getUsedTags().stream()
             .filter(
@@ -230,4 +300,5 @@ public class TagPanel extends JPanel {
             .findFirst();
     return found.orElse(null);
   }
+
 }

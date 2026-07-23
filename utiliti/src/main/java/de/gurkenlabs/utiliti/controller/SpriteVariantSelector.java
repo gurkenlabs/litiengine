@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -165,7 +166,8 @@ public final class SpriteVariantSelector {
     // Prefer idle animations by directional priority using Direction enum
     Direction[] pref = {Direction.DOWN, Direction.RIGHT, Direction.LEFT, Direction.UP};
     for (Direction dir : pref) {
-      String expected = base + '-' + CreatureAnimationState.IDLE.spriteString() + '-' + dir.name().toLowerCase();
+      String expected = base + '-' + CreatureAnimationState.IDLE.spriteString() + '-'
+        + dir.name().toLowerCase(Locale.ROOT);
       for (SpritesheetResource v : variants) {
         if (expected.equals(v.getName())) {
           return v;
@@ -179,6 +181,18 @@ public final class SpriteVariantSelector {
         return v;
       }
     }
+    String moveToken = "-" + CreatureAnimationState.MOVE.spriteString() + "-";
+    for (SpritesheetResource v : variants) {
+      if (v.getName().contains(moveToken)) {
+        return v;
+      }
+    }
+    String walkToken = "-" + CreaturePanel.WALK_SPRITE_TOKEN + "-";
+    for (SpritesheetResource v : variants) {
+      if (v.getName().contains(walkToken)) {
+        return v;
+      }
+    }
     // Final fallback: first available variant (order preserved by grouping)
     return variants.getFirst();
   }
@@ -186,7 +200,8 @@ public final class SpriteVariantSelector {
   private static String chooseCreatureVariantName(String base, List<String> variants) {
     Direction[] dirPref = {Direction.DOWN, Direction.RIGHT, Direction.LEFT, Direction.UP};
     for (Direction dir : dirPref) {
-      String expected = base + '-' + CreatureAnimationState.IDLE.spriteString() + '-' + dir.name().toLowerCase();
+      String expected = base + '-' + CreatureAnimationState.IDLE.spriteString() + '-'
+        + dir.name().toLowerCase(Locale.ROOT);
       for (String v : variants) {
         if (v.equals(expected)) {
           return v;
@@ -195,6 +210,16 @@ public final class SpriteVariantSelector {
     }
     for (String v : variants) {
       if (v.contains("-" + CreatureAnimationState.IDLE.spriteString() + "-")) {
+        return v;
+      }
+    }
+    for (String v : variants) {
+      if (v.contains("-" + CreatureAnimationState.MOVE.spriteString() + "-")) {
+        return v;
+      }
+    }
+    for (String v : variants) {
+      if (v.contains("-" + CreaturePanel.WALK_SPRITE_TOKEN + "-")) {
         return v;
       }
     }

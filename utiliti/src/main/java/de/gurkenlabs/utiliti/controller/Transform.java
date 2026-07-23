@@ -155,7 +155,7 @@ public final class Transform {
       Game.world().environment().updateLighting();
     }
 
-    UI.getInspector().bind(transformObject);
+    Editor.instance().getMapComponent().refreshInspector();
     updateAnchors();
   }
 
@@ -237,7 +237,7 @@ public final class Transform {
         updateEntityTransform(selected);
 
         if (selected.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
-          UI.getInspector().bind(selected);
+          Editor.instance().getMapComponent().refreshInspector();
         }
       }
     }
@@ -260,13 +260,13 @@ public final class Transform {
       Rectangle2D hoverrect = GeometricUtilities.extrude(entry.getValue(), 2.5);
       if (hoverrect.contains(Input.mouse().getMapLocation())) {
         if (entry.getKey() == ResizeAnchor.DOWN || entry.getKey() == ResizeAnchor.UP) {
-          Game.window().cursor().set(Cursors.TRANS_VERTICAL, 0, 0);
+          Cursors.apply(Cursors.TRANS_VERTICAL);
         } else if (entry.getKey() == ResizeAnchor.UPLEFT || entry.getKey() == ResizeAnchor.DOWNRIGHT) {
-          Game.window().cursor().set(Cursors.TRANS_DIAGONAL_LEFT, 0, 0);
+          Cursors.apply(Cursors.TRANS_DIAGONAL_LEFT);
         } else if (entry.getKey() == ResizeAnchor.UPRIGHT || entry.getKey() == ResizeAnchor.DOWNLEFT) {
-          Game.window().cursor().set(Cursors.TRANS_DIAGONAL_RIGHT, 0, 0);
+          Cursors.apply(Cursors.TRANS_DIAGONAL_RIGHT);
         } else {
-          Game.window().cursor().set(Cursors.TRANS_HORIZONTAL, 0, 0);
+          Cursors.apply(Cursors.TRANS_HORIZONTAL);
         }
 
         anchor = entry.getKey();
@@ -279,14 +279,14 @@ public final class Transform {
     if (anchor == null) {
       for (IMapObject selected : Editor.instance().getMapComponent().getSelectedMapObjects()) {
         if (selected.getBoundingBox().contains(Input.mouse().getMapLocation())) {
-          Game.window().cursor().set(Cursors.MOVE, 0, 0);
+          Cursors.apply(Cursors.MOVE);
           mode = TransformMode.MOVE;
           return;
         }
       }
 
       // if no transform can be applied, reset the transform type
-      Game.window().cursor().set(Cursors.DEFAULT, 0, 0);
+      Cursors.apply(Cursors.DEFAULT);
       mode = TransformMode.NONE;
     }
   }

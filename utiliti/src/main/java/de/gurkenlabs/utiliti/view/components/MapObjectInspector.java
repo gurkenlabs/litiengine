@@ -6,46 +6,81 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
+import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.PropertyInspector;
 import de.gurkenlabs.utiliti.controller.Transform;
+import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
-import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.LayoutManager;
+import java.awt.FontMetrics;
+import java.awt.Rectangle;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 public class MapObjectInspector extends PropertyPanel implements PropertyInspector {
+  private static final int SECTION_LABEL_WIDTH = PropertyPanel.LABEL_WIDTH;
+  private static final int MAX_LAYER_LABEL_WIDTH =
+      (int) (120 * Editor.preferences().getUiScale());
+
   private final Map<MapObjectType, PropertyPanel> panels;
   private MapObjectType type;
   private PropertyPanel currentPanel;
-  private final JTabbedPane tabbedPanel;
+
+  private final ExpandableCard generalCard;
+  private final ExpandableCard typeCard;
+  private final ExpandableCard collisionCard;
+  private final ExpandableCard combatCard;
+  private final ExpandableCard movementCard;
+  private final ExpandableCard customCard;
+
   private final CollisionPanel collisionPanel;
   private final CombatPanel combatPanel;
   private final MovementPanel movementPanel;
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
   private final JComboBox<RenderType> renderType;
+  private final JCheckBox checkBoxRenderWithLayer;
+  private final JComboBox<ImplementationOption> implementation;
+  private final JLabel labelImplementation;
 
   private final JLabel labelEntityID;
+  private final JLabel labelTypeIcon;
   private final TagPanel tagPanel;
   private final JLabel lblLayer;
-  private final JPanel infoPanel;
-  private final DualSpinner transform;
-  private final DualSpinner scale;
+  private final JSpinner spnX;
+  private final JSpinner spnY;
+  private final JSpinner spnW;
+  private final JSpinner spnH;
+  private boolean updatingImplementation;
 
   public MapObjectInspector() {
     super();
-    this.setBorder(STANDARDBORDER);
+    setBorder(null);
+    setLayout(new BorderLayout());
+
     this.panels = new ConcurrentHashMap<>();
     this.panels.put(MapObjectType.PROP, new PropPanel());
     this.panels.put(MapObjectType.COLLISIONBOX, new CollisionBoxPanel());
@@ -63,54 +98,142 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.textFieldName = new JTextField();
     this.textFieldName.setColumns(10);
-
     ControlBehavior.apply(this.textFieldName);
 
     this.renderType = new JComboBox<>(RenderType.values());
     this.renderType.setMinimumSize(SMALL_CONTROL_SIZE);
+    ControlBehavior.apply(this.renderType);
+    this.checkBoxRenderWithLayer = new JCheckBox(Resources.strings().get("panel_renderwithlayer"));
+    this.checkBoxRenderWithLayer.setOpaque(false);
+    this.checkBoxRenderWithLayer.addActionListener(e -> updateRenderTypeEnabled());
+    this.labelImplementation = new JLabel(Resources.strings().get("mapObjectInspector_implementation"));
+    this.labelImplementation.setHorizontalAlignment(SwingConstants.TRAILING);
+    this.implementation = new JComboBox<>();
+    ControlBehavior.apply(this.implementation);
+    this.implementation.setMaximumRowCount(9);
+    this.implementation.setRenderer(new ImplementationRenderer());
 
     this.tagPanel = new TagPanel();
 
-    this.tabbedPanel = new JTabbedPane(SwingConstants.TOP);
-    this.tabbedPanel.setFont(Style.getHeaderFont());
-
-    this.infoPanel = new JPanel();
-    this.infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
+    JPanel headerContent = new JPanel();
+    headerContent.setLayout(new BoxLayout(headerContent, BoxLayout.X_AXIS));
+    headerContent.setOpaque(false);
 
     JLabel lblEntityId = new JLabel(Resources.strings().get("panel_ID"));
     lblEntityId.setFont(lblEntityId.getFont().deriveFont(Font.BOLD));
+    lblEntityId.setForeground(Style.mutedText());
 
     this.labelEntityID = new JLabel("####");
     this.labelEntityID.setFont(labelEntityID.getFont());
+    this.labelEntityID.setForeground(Style.text());
+
+    this.labelTypeIcon = new JLabel(Icons.ENTITY_16);
 
     this.lblLayer = new JLabel("");
     this.lblLayer.setHorizontalAlignment(SwingConstants.TRAILING);
-    this.lblLayer.setForeground(Color.LIGHT_GRAY);
-    this.lblLayer.setFont(
-        this.lblLayer.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
+    this.lblLayer.setForeground(Style.mutedText());
 
-    this.infoPanel.add(lblEntityId);
-    this.infoPanel.add(Box.createHorizontalStrut(47));
-    this.infoPanel.add(labelEntityID);
-    this.infoPanel.add(Box.createGlue());
-    this.infoPanel.add(lblLayer);
+    headerContent.add(Box.createHorizontalStrut(6));
+    headerContent.add(labelTypeIcon);
+    headerContent.add(Box.createHorizontalStrut(10));
+    headerContent.add(lblLayer);
+    headerContent.add(Box.createHorizontalStrut(12));
+    headerContent.add(lblEntityId);
+    headerContent.add(Box.createHorizontalStrut(4));
+    headerContent.add(labelEntityID);
+    headerContent.add(Box.createHorizontalStrut(6));
 
-    this.transform =
-        new DualSpinner(
-            Resources.strings().get("panel_x"),
-            Resources.strings().get("panel_y"),
-            0,
-            Short.MAX_VALUE);
-    this.scale =
-        new DualSpinner(
-            Resources.strings().get("panel_width"),
-            Resources.strings().get("panel_height"),
-            0,
-            Short.MAX_VALUE);
+    this.spnX = new JSpinner(createCoordinateSpinnerModel());
+    this.spnY = new JSpinner(createCoordinateSpinnerModel());
+    this.spnW = new JSpinner(createSizeSpinnerModel());
+    this.spnH = new JSpinner(createSizeSpinnerModel());
 
-    setLayout(createLayout());
+    ControlBehavior.apply(this.spnX);
+    ControlBehavior.apply(this.spnY);
+    ControlBehavior.apply(this.spnW);
+    ControlBehavior.apply(this.spnH);
+
+    // ---- build accordion ----
+    JPanel accordion = new ViewportWidthPanel();
+    accordion.setLayout(new BoxLayout(accordion, BoxLayout.Y_AXIS));
+    accordion.setOpaque(true);
+    accordion.setBackground(Style.background());
+    accordion.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
+
+    JPanel generalContent = new JPanel();
+    generalContent.setLayout(new BoxLayout(generalContent, BoxLayout.Y_AXIS));
+    generalContent.setOpaque(false);
+    JPanel entityPanel = createEntityPanel();
+    entityPanel.setMaximumSize(
+        new Dimension(Integer.MAX_VALUE, entityPanel.getPreferredSize().height));
+    generalContent.add(entityPanel);
+
+    JPanel sepTransform = createSectionSeparator(Resources.strings().get("panel_transform").toUpperCase(java.util.Locale.ROOT));
+    sepTransform.setMaximumSize(
+        new Dimension(Integer.MAX_VALUE, sepTransform.getPreferredSize().height));
+    generalContent.add(sepTransform);
+
+    JPanel tfGrid = createTransformGrid();
+    tfGrid.setMaximumSize(
+        new Dimension(Integer.MAX_VALUE, tfGrid.getPreferredSize().height));
+    generalContent.add(tfGrid);
+
+    this.generalCard =
+        new ExpandableCard(
+            Resources.strings().get("mapObjectInspector_mapObject"), generalContent, true);
+    this.typeCard = new ExpandableCard("", new JPanel(), true);
+    this.collisionCard =
+        new ExpandableCard(
+            Resources.strings().get("panel_collisionEntity"), this.collisionPanel, true);
+    this.combatCard =
+        new ExpandableCard(
+            Resources.strings().get("panel_combatEntity"), this.combatPanel, true);
+    this.movementCard =
+        new ExpandableCard(
+            Resources.strings().get("panel_mobileEntity"), this.movementPanel, true);
+    this.customCard =
+        new ExpandableCard(
+            Resources.strings().get("panel_customProperties"), this.customPanel, true);
+
+    generalCard.setContentInsets(8, 0, 8, 0);
+    generalCard.setHeaderTrailing(headerContent);
+    typeCard.setContentInsets(8, 0, 8, 0);
+    collisionCard.setContentInsets(8, 0, 8, 0);
+    combatCard.setContentInsets(8, 0, 8, 0);
+    movementCard.setContentInsets(8, 0, 8, 0);
+    customCard.setContentInsets(8, 0, 8, 0);
+
+    typeCard.setVisible(false);
+    collisionCard.setVisible(false);
+    combatCard.setVisible(false);
+    movementCard.setVisible(false);
+    customCard.setVisible(false);
+
+    accordion.add(generalCard);
+    accordion.add(typeCard);
+    accordion.add(collisionCard);
+    accordion.add(combatCard);
+    accordion.add(movementCard);
+    accordion.add(customCard);
+
+    JScrollPane scrollPane = new JScrollPane(accordion);
+    scrollPane.setBorder(null);
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.getViewport().setBackground(Style.background());
+    add(scrollPane, BorderLayout.CENTER);
+
     this.setupChangedListeners();
-    UI.getLayerController().onLayersChanged(map -> this.bind(this.getDataSource()));
+    if (UI.getLayerController() != null) {
+      UI.getLayerController().onLayersChanged(map -> Editor.instance().getMapComponent().refreshInspector());
+    }
+  }
+
+  static SpinnerNumberModel createCoordinateSpinnerModel() {
+    return new SpinnerNumberModel(0.0, null, (double) Short.MAX_VALUE, 1.0);
+  }
+
+  static SpinnerNumberModel createSizeSpinnerModel() {
+    return new SpinnerNumberModel(0.0, 0.0, (double) Short.MAX_VALUE, 1.0);
   }
 
   @Override
@@ -125,44 +248,195 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   @Override
   public void bind(IMapObject mapObject) {
-    super.bind(mapObject);
-
-    if (mapObject != null) {
-      MapObjectType t = MapObjectType.get(mapObject.getType());
-      this.setMapObjectType(t);
-    } else {
-      this.setMapObjectType(null);
-    }
-
-    if (this.currentPanel != null) {
-      this.currentPanel.bind(this.getDataSource());
-    }
-
-    if (this.collisionPanel != null) {
-      this.collisionPanel.bind(this.getDataSource());
-    }
-    if (this.combatPanel != null) {
-      this.combatPanel.bind(this.getDataSource());
-    }
-    if (this.movementPanel != null) {
-      this.movementPanel.bind(this.getDataSource());
-    }
-
-    this.customPanel.bind(this.getDataSource());
+    this.bindAll(mapObject == null ? List.of() : List.of(mapObject));
   }
 
-  private LayoutManager createLayout() {
-    LayoutItem[] layoutItems =
-        new LayoutItem[] {
-            new LayoutItem(infoPanel),
-            new LayoutItem("panel_rendertype", renderType),
-            new LayoutItem("panel_transform", transform),
-            new LayoutItem("panel_scale", scale),
-            new LayoutItem("panel_name", textFieldName),
-            new LayoutItem("panel_tags", tagPanel),
-            new LayoutItem(tabbedPanel, GroupLayout.PREFERRED_SIZE)
-        };
-    return this.createLayout(layoutItems);
+  @Override
+  public void bindAll(List<IMapObject> mapObjects) {
+    List<IMapObject> targets = mapObjects == null ? List.of() : List.copyOf(mapObjects);
+    super.bindAll(targets);
+
+    MapObjectType commonType = targets.isEmpty() ? null : resolveType(targets.get(0).getType());
+    MapObjectType candidateType = commonType;
+    if (targets.stream().anyMatch(target -> resolveType(target.getType()) != candidateType)) {
+      commonType = null;
+    }
+    this.setMapObjectType(commonType);
+
+    if (this.currentPanel != null) {
+      bindPanel(this.currentPanel, targets);
+    }
+
+    this.customPanel.setExcludedProperties(this.type == MapObjectType.EMITTER ? emitterProperties() : java.util.Set.of());
+
+    boolean supportsCollisionAndCombat = commonType == MapObjectType.PROP || commonType == MapObjectType.CREATURE;
+    bindPanel(this.collisionPanel, supportsCollisionAndCombat ? targets : List.of());
+    bindPanel(this.combatPanel, supportsCollisionAndCombat ? targets : List.of());
+    bindPanel(this.movementPanel, commonType == MapObjectType.CREATURE ? targets : List.of());
+
+    bindPanel(this.customPanel, targets.size() == 1 ? targets : List.of());
+    updateMultiEditState(targets);
+  }
+
+  private static void bindPanel(PropertyPanel panel, List<IMapObject> targets) {
+    if (targets.size() == 1) {
+      panel.bind(targets.get(0));
+    } else {
+      panel.bindAll(targets);
+    }
+  }
+
+  private void updateMultiEditState(List<IMapObject> targets) {
+    boolean multiEdit = targets.size() > 1;
+    this.spnX.setEnabled(!multiEdit);
+    this.spnY.setEnabled(!multiEdit);
+    this.spnW.setEnabled(!multiEdit);
+    this.spnH.setEnabled(!multiEdit);
+    this.customCard.setVisible(!multiEdit && !targets.isEmpty());
+
+    if (multiEdit) {
+      this.labelEntityID.setText(Integer.toString(targets.size()));
+      this.lblLayer.setText("");
+      this.lblLayer.setToolTipText(null);
+    }
+    updateImplementationVisibility();
+    updateRenderTypeEnabled();
+  }
+
+  private static java.util.Set<String> emitterProperties() {
+    java.util.Set<String> properties = new java.util.HashSet<>();
+    for (java.lang.reflect.Field field : MapObjectProperty.Particle.class.getFields()) {
+      if (field.getType() == String.class) {
+        try {
+          properties.add((String) field.get(null));
+        } catch (IllegalAccessException ignored) {
+          // Public constants are expected; inaccessible fields are skipped.
+        }
+      }
+    }
+    return properties;
+  }
+
+  private JPanel createSectionSeparator(String label) {
+    JPanel panel = new JPanel(new BorderLayout());
+    panel.setOpaque(false);
+    JLabel title = new JLabel(label);
+    title.setFont(title.getFont().deriveFont(10f));
+    title.setForeground(Style.mutedText());
+    title.setBorder(BorderFactory.createEmptyBorder(6, 0, 4, 0));
+    title.setHorizontalAlignment(SwingConstants.TRAILING);
+    JPanel wrapper = new JPanel(new BorderLayout());
+    wrapper.setOpaque(false);
+    wrapper.setPreferredSize(new Dimension(SECTION_LABEL_WIDTH, 0));
+    wrapper.add(title, BorderLayout.CENTER);
+    panel.add(wrapper, BorderLayout.WEST);
+    return panel;
+  }
+
+  private JPanel createTransformGrid() {
+    JPanel grid = new JPanel();
+    grid.setOpaque(false);
+    GroupLayout gl = new GroupLayout(grid);
+    grid.setLayout(gl);
+
+    JLabel lblX = new JLabel(Resources.strings().get("panel_x"));
+    lblX.setHorizontalAlignment(SwingConstants.TRAILING);
+    JLabel lblY = new JLabel(Resources.strings().get("panel_y"));
+    lblY.setHorizontalAlignment(SwingConstants.TRAILING);
+    JLabel lblW = new JLabel(Resources.strings().get("mapObjectInspector_widthShort"));
+    lblW.setHorizontalAlignment(SwingConstants.TRAILING);
+    JLabel lblH = new JLabel(Resources.strings().get("mapObjectInspector_heightShort"));
+    lblH.setHorizontalAlignment(SwingConstants.TRAILING);
+
+    int transformLabelWidth = SECTION_LABEL_WIDTH;
+    int secondaryLabelWidth = 24;
+    int gap = CONTROL_MARGIN;
+
+    gl.setAutoCreateGaps(false);
+    gl.setHorizontalGroup(
+      gl.createSequentialGroup()
+        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
+          .addComponent(lblX, transformLabelWidth, transformLabelWidth, transformLabelWidth)
+          .addComponent(lblW, transformLabelWidth, transformLabelWidth, transformLabelWidth))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup()
+          .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
+          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
+          .addComponent(lblY, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth)
+          .addComponent(lblH, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup()
+          .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
+          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)));
+    gl.setVerticalGroup(
+      gl.createSequentialGroup()
+        .addGap(2)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblX).addComponent(spnX)
+          .addComponent(lblY).addComponent(spnY))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblW).addComponent(spnW)
+          .addComponent(lblH).addComponent(spnH))
+        .addGap(2));
+    return grid;
+  }
+
+  private JPanel createEntityPanel() {
+    JPanel panel = new JPanel();
+    panel.setOpaque(false);
+    GroupLayout gl = new GroupLayout(panel);
+    panel.setLayout(gl);
+
+    JLabel lblName = new JLabel(Resources.strings().get("panel_name"));
+    lblName.setHorizontalAlignment(SwingConstants.TRAILING);
+    JLabel lblRenderType = new JLabel(Resources.strings().get("panel_rendertype"));
+    lblRenderType.setHorizontalAlignment(SwingConstants.TRAILING);
+    JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
+    lblTags.setHorizontalAlignment(SwingConstants.TRAILING);
+
+    int gap = CONTROL_MARGIN;
+
+    gl.setAutoCreateGaps(false);
+    gl.setHorizontalGroup(
+      gl.createSequentialGroup()
+        .addGroup(gl.createParallelGroup(Alignment.TRAILING)
+           .addComponent(lblName, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+           .addComponent(labelImplementation, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+           .addComponent(lblRenderType, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
+          .addGap(PropertyPanel.CONTROL_HEIGHT)
+          .addComponent(lblTags, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup()
+           .addComponent(textFieldName, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+           .addComponent(implementation, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+           .addComponent(renderType, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+          .addComponent(checkBoxRenderWithLayer, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
+          .addComponent(tagPanel, 0, CONTROL_WIDTH, Integer.MAX_VALUE)));
+    gl.setVerticalGroup(
+      gl.createSequentialGroup()
+        .addGap(2)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+           .addComponent(lblName)
+           .addComponent(textFieldName))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(labelImplementation)
+          .addComponent(implementation))
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblRenderType)
+          .addComponent(renderType))
+        .addGap(gap)
+        .addComponent(checkBoxRenderWithLayer)
+        .addGap(gap)
+        .addGroup(gl.createParallelGroup(Alignment.CENTER)
+          .addComponent(lblTags)
+          .addComponent(tagPanel))
+        .addGap(2));
+    return panel;
   }
 
   private void switchPanel() {
@@ -173,74 +447,45 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
 
     PropertyPanel panel = this.panels.get(type);
-    if (this.currentPanel != null) {
-      // panel is already selected
-      if (panel == this.currentPanel) {
-        return;
-      }
-
-      // clear current panel
-      this.tabbedPanel.remove(this.currentPanel);
-    }
-
     if (panel != null) {
-      // add explicit map object panel
-      tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
-    }
-
-    // add/remove collision panel
-    if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(
-          Resources.strings().get(this.collisionPanel.getIdentifier()),
-          this.collisionPanel.getIcon(),
-          this.collisionPanel);
+      typeCard.setTitle(Resources.strings().get(panel.getIdentifier()));
+      typeCard.setHeaderTrailing(panel.getHeaderActions());
+      typeCard.setContent(panel);
+      typeCard.setVisible(true);
     } else {
-      this.tabbedPanel.remove(this.collisionPanel);
+      typeCard.setHeaderTrailing(null);
+      typeCard.setVisible(false);
     }
 
-    // add/remove combat panel
-    if (currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(
-          Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
-    } else {
-      this.tabbedPanel.remove(this.combatPanel);
-    }
+    boolean showCollision =
+        currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE;
+    boolean showCombat =
+        currentType == MapObjectType.PROP || currentType == MapObjectType.CREATURE;
 
-    // add/remove movement panel
-    if (currentType == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(
-          Resources.strings().get(this.movementPanel.getIdentifier()),
-          this.movementPanel.getIcon(),
-          this.movementPanel);
-    } else {
-      this.tabbedPanel.remove(this.movementPanel);
-    }
-
-    // always add custom panel
-    tabbedPanel.addTab(
-        Resources.strings().get(this.customPanel.getIdentifier()),
-        this.customPanel.getIcon(),
-        this.customPanel);
+    collisionCard.setVisible(showCollision);
+    combatCard.setVisible(showCombat);
+    movementCard.setVisible(currentType == MapObjectType.CREATURE);
+    customCard.setVisible(true);
 
     this.currentPanel = panel != null ? panel : this.customPanel;
-    this.tabbedPanel.revalidate();
-    this.tabbedPanel.repaint();
+    revalidate();
+    repaint();
   }
 
   private void clearPanels() {
+    typeCard.setVisible(false);
+    collisionCard.setVisible(false);
+    combatCard.setVisible(false);
+    movementCard.setVisible(false);
+    customCard.setVisible(false);
+
     if (this.currentPanel != null) {
-      this.tabbedPanel.remove(this.currentPanel);
       this.currentPanel.bind(null);
       this.currentPanel = null;
     }
 
-    this.tabbedPanel.revalidate();
-    this.tabbedPanel.repaint();
-
-    this.tabbedPanel.remove(this.collisionPanel);
-    this.tabbedPanel.remove(this.combatPanel);
-    this.tabbedPanel.remove(this.movementPanel);
-    this.tabbedPanel.remove(this.customPanel);
+    revalidate();
+    repaint();
   }
 
   @Override
@@ -255,12 +500,18 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.type = null;
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
+    this.labelTypeIcon.setIcon(Icons.ENTITY_16);
+    this.labelTypeIcon.setToolTipText(null);
     this.lblLayer.setText("");
+    this.lblLayer.setToolTipText(null);
     this.renderType.setSelectedIndex(0);
     this.renderType.setEnabled(false);
+    this.checkBoxRenderWithLayer.setSelected(false);
     this.tagPanel.clear();
-    this.transform.bind(null);
-    this.scale.bind(null);
+    this.spnX.setValue(0.0);
+    this.spnY.setValue(0.0);
+    this.spnW.setValue(0.0);
+    this.spnH.setValue(0.0);
   }
 
   @Override
@@ -268,58 +519,219 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     if (mapObject == null) {
       return;
     }
-    this.type = MapObjectType.get(mapObject.getType());
+    this.type = resolveType(mapObject.getType());
     this.textFieldName.setText(mapObject.getName());
-    this.transform.bind(mapObject);
-    this.scale.bind(mapObject);
-    this.transform.setValues(mapObject.getX(), mapObject.getY());
-    this.scale.setValues(mapObject.getWidth(), mapObject.getHeight());
+    this.spnX.setValue((double) mapObject.getX());
+    this.spnY.setValue((double) mapObject.getY());
+    this.spnW.setValue((double) mapObject.getWidth());
+    this.spnH.setValue((double) mapObject.getHeight());
     this.tagPanel.bind(mapObject.getStringValue(MapObjectProperty.TAGS, null));
 
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
-    this.lblLayer.setText("Layer: " + mapObject.getLayer());
+    this.labelTypeIcon.setIcon(Icons.forMapObjectType(this.type));
+    this.labelTypeIcon.setToolTipText(this.type != null ? this.type.name() : null);
+    String layerText = Resources.strings().get("panel_layer") + ": " + mapObject.getLayer();
+    this.lblLayer.setText(elide(layerText, this.lblLayer.getFontMetrics(this.lblLayer.getFont())));
+    this.lblLayer.setToolTipText(layerText);
 
-    RenderType rt = mapObject.getEnumValue(MapObjectProperty.RENDERTYPE, RenderType.class, RenderType.NORMAL);
-    boolean showRenderTypeControls =
-        MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE
-            || MapObjectType.get(mapObject.getType()) == MapObjectType.EMITTER
-            || MapObjectType.get(mapObject.getType()) == MapObjectType.PROP;
-    this.renderType.setEnabled(showRenderTypeControls);
-
+    RenderType rt =
+        mapObject.getEnumValue(
+            MapObjectProperty.RENDERTYPE, RenderType.class, RenderType.NORMAL);
     if (rt != null) {
       this.renderType.setSelectedItem(rt);
+    }
+    this.checkBoxRenderWithLayer.setSelected(mapObject.getBoolValue(MapObjectProperty.RENDERWITHLAYER, false));
+    updateImplementationOptions(mapObject);
+    updateRenderTypeEnabled();
+  }
+
+  private void updateRenderTypeEnabled() {
+    boolean supportsRenderType = getDataSources().isEmpty()
+        ? this.type == MapObjectType.CREATURE || this.type == MapObjectType.EMITTER || this.type == MapObjectType.PROP
+        : getDataSources().stream()
+          .map(mapObject -> resolveType(mapObject.getType()))
+          .allMatch(type -> type == MapObjectType.CREATURE || type == MapObjectType.EMITTER || type == MapObjectType.PROP);
+    this.renderType.setEnabled(supportsRenderType && !this.checkBoxRenderWithLayer.isSelected());
+  }
+
+  private void updateImplementationOptions(IMapObject mapObject) {
+    boolean supported = this.type == MapObjectType.CREATURE || this.type == MapObjectType.PROP;
+    this.labelImplementation.setVisible(supported);
+    this.implementation.setVisible(supported);
+    if (!supported) {
+      return;
+    }
+
+    this.updatingImplementation = true;
+    try {
+      this.implementation.removeAllItems();
+      this.implementation.addItem(new ImplementationOption(
+        null, Resources.strings().get("mapObjectInspector_builtinDefault"), null, null));
+      Editor.instance().getProjectCodeIntegration().getDefinitions().stream()
+        .filter(definition -> definition.baseType() == this.type)
+        .forEach(definition -> this.implementation.addItem(new ImplementationOption(definition.id(), definition.displayName(), compactPackage(definition.className()), definition.className())));
+      String selectedId = mapObject.getStringValue(MapObjectProperty.IMPLEMENTATION, null);
+      for (int i = 0; i < this.implementation.getItemCount(); i++) {
+        if (Objects.equals(this.implementation.getItemAt(i).id(), selectedId)) {
+          this.implementation.setSelectedIndex(i);
+          return;
+        }
+      }
+      this.implementation.setSelectedIndex(0);
+    } finally {
+      this.updatingImplementation = false;
+    }
+  }
+
+  private void updateImplementationVisibility() {
+    boolean supported = this.type == MapObjectType.CREATURE || this.type == MapObjectType.PROP;
+    this.labelImplementation.setVisible(supported);
+    this.implementation.setVisible(supported);
+  }
+
+  private static MapObjectType resolveType(String mapObjectType) {
+    return Editor.instance().getProjectCodeIntegration().getDefinitions().stream()
+      .filter(definition -> definition.id().equals(mapObjectType))
+      .map(de.gurkenlabs.utiliti.controller.ProjectCodeIntegration.Definition::baseType)
+      .findFirst()
+      .orElseGet(() -> MapObjectType.get(mapObjectType));
+  }
+
+  private static String elide(String value, FontMetrics metrics) {
+    if (metrics.stringWidth(value) <= MAX_LAYER_LABEL_WIDTH) {
+      return value;
+    }
+    String suffix = "...";
+    int length = value.length();
+    while (length > 0
+        && metrics.stringWidth(value.substring(0, length) + suffix) > MAX_LAYER_LABEL_WIDTH) {
+      length--;
+    }
+    return value.substring(0, length) + suffix;
+  }
+
+  private static String compactPackage(String className) {
+    int classSeparator = className.lastIndexOf('.');
+    if (classSeparator < 0) {
+      return "";
+    }
+    String packageName = className.substring(0, classSeparator);
+    int parentSeparator = packageName.lastIndexOf('.');
+    return parentSeparator < 0 ? packageName : packageName.substring(parentSeparator + 1);
+  }
+
+  boolean isRenderTypeEnabledForTest() {
+    return this.renderType.isEnabled();
+  }
+
+  boolean isTypeCardVisibleForTest() {
+    return this.typeCard.isVisible();
+  }
+
+  boolean isCustomCardVisibleForTest() {
+    return this.customCard.isVisible();
+  }
+
+  boolean areTransformControlsEnabledForTest() {
+    return this.spnX.isEnabled() && this.spnY.isEnabled() && this.spnW.isEnabled() && this.spnH.isEnabled();
+  }
+
+  PropertyPanel getCurrentPanelForTest() {
+    return this.currentPanel;
+  }
+
+  private static final class ViewportWidthPanel extends JPanel implements Scrollable {
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+      return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visible, int orientation, int direction) {
+      return PropertyPanel.CONTROL_HEIGHT;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visible, int orientation, int direction) {
+      return Math.max(PropertyPanel.CONTROL_HEIGHT, visible.height - PropertyPanel.CONTROL_HEIGHT);
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+      return true;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+      return false;
     }
   }
 
   private void setupChangedListeners() {
     setup(renderType, MapObjectProperty.RENDERTYPE);
+    setup(this.checkBoxRenderWithLayer, MapObjectProperty.RENDERWITHLAYER);
 
-    this.transform.addSpinnerListeners(
-        m -> m.getX() != getSpinnerValue(this.transform.getSpinner1()),
-        m -> m.getY() != getSpinnerValue(this.transform.getSpinner2()),
-        m -> {
-          m.setX(getSpinnerValue(this.transform.getSpinner1()));
-          Transform.updateAnchors();
-        },
-        m -> {
-          m.setY(getSpinnerValue(this.transform.getSpinner2()));
-          Transform.updateAnchors();
+    this.spnX.addChangeListener(
+        e -> {
+          if (getDataSource() == null) {
+            return;
+          }
+          double val = (double) spnX.getValue();
+          if (getDataSource().getX() != val) {
+            UndoManager.instance().mapObjectChanging(getDataSource());
+            getDataSource().setX((float) val);
+            Transform.updateAnchors();
+            UndoManager.instance().mapObjectMoved(getDataSource());
+            updateEnvironment();
+          }
         });
-
-    this.scale.addSpinnerListeners(
-        m -> m.getWidth() != getSpinnerValue(this.scale.getSpinner1()),
-        m -> m.getHeight() != getSpinnerValue(this.scale.getSpinner2()),
-        m -> {
-          m.setWidth(getSpinnerValue(this.scale.getSpinner1()));
-          Transform.updateAnchors();
-        },
-        m -> {
-          m.setHeight(getSpinnerValue(this.scale.getSpinner2()));
-          Transform.updateAnchors();
+    this.spnY.addChangeListener(
+        e -> {
+          if (getDataSource() == null) {
+            return;
+          }
+          double val = (double) spnY.getValue();
+          if (getDataSource().getY() != val) {
+            UndoManager.instance().mapObjectChanging(getDataSource());
+            getDataSource().setY((float) val);
+            Transform.updateAnchors();
+            UndoManager.instance().mapObjectMoved(getDataSource());
+            updateEnvironment();
+          }
+        });
+    this.spnW.addChangeListener(
+        e -> {
+          if (getDataSource() == null) {
+            return;
+          }
+          double val = (double) spnW.getValue();
+          if (getDataSource().getWidth() != val) {
+            UndoManager.instance().mapObjectChanging(getDataSource());
+            getDataSource().setWidth((float) val);
+            Transform.updateAnchors();
+            UndoManager.instance().mapObjectResized(getDataSource());
+            updateEnvironment();
+          }
+        });
+    this.spnH.addChangeListener(
+        e -> {
+          if (getDataSource() == null) {
+            return;
+          }
+          double val = (double) spnH.getValue();
+          if (getDataSource().getHeight() != val) {
+            UndoManager.instance().mapObjectChanging(getDataSource());
+            getDataSource().setHeight((float) val);
+            Transform.updateAnchors();
+            UndoManager.instance().mapObjectResized(getDataSource());
+            updateEnvironment();
+          }
         });
 
     this.textFieldName.addFocusListener(
-        new MapObjectPropertyFocusListener(m -> m.setName(textFieldName.getText())));
+        new MapObjectPropertyFocusListener(this.textFieldName,
+          m -> !Objects.equals(m.getName(), textFieldName.getText()),
+          m -> m.setName(textFieldName.getText())));
 
     this.textFieldName.addActionListener(
         new MapObjectPropertyActionListener(
@@ -328,7 +740,51 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     this.tagPanel.addActionListener(
         new MapObjectPropertyActionListener(
-            m -> !m.hasCustomProperty(MapObjectProperty.TAGS) || !m.getStringValue(MapObjectProperty.TAGS, null).equals(this.tagPanel.getTagsString()),
-            m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+            m ->
+                !m.hasCustomProperty(MapObjectProperty.TAGS)
+                    || !m.getStringValue(MapObjectProperty.TAGS, null)
+                        .equals(this.tagPanel.getTagsString()),
+             m -> m.setValue(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+
+    this.implementation.addActionListener(new MapObjectPropertyActionListener(m -> {
+      if (this.updatingImplementation) {
+        return false;
+      }
+      ImplementationOption selected = (ImplementationOption) this.implementation.getSelectedItem();
+      return !Objects.equals(m.getStringValue(MapObjectProperty.IMPLEMENTATION, null), selected == null ? null : selected.id());
+    }, m -> {
+      ImplementationOption selected = (ImplementationOption) this.implementation.getSelectedItem();
+      if (selected == null || selected.id() == null) {
+        m.removeProperty(MapObjectProperty.IMPLEMENTATION);
+      } else {
+        m.setValue(MapObjectProperty.IMPLEMENTATION, selected.id());
+      }
+    }));
+  }
+
+  private record ImplementationOption(String id, String displayName, String packageName, String className) {
+    @Override
+    public String toString() {
+      return displayName;
+    }
+  }
+
+  private static final class ImplementationRenderer extends DefaultListCellRenderer {
+    @Override
+    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+      if (!(value instanceof ImplementationOption option)) {
+        return label;
+      }
+      label.setToolTipText(option.className());
+      if (index < 0 || option.packageName() == null) {
+        label.setText(option.displayName());
+        return label;
+      }
+      String packageColor = String.format("#%02x%02x%02x", Style.COLOR_SUBTEXT.getRed(), Style.COLOR_SUBTEXT.getGreen(), Style.COLOR_SUBTEXT.getBlue());
+      label.setText("<html>" + option.displayName() + "<br><span style='color:" + packageColor + "; font-size:9px'>" + option.packageName() + "</span></html>");
+      label.setBorder(BorderFactory.createEmptyBorder(3, 4, 3, 4));
+      return label;
+    }
   }
 }

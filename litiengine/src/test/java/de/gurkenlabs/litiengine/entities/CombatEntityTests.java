@@ -12,11 +12,14 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTime;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import java.awt.Shape;
@@ -56,6 +59,27 @@ class CombatEntityTests {
     // assert
     verify(combatEntitySpy, times(2)).isDead();
     verify(combatEntitySpy, times(0)).getHitPoints();
+  }
+
+  @Test
+  void restoringDeadEntityDisablesCollisionWithoutDeathEvent() throws Exception {
+    CombatEntity entity = new CombatEntity();
+    entity.setSize(10, 10);
+    entity.setCollisionBoxWidth(4);
+    entity.setCollisionBoxHeight(4);
+    assertTrue(entity.hasCollision());
+    CombatEntityDeathListener deathListener = mock(CombatEntityDeathListener.class);
+    entity.onDeath(deathListener);
+    MapObject mapObject = new MapObject();
+    mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
+    var callback = CombatEntity.class.getDeclaredMethod("afterTmxUnmarshal", de.gurkenlabs.litiengine.environment.tilemap.IMapObject.class);
+    callback.setAccessible(true);
+
+    callback.invoke(entity, mapObject);
+
+    assertTrue(entity.isDead());
+    assertFalse(entity.hasCollision());
+    verify(deathListener, never()).death(any(), any());
   }
 
   @Test

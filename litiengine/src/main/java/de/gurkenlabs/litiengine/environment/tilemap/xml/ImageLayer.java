@@ -53,6 +53,10 @@ public class ImageLayer extends Layer implements IImageLayer {
     return this.image;
   }
 
+  public void setImage(MapImage image) {
+    this.image = image;
+  }
+
   @Override
   public Color getTransparentColor() {
     return this.trans;

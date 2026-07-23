@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -114,5 +115,14 @@ class CustomPropertyProviderTests {
     assertEquals(Color.BLACK, provider.getColorValue("mycolor"));
 
     assertEquals(123, provider.getMapObjectId("myobject"));
+  }
+
+  @Test
+  void testGetLongValueFromDecimalRepresentation() {
+    provider.setValue("integral", new CustomProperty("2500.0"));
+    provider.setValue("fractional", new CustomProperty("2500.5"));
+
+    assertEquals(2500L, provider.getLongValue("integral"));
+    assertThrows(NumberFormatException.class, () -> provider.getLongValue("fractional"));
   }
 }

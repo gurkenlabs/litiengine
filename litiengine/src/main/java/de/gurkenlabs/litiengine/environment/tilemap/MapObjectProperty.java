@@ -53,6 +53,8 @@ public final class MapObjectProperty {
   public static final String SPRITESHEETNAME = "spritesheetName";
   /** Whether the entity's sprite should be scaled to fit its bounding box. */
   public static final String SCALE_SPRITE = "scaling";
+  /** Project-defined implementation identifier for a built-in map object type. */
+  public static final String IMPLEMENTATION = "implementation";
 
   // mobile entity
   /** Acceleration value of a mobile entity, in milliseconds to reach max velocity. */
@@ -67,6 +69,8 @@ public final class MapObjectProperty {
   // combat entity
   /** Hit points of a combat entity. */
   public static final String COMBAT_HITPOINTS = "hitpoints";
+  /** Initial current hit points of a combat entity. */
+  public static final String COMBAT_CURRENT_HITPOINTS = "currentHitpoints";
   /** Whether the combat entity is indestructible. */
   public static final String COMBAT_INDESTRUCTIBLE = "indestructible";
   /** Identifier of the team the combat entity belongs to. */

@@ -6,7 +6,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Style;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.GroupLayout;
@@ -14,7 +19,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -23,13 +27,15 @@ public class CustomPanel extends PropertyPanel {
   private JTable tableCustomProperties;
   private final JScrollPane scrollPane;
   private DefaultTableModel model;
+  private boolean binding;
+  private java.util.Set<String> excludedProperties = java.util.Set.of();
 
   public CustomPanel() {
     super("panel_customProperties");
 
     this.scrollPane = new JScrollPane();
 
-    JButton buttonAdd = new JButton("+");
+    JButton buttonAdd = Style.textButton("+");
     buttonAdd.addActionListener(
         a -> {
           TableCellEditor editor = tableCustomProperties.getCellEditor();
@@ -37,10 +43,9 @@ public class CustomPanel extends PropertyPanel {
             editor.stopCellEditing();
           }
           model.addRow(new Object[] {"", ""});
-          model.fireTableDataChanged();
         });
 
-    JButton buttonRemove = new JButton("-");
+    JButton buttonRemove = Style.textButton("−");
     buttonRemove.addActionListener(
         a -> {
           TableCellEditor editor = tableCustomProperties.getCellEditor();
@@ -53,59 +58,57 @@ public class CustomPanel extends PropertyPanel {
             model.removeRow(rows[i] - i);
           }
 
-          model.fireTableDataChanged();
           tableCustomProperties.revalidate();
         });
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
         groupLayout
-            .createParallelGroup(Alignment.TRAILING)
+            .createSequentialGroup()
+            .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
             .addGroup(
                 groupLayout
-                    .createSequentialGroup()
+                    .createParallelGroup(Alignment.LEADING)
+                    .addComponent(scrollPane, PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Integer.MAX_VALUE)
                     .addGroup(
                         groupLayout
-                            .createParallelGroup(Alignment.LEADING)
-                            .addGroup(
-                                groupLayout
-                                    .createSequentialGroup()
-                                    .addComponent(buttonAdd)
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addComponent(
-                                        buttonRemove,
-                                        GroupLayout.PREFERRED_SIZE,
-                                        41,
-                                        GroupLayout.PREFERRED_SIZE))
-                            .addGroup(
-                                groupLayout
-                                    .createSequentialGroup()
-                                    .addComponent(
-                                        scrollPane,
-                                        GroupLayout.DEFAULT_SIZE,
-                                        440,
-                                        Short.MAX_VALUE)))
-                    .addGap(PropertyPanel.LABEL_GAP)));
+                            .createSequentialGroup()
+                            .addComponent(buttonAdd)
+                            .addGap(6)
+                            .addComponent(buttonRemove))));
     groupLayout.setVerticalGroup(
         groupLayout
-            .createParallelGroup(Alignment.LEADING)
+            .createSequentialGroup()
+            .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
+            .addGap(6)
             .addGroup(
                 groupLayout
-                    .createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(
-                        scrollPane, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(
-                        groupLayout
-                            .createParallelGroup(Alignment.BASELINE)
-                            .addComponent(buttonAdd)
-                            .addComponent(buttonRemove))
-                    .addContainerGap(148, Short.MAX_VALUE)));
+                    .createParallelGroup(Alignment.CENTER)
+                    .addComponent(buttonAdd)
+                    .addComponent(buttonRemove))
+            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
-    this.tableCustomProperties = new JTable();
+    this.tableCustomProperties = new JTable() {
+      private static final String EMPTY_TEXT = Resources.strings().get("panel_noPropertiesDefined");
+      @Override
+      protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (getRowCount() == 0) {
+          g.setColor(Style.COLOR_PLACEHOLDER);
+          FontMetrics fm = g.getFontMetrics();
+          int x = (getWidth() - fm.stringWidth(EMPTY_TEXT)) / 2;
+          int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+          g.drawString(EMPTY_TEXT, x, y);
+        }
+      }
+    };
+    this.tableCustomProperties.setFillsViewportHeight(true);
     this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);
     this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.tableCustomProperties.setShowHorizontalLines(true);
+    this.tableCustomProperties.setShowVerticalLines(false);
+    this.tableCustomProperties.setGridColor(Style.COLOR_BORDER);
+    this.tableCustomProperties.setIntercellSpacing(new Dimension(0, 1));
     this.scrollPane.setViewportView(tableCustomProperties);
     this.tableCustomProperties.setModel(
         new DefaultTableModel(
@@ -148,14 +151,19 @@ public class CustomPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.clearControls();
-    if (mapObject == null || mapObject.getProperties() == null) {
-      return;
-    }
-    for (Map.Entry<String, ICustomProperty> prop : mapObject.getProperties().entrySet()) {
-      if (MapObjectProperty.isCustom(prop.getKey())) {
-        this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
+    this.binding = true;
+    try {
+      this.clearControls();
+      if (mapObject == null || mapObject.getProperties() == null) {
+        return;
       }
+      for (Map.Entry<String, ICustomProperty> prop : new HashMap<>(mapObject.getProperties()).entrySet()) {
+        if (MapObjectProperty.isCustom(prop.getKey()) && !this.excludedProperties.contains(prop.getKey())) {
+          this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});
+        }
+      }
+    } finally {
+      this.binding = false;
     }
   }
 
@@ -164,7 +172,7 @@ public class CustomPanel extends PropertyPanel {
   }
 
   private void updateCustomProperties() {
-    if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+    if (this.binding || getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
       return;
     }
 
@@ -182,7 +190,11 @@ public class CustomPanel extends PropertyPanel {
     getDataSource()
         .getProperties()
         .keySet()
-        .removeIf(p -> MapObjectProperty.isCustom(p) && !setProperties.contains(p));
+        .removeIf(p -> MapObjectProperty.isCustom(p) && !this.excludedProperties.contains(p) && !setProperties.contains(p));
     UndoManager.instance().mapObjectChanged(getDataSource());
+  }
+
+  void setExcludedProperties(java.util.Set<String> excludedProperties) {
+    this.excludedProperties = excludedProperties != null ? java.util.Set.copyOf(excludedProperties) : java.util.Set.of();
   }
 }

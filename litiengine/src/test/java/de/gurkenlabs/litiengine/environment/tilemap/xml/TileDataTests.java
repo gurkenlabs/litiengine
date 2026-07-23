@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,6 +15,18 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class TileDataTests {
+
+  @Test
+  void copyDeeplyIsolatesTilesAndEmptySentinel() throws TmxException {
+    TileData original = new TileData(List.of(new Tile(4), Tile.EMPTY), 2, 1, TileData.Encoding.CSV, null);
+    TileData copy = new TileData(original);
+
+    copy.getTiles().getFirst().setGridId(9);
+
+    assertEquals(4, original.getTiles().getFirst().getGridId());
+    assertNotSame(original.getTiles().getFirst(), copy.getTiles().getFirst());
+    assertNotSame(Tile.EMPTY, copy.getTiles().get(1));
+  }
 
   @Test
   void testBase64EncodingUncompressed() throws TmxException {
@@ -133,6 +146,19 @@ class TileDataTests {
 
     // assert
     assertEquals(expectedEncoded, actualEncoded);
+  }
+
+  @Test
+  void csvEncodingWithoutDimensionsPreservesTiles() throws IOException, TmxException {
+    TileData data =
+        new TileData(
+            List.of(new Tile(1), new Tile(2)),
+            0,
+            0,
+            TileData.Encoding.CSV,
+            TileData.Compression.NONE);
+
+    assertEquals("\n1,2", TileData.encode(data));
   }
 
   /**

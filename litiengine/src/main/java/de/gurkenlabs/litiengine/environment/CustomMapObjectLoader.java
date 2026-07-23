@@ -100,6 +100,19 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
     return inv;
   }
 
+  static IEntity create(Class<? extends IEntity> entityType, Environment environment, IMapObject mapObject) {
+    ConstructorInvocation invocation = findConstructor(entityType);
+    if (invocation == null) {
+      return null;
+    }
+    try {
+      return invocation.invoke(environment, mapObject);
+    } catch (ReflectiveOperationException e) {
+      log.log(Level.WARNING, "Could not create map object implementation " + entityType.getName(), e);
+      return null;
+    }
+  }
+
   @Override
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
     Collection<IEntity> entities = new ArrayList<>();

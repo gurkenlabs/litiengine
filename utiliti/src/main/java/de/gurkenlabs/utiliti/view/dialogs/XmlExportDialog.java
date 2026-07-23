@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.dialogs;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.controller.Editor;
 import java.io.File;
@@ -34,9 +35,9 @@ public final class XmlExportDialog {
     chooser = new JFileChooser(source.toFile());
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-    chooser.setDialogTitle("Export " + name);
+    chooser.setDialogTitle(Resources.strings().get("dialog_export", name));
     FileFilter filter =
-      new FileNameExtensionFilter("." + extension + " - " + name + " XML", extension);
+      new FileNameExtensionFilter(Resources.strings().get("file_filter_xml", "." + extension, name), extension);
     chooser.setFileFilter(filter);
     chooser.addChoosableFileFilter(filter);
     chooser.setSelectedFile(new File(filename));

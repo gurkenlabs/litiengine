@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import jakarta.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElementRef;
@@ -135,6 +136,9 @@ public class TileData {
   @XmlTransient
   private int minChunkOffsetYMap;
 
+  @XmlTransient
+  private boolean dirty;
+
   /**
    * Default constructor for the {@code TileData} class. This constructor is required for serialization purposes.
    */
@@ -168,6 +172,7 @@ public class TileData {
     this.compression = compression;
     this.width = width;
     this.height = height;
+    this.dirty = true;
   }
 
   /**
@@ -181,14 +186,33 @@ public class TileData {
     this.compression = original.getCompression();
     this.rawValue = original.rawValue != null ? new ArrayList<>(original.rawValue) : null;
     this.value = original.getValue();
-    this.chunks = original.chunks != null ? new ArrayList<>(original.chunks) : null;
-    this.tiles = original.tiles != null ? new CopyOnWriteArrayList<>(original.getTiles()) : null;
+    this.chunks = original.chunks != null ? new ArrayList<>(original.chunks.stream().map(TileChunk::new).toList()) : null;
+    if (this.rawValue != null && this.chunks != null) {
+      for (int i = 0; i < this.rawValue.size(); i++) {
+        if (this.rawValue.get(i) instanceof TileChunk chunk) {
+          int chunkIndex = original.chunks.indexOf(chunk);
+          if (chunkIndex >= 0) {
+            this.rawValue.set(i, this.chunks.get(chunkIndex));
+          }
+        }
+      }
+    }
+    this.tiles = original.tiles != null ? copyTiles(original.getTiles()) : null;
     this.width = original.getWidth();
     this.height = original.getHeight();
     this.offsetX = original.getOffsetX();
     this.offsetY = original.getOffsetY();
     this.minChunkOffsetXMap = original.minChunkOffsetXMap;
     this.minChunkOffsetYMap = original.minChunkOffsetYMap;
+    this.dirty = original.dirty;
+  }
+
+  private static List<Tile> copyTiles(List<Tile> original) {
+    List<Tile> copy = new CopyOnWriteArrayList<>();
+    for (Tile tile : original) {
+      copy.add(tile == null || tile == Tile.EMPTY ? new Tile(Tile.NONE) : new Tile(tile));
+    }
+    return copy;
   }
 
   @XmlTransient
@@ -236,6 +260,11 @@ public class TileData {
     }
 
     this.rawValue.addFirst(value);
+    this.dirty = false;
+  }
+
+  void markDirty() {
+    this.dirty = true;
   }
 
   /**
@@ -307,7 +336,7 @@ public class TileData {
         sb.append(',');
       }
 
-      if (i != 0 && (i + 1) % data.getWidth() == 0) {
+      if (data.getWidth() > 0 && i != 0 && (i + 1) % data.getWidth() == 0) {
         sb.append('\n');
       }
     }
@@ -403,6 +432,11 @@ public class TileData {
     }
 
     return this.height;
+  }
+
+  void setDimensions(int width, int height) {
+    this.width = width;
+    this.height = height;
   }
 
   /**
@@ -510,11 +544,7 @@ public class TileData {
       if (tileId > Integer.MAX_VALUE) {
         parsed.add(new Tile(tileId));
       } else {
-        if (tileId == Tile.NONE) {
-          parsed.add(Tile.EMPTY);
-        } else {
-          parsed.add(new Tile(tileId));
-        }
+        parsed.add(new Tile(tileId));
       }
     }
 
@@ -530,6 +560,36 @@ public class TileData {
       Collections.sort(this.chunks);
 
       this.updateDimensionsByTileData();
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private void beforeMarshal(Marshaller marshaller) throws IOException, TmxException {
+    if (!this.dirty || this.tiles == null) {
+      return;
+    }
+    if (this.isInfinite()) {
+      updateChunkValues();
+    } else {
+      this.value = encode(this);
+      this.rawValue = new CopyOnWriteArrayList<>();
+      this.rawValue.add(this.value);
+    }
+    this.dirty = false;
+  }
+
+  private void updateChunkValues() throws IOException, TmxException {
+    for (TileChunk chunk : this.chunks) {
+      List<Tile> chunkTiles = new ArrayList<>(chunk.getWidth() * chunk.getHeight());
+      int startX = chunk.getX() - this.minChunkOffsetXMap;
+      int startY = chunk.getY() - this.minChunkOffsetYMap;
+      for (int y = startY; y < startY + chunk.getHeight(); y++) {
+        for (int x = startX; x < startX + chunk.getWidth(); x++) {
+          chunkTiles.add(this.tiles.get(x + y * getWidth()));
+        }
+      }
+      TileData chunkData = new TileData(chunkTiles, chunk.getWidth(), chunk.getHeight(), this.encoding, this.compression);
+      chunk.setValue(encode(chunkData));
     }
   }
 

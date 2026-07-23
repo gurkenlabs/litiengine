@@ -12,10 +12,13 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.EntityController;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.renderers.IconTreeListRenderer;
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -23,11 +26,15 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.function.Predicate;
+import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -56,6 +63,7 @@ public final class EntityList extends JPanel implements EntityController {
   private final DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
+  private final Timer searchDebounce;
 
   public EntityList() {
     this.setName(Resources.strings().get("panel_entities"));
@@ -64,35 +72,58 @@ public final class EntityList extends JPanel implements EntityController {
     this.searchPanel = new JPanel();
     this.searchPanel.setLayout(new BorderLayout(0, 0));
 
-    this.btnCollape = new JButton("");
-    this.btnCollape.setOpaque(false);
-    this.btnCollape.setMargin(new Insets(2, 2, 2, 2));
+    this.btnCollape = Style.iconButton(Icons.COLLAPSE_24);
     this.btnCollape.addActionListener(e -> collapseAll());
-    this.btnCollape.setIcon(Icons.COLLAPSE_24);
 
     final String entitySearchDefault = Resources.strings().get("panel_entities_search_default");
 
     this.textField = new JTextField();
     this.textField.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, entitySearchDefault);
+    this.textField.setToolTipText(Resources.strings().get("panel_entities_search_hint"));
     this.textField.setColumns(10);
-    this.textField.addActionListener(e -> search());
+    this.textField.setBorder(null);
+    this.searchDebounce = new Timer(300, e -> search());
+    this.searchDebounce.setRepeats(false);
 
-    this.btnSearch = new JButton("");
-    this.btnSearch.setBorderPainted(false);
-    this.btnSearch.setContentAreaFilled(false);
-    this.btnSearch.setOpaque(false);
-    this.btnSearch.setMargin(new Insets(2, 2, 2, 2));
-    this.btnSearch.addActionListener(e -> search());
-    this.btnSearch.setIcon(Icons.SEARCH_24);
+    this.textField.addActionListener(e -> {
+      searchDebounce.stop();
+      search();
+    });
+    this.textField.getDocument().addDocumentListener(new DocumentListener() {
+      @Override public void insertUpdate(DocumentEvent e) {
+        searchDebounce.restart();
+      }
+      @Override public void removeUpdate(DocumentEvent e) {
+        searchDebounce.restart();
+      }
+      @Override public void changedUpdate(DocumentEvent e) {
+        searchDebounce.restart();
+      }
+    });
+
+    this.btnSearch = Style.iconButton(Icons.SEARCH_24);
+    this.btnSearch.addActionListener(e -> {
+      searchDebounce.stop();
+      search();
+    });
 
     this.searchPanel.add(this.textField, BorderLayout.CENTER);
     this.searchPanel.add(this.btnSearch, BorderLayout.EAST);
     this.searchPanel.add(this.btnCollape, BorderLayout.WEST);
 
+    getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+      KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), "focusSearch");
+    getActionMap().put("focusSearch", new javax.swing.AbstractAction() {
+      @Override public void actionPerformed(java.awt.event.ActionEvent e) {
+        textField.requestFocusInWindow();
+        textField.selectAll();
+      }
+    });
+
     this.tree = new JTree();
     this.tree.setBorder(null);
     this.tree.setRootVisible(false);
-    this.tree.setShowsRootHandles(true);
+    this.tree.setShowsRootHandles(false);
 
     this.tree.setCellRenderer(new IconTreeListRenderer());
     this.tree.setRowHeight((int) (this.tree.getRowHeight() * Editor.preferences().getUiScale()));
@@ -133,7 +164,7 @@ public final class EntityList extends JPanel implements EntityController {
           Resources.strings().get("panel_mapselection_entities"), Icons.ENTITY_16));
     this.nodeProps =
       new DefaultMutableTreeNode(
-        new IconTreeListItem(Resources.strings().get("panel_mapselection_props"), Icons.ENTITY_16));
+        new IconTreeListItem(Resources.strings().get("panel_mapselection_props"), Icons.PROP_16));
     this.nodeCreatures =
       new DefaultMutableTreeNode(
         new IconTreeListItem(
@@ -339,7 +370,7 @@ public final class EntityList extends JPanel implements EntityController {
         Game.world().environment().getProps(),
         this.nodeProps,
         Resources.strings().get("panel_mapselection_props"),
-        Icons.ENTITY_16);
+        Icons.PROP_16);
       addEntitiesToTreeNode(
         Game.world().environment().getCreatures(),
         this.nodeCreatures,
@@ -397,20 +428,29 @@ public final class EntityList extends JPanel implements EntityController {
   }
 
   private void search() {
-    this.btnSearch.requestFocus();
-    if (this.textField.getText() == null || this.textField.getText().isEmpty()) {
+    String query = this.textField.getText();
+    if (query == null || query.isEmpty()) {
       return;
     }
 
+    // support #id syntax
+    if (query.startsWith("#") && query.length() > 1) {
+      try {
+        searchById(Integer.parseInt(query.substring(1)));
+        return;
+      } catch (NumberFormatException ex) {
+        // fall through to name search
+      }
+    }
+
     // if typed in name is an integer, try to find by id first
-    if (this.textField.getText().matches("-?\\d+")) {
-      int id = Integer.parseInt(this.textField.getText());
-      if (this.searchById(id)) {
+    if (query.matches("-?\\d+")) {
+      if (searchById(Integer.parseInt(query))) {
         return;
       }
     }
 
-    this.searchByName(this.textField.getText());
+    searchByName(query);
   }
 
   private boolean searchById(int id) {

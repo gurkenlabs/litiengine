@@ -4,7 +4,7 @@ import com.github.weisj.darklaf.components.border.DarkBorders;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
-import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import javax.swing.Box;
@@ -35,11 +35,11 @@ public class EmitterTextPanel extends PropertyPanel {
     table.setTableHeader(null);
     scrollPanel = new JScrollPane(table);
     scrollPanel.setBorder(DarkBorders.createLineBorder(1, 1, 1, 1));
-    scrollPanel.setPreferredSize(new Dimension(CONTROL_WIDTH * 2, CONTROL_HEIGHT * 3));
+    scrollPanel.setPreferredSize(new Dimension(CONTROL_WIDTH, CONTROL_HEIGHT * 3));
 
     ctrlButtonBox = Box.createVerticalBox();
-    btnAdd = new JButton(Icons.ADD_16);
-    btnRemove = new JButton(Icons.DELETE_16);
+    btnAdd = Style.textButton("+");
+    btnRemove = Style.textButton("−");
     btnAdd.setMaximumSize(BUTTON_SIZE);
     btnRemove.setMaximumSize(BUTTON_SIZE);
 
@@ -85,7 +85,12 @@ public class EmitterTextPanel extends PropertyPanel {
 
   private void setupChangedListeners() {
     btnAdd.addActionListener(a -> model.addRow(new Object[] {EmitterAttributes.DEFAULT_TEXT}));
-    btnRemove.addActionListener(a -> model.removeRow(table.getSelectedRow()));
+    btnRemove.addActionListener(a -> {
+      int row = table.getSelectedRow();
+      if (row >= 0) {
+        model.removeRow(row);
+      }
+    });
     setup(table, MapObjectProperty.Particle.TEXTS);
   }
 }

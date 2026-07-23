@@ -234,9 +234,7 @@ public class FileDrop {
           @SuppressWarnings("unchecked")
           List<File> fileList = (List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor);
 
-          // Convert list to array
-          Path[] filesTemp = new Path[fileList.size()];
-          fileList.toArray(filesTemp);
+          Path[] filesTemp = fileList.stream().map(File::toPath).toArray(Path[]::new);
 
           // Alert listener to drop.
           if (listener != null) {

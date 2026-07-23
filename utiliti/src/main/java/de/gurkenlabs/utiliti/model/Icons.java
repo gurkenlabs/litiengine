@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.model;
 
 import com.github.weisj.darklaf.properties.icons.IconLoader;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import javax.swing.Icon;
 
 public final class Icons {
@@ -21,6 +22,7 @@ public final class Icons {
   public static final Icon COPY_8 = IconLoader.get().getUIAwareIcon("copy.svg", 8, 8);
   public static final Icon CREATURE_8 = IconLoader.get().getUIAwareIcon("creature.svg", 8, 8);
   public static final Icon CUT_8 = IconLoader.get().getUIAwareIcon("cut.svg", 8, 8);
+  public static final Icon CROSS_8 = IconLoader.get().getUIAwareIcon("cross.svg", 8, 8);
   public static final Icon DELETE_8 = IconLoader.get().getUIAwareIcon("delete.svg", 8, 8);
   public static final Icon EMITTER_8 = IconLoader.get().getUIAwareIcon("emitter.svg", 8, 8);
   public static final Icon ENTITY_8 = IconLoader.get().getUIAwareIcon("entity.svg", 8, 8);
@@ -31,11 +33,14 @@ public final class Icons {
   public static final Icon LIFT_8 = IconLoader.get().getUIAwareIcon("lift.svg", 8, 8);
   public static final Icon LOWER_8 = IconLoader.get().getUIAwareIcon("lower.svg", 8, 8);
   public static final Icon MAPAREA_8 = IconLoader.get().getUIAwareIcon("maparea.svg", 8, 8);
+  public static final Icon MINUS_8 = IconLoader.get().getUIAwareIcon("minus.svg", 8, 8);
   public static final Icon MISC_8 = IconLoader.get().getUIAwareIcon("misc.svg", 8, 8);
   public static final Icon PASTE_8 = IconLoader.get().getUIAwareIcon("paste.svg", 8, 8);
   public static final Icon PAUSE_8 = IconLoader.get().getUIAwareIcon("pause.svg", 8, 8);
   public static final Icon PENCIL_8 = IconLoader.get().getUIAwareIcon("pencil.svg", 8, 8);
+  public static final Icon POINTER_8 = IconLoader.get().getUIAwareIcon("pointer.svg", 8, 8);
   public static final Icon PLAY_8 = IconLoader.get().getUIAwareIcon("play.svg", 8, 8);
+  public static final Icon PROP_8 = IconLoader.get().getUIAwareIcon("prop.svg", 8, 8);
   public static final Icon RENAME_8 = IconLoader.get().getUIAwareIcon("rename.svg", 8, 8);
   public static final Icon REWIND_8 = IconLoader.get().getUIAwareIcon("rewind.svg", 8, 8);
   public static final Icon SCROLL_DOWN_8 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 8, 8);
@@ -51,47 +56,113 @@ public final class Icons {
 
   // 16px variants
   public static final Icon ADD_16 = IconLoader.get().getUIAwareIcon("add.svg", 16, 16);
+  public static final Icon ABOUT_16 = IconLoader.get().getUIAwareIcon("about.svg", 16, 16);
+  public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("animation.svg", 16, 16);
+  public static final Icon API_16 = IconLoader.get().getUIAwareIcon("api.svg", 16, 16);
   public static final Icon ASSET_16 = IconLoader.get().getUIAwareIcon("asset.svg", 16, 16);
   public static final Icon ASSET_BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("asset_blueprint.svg", 16, 16);
   public static final Icon ASSET_EMITTER_16 = IconLoader.get().getUIAwareIcon("asset_emitter.svg", 16, 16);
   public static final Icon ASSET_SOUND_16 = IconLoader.get().getUIAwareIcon("asset_sound.svg", 16, 16);
   public static final Icon ASSET_TILESET_16 = IconLoader.get().getUIAwareIcon("asset_tileset.svg", 16, 16);
+  public static final Icon BACK_16 = IconLoader.get().getUIAwareIcon("back.svg", 16, 16);
   public static final Icon BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("blueprint.svg", 16, 16);
   public static final Icon BULB_16 = IconLoader.get().getUIAwareIcon("bulb.svg", 16, 16);
+  public static final Icon BUG_16 = IconLoader.get().getUIAwareIcon("bug.svg", 16, 16);
   public static final Icon CLEAR_CONSOLE_16 = IconLoader.get().getUIAwareIcon("clear-console.svg", 16, 16);
   public static final Icon COLLAPSE_16 = IconLoader.get().getUIAwareIcon("collapse.svg", 16, 16);
   public static final Icon COLLISIONBOX_16 = IconLoader.get().getUIAwareIcon("collisionbox.svg", 16, 16);
+  public static final Icon CLAMP_MAP_16 = IconLoader.get().getUIAwareIcon("clamp-map.svg", 16, 16);
   public static final Icon COLOR_16 = IconLoader.get().getUIAwareIcon("color.svg", 16, 16);
   public static final Icon CONSOLE_16 = IconLoader.get().getUIAwareIcon("console.svg", 16, 16);
   public static final Icon COPY_16 = IconLoader.get().getUIAwareIcon("copy.svg", 16, 16);
   public static final Icon CREATURE_16 = IconLoader.get().getUIAwareIcon("creature.svg", 16, 16);
   public static final Icon CUT_16 = IconLoader.get().getUIAwareIcon("cut.svg", 16, 16);
+  public static final Icon CROSS_16 = IconLoader.get().getUIAwareIcon("cross.svg", 16, 16);
   public static final Icon DELETE_16 = IconLoader.get().getUIAwareIcon("delete.svg", 16, 16);
+  public static final Icon DOCUMENTATION_16 = IconLoader.get().getUIAwareIcon("documentation.svg", 16, 16);
+  public static final Icon EYEDROPPER_16 = IconLoader.get().getUIAwareIcon("eyedropper.svg", 16, 16);
   public static final Icon EMITTER_16 = IconLoader.get().getUIAwareIcon("emitter.svg", 16, 16);
   public static final Icon ENTITY_16 = IconLoader.get().getUIAwareIcon("entity.svg", 16, 16);
   public static final Icon EXPORT_16 = IconLoader.get().getUIAwareIcon("export.svg", 16, 16);
+  public static final Icon EXTERNAL_16 = IconLoader.get().getUIAwareIcon("external.svg", 16, 16);
+  public static final Icon FILE_NEW_16 = IconLoader.get().getUIAwareIcon("file-new.svg", 16, 16);
+  public static final Icon ERASER_16 = IconLoader.get().getUIAwareIcon("eraser.svg", 16, 16);
+  public static final Icon FILL_16 = IconLoader.get().getUIAwareIcon("fill.svg", 16, 16);
+  public static final Icon FORWARD_16 = IconLoader.get().getUIAwareIcon("forward.svg", 16, 16);
+  public static final Icon FIT_16 = IconLoader.get().getUIAwareIcon("fit.svg", 16, 16);
+  public static final Icon FOLDER_OPEN_16 = IconLoader.get().getUIAwareIcon("folder-open.svg", 16, 16);
+  public static final Icon FORUM_16 = IconLoader.get().getUIAwareIcon("forum.svg", 16, 16);
   public static final Icon HIDE_16 = IconLoader.get().getUIAwareIcon("hide.svg", 16, 16);
   public static final Icon HIDEOTHER_16 = IconLoader.get().getUIAwareIcon("hideother.svg", 16, 16);
+  public static final Icon GROUP_16 = IconLoader.get().getUIAwareIcon("group.svg", 16, 16);
+  public static final Icon GRID_16 = IconLoader.get().getUIAwareIcon("settings-grid.svg", 16, 16);
+  public static final Icon HISTORY_16 = IconLoader.get().getUIAwareIcon("history.svg", 16, 16);
+  public static final Icon IMPORT_16 = IconLoader.get().getUIAwareIcon("import.svg", 16, 16);
   public static final Icon LAYER_16 = IconLoader.get().getUIAwareIcon("layer.svg", 16, 16);
   public static final Icon LIFT_16 = IconLoader.get().getUIAwareIcon("lift.svg", 16, 16);
+  public static final Icon LOOP_16 = IconLoader.get().getUIAwareIcon("loop.svg", 16, 16);
   public static final Icon LOWER_16 = IconLoader.get().getUIAwareIcon("lower.svg", 16, 16);
   public static final Icon MAPAREA_16 = IconLoader.get().getUIAwareIcon("maparea.svg", 16, 16);
+  public static final Icon MAP_16 = IconLoader.get().getUIAwareIcon("map.svg", 16, 16);
+  public static final Icon MAP_EXPORT_16 = IconLoader.get().getUIAwareIcon("map-export.svg", 16, 16);
+  public static final Icon MAP_IDS_16 = IconLoader.get().getUIAwareIcon("map-ids.svg", 16, 16);
+  public static final Icon MAP_IMPORT_16 = IconLoader.get().getUIAwareIcon("map-import.svg", 16, 16);
+  public static final Icon MAP_NEW_16 = IconLoader.get().getUIAwareIcon("map-new.svg", 16, 16);
+  public static final Icon MAP_SNAPSHOT_16 = IconLoader.get().getUIAwareIcon("map-snapshot.svg", 16, 16);
+  public static final Icon MAP_SYNC_16 = IconLoader.get().getUIAwareIcon("map-sync.svg", 16, 16);
+  public static final Icon MINUS_16 = IconLoader.get().getUIAwareIcon("minus.svg", 16, 16);
   public static final Icon MISC_16 = IconLoader.get().getUIAwareIcon("misc.svg", 16, 16);
   public static final Icon PASTE_16 = IconLoader.get().getUIAwareIcon("paste.svg", 16, 16);
   public static final Icon PAUSE_16 = IconLoader.get().getUIAwareIcon("pause.svg", 16, 16);
   public static final Icon PENCIL_16 = IconLoader.get().getUIAwareIcon("pencil.svg", 16, 16);
+  public static final Icon POINTER_16 = IconLoader.get().getUIAwareIcon("pointer.svg", 16, 16);
   public static final Icon PLAY_16 = IconLoader.get().getUIAwareIcon("play.svg", 16, 16);
+  public static final Icon PROP_16 = IconLoader.get().getUIAwareIcon("prop.svg", 16, 16);
   public static final Icon RENAME_16 = IconLoader.get().getUIAwareIcon("rename.svg", 16, 16);
+  public static final Icon RELEASE_NOTES_16 = IconLoader.get().getUIAwareIcon("release-notes.svg", 16, 16);
+  public static final Icon REDO_16 = IconLoader.get().getUIAwareIcon("redo.svg", 16, 16);
   public static final Icon REWIND_16 = IconLoader.get().getUIAwareIcon("rewind.svg", 16, 16);
   public static final Icon SCROLL_DOWN_16 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 16, 16);
+  public static final Icon SAVE_16 = IconLoader.get().getUIAwareIcon("save.svg", 16, 16);
   public static final Icon SEARCH_16 = IconLoader.get().getUIAwareIcon("search.svg", 16, 16);
   public static final Icon SHADOWBOX_16 = IconLoader.get().getUIAwareIcon("shadowbox.svg", 16, 16);
+  public static final Icon SETTINGS_16 = IconLoader.get().getUIAwareIcon("settings.svg", 16, 16);
+  public static final Icon SETTINGS_24 = IconLoader.get().getUIAwareIcon("settings.svg", 24, 24);
+  public static final Icon SETTINGS_APPEARANCE_16 = IconLoader.get().getUIAwareIcon("settings-appearance.svg", 16, 16);
+  public static final Icon SETTINGS_APPEARANCE_24 = IconLoader.get().getUIAwareIcon("settings-appearance.svg", 24, 24);
+  public static final Icon SETTINGS_APPEARANCE_40 = IconLoader.get().getUIAwareIcon("settings-appearance.svg", 40, 40);
+  public static final Icon SETTINGS_DISPLAY_16 = IconLoader.get().getUIAwareIcon("settings-display.svg", 16, 16);
+  public static final Icon SETTINGS_DISPLAY_24 = IconLoader.get().getUIAwareIcon("settings-display.svg", 24, 24);
+  public static final Icon SETTINGS_FONT_24 = IconLoader.get().getUIAwareIcon("settings-font.svg", 24, 24);
+  public static final Icon SETTINGS_GRID_16 = IconLoader.get().getUIAwareIcon("settings-grid.svg", 16, 16);
+  public static final Icon SETTINGS_GRID_24 = IconLoader.get().getUIAwareIcon("settings-grid.svg", 24, 24);
+  public static final Icon SETTINGS_INFO_16 = IconLoader.get().getUIAwareIcon("settings-info.svg", 16, 16);
+  public static final Icon SETTINGS_KEYMAP_16 = IconLoader.get().getUIAwareIcon("settings-keymap.svg", 16, 16);
+  public static final Icon SETTINGS_KEYMAP_24 = IconLoader.get().getUIAwareIcon("settings-keymap.svg", 24, 24);
+  public static final Icon SETTINGS_LANGUAGE_16 = IconLoader.get().getUIAwareIcon("settings-language.svg", 16, 16);
+  public static final Icon SETTINGS_LANGUAGE_24 = IconLoader.get().getUIAwareIcon("settings-language.svg", 24, 24);
+  public static final Icon SETTINGS_THEME_DARK_16 = IconLoader.get().getUIAwareIcon("settings-theme-dark.svg", 16, 16);
+  public static final Icon SETTINGS_THEME_LIGHT_16 = IconLoader.get().getUIAwareIcon("settings-theme-light.svg", 16, 16);
+  public static final Icon SETTINGS_THEME_LIGHT_24 = IconLoader.get().getUIAwareIcon("settings-theme-light.svg", 24, 24);
   public static final Icon SHOW_16 = IconLoader.get().getUIAwareIcon("show.svg", 16, 16);
+  public static final Icon SHOW_NAMES_16 = IconLoader.get().getUIAwareIcon("show-names.svg", 16, 16);
+  public static final Icon SNAP_GRID_16 = IconLoader.get().getUIAwareIcon("snap-grid.svg", 16, 16);
+  public static final Icon SNAP_PIXELS_16 = IconLoader.get().getUIAwareIcon("snap-pixels.svg", 16, 16);
   public static final Icon SOUND_16 = IconLoader.get().getUIAwareIcon("sound.svg", 16, 16);
+  public static final Icon SUPPORT_16 = IconLoader.get().getUIAwareIcon("support.svg", 16, 16);
+  public static final Icon SUPPORT_24 = IconLoader.get().getUIAwareIcon("support.svg", 24, 24);
+  public static final Icon SUPPORT_32 = IconLoader.get().getUIAwareIcon("support.svg", 32, 32);
+  public static final Icon SUPPORT_40 = IconLoader.get().getUIAwareIcon("support.svg", 40, 40);
+  public static final Icon POWER_16 = IconLoader.get().getUIAwareIcon("power.svg", 16, 16);
   public static final Icon SPAWNPOINT_16 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 16, 16);
   public static final Icon SPRITESHEET_16 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 16, 16);
   public static final Icon TILESET_16 = IconLoader.get().getUIAwareIcon("tileset.svg", 16, 16);
+  public static final Icon TUTORIAL_16 = IconLoader.get().getUIAwareIcon("tutorial.svg", 16, 16);
+  public static final Icon TERRAIN_16 = IconLoader.get().getUIAwareIcon("terrain.svg", 16, 16);
   public static final Icon TRIGGER_16 = IconLoader.get().getUIAwareIcon("trigger.svg", 16, 16);
+  public static final Icon UNDO_16 = IconLoader.get().getUIAwareIcon("undo.svg", 16, 16);
+  public static final Icon ZOOM_IN_16 = IconLoader.get().getUIAwareIcon("zoom-in.svg", 16, 16);
+  public static final Icon ZOOM_OUT_16 = IconLoader.get().getUIAwareIcon("zoom-out.svg", 16, 16);
 
 
   // 24px variants
@@ -103,6 +174,7 @@ public final class Icons {
   public static final Icon ASSET_TILESET_24 = IconLoader.get().getUIAwareIcon("asset_tileset.svg", 24, 24);
   public static final Icon BLUEPRINT_24 = IconLoader.get().getUIAwareIcon("blueprint.svg", 24, 24);
   public static final Icon BULB_24 = IconLoader.get().getUIAwareIcon("bulb.svg", 24, 24);
+  public static final Icon BUG_24 = IconLoader.get().getUIAwareIcon("bug.svg", 24, 24);
   public static final Icon CLEAR_CONSOLE_24 = IconLoader.get().getUIAwareIcon("clear-console.svg", 24, 24);
   public static final Icon COLLAPSE_24 = IconLoader.get().getUIAwareIcon("collapse.svg", 24, 24);
   public static final Icon COLLISIONBOX_24 = IconLoader.get().getUIAwareIcon("collisionbox.svg", 24, 24);
@@ -110,11 +182,14 @@ public final class Icons {
   public static final Icon CONSOLE_24 = IconLoader.get().getUIAwareIcon("console.svg", 24, 24);
   public static final Icon COPY_24 = IconLoader.get().getUIAwareIcon("copy.svg", 24, 24);
   public static final Icon CREATURE_24 = IconLoader.get().getUIAwareIcon("creature.svg", 24, 24);
+  public static final Icon CROSS_24 = IconLoader.get().getUIAwareIcon("cross.svg", 24, 24);
   public static final Icon CUT_24 = IconLoader.get().getUIAwareIcon("cut.svg", 24, 24);
   public static final Icon DELETE_24 = IconLoader.get().getUIAwareIcon("delete.svg", 24, 24);
   public static final Icon EMITTER_24 = IconLoader.get().getUIAwareIcon("emitter.svg", 24, 24);
   public static final Icon ENTITY_24 = IconLoader.get().getUIAwareIcon("entity.svg", 24, 24);
   public static final Icon EXPORT_24 = IconLoader.get().getUIAwareIcon("export.svg", 24, 24);
+  public static final Icon ERASER_24 = IconLoader.get().getUIAwareIcon("eraser.svg", 24, 24);
+  public static final Icon FILL_24 = IconLoader.get().getUIAwareIcon("fill.svg", 24, 24);
   public static final Icon HIDE_24 = IconLoader.get().getUIAwareIcon("hide.svg", 24, 24);
   public static final Icon HIDEOTHER_24 = IconLoader.get().getUIAwareIcon("hideother.svg", 24, 24);
   public static final Icon LAYER_24 = IconLoader.get().getUIAwareIcon("layer.svg", 24, 24);
@@ -125,9 +200,13 @@ public final class Icons {
   public static final Icon PASTE_24 = IconLoader.get().getUIAwareIcon("paste.svg", 24, 24);
   public static final Icon PAUSE_24 = IconLoader.get().getUIAwareIcon("pause.svg", 24, 24);
   public static final Icon PENCIL_24 = IconLoader.get().getUIAwareIcon("pencil.svg", 24, 24);
+  public static final Icon POINTER_24 = IconLoader.get().getUIAwareIcon("pointer.svg", 24, 24);
   public static final Icon PLAY_24 = IconLoader.get().getUIAwareIcon("play.svg", 24, 24);
+  public static final Icon PROP_24 = IconLoader.get().getUIAwareIcon("prop.svg", 24, 24);
   public static final Icon RENAME_24 = IconLoader.get().getUIAwareIcon("rename.svg", 24, 24);
   public static final Icon REWIND_24 = IconLoader.get().getUIAwareIcon("rewind.svg", 24, 24);
+  public static final Icon UNDO_24 = IconLoader.get().getUIAwareIcon("undo.svg", 24, 24);
+  public static final Icon REDO_24 = IconLoader.get().getUIAwareIcon("redo.svg", 24, 24);
   public static final Icon SCROLL_DOWN_24 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 24, 24);
   public static final Icon SEARCH_24 = IconLoader.get().getUIAwareIcon("search.svg", 24, 24);
   public static final Icon SHADOWBOX_24 = IconLoader.get().getUIAwareIcon("shadowbox.svg", 24, 24);
@@ -135,8 +214,9 @@ public final class Icons {
   public static final Icon SOUND_24 = IconLoader.get().getUIAwareIcon("sound.svg", 24, 24);
   public static final Icon SPAWNPOINT_24 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 24, 24);
   public static final Icon SPRITESHEET_24 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 24, 24);
-  public static final Icon ANIMATION_24 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 24, 24);
+  public static final Icon ANIMATION_24 = IconLoader.get().getUIAwareIcon("animation.svg", 24, 24);
   public static final Icon TILESET_24 = IconLoader.get().getUIAwareIcon("tileset.svg", 24, 24);
+  public static final Icon TERRAIN_24 = IconLoader.get().getUIAwareIcon("terrain.svg", 24, 24);
   public static final Icon TRIGGER_24 = IconLoader.get().getUIAwareIcon("trigger.svg", 24, 24);
 
 
@@ -171,7 +251,9 @@ public final class Icons {
   public static final Icon PASTE_32 = IconLoader.get().getUIAwareIcon("paste.svg", 32, 32);
   public static final Icon PAUSE_32 = IconLoader.get().getUIAwareIcon("pause.svg", 32, 32);
   public static final Icon PENCIL_32 = IconLoader.get().getUIAwareIcon("pencil.svg", 32, 32);
+  public static final Icon POINTER_32 = IconLoader.get().getUIAwareIcon("pointer.svg", 32, 32);
   public static final Icon PLAY_32 = IconLoader.get().getUIAwareIcon("play.svg", 32, 32);
+  public static final Icon PROP_32 = IconLoader.get().getUIAwareIcon("prop.svg", 32, 32);
   public static final Icon RENAME_32 = IconLoader.get().getUIAwareIcon("rename.svg", 32, 32);
   public static final Icon REWIND_32 = IconLoader.get().getUIAwareIcon("rewind.svg", 32, 32);
   public static final Icon SCROLL_DOWN_32 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 32, 32);
@@ -181,10 +263,30 @@ public final class Icons {
   public static final Icon SOUND_32 = IconLoader.get().getUIAwareIcon("sound.svg", 32, 32);
   public static final Icon SPAWNPOINT_32 = IconLoader.get().getUIAwareIcon("spawnpoint.svg", 32, 32);
   public static final Icon SPRITESHEET_32 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 32, 32);
-  public static final Icon ASSET_ANIMATION_32 = IconLoader.get().getUIAwareIcon("spritesheet.svg", 32, 32);
+  public static final Icon ASSET_ANIMATION_32 = IconLoader.get().getUIAwareIcon("animation.svg", 32, 32);
   public static final Icon TILESET_32 = IconLoader.get().getUIAwareIcon("tileset.svg", 32, 32);
   public static final Icon TRIGGER_32 = IconLoader.get().getUIAwareIcon("trigger.svg", 32, 32);
 
   private Icons() {
+  }
+
+  public static Icon forMapObjectType(MapObjectType type) {
+    if (type == null) {
+      return ENTITY_16;
+    }
+
+    return switch (type) {
+      case AREA -> MAPAREA_16;
+      case COLLISIONBOX -> COLLISIONBOX_16;
+      case CREATURE -> CREATURE_16;
+      case EMITTER -> EMITTER_16;
+      case LIGHTSOURCE -> BULB_16;
+      case PROP -> PROP_16;
+      case SOUNDSOURCE -> SOUND_16;
+      case SPAWNPOINT -> SPAWNPOINT_16;
+      case STATICSHADOW -> SHADOWBOX_16;
+      case TRIGGER -> TRIGGER_16;
+      default -> ENTITY_16;
+    };
   }
 }

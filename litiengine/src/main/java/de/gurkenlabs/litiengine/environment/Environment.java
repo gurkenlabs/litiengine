@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectDefinition;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
@@ -231,6 +232,27 @@ public final class Environment implements IRenderable {
     }
 
     registerCustomEntityType(info.customMapObjectType(), entityType);
+  }
+
+  /**
+   * Registers an entity type declared for map editing with {@link MapObjectDefinition}.
+   *
+   * @param entityType the annotated entity implementation
+   */
+  public static void registerMapObjectDefinition(Class<? extends IEntity> entityType) {
+    MapObjectDefinition definition = entityType.getAnnotation(MapObjectDefinition.class);
+    if (definition == null || definition.id().isBlank()) {
+      log.log(Level.WARNING, "Cannot register map object definition [{0}]: MapObjectDefinition.id must be specified.", entityType.getName());
+      return;
+    }
+
+    if (definition.baseType() == MapObjectType.CREATURE && Creature.class.isAssignableFrom(entityType)) {
+      CreatureMapObjectLoader.registerMapObjectImplementation(definition.id(), entityType.asSubclass(Creature.class));
+    } else if (definition.baseType() == MapObjectType.PROP && Prop.class.isAssignableFrom(entityType)) {
+      PropMapObjectLoader.registerMapObjectImplementation(definition.id(), entityType.asSubclass(Prop.class));
+    } else {
+      log.log(Level.WARNING, "Cannot register map object definition [{0}]: implementation must extend the declared base type.", entityType.getName());
+    }
   }
 
   /**

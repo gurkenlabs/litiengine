@@ -1,51 +1,34 @@
 package de.gurkenlabs.utiliti.model;
 
-import de.gurkenlabs.litiengine.resources.Resources;
-import java.awt.image.BufferedImage;
+import de.gurkenlabs.litiengine.Game;
+import java.awt.Component;
+import java.awt.Cursor;
 
 /**
- * A utility class that provides various cursor images for the application.
+ * Native cursor definitions used by the editor Canvas.
  */
 public final class Cursors {
-  /**
-   * The default cursor image.
-   */
-  public static final BufferedImage DEFAULT = Resources.images().get("cursor.png");
+  public static final Cursor DEFAULT = Cursor.getDefaultCursor();
+  public static final Cursor ADD = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+  public static final Cursor MOVE = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+  public static final Cursor LOAD = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+  public static final Cursor TRANS_HORIZONTAL = Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR);
+  public static final Cursor TRANS_VERTICAL = Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
+  public static final Cursor TRANS_DIAGONAL_LEFT = Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR);
+  public static final Cursor TRANS_DIAGONAL_RIGHT = Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR);
 
-  /**
-   * The cursor image for adding elements.
-   */
-  public static final BufferedImage ADD = Resources.images().get("cursor-add.png");
+  public static void initialize() {
+    Game.window().cursor().setVisible(false);
+    apply(DEFAULT);
+  }
 
-  /**
-   * The cursor image for moving elements.
-   */
-  public static final BufferedImage MOVE = Resources.images().get("cursor-move.png");
-
-  /**
-   * The cursor image for loading.
-   */
-  public static final BufferedImage LOAD = Resources.images().get("cursor-load.png");
-
-  /**
-   * The cursor image for horizontal transformations.
-   */
-  public static final BufferedImage TRANS_HORIZONTAL = Resources.images().get("cursor-trans-horizontal.png");
-
-  /**
-   * The cursor image for vertical transformations.
-   */
-  public static final BufferedImage TRANS_VERTICAL = Resources.images().get("cursor-trans-vertical.png");
-
-  /**
-   * The cursor image for diagonal transformations to the left.
-   */
-  public static final BufferedImage TRANS_DIAGONAL_LEFT = Resources.images().get("cursor-trans-315.png");
-
-  /**
-   * The cursor image for diagonal transformations to the right.
-   */
-  public static final BufferedImage TRANS_DIAGONAL_RIGHT = Resources.images().get("cursor-trans-45.png");
+  public static void apply(Cursor cursor) {
+    Component renderComponent = Game.window().getRenderComponent();
+    Cursor resolved = cursor != null ? cursor : DEFAULT;
+    if (!resolved.equals(renderComponent.getCursor())) {
+      renderComponent.setCursor(resolved);
+    }
+  }
 
   /**
    * Private constructor to prevent instantiation of this utility class.

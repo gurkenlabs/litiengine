@@ -4,9 +4,13 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Icons;
 import java.awt.LayoutManager;
+import java.awt.Color;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -22,14 +26,14 @@ public class LightSourcePanel extends PropertyPanel {
   public LightSourcePanel() {
     super("panel_lightSource", Icons.BULB_24);
 
-    this.colorControl = new ColorComponent();
+    this.colorControl = new ColorComponent(Color.WHITE, "panel_color");
 
     this.comboBoxLightShape = new JComboBox<>();
     this.comboBoxLightShape.setModel(
         new DefaultComboBoxModel<>(new String[] {"ellipse", "rectangle"}));
 
     this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 5));
-    this.checkBoxIsActive = new JCheckBox("is active");
+    this.checkBoxIsActive = new JCheckBox(Resources.strings().get("lightSource_isActive"));
     this.checkBoxIsActive.setSelected(true);
 
     setLayout(this.createLayout());
@@ -39,6 +43,12 @@ public class LightSourcePanel extends PropertyPanel {
   @Override
   public void bind(IMapObject mapObject) {
     super.bind(mapObject);
+    this.updateLighting();
+  }
+
+  @Override
+  public void bindAll(List<IMapObject> mapObjects) {
+    super.bindAll(mapObjects);
     this.updateLighting();
   }
 
@@ -78,7 +88,7 @@ public class LightSourcePanel extends PropertyPanel {
             m -> {
               m.setValue(MapObjectProperty.LIGHT_COLOR, this.colorControl.getHexColor());
               m.setValue(MapObjectProperty.LIGHT_INTENSITY, (int) this.spinnerIntensity.getValue());
-              Game.world().environment().updateLighting(getDataSource().getBoundingBox());
+              updateLighting();
             }));
     this.setup(this.spinnerIntensity, MapObjectProperty.LIGHT_INTENSITY);
     this.spinnerIntensity.addChangeListener(m -> this.updateLighting());
@@ -95,12 +105,14 @@ public class LightSourcePanel extends PropertyPanel {
       return;
     }
 
-    final IMapObject datasource = getDataSource();
-    if (datasource == null) {
+    if (getDataSources().isEmpty()) {
       return;
     }
-
-    Game.world().environment().updateLighting(getDataSource().getBoundingBox());
+    Rectangle2D bounds = null;
+    for (IMapObject mapObject : getDataSources()) {
+      bounds = bounds == null ? mapObject.getBoundingBox() : bounds.createUnion(mapObject.getBoundingBox());
+    }
+    Game.world().environment().updateLighting(bounds);
   }
 
   private LayoutManager createLayout() {
@@ -108,8 +120,7 @@ public class LightSourcePanel extends PropertyPanel {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
             new LayoutItem("panel_shape", this.comboBoxLightShape),
-            new LayoutItem(
-                "panel_color", this.colorControl, this.colorControl.getPreferredSize().height),
+            new LayoutItem(this.colorControl, this.colorControl.getPreferredSize().height),
             new LayoutItem("panel_intensity", this.spinnerIntensity),
         };
 

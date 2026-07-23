@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
@@ -20,7 +21,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.GroupLayout;
@@ -38,7 +41,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -54,9 +56,14 @@ import javax.swing.event.TableModelListener;
 public abstract class PropertyPanel extends JPanel {
 
   /**
-   * The width of the label in pixels, scaled by the UI scale factor.
+   * Fixed label column width (100px at 1x scale).
    */
-  public static final int LABEL_WIDTH = (int) (35 * Editor.preferences().getUiScale());
+  public static final int LABEL_WIDTH = (int) (92 * Editor.preferences().getUiScale());
+
+  /**
+   * Gutter between label column and input column.
+   */
+  public static final int GUTTER_WIDTH = (int) (8 * Editor.preferences().getUiScale());
 
   /**
    * The minimum width of the control in pixels, scaled by the UI scale factor.
@@ -66,7 +73,7 @@ public abstract class PropertyPanel extends JPanel {
   /**
    * The width of the control in pixels, scaled by the UI scale factor.
    */
-  public static final int CONTROL_WIDTH = (int) (160 * Editor.preferences().getUiScale());
+  public static final int CONTROL_WIDTH = (int) (200 * Editor.preferences().getUiScale());
 
   /**
    * The width of the spinner in pixels, scaled by the UI scale factor.
@@ -76,12 +83,12 @@ public abstract class PropertyPanel extends JPanel {
   /**
    * The height of the control in pixels, scaled by the UI scale factor.
    */
-  public static final int CONTROL_HEIGHT = (int) (32 * Editor.preferences().getUiScale());
+  public static final int CONTROL_HEIGHT = (int) (Style.CONTROL_HEIGHT * Editor.preferences().getUiScale());
 
   /**
    * The margin between controls in pixels, scaled by the UI scale factor.
    */
-  public static final int CONTROL_MARGIN = (int) (5 * Editor.preferences().getUiScale());
+  public static final int CONTROL_MARGIN = (int) (4 * Editor.preferences().getUiScale());
 
   /**
    * The width of the panel in pixels, calculated based on control and label widths.
@@ -157,6 +164,9 @@ public abstract class PropertyPanel extends JPanel {
    * The data source for the property panel, representing a map object.
    */
   protected transient IMapObject dataSource;
+  private transient List<IMapObject> dataSources = List.of();
+  private boolean binding;
+  private long bindingVersion;
 
   /**
    * The identifier for the property panel.
@@ -262,6 +272,10 @@ public abstract class PropertyPanel extends JPanel {
     return this.dataSource;
   }
 
+  protected List<IMapObject> getDataSources() {
+    return this.dataSources;
+  }
+
   /**
    * Retrieves the identifier for the property panel.
    *
@@ -280,6 +294,11 @@ public abstract class PropertyPanel extends JPanel {
     return this.icon;
   }
 
+  /** Optional actions displayed at the trailing edge of the inspector section header. */
+  public Component getHeaderActions() {
+    return null;
+  }
+
   /**
    * Sets the icon for the property panel.
    *
@@ -296,14 +315,29 @@ public abstract class PropertyPanel extends JPanel {
    * @param mapObject the map object to bind
    */
   public void bind(IMapObject mapObject) {
-    this.dataSource = mapObject;
+    this.bindTargets(mapObject == null ? List.of() : List.of(mapObject));
+  }
 
-    if (this.dataSource == null) {
-      this.clearControls();
-      return;
+  public void bindAll(List<IMapObject> mapObjects) {
+    this.bindTargets(mapObjects == null ? List.of() : List.copyOf(mapObjects));
+  }
+
+  private void bindTargets(List<IMapObject> mapObjects) {
+    this.bindingVersion++;
+    this.dataSources = mapObjects;
+    this.dataSource = this.dataSources.isEmpty() ? null : this.dataSources.get(0);
+
+    this.binding = true;
+    try {
+      if (this.dataSource == null) {
+        this.clearControls();
+        return;
+      }
+
+      this.setControlValues(this.dataSource);
+    } finally {
+      this.binding = false;
     }
-
-    this.setControlValues(mapObject);
   }
 
   /**
@@ -383,15 +417,19 @@ public abstract class PropertyPanel extends JPanel {
       return;
     }
     comboBox.addActionListener(new MapObjectPropertyActionListener(m -> {
+      String value = SearchableSpriteComboBox.selectedText(comboBox);
+      if (value == null) {
+        return false;
+      }
       if (!m.hasCustomProperty(property) || m.getStringValue(property, null) == null) {
         return true;
       }
-
-      JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-      return value != null && !m.getStringValue(property, null).equals(value.getText());
+      return !m.getStringValue(property, null).equals(value);
     }, m -> {
-      JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-      m.setValue(property, value != null ? value.getText() : null);
+      String value = SearchableSpriteComboBox.selectedText(comboBox);
+      if (value != null) {
+        m.setValue(property, value);
+      }
     }));
   }
 
@@ -445,7 +483,9 @@ public abstract class PropertyPanel extends JPanel {
     if (property == null || property.isEmpty()) {
       return;
     }
-    textField.addFocusListener(new MapObjectPropertyFocusListener(m -> m.setValue(property, textField.getText())));
+    textField.addFocusListener(new MapObjectPropertyFocusListener(textField,
+      m -> !Objects.equals(m.getStringValue(property, null), textField.getText()),
+      m -> m.setValue(property, textField.getText())));
     textField.addActionListener(new MapObjectPropertyActionListener(
       m -> !m.hasCustomProperty(property) || m.getStringValue(property, null) == null || !m.getStringValue(property, null)
         .equals(textField.getText()), m -> m.setValue(property, textField.getText())));
@@ -484,8 +524,7 @@ public abstract class PropertyPanel extends JPanel {
    * object, reloads it from the map, and refreshes the entity controller with the map object's ID.
    */
   protected void updateEnvironment() {
-    if (getDataSource() != null) {
-      IMapObject obj = getDataSource();
+    for (IMapObject obj : getDataSources()) {
       Game.world().environment().reloadFromMap(obj.getId());
       UI.getEntityController().refresh(obj.getId());
     }
@@ -504,15 +543,19 @@ public abstract class PropertyPanel extends JPanel {
 
     // prepare the parallel group for the labels
     // add additional components to the group
-    ParallelGroup parallel = groupLayout.createParallelGroup(Alignment.TRAILING);
+    ParallelGroup parallel = groupLayout.createParallelGroup(Alignment.LEADING);
     for (Component component : additionalComponents) {
-      parallel.addComponent(component, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE);
+      parallel.addGroup(
+        groupLayout
+          .createSequentialGroup()
+          .addGap(LABEL_WIDTH + GUTTER_WIDTH)
+          .addComponent(component, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE));
     }
 
     for (LayoutItem item : layoutItems) {
       SequentialGroup horGrp = groupLayout.createSequentialGroup();
       if (item.getLabel() != null) {
-        horGrp.addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Integer.MAX_VALUE).addPreferredGap(ComponentPlacement.UNRELATED)
+        horGrp.addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, LABEL_WIDTH).addGap(GUTTER_WIDTH)
           .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE);
       } else {
         horGrp.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Integer.MAX_VALUE);
@@ -522,35 +565,36 @@ public abstract class PropertyPanel extends JPanel {
 
     // initialize the horizontal layout group with the parallel groups for
     // labels and components and some additional gaps
-    groupLayout.setHorizontalGroup(
-      groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGroup(parallel)));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(parallel));
 
     // now prepare the vertical groups
     SequentialGroup seq = groupLayout.createSequentialGroup();
-    SequentialGroup current = seq.addGap(CONTROL_MARGIN);
+    SequentialGroup current = seq;
 
-    for (LayoutItem item : layoutItems) {
+    for (int i = 0; i < layoutItems.length; i++) {
+      LayoutItem item = layoutItems[i];
       ParallelGroup verGrp = groupLayout.createParallelGroup(Alignment.LEADING);
       if (item.getLabel() != null) {
         verGrp.addComponent(item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight())
-          .addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, item.getMinHeight()).addGap(CONTROL_MARGIN);
+          .addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, item.getMinHeight());
       } else {
         verGrp.addComponent(item.getComponent(), item.getMinHeight(), item.getMinHeight(), item.getMinHeight());
       }
 
       current = current.addGroup(verGrp);
+      if (i < layoutItems.length - 1 || additionalComponents.length > 0) {
+        current = current.addGap(CONTROL_MARGIN);
+      }
     }
 
-    current.addPreferredGap(ComponentPlacement.UNRELATED);
-    for (Component component : additionalComponents) {
+    for (int i = 0; i < additionalComponents.length; i++) {
+      Component component = additionalComponents[i];
       current =
         current
-          .addComponent(
-            component,
-            GroupLayout.PREFERRED_SIZE,
-            GroupLayout.PREFERRED_SIZE,
-            GroupLayout.PREFERRED_SIZE)
-          .addGap(CONTROL_MARGIN);
+          .addComponent(component, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+      if (i < additionalComponents.length - 1) {
+        current = current.addGap(CONTROL_MARGIN);
+      }
     }
 
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(seq));
@@ -563,11 +607,36 @@ public abstract class PropertyPanel extends JPanel {
    *
    * @param updateAction the action to apply to the map object
    */
+  private boolean applying;
+
   private void applyChanges(Consumer<IMapObject> updateAction) {
-    UndoManager.instance().mapObjectChanging(getDataSource());
-    updateAction.accept(getDataSource());
-    UndoManager.instance().mapObjectChanged(getDataSource());
-    updateEnvironment();
+    if (applying) {
+      return;
+    }
+    applying = true;
+    UndoManager undoManager = UndoManager.instance();
+    boolean operationStarted = this.dataSources.size() > 1 && undoManager.tryBeginOperation();
+    try {
+      for (IMapObject mapObject : this.dataSources) {
+        undoManager.mapObjectChanging(mapObject);
+        updateAction.accept(mapObject);
+        undoManager.mapObjectChanged(mapObject);
+      }
+      updateEnvironment();
+    } finally {
+      if (operationStarted) {
+        undoManager.endOperation();
+      }
+      applying = false;
+    }
+  }
+
+  private boolean editingBlocked() {
+    return this.binding || getDataSource() == null || Editor.instance().getMapComponent().isFocussing();
+  }
+
+  private boolean anyDataSourceMatches(Function<IMapObject, Boolean> check) {
+    return this.dataSources.stream().anyMatch(mapObject -> Boolean.TRUE.equals(check.apply(mapObject)));
   }
 
   /**
@@ -615,6 +684,7 @@ public abstract class PropertyPanel extends JPanel {
       this.component = component;
       this.label = new JLabel(this.caption);
       this.label.setVerticalAlignment(SwingConstants.CENTER);
+      this.label.setHorizontalAlignment(SwingConstants.TRAILING);
       this.setMinHeight(CONTROL_HEIGHT);
       ControlBehavior.apply(this.getComponent());
     }
@@ -694,7 +764,7 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     @Override public void itemStateChanged(ItemEvent arg0) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+      if (editingBlocked()) {
         return;
       }
 
@@ -722,8 +792,7 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     @Override public void actionPerformed(ActionEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing() || Boolean.FALSE.equals(
-        this.newValueCheck.apply(getDataSource()))) {
+      if (editingBlocked() || !anyDataSourceMatches(this.newValueCheck)) {
         return;
       }
 
@@ -748,7 +817,7 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     @Override public void tableChanged(TableModelEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+      if (editingBlocked()) {
         return;
       }
       applyChanges(this.updateAction);
@@ -775,8 +844,7 @@ public abstract class PropertyPanel extends JPanel {
     }
 
     @Override public void stateChanged(ChangeEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing() || Boolean.FALSE.equals(
-        this.newValueCheck.apply(getDataSource()))) {
+      if (editingBlocked() || !anyDataSourceMatches(this.newValueCheck)) {
         return;
       }
 
@@ -862,23 +930,56 @@ public abstract class PropertyPanel extends JPanel {
    */
   protected class MapObjectPropertyFocusListener extends FocusAdapter {
 
+    private final JTextField textField;
     private final Consumer<IMapObject> updateAction;
+    private final Function<IMapObject, Boolean> newValueCheck;
+    private boolean dirty;
+    private long bindingVersionOnFocus;
 
     /**
      * Constructs a MapObjectPropertyFocusListener with the specified update action.
      *
      * @param updateAction the action to apply to the map object
      */
-    MapObjectPropertyFocusListener(Consumer<IMapObject> updateAction) {
+    MapObjectPropertyFocusListener(JTextField textField, Function<IMapObject, Boolean> newValueCheck,
+        Consumer<IMapObject> updateAction) {
+      this.textField = textField;
+      this.newValueCheck = newValueCheck;
       this.updateAction = updateAction;
+      this.textField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        @Override public void insertUpdate(javax.swing.event.DocumentEvent e) {
+          markDirty();
+        }
+
+        @Override public void removeUpdate(javax.swing.event.DocumentEvent e) {
+          markDirty();
+        }
+
+        @Override public void changedUpdate(javax.swing.event.DocumentEvent e) {
+          markDirty();
+        }
+
+        private void markDirty() {
+          if (!binding) {
+            dirty = true;
+          }
+        }
+      });
+    }
+
+    @Override public void focusGained(FocusEvent e) {
+      this.dirty = false;
+      this.bindingVersionOnFocus = bindingVersion;
     }
 
     @Override public void focusLost(FocusEvent e) {
-      if (getDataSource() == null || Editor.instance().getMapComponent().isFocussing()) {
+      if (editingBlocked() || !this.dirty || this.bindingVersionOnFocus != bindingVersion
+          || !anyDataSourceMatches(this.newValueCheck)) {
         return;
       }
 
       applyChanges(this.updateAction);
+      this.dirty = false;
     }
   }
 }

@@ -501,7 +501,7 @@ public final class Game {
       handleCommandLineArguments(args);
 
       config().load();
-      Locale.setDefault(Locale.of(config().client().getCountry(), config().client().getLanguage()));
+      Locale.setDefault(config().client().getLocale());
 
       gameLoop = new GameLoop("Main Update Loop", config().client().getMaxFps());
       loop().attach(physics());

@@ -15,6 +15,13 @@ public interface IMapObjectLayer extends ILayer {
 
   void addMapObject(IMapObject mapObject);
 
+  default void addMapObject(int index, IMapObject mapObject) {
+    addMapObject(mapObject);
+    List<IMapObject> mapObjects = getMapObjects();
+    mapObjects.remove(mapObject);
+    mapObjects.add(index, mapObject);
+  }
+
   void removeMapObject(IMapObject mapObject);
 
   Color getColor();
