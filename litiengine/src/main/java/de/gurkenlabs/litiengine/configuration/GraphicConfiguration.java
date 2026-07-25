@@ -29,6 +29,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private boolean colorInterpolation;
 
+  private Java2DPipeline java2DPipeline;
+
   /**
    * Constructs a new GraphicConfiguration with default settings.
    */
@@ -43,6 +45,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.setReduceFramesWhenNotFocused(true);
     this.setAntiAliasing(false);
     this.setColorInterpolation(false);
+    this.setJava2DPipeline(Java2DPipeline.OPENGL);
   }
 
 
@@ -213,5 +216,25 @@ public class GraphicConfiguration extends ConfigurationGroup {
    */
   public void setColorInterpolation(boolean colorInterpolation) {
     this.set("colorInterpolation", colorInterpolation);
+  }
+
+  /**
+   * Gets the Java2D rendering pipeline. The pipeline is locked in once the
+   * first {@code Graphics2D} context is created, so changing this after
+   * {@code Game.init()} has no effect.
+   *
+   * @return the configured Java2D pipeline.
+   */
+  public Java2DPipeline getJava2DPipeline() {
+    return java2DPipeline;
+  }
+
+  /**
+   * Sets the Java2D rendering pipeline.
+   *
+   * @param pipeline the desired Java2D pipeline.
+   */
+  public void setJava2DPipeline(Java2DPipeline pipeline) {
+    this.set("java2DPipeline", pipeline);
   }
 }

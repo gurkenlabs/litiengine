@@ -502,6 +502,7 @@ public final class Game {
 
       config().load();
       Locale.setDefault(config().client().getLocale());
+      RenderComponent.configurePipeline();
 
       gameLoop = new GameLoop("Main Update Loop", config().client().getMaxFps());
       loop().attach(physics());
