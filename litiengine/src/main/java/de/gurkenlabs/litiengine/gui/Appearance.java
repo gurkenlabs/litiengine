@@ -50,6 +50,11 @@ public class Appearance {
    */
   private boolean transparentBackground;
 
+  private transient Paint cachedGradientPaint;
+  private double cachedGradientWidth;
+  private double cachedGradientHeight;
+  private boolean gradientCacheValid;
+
   /**
    * Constructs a new Appearance with default settings.
    */
@@ -156,11 +161,6 @@ public class Appearance {
    * @param height the height of the component
    * @return the background paint, or null if the background is transparent
    */
-  private transient Paint cachedGradientPaint;
-  private double cachedGradientWidth;
-  private double cachedGradientHeight;
-  private boolean gradientCacheValid;
-
   public Paint getBackgroundPaint(double width, double height) {
     if (this.isTransparentBackground()) {
       return null;
