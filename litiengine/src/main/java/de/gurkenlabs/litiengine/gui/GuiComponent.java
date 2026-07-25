@@ -102,10 +102,7 @@ public abstract class GuiComponent
   private double textY;
   private boolean visible;
   private Point2D location;
-  private final Rectangle2D boundingBox = new Rectangle2D.Double();
-  private boolean boundingBoxDirty = true;
-  private final RoundRectangle2D.Double shapeCache = new RoundRectangle2D.Double();
-  private boolean shapeCacheDirty = true;
+  private Rectangle2D boundingBox;
 
   private double relativeX;
   private double relativeY;
@@ -223,12 +220,12 @@ public abstract class GuiComponent
    * @return the bounding box
    */
   public Rectangle2D getBoundingBox() {
-    if (this.boundingBoxDirty) {
-      this.boundingBox.setRect(getX(), getY(), getWidth(), getHeight());
-      this.boundingBoxDirty = false;
+    if (boundingBox != null) {
+      return boundingBox;
     }
 
-    return this.boundingBox;
+    this.boundingBox = new Rectangle2D.Double(getX(), getY(), getWidth(), getHeight());
+    return boundingBox;
   }
 
   /**
@@ -967,19 +964,13 @@ public abstract class GuiComponent
       return getBoundingBox();
     }
 
-    if (!this.shapeCacheDirty
-      && this.shapeCache.x == getX()
-      && this.shapeCache.y == getY()
-      && this.shapeCache.width == getWidth()
-      && this.shapeCache.height == getHeight()
-      && this.shapeCache.arcwidth == radius
-      && this.shapeCache.archeight == radius) {
-      return this.shapeCache;
-    }
-
-    this.shapeCache.setRoundRect(getX(), getY(), getWidth(), getHeight(), radius, radius);
-    this.shapeCacheDirty = false;
-    return this.shapeCache;
+    return new RoundRectangle2D.Double(
+      getX(),
+      getY(),
+      getWidth(),
+      getHeight(),
+      getCurrentAppearance().getBorderRadius(),
+      getCurrentAppearance().getBorderRadius());
   }
 
   /**
@@ -1028,8 +1019,7 @@ public abstract class GuiComponent
         );
         this.width = relativeWidth * resolution.getWidth();
         this.height = relativeHeight * resolution.getHeight();
-        this.boundingBoxDirty = true;
-        this.shapeCacheDirty = true;
+        this.boundingBox = null;
       } else {
         // Fallback for components created before window was available (e.g. in tests):
         // just resize to the full resolution and set relative layout for future calls.
@@ -1159,8 +1149,7 @@ public abstract class GuiComponent
    */
   public void setHeight(final double height) {
     this.height = height;
-    this.boundingBoxDirty = true;
-    this.shapeCacheDirty = true;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
     updateRelativeLayout();
   }
 
@@ -1202,8 +1191,7 @@ public abstract class GuiComponent
     final double deltaY = location.getY() - getY();
 
     this.location = location;
-    this.boundingBoxDirty = true;
-    this.shapeCacheDirty = true;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
     for (final GuiComponent component : getComponents()) {
       component.setLocation(
         new Point2D.Double(component.getX() + deltaX, component.getY() + deltaY));
@@ -1341,8 +1329,7 @@ public abstract class GuiComponent
    */
   public void setWidth(final double width) {
     this.width = width;
-    this.boundingBoxDirty = true;
-    this.shapeCacheDirty = true;
+    this.boundingBox = null; // trigger recreation in next boundingBox getter call
     updateRelativeLayout();
   }
 
