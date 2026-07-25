@@ -1,37 +1,37 @@
 # LITIENGINE Rendering Benchmark (Real Graphics - Textured)
-Date: 2026-07-02
-Commit: fe6c6171
+Date: 2026-07-25
+Commit: ff9ef548
 
 ## Raw Results (ms)
 
 | Scene                      | Mean  | Min   | Max   | P99   | GC   | N    |
 |----------------------------|-------|-------|-------|-------|------|------|
-| 200 textured entities          |   0.08 |   0.05 |   2.56 |   0.24 |    1 | 1000 |
-| 500 textured entities          |   0.04 |   0.03 |   0.20 |   0.15 |    0 | 1000 |
-| 100x100 tilemap                |   0.08 |   0.05 |   0.30 |   0.24 |    0 | 1000 |
-| 50x50 tilemap                  |   0.02 |   0.01 |   0.08 |   0.04 |    0 | 1000 |
-| 50 textured entities           |   0.02 |   0.02 |   2.42 |   0.07 |    1 | 1000 |
-| 100 entities + 50x50 tiles + 4 lights + 20 shadows |   0.03 |   0.02 |   0.11 |   0.07 |    0 | 1000 |
+| 200 textured entities          |   0.05 |   0.03 |   0.27 |   0.17 |    0 | 1000 |
+| 500 textured entities          |   0.04 |   0.02 |   0.32 |   0.13 |    0 | 1000 |
+| 100x100 tilemap                |   0.07 |   0.07 |   0.28 |   0.13 |    0 | 1000 |
+| 50x50 tilemap                  |   0.02 |   0.02 |   0.15 |   0.03 |    0 | 1000 |
+| 50 textured entities           |   0.02 |   0.02 |   0.10 |   0.05 |    0 | 1000 |
+| 100 entities + 50x50 tiles + 4 lights + 20 shadows |   0.03 |   0.02 |   0.16 |   0.07 |    0 | 1000 |
 
 ## Results (nanoseconds)
 
 | Scene                      | Mean (ns) | Min (ns) | Max (ns) | P99 (ns) | GC   | N    |   FPS |
 |----------------------------|-----------|----------|----------|----------|------|------|-------|
-| 200 textured entities          |      79581 |    46600 |  2555700 |   237500 |    1 | 1000 |   12566 |
-| 500 textured entities          |      38101 |    30200 |   201500 |   145300 |    0 | 1000 |   26246 |
-| 100x100 tilemap                |      75898 |    45400 |   302600 |   237000 |    0 | 1000 |   13176 |
-| 50x50 tilemap                  |      17533 |    14300 |    77600 |    38300 |    0 | 1000 |   57034 |
-| 50 textured entities           |      24255 |    17200 |  2420100 |    71300 |    1 | 1000 |   41229 |
-| 100 entities + 50x50 tiles + 4 lights + 20 shadows |      26717 |    15400 |   106300 |    66800 |    0 | 1000 |   37429 |
+| 200 textured entities          |      51072 |    26200 |   272400 |   167900 |    0 | 1000 |   19580 |
+| 500 textured entities          |      40140 |    19000 |   315100 |   130100 |    0 | 1000 |   24913 |
+| 100x100 tilemap                |      71704 |    65300 |   276800 |   132000 |    0 | 1000 |   13946 |
+| 50x50 tilemap                  |      19479 |    18400 |   149100 |    32200 |    0 | 1000 |   51338 |
+| 50 textured entities           |      17773 |    15600 |   104200 |    53900 |    0 | 1000 |   56265 |
+| 100 entities + 50x50 tiles + 4 lights + 20 shadows |      30710 |    22700 |   161700 |    74900 |    0 | 1000 |   32562 |
 
 ## Change vs Baseline
 
 | Scene                      | Baseline (ns) | Current (ns) | Change  | FPS Δ   |
 |----------------------------|---------------|--------------|---------|---------|
-| 200 textured entities          |      70000 |      79581 | +13.69% |    -12% |
-| 500 textured entities          |      40000 |      38101 | -4.75% |     +5% |
-| 100x100 tilemap                |      90000 |      75898 | -15.67% |    +19% |
-| 50x50 tilemap                  |      20000 |      17533 | -12.33% |    +14% |
-| 50 textured entities           |      20000 |      24255 | +21.27% |    -18% |
-| 100 entities + 50x50 tiles + 4 lights + 20 shadows |      20000 |      26717 | +33.59% |    -25% |
+| 200 textured entities          |      70000 |      51072 | -27.04% |    +37% |
+| 500 textured entities          |      40000 |      40140 | +0.35% |     -0% |
+| 100x100 tilemap                |      90000 |      71704 | -20.33% |    +26% |
+| 50x50 tilemap                  |      20000 |      19479 | -2.61% |     +3% |
+| 50 textured entities           |      20000 |      17773 | -11.13% |    +13% |
+| 100 entities + 50x50 tiles + 4 lights + 20 shadows |      20000 |      30710 | +53.55% |    -35% |
 
