@@ -114,15 +114,13 @@ public class MapRenderer {
     // TODO: possibly implement the same render order that Tiled uses for staggered maps: undo the staggering, and then render it right-down
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 
-    int[] range = getVisibleTileRange(viewport, map);
-
     if (map.getRenderOrder().btt) {
-      for (int y = range[3]; y >= range[1]; y--) {
-        drawRow(g, layer, y, range[0], range[2], map, viewport);
+      for (int y = map.getHeight() - 1; y >= 0; y--) {
+        drawRow(g, layer, y, map, viewport);
       }
     } else {
-      for (int y = range[1]; y <= range[3]; y++) {
-        drawRow(g, layer, y, range[0], range[2], map, viewport);
+      for (int y = 0; y < map.getHeight(); y++) {
+        drawRow(g, layer, y, map, viewport);
       }
     }
 
@@ -132,66 +130,16 @@ public class MapRenderer {
     }
   }
 
-  private static void drawRow(Graphics2D g, ITileLayer layer, int y, int minX, int maxX, IMap map, Rectangle2D viewport) {
+  private static void drawRow(Graphics2D g, ITileLayer layer, int y, IMap map, Rectangle2D viewport) {
     if (map.getRenderOrder().rtl) {
-      for (int x = maxX; x >= minX; x--) {
+      for (int x = map.getWidth() - 1; x >= 0; x--) {
         drawTile(g, layer, x, y, map, viewport);
       }
     } else {
-      for (int x = minX; x <= maxX; x++) {
+      for (int x = 0; x < map.getWidth(); x++) {
         drawTile(g, layer, x, y, map, viewport);
       }
     }
-  }
-
-  private static int[] getVisibleTileRange(Rectangle2D viewport, IMap map) {
-    int minX = 0, minY = 0;
-    int maxX = map.getWidth() - 1;
-    int maxY = map.getHeight() - 1;
-
-    if (viewport == null || viewport.isEmpty() || map.getWidth() <= 0 || map.getHeight() <= 0) {
-      return new int[] { minX, minY, maxX, maxY };
-    }
-
-    if ("orthogonal".equals(map.getOrientation().getName())) {
-      Rectangle2D mapBounds = new Rectangle2D.Double(
-        0, 0, (double) map.getWidth() * map.getTileWidth(), (double) map.getHeight() * map.getTileHeight());
-      Rectangle2D visible = viewport.createIntersection(mapBounds);
-      if (!visible.isEmpty()) {
-        minX = (int) Math.floor(visible.getMinX() / map.getTileWidth());
-        minY = (int) Math.floor(visible.getMinY() / map.getTileHeight());
-        maxX = (int) Math.floor(Math.nextDown(visible.getMaxX()) / map.getTileWidth());
-        maxY = (int) Math.floor(Math.nextDown(visible.getMaxY()) / map.getTileHeight());
-      }
-    } else {
-      Rectangle2D visible = viewport.createIntersection(
-        new Rectangle2D.Double(0, 0, map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight()));
-      if (!visible.isEmpty()) {
-        double sampleXs[] = { visible.getMinX(), (visible.getMinX() + visible.getMaxX()) / 2.0, Math.nextDown(visible.getMaxX()) };
-        double sampleYs[] = { visible.getMinY(), (visible.getMinY() + visible.getMaxY()) / 2.0, Math.nextDown(visible.getMaxY()) };
-        minX = Integer.MAX_VALUE;
-        minY = Integer.MAX_VALUE;
-        maxX = Integer.MIN_VALUE;
-        maxY = Integer.MIN_VALUE;
-        for (double sx : sampleXs) {
-          for (double sy : sampleYs) {
-            Point t = map.getOrientation().getTile(sx, sy, map);
-            minX = Math.min(minX, t.x);
-            minY = Math.min(minY, t.y);
-            maxX = Math.max(maxX, t.x);
-            maxY = Math.max(maxY, t.y);
-          }
-        }
-      }
-    }
-
-    // expand by 1 tile for offsets/overlapping tiles, then clamp to map bounds
-    return new int[] {
-      Math.clamp(minX - 1, 0, map.getWidth() - 1),
-      Math.clamp(minY - 1, 0, map.getHeight() - 1),
-      Math.clamp(maxX + 1, 0, map.getWidth() - 1),
-      Math.clamp(maxY + 1, 0, map.getHeight() - 1)
-    };
   }
 
   private static void drawTile(Graphics2D g, ITileLayer layer, int x, int y, IMap map, Rectangle2D viewport) {
