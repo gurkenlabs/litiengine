@@ -48,7 +48,6 @@ public final class RenderEngine {
   private final EntityYComparator entityComparator = new EntityYComparator();
   private final List<EntityRenderedListener> entityRenderedListener = new CopyOnWriteArrayList<>();
   private final List<EntityRenderListener> entityRenderListener = new CopyOnWriteArrayList<>();
-  private final List<IEntity> renderCache = new ArrayList<>();
 
   private float baseRenderScale = DEFAULT_RENDERSCALE;
 
@@ -388,10 +387,10 @@ public final class RenderEngine {
     // filter out entities that are outside the viewport and always include emitters which have
     // an internal mechanism do determine on a per-particle basis whether it should be rendered
     final Rectangle2D viewport = Game.world().camera().getViewport();
-    renderCache.clear();
+    final List<IEntity> entitiesToRender = new ArrayList<>();
     for (IEntity entity : entities) {
       if (viewport.intersects(entity.getBoundingBox()) || entity instanceof Emitter) {
-        renderCache.add(entity);
+        entitiesToRender.add(entity);
       }
     }
 
@@ -401,9 +400,9 @@ public final class RenderEngine {
       // BETTER DATASTRUCTURE FOR THE (HEAP)
       // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
       try {
-        renderCache.sort(this.entityComparator);
+        entitiesToRender.sort(this.entityComparator);
       } catch (final IllegalArgumentException e) {
-        for (final IEntity entity : renderCache) {
+        for (final IEntity entity : entitiesToRender) {
           this.renderEntity(g, entity);
         }
 
@@ -411,7 +410,7 @@ public final class RenderEngine {
       }
     }
 
-    for (final IEntity entity : renderCache) {
+    for (final IEntity entity : entitiesToRender) {
       this.renderEntity(g, entity);
     }
   }
