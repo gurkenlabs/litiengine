@@ -1,21 +1,26 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
-import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Tag extends JPanel {
+  static final int CHIP_HEIGHT = 24;
+  private static final int TAG_ARC = 12;
 
   private final JLabel lblText;
   private final JButton btnDelete;
@@ -26,65 +31,68 @@ public class Tag extends JPanel {
   }
 
   public Tag() {
-    setBorder(null);
+    setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 4));
+    setLayout(new BorderLayout(2, 0));
+    setBackground(Style.COLOR_DEFAULT_TAG);
+    setOpaque(false);
 
-    JPanel panel = new InternalTagPanel();
-    panel.setBackground(Style.COLOR_DEFAULT_TAG);
-    panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 2));
-    add(panel);
-
-    this.lblText = new JLabel("New label");
-    this.lblText.setForeground(Color.WHITE);
+    this.lblText = new JLabel(Resources.strings().get("tag_newLabel"));
+    this.lblText.setForeground(Style.COLOR_TEXT);
     this.lblText.setFont(
-      this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.75f));
-    panel.add(this.lblText);
+      this.lblText.getFont().deriveFont(Style.getDefaultFont().getSize() * 0.8f));
+    add(this.lblText, BorderLayout.CENTER);
 
-    this.btnDelete = new JButton();
+    this.btnDelete = new JButton("\u00D7");
     this.btnDelete.addActionListener(
       e -> {
         final Container parent = this.getParent();
-        parent.remove(this);
-        parent.revalidate();
-      });
-
-    this.btnDelete.addMouseListener(
-      new MouseAdapter() {
-        @Override
-        public void mouseEntered(final MouseEvent e) {
-          btnDelete.setIcon(Icons.DELETE_8);
-        }
-
-        @Override
-        public void mouseExited(final MouseEvent e) {
-          if (!btnDelete.hasFocus()) {
-            //              TODO: grey out the icon when not focused
-            btnDelete.setIcon(Icons.DELETE_8);
-          }
+        if (parent != null) {
+          parent.remove(this);
+          parent.revalidate();
         }
       });
-
-    this.btnDelete.addFocusListener(
-      new FocusListener() {
-        @Override
-        public void focusLost(FocusEvent e) {
-          //              TODO: grey out the icon when not focused
-          btnDelete.setIcon(Icons.DELETE_8);
-        }
-
-        @Override
-        public void focusGained(FocusEvent e) {
-          btnDelete.setIcon(Icons.DELETE_8);
-        }
-      });
-
-    this.btnDelete.setMargin(new Insets(2, 0, 2, 0));
+    this.btnDelete.setFont(this.btnDelete.getFont().deriveFont(11f));
+    this.btnDelete.setForeground(Style.COLOR_SUBTEXT);
+    this.btnDelete.setMargin(new Insets(0, 0, 0, 0));
     this.btnDelete.setContentAreaFilled(false);
     this.btnDelete.setBorderPainted(false);
     this.btnDelete.setFocusPainted(false);
     this.btnDelete.setBorder(null);
-    this.btnDelete.setPreferredSize(new Dimension(9, 9));
-    this.btnDelete.setIcon(Icons.DELETE_8);
-    panel.add(this.btnDelete);
+    this.btnDelete.setPreferredSize(new Dimension(16, 16));
+    this.btnDelete.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+    add(this.btnDelete, BorderLayout.EAST);
+
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        setBackground(Style.COLOR_TAG_HOVER);
+        repaint();
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        setBackground(Style.COLOR_DEFAULT_TAG);
+        repaint();
+      }
+    });
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    Graphics2D g2 = (Graphics2D) g.create();
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2.setColor(getBackground());
+    g2.fillRoundRect(1, 1, getWidth() - 2, getHeight() - 2, TAG_ARC, TAG_ARC);
+    g2.setColor(Style.COLOR_TAG_BORDER);
+    g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, TAG_ARC, TAG_ARC);
+    g2.dispose();
+  }
+
+  @Override
+  public Dimension getPreferredSize() {
+    Dimension d = super.getPreferredSize();
+    d.height = CHIP_HEIGHT;
+    return d;
   }
 
   @Override
@@ -100,10 +108,4 @@ public class Tag extends JPanel {
     return this.lblText.getText();
   }
 
-  private static class InternalTagPanel extends JPanel {
-    @Override
-    public Dimension getPreferredSize() {
-      return new Dimension(super.getMinimumSize().width, 17);
-    }
-  }
 }

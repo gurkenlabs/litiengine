@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.Valign;
@@ -24,17 +26,23 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.SoundSource;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
+import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectDefinition;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
+import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -135,6 +143,28 @@ class MapObjectLoaderTests {
   }
 
   @Test
+  void testCreatureMapObjectLoaderWithZeroCurrentHitpointsStartsDead() {
+    CreatureMapObjectLoader loader = new CreatureMapObjectLoader();
+    MapObject mapObject = new MapObject();
+    mapObject.setType(MapObjectType.CREATURE.name());
+    mapObject.setId(111);
+    mapObject.setName("deadCreature");
+    mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+    mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
+    mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
+
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+
+    assertTrue(opt.isPresent());
+    Creature creature = (Creature) opt.get();
+    loader.afterLoad(entities, mapObject);
+    assertEquals(100, creature.getHitPoints().getModifiedMax().intValue());
+    assertEquals(0, creature.getHitPoints().getModifiedValue().intValue());
+    assertTrue(creature.isDead());
+  }
+
+  @Test
   void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
     MapObject mapObject = new MapObject();
@@ -178,6 +208,25 @@ class MapObjectLoaderTests {
     assertEquals(100, prop.getHitPoints().getModifiedMax().intValue());
     assertEquals(100, prop.getHitPoints().getModifiedValue().intValue());
     assertEquals(1, prop.getTeam());
+  }
+
+  @Test
+  void testSoundSourceMapObjectLoaderWithoutSoundName() {
+    SoundSourceMapObjectLoader loader = new SoundSourceMapObjectLoader();
+    MapObject mapObject = new MapObject();
+    mapObject.setType(MapObjectType.SOUNDSOURCE.name());
+    mapObject.setId(112);
+    mapObject.setName("testSoundSource");
+    mapObject.setLocation(10, 20);
+
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    assertTrue(opt.isPresent());
+
+    SoundSource soundSource = assertInstanceOf(SoundSource.class, opt.get());
+    assertEquals(112, soundSource.getMapId());
+    assertEquals("testSoundSource", soundSource.getName());
+    assertNull(soundSource.getSound());
   }
 
   @Test
@@ -271,6 +320,54 @@ class MapObjectLoaderTests {
   }
 
   @Test
+  void emitterLoaderSwapsReversedParticleRanges() {
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MIN, 0)).thenReturn(8f);
+    when(mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_X_MAX, 0)).thenReturn(2f);
+    when(mapObject.getLongValue(MapObjectProperty.Particle.TTL_MIN, 0L)).thenReturn(900L);
+    when(mapObject.getLongValue(MapObjectProperty.Particle.TTL_MAX, 0L)).thenReturn(100L);
+
+    var data = EmitterMapObjectLoader.createEmitterData(mapObject);
+
+    assertEquals(2f, data.getParticleOffsetX().getMin());
+    assertEquals(8f, data.getParticleOffsetX().getMax());
+    assertEquals(100L, data.getParticleTTL().getMin());
+    assertEquals(900L, data.getParticleTTL().getMax());
+  }
+
+  @Test
+  void emitterMapObjectUsesDefaultsForNullableImportedValues() {
+    EmitterAttributes attributes = new EmitterAttributes();
+    attributes.setParticleType(null);
+    attributes.setOriginAlign(null);
+    attributes.setOriginValign(null);
+    attributes.setCollision(null);
+    attributes.setRequiredQuality(null);
+    attributes.setSpritesheet((String) null);
+
+    IMapObject mapObject = assertDoesNotThrow(() -> EmitterMapObjectLoader.createMapObject(attributes));
+
+    assertEquals(ParticleType.RECTANGLE,
+      mapObject.getEnumValue(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class));
+    assertEquals(Align.CENTER,
+      mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class));
+    assertEquals(Valign.MIDDLE,
+      mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class));
+    assertEquals(Collision.NONE,
+      mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class));
+    assertEquals(Quality.VERYLOW,
+      mapObject.getEnumValue(MapObjectProperty.REQUIRED_QUALITY, Quality.class));
+    assertEquals("", mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
+    assertEquals(EmitterAttributes.DEFAULT_MAX_ACCELERATION_X,
+      mapObject.getFloatValue(MapObjectProperty.Particle.ACCELERATION_X_MAX));
+    assertEquals(EmitterAttributes.DEFAULT_MIN_OFFSET_Y,
+      mapObject.getFloatValue(MapObjectProperty.Particle.OFFSET_Y_MIN));
+    assertEquals(EmitterAttributes.DEFAULT_MAX_PARTICLE_TTL,
+      mapObject.getLongValue(MapObjectProperty.Particle.TTL_MAX));
+  }
+
+  @Test
   void testLightSourceMapObjectLoader() {
     LightSourceMapObjectLoader loader = new LightSourceMapObjectLoader();
     IMapObject mapObject = mock(IMapObject.class);
@@ -342,6 +439,26 @@ class MapObjectLoaderTests {
     CustomEntity customEntity = (CustomEntity) ent;
     assertEquals("foovalue", customEntity.getFoo());
     assertEquals(111, customEntity.getBar());
+  }
+
+  @Test
+  void mapObjectDefinitionRegistersItsDeclaredType() {
+    Environment.registerMapObjectDefinition(DefinedEntity.class);
+
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn(MapObjectType.CREATURE.name());
+    when(mapObject.getStringValue(MapObjectProperty.IMPLEMENTATION, null)).thenReturn("definedEntity");
+    when(mapObject.getId()).thenReturn(112);
+    when(mapObject.getLocation()).thenReturn(new Point(0, 0));
+    when(mapObject.getWidth()).thenReturn(16f);
+    when(mapObject.getHeight()).thenReturn(16f);
+    when(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT)).thenReturn(Direction.RIGHT);
+
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+
+    assertInstanceOf(DefinedEntity.class, new Environment(map).load(mapObject).iterator().next());
   }
 
   @Test
@@ -555,6 +672,12 @@ class MapObjectLoaderTests {
 
     public int getBar() {
       return this.bar;
+    }
+  }
+
+  @MapObjectDefinition(id = "definedEntity", baseType = MapObjectType.CREATURE)
+  public static class DefinedEntity extends Creature {
+    public DefinedEntity() {
     }
   }
 }

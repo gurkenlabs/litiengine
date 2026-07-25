@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.renderers;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.MapComponent;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
 import de.gurkenlabs.utiliti.model.Style;
@@ -24,7 +25,9 @@ public class FocusRenderer implements IEditorRenderer {
     // render the focus and the transform rects
     final Rectangle2D focus = Editor.instance().getMapComponent().getFocusBounds();
     final IMapObject focusedMapObject = Editor.instance().getMapComponent().getFocusedMapObject();
-    if (focus != null && focusedMapObject != null) {
+    if (focus != null && focusedMapObject != null
+        && MapComponent.isLayerEffectivelyVisible(
+            Game.world().environment().getMap(), focusedMapObject.getLayer())) {
       final float strokeSize =
           (float) Math.max(1, Math.log(Game.world().camera().getRenderScale()) * 4);
       final float dashPhaseBlack =
@@ -42,7 +45,9 @@ public class FocusRenderer implements IEditorRenderer {
 
       g.setColor(Color.BLACK);
 
-      Game.graphics().renderOutline(g, focus, stroke);
+      Rectangle2D screenFocus = EditorRenderHelper.toScreen(focus);
+      g.setStroke(stroke);
+      g.draw(screenFocus);
 
       Stroke whiteStroke =
           new BasicStroke(
@@ -53,16 +58,19 @@ public class FocusRenderer implements IEditorRenderer {
               new float[] {strokeSize, strokeSize},
               dashPhaseWhite);
       g.setColor(Color.WHITE);
-      Game.graphics().renderOutline(g, focus, whiteStroke);
+      g.setStroke(whiteStroke);
+      g.draw(screenFocus);
 
       // render transform rects (not when in MOVE mode)
       if (Editor.instance().getMapComponent().getTransformMode() != TransformMode.MOVE) {
         Stroke transStroke = new BasicStroke(1);
         for (Rectangle2D trans : Transform.getAnchors()) {
+          Rectangle2D screenTrans = EditorRenderHelper.toScreen(trans);
           g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);
-          Game.graphics().renderShape(g, trans);
+          g.fill(screenTrans);
           g.setColor(Color.BLACK);
-          Game.graphics().renderOutline(g, trans, transStroke);
+          g.setStroke(transStroke);
+          g.draw(screenTrans);
         }
       }
     }

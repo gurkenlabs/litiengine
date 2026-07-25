@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.MapComponent;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -11,9 +12,12 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
+import java.awt.geom.RoundRectangle2D;
+import java.util.List;
 import java.util.Objects;
 
 public class SelectionRenderer implements IEditorRenderer {
+  private static final Stroke SELECTION_STROKE = new BasicStroke(1.5f);
   private Color colorSelectionBorder;
   private float selectionBorderBrightness = 0;
   private boolean selectionBorderBrightnessIncreasing = true;
@@ -25,19 +29,30 @@ public class SelectionRenderer implements IEditorRenderer {
 
   @Override
   public void render(Graphics2D g) {
+    List<IMapObject> selectedMapObjects = Editor.instance().getMapComponent().getSelectedMapObjects();
+    if (selectedMapObjects.isEmpty()) {
+      return;
+    }
     this.updateSelectionColor();
+    IMapObject focusedMapObject = Editor.instance().getMapComponent().getFocusedMapObject();
 
-    for (IMapObject mapObject : Editor.instance().getMapComponent().getSelectedMapObjects()) {
+    for (IMapObject mapObject : selectedMapObjects) {
+      if (!MapComponent.isLayerEffectivelyVisible(
+          Game.world().environment().getMap(), mapObject.getLayer())) {
+        continue;
+      }
       renderObjectId(g, mapObject);
 
-      if (mapObject.equals(Editor.instance().getMapComponent().getFocusedMapObject())) {
+      if (mapObject.equals(focusedMapObject)) {
         continue;
       }
 
-      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
-
       g.setColor(colorSelectionBorder);
-      Game.graphics().renderOutline(g, mapObject.getBoundingBox(), stroke);
+      g.setStroke(SELECTION_STROKE);
+      java.awt.geom.Rectangle2D bb = mapObject.getBoundingBox();
+      java.awt.geom.Rectangle2D screenBounds = EditorRenderHelper.toScreen(bb);
+      double arc = 4.0;
+      g.draw(new RoundRectangle2D.Double(screenBounds.getX(), screenBounds.getY(), screenBounds.getWidth(), screenBounds.getHeight(), arc, arc));
     }
   }
 
@@ -54,7 +69,11 @@ public class SelectionRenderer implements IEditorRenderer {
       this.selectionBorderBrightness -= 0.01;
     }
 
-    this.colorSelectionBorder = Color.getHSBColor(0, 0, this.selectionBorderBrightness);
+    this.colorSelectionBorder = new Color(
+      Style.COLOR_ACCENT_BLUE.getRed(),
+      Style.COLOR_ACCENT_BLUE.getGreen(),
+      Style.COLOR_ACCENT_BLUE.getBlue(),
+      (int)(this.selectionBorderBrightness * 255));
   }
 
   private static void renderObjectId(Graphics2D g, IMapObject mapObject) {

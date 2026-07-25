@@ -277,9 +277,27 @@ public final class TmxMap extends CustomPropertyProvider implements IMap {
     this.renderorder = renderorder;
   }
 
+  /**
+   * Returns an unmodifiable snapshot of all map object layers, including layers nested in groups. Changes to the map after this call are visible only
+   * in a newly requested snapshot.
+   *
+   * @return an unmodifiable recursive snapshot of the map object layers
+   */
   @Override
   public List<IMapObjectLayer> getMapObjectLayers() {
-    return this.mapObjectLayers;
+    List<IMapObjectLayer> objectLayers = new ArrayList<>();
+    collectMapObjectLayers(this.getRenderLayers(), objectLayers);
+    return Collections.unmodifiableList(objectLayers);
+  }
+
+  private static void collectMapObjectLayers(List<ILayer> layers, List<IMapObjectLayer> objectLayers) {
+    for (ILayer layer : layers) {
+      if (layer instanceof IMapObjectLayer objectLayer) {
+        objectLayers.add(objectLayer);
+      } else if (layer instanceof IGroupLayer group) {
+        collectMapObjectLayers(group.getRenderLayers(), objectLayers);
+      }
+    }
   }
 
   @Override

@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +23,7 @@ import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 public class PropMapObjectLoader extends MapObjectLoader {
   private static final Logger log = Logger.getLogger(PropMapObjectLoader.class.getName());
   private static final List<Class<? extends Prop>> customPropType;
+  private static final Map<String, Class<? extends Prop>> mapObjectImplementations = new ConcurrentHashMap<>();
 
   static {
     customPropType = new CopyOnWriteArrayList<>();
@@ -60,6 +63,10 @@ public class PropMapObjectLoader extends MapObjectLoader {
     customPropType.add(propType);
   }
 
+  public static <T extends Prop> void registerMapObjectImplementation(String id, Class<T> propType) {
+    mapObjectImplementations.put(id, propType);
+  }
+
   @Override
   public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
     Collection<IEntity> entities = new ArrayList<>();
@@ -68,7 +75,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
     }
 
 
-    final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null));
+    final Prop prop = this.createNewProp(environment, mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null));
     loadDefaultProperties(prop, mapObject);
 
     prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL, null)));
@@ -77,7 +84,15 @@ public class PropMapObjectLoader extends MapObjectLoader {
     return entities;
   }
 
-  protected Prop createNewProp(IMapObject mapObject, String spriteSheet) {
+  protected Prop createNewProp(Environment environment, IMapObject mapObject, String spriteSheet) {
+    String implementation = mapObject.getStringValue(MapObjectProperty.IMPLEMENTATION, null);
+    Class<? extends Prop> implementationType = implementation == null ? null : mapObjectImplementations.get(implementation);
+    if (implementationType != null) {
+      IEntity entity = CustomMapObjectLoader.create(implementationType, environment, mapObject);
+      if (entity instanceof Prop prop) {
+        return prop;
+      }
+    }
     if(spriteSheet != null) {
       for (Class<? extends Prop> customProp : customPropType) {
         for (String prefix : EntityAnimationController.getDefaultSpritePrefixes(customProp)) {

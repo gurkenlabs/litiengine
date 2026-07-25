@@ -10,6 +10,8 @@ import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.components.AssetPanelItem;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
@@ -26,24 +28,26 @@ public final class AssetPanelItemPopupMenu extends JPopupMenu {
     JMenuItem add = new JMenuItem(Resources.strings().get("contextmenu_resource_add"), Icons.ADD_16);
     add.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     add.addActionListener(e -> item.addEntity());
-    add.setEnabled(item.canAdd());
-
-    JMenuItem edit = new JMenuItem(Resources.strings().get("contextmenu_resource_edit_" + typeKey), Icons.PENCIL_16);
-    edit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
-    edit.addActionListener(e -> item.editAsset());
-    edit.setEnabled(origin instanceof SpritesheetResource || origin instanceof Animation);
+    add.setEnabled(item.canAdd() && item.isIndividualActionsEnabled());
 
     JMenuItem export = new JMenuItem(Resources.strings().get("contextmenu_resource_export_" + typeKey), Icons.EXPORT_16);
-    export.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
+    export.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutMask()));
     export.addActionListener(e -> item.exportAsset());
+    export.setEnabled(item.isIndividualActionsEnabled());
 
     JMenuItem delete = new JMenuItem(Resources.strings().get("contextmenu_resource_delete_" + typeKey), Icons.DELETE_16);
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     delete.addActionListener(e -> item.deleteAsset());
-    delete.setEnabled(!(origin instanceof Tileset));
+    delete.setEnabled(!(origin instanceof Tileset) && item.isIndividualActionsEnabled());
 
     add(add);
-    add(edit);
+    if (item.canEdit()) {
+      JMenuItem edit = new JMenuItem(Resources.strings().get("contextmenu_resource_edit_" + typeKey), Icons.PENCIL_16);
+      edit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
+      edit.addActionListener(e -> item.editAsset());
+      edit.setEnabled(item.isIndividualActionsEnabled());
+      add(edit);
+    }
     add(export);
     addSeparator();
     add(delete);
@@ -69,5 +73,13 @@ public final class AssetPanelItemPopupMenu extends JPopupMenu {
       return "animation";
     }
     return "asset";
+  }
+
+  private static int menuShortcutMask() {
+    try {
+      return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+    } catch (HeadlessException ignored) {
+      return InputEvent.CTRL_DOWN_MASK;
+    }
   }
 }

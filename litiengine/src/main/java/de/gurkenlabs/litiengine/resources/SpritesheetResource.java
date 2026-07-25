@@ -63,6 +63,24 @@ public class SpritesheetResource extends NamedResource implements Serializable {
     this.setKeyframes(Resources.spritesheets().getCustomKeyFrameDurations(sprite));
   }
 
+  public SpritesheetResource(SpritesheetResource original) {
+    this.width = original.width;
+    this.height = original.height;
+    this.imageformat = original.imageformat;
+    this.image = original.image;
+    this.keyframes = original.keyframes;
+    this.setName(original.getName());
+  }
+
+  public void copyFrom(SpritesheetResource original) {
+    this.width = original.width;
+    this.height = original.height;
+    this.imageformat = original.imageformat;
+    this.image = original.image;
+    this.keyframes = original.keyframes;
+    this.setName(original.getName());
+  }
+
   /**
    * Constructs a new SpritesheetResource from a BufferedImage.
    * <p>

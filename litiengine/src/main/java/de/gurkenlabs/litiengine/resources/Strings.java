@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -32,7 +31,6 @@ public final class Strings {
   private Charset charset = StandardCharsets.ISO_8859_1;
 
   Strings() {
-    Locale.setDefault(Locale.of("en", "US"));
   }
 
   /**
@@ -92,8 +90,9 @@ public final class Strings {
 
       String value = defaultBundle.getString(key);
 
-      String decodedValue =
-        this.charset.equals(StandardCharsets.ISO_8859_1) ? value : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
+      String decodedValue = this.charset.equals(StandardCharsets.ISO_8859_1) || this.charset.equals(StandardCharsets.UTF_8)
+        ? value
+        : new String(value.getBytes(StandardCharsets.ISO_8859_1), this.charset);
       if (args.length > 0) {
         return MessageFormat.format(decodedValue, args);
       }

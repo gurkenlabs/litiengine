@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
@@ -55,6 +56,33 @@ class LogHandlerTest {
 
     assertEquals(0, styledDocument.getLength());
     assertEquals(0, textPane.getCaretPosition());
+    assertEquals(0, logHandler.getWarningCount());
+    assertEquals(0, logHandler.getErrorCount());
+    assertNull(logHandler.getLatestErrorStack());
+  }
+
+  @Test
+  void tracksWarningsAndErrors() {
+    LogHandler logHandler = new LogHandler(new JTextPane());
+    int[] changes = {0};
+    logHandler.addChangeListener(() -> changes[0]++);
+
+    logHandler.publish(new LogRecord(Level.WARNING, "Warning"));
+    LogRecord error = new LogRecord(Level.SEVERE, "Error");
+    error.setThrown(new IllegalStateException("Broken"));
+    logHandler.publish(error);
+
+    assertEquals(1, logHandler.getWarningCount());
+    assertEquals(1, logHandler.getErrorCount());
+    assertTrue(logHandler.getLatestErrorStack().contains("IllegalStateException: Broken"));
+    assertEquals(2, changes[0]);
+
+    logHandler.flush();
+
+    assertEquals(0, logHandler.getWarningCount());
+    assertEquals(0, logHandler.getErrorCount());
+    assertNull(logHandler.getLatestErrorStack());
+    assertEquals(3, changes[0]);
   }
 
   @Test

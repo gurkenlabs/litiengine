@@ -11,9 +11,11 @@ import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
+import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.components.IconTreeListItem;
 import java.awt.Color;
 import java.awt.Component;
+import javax.swing.BorderFactory;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -31,6 +33,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
 
   public IconTreeListRenderer() {
     this.label = new JLabel();
+    this.label.setOpaque(true);
+    this.label.setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
   }
 
   @Override
@@ -45,18 +49,40 @@ public class IconTreeListRenderer implements TreeCellRenderer {
     this.label.setText(value.toString());
     if (value instanceof DefaultMutableTreeNode defaultMutableTreeNode
         && defaultMutableTreeNode.getUserObject()instanceof IconTreeListItem iconTreeListItem) {
-      this.label.setText(iconTreeListItem.toString());
+      Object userObj = iconTreeListItem.getUserObject();
+      this.label.setText(formatEntityLabel(userObj));
       if (iconTreeListItem.getIcon() != null) {
         this.label.setIcon(iconTreeListItem.getIcon());
-      } else if (iconTreeListItem.getUserObject()instanceof Prop prop) {
+      } else if (userObj instanceof Prop prop) {
         label.setIcon(getIcon(prop));
-      } else if (iconTreeListItem.getUserObject()instanceof Creature creature) {
+      } else if (userObj instanceof Creature creature) {
         label.setIcon(getIcon(creature));
-      } else if (iconTreeListItem.getUserObject()instanceof LightSource lightSource) {
+      } else if (userObj instanceof LightSource lightSource) {
         label.setIcon(getIcon(lightSource));
       }
     }
+    this.label.setBackground(selected ? Style.COLOR_SELECTION_INACTIVE : Style.COLOR_SURFACE);
+    this.label.setForeground(selected ? Style.COLOR_TEXT : Style.COLOR_TEXT);
     return label;
+  }
+
+  private static String formatEntityLabel(Object userObj) {
+    if (userObj instanceof de.gurkenlabs.litiengine.entities.Entity entity) {
+      String name = entity.getName();
+      int id = entity.getMapId();
+      if (name != null && !name.isEmpty()) {
+        return "<html>" + escapeHtml(name) + " <span style='color:#787898;font-size:10px'>#" + id + "</span></html>";
+      }
+      return entity.getClass().getSimpleName() + " (#" + id + ")";
+    }
+    if (userObj instanceof IconTreeListItem inner) {
+      return inner.toString();
+    }
+    return userObj.toString();
+  }
+
+  private static String escapeHtml(String s) {
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
   }
 
   private static Icon getIcon(Prop prop) {

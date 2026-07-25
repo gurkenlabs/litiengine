@@ -23,7 +23,11 @@ import javax.swing.table.TableCellRenderer;
 
 public class LayerTable extends JTable {
 
-  protected static final String[] columns = new String[] {"visible", "name", "objects", "color"};
+  protected static final String[] columns = new String[] {
+    Resources.strings().get("layerTable_visible"),
+    Resources.strings().get("layerTable_name"),
+    Resources.strings().get("layerTable_objects"),
+    Resources.strings().get("layerTable_color")};
 
   private static final TableCellEditor visibilityEditor =
       new DarkTableCellEditor(new JToggleButton());

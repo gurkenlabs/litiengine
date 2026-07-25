@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.ResourcesContainerListener;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.LayoutManager;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -32,7 +33,8 @@ public class SoundPanel extends PropertyPanel {
     this.loop = new JToggleButton();
     this.loop.putClientProperty(ToggleButtonConstants.KEY_VARIANT, ToggleButtonConstants.VARIANT_SLIDER);
     this.soundResource = new JComboBox<>();
-    this.play = new JButton(Resources.strings().get("panel_play_sound"), Icons.PLAY_16);
+    this.play = Style.iconButton(Icons.PLAY_16);
+    this.play.setToolTipText(Resources.strings().get("panel_play_sound"));
     this.play.addActionListener(
       l -> Game.audio().playSound((Sound) this.soundResource.getSelectedItem(), false, (int) this.range.getValue(), this.volume.getValue() / 50f));
     setLayout(this.createLayout());

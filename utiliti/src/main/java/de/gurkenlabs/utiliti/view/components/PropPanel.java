@@ -9,6 +9,9 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,6 +19,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class PropPanel extends PropertyPanel {
   private final JComboBox<JLabel> comboBoxSpriteSheets;
@@ -25,6 +29,7 @@ public class PropPanel extends PropertyPanel {
   private final JCheckBox checkBoxHorizontalFlip;
   private final JCheckBox checkBoxVerticalFlip;
   private final JCheckBox checkBoxScale;
+  private final SpriteAnimationPreview animationPreview;
 
   private boolean propsLoaded;
 
@@ -32,11 +37,12 @@ public class PropPanel extends PropertyPanel {
    * Create the panel.
    */
   public PropPanel() {
-    super("panel_prop", Icons.ENTITY_24);
+    super("panel_prop", Icons.PROP_24);
     Resources.images().addClearedListener(() -> this.propsLoaded = false);
 
-    this.comboBoxSpriteSheets = new JComboBox<>();
+    this.comboBoxSpriteSheets = new SearchableSpriteComboBox();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
+    this.animationPreview = new SpriteAnimationPreview();
 
     this.comboBoxMaterial = new JComboBox<>();
     this.comboBoxMaterial.setModel(
@@ -49,9 +55,16 @@ public class PropPanel extends PropertyPanel {
     this.checkBoxHorizontalFlip = new JCheckBox(Resources.strings().get("panel_flip_horizontal"));
     this.checkBoxVerticalFlip = new JCheckBox(Resources.strings().get("panel_flip_vertical"));
     this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
+    Resources.spritesheets().addClearedListener(this::clearSpriteCache);
 
     setLayout(this.createLayout());
     setupChangedListeners();
+    this.comboBoxSpriteSheets.addActionListener(e -> updateSpritePreview());
+  }
+
+  private void clearSpriteCache() {
+    this.propsLoaded = false;
+    this.comboBoxSpriteSheets.removeAllItems();
   }
 
   public static String getIdentifierBySpriteName(String spriteName) {
@@ -70,9 +83,6 @@ public class PropPanel extends PropertyPanel {
   @Override
   public void bind(IMapObject mapObject) {
     this.loadAvailableProps();
-    if (mapObject != null) {
-      setControlValues(mapObject);
-    }
     super.bind(mapObject);
   }
 
@@ -88,6 +98,7 @@ public class PropPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
+    updateSpritePreview();
 
     var material = Material.UNDEFINED;
     if(mapObject.hasCustomProperty(MapObjectProperty.PROP_MATERIAL)){
@@ -128,19 +139,46 @@ public class PropPanel extends PropertyPanel {
     this.propsLoaded = true;
   }
 
+  @Override
+  public void bindAll(java.util.List<IMapObject> mapObjects) {
+    this.loadAvailableProps();
+    super.bindAll(mapObjects);
+  }
+
+  int getSpriteItemCountForTest() {
+    return this.comboBoxSpriteSheets.getItemCount();
+  }
+
+  private static JPanel wrapCheckbox(JCheckBox cb) {
+    JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    p.setOpaque(false);
+    p.add(cb);
+    return p;
+  }
+
+  private void updateSpritePreview() {
+    String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
+    String source = name != null ? SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name) : null;
+    var spritesheet = source != null ? Resources.spritesheets().get(source) : null;
+    this.animationPreview.setSpritesheet(spritesheet, source);
+  }
+
   private LayoutManager createLayout() {
     LayoutItem[] layoutItems =
       new LayoutItem[] {
+        new LayoutItem(this.animationPreview, 140),
         new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
         new LayoutItem("panel_material", this.comboBoxMaterial),
         new LayoutItem("panel_rotation", this.comboBoxRotation),
       };
 
-    return this.createLayout(
-      layoutItems,
-      this.checkBoxScale,
-      this.chckbxShadow,
-      this.checkBoxHorizontalFlip,
-      this.checkBoxVerticalFlip);
+    JPanel checkboxGrid = new JPanel(new GridLayout(2, 2, 2, 0));
+    checkboxGrid.setOpaque(false);
+    checkboxGrid.add(wrapCheckbox(checkBoxScale));
+    checkboxGrid.add(wrapCheckbox(chckbxShadow));
+    checkboxGrid.add(wrapCheckbox(checkBoxHorizontalFlip));
+    checkboxGrid.add(wrapCheckbox(checkBoxVerticalFlip));
+
+    return this.createLayout(layoutItems, checkboxGrid);
   }
 }

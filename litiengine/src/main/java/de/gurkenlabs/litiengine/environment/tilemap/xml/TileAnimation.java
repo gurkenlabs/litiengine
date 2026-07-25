@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -15,38 +16,65 @@ public class TileAnimation implements ITileAnimation {
   @XmlElement(name = "frame", type = Frame.class)
   private List<ITileAnimationFrame> frames;
 
-  private transient int totalDuration;
+  public TileAnimation() {
+    this.frames = new ArrayList<>();
+  }
+
+  public TileAnimation(List<ITileAnimationFrame> frames) {
+    this.setFrames(frames);
+  }
 
   @Override
   public List<ITileAnimationFrame> getFrames() {
     return this.frames;
   }
 
-  @Override
-  public int getTotalDuration() {
-    if (this.totalDuration > 0) {
-      return this.totalDuration;
-    }
-
-    if (this.getFrames().isEmpty()) {
-      return 0;
-    }
-
-    for (ITileAnimationFrame frame : this.getFrames()) {
-      if (frame != null) {
-        this.totalDuration += frame.getDuration();
+  public void setFrames(List<ITileAnimationFrame> frames) {
+    this.frames = new ArrayList<>();
+    if (frames != null) {
+      for (ITileAnimationFrame frame : frames) {
+        if (frame != null) {
+          this.frames.add(new Frame(frame));
+        }
       }
     }
+  }
 
-    return this.totalDuration;
+  @Override
+  public int getTotalDuration() {
+    int totalDuration = 0;
+    for (ITileAnimationFrame frame : this.getFrames()) {
+      if (frame != null) {
+        totalDuration += frame.getDuration();
+      }
+    }
+    return totalDuration;
   }
 
   @Override
   public ITileAnimationFrame getCurrentFrame() {
-    long time = Game.time().sinceEnvironmentLoad() % this.getTotalDuration();
+    if (this.getFrames().isEmpty()) {
+      return null;
+    }
+    if (this.getTotalDuration() <= 0) {
+      return this.getFrames().getFirst();
+    }
+    return this.getFrameAt(Game.time().sinceEnvironmentLoad());
+  }
+
+  ITileAnimationFrame getFrameAt(long elapsed) {
+    int duration = this.getTotalDuration();
+    if (this.getFrames().isEmpty()) {
+      return null;
+    }
+    if (duration <= 0) {
+      return this.getFrames().getFirst();
+    }
+
+    long time = elapsed % duration;
     for (ITileAnimationFrame frame : this.getFrames()) {
       time -= frame.getDuration();
-      if (time <= 0) {
+      if (time < 0) {
         return frame;
       }
     }

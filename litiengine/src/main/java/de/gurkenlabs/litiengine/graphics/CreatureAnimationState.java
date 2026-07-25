@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.util.Locale;
+
 /**
  * Represents the different animation states for a creature in the game.
  *
@@ -29,7 +31,7 @@ public enum CreatureAnimationState {
    * <p>The sprite string is derived from the name of the state in lowercase.
    */
   CreatureAnimationState() {
-    this.spriteString = name().toLowerCase();
+    this.spriteString = name().toLowerCase(Locale.ROOT);
   }
 
   /**

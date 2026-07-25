@@ -17,7 +17,8 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -36,7 +37,7 @@ public final class LayerList extends JPanel implements LayerController {
   private static final Dimension ICON_SIZE = new Dimension(16, 16);
   private static final Dimension BUTTON_SIZE = new Dimension(28, 28);
 
-  private final Map<String, Integer> selectedLayers;
+  private final Map<IMap, Integer> selectedLayers;
   private final transient List<Consumer<IMap>> layerChangedListeners;
 
   private final LayerTable layerTable;
@@ -48,7 +49,7 @@ public final class LayerList extends JPanel implements LayerController {
     this.setName(Resources.strings().get("panel_mapObjectLayers"));
     this.setMinimumSize(new Dimension(260, 0));
 
-    this.selectedLayers = new ConcurrentHashMap<>();
+    this.selectedLayers = Collections.synchronizedMap(new IdentityHashMap<>());
     this.layerChangedListeners = new CopyOnWriteArrayList<>();
     this.layerTable = new LayerTable();
 
@@ -73,15 +74,15 @@ public final class LayerList extends JPanel implements LayerController {
                 return;
               }
 
-              selectedLayers.put(map.getName(), layerTable.getSelectedRow());
+               selectedLayers.put(map, layerTable.getSelectedRow());
             });
 
     Editor.instance()
         .getMapComponent()
         .onMapLoaded(
             map -> {
-              if (this.selectedLayers.containsKey(map.getName())) {
-                this.layerTable.select(this.selectedLayers.get(map.getName()));
+               if (this.selectedLayers.containsKey(map)) {
+                 this.layerTable.select(this.selectedLayers.get(map));
               }
             });
   }
@@ -119,12 +120,19 @@ public final class LayerList extends JPanel implements LayerController {
     box.add(Box.createHorizontalGlue());
 
     box.add(createAddLayerButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createRemoveLayerButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createDuplicateLayerButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createSetColorButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createRenameLayerButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createHideOtherLayersButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createMoveLayerUpButton());
+    box.add(Box.createHorizontalStrut(4));
     box.add(createMoveLayerDownButton());
 
     box.add(Box.createHorizontalGlue());
@@ -133,7 +141,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createAddLayerButton() {
     return createButton(
-      Icons.ADD_24,
+      Icons.ADD_16, Resources.strings().get("panel_addLayer"),
         (map, selectedLayer) -> {
           MapObjectLayer layer = new MapObjectLayer();
           layer.setName("new layer");
@@ -152,42 +160,40 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createRemoveLayerButton() {
     return createButton(
-      Icons.DELETE_24,
+      Icons.DELETE_16, Resources.strings().get("panel_removeLayer"),
         (map, selectedLayer) -> {
-          // we need at least on mapobject layer to work with LITIENGINE entities.
           if (map.getMapObjectLayers().size() <= 1) {
             return;
           }
 
-          if (JOptionPane.showConfirmDialog(
-              null,
-              Resources.strings().get("panel_confirmDeleteLayer"),
-              "",
-              JOptionPane.YES_NO_OPTION) != 0) {
-            return;
-          }
-
-          Editor.instance().getMapComponent().delete(selectedLayer);
+          UndoManager undoManager = UndoManager.forMap(map);
+          long deletionRevision = undoManager.getRevision() + 1;
           map.removeLayer(selectedLayer);
+          Editor.instance().getMapComponent().synchronizeEnvironmentEntities(map);
           this.layerTable.bind(map);
           Transform.updateAnchors();
+
+          Toast.show(
+              this.getRootPane(),
+              Resources.strings().get("panel_layerDeleted"),
+              () -> undoManager.undoIfRevision(deletionRevision));
         });
   }
 
   private JButton createDuplicateLayerButton() {
     return createButton(
-      Icons.COPY_24,
+      Icons.COPY_16, Resources.strings().get("panel_duplicateLayer"),
         (map, selectedLayer) -> {
           IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) selectedLayer);
           map.addLayer(getAbsoluteIndex(map, this.layerTable.getSelectedRow()), copiedLayer);
           this.refresh();
-          Editor.instance().getMapComponent().add(copiedLayer);
+          Editor.instance().getMapComponent().synchronizeEnvironmentEntities(map);
         });
   }
 
   private JButton createSetColorButton() {
     return createButton(
-      Icons.COLOR_24,
+      Icons.COLOR_16, Resources.strings().get("panel_selectLayerColor"),
         (map, selectedLayer) -> {
           Color newColor =
               JColorChooser.showDialog(
@@ -203,7 +209,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createRenameLayerButton() {
     return createButton(
-      Icons.RENAME_24,
+      Icons.RENAME_16, Resources.strings().get("panel_renameLayer"),
         (map, selectedLayer) -> {
           String newLayerName =
               JOptionPane.showInputDialog(
@@ -218,7 +224,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createHideOtherLayersButton() {
     return createButton(
-      Icons.HIDEOTHER_24,
+      Icons.HIDEOTHER_16, Resources.strings().get("panel_hideOtherLayers"),
         (map, selectedLayer) -> {
           for (int i = 0; i < map.getMapObjectLayers().size(); i++) {
             if (i != this.layerTable.getSelectedRow()) {
@@ -235,7 +241,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createMoveLayerUpButton() {
     return createButton(
-      Icons.LIFT_24,
+      Icons.LIFT_16, Resources.strings().get("panel_moveLayerUp"),
         (map, selectedLayer) -> {
           final int selLayerIndex = this.layerTable.getSelectedRow();
           if (selLayerIndex < 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
@@ -250,7 +256,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createMoveLayerDownButton() {
     return createButton(
-      Icons.LOWER_24,
+      Icons.LOWER_16, Resources.strings().get("panel_moveLayerDown"),
         (map, selectedLayer) -> {
           int selLayerIndex = this.layerTable.getSelectedRow();
           if (selLayerIndex <= 0 || selLayerIndex >= map.getMapObjectLayers().size()) {
@@ -294,8 +300,8 @@ public final class LayerList extends JPanel implements LayerController {
       IMap map = getCurrentMap();
       this.layerTable.bind(map);
 
-      if (map != null && this.selectedLayers.containsKey(map.getName())) {
-        this.layerTable.select(this.selectedLayers.get(map.getName()));
+      if (map != null && this.selectedLayers.containsKey(map)) {
+        this.layerTable.select(this.selectedLayers.get(map));
       }
     } finally {
       this.refreshing = false;
@@ -307,14 +313,15 @@ public final class LayerList extends JPanel implements LayerController {
     this.layerChangedListeners.add(consumer);
   }
 
-  private JButton createButton(Icon icon, BiConsumer<IMap, IMapObjectLayer> consumer) {
-    return createButton(icon, consumer, true);
+  private JButton createButton(Icon icon, String tooltip, BiConsumer<IMap, IMapObjectLayer> consumer) {
+    return createButton(icon, tooltip, consumer, true);
   }
 
-  private JButton createButton(Icon icon, BiConsumer<IMap, IMapObjectLayer> consumer,
+  private JButton createButton(Icon icon, String tooltip, BiConsumer<IMap, IMapObjectLayer> consumer,
       boolean requireLayer) {
     JButton button = new JButton();
     button.setIcon(icon);
+    button.setToolTipText(tooltip);
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setPreferredSize(BUTTON_SIZE);
     button.setMinimumSize(BUTTON_SIZE);
@@ -333,9 +340,13 @@ public final class LayerList extends JPanel implements LayerController {
             return;
           }
 
+          UndoManager undoManager = UndoManager.instance();
+          undoManager.layerStructureChanging(currentMap);
+          undoManager.layersChanging(currentMap);
           consumer.accept(currentMap, layer);
+          undoManager.layersChanged(currentMap);
+          undoManager.layerStructureChanged(currentMap);
           this.refresh();
-          UndoManager.instance().recordChanges();
           for (Consumer<IMap> c : this.layerChangedListeners) {
             c.accept(getCurrentMap());
           }

@@ -24,6 +24,7 @@ public final class ColorHelper {
    * <ul>
    * <li>#RRGGBB - For colors without alpha
    * <li>#AARRGGBB - For colors with alpha
+   * <li>#RRGGBB|A - Legacy format with decimal alpha
    * </ul>
    * <p>
    * Examples: <br>
@@ -105,6 +106,13 @@ public final class ColorHelper {
       return null;
     }
 
+    if (colorHexString.indexOf('|') >= 0) {
+      colorHexString = normalizeLegacyAlpha(colorHexString);
+      if (colorHexString == null) {
+        return null;
+      }
+    }
+
     if (!colorHexString.startsWith("#")) {
       if (colorHexString.length() == HEX_STRING_LENGTH - 1 || colorHexString.length() == HEX_STRING_LENGTH_ALPHA - 1) {
         colorHexString = "#" + colorHexString;
@@ -124,6 +132,29 @@ public final class ColorHelper {
         yield null;
       }
     };
+  }
+
+  private static String normalizeLegacyAlpha(String colorString) {
+    int separator = colorString.indexOf('|');
+    String rgb = colorString.substring(0, separator);
+    String alpha = colorString.substring(separator + 1);
+    if (rgb.startsWith("#")) {
+      rgb = rgb.substring(1);
+    }
+    if (rgb.length() != 6 || !rgb.matches("[0-9a-fA-F]{6}")) {
+      log.log(Level.SEVERE, "Could not parse legacy color string \"{0}\". Expected #RRGGBB|A.", colorString);
+      return null;
+    }
+    try {
+      int alphaValue = Integer.parseInt(alpha);
+      if (alphaValue < 0 || alphaValue > MAX_RGB_VALUE) {
+        throw new NumberFormatException("Alpha must be between 0 and 255.");
+      }
+      return String.format("#%02x%s", alphaValue, rgb);
+    } catch (NumberFormatException e) {
+      log.log(Level.SEVERE, "Could not parse legacy color string \"{0}\". Decimal alpha must be between 0 and 255.", colorString);
+      return null;
+    }
   }
 
   /**

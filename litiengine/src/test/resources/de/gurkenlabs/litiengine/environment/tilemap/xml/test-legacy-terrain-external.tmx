@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" width="1" height="1" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" source="test-legacy-terrain.tsx"/>
+ <layer name="ground" width="1" height="1"><data encoding="csv">1</data></layer>
+</map>

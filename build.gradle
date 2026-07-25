@@ -11,9 +11,25 @@ plugins {
 
 group = gurkenlabs_group
 
-java {
-  toolchain {
-    languageVersion = JavaLanguageVersion.of(25)
+def javaLanguageVersion = JavaLanguageVersion.of(25)
+def javaVersion = JavaVersion.VERSION_25
+
+allprojects {
+  plugins.withType(JavaPlugin).configureEach {
+    java {
+      toolchain {
+        languageVersion = javaLanguageVersion
+      }
+      sourceCompatibility = javaVersion
+      targetCompatibility = javaVersion
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+      options.release = 25
+    }
+
+    tasks.withType(Test).configureEach {
+      jvmArgs "--enable-native-access=ALL-UNNAMED"
+    }
   }
-  targetCompatibility = JavaVersion.VERSION_17
 }
