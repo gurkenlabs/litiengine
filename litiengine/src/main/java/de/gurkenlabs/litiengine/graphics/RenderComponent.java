@@ -122,9 +122,18 @@ public class RenderComponent extends Canvas {
   public static void configurePipeline() {
     var pipeline = Game.config().graphics().getJava2DPipeline();
     switch (pipeline) {
-      case OPENGL -> System.setProperty("sun.java2d.opengl", "true");
-      case DIRECT3D -> System.setProperty("sun.java2d.d3d", "true");
-      case SOFTWARE -> System.setProperty("sun.java2d.pmoffscreen", "false");
+      case OPENGL -> {
+        System.setProperty("sun.java2d.d3d", "false");
+        System.setProperty("sun.java2d.opengl", "true");
+      }
+      case DIRECT3D -> {
+        System.setProperty("sun.java2d.opengl", "false");
+        System.setProperty("sun.java2d.d3d", "true");
+      }
+      case SOFTWARE -> {
+        System.setProperty("sun.java2d.opengl", "false");
+        System.setProperty("sun.java2d.d3d", "false");
+      }
       case DEFAULT -> { /* leave all sun.java2d.* properties at defaults */ }
     }
   }

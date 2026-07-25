@@ -30,7 +30,7 @@ public enum Java2DPipeline {
   DIRECT3D,
 
   /**
-   * Force software rendering by disabling pixel-buffer objects.
+   * Force software rendering by disabling the OpenGL and Direct3D pipelines.
    * Use this if hardware acceleration causes rendering glitches.
    */
   SOFTWARE

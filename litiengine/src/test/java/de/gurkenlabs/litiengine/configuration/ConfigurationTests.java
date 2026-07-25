@@ -95,6 +95,23 @@ class ConfigurationTests {
     assertArrayEquals(new String[] {"test", "testicle"}, configGroup.getTestStringArray());
   }
 
+  @Test
+  void testGraphicPipelineRoundTrip() throws IOException {
+    Path path = Files.createTempFile("litiengine-graphics", ".properties");
+    try {
+      GraphicConfiguration savedGraphics = new GraphicConfiguration();
+      savedGraphics.setJava2DPipeline(Java2DPipeline.DIRECT3D);
+      new Configuration(path, savedGraphics).save();
+
+      GraphicConfiguration loadedGraphics = new GraphicConfiguration();
+      new Configuration(path, loadedGraphics).load();
+
+      assertEquals(Java2DPipeline.DIRECT3D, loadedGraphics.getJava2DPipeline());
+    } finally {
+      Files.deleteIfExists(path);
+    }
+  }
+
   private enum TEST {
     TEST1,
     TEST2;
