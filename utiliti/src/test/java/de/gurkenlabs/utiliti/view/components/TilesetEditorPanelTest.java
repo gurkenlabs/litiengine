@@ -240,6 +240,49 @@ class TilesetEditorPanelTest {
   }
 
   @Test
+  void terrainProbabilitySliderUpdatesSelectedTerrain() throws Exception {
+    Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset);
+    panel.addTerrainSetForTest();
+    panel.addTerrainForTest();
+
+    panel.setTerrainProbabilitySliderForTest(0.25);
+
+    WangSet terrainSet = (WangSet) tileset.getTerrainSets().getFirst();
+    assertEquals(0.25, terrainSet.getTerrains().getFirst().getProbability(), 0.0001);
+  }
+
+  @Test
+  void terrainSetDuplicationPreservesTerrainAssignments() throws Exception {
+    Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset);
+    panel.addTerrainSetForTest();
+    panel.addTerrainForTest();
+    panel.assignTerrainSlotForTest(0);
+
+    panel.duplicateTerrainSetForTest();
+
+    assertEquals(2, tileset.getTerrainSets().size());
+    WangSet copy = (WangSet) tileset.getTerrainSets().getLast();
+    assertEquals(1, copy.getWangTiles().getFirst().getWangId()[0]);
+  }
+
+  @Test
+  void terrainAssignmentCellsKeepDirectionLabels() throws Exception {
+    Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset);
+    panel.addTerrainSetForTest();
+    panel.addTerrainForTest();
+
+    panel.assignTerrainSlotForTest(0);
+
+    assertEquals("N", panel.getTerrainSlotTextForTest(0));
+  }
+
+  @Test
   void terrainTypeUpdatesTerrainSetAndAllowsCornerAssignment() throws Exception {
     Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
     TilesetEditorPanel panel = new TilesetEditorPanel();

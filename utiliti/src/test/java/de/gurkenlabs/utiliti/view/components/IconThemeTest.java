@@ -31,6 +31,21 @@ class IconThemeTest {
     }
   }
 
+  @Test
+  void blueprintResourceIconUpdatesWhenThemeChanges() {
+    Style.Theme original = Editor.preferences().getTheme();
+    Icon icon = Icons.ASSET_BLUEPRINT_16;
+    try {
+      UI.setTheme(Style.Theme.DARK);
+      assertEquals(new Color(0xE5E7EB), foregroundColor(icon));
+
+      UI.setTheme(Style.Theme.LIGHT);
+      assertEquals(new Color(0x4B5563), foregroundColor(icon));
+    } finally {
+      UI.setTheme(original);
+    }
+  }
+
   private static Color foregroundColor(Icon icon) {
     BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
     Graphics2D graphics = image.createGraphics();

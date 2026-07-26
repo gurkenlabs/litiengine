@@ -464,15 +464,17 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
           return;
         }
 
-        if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !node.isSection()) {
-          if (node.isLayer() && visibilityActionBounds(selRow).contains(e.getPoint())) {
-            toggleLayerVisibility(node);
-            return;
+        boolean visibilityAction = node.isLayer() && visibilityActionBounds(selRow).contains(e.getPoint());
+        boolean miscAction = !node.isMap() && miscActionBounds(selRow).contains(e.getPoint());
+        if (visibilityAction || miscAction) {
+          if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !node.isSection()) {
+            if (visibilityAction) {
+              toggleLayerVisibility(node);
+            } else {
+              showRowActionMenu(e, node);
+            }
           }
-          if (!node.isMap() && miscActionBounds(selRow).contains(e.getPoint())) {
-            showRowActionMenu(e, node);
-            return;
-          }
+          return;
         }
 
         if (e.getClickCount() == 2) {
@@ -1179,6 +1181,60 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     return this.selectedLayers.containsKey(map) || this.expandedLayers.containsKey(map);
   }
 
+  void setLayerExpandedForTest(ILayer layer, boolean expanded) {
+    DefaultMutableTreeNode node = findLayerNode(layer);
+    if (node == null) {
+      return;
+    }
+    TreePath path = new TreePath(node.getPath());
+    if (expanded) {
+      this.tree.expandPath(path);
+    } else {
+      this.tree.collapsePath(path);
+    }
+  }
+
+  boolean isLayerExpandedForTest(ILayer layer) {
+    DefaultMutableTreeNode node = findLayerNode(layer);
+    return node != null && this.tree.isExpanded(new TreePath(node.getPath()));
+  }
+
+  void toggleLayerVisibilityForTest(ILayer layer) {
+    DefaultMutableTreeNode node = findLayerNode(layer);
+    if (node != null && node.getUserObject() instanceof SceneNode sceneNode) {
+      toggleLayerVisibility(sceneNode);
+    }
+  }
+
+  void doubleClickRowActionForTest(ILayer layer, boolean visibilityAction) {
+    DefaultMutableTreeNode node = findLayerNode(layer);
+    if (node == null) {
+      return;
+    }
+    int row = this.tree.getRowForPath(new TreePath(node.getPath()));
+    if (row < 0) {
+      throw new AssertionError("Layer is not visible in the scene tree");
+    }
+    Rectangle bounds = visibilityAction ? visibilityActionBounds(row) : miscActionBounds(row);
+    MouseEvent event = new MouseEvent(
+        this.tree,
+        MouseEvent.MOUSE_CLICKED,
+        System.currentTimeMillis(),
+        0,
+        bounds.x + bounds.width / 2,
+        bounds.y + bounds.height / 2,
+        2,
+        false,
+        MouseEvent.BUTTON1);
+    for (MouseListener listener : this.tree.getMouseListeners()) {
+      listener.mouseClicked(event);
+    }
+  }
+
+  boolean isRenamingForTest() {
+    return this.renamedNode != null;
+  }
+
   static boolean moveMapObjectsForTest(
       List<IMapObject> objects, IMapObjectLayer targetLayer, int targetIndex) {
     return SceneTransferHandler.moveMapObjects(objects, targetLayer, targetIndex);
@@ -1657,7 +1713,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   private void restoreExpansionState(IMap map) {
     java.util.Set<Integer> expanded = this.expandedLayers.get(map);
-    if (expanded == null || expanded.isEmpty()) {
+    if (expanded == null) {
       expandAllRows();
       saveExpansionState(map);
       return;
@@ -1798,22 +1854,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     tree.scrollRectToVisible(new Rectangle(0, bounds.y, 1, bounds.height));
   }
 
-  private void showContextMenu(MouseEvent e) {
-    TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-    if (path == null) {
-      return;
-    }
-    Object last = path.getLastPathComponent();
-    if (!(last instanceof DefaultMutableTreeNode dmtn)) {
-      return;
-    }
-    if (!(dmtn.getUserObject() instanceof SceneNode node)) {
-      return;
-    }
-    if (!node.isLayer()) {
-      return;
-    }
-
+  private void showContextMenu(MouseEvent e, SceneNode node) {
     JPopupMenu popup = new JPopupMenu();
     String toggleLabel = Resources.strings().get(
         node.isVisible() ? "scenegraph_hide_layer" : "scenegraph_show_layer");
@@ -1828,7 +1869,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
 
   private void showRowActionMenu(MouseEvent e, SceneNode node) {
     if (node.isLayer()) {
-      showContextMenu(e);
+      showContextMenu(e, node);
     } else if (node.getMapObject() != null) {
       showMapObjectMenu(e, node.getMapObject());
     }
@@ -1896,8 +1937,12 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     this.renamedNode = node;
     this.renameField.setText(node.isMap() ? node.getMap().getName() : node.isLayer() ? node.getLayer().getName() : node.getMapObject().getName());
     Rectangle visible = this.tree.getVisibleRect();
-    int nameX = bounds.x + 26;
-    int nameWidth = Math.max(1, visible.x + visible.width - nameX - 36);
+    int nameX = bounds.x + 24;
+    int actionInset = ROW_ACTION_RIGHT_INSET + ROW_ACTION_SIZE + 6;
+    if (node.isLayer()) {
+      actionInset += ROW_ACTION_GAP + ROW_ACTION_SIZE;
+    }
+    int nameWidth = Math.max(1, visible.x + visible.width - nameX - actionInset);
     this.renameField.setBounds(nameX, bounds.y + 2, nameWidth, Math.max(1, bounds.height - 4));
     this.tree.add(this.renameField);
     this.tree.setComponentZOrder(this.renameField, 0);
@@ -2096,7 +2141,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     setLayerVisibility(map, node.getLayer());
     undoManager.layersChanged(map);
     Transform.updateAnchors();
-    refresh();
+    repaintLayerVisibility();
     fireLayerChanged();
   }
 
@@ -2190,7 +2235,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     undoManager.layersChanging(map);
     node.getLayer().setVisible(!node.getLayer().isVisible());
     undoManager.layersChanged(map);
-    refresh();
+    repaintLayerVisibility();
     fireLayerChanged();
   }
 
@@ -2203,8 +2248,12 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     undoManager.layersChanging(map);
     setAllLayersVisible(map, visible);
     undoManager.layersChanged(map);
-    refresh();
+    repaintLayerVisibility();
     fireLayerChanged();
+  }
+
+  private void repaintLayerVisibility() {
+    this.tree.repaint();
     updateLayerCommandState();
   }
 
