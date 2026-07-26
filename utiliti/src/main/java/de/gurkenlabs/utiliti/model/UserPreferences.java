@@ -20,6 +20,8 @@ public class UserPreferences extends ConfigurationGroup {
   public static final float UI_SCALE_MIN = 0.5f;
   public static final int EDITOR_FONT_SIZE_MIN = 8;
   public static final int EDITOR_FONT_SIZE_MAX = 32;
+  public static final int EDITOR_FPS_CAP_MIN = 1;
+  public static final int EDITOR_FPS_CAP_MAX = 1000;
 
   private float zoom;
   private boolean showGrid;
@@ -58,6 +60,7 @@ public class UserPreferences extends ConfigurationGroup {
   private boolean reopenLastProject;
   private String editorFontFamily;
   private int editorFontSize;
+  private int editorFpsCap;
   private int settingsDialogX;
   private int settingsDialogY;
 
@@ -86,6 +89,7 @@ public class UserPreferences extends ConfigurationGroup {
     this.reopenLastProject = true;
     this.editorFontFamily = "Roboto";
     this.editorFontSize = 12;
+    this.editorFpsCap = 60;
     this.settingsDialogX = Integer.MIN_VALUE;
     this.settingsDialogY = Integer.MIN_VALUE;
   }
@@ -170,6 +174,14 @@ public class UserPreferences extends ConfigurationGroup {
 
   public void setEditorFontSize(int editorFontSize) {
     this.editorFontSize = Math.clamp(editorFontSize, EDITOR_FONT_SIZE_MIN, EDITOR_FONT_SIZE_MAX);
+  }
+
+  public int getEditorFpsCap() {
+    return Math.clamp(this.editorFpsCap, EDITOR_FPS_CAP_MIN, EDITOR_FPS_CAP_MAX);
+  }
+
+  public void setEditorFpsCap(int editorFpsCap) {
+    this.editorFpsCap = Math.clamp(editorFpsCap, EDITOR_FPS_CAP_MIN, EDITOR_FPS_CAP_MAX);
   }
 
   public int getSettingsDialogX() {

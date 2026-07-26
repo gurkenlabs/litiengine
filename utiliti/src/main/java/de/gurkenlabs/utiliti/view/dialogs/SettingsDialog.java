@@ -100,6 +100,7 @@ public final class SettingsDialog extends JDialog {
   private final JLabel editorFontPreview;
   private JPanel uiPreview;
   private final JCheckBox reopenLastProject;
+  private final JSpinner editorFpsCap;
   private final JSpinner gridLineWidth;
   private final JSpinner snapDivision;
   private final JButton gridColorButton;
@@ -164,6 +165,11 @@ public final class SettingsDialog extends JDialog {
     this.editorFontSize.getAccessibleContext().setAccessibleDescription(text("settings_editor_font_description"));
     this.reopenLastProject = new JCheckBox(
         text("settings_reopen_last_project"), this.preferences.reopenLastProject());
+    this.editorFpsCap = new JSpinner(new SpinnerNumberModel(
+        this.preferences.getEditorFpsCap(),
+        UserPreferences.EDITOR_FPS_CAP_MIN,
+        UserPreferences.EDITOR_FPS_CAP_MAX, 1));
+    ControlBehavior.apply(this.editorFpsCap);
     this.gridLineWidth = new JSpinner(new SpinnerNumberModel(
         (double) this.preferences.getGridLineWidth(), 1.0, 5.0, 0.1));
     ControlBehavior.apply(this.gridLineWidth);
@@ -369,6 +375,12 @@ public final class SettingsDialog extends JDialog {
         text("settings_reopen_last_project"),
         text("settings_reopen_last_project_description"),
         this.reopenLastProject));
+    body.add(rowSeparator());
+    body.add(settingRow(
+        Icons.SETTINGS_DISPLAY_24,
+        text("settings_editor_fps_cap"),
+        text("settings_editor_fps_cap_description"),
+        this.editorFpsCap));
     panel.add(topAligned(body), BorderLayout.CENTER);
     return panel;
   }
@@ -558,6 +570,10 @@ public final class SettingsDialog extends JDialog {
     this.preferences.setEditorFontFamily(fontFamily);
     this.preferences.setEditorFontSize(fontSize);
     this.preferences.setReopenLastProject(this.reopenLastProject.isSelected());
+    int fpsCap = ((Number) this.editorFpsCap.getValue()).intValue();
+    this.preferences.setEditorFpsCap(fpsCap);
+    Game.config().client().setMaxFps(fpsCap);
+    Game.loop().setTickRate(fpsCap);
     this.preferences.setGridLineWidth(((Number) this.gridLineWidth.getValue()).floatValue());
     this.preferences.setGridColor(ColorHelper.encode(this.gridColor));
     this.preferences.setSnapDivision(((Number) this.snapDivision.getValue()).intValue());
@@ -609,6 +625,7 @@ public final class SettingsDialog extends JDialog {
     this.editorFontFamily.setSelectedItem(defaults.getEditorFontFamily());
     this.editorFontSize.setValue(defaults.getEditorFontSize());
     this.reopenLastProject.setSelected(defaults.reopenLastProject());
+    this.editorFpsCap.setValue(defaults.getEditorFpsCap());
     this.gridLineWidth.setValue((double) defaults.getGridLineWidth());
     this.snapDivision.setValue(defaults.getSnapDivision());
     this.gridColor = defaults.getGridColor();
