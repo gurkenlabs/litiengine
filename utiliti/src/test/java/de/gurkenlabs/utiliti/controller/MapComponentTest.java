@@ -164,6 +164,16 @@ class MapComponentTest {
   }
 
   @Test
+  void onlyPrimaryButtonDragsCanTransformMapObjects() {
+    MouseEvent event = mock(MouseEvent.class);
+    when(event.getModifiersEx()).thenReturn(InputEvent.BUTTON1_DOWN_MASK);
+    assertTrue(MapComponent.isPrimaryButtonDown(event));
+
+    when(event.getModifiersEx()).thenReturn(InputEvent.BUTTON3_DOWN_MASK | InputEvent.ALT_DOWN_MASK);
+    assertTrue(!MapComponent.isPrimaryButtonDown(event));
+  }
+
+  @Test
   void altArrowDoesNotTransformMapObjects() {
     assertTrue(MapComponent.shouldHandleArrowTransform(0));
     assertTrue(!MapComponent.shouldHandleArrowTransform(InputEvent.ALT_DOWN_MASK));
@@ -178,6 +188,33 @@ class MapComponentTest {
     map.addLayer(group);
 
     assertTrue(MapComponent.containsLayer(map, child));
+  }
+
+  @Test
+  void findsOverlappingVisibleMapObjectsAtLocation() {
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    MapObject first = mapObject(1, 0, 0, 10, 10);
+    MapObject second = mapObject(2, 5, 5, 10, 10);
+    MapObject outside = mapObject(3, 20, 20, 10, 10);
+    MapObjectLayer layer = new MapObjectLayer();
+    layer.addMapObject(first);
+    layer.addMapObject(second);
+    layer.addMapObject(outside);
+    map.addLayer(layer);
+
+    assertEquals(List.of(first, second), MapComponent.mapObjectsAt(map, new Point2D.Double(7, 7)));
+  }
+
+  @Test
+  void excludesObjectsOnHiddenLayersAtLocation() {
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    MapObject mapObject = mapObject(1, 0, 0, 10, 10);
+    MapObjectLayer layer = new MapObjectLayer();
+    layer.addMapObject(mapObject);
+    layer.setVisible(false);
+    map.addLayer(layer);
+
+    assertTrue(MapComponent.mapObjectsAt(map, new Point2D.Double(5, 5)).isEmpty());
   }
 
   @Test
@@ -219,5 +256,16 @@ class MapComponentTest {
     layer.addMapObject(object);
     map.addLayer(layer);
     return map;
+  }
+
+  private static MapObject mapObject(int id, float x, float y, float width, float height) {
+    MapObject mapObject = new MapObject();
+    mapObject.setId(id);
+    mapObject.setType(MapObjectType.PROP.name());
+    mapObject.setX(x);
+    mapObject.setY(y);
+    mapObject.setWidth(width);
+    mapObject.setHeight(height);
+    return mapObject;
   }
 }
