@@ -512,6 +512,39 @@ public class MapComponent extends GuiComponent {
       canvasLocation.getY() / renderScale));
   }
 
+  public List<IMapObject> getMapObjectsAt(Point2D canvasLocation) {
+    if (canvasLocation == null || mapIsNull() || Game.world().camera() == null) {
+      return List.of();
+    }
+
+    return mapObjectsAt(
+      Game.world().environment().getMap(),
+      toMapLocation(canvasLocation, Game.world().camera()));
+  }
+
+  static List<IMapObject> mapObjectsAt(IMap map, Point2D location) {
+    if (map == null || location == null) {
+      return List.of();
+    }
+
+    Rectangle2D point = new Rectangle2D.Double(location.getX(), location.getY(), 0, 0);
+    List<IMapObject> matches = new ArrayList<>();
+    for (IMapObjectLayer layer : map.getMapObjectLayers()) {
+      if (layer == null || !isLayerEffectivelyVisible(map, layer)) {
+        continue;
+      }
+
+      for (IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject != null
+          && MapObjectType.get(mapObject.getType()) != null
+          && GeometricUtilities.intersects(point, mapObject.getBoundingBox())) {
+          matches.add(mapObject);
+        }
+      }
+    }
+    return matches;
+  }
+
   public boolean addMapObjectFromAsset(Object asset, Point2D location) {
     if (asset == null || location == null || UI.getLayerController() == null
       || UI.getLayerController().getCurrentLayer() == null) {
@@ -928,6 +961,9 @@ public class MapComponent extends GuiComponent {
       final IMapObject currentFocus = getFocusedMapObject();
       if (mapObject != null && mapObject.equals(currentFocus)
         || mapObject == null && currentFocus == null) {
+        if (mapObject != null) {
+          this.setSelection(mapObject, clearSelection);
+        }
         return;
       }
 
@@ -1856,6 +1892,9 @@ public class MapComponent extends GuiComponent {
       active.mouseDragged(e);
       return;
     }
+    if (e == null || e.getEvent() == null || !isPrimaryButtonDown(e.getEvent())) {
+      return;
+    }
     if (!this.hasFocus() || mapIsNull()) {
       return;
     }
@@ -1888,6 +1927,10 @@ public class MapComponent extends GuiComponent {
       default -> {
       }
     }
+  }
+
+  static boolean isPrimaryButtonDown(MouseEvent event) {
+    return event != null && (event.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) != 0;
   }
 
   void handleMouseReleased(ComponentMouseEvent e) {

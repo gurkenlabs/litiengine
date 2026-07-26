@@ -7,7 +7,9 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
@@ -47,6 +49,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.KeyboardFocusManager;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.dnd.DnDConstants;
@@ -77,6 +80,7 @@ import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -99,6 +103,10 @@ public final class UI {
 
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static JPopupMenu canvasPopup;
+  private static JPopupMenu objectSelectionPopup;
+  private static Canvas objectSelectionPopupInvoker;
+  private static int objectSelectionPopupX;
+  private static int objectSelectionPopupY;
   private static AssetList assetComponent;
 
   private static MapObjectInspector mapObjectPanel;
@@ -942,22 +950,67 @@ public final class UI {
   private static void initPopupMenu(Canvas canvas) {
     canvasPopup = new CanvasPopupMenu();
     addOrphanComponent(canvasPopup);
+    objectSelectionPopup = new JPopupMenu();
+    addOrphanComponent(objectSelectionPopup);
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(event -> {
+      if (event.getID() == KeyEvent.KEY_RELEASED
+        && event.getKeyCode() == KeyEvent.VK_ALT
+        && objectSelectionPopup.isVisible()) {
+        SwingUtilities.invokeLater(() -> {
+          if (!objectSelectionPopup.isVisible() && objectSelectionPopupInvoker != null) {
+            objectSelectionPopup.show(
+              objectSelectionPopupInvoker, objectSelectionPopupX, objectSelectionPopupY);
+          }
+        });
+      }
+      return false;
+    });
 
     canvas.addMouseListener(new MouseAdapter() {
       @Override public void mousePressed(MouseEvent e) {
-        if (e.isPopupTrigger()) {
-          Editor.instance().getMapComponent().setTransformMode(TransformMode.NONE);
-          canvasPopup.show(canvas, e.getX(), e.getY());
-        }
+        showCanvasPopup(canvas, e);
       }
 
       @Override public void mouseReleased(MouseEvent e) {
-        if (e.isPopupTrigger()) {
-          Editor.instance().getMapComponent().setTransformMode(TransformMode.NONE);
-          canvasPopup.show(canvas, e.getX(), e.getY());
-        }
+        showCanvasPopup(canvas, e);
       }
     });
+  }
+
+  private static void showCanvasPopup(Canvas canvas, MouseEvent event) {
+    if (!event.isPopupTrigger()) {
+      return;
+    }
+
+    var mapComponent = Editor.instance().getMapComponent();
+    mapComponent.setTransformMode(TransformMode.NONE);
+    if (!event.isAltDown()) {
+      canvasPopup.show(canvas, event.getX(), event.getY());
+      return;
+    }
+
+    List<IMapObject> mapObjects = mapComponent.getMapObjectsAt(event.getPoint());
+    if (mapObjects.size() == 1) {
+      mapComponent.setFocus(mapObjects.getFirst(), true);
+    } else if (mapObjects.size() > 1) {
+      objectSelectionPopup.removeAll();
+      for (IMapObject mapObject : mapObjects) {
+        MapObjectType type = MapObjectType.get(mapObject.getType());
+        String name = mapObject.getName() == null || mapObject.getName().isBlank()
+          ? type.name() : mapObject.getName();
+        JMenuItem item = new JMenuItem(name + " (#" + mapObject.getId() + ")", Icons.forMapObjectType(type));
+        item.addActionListener(e -> {
+          objectSelectionPopupInvoker = null;
+          mapComponent.setFocus(mapObject, true);
+        });
+        objectSelectionPopup.add(item);
+      }
+      objectSelectionPopupInvoker = canvas;
+      objectSelectionPopupX = event.getX();
+      objectSelectionPopupY = event.getY();
+      objectSelectionPopup.show(canvas, event.getX(), event.getY());
+    }
+    event.consume();
   }
 
   public static void initLookAndFeel() {
