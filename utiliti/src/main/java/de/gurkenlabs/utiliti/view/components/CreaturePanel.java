@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 public class CreaturePanel extends PropertyPanel {
   public static final String WALK_SPRITE_TOKEN = "walk";
   private final JComboBox<JLabel> comboBoxSpriteSheets;
+  private final JComboBox<JLabel> comboBoxAnimations;
   private final JComboBox<Direction> comboBoxDirection;
   private final JCheckBox checkBoxScale;
   private final JCheckBox checkBoxStartDead;
@@ -42,6 +43,8 @@ public class CreaturePanel extends PropertyPanel {
     super("panel_creature", Icons.CREATURE_16);
     this.comboBoxSpriteSheets = new SearchableSpriteComboBox();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
+    this.comboBoxAnimations = new JComboBox<>();
+    this.comboBoxAnimations.setRenderer(new LabelListCellRenderer());
     this.animationPreview = new SpriteAnimationPreview(editAction);
 
     this.comboBoxDirection = new JComboBox<>();
@@ -52,10 +55,11 @@ public class CreaturePanel extends PropertyPanel {
 
     setLayout(this.createLayout());
     setupChangedListeners();
-    this.comboBoxSpriteSheets.addActionListener(e -> updateSpritePreview());
+    this.comboBoxSpriteSheets.addActionListener(e -> refreshAnimationChoices());
+    this.comboBoxAnimations.addActionListener(e -> updateSpritePreview());
     this.comboBoxDirection.addActionListener(
-        e -> SwingUtilities.invokeLater(this::updateSpritePreview));
-    this.checkBoxStartDead.addActionListener(e -> updateSpritePreview());
+        e -> SwingUtilities.invokeLater(this::refreshAnimationChoices));
+    this.checkBoxStartDead.addActionListener(e -> refreshAnimationChoices());
 
     // if images are cleared (e.g. resource reload), repopulate on next bind
     Resources.images().addClearedListener(() -> this.creaturesLoaded = false);
@@ -64,6 +68,7 @@ public class CreaturePanel extends PropertyPanel {
   private void clearSpriteCache() {
     this.creaturesLoaded = false;
     this.comboBoxSpriteSheets.removeAllItems();
+    this.comboBoxAnimations.removeAllItems();
   }
 
   public static String getCreatureSpriteName(String name) {
@@ -111,7 +116,7 @@ public class CreaturePanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     // first try regular selection by stored property (base name expected)
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
-    updateSpritePreview();
+    refreshAnimationChoices();
 
     // fallback: if nothing selected and a full spritesheet name was stored earlier, try its base
     if (this.comboBoxSpriteSheets.getSelectedItem() == null) {
@@ -192,6 +197,7 @@ public class CreaturePanel extends PropertyPanel {
     LayoutItem[] layoutItems = new LayoutItem[] {
       new LayoutItem(this.animationPreview, 140),
       new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+      new LayoutItem("panel_animation", this.comboBoxAnimations),
       new LayoutItem("panel_direction", this.comboBoxDirection),
     };
     return this.createLayout(layoutItems, this.checkBoxScale, this.checkBoxStartDead);
@@ -200,11 +206,45 @@ public class CreaturePanel extends PropertyPanel {
   private void updateSpritePreview() {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
     Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
-    String source = selectPreviewSpriteName(
-        name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll());
+    String source = SearchableSpriteComboBox.selectedText(this.comboBoxAnimations);
+    if (source == null) {
+      source = selectPreviewSpriteName(name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll());
+    }
     Spritesheet spritesheet = source != null ? Resources.spritesheets().get(source) : null;
     SpritesheetResource resource = resolveOriginalResource(source);
     this.animationPreview.setSpritesheet(spritesheet, resource);
+  }
+
+  private void refreshAnimationChoices() {
+    String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
+    Map<String, String> animations = getAnimationSpriteNames(name, Resources.spritesheets().getAll());
+    populateComboBoxWithSprites(this.comboBoxAnimations, animations);
+    Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
+    selectAnimation(selectPreviewSpriteName(name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll()));
+    updateSpritePreview();
+  }
+
+  static Map<String, String> getAnimationSpriteNames(String base, java.util.Collection<Spritesheet> spritesheets) {
+    Map<String, String> animations = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    if (base == null) {
+      return animations;
+    }
+    for (Spritesheet spritesheet : spritesheets) {
+      if (base.equalsIgnoreCase(getCreatureSpriteName(spritesheet.getName()))) {
+        animations.put(spritesheet.getName(), spritesheet.getName());
+      }
+    }
+    return animations;
+  }
+
+  private void selectAnimation(String name) {
+    for (int i = 0; i < this.comboBoxAnimations.getItemCount(); i++) {
+      JLabel item = this.comboBoxAnimations.getItemAt(i);
+      if (item != null && item.getText().equalsIgnoreCase(name)) {
+        this.comboBoxAnimations.setSelectedItem(item);
+        return;
+      }
+    }
   }
 
   @Override
