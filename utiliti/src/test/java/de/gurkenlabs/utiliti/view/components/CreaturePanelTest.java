@@ -104,6 +104,21 @@ class CreaturePanelTest {
   }
 
   @Test
+  void animationPickerIncludesAllCreatureStatesIncludingDeath() {
+    List<Spritesheet> sheets = List.of(
+        new Spritesheet(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "goblin-idle-down.png", 1, 1),
+        new Spritesheet(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "goblin-move-down.png", 1, 1),
+        new Spritesheet(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "goblin-dead.png", 1, 1));
+
+    assertEquals(List.of("goblin-dead", "goblin-idle-down", "goblin-move-down"),
+        List.copyOf(CreaturePanel.getAnimationSpriteNames("goblin", sheets).keySet()));
+
+    Resources.spritesheets().remove("goblin-idle-down");
+    Resources.spritesheets().remove("goblin-move-down");
+    Resources.spritesheets().remove("goblin-dead");
+  }
+
+  @Test
   @ResourceLock("default-locale")
   void previewSpriteLookupIsLocaleIndependent() {
     Locale originalLocale = Locale.getDefault();

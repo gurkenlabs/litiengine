@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
@@ -13,6 +14,7 @@ import java.awt.FlowLayout;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.DefaultComboBoxModel;
@@ -23,6 +25,7 @@ import javax.swing.JPanel;
 
 public class PropPanel extends PropertyPanel {
   private final JComboBox<JLabel> comboBoxSpriteSheets;
+  private final JComboBox<JLabel> comboBoxAnimations;
   private final JComboBox<Material> comboBoxMaterial;
   private final JCheckBox chckbxShadow;
   private final JComboBox<Rotation> comboBoxRotation;
@@ -42,6 +45,8 @@ public class PropPanel extends PropertyPanel {
 
     this.comboBoxSpriteSheets = new SearchableSpriteComboBox();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
+    this.comboBoxAnimations = new JComboBox<>();
+    this.comboBoxAnimations.setRenderer(new LabelListCellRenderer());
     this.animationPreview = new SpriteAnimationPreview();
 
     this.comboBoxMaterial = new JComboBox<>();
@@ -59,12 +64,14 @@ public class PropPanel extends PropertyPanel {
 
     setLayout(this.createLayout());
     setupChangedListeners();
-    this.comboBoxSpriteSheets.addActionListener(e -> updateSpritePreview());
+    this.comboBoxSpriteSheets.addActionListener(e -> refreshAnimationChoices());
+    this.comboBoxAnimations.addActionListener(e -> updateSpritePreview());
   }
 
   private void clearSpriteCache() {
     this.propsLoaded = false;
     this.comboBoxSpriteSheets.removeAllItems();
+    this.comboBoxAnimations.removeAllItems();
   }
 
   public static String getIdentifierBySpriteName(String spriteName) {
@@ -98,7 +105,7 @@ public class PropPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
-    updateSpritePreview();
+    refreshAnimationChoices();
 
     var material = Material.UNDEFINED;
     if(mapObject.hasCustomProperty(MapObjectProperty.PROP_MATERIAL)){
@@ -158,9 +165,46 @@ public class PropPanel extends PropertyPanel {
 
   private void updateSpritePreview() {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
-    String source = name != null ? SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name) : null;
+    String source = SearchableSpriteComboBox.selectedText(this.comboBoxAnimations);
+    if (source == null && name != null) {
+      source = SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name);
+    }
     var spritesheet = source != null ? Resources.spritesheets().get(source) : null;
     this.animationPreview.setSpritesheet(spritesheet, source);
+  }
+
+  private void refreshAnimationChoices() {
+    String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
+    Map<String, String> animations = getAnimationSpriteNames(name, Resources.spritesheets().getAll());
+    populateComboBoxWithSprites(this.comboBoxAnimations, animations);
+    String defaultAnimation = name != null
+        ? SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name)
+        : null;
+    selectAnimation(defaultAnimation);
+    updateSpritePreview();
+  }
+
+  static Map<String, String> getAnimationSpriteNames(String identifier, Collection<Spritesheet> spritesheets) {
+    Map<String, String> animations = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    if (identifier == null) {
+      return animations;
+    }
+    for (var spritesheet : spritesheets) {
+      if (identifier.equalsIgnoreCase(getIdentifierBySpriteName(spritesheet.getName()))) {
+        animations.put(spritesheet.getName(), spritesheet.getName());
+      }
+    }
+    return animations;
+  }
+
+  private void selectAnimation(String name) {
+    for (int i = 0; i < this.comboBoxAnimations.getItemCount(); i++) {
+      JLabel item = this.comboBoxAnimations.getItemAt(i);
+      if (item != null && item.getText().equalsIgnoreCase(name)) {
+        this.comboBoxAnimations.setSelectedItem(item);
+        return;
+      }
+    }
   }
 
   private LayoutManager createLayout() {
@@ -168,6 +212,7 @@ public class PropPanel extends PropertyPanel {
       new LayoutItem[] {
         new LayoutItem(this.animationPreview, 140),
         new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+        new LayoutItem("panel_animation", this.comboBoxAnimations),
         new LayoutItem("panel_material", this.comboBoxMaterial),
         new LayoutItem("panel_rotation", this.comboBoxRotation),
       };
