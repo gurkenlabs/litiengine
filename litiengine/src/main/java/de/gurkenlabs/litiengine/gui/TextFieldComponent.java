@@ -6,8 +6,6 @@ import de.gurkenlabs.litiengine.input.Input;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -30,7 +28,6 @@ public class TextFieldComponent extends ImageComponent {
    */
   public static final String INTEGER_FORMAT = "[0-9]{1,10}";
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
-  private static final Map<String, Pattern> FORMAT_PATTERN_CACHE = new ConcurrentHashMap<>();
   private final List<Consumer<String>> changeConfirmedConsumers;
   private boolean cursorVisible;
   private int flickerDelay = 300;
@@ -240,7 +237,7 @@ public class TextFieldComponent extends ImageComponent {
 
     // regex check to ensure certain formats
     if (getFormat() != null && !getFormat().isEmpty()) {
-      final Pattern pat = FORMAT_PATTERN_CACHE.computeIfAbsent(getFormat(), Pattern::compile);
+      final Pattern pat = Pattern.compile(getFormat());
       final Matcher mat = pat.matcher(getText() + text);
       if (!mat.matches()) {
         return;

@@ -50,11 +50,6 @@ public class Appearance {
    */
   private boolean transparentBackground;
 
-  private transient Paint cachedGradientPaint;
-  private double cachedGradientWidth;
-  private double cachedGradientHeight;
-  private boolean gradientCacheValid;
-
   /**
    * Constructs a new Appearance with default settings.
    */
@@ -171,23 +166,13 @@ public class Appearance {
       return this.backgroundColor1;
     }
 
-    if (this.gradientCacheValid
-      && this.cachedGradientWidth == width
-      && this.cachedGradientHeight == height) {
-      return this.cachedGradientPaint;
-    }
-
     if (this.horizontalBackgroundGradient) {
-      this.cachedGradientPaint = new GradientPaint(
+      return new GradientPaint(
         0, 0, this.backgroundColor1, (float) (width / 2.0), 0, this.backgroundColor2);
     } else {
-      this.cachedGradientPaint = new GradientPaint(
+      return new GradientPaint(
         0, 0, this.backgroundColor1, 0, (float) (height / 2.0), this.backgroundColor2);
     }
-    this.cachedGradientWidth = width;
-    this.cachedGradientHeight = height;
-    this.gradientCacheValid = true;
-    return this.cachedGradientPaint;
   }
 
   /**
@@ -252,7 +237,6 @@ public class Appearance {
    */
   public void setBackgroundColor1(Color backColor1) {
     this.backgroundColor1 = backColor1;
-    this.gradientCacheValid = false;
     this.fireOnChangeEvent();
   }
 
@@ -263,7 +247,6 @@ public class Appearance {
    */
   public void setBackgroundColor2(Color backColor2) {
     this.backgroundColor2 = backColor2;
-    this.gradientCacheValid = false;
     this.fireOnChangeEvent();
   }
 
@@ -301,7 +284,6 @@ public class Appearance {
    */
   public void setHorizontalBackgroundGradient(boolean horizontal) {
     this.horizontalBackgroundGradient = horizontal;
-    this.gradientCacheValid = false;
     this.fireOnChangeEvent();
   }
 

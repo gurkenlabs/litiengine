@@ -820,7 +820,6 @@ public abstract class GuiComponent
     }
 
     final ComponentRenderEvent event = new ComponentRenderEvent(g, this);
-
     for (ComponentRenderListener listener : this.renderListeners) {
       listener.rendering(event);
     }
@@ -963,7 +962,6 @@ public abstract class GuiComponent
     if (radius == 0f) {
       return getBoundingBox();
     }
-
     return new RoundRectangle2D.Double(
       getX(),
       getY(),
