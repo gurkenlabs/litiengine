@@ -15,6 +15,9 @@ import java.awt.geom.Point2D;
  */
 public final class ImageRenderer {
 
+  private static final ThreadLocal<AffineTransform> TEMP_TRANSFORM =
+    ThreadLocal.withInitial(AffineTransform::new);
+
   private ImageRenderer() {
     throw new UnsupportedOperationException();
   }
@@ -32,7 +35,8 @@ public final class ImageRenderer {
       return;
     }
 
-    final AffineTransform t = AffineTransform.getTranslateInstance(x, y);
+    final AffineTransform t = TEMP_TRANSFORM.get();
+    t.setToTranslation(x, y);
     g.drawImage(image, t, null);
   }
 
@@ -72,8 +76,8 @@ public final class ImageRenderer {
       return;
     }
 
-    final AffineTransform t = new AffineTransform();
-
+    final AffineTransform t = TEMP_TRANSFORM.get();
+    t.setToIdentity();
     t.translate(x, y);
     t.rotate(Math.toRadians(angle), image.getWidth(null) * 0.5, image.getHeight(null) * 0.5);
 
@@ -164,8 +168,8 @@ public final class ImageRenderer {
       return;
     }
 
-    final AffineTransform t = new AffineTransform();
-
+    final AffineTransform t = TEMP_TRANSFORM.get();
+    t.setToIdentity();
     t.translate(x, y);
     t.scale(scaleX, scaleY);
 
@@ -204,7 +208,8 @@ public final class ImageRenderer {
       return;
     }
 
-    AffineTransform t = new AffineTransform();
+    AffineTransform t = TEMP_TRANSFORM.get();
+    t.setToIdentity();
     t.translate(x, y);
     t.concatenate(transform);
 

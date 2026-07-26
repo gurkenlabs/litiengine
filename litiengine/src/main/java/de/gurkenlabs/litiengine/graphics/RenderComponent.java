@@ -110,6 +110,35 @@ public class RenderComponent extends Canvas {
   }
 
   /**
+   * Configures the Java2D rendering pipeline system properties from the
+   * current game configuration. This must be called <em>before</em> any
+   * {@code Graphics2D} context is created (i.e. before the first
+   * {@code BufferedImage}, {@code Canvas.createGraphics()}, or
+   * {@code createBufferStrategy()} call), because the pipeline is locked in
+   * once the first graphics context is initialized.
+   *
+   * @see de.gurkenlabs.litiengine.configuration.Java2DPipeline
+   */
+  public static void configurePipeline() {
+    var pipeline = Game.config().graphics().getJava2DPipeline();
+    switch (pipeline) {
+      case OPENGL -> {
+        System.setProperty("sun.java2d.d3d", "false");
+        System.setProperty("sun.java2d.opengl", "true");
+      }
+      case DIRECT3D -> {
+        System.setProperty("sun.java2d.opengl", "false");
+        System.setProperty("sun.java2d.d3d", "true");
+      }
+      case SOFTWARE -> {
+        System.setProperty("sun.java2d.opengl", "false");
+        System.setProperty("sun.java2d.d3d", "false");
+      }
+      case DEFAULT -> { /* leave all sun.java2d.* properties at defaults */ }
+    }
+  }
+
+  /**
    * Registers a consumer to be notified when the frames per second (FPS) change.
    *
    * @param fpsConsumer The consumer to notify of FPS changes.

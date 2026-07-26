@@ -31,10 +31,14 @@ public class SpriteParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = getRenderLocation(emitterOrigin);
     if (isAnimatingSprite()) {
       currentImage = animation.getCurrentImage();
     }
+    if (currentImage == null) {
+      return;
+    }
+
+    final Point2D renderLocation = getRenderLocation(emitterOrigin);
     Composite oldComp = g.getComposite();
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getOpacity()));
     if (getAngle() != 0) {

@@ -207,16 +207,18 @@ public class LightSource extends Entity implements IRenderable {
 
 
   @Override public void setSize(double width, double height) {
+    Rectangle2D previousBounds = new Rectangle2D.Double(getX(), getY(), getWidth(), getHeight());
     super.setSize(width, height);
     updateShape();
-    updateAmbientLayers();
+    updateAmbientLayers(previousBounds.createUnion(getBoundingBox()));
   }
 
   @Override
   public void setLocation(final Point2D location) {
+    Rectangle2D previousBounds = new Rectangle2D.Double(getX(), getY(), getWidth(), getHeight());
     super.setLocation(location);
     updateShape();
-    updateAmbientLayers();
+    updateAmbientLayers(previousBounds.createUnion(getBoundingBox()));
   }
 
   /**
@@ -253,18 +255,22 @@ public class LightSource extends Entity implements IRenderable {
    * Updates the ambient layers of the environment.
    */
   private void updateAmbientLayers() {
+    updateAmbientLayers(getBoundingBox());
+  }
+
+  private void updateAmbientLayers(Rectangle2D section) {
     if (!isLoaded()) {
       return;
     }
 
     if (Game.world().environment() != null
       && Game.world().environment().getAmbientLight() != null) {
-      Game.world().environment().getAmbientLight().updateSection(getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(section);
     }
 
     if (Game.world().environment() != null
       && Game.world().environment().getStaticShadowLayer() != null) {
-      Game.world().environment().getStaticShadowLayer().updateSection(getBoundingBox());
+      Game.world().environment().getStaticShadowLayer().updateSection(section);
     }
   }
 

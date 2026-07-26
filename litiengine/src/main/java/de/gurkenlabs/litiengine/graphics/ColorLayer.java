@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
@@ -83,14 +84,20 @@ public abstract class ColorLayer implements IRenderable {
    * @param section The section of the layer to update.
    */
   public void updateSection(Rectangle2D section) {
-    if (this.getColor() == null) {
+    if (this.getColor() == null || section == null || section.isEmpty()) {
       return;
     }
+
+    Rectangle dirtyRegion = section.getBounds().intersection(
+      new Rectangle(0, 0, layer.getWidth(), layer.getHeight()));
+    if (dirtyRegion.isEmpty()) {
+      return;
+    }
+
     final Graphics2D g = layer.createGraphics();
-    clearSection(g, section);
-    g.setClip(section);
-    //    g.translate(section.getX(),section.getY());
-    renderSection(g, section);
+    clearSection(g, dirtyRegion);
+    g.setClip(dirtyRegion);
+    renderSection(g, dirtyRegion);
     g.dispose();
   }
 

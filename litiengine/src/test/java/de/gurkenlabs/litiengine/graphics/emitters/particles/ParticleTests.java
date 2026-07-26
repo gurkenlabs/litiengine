@@ -11,12 +11,15 @@ import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 
+import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,6 +49,25 @@ class ParticleTests {
   public void setUp() {
     // arrange
     particle = new TextParticle("test");
+  }
+
+  @Test
+  void spriteParticleRenderingPreservesConfiguredDimensions() {
+    BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    SpriteParticle spriteParticle = new SpriteParticle(new Spritesheet(image, "particle-test.png", 16, 16));
+    spriteParticle.setAnimateSprite(false);
+    spriteParticle.setWidth(8);
+    spriteParticle.setHeight(12);
+
+    Graphics2D graphics = image.createGraphics();
+    try {
+      spriteParticle.render(graphics, new Point2D.Double());
+    } finally {
+      graphics.dispose();
+    }
+
+    assertEquals(8, spriteParticle.getWidth());
+    assertEquals(12, spriteParticle.getHeight());
   }
 
   @Test
