@@ -2512,12 +2512,6 @@ public final class Environment implements IRenderable {
       return;
     }
 
-    if (entity instanceof LightSource && this.getAmbientLight() != null && this.getMap() != null) {
-      // AmbientLight combines every source, so partial updates can retain stale pixels from removed lights.
-      this.getAmbientLight().updateSection(this.getMap().getBounds());
-      return;
-    }
-
     this.updateLighting(entity.getBoundingBox());
   }
 

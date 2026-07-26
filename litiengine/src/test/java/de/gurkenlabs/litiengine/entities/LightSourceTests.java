@@ -28,6 +28,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 class LightSourceTests {
@@ -195,6 +196,30 @@ class LightSourceTests {
         .isLoaded(); // entry point of private method updateAmbientLayers()
       verify(ambientLightMock, times(1)).updateSection(any(Rectangle2D.class));
       verify(staticShadowLayerMock, times(1)).updateSection(any(Rectangle2D.class));
+    }
+  }
+
+  @Test
+  void movingLightUpdatesPreviousAndCurrentBounds() {
+    lightSourceActiveSpy.setSize(10, 20);
+    lightSourceActiveSpy.setLocation(new Point2D.Double(10, 20));
+    Rectangle2D previousBounds = lightSourceActiveSpy.getBoundingBox().getBounds2D();
+    when(lightSourceActiveSpy.isLoaded()).thenReturn(true);
+
+    GameWorld actualWorld = spy(Game.world());
+    try (var gameMockedStatic = mockStatic(Game.class)) {
+      gameMockedStatic.when(Game::world).thenReturn(actualWorld);
+      Environment environmentMock = mock(Environment.class);
+      when(actualWorld.environment()).thenReturn(environmentMock);
+      AmbientLight ambientLightMock = mock(AmbientLight.class);
+      when(environmentMock.getAmbientLight()).thenReturn(ambientLightMock);
+
+      lightSourceActiveSpy.setLocation(new Point2D.Double(30, 40));
+
+      ArgumentCaptor<Rectangle2D> section = ArgumentCaptor.forClass(Rectangle2D.class);
+      verify(ambientLightMock).updateSection(section.capture());
+      Rectangle2D expected = previousBounds.createUnion(lightSourceActiveSpy.getBoundingBox());
+      assertEquals(expected, section.getValue());
     }
   }
 
