@@ -29,6 +29,7 @@ public class Program {
         Game.config().add(Editor.preferences());
 
         Game.config().load();
+        Game.config().client().setMaxFps(Editor.preferences().getEditorFpsCap());
         applyPreferredLocale();
 
         Game.info().setSubTitle(Resources.strings().get("app_subtitle"));

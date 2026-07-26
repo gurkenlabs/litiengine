@@ -26,15 +26,20 @@ import javax.swing.Timer;
 
 /** Compact status strip scoped to the map viewport. */
 public final class StatusBar extends JPanel {
+  static final Color FPS_WARNING_COLOR = new Color(224, 207, 104);
+  private static final int FPS_TOLERANCE = 1;
+  private static final double FPS_WARNING_RATIO = 0.9;
+
   private final JLabel stateLabel = new JLabel(new StatusIcon());
   private final JLabel toolLabel = new JLabel();
   private final JLabel positionLabel = new JLabel();
   private final JLabel tileLabel = new JLabel();
   private final JLabel gridLabel = new JLabel();
   private final JLabel snapLabel = new JLabel();
-  private final JLabel fpsLabel = new JLabel("0 FPS");
+  private final JLabel fpsLabel = new JLabel(formatFps(0, 0));
   private final Timer updateTimer;
   private final List<JPanel> separatorLines = new ArrayList<>();
+  private int currentFps;
 
   public StatusBar() {
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -69,9 +74,26 @@ public final class StatusBar extends JPanel {
 
     this.updateTimer = new Timer(100, event -> updateValues());
     Game.window().getRenderComponent().onFpsChanged(
-        fps -> javax.swing.SwingUtilities.invokeLater(() -> this.fpsLabel.setText(fps + " FPS")));
+        fps -> javax.swing.SwingUtilities.invokeLater(() -> {
+          this.currentFps = fps;
+          this.fpsLabel.setText(formatFps(fps, Game.metrics().getEstimatedMaxFramesPerSecond()));
+          this.fpsLabel.setForeground(fpsColor(fps, Editor.preferences().getEditorFpsCap()));
+        }));
     refreshTheme();
     updateValues();
+  }
+
+  static String formatFps(int fps, int maxFps) {
+    return fps + " FPS  |  " + maxFps + " MAX";
+  }
+
+  static Color fpsColor(int fps, int configuredFps) {
+    if (fps >= configuredFps - FPS_TOLERANCE) {
+      return Style.COLOR_GREEN;
+    }
+    return fps >= Math.ceil(configuredFps * FPS_WARNING_RATIO)
+        ? FPS_WARNING_COLOR
+        : Style.COLOR_RED;
   }
 
   @Override public void addNotify() {
@@ -95,7 +117,7 @@ public final class StatusBar extends JPanel {
     this.tileLabel.setForeground(Style.mutedText());
     this.gridLabel.setForeground(Style.mutedText());
     this.snapLabel.setForeground(Style.mutedText());
-    this.fpsLabel.setForeground(Style.COLOR_GREEN);
+    this.fpsLabel.setForeground(fpsColor(this.currentFps, Editor.preferences().getEditorFpsCap()));
     for (JPanel separatorLine : this.separatorLines) {
       separatorLine.setBackground(Style.border());
     }

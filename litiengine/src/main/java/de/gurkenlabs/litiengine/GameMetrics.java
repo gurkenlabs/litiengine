@@ -54,6 +54,15 @@ public final class GameMetrics implements IRenderable {
     return this.framesPerSecond;
   }
 
+  /**
+   * Gets the estimated maximum frame rate based on the latest frame processing time.
+   *
+   * @return the estimated maximum frames per second
+   */
+  public int getEstimatedMaxFramesPerSecond() {
+    return this.maxFramesPerSecond;
+  }
+
   public float getUsedMemory() {
     return this.usedMemory;
   }

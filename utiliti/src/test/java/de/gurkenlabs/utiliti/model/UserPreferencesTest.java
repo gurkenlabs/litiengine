@@ -42,4 +42,15 @@ class UserPreferencesTest {
     assertEquals(Integer.MIN_VALUE, preferences.getSettingsDialogX());
     assertEquals(Integer.MIN_VALUE, preferences.getSettingsDialogY());
   }
+
+  @Test
+  void storesAndBoundsEditorFpsCap() {
+    UserPreferences preferences = new UserPreferences();
+
+    assertEquals(60, preferences.getEditorFpsCap());
+    preferences.setEditorFpsCap(2000);
+    assertEquals(UserPreferences.EDITOR_FPS_CAP_MAX, preferences.getEditorFpsCap());
+    preferences.setEditorFpsCap(0);
+    assertEquals(UserPreferences.EDITOR_FPS_CAP_MIN, preferences.getEditorFpsCap());
+  }
 }
