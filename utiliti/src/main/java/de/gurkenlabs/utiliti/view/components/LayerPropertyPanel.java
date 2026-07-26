@@ -103,7 +103,7 @@ public class LayerPropertyPanel extends JPanel {
     checkBoxVisible.setOpaque(false);
     checkBoxVisible.setForeground(Style.text());
 
-    this.tintColorComponent = new ColorComponent(java.awt.Color.WHITE);
+    this.tintColorComponent = new ColorComponent(java.awt.Color.WHITE, "layerProperties_tintColor");
     this.tintColorComponent.addActionListener(a -> saveChanges());
 
     this.comboRenderType = new JComboBox<>(RenderType.values());
@@ -206,12 +206,12 @@ public class LayerPropertyPanel extends JPanel {
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
     JPanel renderTypeRow = createForm(
-        new JLabel[] {
-          createLabel(Resources.strings().get("layerProperties_renderType")),
-          createLabel(Resources.strings().get("layerProperties_tintColor")) },
-        new JComponent[] { this.comboRenderType, this.tintColorComponent },
-        new int[] { PropertyPanel.CONTROL_HEIGHT, this.tintColorComponent.getPreferredSize().height });
+        new JLabel[] { createLabel(Resources.strings().get("layerProperties_renderType")) },
+        new JComponent[] { this.comboRenderType },
+        new int[] { PropertyPanel.CONTROL_HEIGHT });
     panel.add(renderTypeRow);
+    setRowSize(this.tintColorComponent, this.tintColorComponent.getPreferredSize().height);
+    panel.add(this.tintColorComponent);
     return panel;
   }
 
