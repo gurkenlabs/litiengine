@@ -822,6 +822,7 @@ public class MapComponent extends GuiComponent {
         name.toString(),
         getSelectedMapObjects().toArray(new MapObject[0]));
     Editor.instance().getGameFile().getBluePrints().add(blueprint);
+    UI.getAssetController().refresh();
   }
 
   public void centerCameraOnFocus() {
