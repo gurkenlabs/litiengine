@@ -201,8 +201,9 @@ public class QuickSearchDialog extends JDialog {
     dispose();
 
     if (selected.type() == ItemType.OBJECT && selected.object() instanceof IMapObject mapObject) {
-      Editor.instance().getMapComponent().setFocus(mapObject, true);
-      Rectangle2D bounds = mapObject.getBoundingBox();
+      IMapObject target = de.gurkenlabs.utiliti.controller.MapComponent.resolveParentEntity(mapObject);
+      Editor.instance().getMapComponent().setFocus(target, true);
+      Rectangle2D bounds = target.getBoundingBox();
       if (bounds != null) {
         Game.world().camera().setFocus(new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()));
       }

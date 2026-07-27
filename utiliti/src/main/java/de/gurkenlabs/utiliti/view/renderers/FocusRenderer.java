@@ -28,15 +28,26 @@ public class FocusRenderer implements IEditorRenderer {
     if (focus != null && focusedMapObject != null
         && MapComponent.isLayerEffectivelyVisible(
             Game.world().environment().getMap(), focusedMapObject.getLayer())) {
-      final float strokeSize =
-          (float) Math.max(1, Math.log(Game.world().camera().getRenderScale()) * 4);
+      float renderScale = Game.world().camera().getRenderScale();
+      Rectangle2D screenFocus = EditorRenderHelper.toScreen(focus);
+
+      // High-contrast glowing outline for small zoom levels
+      if (renderScale < 0.6f) {
+        g.setColor(new Color(255, 220, 0, 200));
+        g.setStroke(new BasicStroke(3.0f));
+        g.draw(new Rectangle2D.Double(screenFocus.getX() - 2, screenFocus.getY() - 2, screenFocus.getWidth() + 4, screenFocus.getHeight() + 4));
+      }
+
+      final float strokeSize = (float) Math.max(3, Math.log(renderScale) * 4);
       final float dashPhaseBlack =
           (float) ((Game.time().now() / 15f)
-              * Math.max(1, Math.sqrt(Game.world().camera().getRenderScale())));
+              * Math.max(1, Math.sqrt(renderScale)));
       final float dashPhaseWhite = dashPhaseBlack + strokeSize;
+      float lineWidth = renderScale < 0.5f ? 2.5f : 1.5f;
+
       Stroke stroke =
           new BasicStroke(
-              1,
+              lineWidth,
               BasicStroke.CAP_ROUND,
               BasicStroke.JOIN_MITER,
               strokeSize,
@@ -44,14 +55,12 @@ public class FocusRenderer implements IEditorRenderer {
               dashPhaseBlack);
 
       g.setColor(Color.BLACK);
-
-      Rectangle2D screenFocus = EditorRenderHelper.toScreen(focus);
       g.setStroke(stroke);
       g.draw(screenFocus);
 
       Stroke whiteStroke =
           new BasicStroke(
-              1,
+              lineWidth,
               BasicStroke.CAP_ROUND,
               BasicStroke.JOIN_MITER,
               strokeSize,
@@ -63,14 +72,19 @@ public class FocusRenderer implements IEditorRenderer {
 
       // render transform rects (not when in MOVE mode)
       if (Editor.instance().getMapComponent().getTransformMode() != TransformMode.MOVE) {
-        Stroke transStroke = new BasicStroke(1);
+        Stroke transStroke = new BasicStroke(1.5f);
         for (Rectangle2D trans : Transform.getAnchors()) {
           Rectangle2D screenTrans = EditorRenderHelper.toScreen(trans);
+          double anchorSize = Math.max(screenTrans.getWidth(), 7.0);
+          double anchorX = screenTrans.getCenterX() - anchorSize / 2.0;
+          double anchorY = screenTrans.getCenterY() - anchorSize / 2.0;
+          Rectangle2D drawAnchor = new Rectangle2D.Double(anchorX, anchorY, anchorSize, anchorSize);
+
           g.setColor(Style.COLOR_TRANSFORM_RECT_FILL);
-          g.fill(screenTrans);
+          g.fill(drawAnchor);
           g.setColor(Color.BLACK);
           g.setStroke(transStroke);
-          g.draw(screenTrans);
+          g.draw(drawAnchor);
         }
       }
     }
