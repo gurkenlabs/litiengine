@@ -86,6 +86,7 @@ public class SpriteEditorPanel extends JPanel {
   private final DefaultTableModel keyframeModel;
   private final JTable keyframeTable;
   private final Timer animationPreviewTimer;
+  private final JComboBox<String> variantCombo;
 
   private SpritesheetResource spritesheetResource;
   private BufferedImage image;
@@ -99,6 +100,22 @@ public class SpriteEditorPanel extends JPanel {
     super(new BorderLayout());
     setOpaque(true);
     setBackground(Style.background());
+
+    this.variantCombo = new JComboBox<>();
+    this.variantCombo.setFont(this.variantCombo.getFont().deriveFont(11f));
+    this.variantCombo.setFocusable(false);
+    this.variantCombo.addActionListener(e -> {
+      if (this.binding || this.spritesheetResource == null) {
+        return;
+      }
+      String selectedName = (String) this.variantCombo.getSelectedItem();
+      if (selectedName != null && !selectedName.equals(this.spritesheetResource.getName())) {
+        SpritesheetResource target = findSpriteResource(selectedName);
+        if (target != null) {
+          bind(target);
+        }
+      }
+    });
 
     this.titleLabel = new JLabel(Resources.strings().get("spriteEditor_noSpriteSelected"));
     this.titleLabel.setForeground(Style.text());
@@ -248,7 +265,12 @@ public class SpriteEditorPanel extends JPanel {
     JButton rename = Style.iconButton(Icons.PENCIL_16);
     configureButton(rename, "spriteEditor_rename");
     rename.addActionListener(_ -> beginRename());
-    titleRow.add(rename, BorderLayout.EAST);
+
+    JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+    actions.setOpaque(false);
+    actions.add(this.variantCombo);
+    actions.add(rename);
+    titleRow.add(actions, BorderLayout.EAST);
     text.add(titleRow);
     text.add(Box.createVerticalStrut(2));
     this.metadataLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -437,10 +459,87 @@ public class SpriteEditorPanel extends JPanel {
       updateFrameState();
       updateTotalDuration();
       updateDurationSummary();
+      updateVariantCombo();
     } finally {
       this.binding = false;
       updatePreviewZoom();
     }
+  }
+
+  private void updateVariantCombo() {
+    if (this.spritesheetResource == null || Editor.instance().getGameFile() == null) {
+      this.variantCombo.setVisible(false);
+      return;
+    }
+
+    String currentName = this.spritesheetResource.getName();
+    java.util.List<String> variants = getFamilyVariants(currentName);
+    if (variants.size() <= 1) {
+      this.variantCombo.setVisible(false);
+      return;
+    }
+
+    javax.swing.DefaultComboBoxModel<String> model = new javax.swing.DefaultComboBoxModel<>();
+    for (String variant : variants) {
+      model.addElement(variant);
+    }
+    this.variantCombo.setModel(model);
+    this.variantCombo.setSelectedItem(currentName);
+    this.variantCombo.setVisible(true);
+  }
+
+  private static java.util.List<String> getFamilyVariants(String currentName) {
+    java.util.List<String> variants = new java.util.ArrayList<>();
+    if (currentName == null || Editor.instance().getGameFile() == null) {
+      return variants;
+    }
+
+    String propId = PropPanel.getIdentifierBySpriteName(currentName);
+    if (propId != null) {
+      for (SpritesheetResource resource : Editor.instance().getGameFile().getSpriteSheets()) {
+        if (resource != null && resource.getName() != null && propId.equalsIgnoreCase(PropPanel.getIdentifierBySpriteName(resource.getName()))) {
+          variants.add(resource.getName());
+        }
+      }
+      java.util.Collections.sort(variants);
+      return variants;
+    }
+
+    String creatureBase = CreaturePanel.getCreatureSpriteName(currentName);
+    if (creatureBase != null) {
+      for (SpritesheetResource resource : Editor.instance().getGameFile().getSpriteSheets()) {
+        if (resource != null && resource.getName() != null && creatureBase.equalsIgnoreCase(CreaturePanel.getCreatureSpriteName(resource.getName()))) {
+          variants.add(resource.getName());
+        }
+      }
+      java.util.Collections.sort(variants);
+      return variants;
+    }
+
+    int lastDash = currentName.lastIndexOf('-');
+    if (lastDash > 0) {
+      String prefix = currentName.substring(0, lastDash);
+      for (SpritesheetResource resource : Editor.instance().getGameFile().getSpriteSheets()) {
+        if (resource != null && resource.getName() != null && resource.getName().startsWith(prefix + "-")) {
+          variants.add(resource.getName());
+        }
+      }
+      java.util.Collections.sort(variants);
+    }
+
+    return variants;
+  }
+
+  private static SpritesheetResource findSpriteResource(String name) {
+    if (name == null || Editor.instance().getGameFile() == null) {
+      return null;
+    }
+    for (SpritesheetResource resource : Editor.instance().getGameFile().getSpriteSheets()) {
+      if (resource != null && name.equalsIgnoreCase(resource.getName())) {
+        return resource;
+      }
+    }
+    return null;
   }
 
   private DefaultTableModel createKeyframeModel() {

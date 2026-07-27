@@ -104,8 +104,12 @@ public class PropPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
+    String storedSprite = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
     refreshAnimationChoices();
+    if (storedSprite != null) {
+      selectAnimation(storedSprite);
+    }
 
     var material = Material.UNDEFINED;
     if(mapObject.hasCustomProperty(MapObjectProperty.PROP_MATERIAL)){
