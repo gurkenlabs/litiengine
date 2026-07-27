@@ -50,7 +50,7 @@ public class CreaturePanel extends PropertyPanel {
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
     this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
-    this.checkBoxStartDead = new JCheckBox(Resources.strings().get("panel_creature_startDead"));
+    this.checkBoxStartDead = new JCheckBox("Spawn Dead (0 HP)");
     Resources.spritesheets().addClearedListener(this::clearSpriteCache);
 
     setLayout(this.createLayout());
