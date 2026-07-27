@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.utiliti.view.components.CreaturePanel;
+import de.gurkenlabs.utiliti.view.components.PropPanel;
 import org.junit.jupiter.api.Test;
 
 class CreatureAndPropPanelTest {
@@ -38,33 +39,18 @@ class CreatureAndPropPanelTest {
     mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
 
     // Default (no current HP override) -> INTACT
-    assertEquals(PropState.INTACT, getPropState(mapObject));
+    assertEquals(PropState.INTACT, PropPanel.resolvePropState(mapObject));
 
     // Current HP = 50 -> DAMAGED (<= 50% max HP)
     mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 50);
-    assertEquals(PropState.DAMAGED, getPropState(mapObject));
+    assertEquals(PropState.DAMAGED, PropPanel.resolvePropState(mapObject));
 
     // Current HP = 0 -> DESTROYED
     mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
-    assertEquals(PropState.DESTROYED, getPropState(mapObject));
+    assertEquals(PropState.DESTROYED, PropPanel.resolvePropState(mapObject));
 
     // Indestructible prop is always INTACT regardless of current HP
     mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
-    assertEquals(PropState.INTACT, getPropState(mapObject));
-  }
-
-  private static PropState getPropState(IMapObject mapObject) {
-    int maxHp = mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
-    int currentHp = mapObject.hasCustomProperty(MapObjectProperty.COMBAT_CURRENT_HITPOINTS)
-        ? mapObject.getIntValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS)
-        : maxHp;
-    boolean indestructible = mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
-
-    if (!indestructible && currentHp <= 0) {
-      return PropState.DESTROYED;
-    } else if (!indestructible && currentHp <= maxHp * 0.5) {
-      return PropState.DAMAGED;
-    }
-    return PropState.INTACT;
+    assertEquals(PropState.INTACT, PropPanel.resolvePropState(mapObject));
   }
 }

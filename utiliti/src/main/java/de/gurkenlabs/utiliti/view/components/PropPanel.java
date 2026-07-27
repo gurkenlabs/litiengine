@@ -135,18 +135,13 @@ public class PropPanel extends PropertyPanel {
     }
 
     int maxHp = mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
-    int currentHp = mapObject.hasCustomProperty(MapObjectProperty.COMBAT_CURRENT_HITPOINTS)
-        ? mapObject.getIntValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS)
-        : maxHp;
-    boolean indestructible = mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
-
-    PropState state = PropState.INTACT;
-    if (!indestructible && currentHp <= 0) {
-      state = PropState.DESTROYED;
-    } else if (!indestructible && currentHp <= maxHp * 0.5) {
-      state = PropState.DAMAGED;
-    }
+    PropState state = resolvePropState(mapObject);
     this.comboBoxState.setSelectedItem(state);
+
+    if (storedSprite != null && !storedSprite.isEmpty()) {
+      String expectedAnim = "prop-" + storedSprite + "-" + state.spriteString();
+      selectAnimation(expectedAnim);
+    }
 
     var material = Material.UNDEFINED;
     if(mapObject.hasCustomProperty(MapObjectProperty.PROP_MATERIAL)){
@@ -166,6 +161,21 @@ public class PropPanel extends PropertyPanel {
     this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE, false));
   }
 
+  public static PropState resolvePropState(IMapObject mapObject) {
+    int maxHp = mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
+    int currentHp = mapObject.hasCustomProperty(MapObjectProperty.COMBAT_CURRENT_HITPOINTS)
+        ? mapObject.getIntValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS)
+        : maxHp;
+    boolean indestructible = mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+
+    if (!indestructible && currentHp <= 0) {
+      return PropState.DESTROYED;
+    } else if (!indestructible && currentHp <= maxHp * 0.5) {
+      return PropState.DAMAGED;
+    }
+    return PropState.INTACT;
+  }
+
   private void setupChangedListeners() {
     setup(this.comboBoxMaterial, MapObjectProperty.PROP_MATERIAL);
     setup(this.comboBoxRotation, MapObjectProperty.PROP_ROTATION);
@@ -175,7 +185,7 @@ public class PropPanel extends PropertyPanel {
       new MapObjectPropertyActionListener(
         m -> {
           PropState state = (PropState) this.comboBoxState.getSelectedItem();
-          return state != null;
+          return state != null && state != resolvePropState(m);
         },
         m -> {
           PropState state = (PropState) this.comboBoxState.getSelectedItem();
