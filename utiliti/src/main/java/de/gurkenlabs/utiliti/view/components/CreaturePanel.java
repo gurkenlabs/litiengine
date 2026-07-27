@@ -156,12 +156,12 @@ public class CreaturePanel extends PropertyPanel {
         m -> applyStartDead(m, this.checkBoxStartDead.isSelected())));
   }
 
-  static boolean isStartDead(IMapObject mapObject) {
+  public static boolean isStartDead(IMapObject mapObject) {
     return mapObject.getIntValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, CombatEntity.DEFAULT_HITPOINTS) <= 0
       && !mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
   }
 
-  static void applyStartDead(IMapObject mapObject, boolean startDead) {
+  public static void applyStartDead(IMapObject mapObject, boolean startDead) {
     if (startDead) {
       mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
       mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
