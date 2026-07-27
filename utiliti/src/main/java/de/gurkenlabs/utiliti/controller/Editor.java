@@ -276,6 +276,8 @@ public class Editor extends Screen {
       }
     }
 
+    AutoSaveManager.checkForRecovery(gameFile);
+
     if (!Files.exists(gameFile)) {
       log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
       return;
@@ -1024,6 +1026,7 @@ public class Editor extends Screen {
       Files.deleteIfExists(target);
 
       getGameFile().save(target.toString(), preferences().compressFile());
+      AutoSaveManager.deleteBackup(target);
       this.currentResourceFile = target;
       this.windowMetadataDirty.set(true);
       preferences().addOpenedFile(target);

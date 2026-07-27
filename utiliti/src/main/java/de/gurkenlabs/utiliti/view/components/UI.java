@@ -197,6 +197,7 @@ public final class UI {
     });
 
     setTheme(Editor.preferences().getTheme());
+    de.gurkenlabs.utiliti.controller.AutoSaveManager.instance().start();
 
     initialized = true;
   }
@@ -619,6 +620,15 @@ public final class UI {
   private static JFrame initWindow() {
     JFrame window = ((JFrame) Game.window().getHostControl());
     window.setResizable(true);
+
+    KeyStroke quickSearchKey = KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+    window.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(quickSearchKey, "quickSearch");
+    window.getRootPane().getActionMap().put("quickSearch", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent e) {
+        de.gurkenlabs.utiliti.view.dialogs.QuickSearchDialog.showPalette();
+      }
+    });
 
     Game.addGameListener(new GameListener() {
       @Override public boolean terminating() {
