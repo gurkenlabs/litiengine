@@ -30,6 +30,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -1701,54 +1702,77 @@ public class TilesetEditorPanel extends JPanel {
 
     @Override protected void paintComponent(Graphics g) {
       super.paintComponent(g);
-      if (this.tileset == null) {
+      if (this.tileset == null || this.tileset.getTileCount() <= 0) {
         return;
       }
       Graphics2D g2 = (Graphics2D) g.create();
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       int cell = cellSize();
       int columns = columns();
+
+      if (cell >= 18) {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      }
+
+      // Viewport clipping calculation for large tileset rendering
+      Rectangle clip = g2.getClipBounds();
+      if (clip == null) {
+        clip = new Rectangle(0, 0, getWidth(), getHeight());
+      }
+
+      int minCol = Math.max(0, clip.x / cell);
+      int maxCol = Math.min(columns - 1, (clip.x + clip.width) / cell);
+      int totalRows = (int) Math.ceil(this.tileset.getTileCount() / (double) columns);
+      int minRow = Math.max(0, clip.y / cell);
+      int maxRow = Math.min(totalRows - 1, (clip.y + clip.height) / cell);
+
       Set<Integer> selectedAnimationFrames = selectedAnimationFrameTiles();
-      for (int i = 0; i < this.tileset.getTileCount(); i++) {
-        int x = i % columns * cell;
-        int y = i / columns * cell;
-        BufferedImage image = getTileImage(i);
-        if (image != null) {
-          g2.drawImage(image, x + CELL_PADDING, y + CELL_PADDING, cell - CELL_PADDING * 2, cell - CELL_PADDING * 2, null);
-        }
-        paintTerrain(g2, i, x, y, cell);
-        if (selectedAnimationFrames.contains(i)) {
-          g2.setColor(SELECTED_ANIMATION_FRAME_FILL);
-          g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
-          g2.setColor(SELECTED_ANIMATION_FRAME_BORDER);
-          g2.setStroke(new BasicStroke(2f));
-          g2.drawRect(x + 1, y + 1, cell - 3, cell - 3);
+
+      for (int row = minRow; row <= maxRow; row++) {
+        for (int col = minCol; col <= maxCol; col++) {
+          int i = row * columns + col;
+          if (i >= this.tileset.getTileCount()) {
+            continue;
+          }
+          int x = col * cell;
+          int y = row * cell;
+          BufferedImage image = getTileImage(i);
+          if (image != null) {
+            g2.drawImage(image, x + CELL_PADDING, y + CELL_PADDING, cell - CELL_PADDING * 2, cell - CELL_PADDING * 2, null);
+          }
+          paintTerrain(g2, i, x, y, cell);
+          if (selectedAnimationFrames.contains(i)) {
+            g2.setColor(SELECTED_ANIMATION_FRAME_FILL);
+            g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
+            g2.setColor(SELECTED_ANIMATION_FRAME_BORDER);
+            g2.setStroke(new BasicStroke(2f));
+            g2.drawRect(x + 1, y + 1, cell - 3, cell - 3);
+            g2.setStroke(new BasicStroke(1f));
+          }
+          if (cell >= 16 && definesAnimation(i)) {
+            g2.setColor(ANIMATION_TILE_COLOR);
+            int triangleX = x + cell - 10;
+            int triangleY = y + 4;
+            g2.fillPolygon(
+              new int[] {triangleX, triangleX, triangleX + 6},
+              new int[] {triangleY, triangleY + 8, triangleY + 4},
+              3);
+          }
+          boolean selected = this.selectedTiles.contains(i);
+          if (selected) {
+            g2.setColor(new Color(80, 145, 255, 50));
+            g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
+          }
+          g2.setColor(selected ? Style.accent() : Style.border());
+          g2.setStroke(new BasicStroke(i == this.selectedTile ? 2f : 1f));
+          g2.drawRect(x, y, cell - 1, cell - 1);
           g2.setStroke(new BasicStroke(1f));
         }
-        if (definesAnimation(i)) {
-          g2.setColor(ANIMATION_TILE_COLOR);
-          int triangleX = x + cell - 10;
-          int triangleY = y + 4;
-          g2.fillPolygon(
-            new int[] {triangleX, triangleX, triangleX + 6},
-            new int[] {triangleY, triangleY + 8, triangleY + 4},
-            3);
-        }
-        boolean selected = this.selectedTiles.contains(i);
-        if (selected) {
-          g2.setColor(new Color(80, 145, 255, 50));
-          g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
-        }
-        g2.setColor(selected ? Style.accent() : Style.border());
-        g2.setStroke(new BasicStroke(i == this.selectedTile ? 2f : 1f));
-        g2.drawRect(x, y, cell - 1, cell - 1);
-        g2.setStroke(new BasicStroke(1f));
       }
       g2.dispose();
     }
 
     private void paintTerrain(Graphics2D g2, int tile, int x, int y, int cell) {
-      if (this.terrainSet == null) {
+      if (this.terrainSet == null || cell < 18) {
         return;
       }
       var terrains = this.terrainSet.getTerrains(tile);
