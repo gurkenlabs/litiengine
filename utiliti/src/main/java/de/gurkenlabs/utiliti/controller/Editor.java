@@ -56,6 +56,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -345,8 +346,98 @@ public class Editor extends Screen {
     } finally {
       Cursors.apply(Cursors.DEFAULT);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] {gameFile, (System.nanoTime() - currentTime) / 1000000.0});
-      this.loading = false;
     }
+  }
+
+  public void loadAsync(Path gameFile, boolean force) {
+    this.loadAsync(gameFile, force, null);
+  }
+
+  public void loadAsync(Path gameFile, boolean force, Runnable onComplete) {
+    if (!force) {
+      boolean proceedLoading = UI.notifyPendingChanges();
+      if (!proceedLoading) {
+        return;
+      }
+    }
+
+    if (!Files.exists(gameFile)) {
+      log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
+      return;
+    }
+
+    if (!FileUtilities.getExtension(gameFile).equals(ResourceBundle.FILE_EXTENSION)) {
+      log.log(Level.SEVERE, "[{0}] unsupported file format [{1}]", new Object[] {gameFile, FileUtilities.getExtension(gameFile)});
+      return;
+    }
+
+    final long currentTime = System.nanoTime();
+    Cursors.apply(Cursors.LOAD);
+    this.loading = true;
+
+    CompletableFuture.supplyAsync(() -> {
+      ResourceBundle loadedBundle = ResourceBundle.load(gameFile.toString());
+      if (loadedBundle == null) {
+        throw new IllegalArgumentException("The game file " + gameFile + " could not be loaded!");
+      }
+      return loadedBundle;
+    }).thenAcceptAsync(loadedBundle -> {
+      try {
+        UndoManager.clearAll();
+        ToolManager.instance().clearSelections();
+
+        this.currentResourceFile = gameFile;
+        this.gameFile = loadedBundle;
+
+        this.setProjectPath(gameFile);
+        this.loadProjectTilesetTerrains(gameFile.getParent());
+        this.projectCodeIntegration.reload(gameFile);
+
+        this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
+
+        Resources.images().clear();
+        Resources.spritesheets().clear();
+
+        this.loadSpriteSheets(this.getGameFile().getSpriteSheets(), true);
+        this.getGameFile().getSounds().parallelStream().forEach(Resources.sounds()::load);
+
+        log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] {this.getGameFile().getMaps().size(), this.currentResourceFile});
+        log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] {this.getGameFile().getSpriteSheets().size(), this.currentResourceFile});
+        log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] {this.getGameFile().getTilesets().size(), this.currentResourceFile});
+        log.log(Level.INFO, "{0} emitters loaded from {1}", new Object[] {this.getGameFile().getEmitters().size(), this.currentResourceFile});
+        log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] {this.getGameFile().getBluePrints().size(), this.currentResourceFile});
+        log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] {this.getGameFile().getSounds().size(), this.currentResourceFile});
+
+        for (TmxMap map : this.mapComponent.getMaps()) {
+          this.loadSpriteSheets(map);
+        }
+
+        loadCustomEmitters(this.getGameFile().getEmitters());
+        UI.getAssetController().refresh();
+
+        if (!this.mapComponent.getMaps().isEmpty()) {
+          this.mapComponent.loadEnvironment(this.mapComponent.getMaps().getFirst());
+        } else {
+          Game.world().unloadEnvironment();
+        }
+
+        this.gamefileLoaded();
+        this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
+        if (onComplete != null) {
+          onComplete.run();
+        }
+      } finally {
+        Cursors.apply(Cursors.DEFAULT);
+        log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] {gameFile, (System.nanoTime() - currentTime) / 1000000.0});
+        this.loading = false;
+      }
+    }, javax.swing.SwingUtilities::invokeLater)
+    .exceptionally(throwable -> {
+      Cursors.apply(Cursors.DEFAULT);
+      this.loading = false;
+      log.log(Level.SEVERE, "Failed to load game file " + gameFile, throwable);
+      return null;
+    });
   }
 
   public void onLoaded(Runnable callback) {
