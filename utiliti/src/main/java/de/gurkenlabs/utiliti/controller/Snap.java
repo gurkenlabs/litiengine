@@ -4,6 +4,9 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
+import de.gurkenlabs.litiengine.input.Input;
+import java.awt.event.KeyEvent;
+
 public final class Snap {
 
   private static final int DEFAULT_PRECISION = 2;
@@ -41,7 +44,8 @@ public final class Snap {
   private static float snap(double value, int gridSize, boolean snapToGrid, boolean snapToPixel) {
     double snapped = value;
 
-    if (gridSize > 1 && snapToGrid) {
+    boolean ignoreGridSnap = isAltPressed();
+    if (gridSize > 1 && snapToGrid && !ignoreGridSnap) {
       snapped = snapToGrid(value, gridSize);
     } else if (snapToPixel) {
       snapped = snapToPixels(value);
@@ -49,6 +53,11 @@ public final class Snap {
 
     // apply default precision
     return MathUtilities.round((float) snapped, DEFAULT_PRECISION);
+  }
+
+  public static boolean isAltPressed() {
+    return Input.keyboard() != null
+        && (Input.keyboard().isPressed(KeyEvent.VK_ALT) || Input.keyboard().isPressed(KeyEvent.VK_ALT_GRAPH));
   }
 
   private static int snapToPixels(double value) {

@@ -490,7 +490,7 @@ public class MapComponent extends GuiComponent {
     UI.getLayerController().refresh();
 
     Game.window().getRenderComponent().requestFocus();
-    this.setFocus(mapObject, false);
+    this.setFocus(mapObject, true);
     this.setTransformMode(TransformMode.NONE);
   }
 
