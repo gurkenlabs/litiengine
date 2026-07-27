@@ -76,6 +76,7 @@ public class TilesetEditorPanel extends JPanel {
   private final DefaultTableModel tilesetPropertyModel;
   private final JTable tilesetPropertyTable;
   private final JLabel previewLabel;
+  private final TileCollisionEditorPanel collisionEditor;
   private final JLabel detailLabel;
   private final JTextField typeField;
   private final JSlider probabilitySlider;
@@ -201,6 +202,7 @@ public class TilesetEditorPanel extends JPanel {
     this.previewLabel.setBackground(Style.surface());
     this.previewLabel.setBorder(BorderFactory.createLineBorder(Style.border()));
     this.previewLabel.setPreferredSize(new Dimension(0, 112));
+    this.collisionEditor = new TileCollisionEditorPanel();
 
     this.detailLabel = new JLabel(" ");
     this.detailLabel.setForeground(Style.mutedText());
@@ -297,6 +299,11 @@ public class TilesetEditorPanel extends JPanel {
     controls.add(propertyPanel);
     controls.add(javax.swing.Box.createVerticalStrut(6));
     controls.add(animationPanel);
+    controls.add(javax.swing.Box.createVerticalStrut(6));
+    ExpandableCard collisionPanel = new ExpandableCard(
+      Resources.strings().get("tilesetEditor_collisionEditing"), this.collisionEditor, true);
+    collisionPanel.setContentInsets(8, 0, 8, 0);
+    controls.add(collisionPanel);
     selectedTilePanel.add(controls, BorderLayout.CENTER);
     bodyPanel.add(selectedTilePanel, BorderLayout.SOUTH);
 
@@ -1168,6 +1175,7 @@ public class TilesetEditorPanel extends JPanel {
       this.probabilitySlider.setValue(100);
       this.tilePropertyModel.setRowCount(0);
       this.animationModel.setRowCount(0);
+      this.collisionEditor.bind(null, null, 0, 0, null, null);
     } finally {
       this.binding = false;
     }
@@ -1217,6 +1225,13 @@ public class TilesetEditorPanel extends JPanel {
     }
 
     updateSelectedTilePreview();
+    this.collisionEditor.bind(
+      selectedEntry(),
+      this.tileGrid.getTileImage(localId),
+      this.tileset.getTileWidth(),
+      this.tileset.getTileHeight(),
+      this::changeTileset,
+      this::refreshCollisionControls);
     updateTerrainSlots();
     publishSelectedTile();
   }
@@ -1306,6 +1321,27 @@ public class TilesetEditorPanel extends JPanel {
     }
     ITilesetEntry entry = this.tileset.getTile(this.tileGrid.selectedTile);
     return entry instanceof TilesetEntry tilesetEntry ? tilesetEntry : null;
+  }
+
+  private void refreshCollisionControls() {
+    TilesetEntry entry = selectedEntry();
+    if (entry == null) {
+      this.collisionEditor.refresh(null, null);
+      return;
+    }
+    int shapeCount = entry.getCollisionInfo() != null ? entry.getCollisionInfo().getMapObjects().size() : 0;
+    String collision = shapeCount > 0
+      ? Resources.strings().get("tilesetEditor_collisionShapes", String.valueOf(shapeCount))
+      : Resources.strings().get("tilesetEditor_none");
+    this.detailLabel.setText(Resources.strings().get("tilesetEditor_tileSummary",
+      String.valueOf(this.tileGrid.selectedTile),
+      "gid " + (this.tileset.getFirstGridId() + this.tileGrid.selectedTile),
+      collision,
+      animationSummary(entry)));
+  }
+
+  TileCollisionEditorPanel getCollisionEditorForTest() {
+    return this.collisionEditor;
   }
 
   private static String animationSummary(ITilesetEntry entry) {
@@ -1456,8 +1492,12 @@ public class TilesetEditorPanel extends JPanel {
   }
 
   private void restoreTileset(Tileset snapshot) {
+    int selectedTile = this.tileGrid.selectedTile;
     this.tileset.copyFrom(snapshot);
     bind(this.tileset);
+    if (selectedTile > 0 && selectedTile < this.tileset.getTileCount()) {
+      this.tileGrid.selectTile(selectedTile);
+    }
   }
 
   private static void applyProperties(de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider target, DefaultTableModel model) {

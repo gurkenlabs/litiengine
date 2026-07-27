@@ -146,6 +146,35 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     return this.collisionData;
   }
 
+  /**
+   * Gets the collision layer for this tile, creating it if necessary.
+   *
+   * @return the collision layer
+   */
+  public MapObjectLayer getOrCreateCollisionInfo() {
+    if (this.collisionData == null) {
+      this.collisionData = new MapObjectLayer();
+      int nextLayerId = 1;
+      if (this.tileset != null) {
+        for (int tileId = 0; tileId < this.tileset.getTileCount(); tileId++) {
+          IMapObjectLayer collision = this.tileset.getTile(tileId).getCollisionInfo();
+          if (collision != null) {
+            nextLayerId = Math.max(nextLayerId, collision.getId() + 1);
+          }
+        }
+      }
+      this.collisionData.setId(nextLayerId);
+    }
+    return this.collisionData;
+  }
+
+  /**
+   * Removes all collision information from this tile.
+   */
+  public void clearCollisionInfo() {
+    this.collisionData = null;
+  }
+
   @Override
   void finish(URL location) throws TmxException {
     super.finish(location);

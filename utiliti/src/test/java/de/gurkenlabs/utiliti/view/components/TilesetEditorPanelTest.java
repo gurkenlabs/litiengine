@@ -224,6 +224,44 @@ class TilesetEditorPanelTest {
   }
 
   @Test
+  void collisionEditAffectsOnlySelectedTileAndUpdatesSummary() throws Exception {
+    Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset);
+
+    panel.getCollisionEditorForTest().createRectangleForTest(2, 3, 12, 14);
+
+    assertEquals(1, tileset.getTile(0).getCollisionInfo().getMapObjects().size());
+    assertEquals(null, tileset.getTile(1).getCollisionInfo());
+    assertTrue(panel.getDetailTextForTest().contains("1 shapes"));
+  }
+
+  @Test
+  void collisionEditIsUndoable() throws Exception {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("tile-collision-undo-test");
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    Game.world().loadEnvironment(map);
+    Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
+    TilesetEditorPanel panel = new TilesetEditorPanel();
+    panel.bind(tileset);
+    panel.selectTileForTest(1);
+
+    panel.getCollisionEditorForTest().createRectangleForTest(2, 3, 12, 14);
+    UndoManager.instance().undo();
+
+    assertEquals(1, panel.getSelectedTileIdForTest());
+    assertEquals(null, tileset.getTile(1).getCollisionInfo());
+    UndoManager.instance().redo();
+    assertEquals(1, panel.getSelectedTileIdForTest());
+    assertEquals(1, tileset.getTile(1).getCollisionInfo().getMapObjects().size());
+  }
+
+  @Test
   void terrainControlsCreateAndAssignTerrainToSelectedTile() throws Exception {
     Tileset tileset = tileset("world", "tiles/world.png", 4, 2);
     TilesetEditorPanel panel = new TilesetEditorPanel();

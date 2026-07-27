@@ -20,16 +20,21 @@ import de.gurkenlabs.litiengine.entities.SoundSource;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayerList;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectDefinition;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.ColorLayer;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
@@ -50,6 +55,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1761,6 +1767,7 @@ public final class Environment implements IRenderable {
 
     if (this.getMap() != null) {
       this.loadMapObjects();
+      this.loadTileCollisions(this.getMap());
       this.addStaticShadows();
       this.addAmbientLight();
     }
@@ -2354,6 +2361,74 @@ public final class Environment implements IRenderable {
         this.load(mapObject);
       }
     }
+  }
+
+  private void loadTileCollisions(IMap map) {
+    for (final ITileLayer layer : map.getTileLayers()) {
+      for (ITile tile : layer.getTiles()) {
+        if (tile == null || tile.getGridId() == 0 || tile.getTilesetEntry() == null
+          || tile.getTilesetEntry().getCollisionInfo() == null) {
+          continue;
+        }
+        Point2D tileLocation = MapUtilities.getTileImageLocation(map, tile);
+        if (tileLocation == null) {
+          continue;
+        }
+        BufferedImage sourceImage = tile.getTilesetEntry().getImage();
+        if (sourceImage == null) {
+          continue;
+        }
+        AffineTransform tileTransform = getTileTransform(tile, sourceImage.getWidth(), sourceImage.getHeight());
+        for (IMapObject collision : tile.getTilesetEntry().getCollisionInfo().getMapObjects()) {
+          if (!isRectangularTileCollision(collision)) {
+            continue;
+          }
+          Shape transformed = tileTransform.createTransformedShape(collision.getBoundingBox());
+          Rectangle2D bounds = transformed.getBounds2D();
+          if (bounds.isEmpty()) {
+            continue;
+          }
+          MapObject mapObject = new MapObject((MapObject) collision, 0);
+          mapObject.setType(MapObjectType.COLLISIONBOX.name());
+          mapObject.setLocation((float) (tileLocation.getX() + bounds.getX()),
+            (float) (tileLocation.getY() + bounds.getY()));
+          mapObject.setWidth((float) bounds.getWidth());
+          mapObject.setHeight((float) bounds.getHeight());
+          this.load(mapObject);
+        }
+      }
+    }
+  }
+
+  private static boolean isRectangularTileCollision(IMapObject collision) {
+    return collision instanceof MapObject
+      && !collision.isPolygon()
+      && !collision.isPolyline()
+      && !collision.isEllipse()
+      && !collision.isPoint()
+      && collision.getText() == null
+      && collision.getGridId() == 0;
+  }
+
+  private static AffineTransform getTileTransform(ITile tile, int width, int height) {
+    AffineTransform transform = new AffineTransform();
+    if (tile.isFlippedHorizontally()) {
+      transform.translate(width, 0);
+      transform.scale(-1, 1);
+    }
+    if (tile.isFlippedVertically()) {
+      transform.translate(0, height);
+      transform.scale(1, -1);
+    }
+    if (tile.isFlippedDiagonally()) {
+      transform.concatenate(new AffineTransform(0, 1, 1, 0, 0, 0));
+    }
+    Rectangle2D transformedImage = transform.createTransformedShape(
+      new Rectangle2D.Double(0, 0, width, height)).getBounds2D();
+    AffineTransform normalized = AffineTransform.getTranslateInstance(
+      -transformedImage.getX(), -transformedImage.getY());
+    normalized.concatenate(transform);
+    return normalized;
   }
 
   /**

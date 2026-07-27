@@ -47,8 +47,7 @@ public class PolyShape implements IPolyShape {
   public List<Point2D> getAbsolutePoints(double x, double y) {
     List<Point2D> absolutePoints = new ArrayList<>();
 
-    for (int i = 1; i < this.getPoints().size(); i++) {
-      Point2D point = this.getPoints().get(i);
+    for (Point2D point : this.getPoints()) {
       absolutePoints.add(new Point2D.Double(x + point.getX(), y + point.getY()));
     }
 

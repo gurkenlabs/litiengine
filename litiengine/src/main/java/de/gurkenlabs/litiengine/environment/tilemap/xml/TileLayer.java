@@ -138,7 +138,7 @@ public class TileLayer extends Layer implements ITileLayer {
 
     if (getMap() != null) {
       // Clearing a tile must also clear its image source. Otherwise undoing an overlay paint leaves the old image visible.
-      tile.setTilesetEntry(gid == Tile.NONE ? null : getMap().getTilesetEntry(gid));
+      tile.setTilesetEntry(tile.getGridId() == Tile.NONE ? null : getMap().getTilesetEntry(tile.getGridId()));
     }
     getRawTileData().markDirty();
   }

@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -148,15 +148,9 @@ public class MapRenderer {
     }
     BufferedImage image = tile.getImage();
     if (image != null) {
-      Point p = map.getOrientation().getLocation(x, y, map);
-      p.y -= image.getHeight();
-      ITileOffset offset = tile.getTilesetEntry().getTileset().getTileOffset();
-      if (offset != null) {
-        p.x += offset.getX();
-        p.y += offset.getY();
-      }
-      if (viewport.intersects(p.x, p.y, image.getWidth(), image.getHeight())) {
-        ImageRenderer.render(g, image, p.x - viewport.getX(), p.y - viewport.getY());
+      Point2D p = MapUtilities.getTileImageLocation(map, tile, x, y, image.getHeight());
+      if (viewport.intersects(p.getX(), p.getY(), image.getWidth(), image.getHeight())) {
+        ImageRenderer.render(g, image, p.getX() - viewport.getX(), p.getY() - viewport.getY());
       }
     }
   }
