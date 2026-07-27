@@ -207,7 +207,11 @@ public class Tile extends CustomPropertyProvider implements ITile {
    * @param gid The grid ID to set.
    */
   void setGridId(int gid) {
-    this.gid = gid;
+    this.flippedDiagonally = (gid & FLIPPED_DIAGONALLY_FLAG) != 0;
+    this.flippedHorizontally = (gid & FLIPPED_HORIZONTALLY_FLAG) != 0;
+    this.flippedVertically = (gid & FLIPPED_VERTICALLY_FLAG) != 0;
+    this.flipped = this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
+    this.gid = gid & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
   }
 
   /**

@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -167,6 +168,36 @@ public final class MapUtilities {
   }
 
   /**
+   * Gets the top-left map location at which the image of a tile is rendered.
+   *
+   * @param map  the map containing the tile
+   * @param tile the tile
+   * @return the rendered image location, or {@code null} if the tile has no image or coordinate
+   */
+  public static Point2D getTileImageLocation(final IMap map, final ITile tile) {
+    if (map == null || tile == null || tile.getTileCoordinate() == null) {
+      return null;
+    }
+    BufferedImage image = tile.getImage();
+    if (image == null) {
+      return null;
+    }
+    return getTileImageLocation(map, tile, tile.getTileCoordinate().x, tile.getTileCoordinate().y, image.getHeight());
+  }
+
+  static Point2D getTileImageLocation(final IMap map, final ITile tile, int x, int y, int imageHeight) {
+    Point anchor = map.getOrientation().getLocation(x, y, map);
+    double locationX = anchor.x;
+    double locationY = anchor.y - imageHeight;
+    ITileOffset offset = tile.getTilesetEntry().getTileset().getTileOffset();
+    if (offset != null) {
+      locationX += offset.getX();
+      locationY += offset.getY();
+    }
+    return new Point2D.Double(locationX, locationY);
+  }
+
+  /**
    * Returns all tiles from any tile layer on the given map that contain the supplied pixel-space location.
    *
    * @param map      the map to inspect
@@ -298,7 +329,9 @@ public final class MapUtilities {
     }
 
     Path2D path = new Path2D.Float();
-    path.moveTo(mapObject.getLocation().getX(), mapObject.getLocation().getY());
+    Point2D first = points.getFirst();
+    path.moveTo(mapObject.getLocation().getX() + first.getX(),
+      mapObject.getLocation().getY() + first.getY());
     for (int i = 1; i < points.size(); i++) {
       Point2D point = points.get(i);
       path.lineTo(mapObject.getLocation().getX() + point.getX(),
