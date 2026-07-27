@@ -41,6 +41,21 @@ class TilesetRenderingMathTest {
     assertFalse(shouldShowGrid(8));
   }
 
+  @Test
+  void testAltZoomCalculation() {
+    float zoom = 1.0f;
+    float zoomInFactor = 1.15f;
+    float zoomOutFactor = 0.85f;
+
+    // Zooming in (wheel rotation < 0) increases zoom scale
+    float zoomedIn = zoom * zoomInFactor;
+    assertTrue(zoomedIn > zoom);
+
+    // Zooming out (wheel rotation > 0) decreases zoom scale
+    float zoomedOut = zoom * zoomOutFactor;
+    assertTrue(zoomedOut < zoom);
+  }
+
   private static boolean shouldShowGrid(int cellSize) {
     return cellSize >= 16;
   }

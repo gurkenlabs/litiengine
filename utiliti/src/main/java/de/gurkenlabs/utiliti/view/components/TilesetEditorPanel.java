@@ -161,6 +161,13 @@ public class TilesetEditorPanel extends JPanel {
     this.tileGrid = new TileGrid();
     this.tileGrid.setSelectionChanged(this::updateSelectedTileControls);
     this.gridScroll = new JScrollPane(this.tileGrid);
+    this.gridScroll.addMouseWheelListener(e -> {
+      if (e.isAltDown() || e.isAltGraphDown()) {
+        e.consume();
+        float factor = e.getPreciseWheelRotation() < 0 ? 1.15f : 0.85f;
+        setGridZoom(this.tileGrid.zoom * factor);
+      }
+    });
     this.gridScroll.setMinimumSize(new Dimension(0, 180));
     this.gridScroll.setPreferredSize(new Dimension(0, 360));
     this.gridScroll.setMaximumSize(new Dimension(Short.MAX_VALUE, 520));
