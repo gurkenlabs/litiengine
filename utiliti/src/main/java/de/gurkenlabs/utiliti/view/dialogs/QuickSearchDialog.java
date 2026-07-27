@@ -1,22 +1,24 @@
 package de.gurkenlabs.utiliti.view.dialogs;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
-import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.SoundResource;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Locale;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -44,7 +46,7 @@ public class QuickSearchDialog extends JDialog {
   public QuickSearchDialog(Frame parent) {
     super(parent, "Quick Search", true);
     setUndecorated(true);
-    setSize(520, 320);
+    setSize(540, 340);
     if (parent != null) {
       setLocationRelativeTo(parent);
     }
@@ -127,6 +129,37 @@ public class QuickSearchDialog extends JDialog {
     listModel.clear();
     String filter = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
 
+    // Scene Graph Map Objects & Layers
+    if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
+      IMap activeMap = Game.world().environment().getMap();
+      for (IMapObjectLayer objectLayer : activeMap.getMapObjectLayers()) {
+        if (objectLayer == null) {
+          continue;
+        }
+        for (IMapObject mapObject : objectLayer.getMapObjects()) {
+          if (mapObject == null) {
+            continue;
+          }
+          String objName = mapObject.getName();
+          String objType = mapObject.getType();
+          String objId = String.valueOf(mapObject.getId());
+          if ((objName != null && objName.toLowerCase(Locale.ROOT).contains(filter))
+            || (objType != null && objType.toLowerCase(Locale.ROOT).contains(filter))
+            || objId.contains(filter)) {
+            String label = (objName != null && !objName.isBlank() ? objName : "#" + objId)
+              + (objType != null && !objType.isBlank() ? " [" + objType + "]" : "");
+            listModel.addElement(new SearchItem(ItemType.OBJECT, label, mapObject));
+          }
+        }
+      }
+
+      for (ILayer layer : activeMap.getRenderLayers()) {
+        if (layer != null && layer.getName() != null && layer.getName().toLowerCase(Locale.ROOT).contains(filter)) {
+          listModel.addElement(new SearchItem(ItemType.LAYER, layer.getName(), layer));
+        }
+      }
+    }
+
     // Maps
     if (Editor.instance().getMapComponent() != null) {
       for (TmxMap map : Editor.instance().getMapComponent().getMaps()) {
@@ -167,7 +200,16 @@ public class QuickSearchDialog extends JDialog {
 
     dispose();
 
-    if (selected.type() == ItemType.MAP && selected.object() instanceof TmxMap map) {
+    if (selected.type() == ItemType.OBJECT && selected.object() instanceof IMapObject mapObject) {
+      Editor.instance().getMapComponent().setFocus(mapObject, true);
+      Rectangle2D bounds = mapObject.getBoundingBox();
+      if (bounds != null) {
+        Game.world().camera().setFocus(new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()));
+      }
+      UI.showObjectInspector();
+    } else if (selected.type() == ItemType.LAYER && selected.object() instanceof ILayer layer) {
+      UI.showLayerProperties(layer);
+    } else if (selected.type() == ItemType.MAP && selected.object() instanceof TmxMap map) {
       Editor.instance().getMapComponent().loadEnvironment(map);
     } else if (selected.type() == ItemType.SPRITE || selected.type() == ItemType.SOUND) {
       UI.getAssetController().refresh();
@@ -175,7 +217,7 @@ public class QuickSearchDialog extends JDialog {
   }
 
   public enum ItemType {
-    MAP, SPRITE, SOUND
+    OBJECT, LAYER, MAP, SPRITE, SOUND
   }
 
   public record SearchItem(ItemType type, String name, Object object) {
