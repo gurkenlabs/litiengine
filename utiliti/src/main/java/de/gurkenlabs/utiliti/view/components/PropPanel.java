@@ -171,6 +171,27 @@ public class PropPanel extends PropertyPanel {
     setup(this.comboBoxRotation, MapObjectProperty.PROP_ROTATION);
     setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
 
+    this.comboBoxState.addActionListener(
+      new MapObjectPropertyActionListener(
+        m -> {
+          PropState state = (PropState) this.comboBoxState.getSelectedItem();
+          return state != null;
+        },
+        m -> {
+          PropState state = (PropState) this.comboBoxState.getSelectedItem();
+          if (state == null) {
+            return;
+          }
+          int maxHp = m.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
+          switch (state) {
+            case INTACT -> m.removeProperty(MapObjectProperty.COMBAT_CURRENT_HITPOINTS);
+            case DAMAGED -> m.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, Math.max(1, (int) (maxHp * 0.5)));
+            case DESTROYED -> m.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
+          }
+        }
+      )
+    );
+
     setup(this.chckbxShadow, MapObjectProperty.PROP_ADDSHADOW);
     setup(this.checkBoxHorizontalFlip, MapObjectProperty.PROP_FLIPHORIZONTALLY);
     setup(this.checkBoxVerticalFlip, MapObjectProperty.PROP_FLIPVERTICALLY);
