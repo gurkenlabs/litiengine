@@ -1708,12 +1708,49 @@ public class TilesetEditorPanel extends JPanel {
       Graphics2D g2 = (Graphics2D) g.create();
       int cell = cellSize();
       int columns = columns();
+      int totalRows = (int) Math.ceil(this.tileset.getTileCount() / (double) columns);
 
-      if (cell >= 18) {
+      boolean showGrid = cell >= 16;
+      if (showGrid) {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       }
 
-      // Viewport clipping calculation for large tileset rendering
+      Spritesheet sheet = this.tileset.getSpritesheet();
+      BufferedImage wholeImage = sheet != null ? sheet.getImage() : null;
+
+      // On small zoom levels (cell < 16), render the spritesheet image as a whole and remove dark cell grid lines
+      if (!showGrid && wholeImage != null) {
+        g2.drawImage(wholeImage, 0, 0, columns * cell, totalRows * cell, null);
+
+        for (int i : this.selectedTiles) {
+          if (i < 0 || i >= this.tileset.getTileCount()) {
+            continue;
+          }
+          int col = i % columns;
+          int row = i / columns;
+          int x = col * cell;
+          int y = row * cell;
+          g2.setColor(new Color(80, 145, 255, 100));
+          g2.fillRect(x, y, cell, cell);
+          g2.setColor(Style.accent());
+          g2.drawRect(x, y, Math.max(1, cell - 1), Math.max(1, cell - 1));
+        }
+
+        if (this.selectedTile >= 0 && this.selectedTile < this.tileset.getTileCount()) {
+          int col = this.selectedTile % columns;
+          int row = this.selectedTile / columns;
+          int x = col * cell;
+          int y = row * cell;
+          g2.setColor(Color.YELLOW);
+          g2.setStroke(new BasicStroke(2f));
+          g2.drawRect(x, y, Math.max(1, cell - 1), Math.max(1, cell - 1));
+        }
+
+        g2.dispose();
+        return;
+      }
+
+      // Viewport clipping calculation for tile-by-tile rendering when zoomed in
       Rectangle clip = g2.getClipBounds();
       if (clip == null) {
         clip = new Rectangle(0, 0, getWidth(), getHeight());
@@ -1721,7 +1758,6 @@ public class TilesetEditorPanel extends JPanel {
 
       int minCol = Math.max(0, clip.x / cell);
       int maxCol = Math.min(columns - 1, (clip.x + clip.width) / cell);
-      int totalRows = (int) Math.ceil(this.tileset.getTileCount() / (double) columns);
       int minRow = Math.max(0, clip.y / cell);
       int maxRow = Math.min(totalRows - 1, (clip.y + clip.height) / cell);
 
@@ -1737,7 +1773,8 @@ public class TilesetEditorPanel extends JPanel {
           int y = row * cell;
           BufferedImage image = getTileImage(i);
           if (image != null) {
-            g2.drawImage(image, x + CELL_PADDING, y + CELL_PADDING, cell - CELL_PADDING * 2, cell - CELL_PADDING * 2, null);
+            int pad = showGrid ? CELL_PADDING : 0;
+            g2.drawImage(image, x + pad, y + pad, cell - pad * 2, cell - pad * 2, null);
           }
           paintTerrain(g2, i, x, y, cell);
           if (selectedAnimationFrames.contains(i)) {
@@ -1748,7 +1785,7 @@ public class TilesetEditorPanel extends JPanel {
             g2.drawRect(x + 1, y + 1, cell - 3, cell - 3);
             g2.setStroke(new BasicStroke(1f));
           }
-          if (cell >= 16 && definesAnimation(i)) {
+          if (showGrid && definesAnimation(i)) {
             g2.setColor(ANIMATION_TILE_COLOR);
             int triangleX = x + cell - 10;
             int triangleY = y + 4;
@@ -1762,10 +1799,12 @@ public class TilesetEditorPanel extends JPanel {
             g2.setColor(new Color(80, 145, 255, 50));
             g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
           }
-          g2.setColor(selected ? Style.accent() : Style.border());
-          g2.setStroke(new BasicStroke(i == this.selectedTile ? 2f : 1f));
-          g2.drawRect(x, y, cell - 1, cell - 1);
-          g2.setStroke(new BasicStroke(1f));
+          if (showGrid) {
+            g2.setColor(selected ? Style.accent() : Style.border());
+            g2.setStroke(new BasicStroke(i == this.selectedTile ? 2f : 1f));
+            g2.drawRect(x, y, cell - 1, cell - 1);
+            g2.setStroke(new BasicStroke(1f));
+          }
         }
       }
       g2.dispose();
