@@ -34,6 +34,7 @@ import java.util.List;
 public class MapObjectsRenderer implements IEditorRenderer {
 
   private static final int MAX_NAME_DISPLAY_LENGTH = 50;
+  private static final float MIN_NAME_RENDER_SCALE = 0.35f;
 
   @Override
   public String getName() {
@@ -45,7 +46,9 @@ public class MapObjectsRenderer implements IEditorRenderer {
     final UserPreferences preferences = Editor.preferences();
     final boolean renderBoundingBoxes = preferences.renderBoundingBoxes();
     final boolean renderCustomMapObjects = preferences.renderCustomMapObjects();
-    final boolean renderNames = preferences.renderNames();
+    final ICamera camera = Game.world().camera();
+    final float renderScale = camera.getRenderScale();
+    final boolean renderNames = preferences.renderNames() && renderScale >= MIN_NAME_RENDER_SCALE;
     if (!renderBoundingBoxes) {
       return;
     }
@@ -60,9 +63,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
       return;
     }
 
-    final ICamera camera = Game.world().camera();
     final Rectangle2D viewport = camera.getViewport();
-    final float renderScale = camera.getRenderScale();
     final BasicStroke boundingBoxStroke = new BasicStroke(0.5f * renderScale);
     final BasicStroke polylineStroke = new BasicStroke(renderScale);
     final BasicStroke soundRangeStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
