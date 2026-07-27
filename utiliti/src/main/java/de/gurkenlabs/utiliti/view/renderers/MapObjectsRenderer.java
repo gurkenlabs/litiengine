@@ -343,16 +343,19 @@ public class MapObjectsRenderer implements IEditorRenderer {
     if (renderBaseShape) {
       g.setColor(borderColor);
       Shape bounds = baseBounds;
+      boolean isComplexShape = false;
       if (mapObject.isEllipse()) {
         bounds = mapObject.getEllipse();
+        isComplexShape = true;
       } else if (mapObject.isPolyline() || mapObject.isPolygon()) {
         bounds = MapUtilities.convertPolyshapeToPath(mapObject);
+        isComplexShape = true;
       }
-      Game.graphics().renderOutline(g, bounds, shapeStroke, true);
+      Game.graphics().renderOutline(g, bounds, shapeStroke, isComplexShape);
 
       g.setColor(fillColor);
       if (type != MapObjectType.LIGHTSOURCE && !mapObject.isPolyline()) {
-        Game.graphics().renderShape(g, bounds, true);
+        Game.graphics().renderShape(g, bounds, isComplexShape);
       }
     }
 
@@ -375,9 +378,9 @@ public class MapObjectsRenderer implements IEditorRenderer {
       || mapObject.getBoolValue(MapObjectProperty.COLLISION, false);
 
     g.setColor(Style.COLOR_COLLISION_FILL);
-    Game.graphics().renderShape(g, collisionBox);
+    Game.graphics().renderShape(g, collisionBox, false);
     g.setColor(collision ? Style.COLOR_COLLISION_BORDER : Style.COLOR_NOCOLLISION_BORDER);
-    Game.graphics().renderOutline(g, collisionBox, collision ? shapeStroke : noCollisionStroke);
+    Game.graphics().renderOutline(g, collisionBox, collision ? shapeStroke : noCollisionStroke, false);
   }
 
   private static void renderName(Graphics2D g, IMapObject mapObject, Rectangle2D bounds,
