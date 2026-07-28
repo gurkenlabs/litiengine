@@ -490,7 +490,7 @@ public class MapComponent extends GuiComponent {
     UI.getLayerController().refresh();
 
     Game.window().getRenderComponent().requestFocus();
-    this.setFocus(mapObject, false);
+    this.setFocus(mapObject, true);
     this.setTransformMode(TransformMode.NONE);
   }
 
@@ -952,7 +952,38 @@ public class MapComponent extends GuiComponent {
     }
   }
 
+  public static IMapObject resolveParentEntity(IMapObject mapObject) {
+    if (mapObject == null) {
+      return null;
+    }
+    MapObjectType type = MapObjectType.get(mapObject.getType());
+    if (type == MapObjectType.PROP || type == MapObjectType.CREATURE) {
+      return mapObject;
+    }
+
+    if (Game.world().environment() != null && Game.world().environment().getMap() != null && mapObject.getBoundingBox() != null) {
+      for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
+        if (layer == null || !isLayerEffectivelyVisible(Game.world().environment().getMap(), layer)) {
+          continue;
+        }
+        for (IMapObject other : layer.getMapObjects()) {
+          if (other == null || other.equals(mapObject)) {
+            continue;
+          }
+          MapObjectType otherType = MapObjectType.get(other.getType());
+          if ((otherType == MapObjectType.PROP || otherType == MapObjectType.CREATURE)
+              && other.getBoundingBox() != null
+              && other.getBoundingBox().intersects(mapObject.getBoundingBox())) {
+            return other;
+          }
+        }
+      }
+    }
+    return mapObject;
+  }
+
   public void setFocus(IMapObject mapObject, boolean clearSelection) {
+    mapObject = resolveParentEntity(mapObject);
     if (isFocussing) {
       return;
     }

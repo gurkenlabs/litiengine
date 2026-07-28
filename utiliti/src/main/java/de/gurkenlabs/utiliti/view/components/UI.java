@@ -197,6 +197,7 @@ public final class UI {
     });
 
     setTheme(Editor.preferences().getTheme());
+    de.gurkenlabs.utiliti.controller.AutoSaveManager.instance().start();
 
     initialized = true;
   }

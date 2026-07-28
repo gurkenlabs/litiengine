@@ -58,6 +58,10 @@ public final class EditMenu extends JMenu {
     KeyBindings.bind(deselect, Command.DESELECT);
     deselect.addActionListener(a -> Editor.instance().getMapComponent().deselect());
 
+    JMenuItem quickSearch = new JMenuItem(Resources.strings().get("menu_edit_quickSearch"), Icons.SEARCH_16);
+    KeyBindings.bind(quickSearch, Command.QUICK_SEARCH);
+    quickSearch.addActionListener(a -> de.gurkenlabs.utiliti.view.dialogs.QuickSearchDialog.showPalette());
+
     JMenu layerMenu = new LayerMenu();
     layerMenu.setIcon(Icons.LAYER_16);
     layerMenu.setEnabled(false);
@@ -104,6 +108,8 @@ public final class EditMenu extends JMenu {
             mode -> paste.setEnabled(Editor.instance().getMapComponent().getCopiedBlueprint() != null));
 
     this.add(addMenu);
+    this.addSeparator();
+    this.add(quickSearch);
     this.addSeparator();
     this.add(undo);
     this.add(redo);

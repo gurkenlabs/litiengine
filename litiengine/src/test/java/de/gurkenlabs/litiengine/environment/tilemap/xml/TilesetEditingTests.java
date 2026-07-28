@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.environment.tilemap.TerrainType;
 import org.junit.jupiter.api.Test;
 
@@ -75,6 +76,42 @@ class TilesetEditingTests {
       String xml = Files.readString(target);
       assertTrue(xml.contains("tilecount=\"2\""));
       assertTrue(xml.contains("<tile id=\"1\" type=\"wall\""));
+    } finally {
+      Files.deleteIfExists(target);
+    }
+  }
+
+  @Test
+  void tileCollisionShapesRoundTripThroughTsx() throws Exception {
+    Tileset tileset = tilesetWithEntry();
+    TilesetEntry entry = (TilesetEntry) tileset.getTile(0);
+    MapObject rectangle = new MapObject();
+    rectangle.setId(1);
+    rectangle.setLocation(2, 3);
+    rectangle.setWidth(10);
+    rectangle.setHeight(8);
+    entry.getOrCreateCollisionInfo().addMapObject(rectangle);
+    MapObject polygon = new MapObject();
+    polygon.setId(2);
+    polygon.setLocation(1, 1);
+    PolyShape points = new PolyShape();
+    points.getPoints().addAll(List.of(
+      new Point2D.Float(0, 0), new Point2D.Float(12, 0), new Point2D.Float(6, 10)));
+    polygon.setPolygon(points);
+    entry.getOrCreateCollisionInfo().addMapObject(polygon);
+    Path target = Files.createTempFile("collision-tileset", ".tsx");
+
+    try {
+      XmlUtilities.save(tileset, target);
+      String xml = Files.readString(target);
+      Tileset loaded = XmlUtilities.read(Tileset.class, target.toUri().toURL());
+
+      assertTrue(xml.contains("<objectgroup id=\"1\""));
+      assertEquals(2, loaded.getTile(0).getCollisionInfo().getMapObjects().size());
+      assertEquals(10, loaded.getTile(0).getCollisionInfo().getMapObjects().getFirst().getWidth());
+      assertTrue(loaded.getTile(0).getCollisionInfo().getMapObjects().get(1).isPolygon());
+      assertEquals(12, loaded.getTile(0).getCollisionInfo().getMapObjects().get(1).getPolygon().getPoints().get(1).getX());
+      assertEquals(3, loaded.getTile(0).getCollisionInfo().getMapObjects().get(1).getPolygon().getAbsolutePoints(1, 1).size());
     } finally {
       Files.deleteIfExists(target);
     }

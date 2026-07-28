@@ -30,6 +30,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -75,6 +76,7 @@ public class TilesetEditorPanel extends JPanel {
   private final DefaultTableModel tilesetPropertyModel;
   private final JTable tilesetPropertyTable;
   private final JLabel previewLabel;
+  private final TileCollisionEditorPanel collisionEditor;
   private final JLabel detailLabel;
   private final JTextField typeField;
   private final JSlider probabilitySlider;
@@ -160,6 +162,13 @@ public class TilesetEditorPanel extends JPanel {
     this.tileGrid = new TileGrid();
     this.tileGrid.setSelectionChanged(this::updateSelectedTileControls);
     this.gridScroll = new JScrollPane(this.tileGrid);
+    this.gridScroll.addMouseWheelListener(e -> {
+      if (e.isAltDown() || e.isAltGraphDown()) {
+        e.consume();
+        float factor = e.getPreciseWheelRotation() < 0 ? 1.15f : 0.85f;
+        setGridZoom(this.tileGrid.zoom * factor);
+      }
+    });
     this.gridScroll.setMinimumSize(new Dimension(0, 180));
     this.gridScroll.setPreferredSize(new Dimension(0, 360));
     this.gridScroll.setMaximumSize(new Dimension(Short.MAX_VALUE, 520));
@@ -193,6 +202,7 @@ public class TilesetEditorPanel extends JPanel {
     this.previewLabel.setBackground(Style.surface());
     this.previewLabel.setBorder(BorderFactory.createLineBorder(Style.border()));
     this.previewLabel.setPreferredSize(new Dimension(0, 112));
+    this.collisionEditor = new TileCollisionEditorPanel();
 
     this.detailLabel = new JLabel(" ");
     this.detailLabel.setForeground(Style.mutedText());
@@ -289,6 +299,11 @@ public class TilesetEditorPanel extends JPanel {
     controls.add(propertyPanel);
     controls.add(javax.swing.Box.createVerticalStrut(6));
     controls.add(animationPanel);
+    controls.add(javax.swing.Box.createVerticalStrut(6));
+    ExpandableCard collisionPanel = new ExpandableCard(
+      Resources.strings().get("tilesetEditor_collisionEditing"), this.collisionEditor, true);
+    collisionPanel.setContentInsets(8, 0, 8, 0);
+    controls.add(collisionPanel);
     selectedTilePanel.add(controls, BorderLayout.CENTER);
     bodyPanel.add(selectedTilePanel, BorderLayout.SOUTH);
 
@@ -1160,6 +1175,7 @@ public class TilesetEditorPanel extends JPanel {
       this.probabilitySlider.setValue(100);
       this.tilePropertyModel.setRowCount(0);
       this.animationModel.setRowCount(0);
+      this.collisionEditor.bind(null, null, 0, 0, null, null);
     } finally {
       this.binding = false;
     }
@@ -1209,6 +1225,13 @@ public class TilesetEditorPanel extends JPanel {
     }
 
     updateSelectedTilePreview();
+    this.collisionEditor.bind(
+      selectedEntry(),
+      this.tileGrid.getTileImage(localId),
+      this.tileset.getTileWidth(),
+      this.tileset.getTileHeight(),
+      this::changeTileset,
+      this::refreshCollisionControls);
     updateTerrainSlots();
     publishSelectedTile();
   }
@@ -1298,6 +1321,27 @@ public class TilesetEditorPanel extends JPanel {
     }
     ITilesetEntry entry = this.tileset.getTile(this.tileGrid.selectedTile);
     return entry instanceof TilesetEntry tilesetEntry ? tilesetEntry : null;
+  }
+
+  private void refreshCollisionControls() {
+    TilesetEntry entry = selectedEntry();
+    if (entry == null) {
+      this.collisionEditor.refresh(null, null);
+      return;
+    }
+    int shapeCount = entry.getCollisionInfo() != null ? entry.getCollisionInfo().getMapObjects().size() : 0;
+    String collision = shapeCount > 0
+      ? Resources.strings().get("tilesetEditor_collisionShapes", String.valueOf(shapeCount))
+      : Resources.strings().get("tilesetEditor_none");
+    this.detailLabel.setText(Resources.strings().get("tilesetEditor_tileSummary",
+      String.valueOf(this.tileGrid.selectedTile),
+      "gid " + (this.tileset.getFirstGridId() + this.tileGrid.selectedTile),
+      collision,
+      animationSummary(entry)));
+  }
+
+  TileCollisionEditorPanel getCollisionEditorForTest() {
+    return this.collisionEditor;
   }
 
   private static String animationSummary(ITilesetEntry entry) {
@@ -1448,8 +1492,12 @@ public class TilesetEditorPanel extends JPanel {
   }
 
   private void restoreTileset(Tileset snapshot) {
+    int selectedTile = this.tileGrid.selectedTile;
     this.tileset.copyFrom(snapshot);
     bind(this.tileset);
+    if (selectedTile > 0 && selectedTile < this.tileset.getTileCount()) {
+      this.tileGrid.selectTile(selectedTile);
+    }
   }
 
   private static void applyProperties(de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider target, DefaultTableModel model) {
@@ -1701,54 +1749,116 @@ public class TilesetEditorPanel extends JPanel {
 
     @Override protected void paintComponent(Graphics g) {
       super.paintComponent(g);
-      if (this.tileset == null) {
+      if (this.tileset == null || this.tileset.getTileCount() <= 0) {
         return;
       }
       Graphics2D g2 = (Graphics2D) g.create();
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       int cell = cellSize();
       int columns = columns();
-      Set<Integer> selectedAnimationFrames = selectedAnimationFrameTiles();
-      for (int i = 0; i < this.tileset.getTileCount(); i++) {
-        int x = i % columns * cell;
-        int y = i / columns * cell;
-        BufferedImage image = getTileImage(i);
-        if (image != null) {
-          g2.drawImage(image, x + CELL_PADDING, y + CELL_PADDING, cell - CELL_PADDING * 2, cell - CELL_PADDING * 2, null);
+      int totalRows = (int) Math.ceil(this.tileset.getTileCount() / (double) columns);
+
+      boolean showGrid = cell >= 16;
+      if (showGrid) {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      }
+
+      Spritesheet sheet = this.tileset.getSpritesheet();
+      BufferedImage wholeImage = sheet != null ? sheet.getImage() : null;
+
+      // On small zoom levels (cell < 16), render the spritesheet image as a whole and remove dark cell grid lines
+      if (!showGrid && wholeImage != null) {
+        g2.drawImage(wholeImage, 0, 0, columns * cell, totalRows * cell, null);
+
+        for (int i : this.selectedTiles) {
+          if (i < 0 || i >= this.tileset.getTileCount()) {
+            continue;
+          }
+          int col = i % columns;
+          int row = i / columns;
+          int x = col * cell;
+          int y = row * cell;
+          g2.setColor(new Color(80, 145, 255, 100));
+          g2.fillRect(x, y, cell, cell);
+          g2.setColor(Style.accent());
+          g2.drawRect(x, y, Math.max(1, cell - 1), Math.max(1, cell - 1));
         }
-        paintTerrain(g2, i, x, y, cell);
-        if (selectedAnimationFrames.contains(i)) {
-          g2.setColor(SELECTED_ANIMATION_FRAME_FILL);
-          g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
-          g2.setColor(SELECTED_ANIMATION_FRAME_BORDER);
+
+        if (this.selectedTile >= 0 && this.selectedTile < this.tileset.getTileCount()) {
+          int col = this.selectedTile % columns;
+          int row = this.selectedTile / columns;
+          int x = col * cell;
+          int y = row * cell;
+          g2.setColor(Color.YELLOW);
           g2.setStroke(new BasicStroke(2f));
-          g2.drawRect(x + 1, y + 1, cell - 3, cell - 3);
-          g2.setStroke(new BasicStroke(1f));
+          g2.drawRect(x, y, Math.max(1, cell - 1), Math.max(1, cell - 1));
         }
-        if (definesAnimation(i)) {
-          g2.setColor(ANIMATION_TILE_COLOR);
-          int triangleX = x + cell - 10;
-          int triangleY = y + 4;
-          g2.fillPolygon(
-            new int[] {triangleX, triangleX, triangleX + 6},
-            new int[] {triangleY, triangleY + 8, triangleY + 4},
-            3);
+
+        g2.dispose();
+        return;
+      }
+
+      // Viewport clipping calculation for tile-by-tile rendering when zoomed in
+      Rectangle clip = g2.getClipBounds();
+      if (clip == null) {
+        clip = new Rectangle(0, 0, getWidth(), getHeight());
+      }
+
+      int minCol = Math.max(0, clip.x / cell);
+      int maxCol = Math.min(columns - 1, (clip.x + clip.width) / cell);
+      int minRow = Math.max(0, clip.y / cell);
+      int maxRow = Math.min(totalRows - 1, (clip.y + clip.height) / cell);
+
+      Set<Integer> selectedAnimationFrames = selectedAnimationFrameTiles();
+
+      for (int row = minRow; row <= maxRow; row++) {
+        for (int col = minCol; col <= maxCol; col++) {
+          int i = row * columns + col;
+          if (i >= this.tileset.getTileCount()) {
+            continue;
+          }
+          int x = col * cell;
+          int y = row * cell;
+          BufferedImage image = getTileImage(i);
+          if (image != null) {
+            int pad = showGrid ? CELL_PADDING : 0;
+            g2.drawImage(image, x + pad, y + pad, cell - pad * 2, cell - pad * 2, null);
+          }
+          paintTerrain(g2, i, x, y, cell);
+          if (selectedAnimationFrames.contains(i)) {
+            g2.setColor(SELECTED_ANIMATION_FRAME_FILL);
+            g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
+            g2.setColor(SELECTED_ANIMATION_FRAME_BORDER);
+            g2.setStroke(new BasicStroke(2f));
+            g2.drawRect(x + 1, y + 1, cell - 3, cell - 3);
+            g2.setStroke(new BasicStroke(1f));
+          }
+          if (showGrid && definesAnimation(i)) {
+            g2.setColor(ANIMATION_TILE_COLOR);
+            int triangleX = x + cell - 10;
+            int triangleY = y + 4;
+            g2.fillPolygon(
+              new int[] {triangleX, triangleX, triangleX + 6},
+              new int[] {triangleY, triangleY + 8, triangleY + 4},
+              3);
+          }
+          boolean selected = this.selectedTiles.contains(i);
+          if (selected) {
+            g2.setColor(new Color(80, 145, 255, 50));
+            g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
+          }
+          if (showGrid) {
+            g2.setColor(selected ? Style.accent() : Style.border());
+            g2.setStroke(new BasicStroke(i == this.selectedTile ? 2f : 1f));
+            g2.drawRect(x, y, cell - 1, cell - 1);
+            g2.setStroke(new BasicStroke(1f));
+          }
         }
-        boolean selected = this.selectedTiles.contains(i);
-        if (selected) {
-          g2.setColor(new Color(80, 145, 255, 50));
-          g2.fillRect(x + 1, y + 1, cell - 2, cell - 2);
-        }
-        g2.setColor(selected ? Style.accent() : Style.border());
-        g2.setStroke(new BasicStroke(i == this.selectedTile ? 2f : 1f));
-        g2.drawRect(x, y, cell - 1, cell - 1);
-        g2.setStroke(new BasicStroke(1f));
       }
       g2.dispose();
     }
 
     private void paintTerrain(Graphics2D g2, int tile, int x, int y, int cell) {
-      if (this.terrainSet == null) {
+      if (this.terrainSet == null || cell < 18) {
         return;
       }
       var terrains = this.terrainSet.getTerrains(tile);

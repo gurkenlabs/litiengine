@@ -12,6 +12,7 @@ import javax.swing.SpinnerNumberModel;
 public class CombatPanel extends PropertyPanel {
   private final JCheckBox chckbxIndestructible;
   private final JSpinner spinnerHitpoints;
+  private final JSpinner spinnerSpawnHitpoints;
   private final JSpinner spinnerTeam;
 
   /** Create the panel. */
@@ -19,6 +20,7 @@ public class CombatPanel extends PropertyPanel {
     super("panel_combatEntity");
 
     this.spinnerHitpoints = new JSpinner(new SpinnerNumberModel(100, 0, null, 1));
+    this.spinnerSpawnHitpoints = new JSpinner(new SpinnerNumberModel(100, 0, null, 1));
     this.spinnerTeam = new JSpinner(new SpinnerNumberModel(1, 0, Integer.MAX_VALUE, 1));
     this.chckbxIndestructible = new JCheckBox(Resources.strings().get("panel_indestructible"));
 
@@ -30,6 +32,7 @@ public class CombatPanel extends PropertyPanel {
   protected void clearControls() {
     this.chckbxIndestructible.setSelected(false);
     this.spinnerHitpoints.setValue(0);
+    this.spinnerSpawnHitpoints.setValue(0);
     this.spinnerTeam.setValue(0);
   }
 
@@ -37,14 +40,19 @@ public class CombatPanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     this.chckbxIndestructible.setSelected(
         mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false));
-    this.spinnerHitpoints.setValue(
-        mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, CombatEntity.DEFAULT_HITPOINTS));
+    int maxHp = mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, CombatEntity.DEFAULT_HITPOINTS);
+    this.spinnerHitpoints.setValue(maxHp);
+    int spawnHp = mapObject.hasCustomProperty(MapObjectProperty.COMBAT_CURRENT_HITPOINTS)
+        ? mapObject.getIntValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS)
+        : maxHp;
+    this.spinnerSpawnHitpoints.setValue(spawnHp);
     this.spinnerTeam.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM, 0));
   }
 
   private void setupChangedListeners() {
     this.setup(this.chckbxIndestructible, MapObjectProperty.COMBAT_INDESTRUCTIBLE);
     this.setup(this.spinnerHitpoints, MapObjectProperty.COMBAT_HITPOINTS);
+    this.setup(this.spinnerSpawnHitpoints, MapObjectProperty.COMBAT_CURRENT_HITPOINTS);
     this.setup(this.spinnerTeam, MapObjectProperty.COMBAT_TEAM);
   }
 
@@ -56,6 +64,7 @@ public class CombatPanel extends PropertyPanel {
     LayoutItem[] layoutItems =
         new LayoutItem[] {
             new LayoutItem("panel_hitpoints", this.spinnerHitpoints),
+            new LayoutItem("panel_spawnHitpoints", this.spinnerSpawnHitpoints),
             new LayoutItem("panel_team", this.spinnerTeam)
         };
 

@@ -528,6 +528,9 @@ public abstract class PropertyPanel extends JPanel {
       Game.world().environment().reloadFromMap(obj.getId());
       UI.getEntityController().refresh(obj.getId());
     }
+    if (Editor.instance() != null && Editor.instance().getMapComponent() != null) {
+      Editor.instance().getMapComponent().refreshInspector();
+    }
   }
 
   /**

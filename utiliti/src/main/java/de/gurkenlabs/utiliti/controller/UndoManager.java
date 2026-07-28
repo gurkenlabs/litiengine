@@ -1042,7 +1042,7 @@ public class UndoManager {
    */
   private void ensureStackSize() {
     // move undo states by one index
-    if (this.currentIndex == MAX_STACK_SIZE - 1) {
+    while (this.currentIndex >= MAX_STACK_SIZE - 1) {
       System.arraycopy(this.undoStack, 1, this.undoStack, 0, MAX_STACK_SIZE - 1);
       this.undoStack[MAX_STACK_SIZE - 1] = null;
       this.currentIndex--;

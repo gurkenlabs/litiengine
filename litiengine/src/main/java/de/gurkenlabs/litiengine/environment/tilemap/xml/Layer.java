@@ -88,6 +88,10 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.setTintColor(layerToBeCopied.getTintColor());
   }
 
+  void setId(int id) {
+    this.id = id;
+  }
+
   /**
    * Gets the height.
    *

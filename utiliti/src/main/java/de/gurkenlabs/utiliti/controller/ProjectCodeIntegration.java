@@ -18,10 +18,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** Discovers editor-visible entity types from a Gradle project's compiled main classes. */
+/** Discovers editor-visible entity types from project compiled main classes (Gradle, Kotlin, Maven, etc.). */
 public final class ProjectCodeIntegration implements AutoCloseable {
   private static final Logger log = Logger.getLogger(ProjectCodeIntegration.class.getName());
-  private static final Path GRADLE_CLASSES = Path.of("build", "classes", "java", "main");
+  private static final List<Path> CLASS_DIRECTORIES = List.of(
+    Path.of("build", "classes", "java", "main"),
+    Path.of("build", "classes", "kotlin", "main"),
+    Path.of("target", "classes"),
+    Path.of("bin", "main"),
+    Path.of("bin"),
+    Path.of("out", "production", "main"),
+    Path.of("out", "production", "classes")
+  );
 
   private URLClassLoader classLoader;
   private List<Definition> definitions = List.of();
@@ -36,24 +44,36 @@ public final class ProjectCodeIntegration implements AutoCloseable {
       return;
     }
 
-    Path classesDirectory = gameFile.getParent().resolve(GRADLE_CLASSES);
-    if (!Files.isDirectory(classesDirectory)) {
+    Path parent = gameFile.getParent();
+    List<Path> validDirectories = CLASS_DIRECTORIES.stream()
+      .map(parent::resolve)
+      .filter(Files::isDirectory)
+      .toList();
+
+    if (validDirectories.isEmpty()) {
       return;
     }
 
     try {
-      classLoader = new URLClassLoader(new URL[] {classesDirectory.toUri().toURL()}, getClass().getClassLoader());
+      URL[] urls = new URL[validDirectories.size()];
+      for (int i = 0; i < validDirectories.size(); i++) {
+        urls[i] = validDirectories.get(i).toUri().toURL();
+      }
+      classLoader = new URLClassLoader(urls, getClass().getClassLoader());
       List<Definition> discovered = new ArrayList<>();
-      try (var paths = Files.walk(classesDirectory)) {
-        paths.filter(path -> path.toString().endsWith(".class"))
-          .map(path -> className(classesDirectory, path))
-          .filter(name -> !name.endsWith("module-info") && !name.contains("$$"))
-          .forEach(name -> discover(name, discovered));
+
+      for (Path classesDirectory : validDirectories) {
+        try (var paths = Files.walk(classesDirectory)) {
+          paths.filter(path -> path.toString().endsWith(".class"))
+            .map(path -> className(classesDirectory, path))
+            .filter(name -> !name.endsWith("module-info") && !name.contains("$$"))
+            .forEach(name -> discover(name, discovered));
+        }
       }
       discovered.sort(Comparator.comparing(Definition::displayName));
       definitions = List.copyOf(discovered);
     } catch (IOException e) {
-      log.log(Level.WARNING, "Could not inspect compiled project classes in " + classesDirectory, e);
+      log.log(Level.WARNING, "Could not inspect compiled project classes in " + validDirectories, e);
       close();
     }
   }

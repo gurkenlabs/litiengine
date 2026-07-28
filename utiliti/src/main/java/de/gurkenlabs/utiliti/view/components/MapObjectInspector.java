@@ -243,7 +243,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
   @Override
   public void refresh() {
-    // Do nothing
+    this.bindAll(this.getDataSources());
   }
 
   @Override

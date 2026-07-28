@@ -48,6 +48,9 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
   MapObjectLayer(MapObjectLayer original, boolean keepIds) {
     super(original);
+    if (keepIds) {
+      this.setId(original.getId());
+    }
     int mapId = keepIds ? 0 : Game.world().environment().getNextMapId();
     for (IMapObject obj : original.getMapObjects()) {
       this.addMapObject(new MapObject((MapObject) obj, keepIds ? obj.getId() : mapId));
