@@ -71,24 +71,6 @@ public class PropPanel extends PropertyPanel {
     setupChangedListeners();
     this.comboBoxSpriteSheets.addActionListener(e -> refreshAnimationChoices());
     this.comboBoxAnimations.addActionListener(e -> updateSpritePreview());
-    this.comboBoxState.addActionListener(new MapObjectPropertyActionListener(
-        m -> true,
-        m -> {
-          PropState state = (PropState) this.comboBoxState.getSelectedItem();
-          if (state == null) {
-            return;
-          }
-          int maxHp = m.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
-          if (state == PropState.DESTROYED) {
-            m.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
-          } else if (state == PropState.DAMAGED) {
-            m.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, (int)(maxHp * 0.5));
-          } else {
-            m.removeProperty(MapObjectProperty.COMBAT_CURRENT_HITPOINTS);
-          }
-          refreshAnimationChoices();
-        }
-    ));
   }
 
   private void clearSpriteCache() {
@@ -129,18 +111,19 @@ public class PropPanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     String storedSprite = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
+    String identifier = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
     refreshAnimationChoices();
     if (storedSprite != null) {
-      selectAnimation(storedSprite);
+      selectAnimationBySpriteName(storedSprite);
     }
 
-    int maxHp = mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
     PropState state = resolvePropState(mapObject);
     this.comboBoxState.setSelectedItem(state);
 
-    if (storedSprite != null && !storedSprite.isEmpty()) {
-      String expectedAnim = "prop-" + storedSprite + "-" + state.spriteString();
-      selectAnimation(expectedAnim);
+    // select the animation matching the resolved state
+    if (identifier != null && !identifier.isEmpty()) {
+      String expectedAnim = PropAnimationController.PROP_IDENTIFIER + identifier + "-" + state.spriteString();
+      selectAnimationBySpriteName(expectedAnim);
     }
 
     var material = Material.UNDEFINED;
@@ -237,7 +220,12 @@ public class PropPanel extends PropertyPanel {
 
   private void updateSpritePreview() {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
-    String source = SearchableSpriteComboBox.selectedText(this.comboBoxAnimations);
+    // resolve actual sprite name from the selected animation label
+    String source = null;
+    JLabel selectedAnim = (JLabel) this.comboBoxAnimations.getSelectedItem();
+    if (selectedAnim != null) {
+      source = selectedAnim.getName() != null ? selectedAnim.getName() : selectedAnim.getText();
+    }
     if (source == null && name != null) {
       source = SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name);
     }
@@ -248,12 +236,61 @@ public class PropPanel extends PropertyPanel {
   private void refreshAnimationChoices() {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
     Map<String, String> animations = getAnimationSpriteNames(name, Resources.spritesheets().getAll());
-    populateComboBoxWithSprites(this.comboBoxAnimations, animations);
+    Map<String, String> display = toDisplayNames(name, animations);
+    populateComboBoxWithSpritesAndNames(this.comboBoxAnimations, display, animations);
     String defaultAnimation = name != null
         ? SpriteVariantSelector.selectBasePropSpriteNames(Resources.spritesheets().getAll()).get(name)
         : null;
-    selectAnimation(defaultAnimation);
+    selectAnimationBySpriteName(defaultAnimation);
     updateSpritePreview();
+  }
+
+  /**
+   * Populates the animation combo box with display names, storing the actual sprite name
+   * in each JLabel's {@code name} property for later resolution.
+   */
+  private static void populateComboBoxWithSpritesAndNames(
+      JComboBox<JLabel> comboBox, Map<String, String> display, Map<String, String> fullNames) {
+    comboBox.removeAllItems();
+    display.forEach((displayName, spriteName) -> {
+      JLabel label = new JLabel(displayName);
+      label.setName(spriteName); // store full sprite name for resolution
+      Spritesheet spritesheet = Resources.spritesheets().get(spriteName);
+      if (spritesheet != null && spritesheet.getTotalNumberOfSprites() > 0) {
+        java.awt.image.BufferedImage preview = spritesheet.getPreview(24);
+        if (preview != null) {
+          label.setIcon(new javax.swing.ImageIcon(preview));
+        }
+      }
+      comboBox.addItem(label);
+    });
+  }
+
+  /**
+   * Converts full sprite names to clean display names for the animation dropdown.
+   * Strips the "prop-{identifier}-" prefix, showing just the variant/state name (e.g. "intact", "damaged").
+   */
+  static Map<String, String> toDisplayNames(String identifier, Map<String, String> animations) {
+    if (identifier == null) {
+      return animations;
+    }
+    String prefix = (PropAnimationController.PROP_IDENTIFIER + identifier).toLowerCase();
+    Map<String, String> display = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    for (Map.Entry<String, String> entry : animations.entrySet()) {
+      String spriteName = entry.getValue();
+      String displayName;
+      if (spriteName.toLowerCase().startsWith(prefix) && spriteName.length() > prefix.length()) {
+        // strip "prop-barrel1-" to get "damaged", "destroyed", "intact", etc.
+        displayName = spriteName.substring(prefix.length());
+        if (displayName.startsWith("-")) {
+          displayName = displayName.substring(1);
+        }
+      } else {
+        displayName = spriteName;
+      }
+      display.put(displayName, spriteName);
+    }
+    return display;
   }
 
   static Map<String, String> getAnimationSpriteNames(String identifier, Collection<Spritesheet> spritesheets) {
@@ -277,12 +314,21 @@ public class PropPanel extends PropertyPanel {
     return animations;
   }
 
-  private void selectAnimation(String name) {
+  /**
+   * Selects the animation entry whose actual sprite name (stored in JLabel.getName()) matches.
+   */
+  private void selectAnimationBySpriteName(String spriteName) {
+    if (spriteName == null) {
+      return;
+    }
     for (int i = 0; i < this.comboBoxAnimations.getItemCount(); i++) {
       JLabel item = this.comboBoxAnimations.getItemAt(i);
-      if (item != null && item.getText().equalsIgnoreCase(name)) {
-        this.comboBoxAnimations.setSelectedItem(item);
-        return;
+      if (item != null) {
+        String itemSpriteName = item.getName() != null ? item.getName() : item.getText();
+        if (itemSpriteName.equalsIgnoreCase(spriteName)) {
+          this.comboBoxAnimations.setSelectedItem(item);
+          return;
+        }
       }
     }
   }

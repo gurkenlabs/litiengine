@@ -50,7 +50,7 @@ public class CreaturePanel extends PropertyPanel {
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
     this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
-    this.checkBoxStartDead = new JCheckBox("Spawn Dead (0 HP)");
+    this.checkBoxStartDead = new JCheckBox(Resources.strings().get("panel_spawnDead"));
     Resources.spritesheets().addClearedListener(this::clearSpriteCache);
 
     setLayout(this.createLayout());
@@ -206,7 +206,12 @@ public class CreaturePanel extends PropertyPanel {
   private void updateSpritePreview() {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
     Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
-    String source = SearchableSpriteComboBox.selectedText(this.comboBoxAnimations);
+    // resolve actual sprite name from the selected animation label
+    String source = null;
+    JLabel selectedAnim = (JLabel) this.comboBoxAnimations.getSelectedItem();
+    if (selectedAnim != null) {
+      source = selectedAnim.getName() != null ? selectedAnim.getName() : selectedAnim.getText();
+    }
     if (source == null) {
       source = selectPreviewSpriteName(name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll());
     }
@@ -218,9 +223,10 @@ public class CreaturePanel extends PropertyPanel {
   private void refreshAnimationChoices() {
     String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
     Map<String, String> animations = getAnimationSpriteNames(name, Resources.spritesheets().getAll());
-    populateComboBoxWithSprites(this.comboBoxAnimations, animations);
+    Map<String, String> display = toDisplayNames(name, animations);
+    populateComboBoxWithSpritesAndNames(this.comboBoxAnimations, display);
     Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
-    selectAnimation(selectPreviewSpriteName(name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll()));
+    selectAnimationBySpriteName(selectPreviewSpriteName(name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll()));
     updateSpritePreview();
   }
 
@@ -237,12 +243,65 @@ public class CreaturePanel extends PropertyPanel {
     return animations;
   }
 
-  private void selectAnimation(String name) {
+  /**
+   * Converts full sprite names to clean display names for the animation dropdown.
+   * Strips the base creature name prefix (e.g. "warrior-idle-left" becomes "idle-left").
+   */
+  static Map<String, String> toDisplayNames(String base, Map<String, String> animations) {
+    if (base == null) {
+      return animations;
+    }
+    String prefix = base.toLowerCase() + "-";
+    Map<String, String> display = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    for (Map.Entry<String, String> entry : animations.entrySet()) {
+      String spriteName = entry.getValue();
+      String displayName;
+      if (spriteName.toLowerCase().startsWith(prefix) && spriteName.length() > prefix.length()) {
+        displayName = spriteName.substring(prefix.length());
+      } else {
+        displayName = spriteName;
+      }
+      display.put(displayName, spriteName);
+    }
+    return display;
+  }
+
+  /**
+   * Populates the animation combo box with display names, storing the actual sprite name
+   * in each JLabel's {@code name} property for later resolution.
+   */
+  private static void populateComboBoxWithSpritesAndNames(
+      JComboBox<JLabel> comboBox, Map<String, String> display) {
+    comboBox.removeAllItems();
+    display.forEach((displayName, spriteName) -> {
+      JLabel label = new JLabel(displayName);
+      label.setName(spriteName); // store full sprite name for resolution
+      Spritesheet spritesheet = Resources.spritesheets().get(spriteName);
+      if (spritesheet != null && spritesheet.getTotalNumberOfSprites() > 0) {
+        java.awt.image.BufferedImage preview = spritesheet.getPreview(24);
+        if (preview != null) {
+          label.setIcon(new javax.swing.ImageIcon(preview));
+        }
+      }
+      comboBox.addItem(label);
+    });
+  }
+
+  /**
+   * Selects the animation entry whose actual sprite name (stored in JLabel.getName()) matches.
+   */
+  private void selectAnimationBySpriteName(String spriteName) {
+    if (spriteName == null) {
+      return;
+    }
     for (int i = 0; i < this.comboBoxAnimations.getItemCount(); i++) {
       JLabel item = this.comboBoxAnimations.getItemAt(i);
-      if (item != null && item.getText().equalsIgnoreCase(name)) {
-        this.comboBoxAnimations.setSelectedItem(item);
-        return;
+      if (item != null) {
+        String itemSpriteName = item.getName() != null ? item.getName() : item.getText();
+        if (itemSpriteName.equalsIgnoreCase(spriteName)) {
+          this.comboBoxAnimations.setSelectedItem(item);
+          return;
+        }
       }
     }
   }

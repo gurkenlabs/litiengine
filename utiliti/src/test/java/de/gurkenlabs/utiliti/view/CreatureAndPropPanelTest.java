@@ -53,4 +53,23 @@ class CreatureAndPropPanelTest {
     mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
     assertEquals(PropState.INTACT, PropPanel.resolvePropState(mapObject));
   }
+
+  @Test
+  void testCreatureStartDeadSyncWithCurrentHitpoints() {
+    IMapObject mapObject = new MapObject();
+    mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
+
+    // Setting COMBAT_CURRENT_HITPOINTS to 0 makes isStartDead return true
+    mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
+    assertTrue(CreaturePanel.isStartDead(mapObject));
+
+    // Setting COMBAT_CURRENT_HITPOINTS to > 0 makes isStartDead return false
+    mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 50);
+    assertFalse(CreaturePanel.isStartDead(mapObject));
+
+    // Making indestructible makes isStartDead return false even if current HP is 0
+    mapObject.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
+    mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
+    assertFalse(CreaturePanel.isStartDead(mapObject));
+  }
 }
