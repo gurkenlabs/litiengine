@@ -60,4 +60,12 @@ class KeyBindingsTest {
 
     assertEquals(Command.SAVE_PROJECT.defaultKeyStroke(), bindings.get(Command.SAVE_PROJECT));
   }
+
+  @Test
+  void includesQuickSearchDefault() {
+    EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
+
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
+        bindings.get(Command.QUICK_SEARCH));
+  }
 }

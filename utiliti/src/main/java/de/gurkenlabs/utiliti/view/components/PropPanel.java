@@ -178,8 +178,14 @@ public class PropPanel extends PropertyPanel {
           int maxHp = m.getIntValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
           switch (state) {
             case INTACT -> m.removeProperty(MapObjectProperty.COMBAT_CURRENT_HITPOINTS);
-            case DAMAGED -> m.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, Math.max(1, (int) (maxHp * 0.5)));
-            case DESTROYED -> m.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
+            case DAMAGED -> {
+              m.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+              m.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, Math.max(1, (int) (Math.max(1, maxHp) * 0.5)));
+            }
+            case DESTROYED -> {
+              m.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+              m.setValue(MapObjectProperty.COMBAT_CURRENT_HITPOINTS, 0);
+            }
           }
         }
       )

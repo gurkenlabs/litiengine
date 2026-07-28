@@ -27,6 +27,7 @@ public final class KeyBindings {
     DELETE("menu_edit_delete", KeyEvent.VK_DELETE, 0),
     SELECT_ALL("menu_edit_selectAll", KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK),
     DESELECT("menu_edit_deselect", KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK),
+    QUICK_SEARCH("menu_edit_quickSearch", KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
     SHOW_GRID("menu_view_showGrid", KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK),
     SHOW_COLLISION("menu_view_showCollisionBoxes", KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK),
     SHOW_CUSTOM_OBJECTS("menu_view_showCustomMapObjects", KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK),

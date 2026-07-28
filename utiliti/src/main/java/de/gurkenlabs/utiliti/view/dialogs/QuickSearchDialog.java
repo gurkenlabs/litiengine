@@ -125,6 +125,8 @@ public class QuickSearchDialog extends JDialog {
     });
   }
 
+  private static final int MAX_RESULTS = 100;
+
   private void populateItems(String query) {
     listModel.clear();
     String filter = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
@@ -133,10 +135,13 @@ public class QuickSearchDialog extends JDialog {
     if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
       IMap activeMap = Game.world().environment().getMap();
       for (IMapObjectLayer objectLayer : activeMap.getMapObjectLayers()) {
-        if (objectLayer == null) {
-          continue;
+        if (objectLayer == null || listModel.size() >= MAX_RESULTS) {
+          break;
         }
         for (IMapObject mapObject : objectLayer.getMapObjects()) {
+          if (listModel.size() >= MAX_RESULTS) {
+            break;
+          }
           if (mapObject == null) {
             continue;
           }
@@ -145,7 +150,7 @@ public class QuickSearchDialog extends JDialog {
           String objId = String.valueOf(mapObject.getId());
           if ((objName != null && objName.toLowerCase(Locale.ROOT).contains(filter))
             || (objType != null && objType.toLowerCase(Locale.ROOT).contains(filter))
-            || objId.contains(filter)) {
+            || (!filter.isEmpty() && objId.contains(filter))) {
             String label = (objName != null && !objName.isBlank() ? objName : "#" + objId)
               + (objType != null && !objType.isBlank() ? " [" + objType + "]" : "");
             listModel.addElement(new SearchItem(ItemType.OBJECT, label, mapObject));
@@ -154,6 +159,9 @@ public class QuickSearchDialog extends JDialog {
       }
 
       for (ILayer layer : activeMap.getRenderLayers()) {
+        if (listModel.size() >= MAX_RESULTS) {
+          break;
+        }
         if (layer != null && layer.getName() != null && layer.getName().toLowerCase(Locale.ROOT).contains(filter)) {
           listModel.addElement(new SearchItem(ItemType.LAYER, layer.getName(), layer));
         }
@@ -161,8 +169,11 @@ public class QuickSearchDialog extends JDialog {
     }
 
     // Maps
-    if (Editor.instance().getMapComponent() != null) {
+    if (Editor.instance().getMapComponent() != null && listModel.size() < MAX_RESULTS) {
       for (TmxMap map : Editor.instance().getMapComponent().getMaps()) {
+        if (listModel.size() >= MAX_RESULTS) {
+          break;
+        }
         if (map.getName() != null && map.getName().toLowerCase(Locale.ROOT).contains(filter)) {
           listModel.addElement(new SearchItem(ItemType.MAP, map.getName(), map));
         }
@@ -170,8 +181,11 @@ public class QuickSearchDialog extends JDialog {
     }
 
     // Sprites
-    if (Editor.instance().getGameFile() != null && Editor.instance().getGameFile().getSpriteSheets() != null) {
+    if (Editor.instance().getGameFile() != null && Editor.instance().getGameFile().getSpriteSheets() != null && listModel.size() < MAX_RESULTS) {
       for (SpritesheetResource sprite : Editor.instance().getGameFile().getSpriteSheets()) {
+        if (listModel.size() >= MAX_RESULTS) {
+          break;
+        }
         if (sprite.getName() != null && sprite.getName().toLowerCase(Locale.ROOT).contains(filter)) {
           listModel.addElement(new SearchItem(ItemType.SPRITE, sprite.getName(), sprite));
         }
@@ -179,8 +193,11 @@ public class QuickSearchDialog extends JDialog {
     }
 
     // Sounds
-    if (Editor.instance().getGameFile() != null && Editor.instance().getGameFile().getSounds() != null) {
+    if (Editor.instance().getGameFile() != null && Editor.instance().getGameFile().getSounds() != null && listModel.size() < MAX_RESULTS) {
       for (SoundResource sound : Editor.instance().getGameFile().getSounds()) {
+        if (listModel.size() >= MAX_RESULTS) {
+          break;
+        }
         if (sound.getName() != null && sound.getName().toLowerCase(Locale.ROOT).contains(filter)) {
           listModel.addElement(new SearchItem(ItemType.SOUND, sound.getName(), sound));
         }

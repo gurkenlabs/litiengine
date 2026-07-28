@@ -621,15 +621,6 @@ public final class UI {
     JFrame window = ((JFrame) Game.window().getHostControl());
     window.setResizable(true);
 
-    KeyStroke quickSearchKey = KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
-    window.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(quickSearchKey, "quickSearch");
-    window.getRootPane().getActionMap().put("quickSearch", new AbstractAction() {
-      @Override
-      public void actionPerformed(java.awt.event.ActionEvent e) {
-        de.gurkenlabs.utiliti.view.dialogs.QuickSearchDialog.showPalette();
-      }
-    });
-
     Game.addGameListener(new GameListener() {
       @Override public boolean terminating() {
         boolean terminate = notifyPendingChanges();
