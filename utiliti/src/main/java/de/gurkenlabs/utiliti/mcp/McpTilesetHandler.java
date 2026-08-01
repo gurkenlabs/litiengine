@@ -916,12 +916,14 @@ final class McpTilesetHandler {
     if (layer == null || edits == null || edits.isEmpty()) return error("A target layer and at least one edit are required");
     int minX = map.getWidth(), minY = map.getHeight(), maxX = -1, maxY = -1;
     JsonArrayBuilder warnings = Json.createArrayBuilder();
-    List<int[]> originals = new ArrayList<>();
+    Map<Long, int[]> originals = new LinkedHashMap<>();
     try {
       for (int index = 0; index < edits.size(); index++) {
         JsonObject edit = edits.getJsonObject(index); int x = McpToolHandler.getInt(edit, "x", -1); int y = McpToolHandler.getInt(edit, "y", -1);
         if (x < 0 || y < 0 || x >= map.getWidth() || y >= map.getHeight()) { warnings.add("Edit " + index + " is outside map bounds"); continue; }
-        originals.add(new int[] {x, y, layer.getTile(x, y) != null ? layer.getTile(x, y).getGridId() : 0});
+        originals.computeIfAbsent(
+            (((long) x) << 32) | (y & 0xffffffffL),
+            _ -> new int[] {x, y, layer.getTile(x, y) != null ? layer.getTile(x, y).getGridId() : 0});
         layer.setTile(x, y, McpToolHandler.getInt(edit, "gid", 0));
         minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
       }
@@ -932,7 +934,7 @@ final class McpTilesetHandler {
       BufferedImage image = renderContext(map, List.of(layer), centerX, centerY, radius,
           Math.max(1, McpToolHandler.getInt(args, "scale", 4)), false);
       int collisionCount = 0;
-      for (int[] original : originals) {
+      for (int[] original : originals.values()) {
         ITile preview = layer.getTile(original[0], original[1]);
         if (preview != null && preview.getTilesetEntry() != null && preview.getTilesetEntry().getCollisionInfo() != null) collisionCount++;
       }
@@ -940,7 +942,7 @@ final class McpTilesetHandler {
           .add("affectedBounds", boundsJson(minX, minY, maxX - minX + 1, maxY - minY + 1))
           .add("affectedCollisionTileCount", collisionCount).add("warnings", warnings).build();
     } finally {
-      for (int[] original : originals) layer.setTile(original[0], original[1], original[2]);
+      for (int[] original : originals.values()) layer.setTile(original[0], original[1], original[2]);
     }
   }
 
