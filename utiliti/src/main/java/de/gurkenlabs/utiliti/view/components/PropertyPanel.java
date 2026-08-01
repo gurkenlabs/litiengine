@@ -524,6 +524,16 @@ public abstract class PropertyPanel extends JPanel {
         .equals(textList.getJoinedString()), m -> m.setValue(property, textList.getJoinedString())));
   }
 
+  /** Sets up an entity-reference list to update a comma-separated map-object ID property. */
+  public void setup(EntityReferenceList entityReferenceList, String property) {
+    if (property == null || property.isEmpty()) {
+      return;
+    }
+    entityReferenceList.addActionListener(new MapObjectPropertyActionListener(
+      m -> !m.hasCustomProperty(property) || m.getStringValue(property, null) == null || !m.getStringValue(property, null)
+        .equals(entityReferenceList.getJoinedString()), m -> m.setValue(property, entityReferenceList.getJoinedString())));
+  }
+
   /**
    * Sets up a JTable to update the specified properties of the map object.
    *
