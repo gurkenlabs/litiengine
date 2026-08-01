@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /** Resolves Wang terrain constraints using the same propagation model as Tiled's WangFiller. */
-final class TerrainResolver {
+public final class TerrainResolver {
   private static final int[] OFFSET_X = {0, 1, 1, 1, 0, -1, -1, -1};
   private static final int[] OFFSET_Y = {-1, -1, 0, 1, 1, 1, 0, -1};
   private static final int[] ALL_POSITIONS = {0, 1, 2, 3, 4, 5, 6, 7};
@@ -51,7 +51,7 @@ final class TerrainResolver {
     this.correctionRadius = maximumDistance(this.distances) + 1;
   }
 
-  static Result resolve(ITileLayer layer, ITileset tileset, WangSet terrainSet, int terrain, Point center) {
+  public static Result resolve(ITileLayer layer, ITileset tileset, WangSet terrainSet, int terrain, Point center) {
     TerrainResolver resolver = new TerrainResolver(layer, tileset, terrainSet);
     return resolver.resolve(terrain, center);
   }
@@ -344,7 +344,7 @@ final class TerrainResolver {
     return maximum;
   }
 
-  record Result(Map<Point, Integer> changes, int invalidCells) {
+  public record Result(Map<Point, Integer> changes, int invalidCells) {
   }
 
   private static final class CellInfo {

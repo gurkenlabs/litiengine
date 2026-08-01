@@ -1,5 +1,9 @@
 package de.gurkenlabs.utiliti.controller;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.Environment;
@@ -208,7 +212,11 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    Renderers.render(g);
+    try {
+      Renderers.render(g);
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "Error during map component render: " + e.getMessage(), e);
+    }
     super.render(g);
   }
 
@@ -323,7 +331,9 @@ public class MapComponent extends GuiComponent {
 
   public void loadEnvironment(TmxMap map) {
     if (map == null) {
-      UI.getMapController().setSelection(null);
+      if (UI.getMapController() != null) {
+        UI.getMapController().setSelection(null);
+      }
       return;
     }
     boolean refitAfterLoad = this.fitMode
@@ -385,13 +395,17 @@ public class MapComponent extends GuiComponent {
         });
       }
 
-      UI.getMapController().setSelection(map);
+      if (UI.getMapController() != null) {
+        UI.getMapController().setSelection(map);
+      }
       IMapObject focused = getFocusedMapObject();
       this.refreshInspector();
-      if (focused == null) {
-        UI.showMapProperties();
-      } else {
-        UI.showObjectInspector();
+      if (UI.getMapController() != null) {
+        if (focused == null) {
+          UI.showMapProperties();
+        } else {
+          UI.showObjectInspector();
+        }
       }
 
       for (Consumer<TmxMap> cons : this.loadedConsumer) {
@@ -953,17 +967,28 @@ public class MapComponent extends GuiComponent {
   }
 
   public static IMapObject resolveParentEntity(IMapObject mapObject) {
+    IMap map =
+      Game.world() != null && Game.world().environment() != null
+        ? Game.world().environment().getMap()
+        : null;
+    return resolveParentEntity(mapObject, map);
+  }
+
+  static IMapObject resolveParentEntity(IMapObject mapObject, IMap map) {
     if (mapObject == null) {
       return null;
     }
     MapObjectType type = MapObjectType.get(mapObject.getType());
-    if (type == MapObjectType.PROP || type == MapObjectType.CREATURE) {
+    if (type == MapObjectType.PROP
+      || type == MapObjectType.CREATURE
+      || type == MapObjectType.SOUNDSOURCE
+      || type == MapObjectType.LIGHTSOURCE) {
       return mapObject;
     }
 
-    if (Game.world().environment() != null && Game.world().environment().getMap() != null && mapObject.getBoundingBox() != null) {
-      for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
-        if (layer == null || !isLayerEffectivelyVisible(Game.world().environment().getMap(), layer)) {
+    if (map != null && mapObject.getBoundingBox() != null) {
+      for (IMapObjectLayer layer : map.getMapObjectLayers()) {
+        if (layer == null || !isLayerEffectivelyVisible(map, layer)) {
           continue;
         }
         for (IMapObject other : layer.getMapObjects()) {
@@ -983,7 +1008,6 @@ public class MapComponent extends GuiComponent {
   }
 
   public void setFocus(IMapObject mapObject, boolean clearSelection) {
-    mapObject = resolveParentEntity(mapObject);
     if (isFocussing) {
       return;
     }
@@ -1222,8 +1246,66 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
+    createMap(
+        mapName,
+        orientation,
+        mapWidth,
+        mapHeight,
+        tileWidth,
+        tileHeight,
+        dialog.getStaggerAxis(),
+        dialog.getStaggerIndex(),
+        dialog.getHexSideLength());
+  }
+
+  public TmxMap createMap(
+      String mapName,
+      IMapOrientation orientation,
+      int mapWidth,
+      int mapHeight,
+      int tileWidth,
+      int tileHeight,
+      StaggerAxis staggerAxis,
+      StaggerIndex staggerIndex,
+      int hexSideLength) {
+    return createMap(
+        mapName,
+        orientation,
+        mapWidth,
+        mapHeight,
+        tileWidth,
+        tileHeight,
+        staggerAxis,
+        staggerIndex,
+        hexSideLength,
+        List.of());
+  }
+
+  public TmxMap createMap(
+      String mapName,
+      IMapOrientation orientation,
+      int mapWidth,
+      int mapHeight,
+      int tileWidth,
+      int tileHeight,
+      StaggerAxis staggerAxis,
+      StaggerIndex staggerIndex,
+      int hexSideLength,
+      List<Tileset> projectTilesets) {
+    if (getMaps() == null
+        || mapName == null
+        || mapName.isBlank()
+        || orientation == null
+        || mapWidth <= 0
+        || mapHeight <= 0
+        || tileWidth <= 0
+        || tileHeight <= 0
+        || !isMapNameAvailable(null, mapName.trim())) {
+      return null;
+    }
+
     TmxMap map = new TmxMap(orientation);
-    map.setName(mapName);
+    map.setName(mapName.trim());
     map.setTileWidth(tileWidth);
     map.setTileHeight(tileHeight);
     map.setWidth(mapWidth);
@@ -1231,13 +1313,24 @@ public class MapComponent extends GuiComponent {
 
     // Set stagger properties for Staggered and Hexagonal orientations
     if (orientation == MapOrientations.ISOMETRIC_STAGGERED || orientation == MapOrientations.HEXAGONAL) {
-      map.setStaggerAxis(dialog.getStaggerAxis());
-      map.setStaggerIndex(dialog.getStaggerIndex());
+      map.setStaggerAxis(staggerAxis != null ? staggerAxis : StaggerAxis.Y);
+      map.setStaggerIndex(staggerIndex != null ? staggerIndex : StaggerIndex.ODD);
     }
 
     // Set hex side length for Hexagonal orientation
     if (orientation == MapOrientations.HEXAGONAL) {
-      map.setHexSideLength(dialog.getHexSideLength());
+      map.setHexSideLength(hexSideLength);
+    }
+
+    long nextFirstGridId = 1;
+    if (projectTilesets != null) {
+      for (Tileset projectTileset : projectTilesets) {
+        if (projectTileset == null || nextFirstGridId > Integer.MAX_VALUE) {
+          return null;
+        }
+        map.getTilesets().add(new Tileset(projectTileset, (int) nextFirstGridId));
+        nextFirstGridId += Math.max(1, projectTileset.getTileCount());
+      }
     }
 
     // Add a default map object layer
@@ -1249,13 +1342,24 @@ public class MapComponent extends GuiComponent {
     Collections.sort(getMaps());
 
     Editor.instance().updateGameFileMaps();
-    Objects.requireNonNull(Renderers.get(GridRenderer.class)).clearCache();
+    GridRenderer gridRenderer = Renderers.get(GridRenderer.class);
+    if (gridRenderer != null) {
+      gridRenderer.clearCache();
+    }
     this.environments.remove(map);
 
-    UI.getMapController().bind(getMaps(), true);
-    this.loadEnvironment(map);
-    UndoManager.instance().recordChanges();
+    if (UI.getMapController() != null) {
+      UI.getMapController().bind(getMaps(), true);
+      this.loadEnvironment(map);
+    } else {
+      Environment environment = new Environment(map);
+      environment.init();
+      this.environments.put(map, environment);
+      Game.world().loadEnvironment(environment);
+    }
+    UndoManager.forMap(map).recordChanges();
     log.log(Level.INFO, "created new map {0}", new Object[] {map.getName()});
+    return map;
   }
 
   public boolean renameMap(IMap map, String requestedName) {
@@ -1322,22 +1426,74 @@ public class MapComponent extends GuiComponent {
       });
   }
 
-  public void reassignIds(TmxMap map, int startID) {
+  public IdReassignmentResult reassignIds(TmxMap map, int startID) {
+    if (map == null) {
+      return new IdReassignmentResult(Collections.emptyList(), Collections.emptyMap(), Collections.emptySet(), Collections.emptyList(), 0);
+    }
+    List<IdChange> changes = new ArrayList<>();
+    Map<Integer, Integer> unambiguousMap = new LinkedHashMap<>();
+    Set<Integer> ambiguousOldIds = new LinkedHashSet<>();
+
+    Map<Integer, List<IMapObject>> oldIdGroups = new LinkedHashMap<>();
+    for (IMapObject obj : map.getMapObjects()) {
+      oldIdGroups.computeIfAbsent(obj.getId(), k -> new ArrayList<>()).add(obj);
+    }
+
+    for (Map.Entry<Integer, List<IMapObject>> entry : oldIdGroups.entrySet()) {
+      if (entry.getValue().size() > 1) {
+        ambiguousOldIds.add(entry.getKey());
+      }
+    }
+
     int maxMapId = startID;
     UndoManager.instance().beginOperation();
     for (IMapObject obj : map.getMapObjects()) {
       final int previousId = obj.getId();
+      final int newId = maxMapId++;
       UndoManager.instance().mapObjectChanging(obj);
-      obj.setId(maxMapId);
+      obj.setId(newId);
       UndoManager.instance().mapObjectChanged(obj, previousId);
-      maxMapId++;
+      changes.add(new IdChange(previousId, newId, obj.getName()));
+      if (!ambiguousOldIds.contains(previousId)) {
+        unambiguousMap.put(previousId, newId);
+      }
     }
+
+    int updatedReferences = 0;
+    List<String> warnings = new ArrayList<>();
+
+    for (IMapObject obj : map.getMapObjects()) {
+      for (String propName : new String[] { MapObjectProperty.TRIGGER_TARGETS, MapObjectProperty.TRIGGER_ACTIVATORS }) {
+        de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty prop = obj.getProperty(propName);
+        if (prop != null && prop.getAsString() != null && !prop.getAsString().isBlank()) {
+          IdReferenceRemap remap = remapIdReferences(prop.getAsString(), unambiguousMap, ambiguousOldIds);
+          if (remap.replacements() > 0 || !remap.ambiguousReferences().isEmpty()) {
+            if (remap.replacements() > 0) {
+              UndoManager.instance().mapObjectChanging(obj);
+              prop.setValue(remap.value());
+              UndoManager.instance().mapObjectChanged(obj, obj.getId());
+              updatedReferences += remap.replacements();
+            }
+            for (int ambiguousId : remap.ambiguousReferences()) {
+              warnings.add("Property " + propName + " on object " + obj.getId() + " references ambiguous old ID: " + ambiguousId);
+            }
+          }
+        }
+      }
+    }
+
     UndoManager.instance().endOperation();
 
-    Game.world().environment().clear();
-    Game.world().environment().load();
-    UI.getMapController().refresh();
+    if (Game.world().environment() != null && Game.world().environment().getMap() == map) {
+      Game.world().environment().clear();
+      Game.world().environment().load();
+    }
+    if (UI.getMapController() != null) {
+      UI.getMapController().refresh();
+    }
     log.log(Level.INFO, "Reassigned IDs for Map {0}.", new Object[] {map.getName()});
+
+    return new IdReassignmentResult(changes, unambiguousMap, ambiguousOldIds, warnings, updatedReferences);
   }
 
   @Override
@@ -1458,17 +1614,42 @@ public class MapComponent extends GuiComponent {
 
   private IMapObject createNewMapObject(MapObjectType type) {
     final Rectangle2D newObjectArea = getMouseSelectArea(true);
-    IMapObject mo = new MapObject();
-    mo.setType(type.toString());
-    mo.setX((float) newObjectArea.getX());
-    mo.setY((float) newObjectArea.getY());
+    IMapObject mo =
+        createMapObjectWithEditorDefaults(
+            type,
+            (float) newObjectArea.getX(),
+            (float) newObjectArea.getY(),
+            (float) newObjectArea.getWidth(),
+            (float) newObjectArea.getHeight());
+    mo.setId(Game.world().environment().getNextMapId());
 
-    // ensure a minimum size for the new object
-    float width = (float) newObjectArea.getWidth();
-    float height = (float) newObjectArea.getHeight();
+    if (this.createDefinition != null) {
+      mo.setValue(MapObjectProperty.IMPLEMENTATION, this.createDefinition.id());
+      for (var property : this.createDefinition.properties()) {
+        setDefaultValue(mo, property);
+      }
+    }
+
+    this.add(mo);
+    return mo;
+  }
+
+  /**
+   * Creates a map object with the same built-in defaults used by the visual map editor.
+   *
+   * <p>The returned object is not assigned an ID and is not added to a map. Callers can apply
+   * overrides and validate the completed object before mutating the current map.
+   */
+  public static MapObject createMapObjectWithEditorDefaults(
+      MapObjectType type, float x, float y, float width, float height) {
+    Objects.requireNonNull(type, "type");
+
+    MapObject mo = new MapObject();
+    mo.setType(type.toString());
+    mo.setX(x);
+    mo.setY(y);
     mo.setWidth(width == 0 ? 16 : width);
     mo.setHeight(height == 0 ? 16 : height);
-    mo.setId(Game.world().environment().getNextMapId());
     mo.setName("");
 
     switch (type) {
@@ -1481,24 +1662,27 @@ public class MapComponent extends GuiComponent {
         EmitterMapObjectLoader.updateMapObject(defaultData, mo);
         break;
       case PROP:
-        String propSprite = getDefaultSpriteName(MapObjectType.PROP, Resources.spritesheets().getAll());
+        String propSprite =
+            getDefaultSpriteName(MapObjectType.PROP, Resources.spritesheets().getAll());
         if (propSprite != null) {
           mo.setValue(MapObjectProperty.SPRITESHEETNAME, propSprite);
         }
-        mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, (newObjectArea.getWidth() * 0.4));
-        mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, (newObjectArea.getHeight() * 0.4));
+        mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, mo.getWidth() * 0.4);
+        mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, mo.getHeight() * 0.4);
         mo.setValue(MapObjectProperty.COLLISION, true);
         mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
         mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
         break;
       case CREATURE:
-        String creatureSprite = getDefaultSpriteName(MapObjectType.CREATURE, Resources.spritesheets().getAll());
+        String creatureSprite =
+            getDefaultSpriteName(MapObjectType.CREATURE, Resources.spritesheets().getAll());
         if (creatureSprite != null) {
           mo.setValue(MapObjectProperty.SPRITESHEETNAME, creatureSprite);
         }
         break;
       case LIGHTSOURCE:
         mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
+        mo.setValue(MapObjectProperty.LIGHT_INTENSITY, 100);
         mo.setValue(MapObjectProperty.LIGHT_SHAPE, "ellipse");
         mo.setValue(MapObjectProperty.LIGHT_ACTIVE, true);
         break;
@@ -1508,21 +1692,15 @@ public class MapComponent extends GuiComponent {
       case SOUNDSOURCE:
         mo.setValue(MapObjectProperty.SOUND_VOLUME, 1);
         mo.setValue(MapObjectProperty.SOUND_LOOP, true);
+        mo.setValue(MapObjectProperty.SOUND_RANGE, Game.audio().getMaxDistance());
         break;
       case SPAWNPOINT:
-        break;
-      default:
+      case AREA:
+      case STATICSHADOW:
+      case TRIGGER:
         break;
     }
 
-    if (this.createDefinition != null) {
-      mo.setValue(MapObjectProperty.IMPLEMENTATION, this.createDefinition.id());
-      for (var property : this.createDefinition.properties()) {
-        setDefaultValue(mo, property);
-      }
-    }
-
-    this.add(mo);
     return mo;
   }
 
@@ -2079,7 +2257,9 @@ public class MapComponent extends GuiComponent {
         if (getSelectedMapObjects().contains(mapObject)) {
           getSelectedMapObjects().remove(mapObject);
         } else {
-          this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
+          this.setFocus(
+            resolveParentEntity(mapObject),
+            !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
         }
         somethingIsFocused = true;
       }
@@ -2103,5 +2283,71 @@ public class MapComponent extends GuiComponent {
     }
 
     return true;
+  }
+
+  public boolean deleteMap(TmxMap map) {
+    if (map == null) {
+      return false;
+    }
+    boolean isCurrentMap = Game.world().environment() != null && Game.world().environment().getMap() == map;
+    if (getMaps().remove(map)) {
+      if (Editor.instance().getGameFile() != null) {
+        Editor.instance().getGameFile().getMaps().remove(map);
+      }
+      if (isCurrentMap) {
+        TmxMap nextMap = getMaps().isEmpty() ? null : getMaps().get(0);
+        loadEnvironment(nextMap);
+      } else if (UI.getMapController() != null) {
+        UI.getMapController().bind(getMaps(), true);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public record IdChange(int oldId, int newId, String name) {}
+  public record IdReassignmentResult(List<IdChange> changes, Map<Integer, Integer> unambiguousMapping, Set<Integer> ambiguousOldIds, List<String> warnings, int updatedReferences) {}
+  public record IdReferenceRemap(String value, Set<Integer> ambiguousReferences, int replacements) {}
+
+  public static IdReferenceRemap remapIdReferences(String rawValue, Map<Integer, Integer> unambiguousMap, Set<Integer> ambiguousOldIds) {
+    if (rawValue == null || rawValue.isBlank()) {
+      return new IdReferenceRemap(rawValue, Collections.emptySet(), 0);
+    }
+    Set<Integer> ambiguousFound = new LinkedHashSet<>();
+    int count = 0;
+    String[] parts = rawValue.split(",");
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < parts.length; i++) {
+      String rawPart = parts[i];
+      int startIdx = 0;
+      while (startIdx < rawPart.length() && Character.isWhitespace(rawPart.charAt(startIdx))) {
+        startIdx++;
+      }
+      int endIdx = rawPart.length();
+      while (endIdx > startIdx && Character.isWhitespace(rawPart.charAt(endIdx - 1))) {
+        endIdx--;
+      }
+      String leadingSpace = rawPart.substring(0, startIdx);
+      String trailingSpace = rawPart.substring(endIdx);
+      String part = rawPart.substring(startIdx, endIdx);
+      try {
+        int parsedId = Integer.parseInt(part);
+        if (ambiguousOldIds != null && ambiguousOldIds.contains(parsedId)) {
+          ambiguousFound.add(parsedId);
+        }
+        if (unambiguousMap != null && unambiguousMap.containsKey(parsedId)) {
+          sb.append(leadingSpace).append(unambiguousMap.get(parsedId)).append(trailingSpace);
+          count++;
+        } else {
+          sb.append(rawPart);
+        }
+      } catch (NumberFormatException e) {
+        sb.append(rawPart);
+      }
+      if (i < parts.length - 1) {
+        sb.append(",");
+      }
+    }
+    return new IdReferenceRemap(sb.toString(), ambiguousFound, count);
   }
 }

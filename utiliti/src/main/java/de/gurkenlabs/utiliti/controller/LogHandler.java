@@ -6,30 +6,57 @@ import java.awt.geom.Rectangle2D;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 public class LogHandler extends java.util.logging.Handler {
+  public record LogEntry(String level, String message, long timestamp) {}
+  private final List<LogEntry> recentLogs = new CopyOnWriteArrayList<>();
+  private static final int MAX_RECENT_LOGS = 100;
+
   final JTextPane textPane;
   private final AtomicInteger warningCount = new AtomicInteger();
   private final AtomicInteger errorCount = new AtomicInteger();
   private final List<Runnable> changeListeners = new CopyOnWriteArrayList<>();
   private volatile String latestErrorStack;
+  private static final Pattern PATH_PATTERN = Pattern.compile("(?:file:///[^\\s\\n\\r\"]+|[A-Za-z]:\\\\[^\\s\\n\\r\"]+|screenshots\\\\[^\\s\\n\\r\"]+|screenshots/[^\\s\\n\\r\"]+)");
 
   public LogHandler(final JTextPane textPane) {
     this.textPane = textPane;
   }
 
+  public List<LogEntry> getRecentLogs() {
+    return new ArrayList<>(recentLogs);
+  }
+
   @Override
   public void publish(final LogRecord rec) {
+    if (rec == null || isExpectedMcpTransportNoise(rec)) {
+      return;
+    }
+
+    Level configuredThreshold = LoggingManager.parseLogLevel(Editor.preferences().getLogLevel());
+    if (rec.getLevel().intValue() < configuredThreshold.intValue()) {
+      return;
+    }
+
+    if (configuredThreshold.intValue() > Level.FINE.intValue()
+        && LoggingManager.isTomcatBoilerplate(rec.getLoggerName(), rec.getMessage())) {
+      return;
+    }
+
     StyledDocument doc = textPane.getStyledDocument();
     SimpleAttributeSet keyWord = new SimpleAttributeSet();
     StyleConstants.setForeground(keyWord, getColor(rec.getLevel()));
@@ -41,9 +68,18 @@ public class LogHandler extends java.util.logging.Handler {
     StyleConstants.setForeground(text, getColor(rec.getLevel()));
     StyleConstants.setFontFamily(text, Style.FONTNAME_CONSOLE);
 
+    SimpleAttributeSet linkStyle = new SimpleAttributeSet();
+    StyleConstants.setForeground(linkStyle, new Color(80, 170, 255));
+    StyleConstants.setUnderline(linkStyle, true);
+    StyleConstants.setFontFamily(linkStyle, Style.FONTNAME_CONSOLE);
+
     String message;
-    if (rec.getParameters() != null) {
-      message = MessageFormat.format(rec.getMessage(), rec.getParameters());
+    if (rec.getParameters() != null && rec.getParameters().length > 0) {
+      try {
+        message = MessageFormat.format(rec.getMessage(), rec.getParameters());
+      } catch (Exception e) {
+        message = rec.getMessage();
+      }
     } else {
       message = rec.getMessage();
     }
@@ -56,15 +92,51 @@ public class LogHandler extends java.util.logging.Handler {
       message = errorStack;
     }
 
-    try {
-      doc.insertString(doc.getLength(), String.format("%1$-10s", rec.getLevel()), keyWord);
-      doc.insertString(doc.getLength(), message, text);
-      doc.insertString(doc.getLength(), "\n", text);
-    } catch (BadLocationException e) {
-      // if an exception occurs while logging, just ignore it
+    String cleanMessage = message != null ? message.replaceAll("\\u001B\\[[;\\d]*[a-zA-Z]|\\u001B\\]8;;.*?\\u001B\\\\", "") : "";
+
+    if (configuredThreshold.intValue() > Level.FINE.intValue()
+        && cleanMessage.contains("Client initialize request - Protocol:")) {
+      cleanMessage = LoggingManager.formatClientInitializeRequest(cleanMessage);
+    }
+    final String formattedMessage = cleanMessage;
+
+    recentLogs.add(new LogEntry(rec.getLevel().getName(), formattedMessage, System.currentTimeMillis()));
+    if (recentLogs.size() > MAX_RECENT_LOGS) {
+      recentLogs.remove(0);
     }
 
-    textPane.setCaretPosition(doc.getLength());
+    Runnable insertTask = () -> {
+      try {
+        doc.insertString(doc.getLength(), String.format("%1$-10s", rec.getLevel()), keyWord);
+
+        Matcher matcher = PATH_PATTERN.matcher(formattedMessage);
+        int lastEnd = 0;
+        while (matcher.find()) {
+          if (matcher.start() > lastEnd) {
+            doc.insertString(doc.getLength(), formattedMessage.substring(lastEnd, matcher.start()), text);
+          }
+          String matchedPath = matcher.group();
+          SimpleAttributeSet matchLinkStyle = new SimpleAttributeSet(linkStyle);
+          matchLinkStyle.addAttribute("LINK_FILE_PATH", matchedPath);
+          doc.insertString(doc.getLength(), matchedPath, matchLinkStyle);
+          lastEnd = matcher.end();
+        }
+        if (lastEnd < formattedMessage.length()) {
+          doc.insertString(doc.getLength(), formattedMessage.substring(lastEnd), text);
+        }
+        doc.insertString(doc.getLength(), "\n", text);
+      } catch (BadLocationException e) {
+        // if an exception occurs while logging, just ignore it
+      }
+
+      textPane.setCaretPosition(doc.getLength());
+    };
+
+    if (SwingUtilities.isEventDispatchThread()) {
+      insertTask.run();
+    } else {
+      SwingUtilities.invokeLater(insertTask);
+    }
 
     if (rec.getLevel().intValue() >= Level.SEVERE.intValue()) {
       this.errorCount.incrementAndGet();
@@ -81,14 +153,23 @@ public class LogHandler extends java.util.logging.Handler {
 
   @Override
   public void flush() {
-    StyledDocument doc = textPane.getStyledDocument();
-    try {
-      doc.remove(0, doc.getLength());
-    } catch (BadLocationException e) {
-      // if an exception occurs while logging, just ignore it
+    Runnable flushTask = () -> {
+      StyledDocument doc = textPane.getStyledDocument();
+      try {
+        doc.remove(0, doc.getLength());
+      } catch (BadLocationException e) {
+        // if an exception occurs while logging, just ignore it
+      }
+
+      textPane.setCaretPosition(doc.getLength());
+    };
+
+    if (SwingUtilities.isEventDispatchThread()) {
+      flushTask.run();
+    } else {
+      SwingUtilities.invokeLater(flushTask);
     }
 
-    textPane.setCaretPosition(doc.getLength());
     this.warningCount.set(0);
     this.errorCount.set(0);
     this.latestErrorStack = null;
@@ -101,15 +182,25 @@ public class LogHandler extends java.util.logging.Handler {
   }
 
   public void scrollToLast() {
-    StyledDocument doc = textPane.getStyledDocument();
-    Rectangle2D bounds;
-    try {
-      bounds = textPane.modelToView2D(textPane.getCaretPosition());
-      textPane.scrollRectToVisible(bounds.getBounds());
-    } catch (BadLocationException e) {
-      // if an exception occurs while logging, just ignore it
+    Runnable scrollTask = () -> {
+      StyledDocument doc = textPane.getStyledDocument();
+      Rectangle2D bounds;
+      try {
+        bounds = textPane.modelToView2D(textPane.getCaretPosition());
+        if (bounds != null) {
+          textPane.scrollRectToVisible(bounds.getBounds());
+        }
+      } catch (BadLocationException e) {
+        // if an exception occurs while logging, just ignore it
+      }
+      textPane.setCaretPosition(doc.getLength());
+    };
+
+    if (SwingUtilities.isEventDispatchThread()) {
+      scrollTask.run();
+    } else {
+      SwingUtilities.invokeLater(scrollTask);
     }
-    textPane.setCaretPosition(doc.getLength());
   }
 
   public int getWarningCount() {
@@ -126,6 +217,37 @@ public class LogHandler extends java.util.logging.Handler {
 
   public void addChangeListener(Runnable listener) {
     this.changeListeners.add(listener);
+  }
+
+  private static boolean isExpectedMcpTransportNoise(LogRecord record) {
+    String loggerName = record.getLoggerName();
+    String message = record.getMessage();
+    if (loggerName == null
+        || !loggerName.startsWith("io.modelcontextprotocol.")
+        || message == null) {
+      return false;
+    }
+
+    boolean unsupportedCancellation =
+        message.contains("No handler registered for notification method:")
+            && message.contains("notifications/cancelled");
+    boolean disconnectedStream =
+        message.contains("Failed to send message to session")
+            && (message.contains("Client disconnected")
+                || message.contains("Stream closed")
+                || message.contains("Stream unavailable"));
+    boolean staleKeepAlive =
+        message.contains("Failed to send keep-alive ping to session")
+            && (message.contains("Stream closed")
+                || message.contains("Stream unavailable"));
+    boolean completedAsyncRequest =
+        message.contains("Failed to complete async context for session")
+            && message.contains("asyncComplete()")
+            && message.contains("COMPLETING");
+    return unsupportedCancellation
+        || disconnectedStream
+        || staleKeepAlive
+        || completedAsyncRequest;
   }
 
   private void notifyChangeListeners() {

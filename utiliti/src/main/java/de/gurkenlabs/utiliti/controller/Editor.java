@@ -127,10 +127,7 @@ public class Editor extends Screen {
   }
 
   @Override public void render(final Graphics2D g) {
-    WorkspaceRenderer.renderBackground(g);
-    if (Game.world().environment() != null) {
-      Game.world().environment().render(g);
-    }
+    renderWorkspace(g);
 
     String mapName = Game.world().environment() != null && Game.world().environment().getMap() != null
       ? Game.world().environment().getMap().getName()
@@ -144,6 +141,25 @@ public class Editor extends Screen {
 
     super.render(g);
     WorkspaceRenderer.renderMapBounds(g);
+  }
+
+  /**
+   * Renders the editor canvas without the surrounding Swing UI.
+   *
+   * <p>This mirrors the visible canvas pipeline: workspace background, map layers and entities,
+   * editor overlays, and map bounds.
+   */
+  public void renderCanvas(Graphics2D g) {
+    renderWorkspace(g);
+    this.mapComponent.render(g);
+    WorkspaceRenderer.renderMapBounds(g);
+  }
+
+  private static void renderWorkspace(Graphics2D g) {
+    WorkspaceRenderer.renderBackground(g);
+    if (Game.world().environment() != null) {
+      Game.world().environment().render(g);
+    }
   }
 
   private void updateWindowMetadata(String mapName) {
@@ -258,12 +274,13 @@ public class Editor extends Screen {
     ToolManager.instance().clearSelections();
     UndoManager.clearAll();
     getMapComponent().clearAll();
+    UI.clearInspector();
     this.currentResourceFile = null;
-    this.gameFile = null;
     this.projectCodeIntegration.close();
     this.setProjectPath(null);
     this.mapComponent.loadMaps(List.of(), true);
     Resources.clearAll();
+    this.gameFile = null;
     UI.getAssetController().refresh();
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
@@ -296,13 +313,14 @@ public class Editor extends Screen {
       UndoManager.clearAll();
       ToolManager.instance().clearSelections();
 
-      // set up project settings
-      this.currentResourceFile = gameFile;
-      this.gameFile = ResourceBundle.load(gameFile.toString());
-      if (this.gameFile == null) {
+      ResourceBundle loadedGameFile = ResourceBundle.load(gameFile.toString());
+      if (loadedGameFile == null) {
         throw new IllegalArgumentException("The game file " + gameFile + " could not be loaded!");
       }
 
+      // Replace the current project only after the new resource bundle was parsed successfully.
+      this.currentResourceFile = gameFile;
+      this.gameFile = loadedGameFile;
       this.setProjectPath(gameFile);
       this.loadProjectTilesetTerrains(gameFile.getParent());
       this.projectCodeIntegration.reload(gameFile);
@@ -348,6 +366,7 @@ public class Editor extends Screen {
     } finally {
       Cursors.apply(Cursors.DEFAULT);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] {gameFile, (System.nanoTime() - currentTime) / 1000000.0});
+      this.loading = false;
     }
   }
 
@@ -1014,7 +1033,9 @@ public class Editor extends Screen {
       this.getGameFile().getMaps().add(map);
     }
 
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   public boolean isUnsavedProject() {

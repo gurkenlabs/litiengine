@@ -30,6 +30,7 @@ public class Program {
 
         Game.config().load();
         Game.config().client().setMaxFps(Editor.preferences().getEditorFpsCap());
+        de.gurkenlabs.utiliti.controller.LoggingManager.applyLogLevel(Editor.preferences().getLogLevel());
         applyPreferredLocale();
 
         Game.info().setSubTitle(Resources.strings().get("app_subtitle"));
@@ -58,6 +59,10 @@ public class Program {
         Path gameFile = Editor.preferences().getLastGameFile();
         if (Editor.preferences().reopenLastProject() && !Editor.instance().fileLoaded() && gameFile != null) {
           Editor.instance().load(gameFile, false);
+        }
+
+        if (Editor.preferences().isMcpEnabled()) {
+          de.gurkenlabs.utiliti.mcp.McpServer.instance().start();
         }
       }, args);
     } catch (Throwable e) {
