@@ -17,6 +17,14 @@ Do not treat maps as collections of tiles and objects. Treat every map as four t
 
 ---
 
+## Tiling Strategy: Terrains Over Plain Tiles
+> **ALWAYS use Wang terrains (`paint_terrain` / `paint-terrain`) over plain tile-by-tile GID editing (`edit_tiles` / `fill_tiles` / `set_tile`) whenever possible.**
+> - Call `list_terrains` / `list-terrains` first to discover available Wang terrain sets (ground, grass, stone, walls, paths) and auto-tiling rulesets.
+> - Use `paint_terrain` / `paint-terrain` to automatically resolve tile corner/edge transitions and neighbor GIDs across grid regions.
+> - Reserve plain tile editing (`edit_tiles` / `fill_tiles` / `set_tile`) only for non-terrain decorative standalone tiles or when no matching Wang terrain set exists in the project tileset.
+
+---
+
 ## MCP Tool Strategy
 
 Use the high-level semantic orchestration tools provided by the utiLITI MCP server:
