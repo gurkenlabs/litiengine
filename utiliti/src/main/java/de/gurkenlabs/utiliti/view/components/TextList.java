@@ -147,8 +147,19 @@ public class TextList extends JPanel {
 
   public void setJoinedString(String rows) {
     this.model.setRowCount(0);
-    for (int target : ArrayUtilities.splitInt(rows)) {
-      this.model.addRow(new Object[] {target});
+    if (rows == null || rows.isBlank()) {
+      return;
+    }
+    for (String token : rows.split(",")) {
+      if (token == null || token.isBlank()) {
+        continue;
+      }
+      try {
+        int target = Integer.parseInt(token.trim());
+        this.model.addRow(new Object[] {target});
+      } catch (NumberFormatException _) {
+        // Ignore non-numeric tokens safely without crashing the editor UI inspector
+      }
     }
   }
 }

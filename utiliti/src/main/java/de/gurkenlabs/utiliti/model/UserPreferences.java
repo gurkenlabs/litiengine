@@ -63,6 +63,9 @@ public class UserPreferences extends ConfigurationGroup {
   private int editorFpsCap;
   private int settingsDialogX;
   private int settingsDialogY;
+  private int mcpPort;
+  private boolean mcpEnabled;
+  private String logLevel;
 
   /**
    * Constructs a new UserPreferences object with default settings. Initializes various user preference settings such as zoom, grid visibility,
@@ -92,6 +95,9 @@ public class UserPreferences extends ConfigurationGroup {
     this.editorFpsCap = 60;
     this.settingsDialogX = Integer.MIN_VALUE;
     this.settingsDialogY = Integer.MIN_VALUE;
+    this.mcpPort = 8080;
+    this.mcpEnabled = false;
+    this.logLevel = "INFO";
   }
 
   /**
@@ -645,6 +651,30 @@ public class UserPreferences extends ConfigurationGroup {
 
   public void setCompactMode(boolean compactMode) {
     this.compactMode = compactMode;
+  }
+
+  public int getMcpPort() {
+    return mcpPort;
+  }
+
+  public void setMcpPort(int mcpPort) {
+    this.mcpPort = mcpPort;
+  }
+
+  public boolean isMcpEnabled() {
+    return mcpEnabled;
+  }
+
+  public void setMcpEnabled(boolean mcpEnabled) {
+    this.mcpEnabled = mcpEnabled;
+  }
+
+  public String getLogLevel() {
+    return logLevel != null && !logLevel.isBlank() ? logLevel : "INFO";
+  }
+
+  public void setLogLevel(String logLevel) {
+    this.logLevel = logLevel != null && !logLevel.isBlank() ? logLevel : "INFO";
   }
 
   public int getAssetCardSize() {

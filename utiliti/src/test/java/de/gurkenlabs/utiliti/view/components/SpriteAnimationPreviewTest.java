@@ -3,6 +3,8 @@ package de.gurkenlabs.utiliti.view.components;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,6 +13,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Editor;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -86,5 +89,21 @@ class SpriteAnimationPreviewTest {
     preview.doubleClickForTest();
 
     assertSame(resource, opened.get());
+  }
+
+  @Test
+  void clearingPreviewAfterProjectCloseDoesNotRequireGameFile() throws Exception {
+    SpriteAnimationPreview preview = new SpriteAnimationPreview();
+    Field gameFile = Editor.class.getDeclaredField("gameFile");
+    gameFile.setAccessible(true);
+    Object original = gameFile.get(Editor.instance());
+    try {
+      gameFile.set(Editor.instance(), null);
+
+      assertDoesNotThrow(() -> preview.setSpritesheet(null));
+      assertNull(preview.getIconForTest());
+    } finally {
+      gameFile.set(Editor.instance(), original);
+    }
   }
 }

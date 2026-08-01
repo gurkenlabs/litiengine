@@ -268,4 +268,13 @@ class MapComponentTest {
     mapObject.setHeight(height);
     return mapObject;
   }
+
+  @Test
+  void remapIdReferencesPreservesExactWhitespace() {
+    java.util.Map<Integer, Integer> mapping = java.util.Map.of(10, 100, 20, 200);
+    MapComponent.IdReferenceRemap result =
+        MapComponent.remapIdReferences("  10 ,  20  , 30 ", mapping, null);
+    assertEquals("  100 ,  200  , 30 ", result.value());
+    assertEquals(2, result.replacements());
+  }
 }

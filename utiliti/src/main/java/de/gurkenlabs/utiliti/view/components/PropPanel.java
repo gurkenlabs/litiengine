@@ -88,8 +88,16 @@ public class PropPanel extends PropertyPanel {
       return null;
     }
 
-    String[] parts = spriteName.split("-");
-    return parts[1];
+    String identifier = spriteName.substring(PropAnimationController.PROP_IDENTIFIER.length());
+    for (PropState state : PropState.values()) {
+      String suffix = "-" + state.spriteString();
+      if (identifier.toLowerCase().endsWith(suffix.toLowerCase())
+          && identifier.length() > suffix.length()) {
+        return identifier.substring(0, identifier.length() - suffix.length());
+      }
+    }
+    int variantSeparator = identifier.indexOf('-');
+    return variantSeparator >= 0 ? identifier.substring(0, variantSeparator) : identifier;
   }
 
   @Override
@@ -215,6 +223,10 @@ public class PropPanel extends PropertyPanel {
 
   int getSpriteItemCountForTest() {
     return this.comboBoxSpriteSheets.getItemCount();
+  }
+
+  String getSelectedSpriteForTest() {
+    return SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
   }
 
   private static JPanel wrapCheckbox(JCheckBox cb) {

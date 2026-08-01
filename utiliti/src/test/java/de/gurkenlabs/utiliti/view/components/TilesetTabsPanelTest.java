@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
@@ -63,6 +64,19 @@ class TilesetTabsPanelTest {
     panel.bindIfMapChanged(map);
 
     assertEquals(2, panel.getTabCountForTest());
+  }
+
+  @Test
+  void bindingNullDisposesAllTilesetEditors() {
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.getTilesets().add(tileset("first", "grass"));
+    TilesetTabsPanel panel = new TilesetTabsPanel();
+    panel.bind(map);
+
+    panel.bind(null);
+
+    assertEquals(0, panel.getTabCountForTest());
+    assertNull(panel.getSelectedEditorForTest());
   }
 
   private static Tileset tileset(String name, String terrainName) {

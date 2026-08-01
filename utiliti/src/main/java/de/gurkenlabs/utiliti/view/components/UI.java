@@ -108,6 +108,7 @@ public final class UI {
   private static int objectSelectionPopupX;
   private static int objectSelectionPopupY;
   private static AssetList assetComponent;
+  private static ConsoleComponent consoleComponent;
 
   private static MapObjectInspector mapObjectPanel;
   private static MapPropertyPanel mapPropertyPanel;
@@ -206,6 +207,10 @@ public final class UI {
     return mapObjectPanel;
   }
 
+  public static ConsoleComponent getConsole() {
+    return consoleComponent;
+  }
+
   public static void showObjectInspector() {
     if (inspectorCards == null || inspectorHost == null) {
       return;
@@ -214,6 +219,34 @@ public final class UI {
     activeInspectorCard = "objects";
     Editor.instance().getMapComponent().inspectorObjectShown(
       Editor.instance().getMapComponent().getFocusedMapObject());
+  }
+
+  public static void clearInspector() {
+    if (mapObjectPanel != null) {
+      mapObjectPanel.bind(null);
+    }
+    if (mapPropertyPanel != null) {
+      mapPropertyPanel.bind(null);
+    }
+    if (layerPropertyPanel != null) {
+      layerPropertyPanel.bind(null);
+    }
+    if (tileLayerPropertyPanel != null) {
+      tileLayerPropertyPanel.bind(null);
+    }
+    if (tilesetEditorPanel != null) {
+      tilesetEditorPanel.bind(null);
+    }
+    if (tileLayerTilesetEditorPanel != null) {
+      tileLayerTilesetEditorPanel.bind(null);
+    }
+    if (spriteEditorPanel != null) {
+      spriteEditorPanel.bind(null);
+    }
+    if (inspectorCards != null && inspectorHost != null) {
+      inspectorCards.show(inspectorHost, "empty");
+      activeInspectorCard = "empty";
+    }
   }
 
   public static void showMapProperties() {
@@ -471,6 +504,12 @@ public final class UI {
     inspectorHost.add(tilesetInspectorScroll, "tilesets");
     inspectorHost.add(tileLayerPropertyPanel, "tileLayers");
     inspectorHost.add(spriteEditorPanel, "sprites");
+    JPanel emptyInspector = new JPanel(new GridBagLayout());
+    emptyInspector.setBackground(Style.background());
+    JLabel emptyInspectorLabel = new JLabel(Resources.strings().get("status_gamefile_closed"));
+    emptyInspectorLabel.setForeground(Style.mutedText());
+    emptyInspector.add(emptyInspectorLabel);
+    inspectorHost.add(emptyInspector, "empty");
     inspectorHost.setMinimumSize(new Dimension(inspectorMinWidth, 0));
 
     JLabel inspectorTitle = new JLabel(Resources.strings().get("panel_inspector"));
@@ -800,7 +839,7 @@ public final class UI {
     assetComponent = new AssetList();
     JPanel content = new JPanel(new CardLayout());
     content.add(assetComponent, "resources");
-    ConsoleComponent consoleComponent = new ConsoleComponent();
+    consoleComponent = new ConsoleComponent();
     content.add(consoleComponent, "console");
 
     JToggleButton resourcesTab = createBottomTab(Resources.strings().get("assettree_assets"), true, false);

@@ -162,8 +162,14 @@ final class SpriteAnimationPreview extends JPanel {
   }
 
   private java.util.Optional<SpritesheetResource> resolveSpriteResource() {
-    return Editor.instance().getGameFile().getSpriteSheets().stream()
-        .filter(resource -> resource.getName().equalsIgnoreCase(this.resourceName)
+    var gameFile = Editor.instance().getGameFile();
+    if (gameFile == null || this.resourceName == null && this.spritesheet == null) {
+      return java.util.Optional.empty();
+    }
+    return gameFile.getSpriteSheets().stream()
+        .filter(java.util.Objects::nonNull)
+        .filter(resource -> resource.getName() != null)
+        .filter(resource -> this.resourceName != null && resource.getName().equalsIgnoreCase(this.resourceName)
             || Resources.spritesheets().get(resource.getName()) == this.spritesheet)
         .findFirst();
   }

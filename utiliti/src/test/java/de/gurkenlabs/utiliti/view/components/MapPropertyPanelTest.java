@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
@@ -63,9 +64,45 @@ class MapPropertyPanelTest {
     assertEquals(tileset, map.getTilesets().getFirst());
   }
 
+  @Test
+  void bindingNullClearsMapAndNestedTilesetControls() throws Exception {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("old-map");
+    Tileset tileset = new Tileset();
+    tileset.setName("old-tileset");
+    map.getTilesets().add(tileset);
+    MapPropertyPanel panel = new MapPropertyPanel();
+    panel.bind(map);
+
+    panel.bind(null);
+
+    assertEquals("", textField(panel, "textFieldName").getText());
+    assertEquals("", textField(panel, "textFieldTitle").getText());
+    assertEquals("", textArea(panel, "textFieldDesc").getText());
+    assertEquals(0, tilesetPanel(panel).getTabCountForTest());
+    assertNull(field(panel, "dataSource"));
+  }
+
   private static ColorComponent shadowColorComponent(MapPropertyPanel panel) throws Exception {
-    Field field = MapPropertyPanel.class.getDeclaredField("shadowColorComponent");
+    return (ColorComponent) field(panel, "shadowColorComponent");
+  }
+
+  private static javax.swing.JTextField textField(MapPropertyPanel panel, String name) throws Exception {
+    return (javax.swing.JTextField) field(panel, name);
+  }
+
+  private static javax.swing.JTextArea textArea(MapPropertyPanel panel, String name) throws Exception {
+    return (javax.swing.JTextArea) field(panel, name);
+  }
+
+  private static TilesetTabsPanel tilesetPanel(MapPropertyPanel panel) throws Exception {
+    return (TilesetTabsPanel) field(panel, "tilesetPanel");
+  }
+
+  private static Object field(MapPropertyPanel panel, String name) throws Exception {
+    Field field = MapPropertyPanel.class.getDeclaredField(name);
     field.setAccessible(true);
-    return (ColorComponent) field.get(panel);
+    return field.get(panel);
   }
 }
