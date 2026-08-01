@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
@@ -24,7 +25,12 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     }
 
     final int intensity = mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
-    final Color color = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);
+    Color color;
+    try {
+      color = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);
+    } catch (NoSuchElementException _) {
+      color = null;
+    }
     if (color == null) {
       return entities;
     }

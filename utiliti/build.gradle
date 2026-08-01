@@ -33,6 +33,10 @@ dependencies {
   implementation project(":litiengine")
   implementation libs.darklaf.core
   implementation libs.darklaf.propertyLoader
+  implementation platform(libs.mcp.bom)
+  implementation libs.mcp.sdk
+  implementation libs.tomcat.embed.core
+  runtimeOnly libs.slf4j.jdk14
   testImplementation project(":shared")
   testImplementation libs.junit.jupiter
   testRuntimeOnly "org.junit.platform:junit-platform-launcher"
@@ -40,7 +44,7 @@ dependencies {
 
 runtime {
   options.set(["--strip-debug", "--no-header-files", "--no-man-pages"])
-  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.xml", "jdk.unsupported.desktop"])
+  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.naming", "java.xml", "jdk.unsupported.desktop"])
 
   launcher {
     noConsole = false

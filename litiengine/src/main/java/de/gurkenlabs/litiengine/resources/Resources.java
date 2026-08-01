@@ -381,6 +381,9 @@ public final class Resources {
    * @return The URL of the resource, or null if the resource could not be found.
    */
   public static URL getLocation(String name) {
+    if (name == null || name.isBlank()) {
+      return null;
+    }
     URL fromClass = ClassLoader.getSystemResource(name);
     if (fromClass != null) {
       return fromClass;

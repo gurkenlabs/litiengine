@@ -18,34 +18,42 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectText;
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyShape;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxPropertyInfo;
 
 public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlAttribute
+  @TmxPropertyInfo(name = "id", description = "Unique auto-incrementing numeric identifier of the entity within the map.", category = "Core", type = "int")
   private int id;
 
   @XmlAttribute
   private Integer gid;
 
   @XmlAttribute
+  @TmxPropertyInfo(name = "name", description = "Human-readable identifier or name assigned to the entity.", category = "Core", type = "string")
   private String name;
 
   @XmlAttribute
+  @TmxPropertyInfo(name = "type", description = "Engine entity type (e.g. PROP, CREATURE, LIGHTSOURCE, TRIGGER, SPAWNPOINT).", category = "Core", type = "enum")
   private String type;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
+  @TmxPropertyInfo(name = "x", description = "Horizontal world position of the entity in map pixels.", category = "Core", type = "float", defaultValue = "0")
   private Float x;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
+  @TmxPropertyInfo(name = "y", description = "Vertical world position of the entity in map pixels.", category = "Core", type = "float", defaultValue = "0")
   private Float y;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
+  @TmxPropertyInfo(name = "width", description = "Width of the entity bounding box in map pixels.", category = "Core", type = "float", defaultValue = "16")
   private Float width = 0f;
 
   @XmlAttribute
   @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
+  @TmxPropertyInfo(name = "height", description = "Height of the entity bounding box in map pixels.", category = "Core", type = "float", defaultValue = "16")
   private Float height = 0f;
 
   @XmlTransient

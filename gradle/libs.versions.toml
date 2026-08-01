@@ -2,6 +2,9 @@
 darklaf = "3.1.1"
 jaxb = "4.0.9"
 junit = "6.1.2"
+mcp = "2.0.0"
+slf4j = "2.0.17"
+tomcat = "11.0.24"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
@@ -17,10 +20,14 @@ junit_jupiter_api = { module = "org.junit.jupiter:junit-jupiter-api", version.re
 junit_jupiter_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit_jupiter_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 mockito_core = { module = "org.mockito:mockito-core", version = "5.23.0" }
+mcp_bom = { module = "io.modelcontextprotocol.sdk:mcp-bom", version.ref = "mcp" }
+mcp_sdk = { module = "io.modelcontextprotocol.sdk:mcp" }
+slf4j_jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4j" }
 soundlibs_jorbis = { module = "com.googlecode.soundlibs:jorbis", version = "0.0.17.4" }
 soundlibs_mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version = "1.9.5.4" }
 soundlibs_tritonus = { module = "com.googlecode.soundlibs:tritonus-share", version = "0.3.7.4" }
 soundlibs_vorbisspi = { module = "com.googlecode.soundlibs:vorbisspi", version = "1.0.3.3" }
+tomcat_embed_core = { module = "org.apache.tomcat.embed:tomcat-embed-core", version.ref = "tomcat" }
 xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.5" }
 xml_runtime_core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
 xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }

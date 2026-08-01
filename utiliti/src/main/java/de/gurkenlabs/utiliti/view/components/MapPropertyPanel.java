@@ -419,6 +419,7 @@ public class MapPropertyPanel extends JPanel {
   public void bind(final IMap map) {
     this.dataSource = map;
     if (map == null) {
+      this.clearControls();
       return;
     }
 
@@ -427,6 +428,26 @@ public class MapPropertyPanel extends JPanel {
       ? map.getName() : Resources.strings().get("mapProperties_unnamedMap");
     this.generalCard.setTitle(Resources.strings().get("menu_map") + "  ·  " + mapName);
     refreshTilesets();
+  }
+
+  private void clearControls() {
+    this.binding = true;
+    try {
+      this.stopTableEditing();
+      this.generalCard.setTitle(Resources.strings().get("menu_map"));
+      this.textFieldName.setText("");
+      this.textFieldTitle.setText("");
+      this.textFieldDesc.setText("");
+      this.spinnerGravity.setValue(0);
+      this.ambientColorComponent.setColor(AmbientLight.DEFAULT_COLOR);
+      this.shadowColorComponent.setColor(StaticShadow.DEFAULT_COLOR);
+      this.ambientlightPreview.setAmbientColor(AmbientLight.DEFAULT_COLOR);
+      this.ambientlightPreview.setStaticShadowColor(StaticShadow.DEFAULT_COLOR);
+      this.model.setRowCount(0);
+      this.tilesetPanel.bind(null);
+    } finally {
+      this.binding = false;
+    }
   }
 
   private void refreshTilesets() {

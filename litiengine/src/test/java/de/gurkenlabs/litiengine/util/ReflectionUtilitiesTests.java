@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.util;
 
+import de.gurkenlabs.litiengine.attributes.Attribute;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +22,17 @@ class ReflectionUtilitiesTests {
     var test = new TestImpl();
     assertDoesNotThrow(() -> ReflectionUtilities.setValue(TestImpl.class, test, "integerField", 12));
     assertEquals(12, test.integerField);
+  }
+
+  @Test
+  void testSetAttributeFieldValueUsesNumericSetter() {
+    var test = new AttributeImpl();
+
+    assertTrue(
+        ReflectionUtilities.setFieldValue(
+            AttributeImpl.class, test, "velocity", "25.0"));
+    assertEquals(25.0f, test.velocity.getValue());
+    assertTrue(test.setterInvoked);
   }
 
   @ParameterizedTest
@@ -66,6 +78,16 @@ class ReflectionUtilitiesTests {
   private class TestImpl {
     @SuppressWarnings("unused")
     private int integerField;
+  }
+
+  private static class AttributeImpl {
+    private Attribute<Float> velocity = new Attribute<>(10.0f);
+    private boolean setterInvoked;
+
+    public void setVelocity(float velocity) {
+      this.velocity.setValue(velocity);
+      this.setterInvoked = true;
+    }
   }
 
   private class ChildImpl extends TestImpl {}

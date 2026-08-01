@@ -35,6 +35,12 @@ public class MapObjectsRenderer implements IEditorRenderer {
 
   private static final int MAX_NAME_DISPLAY_LENGTH = 50;
   private static final float MIN_NAME_RENDER_SCALE = 0.35f;
+  private static final Stroke SOUND_RANGE_HALO_STROKE = new BasicStroke(
+    4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f,
+    new float[] {10.0f, 7.0f}, 0.0f);
+  private static final Stroke SOUND_RANGE_STROKE = new BasicStroke(
+    2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f,
+    new float[] {10.0f, 7.0f}, 0.0f);
 
   @Override
   public String getName() {
@@ -66,8 +72,6 @@ public class MapObjectsRenderer implements IEditorRenderer {
     final Rectangle2D viewport = camera.getViewport();
     final BasicStroke boundingBoxStroke = new BasicStroke(0.5f * renderScale);
     final BasicStroke polylineStroke = new BasicStroke(renderScale);
-    final BasicStroke soundRangeStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
-      BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f}, 0.0f);
     final Stroke noCollisionStroke = new BasicStroke(1 / renderScale, BasicStroke.CAP_ROUND,
       BasicStroke.JOIN_BEVEL, 0, new float[] {1f}, 0);
     final Font nameFont = renderNames ? Style.getDefaultFont().deriveFont(11f) : null;
@@ -148,7 +152,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
         if (type != MapObjectType.COLLISIONBOX) {
           boolean renderBaseShape = baseBoundsVisible || mapObject.isPolyline() || mapObject.isPolygon();
           renderBoundingBox(g, mapObject, type, bounds, boundingBoxFill, boundingBoxBorder,
-            shapeStroke, soundRangeStroke, soundRange, renderNames, nameFont, nameFontMetrics,
+            shapeStroke, soundRange, renderNames, nameFont, nameFontMetrics,
             viewport, renderScale, renderBaseShape);
         }
 
@@ -217,6 +221,44 @@ public class MapObjectsRenderer implements IEditorRenderer {
       && x + width >= viewport.getX()
       && y <= viewport.getMaxY()
       && y + height >= viewport.getY();
+  }
+
+  static Rectangle2D soundRangeBounds(Rectangle2D baseBounds, double soundRange) {
+    return new Rectangle2D.Double(
+      baseBounds.getCenterX() - soundRange,
+      baseBounds.getCenterY() - soundRange,
+      soundRange * 2,
+      soundRange * 2);
+  }
+
+  static void renderSoundRangeScreen(Graphics2D g, Rectangle2D screenBounds) {
+    if (g == null || screenBounds == null || screenBounds.isEmpty()) {
+      return;
+    }
+
+    Color oldColor = g.getColor();
+    Stroke oldStroke = g.getStroke();
+    Object oldAntialiasing = g.getRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING);
+    try {
+      g.setRenderingHint(
+        java.awt.RenderingHints.KEY_ANTIALIASING,
+        java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+      Ellipse2D range = new Ellipse2D.Double(
+        screenBounds.getX(),
+        screenBounds.getY(),
+        screenBounds.getWidth(),
+        screenBounds.getHeight());
+      g.setColor(Style.COLOR_SOUND_RANGE_HALO);
+      g.setStroke(SOUND_RANGE_HALO_STROKE);
+      g.draw(range);
+      g.setColor(Style.COLOR_SOUND_RANGE);
+      g.setStroke(SOUND_RANGE_STROKE);
+      g.draw(range);
+    } finally {
+      g.setColor(oldColor);
+      g.setStroke(oldStroke);
+      g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, oldAntialiasing);
+    }
   }
 
   private static boolean hasCollisionOverlay(String typeName) {
@@ -310,7 +352,7 @@ public class MapObjectsRenderer implements IEditorRenderer {
   // TODO rename to renderShape, support points and draw polygon points too.
   private static void renderBoundingBox(Graphics2D g, IMapObject mapObject, MapObjectType type,
     Rectangle2D baseBounds, Color colorBoundingBoxFill, Color defaultBorderColor,
-    BasicStroke shapeStroke, BasicStroke soundRangeStroke, int soundRange, boolean renderNames,
+    BasicStroke shapeStroke, int soundRange, boolean renderNames,
     Font nameFont, FontMetrics nameFontMetrics, Rectangle2D viewport, float renderScale,
     boolean renderBaseShape) {
     Color fillColor = colorBoundingBoxFill;
@@ -318,6 +360,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
       fillColor = Style.COLOR_TRIGGER_FILL;
     } else if (type == MapObjectType.STATICSHADOW) {
       fillColor = Style.COLOR_SHADOW_FILL;
+    } else if (type == MapObjectType.SOUNDSOURCE) {
+      fillColor = Style.COLOR_SOUND_FILL;
     }
 
     Color borderColor;
@@ -336,6 +380,8 @@ public class MapObjectsRenderer implements IEditorRenderer {
       borderColor = Style.COLOR_SHADOW_BORDER;
     } else if (type == MapObjectType.SPAWNPOINT) {
       borderColor = Style.COLOR_SPAWNPOINT;
+    } else if (type == MapObjectType.SOUNDSOURCE) {
+      borderColor = Style.COLOR_SOUND_BORDER;
     } else {
       borderColor = defaultBorderColor;
     }
@@ -359,12 +405,10 @@ public class MapObjectsRenderer implements IEditorRenderer {
       }
     }
 
-    if (type == MapObjectType.SOUNDSOURCE) {
-      Game.graphics().renderOutline(g,
-        new Ellipse2D.Double(baseBounds.getCenterX() - soundRange,
-          baseBounds.getCenterY() - soundRange, soundRange * 2d, soundRange * 2d),
-        soundRangeStroke,
-        true);
+    if (type == MapObjectType.SOUNDSOURCE && soundRange > 0) {
+      renderSoundRangeScreen(
+        g,
+        EditorRenderHelper.toScreen(soundRangeBounds(baseBounds, soundRange)));
     }
 
     if (renderNames && renderBaseShape) {

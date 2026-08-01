@@ -267,7 +267,7 @@ public abstract class ResourcesContainer<T> {
    * @return The game resource or null if not found.
    */
   public T get(String resourceName, boolean forceLoad) {
-    if (resourceName == null) {
+    if (resourceName == null || resourceName.isBlank()) {
       return null;
     }
 

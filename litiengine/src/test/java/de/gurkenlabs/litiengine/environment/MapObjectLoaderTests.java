@@ -143,6 +143,17 @@ class MapObjectLoaderTests {
   }
 
   @Test
+  void defaultPropertyLoaderAppliesCreatureVelocity() {
+    MapObject mapObject = new MapObject();
+    mapObject.setValue(MapObjectProperty.MOVEMENT_VELOCITY, 275f);
+
+    Creature creature = new Creature();
+    MapObjectLoader.loadDefaultProperties(creature, mapObject);
+
+    assertEquals(275f, creature.getVelocity().getModifiedValue().floatValue());
+  }
+
+  @Test
   void testCreatureMapObjectLoaderWithZeroCurrentHitpointsStartsDead() {
     CreatureMapObjectLoader loader = new CreatureMapObjectLoader();
     MapObject mapObject = new MapObject();
@@ -642,6 +653,34 @@ class MapObjectLoaderTests {
     } finally {
       TriggerMapObjectLoader.clearCustomTriggerTypes();
     }
+  }
+
+  @Test
+  void testTriggerLoaderHandlesNonNumericTargetsAndActivators() {
+    TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
+    when(mapObject.getId()).thenReturn(120);
+    when(mapObject.getName()).thenReturn("testTrigger");
+    when(mapObject.getLocation()).thenReturn(new Point(0, 0));
+    when(mapObject.getWidth()).thenReturn(10f);
+    when(mapObject.getHeight()).thenReturn(10f);
+    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS, null))
+        .thenReturn("annex-zombie-ward-1, 102, invalid_target");
+    when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS, null))
+        .thenReturn("some-string-name, 404");
+    when(mapObject.getEnumValue(eq(MapObjectProperty.TRIGGER_ACTIVATION), any(Class.class), any(TriggerActivation.class)))
+        .thenReturn(TriggerActivation.COLLISION);
+
+    Collection<IEntity> entities = assertDoesNotThrow(() -> loader.load(this.testEnvironment, mapObject));
+    Optional<IEntity> opt = entities.stream().findFirst();
+    assertTrue(opt.isPresent());
+    assertInstanceOf(Trigger.class, opt.get());
+    Trigger trigger = (Trigger) opt.get();
+    assertTrue(trigger.getTargets().contains(102));
+    assertEquals(1, trigger.getTargets().size());
+    assertTrue(trigger.getActivators().contains(404));
+    assertEquals(1, trigger.getActivators().size());
   }
 
   static class CustomTrigger extends Trigger {

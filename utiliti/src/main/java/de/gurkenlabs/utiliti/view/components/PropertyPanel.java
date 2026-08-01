@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
@@ -252,13 +253,30 @@ public abstract class PropertyPanel extends JPanel {
    * @param mapObject the map object containing the sprite sheet name
    */
   protected static void selectSpriteSheet(JComboBox<JLabel> comboBox, IMapObject mapObject) {
-    if (mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null) != null) {
-      for (int i = 0; i < comboBox.getModel().getSize(); i++) {
-        JLabel label = comboBox.getModel().getElementAt(i);
-        if (label != null && label.getText().equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null))) {
-          comboBox.setSelectedItem(label);
-          break;
-        }
+    if (comboBox instanceof SearchableSpriteComboBox searchableComboBox) {
+      searchableComboBox.resetFilter();
+    }
+    comboBox.setSelectedItem(null);
+    String spriteName = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
+    if (spriteName == null) {
+      return;
+    }
+    if (MapObjectType.get(mapObject.getType()) == MapObjectType.PROP) {
+      String identifier = PropPanel.getIdentifierBySpriteName(spriteName);
+      if (identifier != null) {
+        spriteName = identifier;
+      }
+    } else if (MapObjectType.get(mapObject.getType()) == MapObjectType.CREATURE) {
+      String identifier = CreaturePanel.getCreatureSpriteName(spriteName);
+      if (identifier != null) {
+        spriteName = identifier;
+      }
+    }
+    for (int i = 0; i < comboBox.getModel().getSize(); i++) {
+      JLabel label = comboBox.getModel().getElementAt(i);
+      if (label != null && label.getText().equalsIgnoreCase(spriteName)) {
+        comboBox.setSelectedItem(label);
+        break;
       }
     }
   }

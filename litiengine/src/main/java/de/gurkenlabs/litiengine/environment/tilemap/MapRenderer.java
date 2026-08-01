@@ -8,7 +8,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.EventListener;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Game;
@@ -81,7 +80,9 @@ public class MapRenderer {
 
   private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, Environment env,
     RenderType[] renderTypes, float opacity) {
-    final List<ILayer> renderLayers = layers.getRenderLayers();
+    // Map edits can arrive on the AWT event thread while the game loop renders on its own
+    // thread. Iterate a stable snapshot so layer additions/removals do not abort a frame.
+    final ILayer[] renderLayers = layers.getRenderLayers().toArray(ILayer[]::new);
     for (final ILayer layer : renderLayers) {
       if (layer == null || !shouldBeRendered(g, map, layer, renderTypes)) {
         continue;

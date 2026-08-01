@@ -67,6 +67,10 @@ public final class Style {
   public static final Color COLOR_TRIGGER_BORDER = COLOR_ORANGE;
   public static final Color COLOR_TRIGGER_FILL = new Color(224, 175, 104, 20);
   public static final Color COLOR_SPAWNPOINT = COLOR_GREEN;
+  public static final Color COLOR_SOUND_BORDER = new Color(42, 195, 222, 230);
+  public static final Color COLOR_SOUND_FILL = new Color(42, 195, 222, 24);
+  public static final Color COLOR_SOUND_RANGE = new Color(42, 195, 222, 210);
+  public static final Color COLOR_SOUND_RANGE_HALO = new Color(12, 18, 24, 180);
 
   public static final Color COLOR_LIGHT = Color.WHITE;
   public static final Color COLOR_UNSUPPORTED = new Color(187, 154, 247, 200);

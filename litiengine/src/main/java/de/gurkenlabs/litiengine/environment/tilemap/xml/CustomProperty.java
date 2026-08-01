@@ -154,17 +154,41 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public byte getAsByte() {
-    return Byte.parseByte(this.value);
+    try {
+      return Byte.parseByte(this.value);
+    } catch (NumberFormatException exception) {
+      try {
+        return new BigDecimal(this.value).byteValueExact();
+      } catch (ArithmeticException | NumberFormatException _) {
+        throw exception;
+      }
+    }
   }
 
   @Override
   public short getAsShort() {
-    return Short.parseShort(this.value);
+    try {
+      return Short.parseShort(this.value);
+    } catch (NumberFormatException exception) {
+      try {
+        return new BigDecimal(this.value).shortValueExact();
+      } catch (ArithmeticException | NumberFormatException _) {
+        throw exception;
+      }
+    }
   }
 
   @Override
   public int getAsInt() {
-    return Integer.parseInt(this.value);
+    try {
+      return Integer.parseInt(this.value);
+    } catch (NumberFormatException exception) {
+      try {
+        return new BigDecimal(this.value).intValueExact();
+      } catch (ArithmeticException | NumberFormatException _) {
+        throw exception;
+      }
+    }
   }
 
   @Override
@@ -174,7 +198,7 @@ public class CustomProperty implements ICustomProperty {
     } catch (NumberFormatException exception) {
       try {
         return new BigDecimal(this.value).longValueExact();
-      } catch (ArithmeticException _) {
+      } catch (ArithmeticException | NumberFormatException _) {
         throw exception;
       }
     }

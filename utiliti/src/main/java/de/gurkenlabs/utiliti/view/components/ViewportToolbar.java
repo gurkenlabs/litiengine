@@ -34,9 +34,13 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.IntConsumer;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -46,12 +50,16 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.AbstractBorder;
 
@@ -61,6 +69,7 @@ public class ViewportToolbar extends JPanel {
   private static final int DROPDOWN_BUTTON_WIDTH = 22;
   private static final int TOOLBAR_VERTICAL_PADDING = 8;
   private static final int ICON_TEXT_GAP = 5;
+  static final int MAX_HISTORY_VISIBLE_ROWS = 12;
   private static final Insets BUTTON_MARGIN = new Insets(0, BUTTON_HORIZONTAL_PADDING, 0, BUTTON_HORIZONTAL_PADDING);
   private final ZoomControls zoomControls;
   private final JButton btnUndo;
@@ -364,34 +373,148 @@ public class ViewportToolbar extends JPanel {
   private static void showHistory(JButton button, boolean undo) {
     UndoManager manager = UndoManager.instance();
     List<UndoManager.HistoryEntry> history = undo ? manager.getUndoHistory() : manager.getRedoHistory();
+    JPopupMenu popup =
+        createHistoryPopup(
+            history, undo, operations -> {
+              if (undo) {
+                manager.undo(operations);
+              } else {
+                manager.redo(operations);
+              }
+            });
+    popup.show(button, 0, button.getHeight());
+    if (popup.getComponent(0) instanceof JScrollPane scroll
+        && scroll.getViewport().getView() instanceof JList<?> list) {
+      SwingUtilities.invokeLater(list::requestFocusInWindow);
+    }
+  }
+
+  static JPopupMenu createHistoryPopup(
+      List<UndoManager.HistoryEntry> history, boolean undo, IntConsumer applyOperations) {
     JPopupMenu popup = new JPopupMenu();
     if (history.isEmpty()) {
       JMenuItem empty = new JMenuItem(Resources.strings().get(
         undo ? "history_nothingToUndo" : "history_nothingToRedo"));
       empty.setEnabled(false);
       popup.add(empty);
-    } else {
-      for (int index = 0; index < history.size(); index++) {
-        UndoManager.HistoryEntry entry = history.get(index);
-        int operations = index + 1;
-        String label = Resources.strings().get(
-          undo ? "history_undoEntry" : "history_redoEntry", entry.description());
-        if (operations > 1) {
-          label = Resources.strings().get(
-            "history_multipleOperations", label, Integer.toString(operations));
+      return popup;
+    }
+
+    HistoryPopupEntry[] entries = new HistoryPopupEntry[history.size()];
+    for (int index = 0; index < history.size(); index++) {
+      UndoManager.HistoryEntry entry = history.get(index);
+      int operations = index + 1;
+      String label = Resources.strings().get(
+        undo ? "history_undoEntry" : "history_redoEntry", entry.description());
+      if (operations > 1) {
+        label = Resources.strings().get(
+          "history_multipleOperations", label, Integer.toString(operations));
+      }
+      entries[index] = new HistoryPopupEntry(label, operations);
+    }
+
+    JList<HistoryPopupEntry> list = new JList<>(entries);
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    list.setVisibleRowCount(Math.min(entries.length, MAX_HISTORY_VISIBLE_ROWS));
+    list.setCellRenderer(new HistoryEntryRenderer());
+    list.setBackground(Style.surface());
+    list.setForeground(Style.text());
+    list.setSelectionBackground(Style.selection());
+    list.setSelectionForeground(Style.text());
+    list.setFocusable(true);
+    list.getAccessibleContext().setAccessibleName(
+        Resources.strings().get(undo ? "menu_edit_undo" : "menu_edit_redo"));
+
+    Runnable applySelection = () -> {
+      HistoryPopupEntry selected = list.getSelectedValue();
+      if (selected == null) {
+        return;
+      }
+      popup.setVisible(false);
+      applyOperations.accept(selected.operations());
+    };
+    list.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent event) {
+        int index = list.locationToIndex(event.getPoint());
+        if (index >= 0 && list.getCellBounds(index, index).contains(event.getPoint())) {
+          list.setSelectedIndex(index);
+        } else {
+          list.clearSelection();
         }
-        JMenuItem item = new JMenuItem(label);
-        item.addActionListener(e -> {
-          if (undo) {
-            manager.undo(operations);
-          } else {
-            manager.redo(operations);
+      }
+    });
+    list.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseReleased(MouseEvent event) {
+        if (!SwingUtilities.isLeftMouseButton(event)) {
+          return;
+        }
+        int index = list.locationToIndex(event.getPoint());
+        if (index >= 0 && list.getCellBounds(index, index).contains(event.getPoint())) {
+          list.setSelectedIndex(index);
+          applySelection.run();
+        }
+      }
+    });
+    list.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "applyHistory");
+    list.getActionMap().put(
+        "applyHistory",
+        new javax.swing.AbstractAction() {
+          @Override
+          public void actionPerformed(java.awt.event.ActionEvent event) {
+            applySelection.run();
           }
         });
-        popup.add(item);
-      }
+    list.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeHistory");
+    list.getActionMap().put(
+        "closeHistory",
+        new javax.swing.AbstractAction() {
+          @Override
+          public void actionPerformed(java.awt.event.ActionEvent event) {
+            popup.setVisible(false);
+          }
+        });
+
+    JScrollPane scroll = new JScrollPane(
+        list,
+        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scroll.setBorder(BorderFactory.createEmptyBorder());
+    scroll.getViewport().setBackground(Style.surface());
+    scroll.getVerticalScrollBar().setUnitIncrement(Math.max(1, list.getFontMetrics(list.getFont()).getHeight()));
+    popup.add(scroll);
+    return popup;
+  }
+
+  private record HistoryPopupEntry(String label, int operations) {
+    @Override
+    public String toString() {
+      return this.label;
     }
-    popup.show(button, 0, button.getHeight());
+  }
+
+  private static final class HistoryEntryRenderer extends DefaultListCellRenderer {
+    @Override
+    public Component getListCellRendererComponent(
+        JList<?> list,
+        Object value,
+        int index,
+        boolean isSelected,
+        boolean cellHasFocus) {
+      Component component =
+          super.getListCellRendererComponent(
+              list, value, index, isSelected, cellHasFocus);
+      if (component instanceof JLabel label) {
+        label.setBorder(
+            BorderFactory.createEmptyBorder(
+                Style.SPACE_MEDIUM,
+                Style.SPACE_LARGE,
+                Style.SPACE_MEDIUM,
+                Style.SPACE_LARGE));
+      }
+      return component;
+    }
   }
 
   private static JPopupMenu createAddPopup() {

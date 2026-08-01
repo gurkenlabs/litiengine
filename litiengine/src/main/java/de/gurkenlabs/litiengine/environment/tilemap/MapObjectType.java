@@ -5,29 +5,44 @@ package de.gurkenlabs.litiengine.environment.tilemap;
  * by the engine's map object loaders to instantiate the matching engine entity.
  */
 public enum MapObjectType {
-  /**
-   * A generic area without a dedicated entity representation.
-   */
+  /** A generic area without a dedicated entity representation. */
+  @TmxTypeInfo(name = "Area", description = "A generic area region without a dedicated entity representation.")
   AREA,
-  /**
-   * A static collision rectangle.
-   */
+
+  /** A static collision rectangle. */
+  @TmxTypeInfo(name = "Collision Box", description = "A static collision rectangle that obstructs entity movement.")
   COLLISIONBOX,
+
   /** A particle emitter. */
+  @TmxTypeInfo(name = "Particle Emitter", description = "Spawns and simulates visual particle effects.")
   EMITTER,
+
   /** A dynamic light source. */
+  @TmxTypeInfo(name = "Light Source", description = "Emits dynamic ambient lighting into the scene.")
   LIGHTSOURCE,
+
   /** A prop entity. */
+  @TmxTypeInfo(name = "Prop", description = "An interactive or decorative static/destructible object.")
   PROP,
+
   /** A creature entity. */
+  @TmxTypeInfo(name = "Creature", description = "A mobile or combat-capable entity (NPC, monster, player).")
   CREATURE,
+
   /** A point/area emitting a sound. */
+  @TmxTypeInfo(name = "Sound Source", description = "Emits ambient or positional sound effects.")
   SOUNDSOURCE,
+
   /** A spawn point for dynamically spawned entities. */
+  @TmxTypeInfo(name = "Spawn Point", description = "Defines a spawn location and orientation for entities.")
   SPAWNPOINT,
+
   /** A trigger that fires messages when activated. */
+  @TmxTypeInfo(name = "Trigger", description = "Fires target messages upon collision or interaction.")
   TRIGGER,
+
   /** A static (baked) shadow. */
+  @TmxTypeInfo(name = "Static Shadow", description = "Bakes a static shadow graphic onto the environment.")
   STATICSHADOW;
 
   /*
