@@ -18,6 +18,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;
@@ -33,10 +34,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-
-import javax.swing.MenuElement;
-import javax.swing.MenuSelectionManager;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -367,14 +364,14 @@ public final class StatusBar extends JPanel {
     } else {
       for (ConnectedClient client : clients) {
         menu.addSeparator();
-        menu.add(clientEntry(client, menu));
+        menu.add(clientEntry(client));
       }
     }
 
     menu.show(this.mcpLabel, 0, this.mcpLabel.getHeight());
   }
 
-  private JPanel clientEntry(ConnectedClient client, JPopupMenu parentMenu) {
+  private JPanel clientEntry(ConnectedClient client) {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setOpaque(false);
@@ -394,32 +391,6 @@ public final class StatusBar extends JPanel {
     nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD));
     nameRow.add(nameLabel);
     nameRow.add(Box.createHorizontalGlue());
-
-    // Context menu button (...)
-    JLabel moreBtn = new JLabel("...");
-    moreBtn.setForeground(Style.mutedText());
-    moreBtn.setFont(moreBtn.getFont().deriveFont(Font.BOLD));
-    moreBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    moreBtn.addMouseListener(new MouseAdapter() {
-      @Override public void mouseClicked(MouseEvent e) {
-        JPopupMenu ctxMenu = new JPopupMenu();
-        ctxMenu.setBackground(Style.surface());
-        JMenuItem logsItem = new JMenuItem("Show client logs");
-        logsItem.setEnabled(false);
-        ctxMenu.add(logsItem);
-        JMenuItem disconnectItem = new JMenuItem("Disconnect client");
-        disconnectItem.setForeground(Style.COLOR_RED);
-        disconnectItem.addActionListener(ae -> {
-          McpServer.instance().disconnectClient(client.sessionId());
-          parentMenu.setVisible(false);
-        });
-        ctxMenu.add(disconnectItem);
-        ctxMenu.show(moreBtn, moreBtn.getWidth(), 0);
-        MenuSelectionManager.defaultManager().setSelectedPath(
-            new MenuElement[] { parentMenu, ctxMenu });
-      }
-    });
-    nameRow.add(moreBtn);
     panel.add(nameRow);
 
     JPanel versionRow = new JPanel();
@@ -492,7 +463,7 @@ public final class StatusBar extends JPanel {
 
     @Override public int getIconWidth() {
       int count = McpServer.instance().getConnectedClientCount();
-      return count > 0 ? 62 : 44;
+      return count > 0 ? 52 : 36;
     }
     @Override public int getIconHeight() { return HEIGHT; }
 
@@ -506,7 +477,16 @@ public final class StatusBar extends JPanel {
         Color dotColor = mcpColor(server.isRunning(), action);
         int clientCount = server.getConnectedClientCount();
 
-        int pillWidth = clientCount > 0 ? 60 : 42;
+        g.setFont(component.getFont().deriveFont(Font.BOLD, 9f));
+        FontMetrics fm = g.getFontMetrics();
+
+        int textWidth = fm.stringWidth("MCP");
+        int contentWidth = textWidth + 12; // "MCP" + dot space
+        if (clientCount > 0) {
+          contentWidth += 6 + fm.stringWidth(String.valueOf(clientCount));
+        }
+
+        int pillWidth = contentWidth + 10; // 5px left & right padding
 
         // Background pill
         int fillAlpha = action.state() == ActionState.RUNNING
@@ -518,28 +498,18 @@ public final class StatusBar extends JPanel {
         g.drawRoundRect(x, y, pillWidth - 1, HEIGHT - 1, 8, 8);
 
         // "MCP" text
-        g.setFont(component.getFont().deriveFont(Font.BOLD, 9f));
         g.drawString("MCP", x + 5, y + 11);
 
         // Status dot
-        g.fillOval(x + 28, y + 5, 5, 5);
+        int dotX = x + 5 + textWidth + 5;
+        g.fillOval(dotX, y + 5, 5, 5);
 
-        int chevronX;
+        // Client count badge (only rendered when > 0)
         if (clientCount > 0) {
-          // Client count badge (only drawn when > 0!)
           String countStr = String.valueOf(clientCount);
-          g.drawString(countStr, x + 36, y + 11);
-          chevronX = x + 36 + g.getFontMetrics().stringWidth(countStr) + 3;
-        } else {
-          chevronX = x + 35;
+          int countX = dotX + 8;
+          g.drawString(countStr, countX, y + 11);
         }
-
-        // Vector polygon chevron (arrow)
-        g.setColor(dotColor);
-        g.fillPolygon(
-            new int[] {chevronX, chevronX + 6, chevronX + 3},
-            new int[] {y + 9, y + 9, y + 5},
-            3);
       } finally {
         g.dispose();
       }
