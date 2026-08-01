@@ -91,6 +91,48 @@ class McpSemanticToolsTest {
   }
 
   @Test
+  void explicitUnknownMapIdDoesNotFallBackToTheActiveMap() throws Exception {
+    Editor editor = Editor.instance();
+    java.lang.reflect.Field gameFileField = Editor.class.getDeclaredField("gameFile");
+    gameFileField.setAccessible(true);
+    ResourceBundle previous = (ResourceBundle) gameFileField.get(editor);
+    ResourceBundle project = new ResourceBundle();
+    TmxMap map = new TmxMap();
+    map.setName("known-map");
+    project.getMaps().add(map);
+    gameFileField.set(editor, project);
+    try {
+      JsonObject response = McpSemanticHandler.handleSemanticTool("fill_regions",
+          Json.createObjectBuilder().add("mapId", "typo-map").add("regions", Json.createArrayBuilder()).build());
+      assertFalse(response.getBoolean("success", true));
+      assertEquals("MAP_NOT_FOUND", response.getJsonObject("error").getString("code"));
+    } finally {
+      gameFileField.set(editor, previous);
+    }
+  }
+
+  @Test
+  void applyChangesReportsThatOperationsAreNotImplemented() throws Exception {
+    Editor editor = Editor.instance();
+    java.lang.reflect.Field gameFileField = Editor.class.getDeclaredField("gameFile");
+    gameFileField.setAccessible(true);
+    ResourceBundle previous = (ResourceBundle) gameFileField.get(editor);
+    ResourceBundle project = new ResourceBundle();
+    TmxMap map = new TmxMap();
+    map.setName("known-map");
+    project.getMaps().add(map);
+    gameFileField.set(editor, project);
+    try {
+      JsonObject response = McpSemanticHandler.handleSemanticTool("apply_changes",
+          Json.createObjectBuilder().add("mapId", "known-map").add("operations", Json.createArrayBuilder()).build());
+      assertFalse(response.getBoolean("success", true));
+      assertEquals("NOT_IMPLEMENTED", response.getJsonObject("error").getString("code"));
+    } finally {
+      gameFileField.set(editor, previous);
+    }
+  }
+
+  @Test
   void responseFactoryCreatesStandardizedError() {
     JsonObject res = McpResponseFactory.createError(
         "REVISION_CONFLICT", "Revision mismatch", true, null);

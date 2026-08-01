@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.utiliti.controller.Editor;
@@ -926,7 +927,7 @@ public final class McpSemanticHandler {
 
     int w = Math.max(1, map.getSizeInPixels() != null ? map.getSizeInPixels().width : 512);
     int h = Math.max(1, map.getSizeInPixels() != null ? map.getSizeInPixels().height : 512);
-    BufferedImage img = McpToolHandler.renderCanvasSnapshot(w, h);
+    BufferedImage img = renderMapSnapshot(map, w, h);
 
     return Json.createObjectBuilder()
         .add("success", true)
@@ -948,7 +949,7 @@ public final class McpSemanticHandler {
     int w = Math.max(1, (int) getDouble(args, "width", 256));
     int h = Math.max(1, (int) getDouble(args, "height", 256));
 
-    BufferedImage full = McpToolHandler.renderCanvasSnapshot(
+    BufferedImage full = renderMapSnapshot(map,
         map.getSizeInPixels() != null ? map.getSizeInPixels().width : 512,
         map.getSizeInPixels() != null ? map.getSizeInPixels().height : 512);
     int cropX = Math.max(0, Math.min(x, full.getWidth() - 1));
@@ -1065,7 +1066,7 @@ public final class McpSemanticHandler {
           "actorProfile.width and actorProfile.height are required", true, null);
     }
     PlayabilityResult result = playability(map, actor, args.getJsonArray("requiredTargets"));
-    BufferedImage image = McpToolHandler.renderCanvasSnapshot(
+    BufferedImage image = renderMapSnapshot(map,
         Math.max(1, map.getSizeInPixels().width), Math.max(1, map.getSizeInPixels().height));
     Graphics2D graphics = image.createGraphics();
     try {
@@ -1167,12 +1168,11 @@ public final class McpSemanticHandler {
       return revisionConflict(map, args);
     }
 
-    // TODO: iterate operations array and dispatch individual ops
-    long prevRev = McpRevisionTracker.getRevision(map);
-    long newRev = McpRevisionTracker.incrementRevision(map);
-    return McpResponseFactory.createMutationResult(
-        map.getName(), prevRev, newRev, null, null, null, null, null,
-        "apply-changes-" + newRev);
+    return McpResponseFactory.createError(
+        "NOT_IMPLEMENTED",
+        "apply_changes does not execute operations yet. Use the specific mutation tools instead.",
+        true,
+        null);
   }
 
   private static JsonObject setAmbientLight(JsonObject args) {
@@ -1265,15 +1265,36 @@ public final class McpSemanticHandler {
   // ── Helpers ───────────────────────────────────────────────────────
 
   private static IMap resolveMap(String mapId) {
-    if (mapId != null && !mapId.isBlank() && Editor.instance().getGameFile() != null) {
-      for (IMap m : Editor.instance().getGameFile().getMaps()) {
-        if (m != null && mapId.equalsIgnoreCase(m.getName())) {
-          return m;
+    if (mapId != null && !mapId.isBlank()) {
+      if (Editor.instance().getGameFile() != null) {
+        for (IMap m : Editor.instance().getGameFile().getMaps()) {
+          if (m != null && mapId.equalsIgnoreCase(m.getName())) {
+            return m;
+          }
         }
       }
+      IMap activeMap = Game.world().environment() != null ? Game.world().environment().getMap() : null;
+      if (activeMap != null && mapId.equalsIgnoreCase(activeMap.getName())) {
+        return activeMap;
+      }
+      return null;
     }
     // Fallback to currently loaded map
     return Game.world().environment() != null ? Game.world().environment().getMap() : null;
+  }
+
+  private static BufferedImage renderMapSnapshot(IMap map, int width, int height) {
+    if (Game.world().environment() != null && Game.world().environment().getMap() == map) {
+      return McpToolHandler.renderCanvasSnapshot(width, height);
+    }
+    BufferedImage image = new BufferedImage(Math.max(1, width), Math.max(1, height), BufferedImage.TYPE_INT_ARGB);
+    Graphics2D graphics = image.createGraphics();
+    try {
+      MapRenderer.render(graphics, map, map.getBounds());
+    } finally {
+      graphics.dispose();
+    }
+    return image;
   }
 
   private static IMapObject findMapObject(IMap map, int id) {
