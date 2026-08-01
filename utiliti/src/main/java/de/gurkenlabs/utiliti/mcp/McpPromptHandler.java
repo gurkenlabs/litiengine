@@ -80,6 +80,11 @@ public class McpPromptHandler {
               + "4. A language — tiles, props, lighting, collisions, triggers, doors, paths, and landmarks must communicate consistently.\n\n"
               + "Primary operating rule: Inspect first. Infer second. Plan third. Modify last. Never create or edit a map before you understand relevant conventions.\n"
               + "Tiling rule: Always use Wang terrains (paint_terrain / paint-terrain) over plain tile-by-tile GID editing (edit_tiles / fill_tiles / set_tile) whenever possible. Discover terrain sets with list_terrains before painting ground or walls.\n\n"
+              + "Autonomous tile-geometry inference: inspect a tileset with render_tileset, discover real tile-family grammar with find_tile_usage, and inspect local relationships with render_tile_context before selecting tiles. Generate small candidate edits, inspect them with preview_tile_edits, and only then commit. Treat neighbor frequency as evidence, not a guarantee; preserve layer and collision conventions.\n\n"
+              + "Mandatory playability validation: after changing walls, collision, doors, spawns, objectives, or END_LEVEL triggers, run analyze_playability with the real player footprint. Do not call a map complete while it reports FAIL; use render_playability to inspect collision, reachable, and unreachable regions.\n\n"
+              + "Batching rule: Never issue repeated fill_region, move-entity, or resize-entity calls. Use fill_regions for multi-layer rectangular tile work and update_entities for every transform change in one revision.\n\n"
+              + "Prop repair rule: When normalizing multiple props after asset discovery, use one batch-configure-props call; do not issue configure-prop once per entity.\n\n"
+              + "Revision rule: Every successful Level A mutation returns `revision`. Use that exact returned value as `expectedRevision` for the next mutation on the same map. On REVISION_CONFLICT, inspect the returned `error.details.actualRevision`, review intervening changes, then retry deliberately.\n\n"
               + "Phases:\n"
               + "Phase 1: Discover the project (use get_project_context, analyze_project, get_map, query_region, list_terrains).\n"
               + "Phase 2: Infer the project's map grammar (layer stack, tile GID vocabulary, Wang terrain sets, object conventions).\n"
@@ -95,6 +100,9 @@ public class McpPromptHandler {
           "LITIENGINE Map Authoring Plan Prompt",
           "Staged Level-Design Authoring Workflow (Big -> Medium -> Small):\n\n"
               + "Tiling Rule: Always use Wang terrains (paint_terrain / paint-terrain) over plain tile-by-tile GID editing (edit_tiles / fill_tiles / set_tile) whenever possible. Discover terrain sets with list_terrains before painting ground or walls.\n\n"
+              + "Before choosing non-terrain tiles, infer their visual grammar: render_tileset for local IDs, find_tile_usage for adjacency evidence, and render_tile_context for the target neighborhood. Preview every candidate group with preview_tile_edits before mutating the map.\n\n"
+              + "Batching rule: Use fill_regions for all related rectangular fills and update_entities for all related entity moves/resizes; do not make one MCP call per layer or entity.\n\n"
+              + "Revision rule: Chain each mutation's returned `revision` into the next call's `expectedRevision`; never reuse the value from before a successful mutation.\n\n"
               + "Step 1: Big (Gameplay Structure)\n"
               + "- Resolve entrance, goal, critical path, major rooms, gates, encounters, transitions, and collision topology.\n"
               + "- Paint ground and wall regions using Wang terrains (paint_terrain).\n"
@@ -119,7 +127,7 @@ public class McpPromptHandler {
               + "7. Pacing (tension, release, exploration rhythms)\n"
               + "8. Collision & traversal quality (no trapped spawns or clipping)\n"
               + "9. Technical integrity (no broken entity/trigger links)\n\n"
-              + "Use `analyze_project` and `validate_map_plan` to inspect structural evidence.");
+              + "Use `analyze_project` and `validate_map_plan` to inspect structural evidence. For tile readability and geometry, inspect the atlas with `render_tileset`, compare existing adjacency with `find_tile_usage`, render local context, and review candidate edits through `preview_tile_edits` before recommending a change.");
 
       case "build-dungeon-room" -> createPromptResult(
           "Instructions for dungeon room layout",

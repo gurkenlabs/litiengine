@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -87,6 +88,7 @@ public class McpServer implements GameListener {
     }
 
     try {
+      suppressExpectedCancellationWarnings();
       transportProvider = createTransportProvider(port);
       McpSdkAdapter catalog = new McpSdkAdapter(this);
       sdkServer = io.modelcontextprotocol.server.McpServer.sync(transportProvider)
@@ -117,6 +119,27 @@ public class McpServer implements GameListener {
       cleanupServerResources();
       log.log(Level.SEVERE, "Failed to start utiLITI MCP Server on port " + port, e);
     }
+  }
+
+  /**
+   * The SDK logs client-side request aborts as warnings when it has no cancellation-notification
+   * handler. Abort notifications are expected during client retries and do not affect server state.
+   */
+  static void suppressExpectedCancellationWarnings() {
+    Logger sdkLogger = Logger.getLogger("io.modelcontextprotocol.spec.McpStreamableServerSession");
+    java.util.logging.Filter existingFilter = sdkLogger.getFilter();
+    sdkLogger.setFilter(record -> (existingFilter == null || existingFilter.isLoggable(record))
+        && !isExpectedCancellationWarning(record));
+  }
+
+  static boolean isExpectedCancellationWarning(LogRecord record) {
+    if (record == null || record.getLevel().intValue() < Level.WARNING.intValue()) {
+      return false;
+    }
+    String message = record.getMessage();
+    return message != null
+        && message.contains("No handler registered for notification method:")
+        && message.contains("notifications/cancelled");
   }
 
   public synchronized void stop() {

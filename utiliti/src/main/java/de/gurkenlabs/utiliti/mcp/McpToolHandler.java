@@ -507,6 +507,10 @@ public class McpToolHandler {
     configPropParams.add("addShadow", createParam("boolean", "Add shadow to prop", false));
     toolsArr.add(createToolDef("configure-prop", "Configure Prop entity attributes", configPropParams.build()));
 
+    JsonObjectBuilder batchConfigPropParams = Json.createObjectBuilder();
+    batchConfigPropParams.add("updates", createParam("array", "Prop updates [{id or name, spritesheetName?, material?, addShadow?}] applied atomically", true));
+    toolsArr.add(createToolDef("batch-configure-props", "Atomically configure multiple Prop sprites, materials, and shadows in one undoable operation", batchConfigPropParams.build()));
+
     JsonObjectBuilder configTriggerParams = Json.createObjectBuilder();
     configTriggerParams.add("id", createParam("number", "Trigger entity ID", false));
     configTriggerParams.add("name", createParam("string", "Trigger entity name", false));
@@ -1080,6 +1084,9 @@ public class McpToolHandler {
           if (args.containsKey("showNames")) {
             Editor.preferences().setRenderNames(getBoolean(args, "showNames", true));
           }
+          if (UI.getViewportToolbar() != null) {
+            UI.getViewportToolbar().syncPreferenceButtons();
+          }
         }
         return Json.createObjectBuilder().add("success", true).add("message", "Updated viewport display settings").build();
 
@@ -1137,6 +1144,9 @@ public class McpToolHandler {
 
       case "configure-prop":
         return setProperties(args, MapObjectProperty.SPRITESHEETNAME, MapObjectProperty.PROP_MATERIAL, MapObjectProperty.PROP_ADDSHADOW);
+
+      case "batch-configure-props":
+        return batchConfigureProps(args);
 
       case "configure-trigger":
         return setProperties(args,
@@ -1690,7 +1700,7 @@ public class McpToolHandler {
       return Json.createObjectBuilder().add("success", false).add("error", "No active map loaded").build();
     }
     IMap map = Game.world().environment().getMap();
-    String mode = getString(args, "mode", "overlap").toLowerCase();
+    String mode = getString(args, "mode", "overlap").toLowerCase().replace('_', '-');
 
     switch (mode) {
       case "overlap": {
@@ -1771,6 +1781,29 @@ public class McpToolHandler {
             .add("distancePixels", distancePx)
             .add("distanceTiles", distanceTiles)
             .build();
+      }
+
+      case "layer-collision", "collision": {
+        String layerName = getString(args, "layer", "");
+        JsonArrayBuilder collisions = Json.createArrayBuilder();
+        for (IMapObjectLayer objectLayer : map.getMapObjectLayers()) {
+          if (objectLayer == null || (!layerName.isBlank()
+              && !layerName.equalsIgnoreCase(objectLayer.getName()))) {
+            continue;
+          }
+          for (IMapObject object : objectLayer.getMapObjects()) {
+            if (object == null || !"COLLISIONBOX".equalsIgnoreCase(object.getType())) continue;
+            Rectangle2D bounds = object.getBoundingBox();
+            collisions.add(Json.createObjectBuilder()
+                .add("id", object.getId())
+                .add("name", object.getName() != null ? object.getName() : "")
+                .add("layer", objectLayer.getName() != null ? objectLayer.getName() : "")
+                .add("x", bounds.getX()).add("y", bounds.getY())
+                .add("width", bounds.getWidth()).add("height", bounds.getHeight()));
+          }
+        }
+        return Json.createObjectBuilder().add("success", true).add("mode", "layer-collision")
+            .add("layer", layerName).add("collisions", collisions).build();
       }
 
       default:
@@ -2232,7 +2265,7 @@ public class McpToolHandler {
         args.get("properties") instanceof JsonObject properties ? properties : null);
   }
 
-  private static void applyAdditionalProperties(MapObject mo, JsonObject properties) {
+  static void applyAdditionalProperties(MapObject mo, JsonObject properties) {
     if (properties == null) {
       return;
     }
@@ -2390,15 +2423,44 @@ public class McpToolHandler {
     return result.build();
   }
 
+  static JsonObject entityValidationError(List<String> validationErrors) {
+    return entityValidationError(validationErrors, Map.of());
+  }
+
   private static JsonObject entityValidationError(
-      List<String> validationErrors) {
-    JsonArrayBuilder errors = Json.createArrayBuilder();
-    validationErrors.forEach(errors::add);
+      List<String> validationErrors, Map<String, String> suppliedValues) {
+    String message = validationErrors.getFirst();
+    String field = validationField(message);
+    JsonObjectBuilder issue = Json.createObjectBuilder().add("field", field).add("message", message);
+    String suppliedValue = suppliedValues.get(field);
+    if (suppliedValue != null) issue.add("providedValue", suppliedValue);
+    if (message.contains("comma-separated list of integer entity IDs")) {
+      issue.add("expectedFormat", "comma-separated integer entity IDs")
+          .add("example", "101,102")
+          .add("nextAction", "Use search_entities or get_entity_info to resolve names to IDs, then retry.");
+    } else if (message.contains("must be one of ")) {
+      issue.add("allowedValues", message.substring(message.indexOf("must be one of ") + 15))
+          .add("nextAction", "Choose one of allowedValues and retry.");
+    } else {
+      issue.add("nextAction", "Correct the field described by message and retry.");
+    }
     return Json.createObjectBuilder()
         .add("success", false)
-        .add("error", "Entity validation failed: " + validationErrors.getFirst())
-        .add("validationErrors", errors)
+        .add("error", "Invalid entity property: " + field)
+        .add("errorDetails", Json.createObjectBuilder()
+            .add("code", "ENTITY_VALIDATION_FAILED")
+            .add("summary", "Correct the reported property and retry; no changes were applied.")
+            .add("issues", Json.createArrayBuilder().add(issue)))
         .build();
+  }
+
+  private static String validationField(String message) {
+    for (String knownField : List.of(
+        "spritesheetName", "targets", "shadowType", "material", "collisionType", "lightColor",
+        "soundName", "width", "height", "velocity", "volume")) {
+      if (message.contains(knownField)) return knownField;
+    }
+    return message.contains(" ") ? message.substring(0, message.indexOf(' ')) : "entity";
   }
 
   private static IMapObjectLayer resolveTargetObjectLayer(JsonObject args) {
@@ -3665,6 +3727,70 @@ public class McpToolHandler {
     return Json.createObjectBuilder().add("success", true).add("message", "Updated properties on entity " + target.getId()).build();
   }
 
+  private static JsonObject batchConfigureProps(JsonObject args) {
+    IMap map = getActiveMap();
+    if (map == null) return Json.createObjectBuilder().add("success", false).add("error", "No active map loaded").build();
+    JsonArray updates = args != null ? args.getJsonArray("updates") : null;
+    if (updates == null || updates.isEmpty()) {
+      return Json.createObjectBuilder().add("success", false).add("error", "Missing 'updates' array").build();
+    }
+
+    List<IMapObject> targets = new ArrayList<>(updates.size());
+    List<Map<String, String>> changesByTarget = new ArrayList<>(updates.size());
+    for (int i = 0; i < updates.size(); i++) {
+      if (!(updates.get(i) instanceof JsonObject update)) {
+        return batchPropError(i, "Update must be an object");
+      }
+      IMapObject target = findEntity(update);
+      if (target == null) return batchPropError(i, "Prop not found");
+      if (MapObjectType.get(target.getType()) != MapObjectType.PROP) {
+        return batchPropError(i, "Entity " + target.getId() + " is not a PROP");
+      }
+      Map<String, String> changes = propChanges(target, update);
+      if (changes.isEmpty()) return batchPropError(i, "No prop attributes supplied");
+      if (!(target instanceof MapObject original)) {
+        return batchPropError(i, "Entity does not support validated property updates");
+      }
+      MapObject candidate = new MapObject(original, true);
+      changes.forEach(candidate::setValue);
+      List<String> validationErrors = McpEntityValidator.validateForPropertyUpdate(candidate, changes.keySet());
+      if (!validationErrors.isEmpty()) return batchPropError(i, validationErrors.getFirst());
+      targets.add(target);
+      changesByTarget.add(changes);
+    }
+
+    UndoManager.forMap(map).mapChanging(map);
+    for (int i = 0; i < targets.size(); i++) {
+      IMapObject target = targets.get(i);
+      changesByTarget.get(i).forEach(target::setValue);
+      reloadLiveEntity(target);
+    }
+    UndoManager.forMap(map).mapChanged(map);
+    IMapObject lastTarget = targets.getLast();
+    refreshInspectorAfterMutation(lastTarget);
+    return Json.createObjectBuilder().add("success", true).add("updatedCount", targets.size())
+        .add("message", "Configured " + targets.size() + " props").build();
+  }
+
+  private static Map<String, String> propChanges(IMapObject target, JsonObject update) {
+    Map<String, String> changes = new LinkedHashMap<>();
+    for (Map.Entry<String, String> mapping : List.of(
+        Map.entry("spritesheetName", MapObjectProperty.SPRITESHEETNAME),
+        Map.entry("material", MapObjectProperty.PROP_MATERIAL),
+        Map.entry("addShadow", MapObjectProperty.PROP_ADDSHADOW))) {
+      if (update.containsKey(mapping.getKey())) {
+        changes.put(mapping.getValue(), normalizePropertyValue(
+            target, mapping.getValue(), getString(update, mapping.getKey(), "")));
+      }
+    }
+    return changes;
+  }
+
+  private static JsonObject batchPropError(int index, String error) {
+    return Json.createObjectBuilder().add("success", false).add("failedIndex", index)
+        .add("error", "Prop update at batch index " + index + " is invalid: " + error).build();
+  }
+
   static int assignNextMapId(MapObject mapObject) {
     int id = Game.world().environment().getNextMapId();
     mapObject.setId(id);
@@ -3724,9 +3850,9 @@ public class McpToolHandler {
     MapObject candidate = new MapObject(original, true);
     changes.forEach(candidate::setValue);
     List<String> validationErrors =
-        McpEntityValidator.validateForCreation(candidate, null);
+        McpEntityValidator.validateForPropertyUpdate(candidate, changes.keySet());
     if (!validationErrors.isEmpty()) {
-      return entityValidationError(validationErrors);
+      return entityValidationError(validationErrors, changes);
     }
 
     UndoManager.instance().mapObjectChanging(target);

@@ -35,6 +35,7 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,38 @@ class McpToolHandlerTest {
 
     assertEquals(8, McpToolHandler.assignNextMapId(created));
     assertEquals(8, created.getId());
+  }
+
+  @Test
+  void queryGeometryReturnsCollisionBoxesForDocumentedLayerCollisionMode() {
+    JsonObject created = McpToolHandler.handleCallTool("add-collisionbox",
+        Json.createObjectBuilder().add("x", 16).add("y", 32).add("width", 24).add("height", 16).build());
+    assertTrue(created.getBoolean("success"), created::toString);
+
+    JsonObject result = McpToolHandler.handleCallTool("query-geometry",
+        Json.createObjectBuilder().add("mode", "layer-collision").build());
+    assertTrue(result.getBoolean("success"), result::toString);
+    assertEquals("layer-collision", result.getString("mode"));
+    assertEquals(1, result.getJsonArray("collisions").size());
+  }
+
+  @Test
+  void configureViewUpdatesViewportTogglePreferences() {
+    Editor.preferences().setShowGrid(true);
+    Editor.preferences().setSnapToGrid(true);
+    Editor.preferences().setRenderBoundingBoxes(true);
+
+    JsonObject result = McpToolHandler.handleCallTool(
+        "configure-view",
+        Json.createObjectBuilder()
+            .add("showGrid", false)
+            .add("showCollision", false)
+            .build());
+
+    assertTrue(result.getBoolean("success"), result::toString);
+    assertFalse(Editor.preferences().showGrid());
+    assertFalse(Editor.preferences().renderBoundingBoxes());
+    assertTrue(Editor.preferences().snapToGrid(), "configure-view must not change snap unless asked");
   }
 
   @Test
@@ -314,6 +347,53 @@ class McpToolHandlerTest {
   }
 
   @Test
+  void entityValidationErrorsProvideMachineReadableRepairInstructions() {
+    JsonObject error = McpToolHandler.entityValidationError(List.of(
+        "targets must be a comma-separated list of integer entity IDs (e.g. '101,102'), not string names ('Southwest Door')"));
+
+    assertEquals("Invalid entity property: targets", error.getString("error"));
+    JsonObject issue = error.getJsonObject("errorDetails").getJsonArray("issues").getJsonObject(0);
+    assertEquals("ENTITY_VALIDATION_FAILED", error.getJsonObject("errorDetails").getString("code"));
+    assertEquals("targets", issue.getString("field"));
+    assertEquals("101,102", issue.getString("example"));
+    assertTrue(issue.getString("nextAction").contains("search_entities"));
+  }
+
+  @Test
+  void configureMovementDoesNotRequireAnUnrelatedCreatureSprite() {
+    MapObject creature = new MapObject("CREATURE");
+    creature.setId(901);
+    creature.setWidth(16);
+    creature.setHeight(16);
+    this.map.getMapObjectLayers().getFirst().addMapObject(creature);
+
+    JsonObject result = McpToolHandler.handleCallTool("configure-movement", Json.createObjectBuilder()
+        .add("id", 901).add("velocity", 35).add("acceleration", 200).build());
+
+    assertTrue(result.getBoolean("success"), result::toString);
+    assertEquals("35", creature.getStringValue(MapObjectProperty.MOVEMENT_VELOCITY));
+  }
+
+  @Test
+  void batchConfigurePropsUpdatesMultiplePropsInOneOperation() {
+    Resources.spritesheets().clear();
+    new Spritesheet(new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB), "prop-crate.png", 16, 16);
+    JsonObject first = McpToolHandler.handleCallTool("add-prop", Json.createObjectBuilder().add("x", 0).add("y", 0).build());
+    JsonObject second = McpToolHandler.handleCallTool("add-prop", Json.createObjectBuilder().add("x", 16).add("y", 0).build());
+
+    JsonObject result = McpToolHandler.handleCallTool("batch-configure-props", Json.createObjectBuilder()
+        .add("updates", Json.createArrayBuilder()
+            .add(Json.createObjectBuilder().add("id", first.getInt("id")).add("material", "STEEL"))
+            .add(Json.createObjectBuilder().add("id", second.getInt("id")).add("material", "PLASTIC")))
+        .build());
+
+    assertTrue(result.getBoolean("success"), result::toString);
+    assertEquals(2, result.getInt("updatedCount"));
+    assertEquals("STEEL", this.map.getMapObject(first.getInt("id")).getStringValue(MapObjectProperty.PROP_MATERIAL));
+    assertEquals("PLASTIC", this.map.getMapObject(second.getInt("id")).getStringValue(MapObjectProperty.PROP_MATERIAL));
+  }
+
+  @Test
   void rejectsMissingOrUnknownMandatorySpriteBeforeAssigningId() {
     Resources.spritesheets().clear();
 
@@ -330,9 +410,12 @@ class McpToolHandlerTest {
                 .build());
 
     assertFalse(missing.getBoolean("success"));
-    assertTrue(missing.getString("error").contains("spritesheetName"));
+    assertEquals("ENTITY_VALIDATION_FAILED", missing.getJsonObject("errorDetails").getString("code"));
+    assertEquals("spritesheetName", missing.getJsonObject("errorDetails").getJsonArray("issues")
+        .getJsonObject(0).getString("field"));
     assertFalse(unknown.getBoolean("success"));
-    assertTrue(unknown.getString("error").contains("does not resolve"));
+    assertEquals("spritesheetName", unknown.getJsonObject("errorDetails").getJsonArray("issues")
+        .getJsonObject(0).getString("field"));
     assertTrue(this.map.getMapObjects().isEmpty());
   }
 
@@ -514,6 +597,24 @@ class McpToolHandlerTest {
     assertTrue(result.getBoolean("success"));
     assertEquals(expected, this.map.getColorValue(MapProperty.AMBIENTCOLOR));
     assertEquals(expected, Game.world().environment().getAmbientLight().getColor());
+  }
+
+  @Test
+  void semanticAmbientLightUpdatesTheActiveEnvironment() throws Exception {
+    java.lang.reflect.Field gameFileField = Editor.class.getDeclaredField("gameFile");
+    gameFileField.setAccessible(true);
+    Object previous = gameFileField.get(Editor.instance());
+    try {
+      Editor.instance().getGameFile().getMaps().add(this.map);
+      JsonObject result = McpSemanticHandler.handleSemanticTool("set_ambient_light",
+          Json.createObjectBuilder().add("mapId", "mcp-test").add("color", "#112233").add("alpha", 128).build());
+
+      assertTrue(result.getBoolean("success"), result::toString);
+      assertEquals(new Color(0x11, 0x22, 0x33, 128), Game.world().environment().getAmbientLight().getColor());
+    } finally {
+      Editor.instance().getGameFile().getMaps().remove(this.map);
+      gameFileField.set(Editor.instance(), previous);
+    }
   }
 
   @Test

@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrainSet;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
@@ -18,6 +19,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.WangTile;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.tool.TerrainResolver;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -25,7 +27,14 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -48,7 +57,11 @@ final class McpTilesetHandler {
       "update-terrain",
       "remove-terrain",
       "set-tile-terrain",
-      "paint-terrain");
+      "paint-terrain",
+      "render-tileset",
+      "find-tile-usage",
+      "render-tile-context",
+      "preview-tile-edits");
 
   private McpTilesetHandler() {
     throw new UnsupportedOperationException();
@@ -153,6 +166,43 @@ final class McpTilesetHandler {
         "paint-terrain",
         "Paint a named Wang terrain on sparse cells and/or rectangles in one call. The resolver chooses local tiles and updates neighboring transitions; do not calculate GIDs manually. Call list-terrains first.",
         paintParam.build()));
+
+    JsonObjectBuilder renderTileset = Json.createObjectBuilder(tilesetParam())
+        .add("scale", McpToolHandler.createParam("integer", "Nearest-neighbor tile scale (default 4)", false));
+    tools.add(McpToolHandler.createToolDef(
+        "render-tileset", "Render a tileset atlas with local tile ID annotations and grid lines", renderTileset.build()));
+
+    JsonObjectBuilder usage = Json.createObjectBuilder(tilesetParam())
+        .add("mapId", McpToolHandler.createParam("string", "Optional map name; searches every project map by default", false))
+        .add("tileId", McpToolHandler.createParam("integer", "Optional local tile ID filter", false));
+    tools.add(McpToolHandler.createToolDef(
+        "find-tile-usage", "Find tileset usage across maps and summarize top, bottom, left, and right neighbor frequencies", usage.build()));
+
+    JsonObjectBuilder context = Json.createObjectBuilder()
+        .add("mapId", McpToolHandler.createParam("string", "Map name (active map by default)", false))
+        .add("layer", McpToolHandler.createParam("string", "Selected tile layer", false))
+        .add("x", McpToolHandler.createParam("integer", "Center column", true))
+        .add("y", McpToolHandler.createParam("integer", "Center row", true))
+        .add("radius", McpToolHandler.createParam("integer", "Context radius in tiles (default 2)", false))
+        .add("mode", McpToolHandler.createParam("string", "selected-layer, composite, or layer-stack", false))
+        .add("scale", McpToolHandler.createParam("integer", "Nearest-neighbor pixel scale (default 4)", false));
+    tools.add(McpToolHandler.createToolDef(
+        "render-tile-context", "Render a tile neighborhood on one layer, composited layers, or a layer-stack contact sheet", context.build()));
+
+    JsonObject editSchema = Json.createObjectBuilder().add("type", "object")
+        .add("properties", Json.createObjectBuilder()
+            .add("x", Json.createObjectBuilder().add("type", "integer"))
+            .add("y", Json.createObjectBuilder().add("type", "integer"))
+            .add("gid", Json.createObjectBuilder().add("type", "integer")))
+        .add("required", Json.createArrayBuilder().add("x").add("y").add("gid")).build();
+    JsonObjectBuilder preview = Json.createObjectBuilder()
+        .add("mapId", McpToolHandler.createParam("string", "Map name (active map by default)", false))
+        .add("layer", McpToolHandler.createParam("string", "Target tile layer", true))
+        .add("edits", McpToolHandler.createArrayParam("Candidate tile edits; never committed", true, editSchema))
+        .add("padding", McpToolHandler.createParam("integer", "Preview padding in tiles (default 1)", false))
+        .add("scale", McpToolHandler.createParam("integer", "Nearest-neighbor pixel scale (default 4)", false));
+    tools.add(McpToolHandler.createToolDef(
+        "preview-tile-edits", "Non-destructively render candidate tile edits with collision and bounds diagnostics", preview.build()));
   }
 
   private static JsonObject tilesetParam() {
@@ -197,6 +247,10 @@ final class McpTilesetHandler {
       case "remove-terrain" -> removeTerrain(args);
       case "set-tile-terrain" -> setTileTerrain(args);
       case "paint-terrain" -> paintTerrain(args);
+      case "render-tileset" -> renderTileset(args);
+      case "find-tile-usage" -> findTileUsage(args);
+      case "render-tile-context" -> renderTileContext(args);
+      case "preview-tile-edits" -> previewTileEdits(args);
       default -> error("Unknown tileset tool: " + toolName);
     };
   }
@@ -750,6 +804,184 @@ final class McpTilesetHandler {
     Arrays.stream(values).forEach(array::add);
     return array.build();
   }
+
+  private static JsonObject renderTileset(JsonObject args) {
+    Tileset tileset = tileset(args);
+    if (tileset == null) {
+      return error("Tileset not found: " + McpToolHandler.getString(args, "tileset", ""));
+    }
+    int scale = Math.max(1, McpToolHandler.getInt(args, "scale", 4));
+    int tileWidth = Math.max(1, tileset.getTileWidth());
+    int tileHeight = Math.max(1, tileset.getTileHeight());
+    int columns = Math.max(1, tileset.getColumns());
+    int rows = Math.max(1, (int) Math.ceil((double) tileset.getTileCount() / columns));
+    int labelHeight = Math.max(12, 10 * scale / 2);
+    BufferedImage image = new BufferedImage(columns * tileWidth * scale + 1,
+        rows * (tileHeight * scale + labelHeight) + 1, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D graphics = image.createGraphics();
+    try {
+      graphics.setColor(new Color(38, 38, 44));
+      graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+      graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+          RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+      for (int tileId = 0; tileId < tileset.getTileCount(); tileId++) {
+        int col = tileId % columns;
+        int row = tileId / columns;
+        int x = col * tileWidth * scale;
+        int y = row * (tileHeight * scale + labelHeight);
+        if (tileset.getTile(tileId) instanceof TilesetEntry entry && entry.getBasicImage() != null) {
+          graphics.drawImage(entry.getBasicImage(), x, y, tileWidth * scale, tileHeight * scale, null);
+        }
+        graphics.setColor(new Color(255, 255, 255, 210));
+        graphics.drawRect(x, y, tileWidth * scale, tileHeight * scale);
+        graphics.setColor(Color.WHITE);
+        graphics.drawString(String.valueOf(tileId), x + 2, y + tileHeight * scale + labelHeight - 3);
+      }
+    } finally {
+      graphics.dispose();
+    }
+    return imageResult("tileset", tileset.getName(), image)
+        .add("tileWidth", tileWidth).add("tileHeight", tileHeight).add("columns", columns)
+        .add("tileCount", tileset.getTileCount()).add("scale", scale).build();
+  }
+
+  private static JsonObject findTileUsage(JsonObject args) {
+    Tileset tileset = tileset(args);
+    if (tileset == null) {
+      return error("Tileset not found: " + McpToolHandler.getString(args, "tileset", ""));
+    }
+    String requestedMap = McpToolHandler.getString(args, "mapId", "");
+    int requestedTileId = McpToolHandler.getInt(args, "tileId", -1);
+    Map<Integer, Integer> occurrences = new LinkedHashMap<>();
+    Map<String, Map<Integer, Integer>> neighbors = new LinkedHashMap<>();
+    for (String direction : List.of("top", "bottom", "left", "right")) neighbors.put(direction, new LinkedHashMap<>());
+    JsonArrayBuilder maps = Json.createArrayBuilder();
+    if (Editor.instance().getGameFile() != null) {
+      for (IMap map : Editor.instance().getGameFile().getMaps()) {
+        if (map == null || (!requestedMap.isBlank() && !requestedMap.equalsIgnoreCase(map.getName()))) continue;
+        int mapMatches = analyzeUsage(map, tileset, requestedTileId, occurrences, neighbors);
+        maps.add(Json.createObjectBuilder().add("mapId", map.getName()).add("occurrenceCount", mapMatches));
+      }
+    }
+    JsonObjectBuilder neighborJson = Json.createObjectBuilder();
+    neighbors.forEach((direction, counts) -> neighborJson.add(direction, frequencyArray(counts)));
+    return Json.createObjectBuilder().add("success", true).add("tileset", tileset.getName())
+        .add("tileId", requestedTileId).add("maps", maps).add("occurrences", frequencyArray(occurrences))
+        .add("neighborFrequencies", neighborJson).build();
+  }
+
+  private static int analyzeUsage(IMap map, Tileset tileset, int requestedTileId,
+      Map<Integer, Integer> occurrences, Map<String, Map<Integer, Integer>> neighbors) {
+    int matches = 0;
+    for (ITileLayer layer : map.getTileLayers()) {
+      for (int y = 0; y < map.getHeight(); y++) for (int x = 0; x < map.getWidth(); x++) {
+        ITile tile = layer.getTile(x, y);
+        if (tile == null || tile.getTilesetEntry() == null || tile.getTilesetEntry().getTileset() != tileset) continue;
+        int id = tile.getTilesetEntry().getId();
+        if (requestedTileId >= 0 && id != requestedTileId) continue;
+        matches++; increment(occurrences, id);
+        addNeighbor(layer, x, y - 1, "top", neighbors); addNeighbor(layer, x, y + 1, "bottom", neighbors);
+        addNeighbor(layer, x - 1, y, "left", neighbors); addNeighbor(layer, x + 1, y, "right", neighbors);
+      }
+    }
+    return matches;
+  }
+
+  private static void addNeighbor(ITileLayer layer, int x, int y, String direction,
+      Map<String, Map<Integer, Integer>> neighbors) {
+    if (x < 0 || y < 0) return;
+    ITile neighbor = layer.getTile(x, y);
+    if (neighbor != null) increment(neighbors.get(direction), neighbor.getGridId());
+  }
+
+  private static JsonObject renderTileContext(JsonObject args) {
+    IMap map = map(args);
+    if (map == null) return error("Map not found");
+    int x = McpToolHandler.getInt(args, "x", 0), y = McpToolHandler.getInt(args, "y", 0);
+    int radius = Math.max(0, McpToolHandler.getInt(args, "radius", 2));
+    int scale = Math.max(1, McpToolHandler.getInt(args, "scale", 4));
+    String mode = McpToolHandler.getString(args, "mode", "selected-layer").toLowerCase(Locale.ROOT);
+    List<ITileLayer> layers = contextLayers(map, McpToolHandler.getString(args, "layer", ""), mode);
+    if (layers.isEmpty()) return error("Tile layer not found");
+    BufferedImage image = renderContext(map, layers, x, y, radius, scale, "layer-stack".equals(mode));
+    return imageResult("mapId", map.getName(), image).add("mode", mode).add("center", pointJson(x, y))
+        .add("radius", radius).add("layers", layerNames(layers)).build();
+  }
+
+  private static JsonObject previewTileEdits(JsonObject args) {
+    IMap map = map(args);
+    if (map == null) return error("Map not found");
+    ITileLayer layer = tileLayer(map, McpToolHandler.getString(args, "layer", ""));
+    JsonArray edits = args.getJsonArray("edits");
+    if (layer == null || edits == null || edits.isEmpty()) return error("A target layer and at least one edit are required");
+    int minX = map.getWidth(), minY = map.getHeight(), maxX = -1, maxY = -1;
+    JsonArrayBuilder warnings = Json.createArrayBuilder();
+    List<int[]> originals = new ArrayList<>();
+    try {
+      for (int index = 0; index < edits.size(); index++) {
+        JsonObject edit = edits.getJsonObject(index); int x = McpToolHandler.getInt(edit, "x", -1); int y = McpToolHandler.getInt(edit, "y", -1);
+        if (x < 0 || y < 0 || x >= map.getWidth() || y >= map.getHeight()) { warnings.add("Edit " + index + " is outside map bounds"); continue; }
+        originals.add(new int[] {x, y, layer.getTile(x, y) != null ? layer.getTile(x, y).getGridId() : 0});
+        layer.setTile(x, y, McpToolHandler.getInt(edit, "gid", 0));
+        minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+      }
+      if (maxX < 0) return error("No valid in-bounds edits supplied");
+      int padding = Math.max(0, McpToolHandler.getInt(args, "padding", 1));
+      int centerX = (minX + maxX) / 2, centerY = (minY + maxY) / 2;
+      int radius = Math.max(Math.max(maxX - minX, maxY - minY) / 2 + padding, padding);
+      BufferedImage image = renderContext(map, List.of(layer), centerX, centerY, radius,
+          Math.max(1, McpToolHandler.getInt(args, "scale", 4)), false);
+      int collisionCount = 0;
+      for (int[] original : originals) {
+        ITile preview = layer.getTile(original[0], original[1]);
+        if (preview != null && preview.getTilesetEntry() != null && preview.getTilesetEntry().getCollisionInfo() != null) collisionCount++;
+      }
+      return imageResult("mapId", map.getName(), image).add("layer", layer.getName())
+          .add("affectedBounds", boundsJson(minX, minY, maxX - minX + 1, maxY - minY + 1))
+          .add("affectedCollisionTileCount", collisionCount).add("warnings", warnings).build();
+    } finally {
+      for (int[] original : originals) layer.setTile(original[0], original[1], original[2]);
+    }
+  }
+
+  private static BufferedImage renderContext(IMap map, List<ITileLayer> layers, int centerX, int centerY,
+      int radius, int scale, boolean stack) {
+    int count = radius * 2 + 1, tileWidth = Math.max(1, map.getTileWidth()), tileHeight = Math.max(1, map.getTileHeight());
+    int panelWidth = count * tileWidth * scale, panelHeight = count * tileHeight * scale;
+    BufferedImage image = new BufferedImage(panelWidth, panelHeight * (stack ? layers.size() : 1), BufferedImage.TYPE_INT_ARGB);
+    Graphics2D graphics = image.createGraphics();
+    try { graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+      for (int layerIndex = 0; layerIndex < layers.size(); layerIndex++) {
+        List<ITileLayer> drawLayers = stack ? List.of(layers.get(layerIndex)) : layers;
+        int offsetY = stack ? layerIndex * panelHeight : 0;
+        for (ITileLayer layer : drawLayers) for (int y = 0; y < count; y++) for (int x = 0; x < count; x++) {
+          ITile tile = layer.getTile(centerX - radius + x, centerY - radius + y);
+          if (tile != null && tile.getImage() != null) graphics.drawImage(tile.getImage(), x * tileWidth * scale, offsetY + y * tileHeight * scale, tileWidth * scale, tileHeight * scale, null);
+        }
+        if (!stack) break;
+      }
+    } finally { graphics.dispose(); }
+    return image;
+  }
+
+  private static JsonObjectBuilder imageResult(String identityKey, String identity, BufferedImage image) {
+    String base64 = encodePng(image); String filePath = writePreview(image);
+    JsonObjectBuilder builder = Json.createObjectBuilder().add("success", true).add(identityKey, identity == null ? "" : identity)
+        .add("imageBase64", base64).add("imageData", "data:image/png;base64," + base64).add("mimeType", "image/png");
+    if (filePath != null) builder.add("filePath", filePath);
+    return builder;
+  }
+
+  private static String encodePng(BufferedImage image) { try { ByteArrayOutputStream out = new ByteArrayOutputStream(); javax.imageio.ImageIO.write(image, "png", out); return Base64.getEncoder().encodeToString(out.toByteArray()); } catch (Exception ex) { return ""; } }
+  private static String writePreview(BufferedImage image) { try { Path path = Files.createTempFile("utiliti-mcp-", ".png"); javax.imageio.ImageIO.write(image, "png", path.toFile()); return path.toString(); } catch (Exception ex) { return null; } }
+  private static IMap map(JsonObject args) { String name = McpToolHandler.getString(args, "mapId", ""); if (Editor.instance().getGameFile() != null) for (IMap candidate : Editor.instance().getGameFile().getMaps()) if (name.isBlank() || name.equalsIgnoreCase(candidate.getName())) return candidate; return Game.world().environment() != null ? Game.world().environment().getMap() : null; }
+  private static ITileLayer tileLayer(IMap map, String name) { for (ITileLayer layer : map.getTileLayers()) if (name.isBlank() || name.equalsIgnoreCase(layer.getName())) return layer; return null; }
+  private static List<ITileLayer> contextLayers(IMap map, String name, String mode) { if ("selected-layer".equals(mode)) { ITileLayer layer = tileLayer(map, name); return layer == null ? List.of() : List.of(layer); } return map.getTileLayers(); }
+  private static JsonArray frequencyArray(Map<Integer, Integer> values) { JsonArrayBuilder result = Json.createArrayBuilder(); values.entrySet().stream().sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed()).forEach(entry -> result.add(Json.createObjectBuilder().add("gid", entry.getKey()).add("count", entry.getValue()))); return result.build(); }
+  private static void increment(Map<Integer, Integer> values, int key) { values.merge(key, 1, Integer::sum); }
+  private static JsonArray layerNames(List<ITileLayer> layers) { JsonArrayBuilder result = Json.createArrayBuilder(); layers.forEach(layer -> result.add(layer.getName())); return result.build(); }
+  private static JsonObject pointJson(int x, int y) { return Json.createObjectBuilder().add("x", x).add("y", y).build(); }
+  private static JsonObject boundsJson(int x, int y, int width, int height) { return Json.createObjectBuilder().add("x", x).add("y", y).add("width", width).add("height", height).build(); }
 
   private static Tileset tileset(JsonObject args) {
     return McpAssetHandler.findTileset(McpToolHandler.getString(args, "tileset", ""));

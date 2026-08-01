@@ -79,7 +79,13 @@ public final class McpSemanticToolRegistry {
     JsonObjectBuilder createEntitiesParams = Json.createObjectBuilder();
     createEntitiesParams.add("mapId", McpToolHandler.createParam("string", "Target map name", true));
     createEntitiesParams.add("expectedRevision", McpToolHandler.createParam("integer", "Expected map revision for optimistic concurrency control", false));
-    createEntitiesParams.add("entities", McpToolHandler.createParam("array", "Array of entity definition objects to create", true));
+    createEntitiesParams.add("entities", Json.createObjectBuilder()
+        .add("type", "array")
+        .add("description", "Array of entity definition objects to create. JSON-object strings are accepted for clients that cannot transmit nested MCP objects.")
+        .add("items", Json.createObjectBuilder().add("oneOf", Json.createArrayBuilder()
+            .add(Json.createObjectBuilder().add("type", "object"))
+            .add(Json.createObjectBuilder().add("type", "string").add("description", "A JSON-encoded entity object"))))
+        .add("required", true));
     tools.add(createToolDef(
         "create_entities",
         "Batch create new entities (props, creatures, lights, triggers, spawnpoints, collision boxes) on a specified map. For modifying existing entities, use update_entities; for copying existing entities, use duplicate_entities.",
@@ -165,7 +171,21 @@ public final class McpSemanticToolRegistry {
         fillRegionParams.build(),
         false, false, true, false));
 
-    // 14. paint_terrain
+    // 14. fill_regions
+    JsonObjectBuilder fillRegionsParams = Json.createObjectBuilder();
+    fillRegionsParams.add("mapId", McpToolHandler.createParam("string", "Target map name", true));
+    fillRegionsParams.add("expectedRevision", McpToolHandler.createParam("integer", "Expected map revision", false));
+    fillRegionsParams.add("regions", McpToolHandler.createParam(
+        "array",
+        "Rectangular tile fills across one or more layers: [{layer, x, y, width, height, gid}]. All regions are validated before any tile changes are applied.",
+        true));
+    tools.add(createToolDef(
+        "fill_regions",
+        "Atomically fill multiple rectangular tile regions across layers in one map revision. Prefer this over repeated fill_region calls.",
+        fillRegionsParams.build(),
+        false, false, true, false));
+
+    // 15. paint_terrain
     JsonObjectBuilder paintTerrainParams = Json.createObjectBuilder();
     paintTerrainParams.add("mapId", McpToolHandler.createParam("string", "Target map name", true));
     paintTerrainParams.add("expectedRevision", McpToolHandler.createParam("integer", "Expected map revision", false));
@@ -222,6 +242,27 @@ public final class McpSemanticToolRegistry {
         "Analyze collision layout on a map to detect overlapping collision boxes, isolated collision islands, and inaccessible regions.",
         analyzeCollisionParams.build(),
         true, false, true, false));
+
+    JsonObject actorProfile = Json.createObjectBuilder().add("type", "object")
+        .add("description", "Player collision footprint used for navigation validation")
+        .add("properties", Json.createObjectBuilder()
+            .add("width", Json.createObjectBuilder().add("type", "number"))
+            .add("height", Json.createObjectBuilder().add("type", "number"))
+            .add("clearance", Json.createObjectBuilder().add("type", "number")))
+        .add("required", Json.createArrayBuilder().add("width").add("height")).build();
+    JsonObjectBuilder playabilityParams = Json.createObjectBuilder();
+    playabilityParams.add("mapId", McpToolHandler.createParam("string", "Target map name", true));
+    playabilityParams.add("actorProfile", Json.createObjectBuilder(actorProfile).add("required", true));
+    playabilityParams.add("requiredTargets", McpToolHandler.createParam("array", "Required target selectors by entityId, name, or type", false));
+    tools.add(createToolDef("analyze_playability",
+        "Performs actor-footprint-aware collision, spawn, and required-target reachability validation. A FAIL result contains hard gameplay failures.",
+        playabilityParams.build(), true, false, true, false));
+    tools.add(createToolDef("get_navigation_graph",
+        "Returns navigation connectivity and required target reachability using the player footprint.",
+        playabilityParams.build(), true, false, true, false));
+    tools.add(createToolDef("render_playability",
+        "Renders collision (magenta), reachable cells (green), and unreachable cells (red) for visual navigation inspection.",
+        playabilityParams.build(), true, false, true, false));
 
     // 19. preview_changes
     JsonObjectBuilder previewChangesParams = Json.createObjectBuilder();
@@ -305,6 +346,32 @@ public final class McpSemanticToolRegistry {
         "Performs comprehensive level-design, structural, collision, and transition diagnostics on a map or proposed change plan.",
         validateMapParams.build(),
         true, false, true, false));
+
+    // Tile geometry inspection aliases. The corresponding Level B tools retain their
+    // hyphenated names for backwards-compatible editor-primitive clients.
+    JsonObjectBuilder renderTilesetParams = Json.createObjectBuilder();
+    renderTilesetParams.add("tileset", McpToolHandler.createParam("string", "Tileset resource name", true));
+    renderTilesetParams.add("scale", McpToolHandler.createParam("integer", "Nearest-neighbor scale (default 4)", false));
+    tools.add(createToolDef("render_tileset", "Render a tileset atlas with local tile IDs.", renderTilesetParams.build(), true, false, true, false));
+
+    JsonObjectBuilder usageParams = Json.createObjectBuilder(renderTilesetParams.build());
+    usageParams.add("mapId", McpToolHandler.createParam("string", "Optional map name", false));
+    usageParams.add("tileId", McpToolHandler.createParam("integer", "Optional local tile ID", false));
+    tools.add(createToolDef("find_tile_usage", "Find tile occurrences and directional neighbor statistics.", usageParams.build(), true, false, true, false));
+
+    JsonObjectBuilder contextParams = Json.createObjectBuilder();
+    contextParams.add("mapId", McpToolHandler.createParam("string", "Map name", false));
+    contextParams.add("layer", McpToolHandler.createParam("string", "Selected tile layer", false));
+    contextParams.add("x", McpToolHandler.createParam("integer", "Center column", true));
+    contextParams.add("y", McpToolHandler.createParam("integer", "Center row", true));
+    contextParams.add("radius", McpToolHandler.createParam("integer", "Context radius", false));
+    contextParams.add("mode", McpToolHandler.createParam("string", "selected-layer, composite, or layer-stack", false));
+    contextParams.add("scale", McpToolHandler.createParam("integer", "Nearest-neighbor scale", false));
+    tools.add(createToolDef("render_tile_context", "Render the local tile neighborhood.", contextParams.build(), true, false, true, false));
+
+    JsonObjectBuilder previewParams = Json.createObjectBuilder(contextParams.build());
+    previewParams.add("edits", McpToolHandler.createParam("array", "Candidate tile edits", true));
+    tools.add(createToolDef("preview_tile_edits", "Render candidate tile edits without persisting them.", previewParams.build(), true, false, true, false));
 
     return Json.createObjectBuilder().add("tools", tools).build();
   }

@@ -139,6 +139,75 @@ final class McpEntityValidator {
     return new ArrayList<>(new LinkedHashSet<>(errors));
   }
 
+  /** Validates only fields touched by an incremental configuration operation. */
+  static List<String> validateForPropertyUpdate(
+      MapObject mapObject, Collection<String> changedProperties) {
+    List<String> errors = new ArrayList<>();
+    if (mapObject == null || changedProperties == null || changedProperties.isEmpty()) return errors;
+    MapObjectType type = MapObjectType.get(mapObject.getType());
+    if (type == null) {
+      errors.add("Unknown map object type: " + mapObject.getType());
+      return errors;
+    }
+
+    if (changedProperties.contains(MapObjectProperty.SPRITESHEETNAME)) {
+      validateRequiredSprite(mapObject, type, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.PROP_MATERIAL)) {
+      validateMaterial(mapObject, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.COLLISION_TYPE)) {
+      validateOptionalEnum(mapObject, MapObjectProperty.COLLISION_TYPE, Collision.class, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.COLLISIONBOX_WIDTH)) {
+      validateNonNegative(mapObject, MapObjectProperty.COLLISIONBOX_WIDTH, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.COLLISIONBOX_HEIGHT)) {
+      validateNonNegative(mapObject, MapObjectProperty.COLLISIONBOX_HEIGHT, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.MOVEMENT_VELOCITY)) {
+      validateNonNegative(mapObject, MapObjectProperty.MOVEMENT_VELOCITY, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.COMBAT_HITPOINTS)) {
+      validateNonNegative(mapObject, MapObjectProperty.COMBAT_HITPOINTS, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.COMBAT_TEAM)) {
+      validateNonNegative(mapObject, MapObjectProperty.COMBAT_TEAM, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.LIGHT_COLOR)) {
+      validateRequiredColor(mapObject, MapObjectProperty.LIGHT_COLOR, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.LIGHT_INTENSITY)) {
+      validateRange(mapObject, MapObjectProperty.LIGHT_INTENSITY, 0, 255, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.LIGHT_SHAPE)) {
+      validateOptionalEnum(mapObject, MapObjectProperty.LIGHT_SHAPE, LightSource.Type.class, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.SOUND_NAME)) validateRequiredSound(mapObject, errors);
+    if (changedProperties.contains(MapObjectProperty.SOUND_VOLUME)) {
+      validateRange(mapObject, MapObjectProperty.SOUND_VOLUME, 0, 1, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.SOUND_RANGE)) {
+      validateNonNegative(mapObject, MapObjectProperty.SOUND_RANGE, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.TRIGGER_ACTIVATION)) {
+      validateOptionalEnum(mapObject, MapObjectProperty.TRIGGER_ACTIVATION, TriggerActivation.class, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.TRIGGER_TARGETS)) {
+      validateIntegerList(mapObject, MapObjectProperty.TRIGGER_TARGETS, "targets", errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.TRIGGER_ACTIVATORS)) {
+      validateIntegerList(mapObject, MapObjectProperty.TRIGGER_ACTIVATORS, "activators", errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.TRIGGER_COOLDOWN)) {
+      validateNonNegative(mapObject, MapObjectProperty.TRIGGER_COOLDOWN, errors);
+    }
+    if (changedProperties.contains(MapObjectProperty.SHADOW_TYPE)) {
+      validateOptionalEnum(mapObject, MapObjectProperty.SHADOW_TYPE, StaticShadowType.class, errors);
+    }
+    return new ArrayList<>(new LinkedHashSet<>(errors));
+  }
+
   static String normalizeSpriteReference(MapObjectType type, String reference) {
     if (reference == null || reference.isBlank()) {
       return reference;

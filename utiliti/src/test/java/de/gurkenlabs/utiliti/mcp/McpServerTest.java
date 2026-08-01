@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -75,6 +77,16 @@ public class McpServerTest {
     assertEquals(port, McpServer.instance().getPort());
     assertNotNull(McpServer.instance().getAddress());
     assertTrue(McpServer.instance().getAddress().getAddress().isLoopbackAddress());
+  }
+
+  @Test
+  void filtersExpectedCancellationWarningsButPreservesOtherSdkWarnings() {
+    LogRecord cancelled = new LogRecord(Level.WARNING,
+        "No handler registered for notification method: notifications/cancelled");
+    LogRecord otherWarning = new LogRecord(Level.WARNING, "Unexpected MCP transport warning");
+
+    assertTrue(McpServer.isExpectedCancellationWarning(cancelled));
+    assertFalse(McpServer.isExpectedCancellationWarning(otherWarning));
   }
 
   @Test

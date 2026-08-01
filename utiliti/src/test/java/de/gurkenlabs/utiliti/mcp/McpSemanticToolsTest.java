@@ -5,6 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import de.gurkenlabs.litiengine.resources.ResourceBundle;
+import de.gurkenlabs.utiliti.controller.Editor;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -13,12 +20,12 @@ import org.junit.jupiter.api.Test;
 class McpSemanticToolsTest {
 
   @Test
-  void getSemanticToolsListContainsAll25Tools() {
+  void getSemanticToolsListContainsAll33Tools() {
     JsonObject toolsList = McpSemanticToolRegistry.getSemanticToolsList();
     assertNotNull(toolsList);
     JsonArray tools = toolsList.getJsonArray("tools");
     assertNotNull(tools);
-    assertEquals(25, tools.size(), "Level A API must define 25 semantic tools");
+    assertEquals(33, tools.size(), "Level A API must define 33 semantic tools");
   }
 
   @Test
@@ -97,6 +104,32 @@ class McpSemanticToolsTest {
   }
 
   @Test
+  void revisionConflictReturnsMachineReadableRecoveryDetails() throws Exception {
+    Editor editor = Editor.instance();
+    java.lang.reflect.Field gameFileField = Editor.class.getDeclaredField("gameFile");
+    gameFileField.setAccessible(true);
+    ResourceBundle previous = (ResourceBundle) gameFileField.get(editor);
+    ResourceBundle project = new ResourceBundle();
+    TmxMap map = new TmxMap();
+    map.setName("revision-map");
+    project.getMaps().add(map);
+    gameFileField.set(editor, project);
+    try {
+      McpRevisionTracker.incrementRevision(map);
+      long actualRevision = McpRevisionTracker.getRevision(map);
+      JsonObject response = McpSemanticHandler.handleSemanticTool("set_ambient_light",
+          Json.createObjectBuilder().add("mapId", "revision-map").add("color", "#112233")
+              .add("expectedRevision", actualRevision - 1).build());
+      JsonObject details = response.getJsonObject("error").getJsonObject("details");
+      assertEquals(actualRevision - 1, details.getJsonNumber("expectedRevision").longValue());
+      assertEquals(actualRevision, details.getJsonNumber("actualRevision").longValue());
+      assertTrue(details.getString("recovery").contains("expectedRevision"));
+    } finally {
+      gameFileField.set(editor, previous);
+    }
+  }
+
+  @Test
   void deleteEntitiesSchemaSupportsExtendedParameters() {
     JsonObject toolsList = McpSemanticToolRegistry.getSemanticToolsList();
     JsonArray tools = toolsList.getJsonArray("tools");
@@ -136,6 +169,140 @@ class McpSemanticToolsTest {
     JsonObject response = McpSemanticHandler.handleSemanticTool("analyze_project", Json.createObjectBuilder().build());
     assertNotNull(response);
     assertTrue(response.getBoolean("success", false));
+  }
+
+  @Test
+  void analyzeProjectAcceptsTriggersWithoutOptionalTargetProperties() throws Exception {
+    Editor editor = Editor.instance();
+    java.lang.reflect.Field gameFileField = Editor.class.getDeclaredField("gameFile");
+    gameFileField.setAccessible(true);
+    ResourceBundle previous = (ResourceBundle) gameFileField.get(editor);
+    ResourceBundle project = new ResourceBundle();
+    TmxMap map = new TmxMap();
+    map.setName("test-map");
+    MapObjectLayer layer = new MapObjectLayer();
+    layer.addMapObject(new MapObject("TRIGGER"));
+    map.addLayer(layer);
+    project.getMaps().add(map);
+    gameFileField.set(editor, project);
+    try {
+      JsonObject response = McpSemanticHandler.handleSemanticTool(
+          "analyze_project", Json.createObjectBuilder().build());
+      assertTrue(response.getBoolean("success", false));
+      assertEquals(1, response.getJsonArray("maps").size());
+    } finally {
+      gameFileField.set(editor, previous);
+    }
+  }
+
+  @Test
+  void createEntitiesRejectsStringEntriesWithoutAnInternalError() throws Exception {
+    Editor editor = Editor.instance();
+    java.lang.reflect.Field gameFileField = Editor.class.getDeclaredField("gameFile");
+    gameFileField.setAccessible(true);
+    ResourceBundle previous = (ResourceBundle) gameFileField.get(editor);
+    ResourceBundle project = new ResourceBundle();
+    TmxMap map = new TmxMap();
+    map.setName("test-map");
+    project.getMaps().add(map);
+    gameFileField.set(editor, project);
+    try {
+      JsonObject response = McpSemanticHandler.handleSemanticTool("create_entities",
+          Json.createObjectBuilder().add("mapId", "test-map")
+              .add("entities", Json.createArrayBuilder().add("not an entity object")).build());
+      assertFalse(response.getBoolean("success", true));
+      assertEquals("INVALID_ARGUMENTS", response.getJsonObject("error").getString("code"));
+      assertTrue(response.getJsonObject("error").getString("message").contains("index 0"));
+    } finally {
+      gameFileField.set(editor, previous);
+    }
+  }
+
+  @Test
+  void createEntitiesParsesJsonEncodedEntityDefinitions() {
+    JsonObject definition = McpSemanticHandler.parseEntityDefinition(
+        Json.createValue("{\"type\":\"PROP\",\"name\":\"crate\",\"x\":16,\"y\":32}"));
+
+    assertNotNull(definition);
+    assertEquals("PROP", definition.getString("type"));
+    assertEquals("crate", definition.getString("name"));
+    assertEquals(16, definition.getInt("x"));
+  }
+
+  @Test
+  void createEntitiesPreservesNestedEntityProperties() {
+    MapObject entity = new MapObject();
+    McpToolHandler.applyAdditionalProperties(entity, Json.createObjectBuilder()
+        .add("spritesheetName", "bench1")
+        .add("material", "metal")
+        .add("customFlag", true)
+        .build());
+
+    assertEquals("bench1", entity.getStringValue(MapObjectProperty.SPRITESHEETNAME));
+    assertEquals("metal", entity.getStringValue(MapObjectProperty.PROP_MATERIAL));
+    assertTrue(entity.getBoolValue("customFlag"));
+  }
+
+  @Test
+  void fillRegionsAppliesMultipleLayersInOneRevision() throws Exception {
+    Editor editor = Editor.instance();
+    java.lang.reflect.Field gameFileField = Editor.class.getDeclaredField("gameFile");
+    gameFileField.setAccessible(true);
+    ResourceBundle previous = (ResourceBundle) gameFileField.get(editor);
+    ResourceBundle project = new ResourceBundle();
+    TmxMap map = new TmxMap();
+    map.setName("test-map");
+    map.setWidth(8);
+    map.setHeight(8);
+    TileLayer base = new TileLayer(8, 8);
+    base.setName("base");
+    TileLayer overlay = new TileLayer(8, 8);
+    overlay.setName("overlay");
+    map.addLayer(base);
+    map.addLayer(overlay);
+    project.getMaps().add(map);
+    gameFileField.set(editor, project);
+    try {
+      JsonObject response = McpSemanticHandler.handleSemanticTool("fill_regions",
+          Json.createObjectBuilder().add("mapId", "test-map")
+              .add("regions", Json.createArrayBuilder()
+                  .add(Json.createObjectBuilder().add("layer", "base").add("x", 0).add("y", 0)
+                      .add("width", 2).add("height", 2).add("gid", 3))
+                  .add(Json.createObjectBuilder().add("layer", "overlay").add("x", 1).add("y", 1)
+                      .add("width", 1).add("height", 2).add("gid", 5)))
+              .build());
+      assertTrue(response.getBoolean("success", false), response::toString);
+      assertEquals(2, response.getInt("regionCount"));
+      assertEquals(6, response.getInt("tileCount"));
+      assertEquals(3, base.getTile(0, 0).getGridId());
+      assertEquals(5, overlay.getTile(1, 2).getGridId());
+    } finally {
+      gameFileField.set(editor, previous);
+    }
+  }
+
+  @Test
+  void analyzePlayabilityReportsMissingSpawnAsHardFailure() throws Exception {
+    Editor editor = Editor.instance();
+    java.lang.reflect.Field gameFileField = Editor.class.getDeclaredField("gameFile");
+    gameFileField.setAccessible(true);
+    ResourceBundle previous = (ResourceBundle) gameFileField.get(editor);
+    ResourceBundle project = new ResourceBundle();
+    TmxMap map = new TmxMap();
+    map.setName("test-map");
+    project.getMaps().add(map);
+    gameFileField.set(editor, project);
+    try {
+      JsonObject response = McpSemanticHandler.handleSemanticTool("analyze_playability",
+          Json.createObjectBuilder().add("mapId", "test-map")
+              .add("actorProfile", Json.createObjectBuilder().add("width", 16).add("height", 16)).build());
+      assertTrue(response.getBoolean("success", false));
+      assertEquals("FAIL", response.getString("status"));
+      assertEquals("NO_PLAYER_SPAWN", response.getJsonArray("hardFailures")
+          .getJsonObject(0).getString("code"));
+    } finally {
+      gameFileField.set(editor, previous);
+    }
   }
 
   @Test

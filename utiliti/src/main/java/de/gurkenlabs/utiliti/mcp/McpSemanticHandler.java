@@ -20,9 +20,11 @@ import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashSet;
@@ -58,11 +60,14 @@ public final class McpSemanticHandler {
       case "instantiate_blueprints" -> instantiateBlueprints(args);
       case "edit_tiles" -> editTiles(args);
       case "fill_region" -> fillRegion(args);
+      case "fill_regions" -> fillRegions(args);
       case "paint_terrain" -> paintTerrain(args);
       case "render_map" -> renderMap(args);
       case "render_region" -> renderRegion(args);
       case "analyze_map" -> analyzeMap(args);
       case "analyze_collision" -> analyzeCollision(args);
+      case "analyze_playability", "get_navigation_graph" -> analyzePlayability(args);
+      case "render_playability" -> renderPlayability(args);
       case "preview_changes" -> previewChanges(args);
       case "apply_changes" -> applyChanges(args);
       case "set_ambient_light" -> setAmbientLight(args);
@@ -70,9 +75,28 @@ public final class McpSemanticHandler {
       case "analyze_project" -> analyzeProject(args);
       case "plan_map_changes" -> planMapChanges(args);
       case "validate_map_changes", "validate_map_plan" -> validateMapPlan(args);
+      case "render_tileset" -> McpTilesetHandler.handle("render-tileset", tileInspectionArgs(args));
+      case "find_tile_usage" -> McpTilesetHandler.handle("find-tile-usage", tileInspectionArgs(args));
+      case "render_tile_context" -> McpTilesetHandler.handle("render-tile-context", tileInspectionArgs(args));
+      case "preview_tile_edits" -> McpTilesetHandler.handle("preview-tile-edits", tileInspectionArgs(args));
       default -> McpResponseFactory.createError(
           "UNKNOWN_TOOL", "Unknown semantic tool: " + name, false, null);
     };
+  }
+
+  /** Accept snake_case aliases without weakening the canonical Level B schemas. */
+  private static JsonObject tileInspectionArgs(JsonObject args) {
+    JsonObjectBuilder normalized = Json.createObjectBuilder();
+    args.forEach(normalized::add);
+    copySnakeCase(args, normalized, "map_id", "mapId");
+    copySnakeCase(args, normalized, "tile_id", "tileId");
+    copySnakeCase(args, normalized, "selected_layer", "layer");
+    copySnakeCase(args, normalized, "tile_edits", "edits");
+    return normalized.build();
+  }
+
+  private static void copySnakeCase(JsonObject source, JsonObjectBuilder target, String snake, String camel) {
+    if (!source.containsKey(camel) && source.containsKey(snake)) target.add(camel, source.get(snake));
   }
 
   // ── Context & Inspection ──────────────────────────────────────────
@@ -314,11 +338,36 @@ public final class McpSemanticHandler {
       return McpResponseFactory.createError("INVALID_ARGUMENTS", "No entities provided", true, null);
     }
 
+    List<JsonObject> definitions = new ArrayList<>(entities.size());
+    for (int index = 0; index < entities.size(); index++) {
+      JsonValue value = entities.get(index);
+      JsonObject definition = parseEntityDefinition(value);
+      if (definition != null) {
+        definitions.add(definition);
+        continue;
+      }
+      if (value.getValueType() == JsonValue.ValueType.STRING) {
+        return McpResponseFactory.createError(
+            "INVALID_ARGUMENTS",
+            "Entity at index " + index + " must be a JSON object or a JSON-encoded object string",
+            true,
+            null);
+      }
+      {
+        return McpResponseFactory.createError(
+            "INVALID_ARGUMENTS",
+            "Entity at index " + index + " must be an object, not "
+                + value.getValueType().name().toLowerCase(),
+            true,
+            null);
+      }
+    }
+
     long prevRev = McpRevisionTracker.getRevision(map);
     List<Integer> createdIds = new ArrayList<>();
 
-    for (int i = 0; i < entities.size(); i++) {
-      JsonObject entDef = entities.getJsonObject(i);
+    for (int i = 0; i < definitions.size(); i++) {
+      JsonObject entDef = definitions.get(i);
       MapObject mo = new MapObject();
       mo.setType(getString(entDef, "type", "PROP"));
       mo.setName(getString(entDef, "name", "entity_" + (i + 1)));
@@ -326,6 +375,8 @@ public final class McpSemanticHandler {
       mo.setY(getFloat(entDef, "y", 0f));
       mo.setWidth(getFloat(entDef, "width", 16f));
       mo.setHeight(getFloat(entDef, "height", 16f));
+      McpToolHandler.applyAdditionalProperties(
+          mo, entDef.get("properties") instanceof JsonObject properties ? properties : null);
 
       if (entDef.containsKey("spritesheetName")) {
         String sprite = getString(entDef, "spritesheetName", "");
@@ -378,6 +429,18 @@ public final class McpSemanticHandler {
     return McpResponseFactory.createMutationResult(
         map.getName(), prevRev, newRev, createdIds, null, null, null, null,
         "create-entities-" + newRev);
+  }
+
+  static JsonObject parseEntityDefinition(JsonValue value) {
+    if (value == null) return null;
+    if (value.getValueType() == JsonValue.ValueType.OBJECT) return value.asJsonObject();
+    if (value.getValueType() != JsonValue.ValueType.STRING) return null;
+    try (var reader = Json.createReader(new StringReader(((JsonString) value).getString()))) {
+      JsonValue parsed = reader.readValue();
+      return parsed.getValueType() == JsonValue.ValueType.OBJECT ? parsed.asJsonObject() : null;
+    } catch (RuntimeException _) {
+      return null;
+    }
   }
 
   private static JsonObject updateEntities(JsonObject args) {
@@ -755,6 +818,65 @@ public final class McpSemanticHandler {
         "fill-region-" + newRev);
   }
 
+  private static JsonObject fillRegions(JsonObject args) {
+    String mapId = getString(args, "mapId", null);
+    IMap map = resolveMap(mapId);
+    if (map == null) return mapNotFound(mapId);
+    if (!checkRevision(map, args)) return revisionConflict(map, args);
+
+    JsonArray regions = args.getJsonArray("regions");
+    if (regions == null || regions.isEmpty()) {
+      return McpResponseFactory.createError("INVALID_ARGUMENTS", "No regions provided", true, null);
+    }
+
+    for (int i = 0; i < regions.size(); i++) {
+      if (!(regions.get(i) instanceof JsonObject region)) {
+        return McpResponseFactory.createError(
+            "INVALID_ARGUMENTS", "Region at index " + i + " must be an object", true, null);
+      }
+      String layerName = getString(region, "layer", null);
+      if (resolveTileLayer(map, layerName) == null) {
+        return McpResponseFactory.createError(
+            "LAYER_NOT_FOUND", "Tile layer not found at region index " + i + ": " + layerName, true, null);
+      }
+      if (getInt(region, "width", 0) <= 0 || getInt(region, "height", 0) <= 0) {
+        return McpResponseFactory.createError(
+            "INVALID_ARGUMENTS", "Region at index " + i + " must have positive width and height", true, null);
+      }
+    }
+
+    long prevRev = McpRevisionTracker.getRevision(map);
+    int tileCount = 0;
+    for (int i = 0; i < regions.size(); i++) {
+      JsonObject region = regions.getJsonObject(i);
+      ITileLayer tileLayer = resolveTileLayer(map, getString(region, "layer", null));
+      int startX = getInt(region, "x", 0);
+      int startY = getInt(region, "y", 0);
+      int width = getInt(region, "width", 0);
+      int height = getInt(region, "height", 0);
+      int gid = getInt(region, "gid", 0);
+      for (int col = startX; col < startX + width; col++) {
+        for (int row = startY; row < startY + height; row++) {
+          if (col >= 0 && col < map.getWidth() && row >= 0 && row < map.getHeight()) {
+            tileLayer.setTile(col, row, gid);
+            tileCount++;
+          }
+        }
+      }
+    }
+
+    long newRev = McpRevisionTracker.incrementRevision(map);
+    return Json.createObjectBuilder()
+        .add("success", true)
+        .add("mapId", map.getName())
+        .add("previousRevision", prevRev)
+        .add("revision", newRev)
+        .add("regionCount", regions.size())
+        .add("tileCount", tileCount)
+        .add("operationId", "fill-regions-" + newRev)
+        .build();
+  }
+
   private static JsonObject paintTerrain(JsonObject args) {
     String mapId = getString(args, "mapId", null);
     IMap map = resolveMap(mapId);
@@ -920,6 +1042,100 @@ public final class McpSemanticHandler {
         .build();
   }
 
+  private static JsonObject analyzePlayability(JsonObject args) {
+    String mapId = getString(args, "mapId", null);
+    IMap map = resolveMap(mapId);
+    if (map == null) return mapNotFound(mapId);
+    JsonObject actor = args.getJsonObject("actorProfile");
+    if (actor == null || !actor.containsKey("width") || !actor.containsKey("height")) {
+      return McpResponseFactory.createError("INVALID_ARGUMENTS",
+          "actorProfile.width and actorProfile.height are required", true, null);
+    }
+    PlayabilityResult result = playability(map, actor, args.getJsonArray("requiredTargets"));
+    return result.toJson(map.getName(), McpRevisionTracker.getRevision(map));
+  }
+
+  private static JsonObject renderPlayability(JsonObject args) {
+    String mapId = getString(args, "mapId", null);
+    IMap map = resolveMap(mapId);
+    if (map == null) return mapNotFound(mapId);
+    JsonObject actor = args.getJsonObject("actorProfile");
+    if (actor == null || !actor.containsKey("width") || !actor.containsKey("height")) {
+      return McpResponseFactory.createError("INVALID_ARGUMENTS",
+          "actorProfile.width and actorProfile.height are required", true, null);
+    }
+    PlayabilityResult result = playability(map, actor, args.getJsonArray("requiredTargets"));
+    BufferedImage image = McpToolHandler.renderCanvasSnapshot(
+        Math.max(1, map.getSizeInPixels().width), Math.max(1, map.getSizeInPixels().height));
+    Graphics2D graphics = image.createGraphics();
+    try {
+      for (int y = 0; y < map.getHeight(); y++) for (int x = 0; x < map.getWidth(); x++) {
+        int alpha = result.blocked[y][x] ? 130 : result.reachable[y][x] ? 70 : 100;
+        graphics.setColor(result.blocked[y][x] ? new java.awt.Color(220, 0, 180, alpha)
+            : result.reachable[y][x] ? new java.awt.Color(0, 210, 80, alpha) : new java.awt.Color(220, 30, 30, alpha));
+        graphics.fillRect(x * map.getTileWidth(), y * map.getTileHeight(), map.getTileWidth(), map.getTileHeight());
+      }
+    } finally { graphics.dispose(); }
+    String encoded = encodePngBase64(image);
+    return Json.createObjectBuilder(result.toJson(map.getName(), McpRevisionTracker.getRevision(map)))
+        .add("imageBase64", encoded).add("imageData", "data:image/png;base64," + encoded)
+        .add("mimeType", "image/png").build();
+  }
+
+  private static PlayabilityResult playability(IMap map, JsonObject actor, JsonArray requestedTargets) {
+    int width = map.getWidth(), height = map.getHeight();
+    boolean[][] blocked = new boolean[height][width], reachable = new boolean[height][width];
+    double actorWidth = getDouble(actor, "width", 0), actorHeight = getDouble(actor, "height", 0);
+    double clearance = getDouble(actor, "clearance", 2);
+    List<IMapObject> objects = new ArrayList<>(), collisions = new ArrayList<>(), starts = new ArrayList<>();
+    for (IMapObjectLayer layer : map.getMapObjectLayers()) if (layer != null) for (IMapObject object : layer.getMapObjects()) {
+      if (object == null) continue; objects.add(object);
+      if ("COLLISIONBOX".equalsIgnoreCase(object.getType())) collisions.add(object);
+      if ("SPAWNPOINT".equalsIgnoreCase(object.getType())) starts.add(object);
+    }
+    for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) {
+      double px = x * map.getTileWidth() + (map.getTileWidth() - actorWidth) / 2d;
+      double py = y * map.getTileHeight() + (map.getTileHeight() - actorHeight) / 2d;
+      java.awt.geom.Rectangle2D footprint = new java.awt.geom.Rectangle2D.Double(px, py, actorWidth, actorHeight);
+      if (footprint.getMinX() < clearance || footprint.getMinY() < clearance
+          || footprint.getMaxX() > map.getSizeInPixels().width - clearance
+          || footprint.getMaxY() > map.getSizeInPixels().height - clearance) { blocked[y][x] = true; continue; }
+      for (IMapObject collision : collisions) if (collision.getBoundingBox().intersects(footprint)) { blocked[y][x] = true; break; }
+    }
+    java.util.ArrayDeque<Point> queue = new java.util.ArrayDeque<>();
+    for (IMapObject start : starts) {
+      Point cell = cell(map, start); if (inBounds(cell, width, height) && !blocked[cell.y][cell.x]) { reachable[cell.y][cell.x] = true; queue.add(cell); }
+    }
+    while (!queue.isEmpty()) { Point current = queue.remove(); for (Point next : List.of(new Point(current.x + 1, current.y), new Point(current.x - 1, current.y), new Point(current.x, current.y + 1), new Point(current.x, current.y - 1))) {
+      if (inBounds(next, width, height) && !blocked[next.y][next.x] && !reachable[next.y][next.x]) { reachable[next.y][next.x] = true; queue.add(next); }
+    }}
+    List<IMapObject> targets = new ArrayList<>();
+    if (requestedTargets != null) for (JsonValue value : requestedTargets) if (value instanceof JsonObject target) {
+      for (IMapObject object : objects) if ((target.containsKey("entityId") && object.getId() == getInt(target, "entityId", -1))
+          || (!target.getString("name", "").isBlank() && target.getString("name").equalsIgnoreCase(object.getName()))
+          || (!target.getString("type", "").isBlank() && target.getString("type").equalsIgnoreCase(object.getType()))) targets.add(object);
+    }
+    if (targets.isEmpty()) for (IMapObject object : objects) if (object.getName() != null && object.getName().equalsIgnoreCase("END_LEVEL")) targets.add(object);
+    return new PlayabilityResult(blocked, reachable, starts, targets, map);
+  }
+
+  private static Point cell(IMap map, IMapObject object) { return new Point((int) (object.getX() / map.getTileWidth()), (int) (object.getY() / map.getTileHeight())); }
+  private static boolean inBounds(Point point, int width, int height) { return point.x >= 0 && point.y >= 0 && point.x < width && point.y < height; }
+
+  private record PlayabilityResult(boolean[][] blocked, boolean[][] reachable, List<IMapObject> starts, List<IMapObject> targets, IMap map) {
+    JsonObject toJson(String mapId, long revision) {
+      JsonArrayBuilder failures = Json.createArrayBuilder(), targetResults = Json.createArrayBuilder();
+      if (starts.isEmpty()) failures.add(Json.createObjectBuilder().add("code", "NO_PLAYER_SPAWN").add("message", "No SPAWNPOINT is available for navigation analysis."));
+      for (IMapObject target : targets) { Point point = cell(map, target); boolean found = inBounds(point, map.getWidth(), map.getHeight()) && reachable[point.y][point.x];
+        targetResults.add(Json.createObjectBuilder().add("targetEntity", target.getName() == null ? String.valueOf(target.getId()) : target.getName()).add("found", found));
+        if (!found) failures.add(Json.createObjectBuilder().add("code", "GOAL_UNREACHABLE").add("message", "Required target '" + (target.getName() == null ? target.getId() : target.getName()) + "' cannot be reached from a player spawn.").add("targetEntityId", target.getId())); }
+      int reachableCount = 0, blockedCount = 0; for (int y = 0; y < map.getHeight(); y++) for (int x = 0; x < map.getWidth(); x++) { if (blocked[y][x]) blockedCount++; else if (reachable[y][x]) reachableCount++; }
+      JsonArray hardFailures = failures.build();
+      return Json.createObjectBuilder().add("success", true).add("status", hardFailures.isEmpty() ? "PASS" : "FAIL").add("mapId", mapId).add("revision", revision)
+          .add("hardFailures", hardFailures).add("navigation", Json.createObjectBuilder().add("reachableCellCount", reachableCount).add("blockedCellCount", blockedCount).add("startCount", starts.size()).add("requiredTargetCount", targets.size()).add("paths", targetResults)).build();
+    }
+  }
+
   // ── Transactions ──────────────────────────────────────────────────
 
   private static JsonObject previewChanges(JsonObject args) {
@@ -977,6 +1193,13 @@ public final class McpSemanticHandler {
     }
 
     map.setValue(de.gurkenlabs.litiengine.environment.tilemap.MapProperty.AMBIENTCOLOR, formattedColor);
+    if (Game.world().environment() != null && Game.world().environment().getMap() == map
+        && Game.world().environment().getAmbientLight() != null) {
+      Game.world().environment().getAmbientLight().setColor(
+          map.getColorValue(
+              de.gurkenlabs.litiengine.environment.tilemap.MapProperty.AMBIENTCOLOR,
+              de.gurkenlabs.litiengine.graphics.AmbientLight.DEFAULT_COLOR));
+    }
 
     long prevRev = McpRevisionTracker.getRevision(map);
     long newRev = McpRevisionTracker.incrementRevision(map);
@@ -1126,10 +1349,16 @@ public final class McpSemanticHandler {
 
   private static JsonObject revisionConflict(IMap map, JsonObject args) {
     Long expected = getLong(args, "expectedRevision", null);
+    long actual = McpRevisionTracker.getRevision(map);
     return McpResponseFactory.createError("REVISION_CONFLICT",
-        "Map revision conflict: expected " + expected + " but actual is "
-            + McpRevisionTracker.getRevision(map),
-        true, null);
+        "Map revision conflict: expected " + expected + " but actual is " + actual,
+        true,
+        Json.createObjectBuilder()
+            .add("mapId", map.getName() != null ? map.getName() : "")
+            .add("expectedRevision", expected != null ? expected : -1)
+            .add("actualRevision", actual)
+            .add("recovery", "Retry with expectedRevision set to actualRevision after reviewing any intervening edits.")
+            .build());
   }
 
   private static JsonObject mapNotFound(String mapId) {
@@ -1212,9 +1441,12 @@ public final class McpSemanticHandler {
         }
 
         if ("TRIGGER".equalsIgnoreCase(obj.getType()) || "AREA".equalsIgnoreCase(obj.getType())) {
-          String targetMap = obj.getStringValue("targetMap");
-          if (targetMap == null) targetMap = obj.getStringValue("destination");
-          String targetSpawn = obj.getStringValue("targetSpawn");
+          // Optional custom properties must use the default-value overload. The no-default
+          // overload throws NoSuchElementException (for example, with message "targetMap")
+          // on ordinary triggers that do not define cross-map navigation.
+          String targetMap = obj.getStringValue("targetMap", null);
+          if (targetMap == null) targetMap = obj.getStringValue("destination", null);
+          String targetSpawn = obj.getStringValue("targetSpawn", null);
 
           if (targetMap != null && !targetMap.isBlank()) {
             JsonObjectBuilder transBuilder = Json.createObjectBuilder()

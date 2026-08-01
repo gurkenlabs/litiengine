@@ -246,9 +246,15 @@ final class McpSdkAdapter {
   }
 
   private static void addImageContent(List<Content> content, JsonObject toolResult) {
-    if (!toolResult.containsKey("filePath")) {
-      return;
+    addBase64ImageContent(content, toolResult.getString("imageBase64", null), toolResult.getString("mimeType", "image/png"));
+    if (toolResult.containsKey("images") && toolResult.get("images") instanceof JsonArray images) {
+      for (JsonValue image : images) {
+        if (image instanceof JsonObject imageObject) {
+          addBase64ImageContent(content, imageObject.getString("imageBase64", null), imageObject.getString("mimeType", "image/png"));
+        }
+      }
     }
+    if (!toolResult.containsKey("filePath")) return;
     try {
       Path path = Path.of(toolResult.getString("filePath"));
       String mimeType = Files.probeContentType(path);
@@ -263,6 +269,19 @@ final class McpSdkAdapter {
           .build());
     } catch (Exception e) {
       log.log(Level.FINE, "Could not attach snapshot image content", e);
+    }
+  }
+
+  private static void addBase64ImageContent(List<Content> content, String imageBase64, String mimeType) {
+    if (imageBase64 == null || imageBase64.isBlank()) return;
+    String data = imageBase64.startsWith("data:")
+        ? imageBase64.substring(imageBase64.indexOf(',') + 1)
+        : imageBase64;
+    try {
+      Base64.getDecoder().decode(data);
+      content.add(McpSchema.ImageContent.builder(data, mimeType).build());
+    } catch (IllegalArgumentException ex) {
+      log.log(Level.FINE, "Could not attach base64 image content", ex);
     }
   }
 
