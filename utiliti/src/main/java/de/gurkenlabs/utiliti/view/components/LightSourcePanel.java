@@ -65,7 +65,8 @@ public class LightSourcePanel extends PropertyPanel {
     final boolean isActive = mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, false);
 
     this.spinnerIntensity.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
-    this.colorControl.setColor(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR));
+    this.colorControl.setColor(
+        mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE));
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
 }

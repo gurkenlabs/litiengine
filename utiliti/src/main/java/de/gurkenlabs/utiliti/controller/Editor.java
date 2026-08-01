@@ -286,6 +286,10 @@ public class Editor extends Screen {
   }
 
   public void load(Path gameFile, boolean force) {
+    if (gameFile == null) {
+      log.warning("Cannot load a project without a file path");
+      return;
+    }
     if (!force) {
       boolean proceedLoading = UI.notifyPendingChanges();
       if (!proceedLoading) {
@@ -987,6 +991,9 @@ public class Editor extends Screen {
       return;
     }
 
+    // close(true) clears currentResourceFile, so retain the saved project path before closing.
+    Path resourceFile = this.currentResourceFile;
+
     boolean revert = UI.showRevertWarning();
     if (!revert) {
       return;
@@ -998,7 +1005,7 @@ public class Editor extends Screen {
     }
 
     this.close(true);
-    this.load(currentResourceFile, true);
+    this.load(resourceFile, true);
     UI.getMapController().setSelection(currentMapSelection);
     log.log(Level.INFO, "Reverted all pending changes.");
   }
