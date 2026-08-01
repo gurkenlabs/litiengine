@@ -1819,14 +1819,15 @@ public class McpToolHandler {
 
   // BATCH EDIT ENTITIES TRANSACTIONAL IMPLEMENTATION WITH ROLLBACK
   private static JsonObject batchEditEntities(JsonObject args) {
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+    IMap map = getActiveMap();
+    if (map == null) {
       return Json.createObjectBuilder().add("success", false).add("error", "No active map loaded").build();
     }
     if (args == null || !args.containsKey("operations")) {
       return Json.createObjectBuilder().add("success", false).add("error", "Missing 'operations' array").build();
     }
 
-    IMap map = Game.world().environment().getMap();
+    String topLevelMap = getString(args, "mapId", getString(args, "map", null));
     JsonArray operations = args.getJsonArray("operations");
     JsonArrayBuilder outcomes = Json.createArrayBuilder();
 
@@ -1835,7 +1836,7 @@ public class McpToolHandler {
     String firstError = "";
 
     for (int i = 0; i < operations.size(); i++) {
-      if (!(operations.get(i) instanceof JsonObject opObj)) {
+      if (!(operations.get(i) instanceof JsonObject rawOpObj)) {
         errorEncountered = true;
         firstError = "Batch operation at index " + i + " must be an object";
         outcomes.add(
@@ -1845,6 +1846,15 @@ public class McpToolHandler {
                 .add("error", firstError));
         break;
       }
+
+      JsonObject opObj = rawOpObj;
+      if (topLevelMap != null && !opObj.containsKey("map") && !opObj.containsKey("mapId")) {
+        JsonObjectBuilder merged = Json.createObjectBuilder();
+        opObj.forEach(merged::add);
+        merged.add("map", topLevelMap);
+        opObj = merged.build();
+      }
+
       String action = getString(opObj, "action", "create").toLowerCase();
 
       switch (action) {
@@ -1904,7 +1914,8 @@ public class McpToolHandler {
           IMapObject target = findEntity(opObj);
           if (target == null) {
             errorEncountered = true;
-            firstError = "Entity not found at batch operation index " + i;
+            JsonObject errObj = entityNotFoundError(opObj);
+            firstError = errObj.getString("error", "Entity not found at batch operation index " + i);
             outcomes.add(Json.createObjectBuilder()
                 .add("index", i)
                 .add("action", "update")
@@ -3753,14 +3764,17 @@ public class McpToolHandler {
     if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
       return Game.world().environment().getMap();
     }
-    if (!Editor.instance().getMapComponent().getMaps().isEmpty()) {
+    if (Editor.instance().getMapComponent() != null && !Editor.instance().getMapComponent().getMaps().isEmpty()) {
       return Editor.instance().getMapComponent().getMaps().get(0);
     }
     return null;
   }
 
   private static List<IMap> getAllProjectMaps() {
-    List<IMap> result = new ArrayList<>(Editor.instance().getMapComponent().getMaps());
+    List<IMap> result = new ArrayList<>();
+    if (Editor.instance().getMapComponent() != null) {
+      result.addAll(Editor.instance().getMapComponent().getMaps());
+    }
     if (Editor.instance().getGameFile() != null) {
       for (IMap m : Editor.instance().getGameFile().getMaps()) {
         if (m != null && !result.contains(m)) {
@@ -3795,14 +3809,12 @@ public class McpToolHandler {
       }
     }
 
-    // If not found on primary map and no explicit map was requested, search across all project maps
-    if (specifiedMapName == null) {
-      for (IMap map : getAllProjectMaps()) {
-        if (map == null || map == primaryMap) continue;
-        IMapObject obj = findEntityOnMap(map, args);
-        if (obj != null) {
-          return new EntityLocationResult(map, obj, false);
-        }
+    // If not found on primary map, search across all project maps
+    for (IMap map : getAllProjectMaps()) {
+      if (map == null || map == primaryMap) continue;
+      IMapObject obj = findEntityOnMap(map, args);
+      if (obj != null) {
+        return new EntityLocationResult(map, obj, specifiedMapName != null);
       }
     }
 
@@ -3854,13 +3866,7 @@ public class McpToolHandler {
 
   private static IMapObject findEntity(JsonObject args) {
     EntityLocationResult loc = findEntityWithLocation(args);
-    if (loc == null || loc.object() == null) {
-      return null;
-    }
-    if (!loc.fromExplicitMap() && loc.map() != getActiveMap()) {
-      return null;
-    }
-    return loc.object();
+    return loc != null ? loc.object() : null;
   }
 
   private static JsonObject entityNotFoundError(JsonObject args) {

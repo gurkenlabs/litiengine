@@ -1062,7 +1062,7 @@ class McpToolHandlerTest {
   }
 
   @Test
-  void getEntityInfoResolvesEntityAcrossMapsAndReportsFoundOnMap() {
+  void getEntityInfoAndSetEntityPropertyResolvesEntityAcrossMaps() {
     TmxMap map1 = new TmxMap(MapOrientations.ORTHOGONAL);
     map1.setName("map_active");
     map1.addLayer(new MapObjectLayer());
@@ -1074,13 +1074,15 @@ class McpToolHandlerTest {
     MapObject entity = new MapObject();
     entity.setId(136);
     entity.setName("door_136");
-    entity.setType("PROP");
+    entity.setType(MapObjectType.AREA.name());
+    entity.setWidth(16);
+    entity.setHeight(16);
     objectLayer.addMapObject(entity);
     map2.addLayer(objectLayer);
 
-    Editor.instance().getGameFile().getMaps().clear();
-    Editor.instance().getGameFile().getMaps().add(map1);
-    Editor.instance().getGameFile().getMaps().add(map2);
+    Editor.instance().getMapComponent().getMaps().clear();
+    Editor.instance().getMapComponent().getMaps().add(map1);
+    Editor.instance().getMapComponent().getMaps().add(map2);
 
     JsonObject infoResult = McpToolHandler.handleCallTool(
         "get-entity-info",
@@ -1090,12 +1092,11 @@ class McpToolHandlerTest {
     assertEquals("map_other", infoResult.getString("map"));
     assertEquals(136, infoResult.getInt("id"));
 
-    JsonObject setPropFail = McpToolHandler.handleCallTool(
+    JsonObject setPropSuccess = McpToolHandler.handleCallTool(
         "set-entity-property",
         Json.createObjectBuilder().add("id", 136).add("property", "testKey").add("value", "testVal").build());
 
-    assertFalse(setPropFail.getBoolean("success"));
-    assertEquals("map_other", setPropFail.getString("foundOnMap"));
-    assertTrue(setPropFail.getString("error").contains("found on map 'map_other'"));
+    assertTrue(setPropSuccess.getBoolean("success"), () -> "setPropSuccess: " + setPropSuccess);
+    assertEquals("testVal", entity.getStringValue("testKey"));
   }
 }
