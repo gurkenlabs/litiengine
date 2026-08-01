@@ -113,7 +113,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
       }
 
       if (!ReflectionUtilities.setFieldValue(field.getDeclaringClass(), entity, field.getName(), value)) {
-        log.log(Level.WARNING, "entity #{}: value {} for custom property {} could not be set",
+        log.log(Level.WARNING, "entity #{0}: value {1} for custom property {2} could not be set",
           new Object[] {entity.getMapId(), value, property.name()});
       }
     }

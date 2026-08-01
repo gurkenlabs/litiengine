@@ -124,7 +124,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
     try {
       entity = invoke.invoke(environment, mapObject);
     } catch (ReflectiveOperationException _) {
-      log.log(Level.SEVERE, "map object {} failed to load", mapObject.getId());
+      log.log(Level.SEVERE, "map object {0} failed to load", mapObject.getId());
       return entities;
     }
 

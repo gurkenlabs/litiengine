@@ -123,26 +123,42 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
 
   protected void loadTargets(IMapObject mapObject, Trigger trigger) {
     final String targets = mapObject.getStringValue(MapObjectProperty.TRIGGER_TARGETS, null);
-    if (targets == null) {
+    if (targets == null || targets.isBlank()) {
       return;
     }
 
-    for (final int target : ArrayUtilities.splitInt(targets)) {
-      if (target != 0) {
-        trigger.addTarget(target);
+    for (final String token : targets.split(",")) {
+      if (token == null || token.isBlank()) {
+        continue;
+      }
+      try {
+        int target = Integer.parseInt(token.trim());
+        if (target != 0) {
+          trigger.addTarget(target);
+        }
+      } catch (NumberFormatException _) {
+        // Safely ignore non-numeric target tokens without throwing NumberFormatException
       }
     }
   }
 
   protected void loadActivators(IMapObject mapObject, Trigger trigger) {
     final String activators = mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS, null);
-    if (activators == null) {
+    if (activators == null || activators.isBlank()) {
       return;
     }
 
-    for (final int activator : ArrayUtilities.splitInt(activators)) {
-      if (activator != 0) {
-        trigger.addActivator(activator);
+    for (final String token : activators.split(",")) {
+      if (token == null || token.isBlank()) {
+        continue;
+      }
+      try {
+        int activator = Integer.parseInt(token.trim());
+        if (activator != 0) {
+          trigger.addActivator(activator);
+        }
+      } catch (NumberFormatException _) {
+        // Safely ignore non-numeric activator tokens without throwing NumberFormatException
       }
     }
   }

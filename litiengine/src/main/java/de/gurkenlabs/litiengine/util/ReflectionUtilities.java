@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.util;
 
+import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.entities.Material;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -266,13 +267,64 @@ public final class ReflectionUtilities {
         return setEnumPropertyValue(cls, instance, field, fieldName, value);
       } else if (field.getType().equals(Material.class)) {
         return setValue(cls, instance, fieldName, Material.get(value));
+      } else if (Attribute.class.isAssignableFrom(field.getType())) {
+        return setAttributeValue(cls, instance, field, fieldName, value);
       }
-      // TODO: implement support for Attribute and RangeAttribute fields
-    } catch (final NumberFormatException e) {
+    } catch (final IllegalAccessException | NumberFormatException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return false;
+  }
+
+  private static <T> boolean setAttributeValue(
+      Class<T> cls, Object instance, Field field, String fieldName, String value)
+      throws IllegalAccessException {
+    Method setter = getSetter(cls, fieldName);
+    if (setter != null) {
+      Number parsedValue = parseNumber(setter.getParameterTypes()[0], value);
+      return parsedValue != null && setValue(cls, instance, fieldName, parsedValue);
+    }
+
+    if (!field.canAccess(instance)) {
+      field.setAccessible(true);
+    }
+
+    if (!(field.get(instance) instanceof Attribute<?> attribute)
+        || attribute.getValue() == null) {
+      return false;
+    }
+
+    Number parsedValue = parseNumber(attribute.getValue().getClass(), value);
+    if (parsedValue == null) {
+      return false;
+    }
+
+    setAttributeBaseValue(attribute, parsedValue);
+    return true;
+  }
+
+  private static Number parseNumber(Class<?> type, String value) {
+    if (type.equals(byte.class) || type.equals(Byte.class)) {
+      return Byte.parseByte(value);
+    } else if (type.equals(short.class) || type.equals(Short.class)) {
+      return Short.parseShort(value);
+    } else if (type.equals(int.class) || type.equals(Integer.class)) {
+      return Integer.parseInt(value);
+    } else if (type.equals(long.class) || type.equals(Long.class)) {
+      return Long.parseLong(value);
+    } else if (type.equals(float.class) || type.equals(Float.class)) {
+      return Float.parseFloat(value);
+    } else if (type.equals(double.class) || type.equals(Double.class)) {
+      return Double.parseDouble(value);
+    }
+
+    return null;
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private static void setAttributeBaseValue(Attribute attribute, Number value) {
+    attribute.setValue(value);
   }
 
   public static List<Method> getMethodsAnnotatedWith(

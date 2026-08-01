@@ -77,10 +77,6 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     Creature creature = this.createNewCreature(environment, mapObject, spriteSheet);
     loadDefaultProperties(creature, mapObject);
 
-    if (mapObject.hasCustomProperty(MapObjectProperty.MOVEMENT_VELOCITY)) {
-      creature.setVelocity(mapObject.getFloatValue(MapObjectProperty.MOVEMENT_VELOCITY));
-    }
-
     creature.setFacingDirection(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
 
     entities.add(creature);

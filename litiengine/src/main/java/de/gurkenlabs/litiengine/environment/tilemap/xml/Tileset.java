@@ -175,6 +175,17 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     this.spriteSheet = original.sourceTileset != null ? original.sourceTileset.spriteSheet : original.spriteSheet;
   }
 
+  /**
+   * Creates a map-local copy of a tileset with the supplied first global tile ID.
+   *
+   * @param original the project tileset to copy
+   * @param firstGridId the first global tile ID assigned to the copy
+   */
+  public Tileset(Tileset original, int firstGridId) {
+    this(original);
+    this.setFirstGridId(firstGridId);
+  }
+
   public void copyFrom(Tileset original) {
     original = unwrapSource(original);
     if (this.sourceTileset != null) {
@@ -419,6 +430,18 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   public int getFirstGridId() {
     return this.firstgid;
+  }
+
+  /**
+   * Sets the first global tile ID used by this tileset in its containing map.
+   *
+   * @param firstGridId the first global tile ID, starting at {@code 1}
+   */
+  public void setFirstGridId(int firstGridId) {
+    if (firstGridId < 1) {
+      throw new IllegalArgumentException("The first grid ID must be positive.");
+    }
+    this.firstgid = firstGridId;
   }
 
   @Override

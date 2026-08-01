@@ -97,7 +97,11 @@ import java.util.stream.Collectors;
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsChar();
+    try {
+      return property.getAsChar();
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 
   @Override public int getIntValue(String propertyName) {
@@ -113,7 +117,11 @@ import java.util.stream.Collectors;
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsInt();
+    try {
+      return property.getAsInt();
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 
   @Override public long getLongValue(String propertyName) {
@@ -129,7 +137,11 @@ import java.util.stream.Collectors;
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsLong();
+    try {
+      return property.getAsLong();
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 
   @Override public short getShortValue(String propertyName) {
@@ -145,7 +157,11 @@ import java.util.stream.Collectors;
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsShort();
+    try {
+      return property.getAsShort();
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 
   @Override public byte getByteValue(String propertyName) {
@@ -161,7 +177,11 @@ import java.util.stream.Collectors;
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsByte();
+    try {
+      return property.getAsByte();
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 
   @Override public boolean getBoolValue(String propertyName) {
@@ -177,7 +197,11 @@ import java.util.stream.Collectors;
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsBool();
+    try {
+      return property.getAsBool();
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 
   @Override public float getFloatValue(String propertyName) {
@@ -193,7 +217,11 @@ import java.util.stream.Collectors;
     if (property == null) {
       return defaultValue;
     }
-    return property.getAsFloat();
+    try {
+      return property.getAsFloat();
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 
   @Override public double getDoubleValue(String propertyName) {
@@ -211,7 +239,11 @@ import java.util.stream.Collectors;
       return defaultValue;
     }
 
-    return property.getAsDouble();
+    try {
+      return property.getAsDouble();
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 
   @Override public Color getColorValue(String propertyName) {
@@ -229,12 +261,12 @@ import java.util.stream.Collectors;
       return defaultValue;
     }
 
-    Color value = property.getAsColor();
-    if (value == null) {
+    try {
+      Color value = property.getAsColor();
+      return value != null ? value : defaultValue;
+    } catch (Exception e) {
       return defaultValue;
     }
-
-    return value;
   }
 
   @Override public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType) {
@@ -252,12 +284,12 @@ import java.util.stream.Collectors;
       return defaultValue;
     }
 
-    T value = property.getAsEnum(enumType);
-    if (value == null) {
+    try {
+      T value = property.getAsEnum(enumType);
+      return value != null ? value : defaultValue;
+    } catch (Exception e) {
       return defaultValue;
     }
-
-    return value;
   }
 
   @Override public URL getFileValue(String propertyName) {
