@@ -3573,12 +3573,19 @@ public class McpToolHandler {
   }
 
   private static JsonObject getEntityInfo(JsonObject args) {
-    IMapObject target = findEntity(args);
-    if (target == null) {
+    EntityLocationResult loc = findEntityWithLocation(args);
+    if (loc == null || loc.object() == null) {
       return entityNotFoundError(args);
     }
 
+    IMapObject target = loc.object();
+    IMap map = loc.map();
+
     JsonObjectBuilder builder = Json.createObjectBuilder();
+    builder.add("success", true);
+    if (map != null && map.getName() != null) {
+      builder.add("map", map.getName());
+    }
     builder.add("id", target.getId());
     builder.add("name", target.getName() != null ? target.getName() : "");
     builder.add("type", target.getType() != null ? target.getType() : "");
@@ -3725,11 +3732,85 @@ public class McpToolHandler {
     }
   }
 
-  private static IMapObject findEntity(JsonObject args) {
-    if (Game.world().environment() == null || Game.world().environment().getMap() == null || args == null) {
+  private static IMap findMapByName(String name) {
+    if (name == null || name.isBlank()) return null;
+    for (TmxMap map : Editor.instance().getMapComponent().getMaps()) {
+      if (map != null && map.getName() != null && map.getName().equalsIgnoreCase(name)) {
+        return map;
+      }
+    }
+    if (Editor.instance().getGameFile() != null) {
+      for (IMap map : Editor.instance().getGameFile().getMaps()) {
+        if (map != null && map.getName() != null && map.getName().equalsIgnoreCase(name)) {
+          return map;
+        }
+      }
+    }
+    return null;
+  }
+
+  private static IMap getActiveMap() {
+    if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
+      return Game.world().environment().getMap();
+    }
+    if (!Editor.instance().getMapComponent().getMaps().isEmpty()) {
+      return Editor.instance().getMapComponent().getMaps().get(0);
+    }
+    return null;
+  }
+
+  private static List<IMap> getAllProjectMaps() {
+    List<IMap> result = new ArrayList<>(Editor.instance().getMapComponent().getMaps());
+    if (Editor.instance().getGameFile() != null) {
+      for (IMap m : Editor.instance().getGameFile().getMaps()) {
+        if (m != null && !result.contains(m)) {
+          result.add(m);
+        }
+      }
+    }
+    return result;
+  }
+
+  private record EntityLocationResult(IMap map, IMapObject object, boolean fromExplicitMap) {}
+
+  private static EntityLocationResult findEntityWithLocation(JsonObject args) {
+    if (args == null) {
       return null;
     }
-    IMap map = Game.world().environment().getMap();
+
+    String specifiedMapName = getString(args, "mapId", getString(args, "map", getString(args, "mapName", null)));
+    IMap primaryMap = null;
+
+    if (specifiedMapName != null && !specifiedMapName.isBlank()) {
+      primaryMap = findMapByName(specifiedMapName);
+    }
+    if (primaryMap == null) {
+      primaryMap = getActiveMap();
+    }
+
+    if (primaryMap != null) {
+      IMapObject obj = findEntityOnMap(primaryMap, args);
+      if (obj != null) {
+        return new EntityLocationResult(primaryMap, obj, specifiedMapName != null);
+      }
+    }
+
+    // If not found on primary map and no explicit map was requested, search across all project maps
+    if (specifiedMapName == null) {
+      for (IMap map : getAllProjectMaps()) {
+        if (map == null || map == primaryMap) continue;
+        IMapObject obj = findEntityOnMap(map, args);
+        if (obj != null) {
+          return new EntityLocationResult(map, obj, false);
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private static IMapObject findEntityOnMap(IMap map, JsonObject args) {
+    if (map == null || args == null) return null;
 
     // 1. Try numeric or string ID from "id" or "entityId"
     for (String idProp : new String[] { "id", "entityId" }) {
@@ -3767,7 +3848,19 @@ public class McpToolHandler {
         }
       }
     }
+
     return null;
+  }
+
+  private static IMapObject findEntity(JsonObject args) {
+    EntityLocationResult loc = findEntityWithLocation(args);
+    if (loc == null || loc.object() == null) {
+      return null;
+    }
+    if (!loc.fromExplicitMap() && loc.map() != getActiveMap()) {
+      return null;
+    }
+    return loc.object();
   }
 
   private static JsonObject entityNotFoundError(JsonObject args) {
@@ -3775,23 +3868,43 @@ public class McpToolHandler {
     builder.add("success", false);
 
     Integer id = getInt(args, "id", null);
+    if (id == null) {
+      String idStr = getString(args, "id", null);
+      if (idStr != null) {
+        try {
+          id = Integer.parseInt(idStr);
+        } catch (Exception _) {}
+      }
+    }
     String name = getString(args, "name", null);
     String entityRef = id != null ? "ID " + id : (name != null ? "name '" + name + "'" : "specified");
 
-    String mapInfo = "";
-    if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
-      IMap map = Game.world().environment().getMap();
-      String mapPath = map.getPath() != null ? map.getPath().toString() : "";
-      String mapName = map.getName() != null && !map.getName().isEmpty() ? map.getName() : mapPath;
-      mapInfo = " on active map '" + (mapName != null ? mapName : "unknown") + "'";
-      builder.add("activeMapName", map.getName() != null ? map.getName() : "");
-      builder.add("activeMapFile", mapPath);
-    } else {
-      builder.add("activeMapName", "");
-      builder.add("activeMapFile", "");
+    String activeMapName = "";
+    String activeMapFile = "";
+    IMap activeMap = getActiveMap();
+    if (activeMap != null) {
+      activeMapName = activeMap.getName() != null ? activeMap.getName() : "";
+      activeMapFile = activeMap.getPath() != null ? activeMap.getPath().toString() : "";
     }
 
-    builder.add("error", "Entity " + entityRef + " not found" + mapInfo);
+    builder.add("activeMapName", activeMapName);
+    builder.add("activeMapFile", activeMapFile);
+
+    String foundOnMap = null;
+    for (IMap map : getAllProjectMaps()) {
+      if (map != null && map != activeMap && findEntityOnMap(map, args) != null) {
+        foundOnMap = map.getName();
+        break;
+      }
+    }
+
+    if (foundOnMap != null) {
+      builder.add("foundOnMap", foundOnMap);
+      builder.add("error", "Entity " + entityRef + " not found on active map '" + activeMapName + "' (found on map '" + foundOnMap + "'). Pass map='" + foundOnMap + "' or switch active map using select-map name='" + foundOnMap + "'.");
+    } else {
+      builder.add("error", "Entity " + entityRef + " not found on active map '" + activeMapName + "'");
+    }
+
     return builder.build();
   }
 
