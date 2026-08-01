@@ -143,6 +143,17 @@ class MapObjectLoaderTests {
   }
 
   @Test
+  void defaultPropertyLoaderAppliesCreatureVelocity() {
+    MapObject mapObject = new MapObject();
+    mapObject.setValue(MapObjectProperty.MOVEMENT_VELOCITY, 275f);
+
+    Creature creature = new Creature();
+    MapObjectLoader.loadDefaultProperties(creature, mapObject);
+
+    assertEquals(275f, creature.getVelocity().getModifiedValue().floatValue());
+  }
+
+  @Test
   void testCreatureMapObjectLoaderWithZeroCurrentHitpointsStartsDead() {
     CreatureMapObjectLoader loader = new CreatureMapObjectLoader();
     MapObject mapObject = new MapObject();
