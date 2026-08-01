@@ -48,6 +48,7 @@ import java.util.Locale;
 import java.util.Map;
 import javax.swing.AbstractCellEditor;
 import javax.imageio.ImageIO;
+import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -58,6 +59,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.Icon;
@@ -101,12 +106,26 @@ public final class SettingsDialog extends JDialog {
   private JPanel uiPreview;
   private final JCheckBox reopenLastProject;
   private final JSpinner editorFpsCap;
+  private final JComboBox<LogLevelOption> logLevel;
+  private final JCheckBox mcpEnabled;
+  private final JTextField mcpPort;
   private final JSpinner gridLineWidth;
   private final JSpinner snapDivision;
   private final JButton gridColorButton;
   private Color gridColor;
   private final KeymapTableModel keymapModel;
   private final JLabel restartNotice;
+
+  private enum LogLevelOption {
+    INFO("INFO (Default - Clean User Logs)"),
+    FINE("FINE (Detailed Technical Diagnostics)"),
+    WARNING("WARNING (Warnings & Errors)"),
+    SEVERE("SEVERE (Errors Only)");
+
+    private final String label;
+    LogLevelOption(String label) { this.label = label; }
+    @Override public String toString() { return label; }
+  }
 
   private SettingsDialog(Window owner) {
     super(owner, text("settings_title"), ModalityType.APPLICATION_MODAL);
@@ -170,6 +189,53 @@ public final class SettingsDialog extends JDialog {
         UserPreferences.EDITOR_FPS_CAP_MIN,
         UserPreferences.EDITOR_FPS_CAP_MAX, 1));
     ControlBehavior.apply(this.editorFpsCap);
+    this.logLevel = new JComboBox<>(LogLevelOption.values());
+    try {
+      this.logLevel.setSelectedItem(LogLevelOption.valueOf(this.preferences.getLogLevel().toUpperCase(Locale.ROOT)));
+    } catch (IllegalArgumentException e) {
+      this.logLevel.setSelectedItem(LogLevelOption.INFO);
+    }
+    this.mcpEnabled = new JCheckBox(text("settings_mcp_enable"));
+    this.mcpEnabled.setSelected(this.preferences.isMcpEnabled());
+    ControlBehavior.apply(this.mcpEnabled);
+    this.mcpPort = new JTextField(String.valueOf(this.preferences.getMcpPort()));
+    this.mcpPort.setColumns(6);
+    this.mcpPort.setHorizontalAlignment(JTextField.RIGHT);
+    ((AbstractDocument) this.mcpPort.getDocument()).setDocumentFilter(new DocumentFilter() {
+      @Override
+      public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+          throws BadLocationException {
+        if (string != null && isValid(fb.getDocument().getText(0, fb.getDocument().getLength()) + string)) {
+          super.insertString(fb, offset, string, attr);
+        }
+      }
+
+      @Override
+      public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+          throws BadLocationException {
+        String current = fb.getDocument().getText(0, fb.getDocument().getLength());
+        String next = current.substring(0, offset) + (text != null ? text : "") + current.substring(offset + length);
+        if (next.isEmpty() || isValid(next)) {
+          super.replace(fb, offset, length, text, attrs);
+        }
+      }
+
+      private boolean isValid(String text) {
+        if (!text.matches("\\d{0,5}")) {
+          return false;
+        }
+        if (text.isEmpty()) {
+          return true;
+        }
+        try {
+          int val = Integer.parseInt(text);
+          return val <= 65535;
+        } catch (NumberFormatException e) {
+          return false;
+        }
+      }
+    });
+    ControlBehavior.apply(this.mcpPort);
     this.gridLineWidth = new JSpinner(new SpinnerNumberModel(
         (double) this.preferences.getGridLineWidth(), 1.0, 5.0, 0.1));
     ControlBehavior.apply(this.gridLineWidth);
@@ -250,6 +316,7 @@ public final class SettingsDialog extends JDialog {
     content.add(scrollable(this.createGeneralPanel()), Category.GENERAL.name());
     content.add(scrollable(this.createGridPanel()), Category.GRID.name());
     content.add(scrollable(this.createKeymapPanel()), Category.KEYMAP.name());
+    content.add(scrollable(this.createMcpPanel()), Category.MCP.name());
 
     DefaultListModel<Category> categoryModel = new DefaultListModel<>();
     for (Category category : Category.values()) {
@@ -367,6 +434,24 @@ public final class SettingsDialog extends JDialog {
     return card;
   }
 
+  private JPanel createMcpPanel() {
+    JPanel panel = settingsPanel(Category.MCP);
+    JPanel body = verticalBody();
+    body.add(settingRow(
+        Icons.CONSOLE_16,
+        text("settings_mcp_enable"),
+        text("settings_mcp_enable_description"),
+        this.mcpEnabled));
+    body.add(rowSeparator());
+    body.add(settingRow(
+        Icons.CONSOLE_16,
+        text("settings_mcp_port"),
+        text("settings_mcp_port_description"),
+        this.mcpPort));
+    panel.add(topAligned(body), BorderLayout.CENTER);
+    return panel;
+  }
+
   private JPanel createGeneralPanel() {
     JPanel panel = settingsPanel(Category.GENERAL);
     JPanel body = verticalBody();
@@ -381,6 +466,12 @@ public final class SettingsDialog extends JDialog {
         text("settings_editor_fps_cap"),
         text("settings_editor_fps_cap_description"),
         this.editorFpsCap));
+    body.add(rowSeparator());
+    body.add(settingRow(
+        Icons.CONSOLE_16,
+        "Logging Verbosity",
+        "Configure application log detail (INFO: clean user logs, FINE: detailed diagnostics)",
+        this.logLevel));
     panel.add(topAligned(body), BorderLayout.CENTER);
     return panel;
   }
@@ -577,6 +668,33 @@ public final class SettingsDialog extends JDialog {
     this.preferences.setGridLineWidth(((Number) this.gridLineWidth.getValue()).floatValue());
     this.preferences.setGridColor(ColorHelper.encode(this.gridColor));
     this.preferences.setSnapDivision(((Number) this.snapDivision.getValue()).intValue());
+    LogLevelOption selectedLogLevel = (LogLevelOption) this.logLevel.getSelectedItem();
+    if (selectedLogLevel != null) {
+      this.preferences.setLogLevel(selectedLogLevel.name());
+      de.gurkenlabs.utiliti.controller.LoggingManager.applyLogLevel(selectedLogLevel.name());
+    }
+    int configuredPort = parseMcpPort();
+    if (configuredPort < 1024 || configuredPort > 65535) {
+      JOptionPane.showMessageDialog(this,
+          "The MCP Server Port must be a valid number between 1024 and 65535.",
+          text("settings_mcp_port"),
+          JOptionPane.WARNING_MESSAGE);
+      this.mcpPort.requestFocusInWindow();
+      this.mcpPort.selectAll();
+      return false;
+    }
+    boolean mcpStateChanged = this.mcpEnabled.isSelected() != this.preferences.isMcpEnabled()
+        || configuredPort != this.preferences.getMcpPort();
+    this.preferences.setMcpEnabled(this.mcpEnabled.isSelected());
+    this.preferences.setMcpPort(configuredPort);
+    if (mcpStateChanged) {
+      if (this.preferences.isMcpEnabled()) {
+        de.gurkenlabs.utiliti.mcp.McpServer.instance().stop();
+        de.gurkenlabs.utiliti.mcp.McpServer.instance().start();
+      } else {
+        de.gurkenlabs.utiliti.mcp.McpServer.instance().stop();
+      }
+    }
     KeyBindings.save(this.keymapModel.bindings());
     Theme selectedTheme = this.lightTheme.isSelected() ? Theme.LIGHT : Theme.DARK;
     if (selectedTheme != null && selectedTheme != this.preferences.getTheme()) {
@@ -587,6 +705,21 @@ public final class SettingsDialog extends JDialog {
     Game.config().save();
     this.restartNotice.setVisible(restartRequired || this.restartNotice.isVisible());
     return true;
+  }
+
+  private int parseMcpPort() {
+    try {
+      String text = this.mcpPort.getText().trim();
+      if (!text.isEmpty()) {
+        int p = Integer.parseInt(text);
+        if (p >= 1024 && p <= 65535) {
+          return p;
+        }
+      }
+    } catch (NumberFormatException e) {
+      // Invalid format
+    }
+    return -1;
   }
 
   private void updateGridColorButton() {
@@ -626,6 +759,8 @@ public final class SettingsDialog extends JDialog {
     this.editorFontSize.setValue(defaults.getEditorFontSize());
     this.reopenLastProject.setSelected(defaults.reopenLastProject());
     this.editorFpsCap.setValue(defaults.getEditorFpsCap());
+    this.mcpEnabled.setSelected(defaults.isMcpEnabled());
+    this.mcpPort.setText(String.valueOf(defaults.getMcpPort()));
     this.gridLineWidth.setValue((double) defaults.getGridLineWidth());
     this.snapDivision.setValue(defaults.getSnapDivision());
     this.gridColor = defaults.getGridColor();
@@ -907,7 +1042,8 @@ public final class SettingsDialog extends JDialog {
     APPEARANCE("settings_appearance", "settings_appearance_description", "settings_appearance_nav_description", Icons.SETTINGS_APPEARANCE_24),
     GENERAL("settings_general", "settings_general_description", "settings_general_nav_description", Icons.SETTINGS_24),
     GRID("settings_grid", "settings_grid_description", "settings_grid_nav_description", Icons.SETTINGS_GRID_24),
-    KEYMAP("settings_keymap", "settings_keymap_description", "settings_keymap_nav_description", Icons.SETTINGS_KEYMAP_24);
+    KEYMAP("settings_keymap", "settings_keymap_description", "settings_keymap_nav_description", Icons.SETTINGS_KEYMAP_24),
+    MCP("settings_mcp", "settings_mcp_description", "settings_mcp_nav_description", Icons.CONSOLE_24);
 
     private final String resourceKey;
     private final String descriptionKey;
