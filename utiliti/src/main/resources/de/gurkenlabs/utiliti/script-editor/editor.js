@@ -14,8 +14,8 @@
 
   window.require.config({ paths: { vs: monacoRoot } });
   window.require(['vs/editor/editor.main'], function (monaco) {
-    monaco.languages.register({ id: 'groovy', extensions: ['.groovy'], aliases: ['Groovy', 'groovy'] });
-    monaco.languages.setMonarchTokensProvider('groovy', {
+    monaco.languages.register({ id: 'java', extensions: ['.java'], aliases: ['Java', 'java'] });
+    monaco.languages.setMonarchTokensProvider('java', {
       defaultToken: '',
       keywords: ['as', 'assert', 'break', 'case', 'catch', 'class', 'continue', 'def', 'default', 'do', 'else',
         'enum', 'extends', 'final', 'finally', 'for', 'if', 'implements', 'import', 'in', 'instanceof', 'interface',

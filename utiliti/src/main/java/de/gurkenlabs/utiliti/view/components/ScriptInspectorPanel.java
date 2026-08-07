@@ -42,7 +42,6 @@ public final class ScriptInspectorPanel extends JPanel {
   private final JComboBox<TargetChoice> target = new JComboBox<>();
   private final JCheckBox defaultForType = new JCheckBox("Attach to this entity type by default");
   private final JCheckBox includeSubtypes = new JCheckBox("Include subtypes");
-  private final JCheckBox staticTypeChecking = new JCheckBox("Static type checking");
   private final JTextField source = readOnlyField();
   private final JButton apply = new JButton("Apply metadata");
   private ScriptWorkspacePanel workspace;
@@ -71,7 +70,6 @@ public final class ScriptInspectorPanel extends JPanel {
     addRow(fields, row++, "Target type", this.target);
     addRow(fields, row++, "", this.defaultForType);
     addRow(fields, row++, "", this.includeSubtypes);
-    addRow(fields, row++, "", this.staticTypeChecking);
     addRow(fields, row++, "Source", this.source);
     GridBagConstraints filler = new GridBagConstraints();
     filler.gridy = row;
@@ -84,7 +82,6 @@ public final class ScriptInspectorPanel extends JPanel {
     this.target.setFocusable(false);
     this.defaultForType.setFocusable(false);
     this.includeSubtypes.setFocusable(false);
-    this.staticTypeChecking.setFocusable(false);
     this.source.setFocusable(false);
     this.apply.setFocusable(false);
 
@@ -134,12 +131,9 @@ public final class ScriptInspectorPanel extends JPanel {
       this.selectTarget(definition == null ? null : definition.getTargetType());
       this.refreshDefaultBinding();
       this.source.setText(value(definition == null ? null : definition.getSource()));
-      this.staticTypeChecking.setSelected(definition != null && this.workspace != null
-        && this.workspace.isStaticTypeCheckingEnabled());
       boolean enabled = definition != null;
       this.host.setEnabled(enabled);
       this.apply.setEnabled(enabled);
-      this.staticTypeChecking.setEnabled(enabled && "groovy".equalsIgnoreCase(definition.getLanguage()));
       this.updateTargetEnabled();
     } finally {
       this.binding = false;
@@ -155,7 +149,6 @@ public final class ScriptInspectorPanel extends JPanel {
     updateDefaultBinding(Editor.instance().getGameFile(), this.definition.getId(), previousTarget, targetType,
       selectedHost == ScriptHostType.ENTITY && this.defaultForType.isSelected(), this.includeSubtypes.isSelected());
     this.workspace.updateActiveMetadata(this.name.getText(), selectedHost, targetType);
-    this.workspace.setStaticTypeCheckingEnabled(this.staticTypeChecking.isSelected());
     de.gurkenlabs.litiengine.Game.scripts().setEntityBindings(Editor.instance().getGameFile().getEntityScripts());
   }
 

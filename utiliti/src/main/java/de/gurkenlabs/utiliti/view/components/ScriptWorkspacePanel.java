@@ -248,32 +248,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.setStatus("Updated script metadata; save to write the source declaration", false);
   }
 
-  public boolean isStaticTypeCheckingEnabled() {
-    ScriptTab tab = this.activeTab();
-    return tab != null && tab.getText().contains("@CompileStatic");
-  }
 
-  public void setStaticTypeCheckingEnabled(boolean enabled) {
-    ScriptTab tab = this.activeTab();
-    if (tab == null) return;
-    String source = tab.getText();
-    String updated;
-    if (enabled) {
-      updated = source.contains("import groovy.transform.CompileStatic") ? source
-        : "import groovy.transform.CompileStatic\n" + source;
-      if (!updated.contains("@CompileStatic")) {
-        updated = updated.replaceFirst("(?m)^(\\s*@ScriptInfo|\\s*(?:public\\s+)?class\\s+)",
-          "@CompileStatic\n$1");
-      }
-    } else {
-      updated = source.replaceFirst("(?m)^\\s*import\\s+groovy\\.transform\\.CompileStatic\\s*\\R", "")
-        .replaceFirst("(?m)^\\s*@CompileStatic\\s*\\R", "");
-    }
-    if (!Objects.equals(source, updated)) {
-      tab.setText(updated);
-      if (this.monacoTab == tab && this.monaco != null) this.monaco.open(tab.path, updated, tab.definition);
-    }
-  }
 
   public void reloadActiveFromDisk() {
     ScriptTab tab = this.activeTab();
@@ -315,7 +290,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
     try {
       GradleScriptProjectSupport.Result result = GradleScriptProjectSupport.configure(root);
-      this.setStatus(result.configured() ? "Gradle is configured for Groovy scripts and IntelliJ."
+      this.setStatus(result.configured() ? "Gradle is configured for Java scripts and IntelliJ."
         : String.join(" ", result.issues()), !result.configured());
     } catch (IOException error) {
       this.setStatus("Could not configure the Gradle project: " + error.getMessage(), true);
@@ -1068,8 +1043,8 @@ public final class ScriptWorkspacePanel extends JPanel {
       String oldId = this.definition.getId();
       Path oldPath = resolveSource(this.definition.getSource());
 
-      String ext = "groovy".equalsIgnoreCase(this.definition.getLanguage()) ? ".groovy" : ".java";
-      String subfolder = "groovy".equalsIgnoreCase(this.definition.getLanguage()) ? "src/main/groovy/" : "src/main/java/";
+      String ext = ".java";
+      String subfolder = "src/main/java/";
       String newSourceRel = subfolder + newClassName + ext;
       Path newPath = resolveSource(newSourceRel);
 

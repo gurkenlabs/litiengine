@@ -31,7 +31,6 @@ application {
 
 dependencies {
   implementation project(":litiengine")
-  implementation project(":litiengine-groovy")
   implementation libs.darklaf.core
   implementation libs.darklaf.propertyLoader
   implementation platform(libs.mcp.bom)

@@ -56,9 +56,6 @@ public final class ScriptDefinition {
     if (this.id == null || this.id.isBlank()) errors.add("Script id must not be blank.");
     if (this.language == null || this.language.isBlank()) errors.add("Script language must not be blank.");
     if (this.implementation == null || this.implementation.isBlank()) errors.add("Script implementation must not be blank.");
-    if (!"java".equalsIgnoreCase(this.language) && (this.source == null || this.source.isBlank())) {
-      errors.add("Source must be configured for runtime-compiled scripts.");
-    }
     if (this.host == null) errors.add("Script host must be configured.");
     return List.copyOf(errors);
   }

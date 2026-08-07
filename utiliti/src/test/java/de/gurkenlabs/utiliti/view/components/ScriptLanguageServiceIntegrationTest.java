@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 
 class ScriptLanguageServiceIntegrationTest {
   @Test
-  void registersTheGroovySemanticProviderOnTheEditorClasspath() {
+  void registersTheJavaSemanticProviderOnTheEditorClasspath() {
     assertTrue(Game.scripts().getProviders().stream()
-      .anyMatch(provider -> provider.language().equalsIgnoreCase("groovy")));
+      .anyMatch(provider -> provider.language().equalsIgnoreCase("java")));
   }
 
   @Test
