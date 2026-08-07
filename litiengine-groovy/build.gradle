@@ -1,0 +1,18 @@
+plugins {
+  id "java-library"
+
+  alias libs.plugins.gradle.maven.publish
+
+  id "encoding-defaults"
+  id "licensing-defaults"
+  id "publishing-defaults"
+  id "testing-defaults"
+}
+
+dependencies {
+  api project(":litiengine")
+  implementation libs.groovy
+  testImplementation project(":shared")
+  testImplementation libs.junit.jupiter
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}

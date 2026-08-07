@@ -1,0 +1,30 @@
+package de.gurkenlabs.litiengine.scripting;
+
+import de.gurkenlabs.litiengine.environment.Environment;
+
+/** Base class for scripts attached to one loaded environment. */
+public abstract class EnvironmentScript extends AbstractScript<Environment> {
+  @Override protected final void attached() throws Exception { this.onLoaded(); }
+  @Override protected final void detached() throws Exception { this.onUnloaded(); }
+
+  /** Called after the environment has loaded and is the current world environment. */
+  protected void onLoaded() throws Exception { this.loaded(); }
+
+  /** Called when the environment binding is detached during unload. */
+  protected void onUnloaded() throws Exception { this.unloaded(); }
+
+  /** Called when the attached environment is cleared while it remains active. */
+  protected void onCleared() throws Exception {}
+
+  /** @deprecated Override {@link #onLoaded()} in new scripts. */
+  @Deprecated
+  protected void loaded() throws Exception {}
+
+  /** @deprecated Override {@link #onUnloaded()} in new scripts. */
+  @Deprecated
+  protected void unloaded() throws Exception {}
+
+  final void dispatchCleared() throws Exception {
+    this.onCleared();
+  }
+}

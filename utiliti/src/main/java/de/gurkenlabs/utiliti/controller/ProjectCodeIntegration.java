@@ -1,15 +1,23 @@
 package de.gurkenlabs.utiliti.controller;
 
-import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.IEntityController;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectDefinition;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectPropertyDefinition;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.scripting.ScriptHostType;
+import de.gurkenlabs.litiengine.scripting.ScriptInfo;
+import de.gurkenlabs.litiengine.scripting.ScriptInstance;
+import de.gurkenlabs.litiengine.scripting.ScriptProperty;
+import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,6 +32,7 @@ public final class ProjectCodeIntegration implements AutoCloseable {
   private static final List<Path> CLASS_DIRECTORIES = List.of(
     Path.of("build", "classes", "java", "main"),
     Path.of("build", "classes", "kotlin", "main"),
+    Path.of("build", "classes", "groovy", "main"),
     Path.of("target", "classes"),
     Path.of("bin", "main"),
     Path.of("bin"),
@@ -33,9 +42,26 @@ public final class ProjectCodeIntegration implements AutoCloseable {
 
   private URLClassLoader classLoader;
   private List<Definition> definitions = List.of();
+  private List<ScriptClassDefinition> scriptDefinitions = List.of();
+  private List<ControllerDefinition> controllerDefinitions = List.of();
 
   public List<Definition> getDefinitions() {
     return definitions;
+  }
+
+  /** Returns compiled Java and Groovy script implementations visible to utiLITI. */
+  public List<ScriptClassDefinition> getScriptDefinitions() {
+    return this.scriptDefinitions;
+  }
+
+  /** Returns controller contracts and implementations discovered in compiled project output. */
+  public List<ControllerDefinition> getControllerDefinitions() {
+    return this.controllerDefinitions;
+  }
+
+  /** Returns the loader containing the latest compiled project classes. */
+  public ClassLoader getClassLoader() {
+    return this.classLoader;
   }
 
   public void reload(Path gameFile) {
@@ -61,22 +87,69 @@ public final class ProjectCodeIntegration implements AutoCloseable {
       }
       classLoader = new URLClassLoader(urls, getClass().getClassLoader());
       List<Definition> discovered = new ArrayList<>();
+      List<ScriptClassDefinition> discoveredScripts = new ArrayList<>();
+      List<ControllerDefinition> discoveredControllers = new ArrayList<>();
 
       for (Path classesDirectory : validDirectories) {
         try (var paths = Files.walk(classesDirectory)) {
           paths.filter(path -> path.toString().endsWith(".class"))
             .map(path -> className(classesDirectory, path))
             .filter(name -> !name.endsWith("module-info") && !name.contains("$$"))
-            .forEach(name -> discover(name, discovered));
+            .forEach(name -> {
+              discover(name, discovered);
+              discoverScript(name, discoveredScripts);
+              discoverController(name, discoveredControllers);
+            });
         }
       }
       discovered.sort(Comparator.comparing(Definition::displayName));
       definitions = List.copyOf(discovered);
+      discoveredScripts.sort(Comparator.comparing(ScriptClassDefinition::displayName));
+      scriptDefinitions = List.copyOf(discoveredScripts);
+      discoveredControllers.sort(Comparator.comparing(ControllerDefinition::displayName));
+      controllerDefinitions = List.copyOf(discoveredControllers);
     } catch (IOException e) {
       log.log(Level.WARNING, "Could not inspect compiled project classes in " + validDirectories, e);
       close();
     }
   }
+
+  private void discoverController(String className, List<ControllerDefinition> discovered) {
+    try {
+      Class<?> type = Class.forName(className, false, this.classLoader);
+      if (!IEntityController.class.isAssignableFrom(type) || type == IEntityController.class) return;
+      boolean contract = type.isInterface() || Modifier.isAbstract(type.getModifiers());
+      if (!contract && !Modifier.isPublic(type.getModifiers())) return;
+      discovered.add(new ControllerDefinition(type.getSimpleName(), type.getName(), contract));
+    } catch (LinkageError | ClassNotFoundException e) {
+      // Project output can reference optional dependencies that are not available to the editor.
+    }
+  }
+
+  private void discoverScript(String className, List<ScriptClassDefinition> discovered) {
+    try {
+      Class<?> type = Class.forName(className, false, this.classLoader);
+      if (!ScriptInstance.class.isAssignableFrom(type) || type.isInterface() || Modifier.isAbstract(type.getModifiers())) return;
+      type.asSubclass(ScriptInstance.class).getConstructor();
+      ScriptInfo info = type.getAnnotation(ScriptInfo.class);
+      if (info == null || info.id().isBlank()) return;
+      List<ScriptPropertyDefinition> properties = new ArrayList<>();
+      for (Field field : ReflectionUtilities.getAllFields(new ArrayList<>(), type)) {
+        ScriptProperty property = field.getAnnotation(ScriptProperty.class);
+        if (property == null) continue;
+        properties.add(new ScriptPropertyDefinition(field.getName(), property.name().isBlank() ? field.getName() : property.name(),
+          property.description(), property.category(), property.type().isBlank() ? field.getType().getName() : property.type(),
+          property.defaultValue(), property.min(), property.max(), property.unit(), property.required()));
+      }
+      String displayName = info.name().isBlank() ? type.getSimpleName() : info.name();
+      String targetType = info.target() == Object.class ? null : info.target().getName();
+      discovered.add(new ScriptClassDefinition(info.id(), displayName, type.getName(), info.host(), targetType, List.copyOf(properties)));
+    } catch (LinkageError | ClassNotFoundException | NoSuchMethodException e) {
+      // Only complete, compatible script classes are shown.
+    }
+  }
+
+
 
   private static String className(Path root, Path classFile) {
     return root.relativize(classFile).toString().replace('\\', '.').replace('/', '.').replaceFirst("\\.class$", "");
@@ -111,6 +184,8 @@ public final class ProjectCodeIntegration implements AutoCloseable {
   @Override
   public void close() {
     definitions = List.of();
+    scriptDefinitions = List.of();
+    controllerDefinitions = List.of();
     if (classLoader != null) {
       try {
         classLoader.close();
@@ -122,5 +197,17 @@ public final class ProjectCodeIntegration implements AutoCloseable {
   }
 
   public record Definition(String id, String displayName, String className, MapObjectType baseType, List<MapObjectPropertyDefinition> properties) {
+  }
+
+  public record ScriptClassDefinition(String id, String displayName, String className, ScriptHostType host,
+                                      String targetType, List<ScriptPropertyDefinition> properties) {
+  }
+
+  public record ScriptPropertyDefinition(String name, String displayName, String description, String category,
+                                         String type, String defaultValue, double min, double max, String unit,
+                                         boolean required) {
+  }
+
+  public record ControllerDefinition(String displayName, String className, boolean contract) {
   }
 }

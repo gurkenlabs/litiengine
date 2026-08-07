@@ -54,11 +54,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final ExpandableCard collisionCard;
   private final ExpandableCard combatCard;
   private final ExpandableCard movementCard;
+  private final ExpandableCard scriptsCard;
   private final ExpandableCard customCard;
 
   private final CollisionPanel collisionPanel;
   private final CombatPanel combatPanel;
   private final MovementPanel movementPanel;
+  private final ScriptBindingsInspectorPanel scriptsPanel;
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
   private final JComboBox<RenderType> renderType;
@@ -94,6 +96,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.collisionPanel = new CollisionPanel();
     this.combatPanel = new CombatPanel();
     this.movementPanel = new MovementPanel();
+    this.scriptsPanel = new ScriptBindingsInspectorPanel();
     this.customPanel = new CustomPanel();
 
     this.textFieldName = new JTextField();
@@ -191,6 +194,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.movementCard =
         new ExpandableCard(
             Resources.strings().get("panel_mobileEntity"), this.movementPanel, true);
+    this.scriptsCard =
+        new ExpandableCard(
+            Resources.strings().get("panel_scriptBindings"), this.scriptsPanel, false);
     this.customCard =
         new ExpandableCard(
             Resources.strings().get("panel_customProperties"), this.customPanel, true);
@@ -201,12 +207,14 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     collisionCard.setContentInsets(8, 0, 8, 0);
     combatCard.setContentInsets(8, 0, 8, 0);
     movementCard.setContentInsets(8, 0, 8, 0);
+    scriptsCard.setContentInsets(8, 0, 8, 0);
     customCard.setContentInsets(8, 0, 8, 0);
 
     typeCard.setVisible(false);
     collisionCard.setVisible(false);
     combatCard.setVisible(false);
     movementCard.setVisible(false);
+    scriptsCard.setVisible(false);
     customCard.setVisible(false);
 
     accordion.add(generalCard);
@@ -214,6 +222,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     accordion.add(collisionCard);
     accordion.add(combatCard);
     accordion.add(movementCard);
+    accordion.add(scriptsCard);
     accordion.add(customCard);
 
     JScrollPane scrollPane = new JScrollPane(accordion);
@@ -273,6 +282,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     bindPanel(this.collisionPanel, supportsCollisionAndCombat ? targets : List.of());
     bindPanel(this.combatPanel, supportsCollisionAndCombat ? targets : List.of());
     bindPanel(this.movementPanel, commonType == MapObjectType.CREATURE ? targets : List.of());
+    boolean supportsScripts = commonType != null && commonType != MapObjectType.AREA;
+    bindPanel(this.scriptsPanel, supportsScripts && targets.size() == 1 ? targets : List.of());
+    this.scriptsCard.setVisible(supportsScripts && targets.size() == 1);
 
     bindPanel(this.customPanel, targets.size() == 1 ? targets : List.of());
     updateMultiEditState(targets);
@@ -301,6 +313,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
     updateImplementationVisibility();
     updateRenderTypeEnabled();
+  }
+
+  boolean isScriptsCardVisibleForTest() {
+    return this.scriptsCard.isVisible();
   }
 
   private static java.util.Set<String> emitterProperties() {

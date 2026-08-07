@@ -41,6 +41,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundPlayback;
+import de.gurkenlabs.litiengine.scripting.ScriptManager;
 import de.gurkenlabs.litiengine.tweening.TweenEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -95,6 +96,7 @@ public final class Game {
   private static GameWindow gameWindow;
 
   private static final GameWorld world = new GameWorld();
+  private static final ScriptManager scriptManager = new ScriptManager();
 
   private static boolean debug = true;
   private static boolean noGUIMode = false;
@@ -206,6 +208,15 @@ public final class Game {
    */
   public static GameInfo info() {
     return gameInfo;
+  }
+
+  /**
+   * Gets the manager for Java and runtime scripting integrations.
+   *
+   * @return The global script manager.
+   */
+  public static ScriptManager scripts() {
+    return scriptManager;
   }
 
   /**

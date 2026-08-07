@@ -31,11 +31,20 @@ application {
 
 dependencies {
   implementation project(":litiengine")
+  implementation project(":litiengine-groovy")
   implementation libs.darklaf.core
   implementation libs.darklaf.propertyLoader
   implementation platform(libs.mcp.bom)
   implementation libs.mcp.sdk
   implementation libs.tomcat.embed.core
+  implementation libs.autocomplete
+  implementation libs.jcef
+  implementation libs.monaco
+  def nativeOs = DefaultNativePlatform.currentOperatingSystem
+  def nativeArch = System.getProperty("os.arch").toLowerCase(Locale.ROOT)
+  def jcefPlatform = nativeOs.isWindows() ? "windows" : nativeOs.isMacOsX() ? "macosx" : "linux"
+  jcefPlatform += nativeArch.contains("aarch64") || nativeArch.contains("arm64") ? "-arm64" : "-amd64"
+  runtimeOnly "me.friwi:jcef-natives-${jcefPlatform}:${libs.versions.jcefNatives.get()}"
   runtimeOnly libs.slf4j.jdk14
   testImplementation project(":shared")
   testImplementation libs.junit.jupiter
@@ -44,7 +53,8 @@ dependencies {
 
 runtime {
   options.set(["--strip-debug", "--no-header-files", "--no-man-pages"])
-  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.naming", "java.xml", "jdk.unsupported.desktop"])
+  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.naming", "java.xml",
+               "java.sql", "java.security.jgss", "java.instrument", "jdk.httpserver", "jdk.unsupported.desktop"])
 
   launcher {
     noConsole = false

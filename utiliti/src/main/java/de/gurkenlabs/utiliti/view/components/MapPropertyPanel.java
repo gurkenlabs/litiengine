@@ -9,6 +9,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapImage;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
+import de.gurkenlabs.litiengine.scripting.ScriptHostType;
+import de.gurkenlabs.litiengine.scripting.ScriptManager;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.UndoManager;
@@ -163,6 +165,13 @@ public class MapPropertyPanel extends JPanel {
         new ExpandableCard(Resources.strings().get("mapProperties_lighting"), createLightingPanel(), false);
     ExpandableCard propertiesCard =
         new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), false);
+    JButton scripts = Style.textButton(Resources.strings().get("panel_scriptBindings"));
+    scripts.addActionListener(event -> {
+      if (this.dataSource == null) return;
+      de.gurkenlabs.utiliti.view.dialogs.ScriptBindingsDialog.open(
+        this.dataSource.getStringValue(ScriptManager.BINDINGS_PROPERTY, null), ScriptHostType.ENVIRONMENT, this::applyScriptBindings);
+    });
+    propertiesCard.setHeaderTrailing(scripts);
 
     this.generalCard.setContentInsets(8, 0, 8, 0);
     lightingCard.setContentInsets(8, 0, 8, 0);
@@ -671,6 +680,15 @@ public class MapPropertyPanel extends JPanel {
       Game.world().environment().getStaticShadowLayer().setColor(this.shadowColorComponent.getColor());
     }
     UndoManager.instance().mapChanged(this.dataSource);
+  }
+
+  private void applyScriptBindings(String encoded) {
+    if (this.dataSource == null) return;
+    UndoManager.instance().mapChanging(this.dataSource);
+    if (encoded == null || encoded.isBlank() || "[]".equals(encoded)) this.dataSource.removeProperty(ScriptManager.BINDINGS_PROPERTY);
+    else this.dataSource.setValue(ScriptManager.BINDINGS_PROPERTY, encoded);
+    UndoManager.instance().mapChanged(this.dataSource);
+    this.setControlValues(this.dataSource);
   }
 
   private void stopTableEditing() {

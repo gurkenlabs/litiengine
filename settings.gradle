@@ -18,6 +18,7 @@ dependencyResolutionManagement {
 
 include(
   "litiengine",
+  "litiengine-groovy",
   "utiliti",
   "shared"
 )

@@ -1793,11 +1793,11 @@ public class MapComponent extends GuiComponent {
   }
 
   static boolean shouldHandleArrowTransform(int modifiers) {
-    return (modifiers & InputEvent.ALT_DOWN_MASK) == 0;
+    return !de.gurkenlabs.utiliti.view.components.UI.isScriptWorkspaceActive() && (modifiers & InputEvent.ALT_DOWN_MASK) == 0;
   }
 
   private void handleKeyboardTransform(int x, int y) {
-    if (!Game.window().getRenderComponent().hasFocus()) {
+    if (de.gurkenlabs.utiliti.view.components.UI.isScriptWorkspaceActive() || !Game.window().getRenderComponent().hasFocus()) {
       return;
     }
 

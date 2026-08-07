@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
 import de.gurkenlabs.litiengine.entities.behavior.IBehaviorController;
+import de.gurkenlabs.litiengine.scripting.EntityScriptController;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
@@ -154,6 +155,11 @@ public interface IEntity {
    * @return The controller of the specified type.
    */
   <T extends IEntityController> T getController(Class<T> clss);
+
+  /** Returns the controller that owns this entity's declarative script bindings, if one is configured. */
+  default EntityScriptController<?> scripts() {
+    return this.getController(EntityScriptController.class);
+  }
 
   /**
    * All registered actions of this entity.

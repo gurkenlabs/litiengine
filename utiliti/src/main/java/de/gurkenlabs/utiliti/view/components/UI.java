@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.utiliti.controller.Controller;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.EntityController;
@@ -117,6 +118,10 @@ public final class UI {
   private static TilesetEditorPanel tilesetEditorPanel;
   private static TilesetTabsPanel tileLayerTilesetEditorPanel;
   private static SpriteEditorPanel spriteEditorPanel;
+  private static ScriptWorkspacePanel scriptWorkspacePanel;
+  private static ScriptInspectorPanel scriptInspectorPanel;
+  private static JPanel workspaceHost;
+  private static CardLayout workspaceCards;
   private static JPanel inspectorHost;
   private static CardLayout inspectorCards;
   private static String activeInspectorCard = "objects";
@@ -127,6 +132,8 @@ public final class UI {
   private static ViewportPanel viewportPanel;
   private static JButton inspectorBackButton;
   private static JButton inspectorForwardButton;
+  private static JToggleButton workspaceMapButton;
+  private static JToggleButton workspaceScriptButton;
   private static KeyStroke inspectorBackShortcut;
   private static KeyStroke inspectorForwardShortcut;
 
@@ -456,6 +463,53 @@ public final class UI {
     return mapCombo;
   }
 
+  public static ScriptWorkspacePanel getScriptWorkspacePanel() {
+    return scriptWorkspacePanel;
+  }
+
+  public static boolean isScriptWorkspaceActive() {
+    return workspaceScriptButton != null && workspaceScriptButton.isSelected();
+  }
+
+  /** Switches the central area back to map editing. */
+  public static void showMapWorkspace() {
+    if (workspaceCards == null || workspaceHost == null) return;
+    if (workspaceMapButton != null) workspaceMapButton.setSelected(true);
+    workspaceCards.show(workspaceHost, "map");
+    if (inspectorCards != null) inspectorCards.show(inspectorHost, activeInspectorCard);
+    if (viewportToolbar != null) viewportToolbar.setScriptMode(false);
+    if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
+      menuBar.setScriptMode(false);
+    }
+    if (viewportPanel != null) viewportPanel.requestFocusInWindow();
+  }
+
+  /** Switches the central area to the project scripting workspace. */
+  public static void showScriptWorkspace() {
+    if (workspaceCards == null || workspaceHost == null || scriptWorkspacePanel == null) return;
+    if (workspaceScriptButton != null) workspaceScriptButton.setSelected(true);
+    scriptWorkspacePanel.refreshScripts();
+    workspaceCards.show(workspaceHost, "scripts");
+    if (inspectorCards != null) inspectorCards.show(inspectorHost, "scripts");
+    if (viewportToolbar != null) viewportToolbar.setScriptMode(true);
+    if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
+      menuBar.setScriptMode(true);
+    }
+  }
+
+  /** Opens a script asset in the central scripting workspace. */
+  public static void openScript(ScriptDefinition definition) {
+    if (definition == null || scriptWorkspacePanel == null) return;
+    showScriptWorkspace();
+    scriptWorkspacePanel.open(definition);
+  }
+
+  /** Switches to the scripting workspace and creates a new project script inline. */
+  public static void createScript() {
+    showScriptWorkspace();
+    if (scriptWorkspacePanel != null) scriptWorkspacePanel.createScript();
+  }
+
   private static void setupInterface() {
     JFrame window = initWindow();
     installInspectorNavigationShortcuts(window);
@@ -504,6 +558,9 @@ public final class UI {
     inspectorHost.add(tilesetInspectorScroll, "tilesets");
     inspectorHost.add(tileLayerPropertyPanel, "tileLayers");
     inspectorHost.add(spriteEditorPanel, "sprites");
+    scriptInspectorPanel = new ScriptInspectorPanel();
+    scriptInspectorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
+    inspectorHost.add(scriptInspectorPanel, "scripts");
     JPanel emptyInspector = new JPanel(new GridBagLayout());
     emptyInspector.setBackground(Style.background());
     JLabel emptyInspectorLabel = new JLabel(Resources.strings().get("status_gamefile_closed"));
@@ -546,7 +603,24 @@ public final class UI {
     int initialHierarchyW = Editor.preferences().getMainSplitterPosition() != 0
         ? Math.min(Editor.preferences().getMainSplitterPosition(), SCENE_GRAPH_MAX_WIDTH)
         : prefHierarchyW;
-    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, renderSplitPanel);
+
+    scriptWorkspacePanel = new ScriptWorkspacePanel();
+    scriptInspectorPanel.setWorkspace(scriptWorkspacePanel);
+    scriptWorkspacePanel.onScriptSelected(scriptInspectorPanel::bind);
+    workspaceCards = new CardLayout();
+    workspaceHost = new JPanel(workspaceCards);
+    workspaceHost.add(renderSplitPanel, "map");
+    workspaceHost.add(scriptWorkspacePanel, "scripts");
+
+    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, workspaceHost, inspectorPanel);
+    configureSplitPane(centerRightSplit);
+    centerRightSplit.setContinuousLayout(false);
+    centerRightSplit.setResizeWeight(1.0);
+    int initialInspectorDivider = initialInspectorDivider(
+        winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
+        Editor.preferences().getSelectionEditSplitter());
+
+    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
     configureSplitPane(mainSplit);
     mainSplit.setContinuousLayout(false);
     mainSplit.setResizeWeight(0.0);
@@ -565,21 +639,11 @@ public final class UI {
       Editor.preferences().setMainSplitter(location);
     });
 
-    JPanel workspacePanel = new JPanel(new BorderLayout());
-    workspacePanel.add(viewportToolbar, BorderLayout.NORTH);
-    workspacePanel.add(mainSplit, BorderLayout.CENTER);
-
-    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, workspacePanel, inspectorPanel);
-    configureSplitPane(centerRightSplit);
-    centerRightSplit.setContinuousLayout(false);
-    centerRightSplit.setResizeWeight(1.0);
-    int initialInspectorDivider = initialInspectorDivider(
-        winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
-        Editor.preferences().getSelectionEditSplitter());
-
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
-    rootPanel.add(centerRightSplit, BorderLayout.CENTER);
+    rootPanel.add(viewportToolbar, BorderLayout.NORTH);
+    rootPanel.add(initWorkspaceModeBar(), BorderLayout.WEST);
+    rootPanel.add(mainSplit, BorderLayout.CENTER);
     mainSplit.setDividerLocation(initialHierarchyW);
     centerRightSplit.setDividerLocation(initialInspectorDivider);
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
@@ -594,6 +658,31 @@ public final class UI {
     canvas.setVisible(true);
     window.invalidate();
     window.validate();
+  }
+
+  private static Component initWorkspaceModeBar() {
+    JPanel rail = new JPanel();
+    rail.setLayout(new javax.swing.BoxLayout(rail, javax.swing.BoxLayout.Y_AXIS));
+    rail.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Style.border()));
+    rail.setPreferredSize(new Dimension(44, 0));
+    rail.setBackground(Style.COLOR_BG);
+    workspaceMapButton = new JToggleButton(Icons.MAP_16);
+    workspaceMapButton.setToolTipText("Map editor");
+    workspaceMapButton.setPreferredSize(new Dimension(43, 42));
+    workspaceMapButton.setMaximumSize(new Dimension(43, 42));
+    workspaceMapButton.addActionListener(event -> showMapWorkspace());
+    workspaceScriptButton = new JToggleButton(Icons.API_16);
+    workspaceScriptButton.setToolTipText("Script editor");
+    workspaceScriptButton.setPreferredSize(new Dimension(43, 42));
+    workspaceScriptButton.setMaximumSize(new Dimension(43, 42));
+    workspaceScriptButton.addActionListener(event -> showScriptWorkspace());
+    ButtonGroup modes = new ButtonGroup();
+    modes.add(workspaceMapButton);
+    modes.add(workspaceScriptButton);
+    workspaceMapButton.setSelected(true);
+    rail.add(workspaceMapButton);
+    rail.add(workspaceScriptButton);
+    return rail;
   }
 
   private static void installInspectorNavigationShortcuts(JFrame window) {
@@ -1090,6 +1179,9 @@ public final class UI {
     }
     if (viewportToolbar != null) {
       viewportToolbar.refreshTheme();
+    }
+    if (scriptWorkspacePanel != null) {
+      scriptWorkspacePanel.refreshTheme();
     }
     updateOrphanComponents();
     loadingTheme = false;

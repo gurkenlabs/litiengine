@@ -85,6 +85,9 @@ public class ViewportToolbar extends JPanel {
   private final JToggleButton btnCollision;
   private final List<JPanel> controlGroups = new ArrayList<>();
   private final List<JPanel> groupDividers = new ArrayList<>();
+  private final JPanel mapControlsContainer;
+  private final JPanel scriptControlsContainer;
+  private final JPanel rightControlsContainer;
 
   public ViewportToolbar(JComboBox<?> mapSelector) {
     super(new BorderLayout());
@@ -114,6 +117,9 @@ public class ViewportToolbar extends JPanel {
     mapSelector.getAccessibleContext().setAccessibleName(Resources.strings().get("toolbar_activeMap"));
     left.add(controlGroup(mapSelector));
 
+    this.mapControlsContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
+    this.mapControlsContainer.setOpaque(false);
+
     ButtonGroup toolButtons = new ButtonGroup();
     JPanel toolGroup = controlGroup();
     for (Tool tool : ToolManager.instance().getTools()) {
@@ -124,7 +130,7 @@ public class ViewportToolbar extends JPanel {
             toolGroup, tool instanceof TerrainBrushTool ? terrainSplitButton(button, tool) : button);
       }
     }
-    left.add(toolGroup);
+    this.mapControlsContainer.add(toolGroup);
     this.btnUndo = button(Resources.strings().get("menu_edit_undo"), Icons.UNDO_16, () -> UndoManager.instance().undo(), shortcut(KeyEvent.VK_Z));
     this.btnUndoHistory = button(Resources.strings().get("toolbar_undoHistory"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(this.btnUndoHistory, DROPDOWN_BUTTON_WIDTH);
@@ -133,8 +139,8 @@ public class ViewportToolbar extends JPanel {
     this.btnRedoHistory = button(Resources.strings().get("toolbar_redoHistory"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(this.btnRedoHistory, DROPDOWN_BUTTON_WIDTH);
     this.btnRedoHistory.addActionListener(e -> showHistory(this.btnRedoHistory, false));
-    left.add(controlGroup(splitButton(this.btnUndo, this.btnUndoHistory), splitButton(this.btnRedo, this.btnRedoHistory)));
-    left.add(controlGroup(addButton()));
+    this.mapControlsContainer.add(controlGroup(splitButton(this.btnUndo, this.btnUndoHistory), splitButton(this.btnRedo, this.btnRedoHistory)));
+    this.mapControlsContainer.add(controlGroup(addButton()));
     this.btnCopy = button(Resources.strings().get("menu_edit_copy"), Icons.COPY_16, () -> {
       if (Editor.instance().getMapComponent() != null) {
         Editor.instance().getMapComponent().copy();
@@ -157,7 +163,48 @@ public class ViewportToolbar extends JPanel {
         Editor.instance().getMapComponent().paste();
       }
     }, shortcut(KeyEvent.VK_V));
-    left.add(controlGroup(this.btnCut, this.btnCopy, this.btnPaste, this.btnDelete));
+    this.mapControlsContainer.add(controlGroup(this.btnCut, this.btnCopy, this.btnPaste, this.btnDelete));
+    left.add(this.mapControlsContainer);
+
+    this.scriptControlsContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
+    this.scriptControlsContainer.setOpaque(false);
+    JPanel scriptGroup = controlGroup();
+    JButton btnNewScript = button("New script", Icons.ADD_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript();
+    }, null);
+    JButton btnNewScriptMenu = button("", new DropdownArrowIcon(), () -> {});
+    makeIconOnly(btnNewScriptMenu, DROPDOWN_BUTTON_WIDTH);
+    btnNewScriptMenu.addActionListener(e -> showNewScriptMenu(btnNewScriptMenu));
+
+    JButton btnSaveScript = button("Save", Icons.SAVE_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().saveActive();
+    }, null);
+
+    JButton btnCompileReload = button("Compile & reload", Icons.REWIND_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().reloadActive();
+    }, null);
+
+    JButton btnReloadDisk = button("Reload from disk", Icons.REWIND_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().reloadActiveFromDisk();
+    }, null);
+
+    JButton btnOpenIde = button("Open in IDE", Icons.EXTERNAL_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().openActiveExternally();
+    }, null);
+
+    JButton btnConfigureIntelliJ = button("Configure IntelliJ", null, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().configureProjectForIntellij();
+    }, null);
+
+    addToControlGroup(scriptGroup, splitButton(btnNewScript, btnNewScriptMenu));
+    addToControlGroup(scriptGroup, btnSaveScript);
+    addToControlGroup(scriptGroup, btnCompileReload);
+    addToControlGroup(scriptGroup, btnReloadDisk);
+    addToControlGroup(scriptGroup, btnOpenIde);
+    addToControlGroup(scriptGroup, btnConfigureIntelliJ);
+    this.scriptControlsContainer.add(scriptGroup);
+    this.scriptControlsContainer.setVisible(false);
+    left.add(this.scriptControlsContainer);
 
     this.btnUndo.setEnabled(false);
     this.btnRedo.setEnabled(false);
@@ -207,13 +254,45 @@ public class ViewportToolbar extends JPanel {
         this::fitMap,
         Resources.strings().get("toolbar_fit"));
     this.zoomControls.setZoomText(formatZoom());
-    right.add(viewControls);
-    right.add(Box.createHorizontalStrut(Style.SPACE_MEDIUM));
-    right.add(this.zoomControls);
-    right.add(Box.createHorizontalStrut(Style.SPACE_MEDIUM));
+    this.rightControlsContainer = right;
 
     add(left, BorderLayout.WEST);
     add(right, BorderLayout.EAST);
+  }
+
+  public void setScriptMode(boolean scriptMode) {
+    this.mapControlsContainer.setVisible(!scriptMode);
+    this.scriptControlsContainer.setVisible(scriptMode);
+    this.rightControlsContainer.setVisible(!scriptMode);
+  }
+
+  private void showNewScriptMenu(Component invoker) {
+    JPopupMenu menu = new JPopupMenu();
+    JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.API_16);
+    entityScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.CREATURE_ENTITY);
+    });
+
+    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.API_16);
+    gameScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.GAME_LOGIC);
+    });
+
+    JMenuItem behaviorScript = new JMenuItem("Behavior Script...", Icons.API_16);
+    behaviorScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.BEHAVIOR_CONTROLLER);
+    });
+
+    JMenuItem abilityScript = new JMenuItem("Ability Script...", Icons.API_16);
+    abilityScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ABILITY);
+    });
+
+    menu.add(entityScript);
+    menu.add(gameScript);
+    menu.add(behaviorScript);
+    menu.add(abilityScript);
+    menu.show(invoker, 0, invoker.getHeight());
   }
 
   public void syncPreferenceButtons() {
