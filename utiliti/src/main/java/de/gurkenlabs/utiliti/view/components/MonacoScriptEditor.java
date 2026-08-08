@@ -184,6 +184,10 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     }
   }
 
+  void triggerFormat() {
+    if (this.ready) this.send("triggerFormat", Json.createObjectBuilder().build());
+  }
+
   void notifyMoved() {
     if (this.browser == null || this.resources == null) return;
     Runnable resize = () -> {
@@ -324,6 +328,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       case "definition" -> this.definition(position(payload));
       case "codeActions" -> this.codeActions(payload);
       case "symbols" -> this.symbols();
+      case "format" -> this.format();
       default -> failure("Unknown editor bridge method: " + method);
     };
   }
@@ -424,6 +429,12 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     JsonArrayBuilder symbolArray = Json.createArrayBuilder();
     analysis.symbols().forEach(symbol -> symbolArray.add(buildSymbol(symbol)));
     return success(Json.createObjectBuilder().add("symbols", symbolArray).build());
+  }
+
+  private JsonObject format() {
+    if (this.languageService == null) return success(Json.createObjectBuilder().add("text", Objects.requireNonNullElse(this.text, "")).build());
+    String formatted = this.languageService.format(this.document());
+    return success(Json.createObjectBuilder().add("text", Objects.requireNonNullElse(formatted, "")).build());
   }
 
   private static JsonObject buildSymbol(ScriptLanguageService.Symbol symbol) {

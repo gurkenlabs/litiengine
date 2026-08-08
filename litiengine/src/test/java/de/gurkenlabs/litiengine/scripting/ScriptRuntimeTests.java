@@ -402,4 +402,31 @@ class ScriptRuntimeTests {
       };
     }
   }
+
+  @Test
+  void javaLanguageServiceAutoformatsSourceCode() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    String unformatted = """
+      public class CreatureScript3 extends CreatureScript{
+      private static int cnt;
+      protected void onLoaded(){
+      }
+      public void update(){
+      if(cnt>0){
+      cnt++;
+      }
+      }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, unformatted, 1, null);
+    String formatted = service.format(doc);
+
+    assertTrue(formatted.contains("public class CreatureScript3 extends CreatureScript {"));
+    assertTrue(formatted.contains("  private static int cnt;"));
+    assertTrue(formatted.contains("    if(cnt>0) {"));
+    assertTrue(formatted.contains("      cnt++;"));
+  }
 }

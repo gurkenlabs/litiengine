@@ -712,6 +712,84 @@ public class JavaLanguageService implements ScriptLanguageService {
     return (separator < 0 ? raw : raw.substring(separator + 1)) + suffix;
   }
 
+  @Override
+  public String format(Document document) {
+    if (document == null || document.text() == null) return "";
+    String source = document.text();
+    if (source.isBlank()) return source;
+    String[] lines = source.split("\\R", -1);
+    StringBuilder result = new StringBuilder();
+    int indentLevel = 0;
+    boolean inBlockComment = false;
+    boolean lastWasEmpty = false;
+
+    for (String rawLine : lines) {
+      String line = rawLine.stripTrailing();
+      String code = line.strip();
+
+      if (code.isEmpty()) {
+        if (!lastWasEmpty && result.length() > 0) {
+          result.append("\n");
+          lastWasEmpty = true;
+        }
+        continue;
+      }
+
+      lastWasEmpty = false;
+
+      if (inBlockComment) {
+        result.append("  ".repeat(Math.max(0, indentLevel))).append(code).append("\n");
+        if (code.contains("*/")) inBlockComment = false;
+        continue;
+      }
+
+      if (code.startsWith("/*") && !code.contains("*/")) {
+        inBlockComment = true;
+      }
+
+      int closingBracesAtStart = 0;
+      for (int i = 0; i < code.length(); i++) {
+        char c = code.charAt(i);
+        if (c == '}') closingBracesAtStart++;
+        else if (!Character.isWhitespace(c)) break;
+      }
+
+      int lineIndent = Math.max(0, indentLevel - closingBracesAtStart);
+      String formattedCode = formatLineSpacing(code);
+
+      result.append("  ".repeat(lineIndent)).append(formattedCode).append("\n");
+
+      int openBraces = countOccurrences(code, '{');
+      int closeBraces = countOccurrences(code, '}');
+      indentLevel = Math.max(0, indentLevel + openBraces - closeBraces);
+    }
+
+    return result.toString().stripTrailing() + "\n";
+  }
+
+  private static String formatLineSpacing(String line) {
+    if (line.startsWith("//") || line.startsWith("/*") || line.startsWith("*")) return line;
+    return line.replaceAll("\\s*\\{", " {");
+  }
+
+  private static int countOccurrences(String str, char ch) {
+    int count = 0;
+    boolean inString = false;
+    char quote = 0;
+    for (int i = 0; i < str.length(); i++) {
+      char c = str.charAt(i);
+      if (inString) {
+        if (c == quote && (i == 0 || str.charAt(i - 1) != '\\')) inString = false;
+      } else if (c == '"' || c == '\'') {
+        inString = true;
+        quote = c;
+      } else if (c == ch) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   private record ParsedDocument(URI uri, boolean valid, List<ScriptDiagnostic> diagnostics, List<Symbol> symbols) {}
   private record ResolvedType(Class<?> type, Type genericType, boolean staticOnly) {}
 }

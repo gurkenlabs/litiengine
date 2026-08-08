@@ -33,6 +33,10 @@ public interface ScriptLanguageService extends AutoCloseable {
     return List.of();
   }
 
+  default String format(Document document) {
+    return document.text();
+  }
+
   @Override
   default void close() {}
 

@@ -192,12 +192,17 @@ public class ViewportToolbar extends JPanel {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().openActiveExternally();
     }, null);
 
+    JButton btnFormatScript = button("Format code", Icons.PENCIL_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().formatActive();
+    }, null);
+
     JButton btnConfigureIntelliJ = button("Configure IntelliJ", null, () -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().configureProjectForIntellij();
     }, null);
 
     addToControlGroup(scriptGroup, splitButton(btnNewScript, btnNewScriptMenu));
     addToControlGroup(scriptGroup, btnSaveScript);
+    addToControlGroup(scriptGroup, btnFormatScript);
     addToControlGroup(scriptGroup, btnCompileReload);
     addToControlGroup(scriptGroup, btnReloadDisk);
     addToControlGroup(scriptGroup, btnOpenIde);

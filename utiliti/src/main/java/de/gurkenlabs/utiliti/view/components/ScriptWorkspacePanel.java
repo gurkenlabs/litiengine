@@ -271,6 +271,13 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.setStatus("Reloaded " + tab.definition.getSource(), false);
   }
 
+  public void formatActive() {
+    if (this.monaco != null && this.monaco.isReady()) {
+      this.monaco.triggerFormat();
+      this.setStatus("Formatted active script", false);
+    }
+  }
+
   public void reloadActive() {
     ScriptTab tab = this.activeTab();
     if (tab == null || !tab.save()) return;

@@ -351,6 +351,24 @@
         providedCodeActionKinds: ['quickfix', 'source']
       });
 
+      monaco.languages.registerDocumentFormattingEditProvider(lang, {
+        async provideDocumentFormattingEdits(model) {
+          try {
+            const gen = modelGeneration;
+            const value = await query('format');
+            if (gen !== modelGeneration || editor.getModel() !== model || !value || typeof value.text !== 'string') return [];
+            const fullRange = model.getFullModelRange();
+            return [{
+              range: fullRange,
+              text: value.text
+            }];
+          } catch (error) {
+            console.error('Format document error:', error);
+            return [];
+          }
+        }
+      });
+
       monaco.languages.registerDocumentSymbolProvider(lang, {
         async provideDocumentSymbols(model) {
           try {
@@ -516,6 +534,10 @@
             const op = { identifier: id, range: range, text: payload.text, forceMoveMarkers: true };
             editor.executeEdits('insertText', [op]);
             editor.focus();
+          }
+        } else if (method === 'triggerFormat') {
+          if (typeof editor !== 'undefined') {
+            editor.getAction('editor.action.formatDocument')?.run();
           }
         }
       }
