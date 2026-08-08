@@ -59,7 +59,12 @@ public final class Icons {
   public static final Icon ABOUT_16 = IconLoader.get().getUIAwareIcon("about.svg", 16, 16);
   public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("animation.svg", 16, 16);
   public static final Icon API_16 = IconLoader.get().getUIAwareIcon("api.svg", 16, 16);
-  public static final Icon SCRIPT_16 = new VectorScriptIcon(16, 16, null);
+  public static final Icon SCRIPT_16 = IconLoader.get().getUIAwareIcon("script.svg", 16, 16);
+  public static final Icon SYMBOL_CLASS_16 = IconLoader.get().getUIAwareIcon("symbol_class.svg", 16, 16);
+  public static final Icon SYMBOL_METHOD_16 = IconLoader.get().getUIAwareIcon("symbol_method.svg", 16, 16);
+  public static final Icon SYMBOL_FIELD_16 = IconLoader.get().getUIAwareIcon("symbol_field.svg", 16, 16);
+  public static final Icon SYMBOL_GROUP_16 = IconLoader.get().getUIAwareIcon("symbol_group.svg", 16, 16);
+  public static final Icon SYMBOL_DEPENDENCY_16 = IconLoader.get().getUIAwareIcon("symbol_dependency.svg", 16, 16);
   public static final Icon ASSET_16 = IconLoader.get().getUIAwareIcon("asset.svg", 16, 16);
   public static final Icon ASSET_BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("asset_blueprint.svg", 16, 16);
   public static final Icon ASSET_EMITTER_16 = IconLoader.get().getUIAwareIcon("asset_emitter.svg", 16, 16);

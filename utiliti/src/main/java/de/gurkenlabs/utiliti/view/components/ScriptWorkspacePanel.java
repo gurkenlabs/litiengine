@@ -1183,11 +1183,11 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptOutline.Symbol symbol) {
         this.setText(label(symbol));
         this.setIcon(switch (symbol.kind()) {
-          case CLASS -> Icons.SCRIPT_16;
-          case GROUP -> Icons.LAYER_16;
-          case FIELD -> Icons.PROP_16;
-          case METHOD -> Icons.TRIGGER_16;
-          case DEPENDENCY -> Icons.BLUEPRINT_16;
+          case CLASS -> Icons.SYMBOL_CLASS_16;
+          case GROUP -> Icons.SYMBOL_GROUP_16;
+          case FIELD -> Icons.SYMBOL_FIELD_16;
+          case METHOD -> Icons.SYMBOL_METHOD_16;
+          case DEPENDENCY -> Icons.SYMBOL_DEPENDENCY_16;
         });
         this.setFont(this.getFont().deriveFont(symbol.kind() == ScriptOutline.Kind.CLASS
           || symbol.kind() == ScriptOutline.Kind.GROUP ? Font.BOLD : Font.PLAIN));
