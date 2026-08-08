@@ -399,6 +399,9 @@
     });
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => query('save').catch(console.error));
+    editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Enter, () => {
+      editor.getAction('editor.action.quickFix')?.run();
+    });
     editor.addCommand(monaco.KeyCode.F12, () => {
       editor.getAction('editor.action.revealDefinition')?.run();
     });

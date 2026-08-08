@@ -310,6 +310,25 @@ class ScriptRuntimeTests {
     assertFalse(completions.stream().anyMatch(c -> c.label().equals("actions")), "Should NOT suggest host fields when typing new inside argument.");
   }
 
+  @Test
+  void javaLanguageServiceProvidesImplementAbstractMethodsCodeAction() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("test-creature", "java", null, "CreatureScript1", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.entities.CombatEntityListener;
+      public class Listener implements CombatEntityListener {
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    List<ScriptLanguageService.CodeAction> actions = service.codeActions(doc, new ScriptLanguageService.Range(new ScriptLanguageService.Position(1, 15), new ScriptLanguageService.Position(1, 23)), List.of());
+
+    assertTrue(actions.stream().anyMatch(a -> a.title().contains("Implement abstract methods")), "Should offer code action to implement abstract methods for CombatEntityListener.");
+  }
+
   public static final class JavaEntityScript extends EntityScript<TestEntity> {
     static int loaded;
     static int unloaded;

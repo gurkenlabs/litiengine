@@ -184,7 +184,100 @@ public class JavaLanguageService implements ScriptLanguageService {
         ));
       }
     }
+    actions.addAll(this.abstractMethodCodeActions(document, parsed));
     return actions;
+  }
+
+  private List<CodeAction> abstractMethodCodeActions(Document document, ParsedDocument parsed) {
+    List<CodeAction> actions = new ArrayList<>();
+    String source = document.text();
+
+    Pattern classPattern = Pattern.compile("(?m)^\\s*(?:public|protected|private|static|final)*\\s*class\\s+([A-Za-z_$][\\w$]*)(?:\\s+extends\\s+([A-Za-z_$][\\w$.<>]+))?(?:\\s+implements\\s+([A-Za-z_$][\\w$,\\s.<>]+))?\\s*\\{");
+    Matcher matcher = classPattern.matcher(source);
+    while (matcher.find()) {
+      String superClass = matcher.group(2);
+      String implementsList = matcher.group(3);
+
+      List<String> contracts = new ArrayList<>();
+      if (superClass != null) contracts.add(superClass.replaceAll("<.*>", "").strip());
+      if (implementsList != null) {
+        for (String item : implementsList.split(",")) {
+          contracts.add(item.replaceAll("<.*>", "").strip());
+        }
+      }
+
+      for (String contract : contracts) {
+        Optional<Class<?>> resolvedContract = this.resolveType(contract, source);
+        if (resolvedContract.isEmpty()) continue;
+        Class<?> contractClass = resolvedContract.get();
+
+        List<Method> missingMethods = new ArrayList<>();
+        for (Method m : contractClass.getMethods()) {
+          if (Modifier.isAbstract(m.getModifiers()) || contractClass.isInterface()) {
+            Pattern mPattern = Pattern.compile("\\b" + Pattern.quote(m.getName()) + "\\s*\\(");
+            if (!mPattern.matcher(source).find()) {
+              missingMethods.add(m);
+            }
+          }
+        }
+
+        if (!missingMethods.isEmpty()) {
+          int insertPos = findClassClosingBrace(source, matcher.start());
+          Position insertPosition = positionAt(source, insertPos);
+          Range insertRange = new Range(insertPosition, insertPosition);
+
+          StringBuilder sb = new StringBuilder();
+          for (Method m : missingMethods) {
+            sb.append("  @Override\n  public ");
+            sb.append(simpleName(m.getGenericReturnType().getTypeName())).append(" ");
+            sb.append(m.getName()).append("(");
+            java.lang.reflect.Parameter[] params = m.getParameters();
+            for (int i = 0; i < params.length; i++) {
+              if (i > 0) sb.append(", ");
+              sb.append(simpleName(params[i].getParameterizedType().getTypeName())).append(" ")
+                .append(params[i].isNamePresent() ? params[i].getName() : "arg" + i);
+            }
+            sb.append(") {\n    // TODO: implement\n  }\n\n");
+          }
+
+          actions.add(new CodeAction(
+            "Implement abstract methods for '" + contractClass.getSimpleName() + "'",
+            "quickfix",
+            List.of(new TextEdit(insertRange, sb.toString()))
+          ));
+        }
+      }
+    }
+    return actions;
+  }
+
+  private static int findClassClosingBrace(String source, int classStart) {
+    int openBrace = source.indexOf('{', classStart);
+    if (openBrace < 0) return source.length();
+    int depth = 1;
+    for (int i = openBrace + 1; i < source.length(); i++) {
+      char c = source.charAt(i);
+      if (c == '{') depth++;
+      else if (c == '}') {
+        depth--;
+        if (depth == 0) return i;
+      }
+    }
+    return source.length();
+  }
+
+  private static Position positionAt(String source, int offset) {
+    int line = 0;
+    int col = 0;
+    for (int i = 0; i < Math.min(offset, source.length()); i++) {
+      if (source.charAt(i) == '\n') {
+        line++;
+        col = 0;
+      } else {
+        col++;
+      }
+    }
+    return new Position(line, col);
   }
 
   @Override
