@@ -612,7 +612,17 @@ public final class UI {
     workspaceHost.add(renderSplitPanel, "map");
     workspaceHost.add(scriptWorkspacePanel, "scripts");
 
-    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, workspaceHost, inspectorPanel);
+    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, workspaceHost);
+    configureSplitPane(mainSplit);
+    mainSplit.setContinuousLayout(false);
+    mainSplit.setResizeWeight(0.0);
+
+    JPanel leftWorkspaceContainer = new JPanel(new BorderLayout());
+    leftWorkspaceContainer.add(viewportToolbar, BorderLayout.NORTH);
+    leftWorkspaceContainer.add(initWorkspaceModeBar(), BorderLayout.WEST);
+    leftWorkspaceContainer.add(mainSplit, BorderLayout.CENTER);
+
+    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWorkspaceContainer, inspectorPanel);
     configureSplitPane(centerRightSplit);
     centerRightSplit.setContinuousLayout(false);
     centerRightSplit.setResizeWeight(1.0);
@@ -620,10 +630,6 @@ public final class UI {
         winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
         Editor.preferences().getSelectionEditSplitter());
 
-    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, centerRightSplit);
-    configureSplitPane(mainSplit);
-    mainSplit.setContinuousLayout(false);
-    mainSplit.setResizeWeight(0.0);
     mainSplit.addComponentListener(new ComponentAdapter() {
       @Override public void componentResized(ComponentEvent e) {
         Editor.preferences().setWidth(window.getWidth());
@@ -641,9 +647,7 @@ public final class UI {
 
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
-    rootPanel.add(viewportToolbar, BorderLayout.NORTH);
-    rootPanel.add(initWorkspaceModeBar(), BorderLayout.WEST);
-    rootPanel.add(mainSplit, BorderLayout.CENTER);
+    rootPanel.add(centerRightSplit, BorderLayout.CENTER);
     mainSplit.setDividerLocation(initialHierarchyW);
     centerRightSplit.setDividerLocation(initialInspectorDivider);
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
