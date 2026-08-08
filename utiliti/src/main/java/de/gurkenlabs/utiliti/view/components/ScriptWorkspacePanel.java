@@ -225,6 +225,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.scriptsModel.reload();
     for (int row = 0; row < this.scripts.getRowCount(); row++) this.scripts.expandRow(row);
     if (selectedId != null) this.selectTreeNode(selectedId);
+    this.refreshGlobals();
   }
 
   public void open(ScriptDefinition definition) {
@@ -434,7 +435,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.outline.setRootVisible(false);
     this.outline.setShowsRootHandles(true);
     this.outline.setRowHeight(Style.TREE_ROW_HEIGHT);
-    this.outline.setBackground(Style.background());
+    this.outline.setBackground(new Color(0, 0, 0, 0));
     this.outline.setOpaque(false);
     this.outline.setCellRenderer(new OutlineTreeRenderer());
     this.outline.addTreeSelectionListener(event -> this.navigateToOutlineSelection());
@@ -442,32 +443,20 @@ public final class ScriptWorkspacePanel extends JPanel {
     return panel;
   }
 
+  private DefaultListModel<GlobalApiItem> globalsModel = new DefaultListModel<>();
+
   private JPanel createGlobalsPanel() {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
     panel.setBackground(Style.background());
     panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
     panel.add(sectionTitle("GLOBALS & APIS"), BorderLayout.NORTH);
 
-    DefaultListModel<GlobalApiItem> model = new DefaultListModel<>();
-    model.addElement(new GlobalApiItem("host()", "host()", "Entity / Creature script instance", "h"));
-    model.addElement(new GlobalApiItem("environment()", "environment()", "Active map environment", "e"));
-    model.addElement(new GlobalApiItem("context()", "context()", "Script context & properties", "c"));
-    model.addElement(new GlobalApiItem("globals", "globals", "Shared ScriptGlobals store", "g"));
-    model.addElement(new GlobalApiItem("Game.world()", "Game.world()", "Map & world entity manager", "m"));
-    model.addElement(new GlobalApiItem("Game.loop()", "Game.loop()", "Main loop & frame updates", "m"));
-    model.addElement(new GlobalApiItem("Game.audio()", "Game.audio()", "Sound & music engine", "m"));
-    model.addElement(new GlobalApiItem("Game.physics()", "Game.physics()", "Collision & physics engine", "m"));
-    model.addElement(new GlobalApiItem("Game.graphics()", "Game.graphics()", "Render engine & camera", "m"));
-    model.addElement(new GlobalApiItem("EntityQuery", "EntityQuery.in(environment(), Creature.class)", "Fluent entity finder", "q"));
-    model.addElement(new GlobalApiItem("CombatEntityListener", "CombatEntityListener", "Hit, death & resurrect events", "i"));
-    model.addElement(new GlobalApiItem("EntityListener", "EntityListener", "Loaded & unloaded events", "i"));
-    model.addElement(new GlobalApiItem("CollisionListener", "CollisionListener", "Physics collision events", "i"));
-    model.addElement(new GlobalApiItem("AnimationListener", "AnimationListener", "Animation state events", "i"));
+    this.refreshGlobals();
 
-    JList<GlobalApiItem> list = new JList<>(model);
+    JList<GlobalApiItem> list = new JList<>(this.globalsModel);
     list.setCellRenderer(new GlobalApiRenderer());
     list.setFixedCellHeight(26);
-    list.setBackground(Style.background());
+    list.setBackground(new Color(0, 0, 0, 0));
     list.setOpaque(false);
     list.setSelectionBackground(Style.selection());
 
@@ -484,13 +473,51 @@ public final class ScriptWorkspacePanel extends JPanel {
     return panel;
   }
 
+  public void refreshGlobals() {
+    this.globalsModel.clear();
+
+    // 1. Builtin Globals & Services
+    this.globalsModel.addElement(new GlobalApiItem("host()", "host()", "Entity / Creature script instance", "h"));
+    this.globalsModel.addElement(new GlobalApiItem("environment()", "environment()", "Active map environment", "e"));
+    this.globalsModel.addElement(new GlobalApiItem("context()", "context()", "Script context & properties", "c"));
+    this.globalsModel.addElement(new GlobalApiItem("globals", "globals", "Shared ScriptGlobals store", "g"));
+    this.globalsModel.addElement(new GlobalApiItem("Game.world()", "Game.world()", "Map & world entity manager", "m"));
+    this.globalsModel.addElement(new GlobalApiItem("Game.loop()", "Game.loop()", "Main loop & frame updates", "m"));
+    this.globalsModel.addElement(new GlobalApiItem("Game.audio()", "Game.audio()", "Sound & music engine", "m"));
+    this.globalsModel.addElement(new GlobalApiItem("Game.physics()", "Game.physics()", "Collision & physics engine", "m"));
+    this.globalsModel.addElement(new GlobalApiItem("Game.graphics()", "Game.graphics()", "Render engine & camera", "m"));
+    this.globalsModel.addElement(new GlobalApiItem("EntityQuery", "EntityQuery.in(environment(), Creature.class)", "Fluent entity finder", "q"));
+
+    // 2. Active Map Entities
+    if (Game.world() != null && Game.world().environment() != null) {
+      for (de.gurkenlabs.litiengine.entities.IEntity entity : Game.world().environment().getEntities()) {
+        String name = entity.getName();
+        String identifier = (name != null && !name.isBlank()) ? name : String.valueOf(entity.getMapId());
+        String snippet = "environment().get(\"" + identifier + "\")";
+        String typeName = entity.getClass().getSimpleName();
+        String label = (name != null && !name.isBlank()) ? name : typeName + " #" + entity.getMapId();
+        this.globalsModel.addElement(new GlobalApiItem(label, snippet, typeName + " on active map", "e"));
+      }
+    }
+
+    // 3. Registered ScriptGlobals Entries
+    if (Game.scripts() != null && Game.scripts().globals() != null) {
+      for (Map.Entry<String, Object> entry : Game.scripts().globals().getEntries().entrySet()) {
+        String key = entry.getKey();
+        Object val = entry.getValue();
+        String typeName = val == null ? "Object" : val.getClass().getSimpleName();
+        this.globalsModel.addElement(new GlobalApiItem(key, "globals.get(\"" + key + "\")", "Global variable (" + typeName + ")", "g"));
+      }
+    }
+  }
+
   private static JScrollPane createBorderlessScrollPane(java.awt.Component view) {
     JScrollPane scroll = new JScrollPane(view);
     scroll.setBorder(BorderFactory.createEmptyBorder());
     scroll.setViewportBorder(null);
     scroll.setOpaque(false);
     scroll.getViewport().setOpaque(false);
-    scroll.getViewport().setBackground(Style.background());
+    scroll.getViewport().setBackground(new Color(0, 0, 0, 0));
     return scroll;
   }
 
@@ -518,7 +545,7 @@ public final class ScriptWorkspacePanel extends JPanel {
           default -> Icons.SYMBOL_DEPENDENCY_16;
         });
       }
-      this.setBackground(isSelected ? Style.selection() : Style.background());
+      this.setBackground(isSelected ? Style.selection() : new Color(0, 0, 0, 0));
       this.setOpaque(isSelected);
       this.setForeground(Style.text());
       this.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
@@ -1187,11 +1214,13 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.setText(item.label());
         if (item.definition() != null) this.setIcon(Icons.SCRIPT_16);
       }
-      this.setBackgroundNonSelectionColor(Style.background());
+      this.setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));
       this.setBackgroundSelectionColor(Style.selection());
       this.setTextNonSelectionColor(Style.text());
       this.setTextSelectionColor(Style.text());
       this.setBorderSelectionColor(null);
+      this.setOpaque(selected);
+      this.setBackground(selected ? Style.selection() : new Color(0, 0, 0, 0));
       return this;
     }
   }
@@ -1213,11 +1242,13 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.setFont(this.getFont().deriveFont(symbol.kind() == ScriptOutline.Kind.CLASS
           || symbol.kind() == ScriptOutline.Kind.GROUP ? Font.BOLD : Font.PLAIN));
       }
-      this.setBackgroundNonSelectionColor(Style.background());
+      this.setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));
       this.setBackgroundSelectionColor(Style.selection());
       this.setTextNonSelectionColor(Style.text());
       this.setTextSelectionColor(Style.text());
       this.setBorderSelectionColor(null);
+      this.setOpaque(selected);
+      this.setBackground(selected ? Style.selection() : new Color(0, 0, 0, 0));
       return this;
     }
 

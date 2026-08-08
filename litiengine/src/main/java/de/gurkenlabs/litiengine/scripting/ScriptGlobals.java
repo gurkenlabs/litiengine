@@ -68,4 +68,8 @@ public final class ScriptGlobals {
     this.values.clear();
     this.listeners.clear();
   }
+
+  public Map<String, Object> getEntries() {
+    return Map.copyOf(this.values);
+  }
 }
