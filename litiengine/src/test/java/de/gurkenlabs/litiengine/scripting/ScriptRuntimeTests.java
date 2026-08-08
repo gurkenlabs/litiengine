@@ -329,6 +329,27 @@ class ScriptRuntimeTests {
     assertTrue(actions.stream().anyMatch(a -> a.title().contains("Implement abstract methods")), "Should offer code action to implement abstract methods for CombatEntityListener.");
   }
 
+  @Test
+  void javaLanguageServiceReturnsRichDocumentationOnHover() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("test-game", "java", null, "GameScript1", ScriptHostType.GAME);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.GameScript;
+      public class GameScript1 extends GameScript {
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    var hover = service.hover(doc, new ScriptLanguageService.Position(1, 37));
+
+    assertTrue(hover.isPresent(), "Hover should be present for GameScript.");
+    assertTrue(hover.get().markdown().contains("Lifecycle Callbacks"), "Hover documentation should include GameScript lifecycle callbacks.");
+    assertTrue(hover.get().markdown().contains("onLoaded"), "Hover documentation should include onLoaded details.");
+  }
+
   public static final class JavaEntityScript extends EntityScript<TestEntity> {
     static int loaded;
     static int unloaded;

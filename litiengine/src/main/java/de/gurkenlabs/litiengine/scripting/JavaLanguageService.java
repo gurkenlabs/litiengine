@@ -291,22 +291,24 @@ public class JavaLanguageService implements ScriptLanguageService {
       return Optional.of(new Hover("**globals**  `ScriptGlobals`\n\nGlobal shared game state store (`put`, `get`, `onChanged`).", null));
     }
 
-    Map<String, Class<?>> variables = this.variables(document, text);
-    Class<?> type = variables.get(word);
-    if (type != null) return Optional.of(new Hover("**" + simpleName(type.getName()) + "**  `" + type.getName() + "`", null));
-
     Optional<Class<?>> resolved = this.resolveType(word, text);
     if (resolved.isPresent()) {
       Class<?> cls = resolved.get();
       String pkg = cls.getPackage() == null ? "" : cls.getPackage().getName();
-      String docs = "**" + cls.getSimpleName() + "**";
-      if (!pkg.isEmpty()) docs += "\n\n`" + pkg + "`";
+      String docs = "```java\n" + cls.getName() + "\n```";
+      String description = ScriptDocumentation.get(cls);
+      if (!description.isBlank()) {
+        docs += "\n\n" + description;
+      } else if (!pkg.isEmpty()) {
+        docs += "\n\n`" + pkg + "`";
+      }
       return Optional.of(new Hover(docs, null));
     }
 
     String prefix = text.substring(0, off);
     String receiver = receiverExpression(prefix);
     if (receiver != null) {
+      Map<String, Class<?>> variables = this.variables(document, text);
       ResolvedType receiverType = this.resolveExpression(receiver, document.definition(), variables, text);
       if (receiverType != null) {
         Method method = Arrays.stream(receiverType.type().getMethods())
@@ -316,10 +318,21 @@ public class JavaLanguageService implements ScriptLanguageService {
             + Arrays.stream(method.getParameters())
               .map(p -> simpleName(p.getParameterizedType().getTypeName()) + " " + p.getName())
               .reduce((a, b) -> a + ", " + b).orElse("") + ")";
-          return Optional.of(new Hover("```java\n" + sig + "\n```\n\nDeclared in `" + method.getDeclaringClass().getName() + "`", null));
+          String docs = "```java\n" + sig + "\n```\n\nDeclared in `" + method.getDeclaringClass().getName() + "`";
+          String methodDoc = ScriptDocumentation.getMethodDoc(word);
+          if (!methodDoc.isBlank()) {
+            docs += "\n\n" + methodDoc;
+          }
+          return Optional.of(new Hover(docs, null));
         }
       }
     }
+
+    String methodDoc = ScriptDocumentation.getMethodDoc(word);
+    if (!methodDoc.isBlank()) {
+      return Optional.of(new Hover("**" + word + "**\n\n" + methodDoc, null));
+    }
+
     return Optional.empty();
   }
 
@@ -597,7 +610,9 @@ public class JavaLanguageService implements ScriptLanguageService {
 
   private static Completion typeCompletion(Class<?> type, boolean fullyQualified, List<TextEdit> additionalEdits) {
     String pkg = type.getPackage() == null ? "" : type.getPackage().getName();
-    String docs = "```java\n" + (fullyQualified ? type.getName() : type.getSimpleName()) + "\n```\n\n" + (pkg.isEmpty() ? "" : "`" + pkg + "`");
+    String docStr = ScriptDocumentation.get(type);
+    String docs = "```java\n" + (fullyQualified ? type.getName() : type.getSimpleName()) + "\n```\n\n"
+      + (docStr.isBlank() ? (pkg.isEmpty() ? "" : "`" + pkg + "`") : docStr);
     return new Completion(type.getSimpleName(), CompletionKind.CLASS, type.getName(), docs,
       fullyQualified ? type.getName() : type.getSimpleName(), type.getName(), List.of(), additionalEdits);
   }
