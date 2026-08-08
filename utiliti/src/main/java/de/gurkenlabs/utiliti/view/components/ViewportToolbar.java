@@ -254,6 +254,9 @@ public class ViewportToolbar extends JPanel {
         this::fitMap,
         Resources.strings().get("toolbar_fit"));
     this.zoomControls.setZoomText(formatZoom());
+    right.add(viewControls);
+    right.add(Box.createRigidArea(new Dimension(Style.SPACE_MEDIUM, 0)));
+    right.add(this.zoomControls);
     this.rightControlsContainer = right;
 
     add(left, BorderLayout.WEST);
