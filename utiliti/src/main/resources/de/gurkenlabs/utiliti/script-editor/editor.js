@@ -333,8 +333,10 @@
                 edit: {
                   edits: action.edits.map(edit => ({
                     resource: model.uri,
-                    range: new monaco.Range(edit.startLine + 1, edit.startColumn + 1, edit.endLine + 1, edit.endColumn + 1),
-                    text: edit.text.replace(/\\n/g, '\n')
+                    textEdit: {
+                      range: new monaco.Range(edit.startLine + 1, edit.startColumn + 1, edit.endLine + 1, edit.endColumn + 1),
+                      text: edit.text.replace(/\\n/g, '\n')
+                    }
                   }))
                 }
               })),
