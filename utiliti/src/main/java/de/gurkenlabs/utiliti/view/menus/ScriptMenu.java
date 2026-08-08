@@ -14,21 +14,17 @@ public class ScriptMenu extends JMenu {
     newSub.setIcon(Icons.ADD_16);
 
     JMenuItem entityScript = new JMenuItem("Entity Script...");
-    entityScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.CREATURE_ENTITY));
+    entityScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY));
 
     JMenuItem gameScript = new JMenuItem("Game Script...");
-    gameScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.GAME_LOGIC));
+    gameScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.GAME));
 
-    JMenuItem behaviorScript = new JMenuItem("Behavior Script...");
-    behaviorScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.BEHAVIOR_CONTROLLER));
-
-    JMenuItem abilityScript = new JMenuItem("Ability Script...");
-    abilityScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ABILITY));
+    JMenuItem envScript = new JMenuItem("Environment Script...");
+    envScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENVIRONMENT));
 
     newSub.add(entityScript);
     newSub.add(gameScript);
-    newSub.add(behaviorScript);
-    newSub.add(abilityScript);
+    newSub.add(envScript);
 
     JMenuItem save = new JMenuItem("Save", Icons.SAVE_16);
     save.addActionListener(e -> UI.getScriptWorkspacePanel().saveActive());

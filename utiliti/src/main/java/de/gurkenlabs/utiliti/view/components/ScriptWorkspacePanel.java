@@ -616,31 +616,28 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   public enum ScriptKind {
-    CREATURE_ENTITY,
-    BEHAVIOR_CONTROLLER,
-    ABILITY,
-    GAME_LOGIC
+    ENTITY,
+    GAME,
+    ENVIRONMENT
   }
 
   public void createScript() {
-    createScript(ScriptKind.CREATURE_ENTITY);
+    createScript(ScriptKind.ENTITY);
   }
 
   public void createScript(ScriptKind kind) {
     if (Editor.instance().getGameFile() == null || Editor.instance().getProjectPath() == null) return;
     String prefix = switch (kind) {
-      case GAME_LOGIC -> "GameScript";
-      case BEHAVIOR_CONTROLLER -> "BehaviorScript";
-      case ABILITY -> "AbilityScript";
-      case CREATURE_ENTITY -> "CreatureScript";
+      case GAME -> "GameScript";
+      case ENVIRONMENT -> "EnvironmentScript";
+      case ENTITY -> "CreatureScript";
     };
-    ScriptHostType hostType = kind == ScriptKind.GAME_LOGIC ? ScriptHostType.GAME : ScriptHostType.ENTITY;
-    String targetType = switch (kind) {
-      case BEHAVIOR_CONTROLLER -> "de.gurkenlabs.litiengine.entities.behavior.DefaultScriptBehaviorController";
-      case ABILITY -> "de.gurkenlabs.litiengine.abilities.Ability";
-      case CREATURE_ENTITY -> Creature.class.getName();
-      default -> null;
+    ScriptHostType hostType = switch (kind) {
+      case GAME -> ScriptHostType.GAME;
+      case ENVIRONMENT -> ScriptHostType.ENVIRONMENT;
+      case ENTITY -> ScriptHostType.ENTITY;
     };
+    String targetType = kind == ScriptKind.ENTITY ? Creature.class.getName() : null;
 
     int suffix = 1;
     String id;
@@ -735,7 +732,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         content = content.replaceFirst("(?m)^(\\s*public\\s+)?class\\s+\\w+", "$1class " + className);
       } catch (IOException ignored) {}
     } else {
-      content = defaultSource(dup, className, ScriptKind.CREATURE_ENTITY);
+      content = defaultSource(dup, className, ScriptKind.ENTITY);
     }
 
     try {
@@ -756,21 +753,17 @@ public final class ScriptWorkspacePanel extends JPanel {
   private JPopupMenu createAddScriptPopupMenu() {
     JPopupMenu menu = new JPopupMenu();
     JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.API_16);
-    entityScript.addActionListener(e -> createScript(ScriptKind.CREATURE_ENTITY));
+    entityScript.addActionListener(e -> createScript(ScriptKind.ENTITY));
 
     JMenuItem gameScript = new JMenuItem("Game Script...", Icons.API_16);
-    gameScript.addActionListener(e -> createScript(ScriptKind.GAME_LOGIC));
+    gameScript.addActionListener(e -> createScript(ScriptKind.GAME));
 
-    JMenuItem behaviorScript = new JMenuItem("Behavior Script...", Icons.API_16);
-    behaviorScript.addActionListener(e -> createScript(ScriptKind.BEHAVIOR_CONTROLLER));
-
-    JMenuItem abilityScript = new JMenuItem("Ability Script...", Icons.API_16);
-    abilityScript.addActionListener(e -> createScript(ScriptKind.ABILITY));
+    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.API_16);
+    envScript.addActionListener(e -> createScript(ScriptKind.ENVIRONMENT));
 
     menu.add(entityScript);
     menu.add(gameScript);
-    menu.add(behaviorScript);
-    menu.add(abilityScript);
+    menu.add(envScript);
     return menu;
   }
 
@@ -784,17 +777,14 @@ public final class ScriptWorkspacePanel extends JPanel {
     JMenu newSub = new JMenu("New Script");
     newSub.setIcon(Icons.ADD_16);
     JMenuItem entityScript = new JMenuItem("Entity Script...");
-    entityScript.addActionListener(evt -> createScript(ScriptKind.CREATURE_ENTITY));
+    entityScript.addActionListener(evt -> createScript(ScriptKind.ENTITY));
     JMenuItem gameScript = new JMenuItem("Game Script...");
-    gameScript.addActionListener(evt -> createScript(ScriptKind.GAME_LOGIC));
-    JMenuItem behaviorScript = new JMenuItem("Behavior Script...");
-    behaviorScript.addActionListener(evt -> createScript(ScriptKind.BEHAVIOR_CONTROLLER));
-    JMenuItem abilityScript = new JMenuItem("Ability Script...");
-    abilityScript.addActionListener(evt -> createScript(ScriptKind.ABILITY));
+    gameScript.addActionListener(evt -> createScript(ScriptKind.GAME));
+    JMenuItem envScript = new JMenuItem("Environment Script...");
+    envScript.addActionListener(evt -> createScript(ScriptKind.ENVIRONMENT));
     newSub.add(entityScript);
     newSub.add(gameScript);
-    newSub.add(behaviorScript);
-    newSub.add(abilityScript);
+    newSub.add(envScript);
     menu.add(newSub);
 
     if (selected != null) {
@@ -819,7 +809,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static String defaultSource(ScriptDefinition definition, String className, ScriptKind kind) {
-    if (kind == ScriptKind.GAME_LOGIC) {
+    if (kind == ScriptKind.GAME) {
       return "import de.gurkenlabs.litiengine.*;\n"
         + "import de.gurkenlabs.litiengine.resources.*;\n"
         + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
@@ -828,7 +818,6 @@ public final class ScriptWorkspacePanel extends JPanel {
         + "  @Override\n"
         + "  protected void onStarted() {\n"
         + "    // The game loop is active.\n"
-        + "    // globals.put(\"gameScore\", 0);\n"
         + "  }\n\n"
         + "  @Override\n"
         + "  public void update() {\n"
@@ -836,34 +825,20 @@ public final class ScriptWorkspacePanel extends JPanel {
         + "  }\n"
         + "}\n";
     }
-    if (kind == ScriptKind.BEHAVIOR_CONTROLLER) {
+    if (kind == ScriptKind.ENVIRONMENT) {
       return "import de.gurkenlabs.litiengine.*;\n"
-        + "import de.gurkenlabs.litiengine.entities.behavior.*;\n"
-        + "import de.gurkenlabs.litiengine.entities.IEntity;\n"
+        + "import de.gurkenlabs.litiengine.environment.Environment;\n"
         + "import de.gurkenlabs.litiengine.resources.*;\n"
         + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
-        + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENTITY)\n"
-        + "public class " + className + " extends DefaultScriptBehaviorController<IEntity> {\n"
-        + "  public " + className + "(IEntity entity) {\n"
-        + "    super(entity);\n"
+        + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENVIRONMENT)\n"
+        + "public class " + className + " extends EnvironmentScript {\n"
+        + "  @Override\n"
+        + "  protected void onLoaded() {\n"
+        + "    // Map / Environment loaded.\n"
         + "  }\n\n"
         + "  @Override\n"
         + "  public void update() {\n"
-        + "    super.update();\n"
-        + "    // Behavior logic.\n"
-        + "  }\n"
-        + "}\n";
-    }
-    if (kind == ScriptKind.ABILITY) {
-      return "import de.gurkenlabs.litiengine.*;\n"
-        + "import de.gurkenlabs.litiengine.abilities.Ability;\n"
-        + "import de.gurkenlabs.litiengine.entities.Creature;\n"
-        + "import de.gurkenlabs.litiengine.resources.*;\n"
-        + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
-        + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENTITY, target = Creature.class)\n"
-        + "public class " + className + " extends Ability {\n"
-        + "  public " + className + "(Creature executingCreature) {\n"
-        + "    super(executingCreature);\n"
+        + "    // Environment-level script logic.\n"
         + "  }\n"
         + "}\n";
     }
@@ -876,11 +851,10 @@ public final class ScriptWorkspacePanel extends JPanel {
       + "  @Override\n"
       + "  protected void onLoaded() {\n"
       + "    // Creature and environment ready.\n"
-      + "    // Use direct 'globals' access anywhere in this script.\n"
       + "  }\n\n"
       + "  @Override\n"
-      + "  public void update() {\n"
-      + "    // Type host(). to explore the Creature API.\n"
+      + "  protected void update() {\n"
+      + "    // Entity-level script logic.\n"
       + "  }\n"
       + "}\n";
   }

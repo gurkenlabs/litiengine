@@ -270,28 +270,22 @@ public class ViewportToolbar extends JPanel {
     JPopupMenu menu = new JPopupMenu();
     JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.API_16);
     entityScript.addActionListener(e -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.CREATURE_ENTITY);
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY);
     });
 
     JMenuItem gameScript = new JMenuItem("Game Script...", Icons.API_16);
     gameScript.addActionListener(e -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.GAME_LOGIC);
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.GAME);
     });
 
-    JMenuItem behaviorScript = new JMenuItem("Behavior Script...", Icons.API_16);
-    behaviorScript.addActionListener(e -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.BEHAVIOR_CONTROLLER);
-    });
-
-    JMenuItem abilityScript = new JMenuItem("Ability Script...", Icons.API_16);
-    abilityScript.addActionListener(e -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ABILITY);
+    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.API_16);
+    envScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENVIRONMENT);
     });
 
     menu.add(entityScript);
     menu.add(gameScript);
-    menu.add(behaviorScript);
-    menu.add(abilityScript);
+    menu.add(envScript);
     menu.show(invoker, 0, invoker.getHeight());
   }
 
