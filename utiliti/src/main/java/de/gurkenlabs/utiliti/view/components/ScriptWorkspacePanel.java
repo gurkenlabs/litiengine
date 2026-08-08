@@ -482,14 +482,14 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (value instanceof GlobalApiItem item) {
         this.setText("<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + escapeHtml(item.label()) + "</span>"
           + "<span style='color:#64748b;font-size:10px'>  " + escapeHtml(item.description()) + "</span></html>");
-        Color badgeColor = switch (item.badge()) {
-          case "h", "e" -> new Color(0, 180, 216);
-          case "c", "g" -> new Color(122, 162, 247);
-          case "m" -> new Color(157, 78, 221);
-          case "q" -> new Color(247, 118, 142);
-          default -> new Color(100, 116, 139);
-        };
-        this.setIcon(new SymbolBadgeIcon(item.badge(), badgeColor, Color.WHITE));
+        this.setIcon(switch (item.badge()) {
+          case "h" -> Icons.CREATURE_16;
+          case "e" -> Icons.MAPAREA_16;
+          case "c", "g" -> Icons.SCRIPT_16;
+          case "m" -> Icons.TRIGGER_16;
+          case "q" -> Icons.SEARCH_16;
+          default -> Icons.ANIMATION_16;
+        });
       }
       this.setBackground(isSelected ? Style.selection() : Style.background());
       this.setForeground(Style.text());
@@ -1169,12 +1169,6 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static final class OutlineTreeRenderer extends DefaultTreeCellRenderer {
-    private static final javax.swing.Icon CLASS_ICON = new SymbolBadgeIcon("C", new Color(0, 180, 216), Color.WHITE);
-    private static final javax.swing.Icon METHOD_ICON = new SymbolBadgeIcon("m", new Color(157, 78, 221), Color.WHITE);
-    private static final javax.swing.Icon FIELD_ICON = new SymbolBadgeIcon("f", new Color(247, 118, 142), Color.WHITE);
-    private static final javax.swing.Icon DEPENDENCY_ICON = new SymbolBadgeIcon("d", new Color(122, 162, 247), Color.WHITE);
-    private static final javax.swing.Icon GROUP_ICON = new SymbolBadgeIcon("g", new Color(100, 116, 139), Color.WHITE);
-
     @Override
     public java.awt.Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
                                                            boolean leaf, int row, boolean focused) {
@@ -1182,11 +1176,11 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptOutline.Symbol symbol) {
         this.setText(label(symbol));
         this.setIcon(switch (symbol.kind()) {
-          case CLASS -> CLASS_ICON;
-          case GROUP -> GROUP_ICON;
-          case FIELD -> FIELD_ICON;
-          case METHOD -> METHOD_ICON;
-          case DEPENDENCY -> DEPENDENCY_ICON;
+          case CLASS -> Icons.SCRIPT_16;
+          case GROUP -> Icons.LAYER_16;
+          case FIELD -> Icons.PROP_16;
+          case METHOD -> Icons.TRIGGER_16;
+          case DEPENDENCY -> Icons.BLUEPRINT_16;
         });
         this.setFont(this.getFont().deriveFont(symbol.kind() == ScriptOutline.Kind.CLASS
           || symbol.kind() == ScriptOutline.Kind.GROUP ? Font.BOLD : Font.PLAIN));
@@ -1243,44 +1237,4 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
   }
 
-  private static final class SymbolBadgeIcon implements javax.swing.Icon {
-    private final String letter;
-    private final Color badgeColor;
-    private final Color textColor;
-
-    private SymbolBadgeIcon(String letter, Color badgeColor, Color textColor) {
-      this.letter = letter;
-      this.badgeColor = badgeColor;
-      this.textColor = textColor;
-    }
-
-    @Override public int getIconWidth() { return 16; }
-    @Override public int getIconHeight() { return 16; }
-
-    @Override
-    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
-      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
-      try {
-        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING, java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-        g2.setColor(this.badgeColor);
-        g2.fillOval(x + 1, y + 1, 14, 14);
-
-        g2.setColor(new Color(255, 255, 255, 50));
-        g2.drawOval(x + 1, y + 1, 14, 14);
-
-        g2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
-        g2.setColor(this.textColor);
-        java.awt.FontMetrics fm = g2.getFontMetrics();
-        int stringWidth = fm.stringWidth(this.letter);
-        int stringHeight = fm.getAscent() - 2;
-        int px = x + 1 + (14 - stringWidth) / 2;
-        int py = y + 1 + (14 + stringHeight) / 2;
-        g2.drawString(this.letter, px, py);
-      } finally {
-        g2.dispose();
-      }
-    }
-  }
 }
