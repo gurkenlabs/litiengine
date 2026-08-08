@@ -490,12 +490,12 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.setText("<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + escapeHtml(item.label()) + "</span>"
           + "<span style='color:#64748b;font-size:10px'>  " + escapeHtml(item.description()) + "</span></html>");
         this.setIcon(switch (item.badge()) {
-          case "h" -> Icons.CREATURE_16;
-          case "e" -> Icons.MAPAREA_16;
-          case "c", "g" -> Icons.SCRIPT_16;
-          case "m" -> Icons.TRIGGER_16;
+          case "h" -> Icons.SYMBOL_CLASS_16;
+          case "e" -> Icons.SYMBOL_DEPENDENCY_16;
+          case "c", "g" -> Icons.SYMBOL_FIELD_16;
+          case "m" -> Icons.SYMBOL_METHOD_16;
           case "q" -> Icons.SEARCH_16;
-          default -> Icons.ANIMATION_16;
+          default -> Icons.SYMBOL_DEPENDENCY_16;
         });
       }
       this.setBackground(isSelected ? Style.selection() : Style.background());
