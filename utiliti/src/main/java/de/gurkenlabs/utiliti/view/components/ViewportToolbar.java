@@ -96,7 +96,7 @@ public class ViewportToolbar extends JPanel {
     setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
         BorderFactory.createEmptyBorder(
-            0, 0, TOOLBAR_VERTICAL_PADDING, 0)));
+            0, Style.SPACE_MEDIUM, TOOLBAR_VERTICAL_PADDING, Style.SPACE_MEDIUM)));
 
     JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
     left.setOpaque(false);
