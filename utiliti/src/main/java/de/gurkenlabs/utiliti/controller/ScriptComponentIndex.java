@@ -31,10 +31,31 @@ public final class ScriptComponentIndex {
     this.components = List.copyOf(components);
   }
 
-  public static ScriptComponentIndex create(ScriptDefinition definition) {
+  private static final int MAX_CACHED_INDEXES = 8;
+  private static final Map<CacheKey, ScriptComponentIndex> CACHE = new LinkedHashMap<>(MAX_CACHED_INDEXES, 0.75f, true) {
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<CacheKey, ScriptComponentIndex> eldest) {
+      return this.size() > MAX_CACHED_INDEXES;
+    }
+  };
+
+  private record CacheKey(String targetType, ClassLoader loader) {}
+
+  public static synchronized ScriptComponentIndex create(ScriptDefinition definition) {
     ProjectCodeIntegration projectCode = Editor.instance().getProjectCodeIntegration();
     ClassLoader projectLoader = projectCode.getClassLoader();
     ClassLoader loader = projectLoader == null ? ScriptComponentIndex.class.getClassLoader() : projectLoader;
+    String targetType = definition == null ? null : definition.getTargetType();
+    CacheKey key = new CacheKey(targetType, loader);
+    ScriptComponentIndex cached = CACHE.get(key);
+    if (cached != null) return cached;
+    ScriptComponentIndex created = build(definition, loader);
+    CACHE.put(key, created);
+    return created;
+  }
+
+  private static ScriptComponentIndex build(ScriptDefinition definition, ClassLoader loader) {
+    ProjectCodeIntegration projectCode = Editor.instance().getProjectCodeIntegration();
     Class<?> hostType = resolveHostType(definition, loader);
     Map<String, Class<?>> types = new LinkedHashMap<>();
     ENGINE_CONTROLLERS.forEach(type -> types.put(type.getName(), type));

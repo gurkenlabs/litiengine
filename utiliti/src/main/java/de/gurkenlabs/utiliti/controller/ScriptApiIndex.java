@@ -44,9 +44,26 @@ public final class ScriptApiIndex {
     }
   };
   private final Map<String, TypeSymbol> types;
+  private final List<TypeSymbol> sortedTypes;
+  private final Map<String, String> nameLookupMap;
 
   private ScriptApiIndex(Map<String, TypeSymbol> types) {
     this.types = Map.copyOf(types);
+    this.sortedTypes = this.types.values().stream()
+      .sorted(java.util.Comparator.comparing(TypeSymbol::simpleName))
+      .toList();
+    Map<String, String> lookup = new HashMap<>();
+    Map<String, Integer> counts = new HashMap<>();
+    for (TypeSymbol symbol : this.types.values()) {
+      lookup.put(symbol.qualifiedName(), symbol.qualifiedName());
+      counts.put(symbol.simpleName(), counts.getOrDefault(symbol.simpleName(), 0) + 1);
+    }
+    for (TypeSymbol symbol : this.types.values()) {
+      if (counts.get(symbol.simpleName()) == 1) {
+        lookup.put(symbol.simpleName(), symbol.qualifiedName());
+      }
+    }
+    this.nameLookupMap = Map.copyOf(lookup);
   }
 
   public static synchronized ScriptApiIndex create(ScriptDefinition definition) {
@@ -131,17 +148,17 @@ public final class ScriptApiIndex {
   }
 
   public List<TypeSymbol> types() {
-    return this.types.values().stream().sorted(java.util.Comparator.comparing(TypeSymbol::simpleName)).toList();
+    return this.sortedTypes;
   }
 
   /** Resolves either a qualified or unambiguous simple type name from the indexed API. */
   public String resolveType(String name) {
     if (name == null || name.isBlank()) return null;
-    String normalized = name.strip().replaceAll("<.*>", "").replace("[]", "");
-    if (this.types.containsKey(normalized)) return normalized;
-    List<TypeSymbol> matches = this.types.values().stream()
-      .filter(type -> type.simpleName().equals(normalized)).toList();
-    return matches.size() == 1 ? matches.getFirst().qualifiedName() : null;
+    String raw = name.strip();
+    int generic = raw.indexOf('<');
+    if (generic >= 0) raw = raw.substring(0, generic).strip();
+    if (raw.endsWith("[]")) raw = raw.substring(0, raw.length() - 2).strip();
+    return this.nameLookupMap.get(raw);
   }
 
   /** Returns the indexed public API for a type name. */

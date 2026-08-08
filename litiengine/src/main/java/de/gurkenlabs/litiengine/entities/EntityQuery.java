@@ -76,7 +76,10 @@ public final class EntityQuery<T> {
   }
 
   public Optional<T> first() {
-    return this.list().stream().findFirst();
+    if (this.comparator != null) {
+      return this.list().stream().findFirst();
+    }
+    return this.source.stream().filter(this.predicate).findFirst();
   }
 
   public long count() {
@@ -84,7 +87,7 @@ public final class EntityQuery<T> {
   }
 
   public boolean isEmpty() {
-    return this.first().isEmpty();
+    return !this.source.stream().anyMatch(this.predicate);
   }
 
   public static <T> EntityQuery<T> in(Environment environment, Class<? extends T> type) {

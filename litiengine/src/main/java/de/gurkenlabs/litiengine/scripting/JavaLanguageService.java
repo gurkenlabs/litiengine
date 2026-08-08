@@ -425,18 +425,11 @@ public class JavaLanguageService implements ScriptLanguageService {
     String raw = rawType(name);
     Class<?> imported = this.importedTypes(source).get(raw);
     if (imported != null) return Optional.of(imported);
-    List<String> candidates = List.of(
-      raw, "java.lang." + raw, "java.util." + raw, "java.awt." + raw,
-      "de.gurkenlabs.litiengine." + raw, "de.gurkenlabs.litiengine.entities." + raw,
-      "de.gurkenlabs.litiengine.entities.behavior." + raw, "de.gurkenlabs.litiengine.abilities." + raw,
-      "de.gurkenlabs.litiengine.environment." + raw, "de.gurkenlabs.litiengine.graphics." + raw,
-      "de.gurkenlabs.litiengine.physics." + raw, "de.gurkenlabs.litiengine.scripting." + raw
-    );
-    for (String candidate : candidates) {
-      try {
-        return Optional.of(Class.forName(candidate, false, this.workspace.classLoader()));
-      } catch (ClassNotFoundException | LinkageError ignored) {}
-    }
+    Optional<Class<?>> catalogType = EngineTypeCatalog.findType(raw, this.workspace.classLoader());
+    if (catalogType.isPresent()) return catalogType;
+    try {
+      return Optional.of(Class.forName(raw, false, this.workspace.classLoader()));
+    } catch (ClassNotFoundException | LinkageError ignored) {}
     return Optional.empty();
   }
 

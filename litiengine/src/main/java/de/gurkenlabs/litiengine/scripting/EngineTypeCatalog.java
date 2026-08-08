@@ -29,6 +29,22 @@ public final class EngineTypeCatalog {
     return CACHE.computeIfAbsent(loader, EngineTypeCatalog::loadAll);
   }
 
+  private static final Map<ClassLoader, Map<String, Class<?>>> NAME_LOOKUP_CACHE = new ConcurrentHashMap<>();
+
+  public static Optional<Class<?>> findType(String name, ClassLoader loader) {
+    if (name == null || name.isBlank()) return Optional.empty();
+    ClassLoader effectiveLoader = loader == null ? Game.class.getClassLoader() : loader;
+    Map<String, Class<?>> map = NAME_LOOKUP_CACHE.computeIfAbsent(effectiveLoader, l -> {
+      Map<String, Class<?>> lookup = new ConcurrentHashMap<>();
+      for (Class<?> type : projectTypes(l)) {
+        lookup.putIfAbsent(type.getSimpleName(), type);
+        lookup.putIfAbsent(type.getName(), type);
+      }
+      return lookup;
+    });
+    return Optional.ofNullable(map.get(name));
+  }
+
   private static List<Class<?>> loadEngine(ClassLoader loader) {
     List<Class<?>> result = new ArrayList<>();
     Class<?>[] sentinelClasses = {
