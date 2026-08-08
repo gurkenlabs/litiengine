@@ -35,8 +35,11 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -94,10 +97,14 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.setBackground(Style.background());
     this.add(this.createConflictBar(), BorderLayout.NORTH);
 
-    JSplitPane explorer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createScriptExplorer(), this.createOutline());
+    JSplitPane outlineAndGlobals = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createOutline(), this.createGlobalsPanel());
+    UI.configureSplitPane(outlineAndGlobals);
+    outlineAndGlobals.setResizeWeight(0.5);
+
+    JSplitPane explorer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createScriptExplorer(), outlineAndGlobals);
     UI.configureSplitPane(explorer);
-    explorer.setResizeWeight(0.72);
-    explorer.setDividerLocation(0.72);
+    explorer.setResizeWeight(0.35);
+    explorer.setDividerLocation(0.35);
     explorer.setMinimumSize(new Dimension(235, 0));
     explorer.setPreferredSize(new Dimension(265, 0));
 
@@ -224,7 +231,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (definition == null) return;
     ScriptTab tab = this.openTabs.computeIfAbsent(definition.getId(), ignored -> {
       ScriptTab created = new ScriptTab(definition);
-      this.tabs.addTab(displayName(definition), Icons.API_16, created, definition.getSource());
+      this.tabs.addTab(displayName(definition), Icons.SCRIPT_16, created, definition.getSource());
       this.tabs.setTabComponentAt(this.tabs.indexOfComponent(created), this.createTabHeader(created));
       return created;
     });
@@ -420,6 +427,81 @@ public final class ScriptWorkspacePanel extends JPanel {
     return panel;
   }
 
+  private JPanel createGlobalsPanel() {
+    JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
+    panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
+    panel.add(sectionTitle("GLOBALS & APIS"), BorderLayout.NORTH);
+
+    DefaultListModel<GlobalApiItem> model = new DefaultListModel<>();
+    model.addElement(new GlobalApiItem("host()", "host()", "Entity / Creature script instance", "h"));
+    model.addElement(new GlobalApiItem("environment()", "environment()", "Active map environment", "e"));
+    model.addElement(new GlobalApiItem("context()", "context()", "Script context & properties", "c"));
+    model.addElement(new GlobalApiItem("globals", "globals", "Shared ScriptGlobals store", "g"));
+    model.addElement(new GlobalApiItem("Game.world()", "Game.world()", "Map & world entity manager", "m"));
+    model.addElement(new GlobalApiItem("Game.loop()", "Game.loop()", "Main loop & frame updates", "m"));
+    model.addElement(new GlobalApiItem("Game.audio()", "Game.audio()", "Sound & music engine", "m"));
+    model.addElement(new GlobalApiItem("Game.physics()", "Game.physics()", "Collision & physics engine", "m"));
+    model.addElement(new GlobalApiItem("Game.graphics()", "Game.graphics()", "Render engine & camera", "m"));
+    model.addElement(new GlobalApiItem("EntityQuery", "EntityQuery.in(environment(), Creature.class)", "Fluent entity finder", "q"));
+    model.addElement(new GlobalApiItem("CombatEntityListener", "CombatEntityListener", "Hit, death & resurrect events", "i"));
+    model.addElement(new GlobalApiItem("EntityListener", "EntityListener", "Loaded & unloaded events", "i"));
+    model.addElement(new GlobalApiItem("CollisionListener", "CollisionListener", "Physics collision events", "i"));
+    model.addElement(new GlobalApiItem("AnimationListener", "AnimationListener", "Animation state events", "i"));
+
+    JList<GlobalApiItem> list = new JList<>(model);
+    list.setCellRenderer(new GlobalApiRenderer());
+    list.setFixedCellHeight(26);
+    list.setBackground(Style.background());
+    list.setSelectionBackground(Style.selection());
+
+    list.addMouseListener(new java.awt.event.MouseAdapter() {
+      @Override public void mouseClicked(java.awt.event.MouseEvent event) {
+        if (event.getClickCount() == 2 && list.getSelectedValue() != null) {
+          GlobalApiItem item = list.getSelectedValue();
+          insertTextToActiveScript(item.snippet());
+        }
+      }
+    });
+
+    panel.add(new JScrollPane(list), BorderLayout.CENTER);
+    return panel;
+  }
+
+  public void insertTextToActiveScript(String text) {
+    if (this.monaco != null && this.monaco.isReady() && text != null && !text.isEmpty()) {
+      this.monaco.insertText(text);
+    }
+  }
+
+  private record GlobalApiItem(String label, String snippet, String description, String badge) {}
+
+  private static final class GlobalApiRenderer extends DefaultListCellRenderer {
+    @Override
+    public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+      if (value instanceof GlobalApiItem item) {
+        this.setText("<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + escapeHtml(item.label()) + "</span>"
+          + "<span style='color:#64748b;font-size:10px'>  " + escapeHtml(item.description()) + "</span></html>");
+        Color badgeColor = switch (item.badge()) {
+          case "h", "e" -> new Color(0, 180, 216);
+          case "c", "g" -> new Color(122, 162, 247);
+          case "m" -> new Color(157, 78, 221);
+          case "q" -> new Color(247, 118, 142);
+          default -> new Color(100, 116, 139);
+        };
+        this.setIcon(new SymbolBadgeIcon(item.badge(), badgeColor, Color.WHITE));
+      }
+      this.setBackground(isSelected ? Style.selection() : Style.background());
+      this.setForeground(Style.text());
+      this.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+      return this;
+    }
+
+    private static String escapeHtml(String val) {
+      return val.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+  }
+
   private static JLabel sectionTitle(String text) {
     JLabel title = new JLabel(text);
     title.setFont(title.getFont().deriveFont(Font.BOLD));
@@ -430,7 +512,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private JPanel createTabHeader(ScriptTab tab) {
     JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
     header.setOpaque(false);
-    JLabel label = new JLabel(displayName(tab.definition), Icons.API_16, SwingConstants.LEADING);
+    JLabel label = new JLabel(displayName(tab.definition), Icons.SCRIPT_16, SwingConstants.LEADING);
     tab.title = label;
     JButton close = new JButton("×");
     close.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
@@ -752,13 +834,13 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private JPopupMenu createAddScriptPopupMenu() {
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.API_16);
+    JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.SCRIPT_16);
     entityScript.addActionListener(e -> createScript(ScriptKind.ENTITY));
 
-    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.API_16);
+    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_16);
     gameScript.addActionListener(e -> createScript(ScriptKind.GAME));
 
-    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.API_16);
+    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.SCRIPT_16);
     envScript.addActionListener(e -> createScript(ScriptKind.ENVIRONMENT));
 
     menu.add(entityScript);
@@ -1075,7 +1157,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, focused);
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
         this.setText(item.label());
-        if (item.definition() != null) this.setIcon(Icons.API_16);
+        if (item.definition() != null) this.setIcon(Icons.SCRIPT_16);
       }
       this.setBackgroundNonSelectionColor(Style.background());
       this.setBackgroundSelectionColor(Style.selection());

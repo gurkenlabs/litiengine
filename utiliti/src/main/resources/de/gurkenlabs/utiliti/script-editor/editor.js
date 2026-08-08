@@ -508,6 +508,15 @@
             editor.setPosition({ lineNumber: payload.line, column: 1 });
             editor.focus();
           }
+        } else if (method === 'insertText') {
+          if (payload.text && typeof editor !== 'undefined') {
+            const selection = editor.getSelection();
+            const range = selection || new monaco.Range(1, 1, 1, 1);
+            const id = { major: 1, minor: 1 };
+            const op = { identifier: id, range: range, text: payload.text, forceMoveMarkers: true };
+            editor.executeEdits('insertText', [op]);
+            editor.focus();
+          }
         }
       }
     };

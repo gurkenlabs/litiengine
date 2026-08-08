@@ -178,6 +178,12 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     if (this.ready) this.send("revealLine", Json.createObjectBuilder().add("line", line).build());
   }
 
+  void insertText(String text) {
+    if (this.ready && text != null && !text.isEmpty()) {
+      this.send("insertText", Json.createObjectBuilder().add("text", text).build());
+    }
+  }
+
   void notifyMoved() {
     if (this.browser == null || this.resources == null) return;
     Runnable resize = () -> {

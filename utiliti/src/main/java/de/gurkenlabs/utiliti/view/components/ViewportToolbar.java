@@ -271,17 +271,17 @@ public class ViewportToolbar extends JPanel {
 
   private void showNewScriptMenu(Component invoker) {
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.API_16);
+    JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.SCRIPT_16);
     entityScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY);
     });
 
-    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.API_16);
+    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_16);
     gameScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.GAME);
     });
 
-    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.API_16);
+    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.SCRIPT_16);
     envScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENVIRONMENT);
     });

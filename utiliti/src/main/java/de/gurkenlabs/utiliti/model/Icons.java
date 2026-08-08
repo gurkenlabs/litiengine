@@ -59,6 +59,7 @@ public final class Icons {
   public static final Icon ABOUT_16 = IconLoader.get().getUIAwareIcon("about.svg", 16, 16);
   public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("animation.svg", 16, 16);
   public static final Icon API_16 = IconLoader.get().getUIAwareIcon("api.svg", 16, 16);
+  public static final Icon SCRIPT_16 = new VectorScriptIcon(16, 16, null);
   public static final Icon ASSET_16 = IconLoader.get().getUIAwareIcon("asset.svg", 16, 16);
   public static final Icon ASSET_BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("asset_blueprint.svg", 16, 16);
   public static final Icon ASSET_EMITTER_16 = IconLoader.get().getUIAwareIcon("asset_emitter.svg", 16, 16);
@@ -288,5 +289,42 @@ public final class Icons {
       case TRIGGER -> TRIGGER_16;
       default -> ENTITY_16;
     };
+  }
+
+  public static final class VectorScriptIcon implements Icon {
+    private final int width;
+    private final int height;
+    private final java.awt.Color color;
+
+    public VectorScriptIcon(int width, int height, java.awt.Color color) {
+      this.width = width;
+      this.height = height;
+      this.color = color;
+    }
+
+    @Override public int getIconWidth() { return width; }
+    @Override public int getIconHeight() { return height; }
+
+    @Override
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_STROKE_CONTROL, java.awt.RenderingHints.VALUE_STROKE_PURE);
+        g2.setColor(color != null ? color : (c != null ? c.getForeground() : java.awt.Color.WHITE));
+
+        g2.setStroke(new java.awt.BasicStroke(1.5f, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
+        // <
+        g2.drawLine(x + 3, y + 8, x + 5, y + 5);
+        g2.drawLine(x + 3, y + 8, x + 5, y + 11);
+        // /
+        g2.drawLine(x + 7, y + 12, x + 9, y + 4);
+        // >
+        g2.drawLine(x + 13, y + 8, x + 11, y + 5);
+        g2.drawLine(x + 13, y + 8, x + 11, y + 11);
+      } finally {
+        g2.dispose();
+      }
+    }
   }
 }

@@ -668,7 +668,7 @@ public final class UI {
     workspaceMapButton.setPreferredSize(new Dimension(43, 42));
     workspaceMapButton.setMaximumSize(new Dimension(43, 42));
     workspaceMapButton.addActionListener(event -> showMapWorkspace());
-    workspaceScriptButton = new JToggleButton(Icons.API_16);
+    workspaceScriptButton = new JToggleButton(Icons.SCRIPT_16);
     workspaceScriptButton.setToolTipText("Script editor");
     workspaceScriptButton.setPreferredSize(new Dimension(43, 42));
     workspaceScriptButton.setMaximumSize(new Dimension(43, 42));
