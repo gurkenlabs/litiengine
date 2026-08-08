@@ -67,6 +67,27 @@ class ScriptOutlineTest {
     assertEquals(2, method.line());
   }
 
+  @Test
+  void parsesInnerClassesAndInterfaces() {
+    String source = """
+      public class CreatureScript3 extends CreatureScript {
+        private static int cnt;
+        protected void onLoaded() {}
+        public void update() {}
+        private class Wurst implements EntityListener {}
+      }
+      """;
+
+    ScriptOutline.Symbol outline = ScriptOutline.parse(source);
+    assertNotNull(outline);
+    ScriptOutline.Symbol innerGroup = group(outline, "Classes");
+    assertNotNull(innerGroup);
+    ScriptOutline.Symbol innerClass = innerGroup.children().getFirst();
+    assertEquals("Wurst", innerClass.name());
+    assertEquals("EntityListener", innerClass.detail());
+    assertEquals(4, innerClass.line());
+  }
+
   private static ScriptOutline.Symbol group(ScriptOutline.Symbol outline, String name) {
     return outline.children().stream().filter(symbol -> symbol.name().equals(name)).findFirst().orElseThrow();
   }

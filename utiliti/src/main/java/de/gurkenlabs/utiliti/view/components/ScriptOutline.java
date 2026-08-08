@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
 /** Builds a stable editor outline from incomplete Java or Groovy script source. */
 final class ScriptOutline {
   private static final Pattern CLASS = Pattern.compile(
-    "\\b(?:class|interface|trait)\\s+([A-Za-z_$][\\w$]*)(?:\\s+extends\\s+([\\w.$<>?]+))?");
+    "^(?:@[\\w.]+(?:\\([^)]*\\))?\\s*)*(?:(?:public|protected|private|static|final|abstract|sealed|non-sealed)\\s+)*"
+      + "(?:class|interface|enum|record|trait)\\s+([A-Za-z_$][\\w$]*)(?:\\s+(?:extends|implements)\\s+([\\w.$,<>?\\s]+))?");
   private static final Pattern METHOD = Pattern.compile(
     "^(?:@[\\w.]+(?:\\([^)]*\\))?\\s*)*(?:(?:public|protected|private|static|final|synchronized|abstract)\\s+)*"
       + "(def|void|[A-Za-z_$][\\w$<>.?\\[\\]]*)\\s+([A-Za-z_$][\\w$]*)\\s*\\(([^)]*)\\)");
@@ -37,6 +38,7 @@ final class ScriptOutline {
     int depth = 0;
     int classDepth = -1;
     boolean blockComment = false;
+    List<Symbol> innerClasses = new ArrayList<>();
     List<Symbol> fields = new ArrayList<>();
     List<Symbol> methods = new ArrayList<>();
     Map<String, Symbol> dependencies = new LinkedHashMap<>();
@@ -45,6 +47,7 @@ final class ScriptOutline {
       SanitizedLine sanitized = sanitize(lines[index], blockComment);
       blockComment = sanitized.blockComment();
       String code = sanitized.code().strip();
+
       if (className == null) {
         Matcher declaration = CLASS.matcher(code);
         if (declaration.find()) {
@@ -54,10 +57,16 @@ final class ScriptOutline {
           classDepth = depth + 1;
         }
       } else if (depth == classDepth && !code.isBlank()) {
+        Matcher innerClass = CLASS.matcher(code);
         Matcher method = METHOD.matcher(code);
         Matcher constructor = CONSTRUCTOR.matcher(code);
         Matcher field = FIELD.matcher(code);
-        if (method.find()) {
+
+        if (innerClass.find() && !innerClass.group(1).equals(className)) {
+          String type = simpleName(innerClass.group(2));
+          innerClasses.add(new Symbol(Kind.CLASS, innerClass.group(1), type == null ? "" : type, index, List.of()));
+          if (type != null) addDependency(dependencies, type, index, className, baseType);
+        } else if (method.find()) {
           String returnType = "def".equals(method.group(1)) ? "Object" : simpleName(method.group(1));
           methods.add(new Symbol(Kind.METHOD, method.group(2), formatParameters(method.group(3)) + " : " + returnType,
             index, List.of()));
@@ -82,6 +91,7 @@ final class ScriptOutline {
 
     if (className == null) return null;
     List<Symbol> groups = new ArrayList<>();
+    if (!innerClasses.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Classes", Integer.toString(innerClasses.size()), -1, List.copyOf(innerClasses)));
     if (!fields.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Fields", Integer.toString(fields.size()), -1, List.copyOf(fields)));
     if (!methods.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Methods", Integer.toString(methods.size()), -1, List.copyOf(methods)));
     if (!dependencies.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Dependencies", Integer.toString(dependencies.size()), -1,
