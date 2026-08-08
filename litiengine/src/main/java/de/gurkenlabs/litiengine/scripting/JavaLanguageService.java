@@ -60,21 +60,41 @@ public class JavaLanguageService implements ScriptLanguageService {
     String prefix = document.text().substring(0, offset);
     String source = document.text();
     String receiver = receiverExpression(prefix);
-    if (receiver == null) {
-      int lastDot = prefix.lastIndexOf('.');
-      if (lastDot >= 0) {
-        String beforeDot = prefix.substring(0, lastDot + 1);
-        receiver = receiverExpression(beforeDot);
-      }
-    }
     Map<String, Class<?>> variables = this.variables(document, prefix);
     ResolvedType type = receiver == null ? null : this.resolveExpression(receiver, document.definition(), variables, source);
     Set<String> importedFqns = this.importedTypes(source).values().stream().map(Class::getName).collect(java.util.stream.Collectors.toSet());
     int importInsertLine = importInsertLine(source);
     List<Completion> result = new ArrayList<>();
 
+    boolean constructorContext = prefix.matches("(?s).*\\bnew(?:\\s+[\\w.$]*)?$");
+
     if (type != null) {
       addMembers(result, type);
+    } else if (constructorContext) {
+      Optional<Class<?>> expectedParamType = this.inferExpectedParameterType(prefix, document.definition(), variables, source);
+      expectedParamType.ifPresent(expectedType -> {
+        List<TextEdit> edits = importedFqns.contains(expectedType.getName()) ? List.of()
+          : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+            "import " + expectedType.getName() + ";\n"));
+        result.add(typeCompletion(expectedType, true, edits));
+        if (expectedType.isInterface() || Modifier.isAbstract(expectedType.getModifiers())) {
+          result.add(anonymousClassCompletion(expectedType, edits));
+        }
+      });
+
+      for (Class<?> engineType : EngineTypeCatalog.publicTypes()) {
+        List<TextEdit> edits = importedFqns.contains(engineType.getName()) ? List.of()
+          : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+            "import " + engineType.getName() + ";\n"));
+        result.add(typeCompletion(engineType, true, edits));
+      }
+      for (Class<?> projectType : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
+        if (importedFqns.contains(projectType.getName())) continue;
+        List<TextEdit> edits = List.of(new TextEdit(
+          new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+          "import " + projectType.getName() + ";\n"));
+        result.add(typeCompletion(projectType, true, edits));
+      }
     } else {
       addScriptDeclaredMembers(result, source);
       result.add(new Completion("globals", CompletionKind.FIELD, "ScriptGlobals",
@@ -89,23 +109,22 @@ public class JavaLanguageService implements ScriptLanguageService {
       this.importedTypes(source).values().stream().distinct().sorted(Comparator.comparing(Class::getSimpleName))
         .forEach(imported -> result.add(typeCompletion(imported)));
 
-      boolean constructorContext = prefix.matches("(?s).*\\bnew(?:\\s+[\\w.$]*)?$");
       String currentWord = wordAt(source, offset);
       boolean isUpper = !currentWord.isEmpty() && Character.isUpperCase(currentWord.charAt(0));
 
-      if (constructorContext || isUpper || result.size() < 15) {
+      if (isUpper || result.size() < 15) {
         for (Class<?> engineType : EngineTypeCatalog.publicTypes()) {
           List<TextEdit> edits = importedFqns.contains(engineType.getName()) ? List.of()
             : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
               "import " + engineType.getName() + ";\n"));
-          result.add(typeCompletion(engineType, constructorContext, edits));
+          result.add(typeCompletion(engineType, false, edits));
         }
         for (Class<?> projectType : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
           if (importedFqns.contains(projectType.getName())) continue;
           List<TextEdit> edits = List.of(new TextEdit(
             new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
             "import " + projectType.getName() + ";\n"));
-          result.add(typeCompletion(projectType, constructorContext, edits));
+          result.add(typeCompletion(projectType, false, edits));
         }
       }
     }
@@ -435,6 +454,48 @@ public class JavaLanguageService implements ScriptLanguageService {
 
   private static URI classUri(String fqn) {
     return URI.create("class:///" + fqn.replace('.', '/') + ".java");
+  }
+
+  private Optional<Class<?>> inferExpectedParameterType(String prefix, ScriptDefinition definition, Map<String, Class<?>> variables, String source) {
+    Matcher matcher = Pattern.compile("(?s)([A-Za-z_$][\\w$]*)\\s*\\(([^()]*)$").matcher(prefix);
+    if (!matcher.find()) return Optional.empty();
+    String methodName = matcher.group(1);
+    String argList = matcher.group(2);
+    int argIndex = (int) argList.chars().filter(c -> c == ',').count();
+    String callPrefix = prefix.substring(0, matcher.start(1));
+    String receiverExpr = receiverExpression(callPrefix);
+    ResolvedType receiverType = receiverExpr == null ? this.scriptType(definition)
+      : this.resolveExpression(receiverExpr, definition, variables, source);
+    if (receiverType == null || receiverType.type() == null) return Optional.empty();
+    for (Method method : receiverType.type().getMethods()) {
+      if (method.getName().equals(methodName) && method.getParameterCount() > argIndex) {
+        return Optional.of(method.getParameterTypes()[argIndex]);
+      }
+    }
+    return Optional.empty();
+  }
+
+  private static Completion anonymousClassCompletion(Class<?> type, List<TextEdit> edits) {
+    String name = type.getSimpleName();
+    Method[] methods = type.getDeclaredMethods();
+    StringBuilder body = new StringBuilder();
+    body.append(name).append("() {\n");
+    for (Method method : methods) {
+      if (Modifier.isAbstract(method.getModifiers()) || type.isInterface()) {
+        body.append("  @Override\n  public ");
+        body.append(simpleName(method.getGenericReturnType().getTypeName())).append(" ");
+        body.append(method.getName()).append("(");
+        java.lang.reflect.Parameter[] params = method.getParameters();
+        for (int i = 0; i < params.length; i++) {
+          if (i > 0) body.append(", ");
+          body.append(simpleName(params[i].getParameterizedType().getTypeName())).append(" ").append(params[i].isNamePresent() ? params[i].getName() : "arg" + i);
+        }
+        body.append(") {\n    // TODO: implement\n  }\n");
+      }
+    }
+    body.append("}");
+    return new Completion(name + " () { ... }", CompletionKind.SNIPPET, "Anonymous " + name + " implementation",
+      "Creates an inline anonymous implementation of `" + type.getName() + "`.", body.toString(), name, List.of(), edits);
   }
 
   private static Completion typeCompletion(Class<?> type) {

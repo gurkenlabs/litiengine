@@ -283,6 +283,33 @@ class ScriptRuntimeTests {
     assertTrue(hostCompletions.stream().anyMatch(c -> c.label().equals("die")), "Should offer die on host().");
   }
 
+  @Test
+  void javaLanguageServiceInfersParameterTypesForNewExpression() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("test-creature", "java", null, "CreatureScript1", ScriptHostType.ENTITY);
+    definition.setTargetType(de.gurkenlabs.litiengine.entities.Creature.class.getName());
+
+    String code = """
+      import de.gurkenlabs.litiengine.entities.Creature;
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class CreatureScript1 extends CreatureScript {
+        @Override
+        protected void update() {
+          host().addCombatEntityListener(new 
+        }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    List<ScriptLanguageService.Completion> completions = service.complete(doc, new ScriptLanguageService.Position(5, 41));
+
+    assertTrue(completions.stream().anyMatch(c -> c.label().contains("CombatEntityListener")), "Should suggest CombatEntityListener when typing new for addCombatEntityListener.");
+    assertFalse(completions.stream().anyMatch(c -> c.label().equals("addController")), "Should NOT suggest host methods when typing new inside argument.");
+    assertFalse(completions.stream().anyMatch(c -> c.label().equals("actions")), "Should NOT suggest host fields when typing new inside argument.");
+  }
+
   public static final class JavaEntityScript extends EntityScript<TestEntity> {
     static int loaded;
     static int unloaded;
