@@ -1087,9 +1087,11 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static final class OutlineTreeRenderer extends DefaultTreeCellRenderer {
-    private static final javax.swing.Icon FIELD_ICON = new SemanticDotIcon(new Color(247, 118, 142));
-    private static final javax.swing.Icon METHOD_ICON = new SemanticDotIcon(new Color(158, 206, 106));
-    private static final javax.swing.Icon DEPENDENCY_ICON = new SemanticDotIcon(new Color(122, 162, 247));
+    private static final javax.swing.Icon CLASS_ICON = new SymbolBadgeIcon("C", new Color(0, 180, 216), Color.WHITE);
+    private static final javax.swing.Icon METHOD_ICON = new SymbolBadgeIcon("m", new Color(157, 78, 221), Color.WHITE);
+    private static final javax.swing.Icon FIELD_ICON = new SymbolBadgeIcon("f", new Color(247, 118, 142), Color.WHITE);
+    private static final javax.swing.Icon DEPENDENCY_ICON = new SymbolBadgeIcon("d", new Color(122, 162, 247), Color.WHITE);
+    private static final javax.swing.Icon GROUP_ICON = new SymbolBadgeIcon("g", new Color(100, 116, 139), Color.WHITE);
 
     @Override
     public java.awt.Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
@@ -1098,8 +1100,8 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptOutline.Symbol symbol) {
         this.setText(label(symbol));
         this.setIcon(switch (symbol.kind()) {
-          case CLASS -> Icons.API_16;
-          case GROUP -> Icons.GROUP_16;
+          case CLASS -> CLASS_ICON;
+          case GROUP -> GROUP_ICON;
           case FIELD -> FIELD_ICON;
           case METHOD -> METHOD_ICON;
           case DEPENDENCY -> DEPENDENCY_ICON;
@@ -1117,11 +1119,41 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     private static String label(ScriptOutline.Symbol symbol) {
       String name = escapeHtml(symbol.name());
-      if (symbol.detail() == null || symbol.detail().isBlank()) return name;
+      if (symbol.detail() == null || symbol.detail().isBlank()) {
+        if (symbol.kind() == ScriptOutline.Kind.CLASS) {
+          return "<html><span style='color:#ffffff;font-weight:600;font-size:11px'>" + name + "</span></html>";
+        }
+        return "<html><span style='color:#e1e1e6;font-size:11px'>" + name + "</span></html>";
+      }
+
       String detail = escapeHtml(symbol.detail());
-      String separator = symbol.kind() == ScriptOutline.Kind.FIELD ? " : "
-        : symbol.kind() == ScriptOutline.Kind.GROUP ? "  " : " ";
-      return "<html>" + name + "<span style='color:#7f849c;font-weight:normal'>" + separator + detail + "</span></html>";
+      if (symbol.kind() == ScriptOutline.Kind.METHOD) {
+        int colonIdx = detail.indexOf(':');
+        if (colonIdx >= 0) {
+          String params = detail.substring(0, colonIdx).strip();
+          String retType = detail.substring(colonIdx + 1).strip();
+          return "<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + name + "</span>"
+            + "<span style='color:#94a3b8;font-size:10px'>" + params + "</span>"
+            + "<span style='color:#64748b;font-size:10px'> : </span>"
+            + "<span style='color:#38bdf8;font-size:10px'>" + retType + "</span></html>";
+        }
+        return "<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + name + "</span>"
+          + "<span style='color:#94a3b8;font-size:10px'> " + detail + "</span></html>";
+      }
+
+      if (symbol.kind() == ScriptOutline.Kind.FIELD) {
+        return "<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + name + "</span>"
+          + "<span style='color:#64748b;font-size:10px'> : </span>"
+          + "<span style='color:#f43f5e;font-size:10px'>" + detail + "</span></html>";
+      }
+
+      if (symbol.kind() == ScriptOutline.Kind.GROUP) {
+        return "<html><span style='color:#64748b;font-weight:700;font-size:10px'>" + name.toUpperCase() + "</span>"
+          + "<span style='color:#475569;font-size:10px'> (" + detail + ")</span></html>";
+      }
+
+      return "<html><span style='color:#e1e1e6;font-size:11px'>" + name + "</span>"
+        + "<span style='color:#64748b;font-size:10px'> " + detail + "</span></html>";
     }
 
     private static String escapeHtml(String value) {
@@ -1129,26 +1161,43 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
   }
 
-  private static final class SemanticDotIcon implements javax.swing.Icon {
-    private final Color color;
+  private static final class SymbolBadgeIcon implements javax.swing.Icon {
+    private final String letter;
+    private final Color badgeColor;
+    private final Color textColor;
 
-    private SemanticDotIcon(Color color) {
-      this.color = color;
+    private SymbolBadgeIcon(String letter, Color badgeColor, Color textColor) {
+      this.letter = letter;
+      this.badgeColor = badgeColor;
+      this.textColor = textColor;
     }
 
-    @Override public int getIconWidth() { return 12; }
-    @Override public int getIconHeight() { return 12; }
+    @Override public int getIconWidth() { return 16; }
+    @Override public int getIconHeight() { return 16; }
 
     @Override
-    public void paintIcon(java.awt.Component component, java.awt.Graphics graphics, int x, int y) {
-      java.awt.Graphics2D g = (java.awt.Graphics2D) graphics.create();
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
       try {
-        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setColor(this.color);
-        g.drawOval(x + 2, y + 2, 7, 7);
-        g.fillOval(x + 5, y + 5, 2, 2);
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING, java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        g2.setColor(this.badgeColor);
+        g2.fillOval(x + 1, y + 1, 14, 14);
+
+        g2.setColor(new Color(255, 255, 255, 50));
+        g2.drawOval(x + 1, y + 1, 14, 14);
+
+        g2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
+        g2.setColor(this.textColor);
+        java.awt.FontMetrics fm = g2.getFontMetrics();
+        int stringWidth = fm.stringWidth(this.letter);
+        int stringHeight = fm.getAscent() - 2;
+        int px = x + 1 + (14 - stringWidth) / 2;
+        int py = y + 1 + (14 + stringHeight) / 2;
+        g2.drawString(this.letter, px, py);
       } finally {
-        g.dispose();
+        g2.dispose();
       }
     }
   }
