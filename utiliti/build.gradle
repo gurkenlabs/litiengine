@@ -36,7 +36,6 @@ dependencies {
   implementation platform(libs.mcp.bom)
   implementation libs.mcp.sdk
   implementation libs.tomcat.embed.core
-  implementation libs.autocomplete
   implementation libs.jcef
   implementation libs.monaco
   def nativeOs = DefaultNativePlatform.currentOperatingSystem

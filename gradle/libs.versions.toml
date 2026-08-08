@@ -5,8 +5,6 @@ junit = "6.1.2"
 mcp = "2.0.0"
 slf4j = "2.0.17"
 tomcat = "11.0.24"
-groovy = "4.0.32"
-autocomplete = "3.3.3"
 jcef = "146.0.10"
 jcefNatives = "jcef-d3de827+cef-146.0.10+g8219561+chromium-146.0.7680.179"
 monaco = "0.55.1"
@@ -36,8 +34,6 @@ tomcat_embed_core = { module = "org.apache.tomcat.embed:tomcat-embed-core", vers
 xml_api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version = "4.0.5" }
 xml_runtime_core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
 xml_runtime_impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }
-groovy = { module = "org.apache.groovy:groovy", version.ref = "groovy" }
-autocomplete = { module = "com.fifesoft:autocomplete", version.ref = "autocomplete" }
 jcef = { module = "me.friwi:jcefmaven", version.ref = "jcef" }
 monaco = { module = "org.webjars.npm:monaco-editor", version.ref = "monaco" }
 
