@@ -399,12 +399,17 @@ public final class ScriptWorkspacePanel extends JPanel {
     panel.add(header, BorderLayout.NORTH);
 
     JPanel content = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
+    content.setBackground(Style.background());
+    header.setBackground(Style.background());
+    panel.setBackground(Style.background());
     this.search.putClientProperty("JTextField.placeholderText", "Search scripts...");
     RoundedSearchBox searchBox = new RoundedSearchBox(this.search, 200);
     content.add(searchBox, BorderLayout.NORTH);
     this.scripts.setRootVisible(false);
     this.scripts.setShowsRootHandles(true);
     this.scripts.setRowHeight(Style.TREE_ROW_HEIGHT);
+    this.scripts.setBackground(Style.background());
+    this.scripts.setOpaque(false);
     this.scripts.setCellRenderer(new ScriptTreeRenderer());
     this.scripts.addTreeSelectionListener(event -> {
       ScriptDefinition definition = this.selectedDefinition();
@@ -416,26 +421,30 @@ public final class ScriptWorkspacePanel extends JPanel {
       @Override public void mouseReleased(java.awt.event.MouseEvent e) { showTreeContextMenu(e); }
     });
 
-    content.add(new JScrollPane(this.scripts), BorderLayout.CENTER);
+    content.add(createBorderlessScrollPane(this.scripts), BorderLayout.CENTER);
     panel.add(content, BorderLayout.CENTER);
     return panel;
   }
 
   private JPanel createOutline() {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
+    panel.setBackground(Style.background());
     panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
     panel.add(sectionTitle("OUTLINE"), BorderLayout.NORTH);
     this.outline.setRootVisible(false);
     this.outline.setShowsRootHandles(true);
     this.outline.setRowHeight(Style.TREE_ROW_HEIGHT);
+    this.outline.setBackground(Style.background());
+    this.outline.setOpaque(false);
     this.outline.setCellRenderer(new OutlineTreeRenderer());
     this.outline.addTreeSelectionListener(event -> this.navigateToOutlineSelection());
-    panel.add(new JScrollPane(this.outline), BorderLayout.CENTER);
+    panel.add(createBorderlessScrollPane(this.outline), BorderLayout.CENTER);
     return panel;
   }
 
   private JPanel createGlobalsPanel() {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
+    panel.setBackground(Style.background());
     panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
     panel.add(sectionTitle("GLOBALS & APIS"), BorderLayout.NORTH);
 
@@ -459,6 +468,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     list.setCellRenderer(new GlobalApiRenderer());
     list.setFixedCellHeight(26);
     list.setBackground(Style.background());
+    list.setOpaque(false);
     list.setSelectionBackground(Style.selection());
 
     list.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -470,8 +480,18 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     });
 
-    panel.add(new JScrollPane(list), BorderLayout.CENTER);
+    panel.add(createBorderlessScrollPane(list), BorderLayout.CENTER);
     return panel;
+  }
+
+  private static JScrollPane createBorderlessScrollPane(java.awt.Component view) {
+    JScrollPane scroll = new JScrollPane(view);
+    scroll.setBorder(BorderFactory.createEmptyBorder());
+    scroll.setViewportBorder(null);
+    scroll.setOpaque(false);
+    scroll.getViewport().setOpaque(false);
+    scroll.getViewport().setBackground(Style.background());
+    return scroll;
   }
 
   public void insertTextToActiveScript(String text) {
@@ -499,6 +519,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         });
       }
       this.setBackground(isSelected ? Style.selection() : Style.background());
+      this.setOpaque(isSelected);
       this.setForeground(Style.text());
       this.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
       return this;
