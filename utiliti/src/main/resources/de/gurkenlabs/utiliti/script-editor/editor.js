@@ -439,9 +439,10 @@
           const uri = monaco.Uri.parse(payload.uri);
           let model = monaco.editor.getModel(uri) || models.get(payload.uri);
           if (!model) {
+            const canonical = uri.toString().toLowerCase();
             for (const m of monaco.editor.getModels()) {
-              if (m.uri.toString().toLowerCase() === uri.toString().toLowerCase()) {
-                m.dispose();
+              if (m.uri.toString().toLowerCase() === canonical && !m.isDisposed()) {
+                model = m;
                 break;
               }
             }
@@ -452,26 +453,44 @@
           try {
             if (!model || model.isDisposed()) {
               model = monaco.editor.createModel(payload.text, payload.language || 'java', uri);
-              models.set(payload.uri, model);
             } else {
               if (model.getValue() !== payload.text) {
                 model.setValue(payload.text);
               }
-              models.set(payload.uri, model);
             }
+            models.set(payload.uri, model);
+            models.set(uri.toString(), model);
             editor.setModel(model);
+            setTimeout(() => {
+              if (typeof editor !== 'undefined' && typeof editor.layout === 'function') {
+                editor.layout();
+              }
+            }, 10);
           } catch (e) {
             console.error('Monaco model set error:', e);
+            if (model && !model.isDisposed()) {
+              try { editor.setModel(model); } catch (ignored) {}
+            }
           } finally {
             applying = false;
           }
           analyze();
         } else if (method === 'closeModel') {
           const uri = monaco.Uri.parse(payload.uri);
-          const model = monaco.editor.getModel(uri) || models.get(payload.uri);
+          let model = monaco.editor.getModel(uri) || models.get(payload.uri);
+          if (!model) {
+            const canonical = uri.toString().toLowerCase();
+            for (const m of monaco.editor.getModels()) {
+              if (m.uri.toString().toLowerCase() === canonical) {
+                model = m;
+                break;
+              }
+            }
+          }
           if (model) {
             model.dispose();
             models.delete(payload.uri);
+            models.delete(uri.toString());
           }
         } else if (method === 'theme') {
           monaco.editor.setTheme(payload.dark ? 'utiliti-dark' : 'vs');
