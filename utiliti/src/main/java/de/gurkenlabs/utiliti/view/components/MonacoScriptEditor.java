@@ -69,6 +69,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private CefMessageRouter router;
   private javax.swing.Timer timeoutTimer;
   private volatile boolean ready;
+  private volatile boolean closed;
   private volatile String unavailableReason;
   private boolean started;
 
@@ -102,6 +103,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       return;
     }
     initializeCef().whenComplete((app, error) -> SwingUtilities.invokeLater(() -> {
+      if (this.closed) return;
       if (error != null) {
         this.unavailable("JCEF did not start: " + rootMessage(error));
         log.log(Level.WARNING, "Could not initialize the bundled Monaco editor", error);
@@ -148,7 +150,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     if (this.unavailableReason != null) this.unavailableListener.accept(this.unavailableReason);
   }
 
-  void open(Path path, String content, ScriptDefinition definition) {
+  synchronized void open(Path path, String content, ScriptDefinition definition) {
     this.path = path;
     this.definition = definition == null ? null : new ScriptDefinition(definition);
     this.uri = path == null ? URI.create("inmemory://script/" + (this.definition == null ? "untitled" : this.definition.getId())) : path.toUri();
@@ -271,7 +273,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.browser.executeJavaScript("window.utilitiEditor.receive('" + base64 + "')", this.resources.editorUrl(), 0);
   }
 
-  private JsonObject handle(JsonObject request) {
+  private synchronized JsonObject handle(JsonObject request) {
     String method = request.getString("method", "");
     JsonObject payload = request.getJsonObject("payload");
     return switch (method) {
@@ -296,7 +298,8 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
         }
         this.text = updated.toString();
         this.version++;
-        SwingUtilities.invokeLater(() -> this.changeListener.accept(this.text));
+        String textSnapshot = this.text;
+        SwingUtilities.invokeLater(() -> this.changeListener.accept(textSnapshot));
         yield success(Json.createObjectBuilder().build());
       }
       case "save" -> {
@@ -441,18 +444,25 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
+    this.closed = true;
     this.ready = false;
     if (this.timeoutTimer != null) {
       this.timeoutTimer.stop();
       this.timeoutTimer = null;
     }
-    if (this.languageService != null) this.languageService.close();
+    if (this.languageService != null) {
+      this.languageService.close();
+      this.languageService = null;
+    }
+    if (this.client != null && this.router != null) {
+      this.client.removeMessageRouter(this.router);
+    }
     if (this.router != null) { this.router.dispose(); this.router = null; }
-    if (this.browser != null) this.browser.close(true);
-    if (this.client != null) this.client.dispose();
-    if (this.resources != null) this.resources.close();
-    if (CEF_REFS.decrementAndGet() <= 0) {
+    if (this.browser != null) { this.browser.close(true); this.browser = null; }
+    if (this.client != null) { this.client.dispose(); this.client = null; }
+    if (this.resources != null) { this.resources.close(); this.resources = null; }
+    if (CEF_REFS.get() > 0 && CEF_REFS.decrementAndGet() <= 0) {
       CompletableFuture<CefApp> future = CEF.getAndSet(null);
       if (future != null) future.thenAccept(app -> app.dispose());
     }

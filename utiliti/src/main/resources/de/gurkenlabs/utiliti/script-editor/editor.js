@@ -221,7 +221,7 @@
       }[kind] ?? monaco.languages.CompletionItemKind.Text;
     }
 
-    ['groovy', 'java'].forEach(lang => {
+    ['java'].forEach(lang => {
       monaco.languages.registerCompletionItemProvider(lang, {
         triggerCharacters: ['.', '(', ','],
         async provideCompletionItems(model, position) {
@@ -451,7 +451,7 @@
           applying = true;
           try {
             if (!model || model.isDisposed()) {
-              model = monaco.editor.createModel(payload.text, payload.language || 'groovy', uri);
+              model = monaco.editor.createModel(payload.text, payload.language || 'java', uri);
               models.set(payload.uri, model);
             } else {
               if (model.getValue() !== payload.text) {
