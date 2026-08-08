@@ -119,7 +119,6 @@ public final class UI {
   private static TilesetTabsPanel tileLayerTilesetEditorPanel;
   private static SpriteEditorPanel spriteEditorPanel;
   private static ScriptWorkspacePanel scriptWorkspacePanel;
-  private static ScriptInspectorPanel scriptInspectorPanel;
   private static JPanel workspaceHost;
   private static CardLayout workspaceCards;
   private static JPanel inspectorHost;
@@ -490,7 +489,6 @@ public final class UI {
     if (workspaceScriptButton != null) workspaceScriptButton.setSelected(true);
     scriptWorkspacePanel.refreshScripts();
     workspaceCards.show(workspaceHost, "scripts");
-    if (inspectorCards != null) inspectorCards.show(inspectorHost, "scripts");
     if (viewportToolbar != null) viewportToolbar.setScriptMode(true);
     if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
       menuBar.setScriptMode(true);
@@ -558,9 +556,6 @@ public final class UI {
     inspectorHost.add(tilesetInspectorScroll, "tilesets");
     inspectorHost.add(tileLayerPropertyPanel, "tileLayers");
     inspectorHost.add(spriteEditorPanel, "sprites");
-    scriptInspectorPanel = new ScriptInspectorPanel();
-    scriptInspectorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
-    inspectorHost.add(scriptInspectorPanel, "scripts");
     JPanel emptyInspector = new JPanel(new GridBagLayout());
     emptyInspector.setBackground(Style.background());
     JLabel emptyInspectorLabel = new JLabel(Resources.strings().get("status_gamefile_closed"));
@@ -605,8 +600,6 @@ public final class UI {
         : prefHierarchyW;
 
     scriptWorkspacePanel = new ScriptWorkspacePanel();
-    scriptInspectorPanel.setWorkspace(scriptWorkspacePanel);
-    scriptWorkspacePanel.onScriptSelected(scriptInspectorPanel::bind);
     workspaceCards = new CardLayout();
     workspaceHost = new JPanel(workspaceCards);
     workspaceHost.add(renderSplitPanel, "map");
