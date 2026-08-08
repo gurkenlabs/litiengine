@@ -117,7 +117,40 @@ public final class ScriptWorkspacePanel extends JPanel {
     bottomTabs.setMinimumSize(new Dimension(0, 110));
     bottomTabs.setPreferredSize(new Dimension(0, BOTTOM_PANEL_HEIGHT));
 
-    JSplitPane editorSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.tabs, bottomTabs);
+    try {
+      this.monaco = new MonacoScriptEditor();
+      this.monaco.onChanged(text -> {
+        if (this.monacoTab != null) this.monacoTab.setTextFromMonaco(text);
+      });
+      this.monaco.onSave(() -> {
+        if (this.monacoTab != null && this.monacoTab.save()) {
+          this.setStatus("Saved " + this.monacoTab.definition.getSource(), false);
+        }
+      });
+      this.monaco.onAnalysis(this::showAnalysis);
+      this.monaco.onReady(this::activeTabChanged);
+      this.monaco.onUnavailable(reason -> {
+        this.setStatus("Monaco unavailable: " + reason, true);
+      });
+      this.monaco.onCursor(position -> {
+        if (this.monacoTab != null) {
+          this.monacoTab.caretLine = position.line() + 1;
+          this.monacoTab.caretColumn = position.column() + 1;
+          this.updateCaretStatus(this.monacoTab);
+        }
+      });
+    } catch (IOException error) {
+      this.monaco = null;
+      this.setStatus("Monaco is unavailable: " + error.getMessage(), true);
+    }
+
+    JPanel mainEditorArea = new JPanel(new BorderLayout());
+    mainEditorArea.add(this.tabs, BorderLayout.NORTH);
+    if (this.monaco != null) {
+      mainEditorArea.add(this.monaco, BorderLayout.CENTER);
+    }
+
+    JSplitPane editorSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainEditorArea, bottomTabs);
     UI.configureSplitPane(editorSplit);
     editorSplit.setResizeWeight(1.0);
     editorSplit.addComponentListener(new ComponentAdapter() {
@@ -152,32 +185,6 @@ public final class ScriptWorkspacePanel extends JPanel {
       @Override public void changedUpdate(DocumentEvent event) { refreshScripts(); }
     });
     this.tabs.addChangeListener(event -> this.activeTabChanged());
-    try {
-      this.monaco = new MonacoScriptEditor();
-      this.monaco.onChanged(text -> {
-        if (this.monacoTab != null) this.monacoTab.setTextFromMonaco(text);
-      });
-      this.monaco.onSave(() -> {
-        if (this.monacoTab != null && this.monacoTab.save()) {
-          this.setStatus("Saved " + this.monacoTab.definition.getSource(), false);
-        }
-      });
-      this.monaco.onAnalysis(this::showAnalysis);
-      this.monaco.onReady(this::activeTabChanged);
-      this.monaco.onUnavailable(reason -> {
-        this.setStatus("Monaco unavailable: " + reason, true);
-      });
-      this.monaco.onCursor(position -> {
-        if (this.monacoTab != null) {
-          this.monacoTab.caretLine = position.line() + 1;
-          this.monacoTab.caretColumn = position.column() + 1;
-          this.updateCaretStatus(this.monacoTab);
-        }
-      });
-    } catch (IOException error) {
-      this.monaco = null;
-      this.setStatus("Monaco is unavailable: " + error.getMessage(), true);
-    }
     this.refreshTheme();
   }
 
@@ -452,11 +459,14 @@ public final class ScriptWorkspacePanel extends JPanel {
     ScriptTab active = this.activeTab();
     if (active != null && this.monaco != null && !this.monaco.isUnavailable()) {
       this.monacoTab = active;
-      active.showMonaco(this.monaco);
       this.monaco.open(active.path, active.getText(), active.definition);
       if (this.monaco.isReady()) this.monaco.focusEditor();
+      this.monaco.notifyMoved();
     } else if (active == null) {
       this.monacoTab = null;
+      if (this.monaco != null && !this.monaco.isUnavailable()) {
+        this.monaco.open(null, "", null);
+      }
     }
     ScriptDefinition definition = active == null ? null : active.definition;
     this.selectionListener.accept(definition);
@@ -915,13 +925,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     private int caretLine = 1;
     private int caretColumn = 1;
     private JLabel title;
-    private final JPanel editorHolder = new JPanel(new BorderLayout());
 
     private ScriptTab(ScriptDefinition definition) {
-      super(new BorderLayout());
       this.definition = definition;
       this.path = resolveSource(definition.getSource());
-      this.add(this.editorHolder, BorderLayout.CENTER);
+      this.setPreferredSize(new Dimension(0, 0));
       this.load();
     }
 
@@ -939,18 +947,6 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (ScriptWorkspacePanel.this.monacoTab == this && ScriptWorkspacePanel.this.monaco != null) {
         ScriptWorkspacePanel.this.monaco.open(this.path, this.getText(), this.definition);
       }
-    }
-
-    private void showMonaco(MonacoScriptEditor editor) {
-      if (editor.getParent() == this.editorHolder) {
-        editor.notifyMoved();
-        return;
-      }
-      this.editorHolder.removeAll();
-      this.editorHolder.add(editor, BorderLayout.CENTER);
-      this.editorHolder.revalidate();
-      this.editorHolder.repaint();
-      editor.notifyMoved();
     }
 
     private void setTextFromMonaco(String text) {
