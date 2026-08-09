@@ -36,6 +36,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -104,10 +105,11 @@ public final class ScriptWorkspacePanel extends JPanel {
   };
   private final JPanel mainEditorArea = new JPanel(new BorderLayout());
   private final DefaultTableModel problemsModel = new DefaultTableModel(
-    new Object[] {"Severity", "File", "Line", "Message"}, 0) {
+    new Object[] {"Severity", "File", "Line", "Message", "Diagnostic"}, 0) {
       @Override public boolean isCellEditable(int row, int column) { return false; }
     };
   private final JTable problems = new JTable(this.problemsModel);
+  private final Map<String, Boolean> scriptErrorStates = new ConcurrentHashMap<>();
   private final JTextArea output = new JTextArea();
   private final JLabel status = new JLabel(" ");
   private final JLabel caretStatus = new JLabel(" ");
@@ -138,15 +140,56 @@ public final class ScriptWorkspacePanel extends JPanel {
     explorer.setMinimumSize(new Dimension(235, 0));
     explorer.setPreferredSize(new Dimension(265, 0));
 
-    JTabbedPane bottomTabs = new JTabbedPane();
+    this.problems.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+    this.problems.setRowHeight(Style.TREE_ROW_HEIGHT);
+    this.problems.setShowGrid(false);
+    this.problems.setIntercellSpacing(new Dimension(0, 0));
+    this.problems.setBackground(Style.COLOR_BG);
+    this.problems.setForeground(Style.text());
+    this.problems.setSelectionBackground(Style.sceneRowSelected());
+    this.problems.setSelectionForeground(Color.WHITE);
+    this.problems.setFont(Style.getDefaultFont());
+    this.problems.setOpaque(false);
+
+    if (this.problems.getTableHeader() != null) {
+      this.problems.getTableHeader().setBackground(Style.COLOR_BG);
+      this.problems.getTableHeader().setForeground(Style.mutedText());
+      this.problems.getTableHeader().setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
+      this.problems.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
+    }
+
+    this.problems.getColumnModel().getColumn(0).setPreferredWidth(85);
+    this.problems.getColumnModel().getColumn(0).setCellRenderer(new ProblemSeverityRenderer());
+
+    this.problems.getColumnModel().getColumn(1).setPreferredWidth(160);
+    this.problems.getColumnModel().getColumn(1).setCellRenderer(new ProblemFileRenderer());
+
+    this.problems.getColumnModel().getColumn(2).setPreferredWidth(65);
+    this.problems.getColumnModel().getColumn(2).setCellRenderer(new ProblemLineRenderer());
+
+    this.problems.getColumnModel().getColumn(3).setCellRenderer(new ProblemMessageRenderer());
+
+    if (this.problems.getColumnModel().getColumnCount() > 4) {
+      this.problems.getColumnModel().removeColumn(this.problems.getColumnModel().getColumn(4));
+    }
+
     this.problems.getSelectionModel().addListSelectionListener(e -> {
       if (!e.getValueIsAdjusting() && this.problems.getSelectedRow() >= 0) {
-        Object lineVal = this.problemsModel.getValueAt(this.problems.getSelectedRow(), 2);
-        if (lineVal instanceof Integer line && line > 0 && this.monaco != null && this.monaco.isReady()) {
-          this.monaco.revealLine(line);
+        this.jumpToProblemRow(this.problems.getSelectedRow());
+      }
+    });
+
+    this.problems.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        int row = problems.getSelectedRow();
+        if (row >= 0) {
+          jumpToProblemRow(row);
         }
       }
     });
+
+    JTabbedPane bottomTabs = new JTabbedPane();
     bottomTabs.addTab("Problems", new JScrollPane(this.problems));
     this.output.setEditable(false);
     this.output.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -733,12 +776,78 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static Object[] problemRow(ScriptDiagnostic diagnostic) {
-    return new Object[] {diagnostic.severity(), diagnostic.source(), diagnostic.line(), diagnostic.message()};
+    String cleanFile = diagnostic.scriptId() != null && !diagnostic.scriptId().isBlank()
+      ? diagnostic.scriptId() + ".java"
+      : extractBasename(diagnostic.source());
+    return new Object[] {
+      diagnostic.severity(),
+      cleanFile,
+      diagnostic.line(),
+      diagnostic.message(),
+      diagnostic
+    };
+  }
+
+  private static String extractBasename(String source) {
+    if (source == null || source.isBlank()) return "Script.java";
+    int lastSlash = Math.max(source.lastIndexOf('/'), source.lastIndexOf('\\'));
+    return lastSlash < 0 ? source : source.substring(lastSlash + 1);
+  }
+
+  private void jumpToProblemRow(int row) {
+    if (row < 0 || row >= this.problemsModel.getRowCount()) return;
+    Object diagObj = this.problemsModel.getValueAt(row, 4);
+    ScriptDiagnostic diag = diagObj instanceof ScriptDiagnostic d ? d : null;
+
+    int line = 1;
+    int column = 1;
+    String scriptId = null;
+    String sourceStr = null;
+
+    if (diag != null) {
+      line = Math.max(1, diag.line());
+      column = Math.max(1, diag.column());
+      scriptId = diag.scriptId();
+      sourceStr = diag.source();
+    } else {
+      Object lineVal = this.problemsModel.getValueAt(row, 2);
+      if (lineVal instanceof Integer i) line = Math.max(1, i);
+      sourceStr = Objects.toString(this.problemsModel.getValueAt(row, 1), "");
+    }
+
+    ScriptDefinition target = null;
+    if (Editor.instance().getGameFile() != null) {
+      for (ScriptDefinition def : Editor.instance().getGameFile().getScripts()) {
+        if ((scriptId != null && def.getId().equalsIgnoreCase(scriptId))
+            || (sourceStr != null && (Objects.toString(def.getSource(), "").contains(sourceStr) || sourceStr.contains(def.getId())))) {
+          target = def;
+          break;
+        }
+      }
+    }
+
+    if (target == null && activeTab() != null) {
+      target = activeTab().definition;
+    }
+
+    if (target != null) {
+      this.open(target);
+    }
+
+    if (this.monaco != null && this.monaco.isReady()) {
+      this.monaco.revealPosition(line, column);
+    }
   }
 
   private void showAnalysis(de.gurkenlabs.litiengine.scripting.ScriptLanguageService.Analysis analysis) {
     this.problemsModel.setRowCount(0);
+    boolean currentHasError = analysis.diagnostics().stream()
+      .anyMatch(d -> d.severity() == ScriptDiagnostic.Severity.ERROR);
+    if (this.monacoTab != null && this.monacoTab.definition != null) {
+      this.scriptErrorStates.put(this.monacoTab.definition.getId(), currentHasError);
+    }
     analysis.diagnostics().forEach(diagnostic -> this.problemsModel.addRow(problemRow(diagnostic)));
+    this.scripts.repaint();
   }
 
   private void refreshOutline(ScriptTab tab) {
@@ -1339,7 +1448,6 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.definition.setName(newClassName);
       this.definition.setImplementation(newClassName);
       this.definition.setSource(newSourceRel);
-
       String updatedText = ScriptWorkspacePanel.synchronizeDeclaration(this.getText(), this.definition);
       if (!Objects.equals(updatedText, this.getText())) {
         this.setText(updatedText);
@@ -1378,22 +1486,29 @@ public final class ScriptWorkspacePanel extends JPanel {
     @Override public String toString() { return this.label; }
   }
 
-  private static final class ScriptTreeRenderer implements TreeCellRenderer {
+  private final class ScriptTreeRenderer implements TreeCellRenderer {
     private final JPanel panel = new JPanel();
     private final JLabel iconLabel = new JLabel();
     private final JLabel textLabel = new JLabel();
+    private final JLabel errorLabel = new JLabel();
 
     ScriptTreeRenderer() {
       this.panel.setLayout(new javax.swing.BoxLayout(this.panel, javax.swing.BoxLayout.X_AXIS));
       this.panel.setOpaque(false);
       this.iconLabel.setOpaque(false);
       this.textLabel.setOpaque(false);
+      this.errorLabel.setOpaque(false);
       this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.textLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.errorLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.textLabel.setFont(Style.getDefaultFont());
+      this.errorLabel.setIcon(Icons.BUG_16);
+      this.errorLabel.setVisible(false);
       this.panel.add(this.iconLabel);
       this.panel.add(javax.swing.Box.createHorizontalStrut(4));
       this.panel.add(this.textLabel);
+      this.panel.add(javax.swing.Box.createHorizontalStrut(4));
+      this.panel.add(this.errorLabel);
     }
 
     @Override
@@ -1402,12 +1517,24 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
         this.textLabel.setText(item.label());
         this.iconLabel.setIcon(item.definition() != null ? Icons.SCRIPT_16 : Icons.SYMBOL_GROUP_16);
+
+        boolean hasError = item.definition() != null
+          && Boolean.TRUE.equals(ScriptWorkspacePanel.this.scriptErrorStates.get(item.definition().getId()));
+        this.errorLabel.setVisible(hasError);
+
+        if (selected) {
+          this.textLabel.setForeground(Color.WHITE);
+        } else if (hasError) {
+          this.textLabel.setForeground(new Color(255, 110, 110));
+        } else {
+          this.textLabel.setForeground(Style.text());
+        }
       } else {
         this.textLabel.setText(Objects.toString(value, ""));
         this.iconLabel.setIcon(null);
+        this.errorLabel.setVisible(false);
       }
       this.panel.setOpaque(false);
-      this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
       return this.panel;
     }
   }
@@ -1427,12 +1554,9 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.nameLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.detailLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-      this.nameLabel.setFont(Style.getDefaultFont());
-      this.detailLabel.setFont(Style.getDefaultFont().deriveFont(11f));
       this.panel.add(this.iconLabel);
       this.panel.add(javax.swing.Box.createHorizontalStrut(4));
       this.panel.add(this.nameLabel);
-      this.panel.add(javax.swing.Box.createHorizontalStrut(4));
       this.panel.add(this.detailLabel);
     }
 
@@ -1442,10 +1566,10 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptOutline.Symbol symbol) {
         this.iconLabel.setIcon(switch (symbol.kind()) {
           case CLASS -> Icons.SYMBOL_CLASS_16;
-          case GROUP -> Icons.SYMBOL_GROUP_16;
-          case FIELD -> Icons.SYMBOL_FIELD_16;
           case METHOD -> Icons.SYMBOL_METHOD_16;
-          case DEPENDENCY -> Icons.SYMBOL_DEPENDENCY_16;
+          case FIELD -> Icons.SYMBOL_FIELD_16;
+          case GROUP -> Icons.SYMBOL_GROUP_16;
+          default -> Icons.SYMBOL_DEPENDENCY_16;
         });
 
         this.nameLabel.setText(symbol.name());
@@ -1528,6 +1652,67 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.nameLabel.setForeground(isSelected ? Color.WHITE : Style.text());
       this.descLabel.setForeground(isSelected ? new Color(200, 210, 225) : Style.mutedText());
       return this.panel;
+    }
+  }
+
+  private static final class ProblemSeverityRenderer extends javax.swing.table.DefaultTableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      super.getTableCellRendererComponent(table, "", isSelected, hasFocus, row, column);
+      if (value instanceof ScriptDiagnostic.Severity severity) {
+        if (severity == ScriptDiagnostic.Severity.ERROR) {
+          setIcon(Icons.BUG_16);
+          setText("Error");
+          setForeground(isSelected ? Color.WHITE : new Color(255, 110, 110));
+        } else {
+          setIcon(Icons.BULB_16);
+          setText("Warning");
+          setForeground(isSelected ? Color.WHITE : new Color(240, 200, 80));
+        }
+      } else {
+        setIcon(null);
+        setText(Objects.toString(value, ""));
+      }
+      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+      return this;
+    }
+  }
+
+  private static final class ProblemFileRenderer extends javax.swing.table.DefaultTableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      super.getTableCellRendererComponent(table, Objects.toString(value, ""), isSelected, hasFocus, row, column);
+      setIcon(Icons.SCRIPT_16);
+      setFont(Style.getDefaultFont());
+      setForeground(isSelected ? Color.WHITE : Style.text());
+      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+      return this;
+    }
+  }
+
+  private static final class ProblemLineRenderer extends javax.swing.table.DefaultTableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      String lineText = value instanceof Integer line ? "Ln " + line : Objects.toString(value, "");
+      super.getTableCellRendererComponent(table, lineText, isSelected, hasFocus, row, column);
+      setIcon(null);
+      setFont(Style.getDefaultFont().deriveFont(11f));
+      setForeground(isSelected ? Color.WHITE : Style.mutedText());
+      setHorizontalAlignment(SwingConstants.RIGHT);
+      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+      return this;
+    }
+  }
+
+  private static final class ProblemMessageRenderer extends javax.swing.table.DefaultTableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      super.getTableCellRendererComponent(table, Objects.toString(value, ""), isSelected, hasFocus, row, column);
+      setIcon(null);
+      setFont(Style.getDefaultFont());
+      setForeground(isSelected ? Color.WHITE : Style.text());
+      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+      return this;
     }
   }
 

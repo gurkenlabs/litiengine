@@ -562,7 +562,7 @@
             if (payload.line) {
               try {
                 editor.revealLineInCenter(payload.line);
-                editor.setPosition({ lineNumber: payload.line, column: 1 });
+                editor.setPosition({ lineNumber: payload.line, column: payload.column || 1 });
                 editor.focus();
               } catch (ignored) {}
             }
