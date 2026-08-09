@@ -1,6 +1,8 @@
 package de.gurkenlabs.utiliti.view.menus;
 
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.KeyBindings;
+import de.gurkenlabs.utiliti.model.KeyBindings.Command;
 import de.gurkenlabs.utiliti.view.components.ScriptWorkspacePanel.ScriptKind;
 import de.gurkenlabs.utiliti.view.components.UI;
 import javax.swing.JMenu;
@@ -28,26 +30,31 @@ public class ScriptMenu extends JMenu {
 
     JMenuItem save = new JMenuItem("Save", Icons.SAVE_16);
     save.addActionListener(e -> UI.getScriptWorkspacePanel().saveActive());
+    KeyBindings.bind(save, Command.SCRIPT_SAVE);
 
-    JMenuItem compileReload = new JMenuItem("Compile & reload", Icons.REWIND_16);
-    compileReload.addActionListener(e -> UI.getScriptWorkspacePanel().reloadActive());
+    JMenuItem formatCode = new JMenuItem("Format code", Icons.FORMAT_CODE_16);
+    formatCode.addActionListener(e -> UI.getScriptWorkspacePanel().formatActive());
+    KeyBindings.bind(formatCode, Command.SCRIPT_FORMAT);
 
-    JMenuItem reloadDisk = new JMenuItem("Reload from disk", Icons.REWIND_16);
-    reloadDisk.addActionListener(e -> UI.getScriptWorkspacePanel().reloadActiveFromDisk());
+    JMenuItem compile = new JMenuItem("Compile", Icons.COMPILE_16);
+    compile.addActionListener(e -> UI.getScriptWorkspacePanel().reloadActive());
+    KeyBindings.bind(compile, Command.SCRIPT_COMPILE);
+
+    JMenuItem reload = new JMenuItem("Reload", Icons.RELOAD_16);
+    reload.addActionListener(e -> UI.getScriptWorkspacePanel().reloadActiveFromDisk());
+    KeyBindings.bind(reload, Command.SCRIPT_RELOAD);
 
     JMenuItem openIde = new JMenuItem("Open in IDE", Icons.EXTERNAL_16);
     openIde.addActionListener(e -> UI.getScriptWorkspacePanel().openActiveExternally());
-
-    JMenuItem configureIntelliJ = new JMenuItem("Configure IntelliJ");
-    configureIntelliJ.addActionListener(e -> UI.getScriptWorkspacePanel().configureProjectForIntellij());
+    KeyBindings.bind(openIde, Command.SCRIPT_OPEN_IDE);
 
     this.add(newSub);
     this.addSeparator();
     this.add(save);
-    this.add(compileReload);
-    this.add(reloadDisk);
+    this.add(formatCode);
+    this.add(compile);
+    this.add(reload);
     this.addSeparator();
     this.add(openIde);
-    this.add(configureIntelliJ);
   }
 }

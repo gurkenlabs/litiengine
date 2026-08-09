@@ -50,7 +50,12 @@ public final class KeyBindings {
     ADD_EMITTER("menu_add_emitter", KeyEvent.VK_9, InputEvent.CTRL_DOWN_MASK),
     ADD_SOUND("menu_add_soundsource", KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK),
     MAP_SNAPSHOT("menu_map_snapshot", KeyEvent.VK_PRINTSCREEN, InputEvent.SHIFT_DOWN_MASK),
-    EXPORT_SPRITES("menu_export_spriteSheets", KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK);
+    EXPORT_SPRITES("menu_export_spriteSheets", KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK),
+    SCRIPT_SAVE("menu_script_save", KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
+    SCRIPT_FORMAT("menu_script_format", KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK),
+    SCRIPT_COMPILE("menu_script_compile", KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK),
+    SCRIPT_RELOAD("menu_script_reload", KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK),
+    SCRIPT_OPEN_IDE("menu_script_openIde", KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
 
     private final String resourceKey;
     private final KeyStroke defaultKeyStroke;
