@@ -17,8 +17,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -53,6 +59,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -63,6 +70,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 /** First-class central workspace for project scripts. */
@@ -71,11 +79,11 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private final DefaultMutableTreeNode scriptsRoot = new DefaultMutableTreeNode("Scripts");
   private final DefaultTreeModel scriptsModel = new DefaultTreeModel(this.scriptsRoot);
-  private final JTree scripts = new JTree(this.scriptsModel);
+  private final JTree scripts = createStyledTree(this.scriptsModel);
   private final JTextField search = new JTextField();
   private final DefaultMutableTreeNode outlineRoot = new DefaultMutableTreeNode("Outline");
   private final DefaultTreeModel outlineModel = new DefaultTreeModel(this.outlineRoot);
-  private final JTree outline = new JTree(this.outlineModel);
+  private final JTree outline = createStyledTree(this.outlineModel);
   private final JTabbedPane tabs = new JTabbedPane();
   private final JPanel mainEditorArea = new JPanel(new BorderLayout());
   private final DefaultTableModel problemsModel = new DefaultTableModel(
@@ -463,7 +471,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     this.refreshGlobals();
 
-    JList<GlobalApiItem> list = new JList<>(this.globalsModel);
+    JList<GlobalApiItem> list = createStyledList(this.globalsModel);
     list.setCellRenderer(new GlobalApiRenderer());
     list.setFixedCellHeight(26);
     list.setBackground(Style.background());
@@ -1194,6 +1202,143 @@ public final class ScriptWorkspacePanel extends JPanel {
     @Override public String toString() { return this.label; }
   }
 
+  private static JTree createStyledTree(TreeModel model) {
+    JTree tree = new JTree(model) {
+      @Override
+      protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          Object hoverVal = getClientProperty("hoverRow");
+          int hoverRow = hoverVal instanceof Integer r ? r : -1;
+          int leadRow = getLeadSelectionRow();
+          boolean focused = hasFocus();
+
+          for (int row = 0; row < getRowCount(); row++) {
+            Rectangle bounds = getRowBounds(row);
+            if (bounds == null || bounds.width <= 0) continue;
+            int x = bounds.x;
+            int y = bounds.y + 1;
+            int width = Math.max(1, getWidth() - x - 8);
+            int height = Math.max(1, bounds.height - 2);
+
+            if (isRowSelected(row)) {
+              g2.setColor(Style.sceneRowSelected());
+              g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+              if (focused && row == leadRow) {
+                g2.setColor(Style.selectionOutline());
+                g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+              }
+            } else if (row == hoverRow) {
+              g2.setColor(Style.sceneRowHover());
+              g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+            }
+          }
+        } finally {
+          g2.dispose();
+        }
+        super.paintComponent(g);
+      }
+    };
+
+    tree.addMouseMotionListener(new MouseAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        int row = tree.getRowForLocation(e.getX(), e.getY());
+        Object prev = tree.getClientProperty("hoverRow");
+        if (!Objects.equals(prev, row)) {
+          tree.putClientProperty("hoverRow", row >= 0 ? row : null);
+          tree.repaint();
+        }
+      }
+    });
+
+    tree.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseExited(MouseEvent e) {
+        if (tree.getClientProperty("hoverRow") != null) {
+          tree.putClientProperty("hoverRow", null);
+          tree.repaint();
+        }
+      }
+    });
+
+    tree.putClientProperty("JTree.lineStyle", "None");
+    tree.setOpaque(false);
+    tree.setBackground(Style.background());
+    return tree;
+  }
+
+  private static <T> JList<T> createStyledList(ListModel<T> model) {
+    JList<T> list = new JList<T>(model) {
+      @Override
+      protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          Object hoverVal = getClientProperty("hoverIndex");
+          int hoverIndex = hoverVal instanceof Integer idx ? idx : -1;
+          int leadIndex = getSelectedIndex();
+          boolean focused = hasFocus();
+
+          for (int index = 0; index < getModel().getSize(); index++) {
+            Rectangle bounds = getCellBounds(index, index);
+            if (bounds == null) continue;
+            int x = bounds.x + 4;
+            int y = bounds.y + 1;
+            int width = Math.max(1, getWidth() - x - 8);
+            int height = Math.max(1, bounds.height - 2);
+
+            if (isSelectedIndex(index)) {
+              g2.setColor(Style.sceneRowSelected());
+              g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+              if (focused && index == leadIndex) {
+                g2.setColor(Style.selectionOutline());
+                g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+              }
+            } else if (index == hoverIndex) {
+              g2.setColor(Style.sceneRowHover());
+              g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+            }
+          }
+        } finally {
+          g2.dispose();
+        }
+        super.paintComponent(g);
+      }
+    };
+
+    list.addMouseMotionListener(new MouseAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        int index = list.locationToIndex(e.getPoint());
+        if (index >= 0 && list.getCellBounds(index, index) != null
+            && !list.getCellBounds(index, index).contains(e.getPoint())) {
+          index = -1;
+        }
+        Object prev = list.getClientProperty("hoverIndex");
+        if (!Objects.equals(prev, index)) {
+          list.putClientProperty("hoverIndex", index >= 0 ? index : null);
+          list.repaint();
+        }
+      }
+    });
+
+    list.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseExited(MouseEvent e) {
+        if (list.getClientProperty("hoverIndex") != null) {
+          list.putClientProperty("hoverIndex", null);
+          list.repaint();
+        }
+      }
+    });
+
+    list.setOpaque(false);
+    list.setBackground(Style.background());
+    return list;
+  }
+
   private static final class ScriptTreeRenderer implements TreeCellRenderer {
     private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
     private final JLabel iconLabel = new JLabel();
@@ -1216,8 +1361,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.textLabel.setText(Objects.toString(value, ""));
         this.iconLabel.setIcon(null);
       }
-      this.panel.setOpaque(selected);
-      this.panel.setBackground(selected ? Style.selection() : Style.background());
+      this.panel.setOpaque(false);
       this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
       return this.panel;
     }
@@ -1281,8 +1425,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.detailLabel.setVisible(false);
         this.iconLabel.setIcon(null);
       }
-      this.panel.setOpaque(selected);
-      this.panel.setBackground(selected ? Style.selection() : Style.background());
+      this.panel.setOpaque(false);
       return this.panel;
     }
   }
@@ -1318,8 +1461,7 @@ public final class ScriptWorkspacePanel extends JPanel {
           default -> Icons.SYMBOL_DEPENDENCY_16;
         });
       }
-      this.panel.setOpaque(isSelected);
-      this.panel.setBackground(isSelected ? Style.selection() : Style.background());
+      this.panel.setOpaque(false);
       this.nameLabel.setForeground(isSelected ? Color.WHITE : Style.text());
       this.descLabel.setForeground(isSelected ? new Color(200, 210, 225) : Style.mutedText());
       return this.panel;
