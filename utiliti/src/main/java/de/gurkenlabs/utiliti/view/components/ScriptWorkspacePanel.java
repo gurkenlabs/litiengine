@@ -233,6 +233,13 @@ public final class ScriptWorkspacePanel extends JPanel {
         ScriptWorkspacePanel.this.close();
       }
     });
+
+    Editor.instance().onLoaded(() -> {
+      javax.swing.SwingUtilities.invokeLater(() -> {
+        this.refreshScripts();
+        this.focusOrOpenFirstScript();
+      });
+    });
   }
 
   public synchronized void close() {
@@ -256,12 +263,32 @@ public final class ScriptWorkspacePanel extends JPanel {
   public void addNotify() {
     super.addNotify();
     this.externalChangeTimer.start();
+    this.refreshScripts();
+    this.focusOrOpenFirstScript();
   }
 
   @Override
   public void removeNotify() {
     this.externalChangeTimer.stop();
     super.removeNotify();
+  }
+
+  public void focusOrOpenFirstScript() {
+    if (Editor.instance().getGameFile() == null) return;
+    List<ScriptDefinition> scriptDefs = Editor.instance().getGameFile().getScripts();
+    if (scriptDefs == null || scriptDefs.isEmpty()) return;
+
+    if (this.openTabs.isEmpty() || this.tabs.getSelectedIndex() < 0) {
+      ScriptDefinition first = scriptDefs.getFirst();
+      if (first != null) {
+        this.open(first);
+      }
+    } else {
+      ScriptTab active = activeTab();
+      if (active != null && active.definition != null) {
+        this.selectTreeNode(active.definition.getId());
+      }
+    }
   }
 
   public void onScriptSelected(Consumer<ScriptDefinition> listener) {
@@ -281,7 +308,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
     this.scriptsModel.reload();
     for (int row = 0; row < this.scripts.getRowCount(); row++) this.scripts.expandRow(row);
-    if (selectedId != null) this.selectTreeNode(selectedId);
+    if (selectedId != null) {
+      this.selectTreeNode(selectedId);
+    } else {
+      this.focusOrOpenFirstScript();
+    }
     this.refreshGlobals();
   }
 
