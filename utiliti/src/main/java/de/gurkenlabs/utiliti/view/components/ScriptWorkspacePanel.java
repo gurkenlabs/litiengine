@@ -1229,16 +1229,20 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static final class ScriptTreeRenderer implements TreeCellRenderer {
-    private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+    private final JPanel panel = new JPanel();
     private final JLabel iconLabel = new JLabel();
     private final JLabel textLabel = new JLabel();
 
     ScriptTreeRenderer() {
+      this.panel.setLayout(new javax.swing.BoxLayout(this.panel, javax.swing.BoxLayout.X_AXIS));
       this.panel.setOpaque(false);
       this.iconLabel.setOpaque(false);
       this.textLabel.setOpaque(false);
+      this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.textLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.textLabel.setFont(Style.getDefaultFont());
       this.panel.add(this.iconLabel);
+      this.panel.add(javax.swing.Box.createHorizontalStrut(4));
       this.panel.add(this.textLabel);
     }
 
@@ -1259,20 +1263,26 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static final class OutlineTreeRenderer implements TreeCellRenderer {
-    private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+    private final JPanel panel = new JPanel();
     private final JLabel iconLabel = new JLabel();
     private final JLabel nameLabel = new JLabel();
     private final JLabel detailLabel = new JLabel();
 
     OutlineTreeRenderer() {
+      this.panel.setLayout(new javax.swing.BoxLayout(this.panel, javax.swing.BoxLayout.X_AXIS));
       this.panel.setOpaque(false);
       this.iconLabel.setOpaque(false);
       this.nameLabel.setOpaque(false);
       this.detailLabel.setOpaque(false);
+      this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.nameLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.detailLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.nameLabel.setFont(Style.getDefaultFont());
       this.detailLabel.setFont(Style.getDefaultFont().deriveFont(11f));
       this.panel.add(this.iconLabel);
+      this.panel.add(javax.swing.Box.createHorizontalStrut(4));
       this.panel.add(this.nameLabel);
+      this.panel.add(javax.swing.Box.createHorizontalStrut(4));
       this.panel.add(this.detailLabel);
     }
 
@@ -1325,21 +1335,27 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static final class GlobalApiRenderer implements javax.swing.ListCellRenderer<GlobalApiItem> {
-    private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+    private final JPanel panel = new JPanel();
     private final JLabel iconLabel = new JLabel();
     private final JLabel nameLabel = new JLabel();
     private final JLabel descLabel = new JLabel();
 
     GlobalApiRenderer() {
+      this.panel.setLayout(new javax.swing.BoxLayout(this.panel, javax.swing.BoxLayout.X_AXIS));
       this.panel.setOpaque(false);
       this.iconLabel.setOpaque(false);
       this.nameLabel.setOpaque(false);
       this.descLabel.setOpaque(false);
-      this.panel.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+      this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.nameLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.descLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.panel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
       this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
       this.descLabel.setFont(Style.getDefaultFont().deriveFont(11f));
       this.panel.add(this.iconLabel);
+      this.panel.add(javax.swing.Box.createHorizontalStrut(6));
       this.panel.add(this.nameLabel);
+      this.panel.add(javax.swing.Box.createHorizontalStrut(6));
       this.panel.add(this.descLabel);
     }
 
