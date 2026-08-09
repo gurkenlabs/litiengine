@@ -1217,7 +1217,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.iconLabel.setIcon(null);
       }
       this.panel.setOpaque(selected);
-      this.panel.setBackground(selected ? Style.selection() : null);
+      this.panel.setBackground(selected ? Style.selection() : Style.background());
       this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
       return this.panel;
     }
@@ -1282,7 +1282,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.iconLabel.setIcon(null);
       }
       this.panel.setOpaque(selected);
-      this.panel.setBackground(selected ? Style.selection() : null);
+      this.panel.setBackground(selected ? Style.selection() : Style.background());
       return this.panel;
     }
   }
@@ -1319,7 +1319,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         });
       }
       this.panel.setOpaque(isSelected);
-      this.panel.setBackground(isSelected ? Style.selection() : null);
+      this.panel.setBackground(isSelected ? Style.selection() : Style.background());
       this.nameLabel.setForeground(isSelected ? Color.WHITE : Style.text());
       this.descLabel.setForeground(isSelected ? new Color(200, 210, 225) : Style.mutedText());
       return this.panel;
