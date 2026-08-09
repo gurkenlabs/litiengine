@@ -186,6 +186,19 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.mainEditorArea.add(this.monaco, BorderLayout.CENTER);
     }
 
+    JPanel statusBar = new JPanel(new BorderLayout());
+    statusBar.setBackground(Style.COLOR_BG);
+    statusBar.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()));
+    this.status.setFont(Style.getDefaultFont().deriveFont(11f));
+    this.status.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
+    this.status.setForeground(Style.mutedText());
+    this.caretStatus.setFont(Style.getDefaultFont().deriveFont(11f));
+    this.caretStatus.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
+    this.caretStatus.setForeground(Style.mutedText());
+    statusBar.add(this.status, BorderLayout.WEST);
+    statusBar.add(this.caretStatus, BorderLayout.EAST);
+    this.mainEditorArea.add(statusBar, BorderLayout.SOUTH);
+
     JSplitPane editorSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.mainEditorArea, bottomTabs);
     UI.configureSplitPane(editorSplit);
     editorSplit.setResizeWeight(1.0);
@@ -205,15 +218,6 @@ public final class ScriptWorkspacePanel extends JPanel {
     split.setResizeWeight(0.0);
     split.setDividerLocation(265);
     this.add(split, BorderLayout.CENTER);
-
-    JPanel statusBar = new JPanel(new BorderLayout());
-    statusBar.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()));
-    this.status.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
-    this.caretStatus.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
-    this.caretStatus.setForeground(Style.mutedText());
-    statusBar.add(this.status, BorderLayout.CENTER);
-    statusBar.add(this.caretStatus, BorderLayout.EAST);
-    this.add(statusBar, BorderLayout.SOUTH);
 
     this.search.getDocument().addDocumentListener(new DocumentListener() {
       @Override public void insertUpdate(DocumentEvent event) { refreshScripts(); }
