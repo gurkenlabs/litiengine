@@ -13,6 +13,7 @@ import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -61,6 +62,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 /** First-class central workspace for project scripts. */
@@ -75,6 +77,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final DefaultTreeModel outlineModel = new DefaultTreeModel(this.outlineRoot);
   private final JTree outline = new JTree(this.outlineModel);
   private final JTabbedPane tabs = new JTabbedPane();
+  private final JPanel mainEditorArea = new JPanel(new BorderLayout());
   private final DefaultTableModel problemsModel = new DefaultTableModel(
     new Object[] {"Severity", "File", "Line", "Message"}, 0) {
       @Override public boolean isCellEditable(int row, int column) { return false; }
@@ -151,13 +154,17 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.setStatus("Monaco is unavailable: " + error.getMessage(), true);
     }
 
-    JPanel mainEditorArea = new JPanel(new BorderLayout());
-    mainEditorArea.add(this.tabs, BorderLayout.NORTH);
+    this.tabs.putClientProperty("JTabbedPane.noContentBorder", Boolean.TRUE);
+    this.tabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);
+    this.tabs.putClientProperty("JTabbedPane.contentInsets", new java.awt.Insets(0, 0, 0, 0));
+    this.tabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 0, 0, 0));
+
+    this.mainEditorArea.add(this.tabs, BorderLayout.NORTH);
     if (this.monaco != null) {
-      mainEditorArea.add(this.monaco, BorderLayout.CENTER);
+      this.mainEditorArea.add(this.monaco, BorderLayout.CENTER);
     }
 
-    JSplitPane editorSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainEditorArea, bottomTabs);
+    JSplitPane editorSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.mainEditorArea, bottomTabs);
     UI.configureSplitPane(editorSplit);
     editorSplit.setResizeWeight(1.0);
     editorSplit.addComponentListener(new ComponentAdapter() {
@@ -403,6 +410,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     content.setBackground(Style.background());
     header.setBackground(Style.background());
     panel.setBackground(Style.background());
+    this.search.setFont(Style.getDefaultFont());
     this.search.putClientProperty("JTextField.placeholderText", "Search scripts...");
     RoundedSearchBox searchBox = new RoundedSearchBox(this.search, 200);
     content.add(searchBox, BorderLayout.NORTH);
@@ -411,6 +419,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.scripts.setRowHeight(Style.TREE_ROW_HEIGHT);
     this.scripts.setBackground(Style.background());
     this.scripts.setOpaque(false);
+    this.scripts.putClientProperty("JTree.lineStyle", "None");
     this.scripts.setCellRenderer(new ScriptTreeRenderer());
     this.scripts.addTreeSelectionListener(event -> {
       ScriptDefinition definition = this.selectedDefinition();
@@ -435,8 +444,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.outline.setRootVisible(false);
     this.outline.setShowsRootHandles(true);
     this.outline.setRowHeight(Style.TREE_ROW_HEIGHT);
-    this.outline.setBackground(new Color(0, 0, 0, 0));
+    this.outline.setBackground(Style.background());
     this.outline.setOpaque(false);
+    this.outline.putClientProperty("JTree.lineStyle", "None");
     this.outline.setCellRenderer(new OutlineTreeRenderer());
     this.outline.addTreeSelectionListener(event -> this.navigateToOutlineSelection());
     panel.add(createBorderlessScrollPane(this.outline), BorderLayout.CENTER);
@@ -456,7 +466,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     JList<GlobalApiItem> list = new JList<>(this.globalsModel);
     list.setCellRenderer(new GlobalApiRenderer());
     list.setFixedCellHeight(26);
-    list.setBackground(new Color(0, 0, 0, 0));
+    list.setBackground(Style.background());
     list.setOpaque(false);
     list.setSelectionBackground(Style.selection());
 
@@ -529,37 +539,9 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private record GlobalApiItem(String label, String snippet, String description, String badge) {}
 
-  private static final class GlobalApiRenderer extends DefaultListCellRenderer {
-    @Override
-    public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-      super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-      if (value instanceof GlobalApiItem item) {
-        this.setText("<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + escapeHtml(item.label()) + "</span>"
-          + "<span style='color:#64748b;font-size:10px'>  " + escapeHtml(item.description()) + "</span></html>");
-        this.setIcon(switch (item.badge()) {
-          case "h" -> Icons.SYMBOL_CLASS_16;
-          case "e" -> Icons.SYMBOL_DEPENDENCY_16;
-          case "c", "g" -> Icons.SYMBOL_FIELD_16;
-          case "m" -> Icons.SYMBOL_METHOD_16;
-          case "q" -> Icons.SEARCH_16;
-          default -> Icons.SYMBOL_DEPENDENCY_16;
-        });
-      }
-      this.setBackground(isSelected ? Style.selection() : new Color(0, 0, 0, 0));
-      this.setOpaque(isSelected);
-      this.setForeground(Style.text());
-      this.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-      return this;
-    }
-
-    private static String escapeHtml(String val) {
-      return val.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-    }
-  }
-
   private static JLabel sectionTitle(String text) {
     JLabel title = new JLabel(text);
-    title.setFont(title.getFont().deriveFont(Font.BOLD));
+    title.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
     title.setForeground(Style.mutedText());
     return title;
   }
@@ -568,8 +550,10 @@ public final class ScriptWorkspacePanel extends JPanel {
     JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
     header.setOpaque(false);
     JLabel label = new JLabel(displayName(tab.definition), Icons.SCRIPT_16, SwingConstants.LEADING);
+    label.setFont(Style.getDefaultFont());
     tab.title = label;
     JButton close = new JButton("×");
+    close.setFont(Style.getDefaultFont().deriveFont(12f));
     close.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
     close.setContentAreaFilled(false);
     close.setFocusable(false);
@@ -599,6 +583,8 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.monaco.open(active.path, active.getText(), active.definition);
       if (this.monaco.isReady()) this.monaco.focusEditor();
       this.monaco.notifyMoved();
+      this.mainEditorArea.revalidate();
+      this.mainEditorArea.repaint();
     } else if (active == null) {
       this.monacoTab = null;
       if (this.monaco != null && !this.monaco.isUnavailable()) {
@@ -1041,6 +1027,9 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.definition = definition;
       this.path = resolveSource(definition.getSource());
       this.setPreferredSize(new Dimension(0, 0));
+      this.setMinimumSize(new Dimension(0, 0));
+      this.setMaximumSize(new Dimension(0, 0));
+      this.setOpaque(false);
       this.load();
     }
 
@@ -1205,94 +1194,135 @@ public final class ScriptWorkspacePanel extends JPanel {
     @Override public String toString() { return this.label; }
   }
 
-  private static final class ScriptTreeRenderer extends DefaultTreeCellRenderer {
+  private static final class ScriptTreeRenderer implements TreeCellRenderer {
+    private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+    private final JLabel iconLabel = new JLabel();
+    private final JLabel textLabel = new JLabel();
+
+    ScriptTreeRenderer() {
+      this.panel.setOpaque(false);
+      this.textLabel.setFont(Style.getDefaultFont());
+      this.panel.add(this.iconLabel);
+      this.panel.add(this.textLabel);
+    }
+
     @Override
-    public java.awt.Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
-                                                           boolean leaf, int row, boolean focused) {
-      super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, focused);
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
+                                                   boolean leaf, int row, boolean focused) {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
-        this.setText(item.label());
-        if (item.definition() != null) this.setIcon(Icons.SCRIPT_16);
+        this.textLabel.setText(item.label());
+        this.iconLabel.setIcon(item.definition() != null ? Icons.SCRIPT_16 : Icons.SYMBOL_GROUP_16);
+      } else {
+        this.textLabel.setText(Objects.toString(value, ""));
+        this.iconLabel.setIcon(null);
       }
-      this.setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));
-      this.setBackgroundSelectionColor(Style.selection());
-      this.setTextNonSelectionColor(Style.text());
-      this.setTextSelectionColor(Style.text());
-      this.setBorderSelectionColor(null);
-      this.setOpaque(selected);
-      this.setBackground(selected ? Style.selection() : new Color(0, 0, 0, 0));
-      return this;
+      this.panel.setOpaque(selected);
+      this.panel.setBackground(selected ? Style.selection() : null);
+      this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
+      return this.panel;
     }
   }
 
-  private static final class OutlineTreeRenderer extends DefaultTreeCellRenderer {
+  private static final class OutlineTreeRenderer implements TreeCellRenderer {
+    private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+    private final JLabel iconLabel = new JLabel();
+    private final JLabel nameLabel = new JLabel();
+    private final JLabel detailLabel = new JLabel();
+
+    OutlineTreeRenderer() {
+      this.panel.setOpaque(false);
+      this.nameLabel.setFont(Style.getDefaultFont());
+      this.detailLabel.setFont(Style.getDefaultFont().deriveFont(11f));
+      this.panel.add(this.iconLabel);
+      this.panel.add(this.nameLabel);
+      this.panel.add(this.detailLabel);
+    }
+
     @Override
-    public java.awt.Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
-                                                           boolean leaf, int row, boolean focused) {
-      super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, focused);
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
+                                                   boolean leaf, int row, boolean focused) {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptOutline.Symbol symbol) {
-        this.setText(label(symbol));
-        this.setIcon(switch (symbol.kind()) {
+        this.iconLabel.setIcon(switch (symbol.kind()) {
           case CLASS -> Icons.SYMBOL_CLASS_16;
           case GROUP -> Icons.SYMBOL_GROUP_16;
           case FIELD -> Icons.SYMBOL_FIELD_16;
           case METHOD -> Icons.SYMBOL_METHOD_16;
           case DEPENDENCY -> Icons.SYMBOL_DEPENDENCY_16;
         });
-        this.setFont(this.getFont().deriveFont(symbol.kind() == ScriptOutline.Kind.CLASS
-          || symbol.kind() == ScriptOutline.Kind.GROUP ? Font.BOLD : Font.PLAIN));
+
+        this.nameLabel.setText(symbol.name());
+        this.nameLabel.setFont(Style.getDefaultFont().deriveFont(
+          symbol.kind() == ScriptOutline.Kind.CLASS || symbol.kind() == ScriptOutline.Kind.GROUP ? Font.BOLD : Font.PLAIN, 12f));
+
+        if (symbol.detail() != null && !symbol.detail().isBlank()) {
+          this.detailLabel.setText("  " + symbol.detail());
+          this.detailLabel.setVisible(true);
+        } else {
+          this.detailLabel.setText("");
+          this.detailLabel.setVisible(false);
+        }
+
+        if (selected) {
+          this.nameLabel.setForeground(Color.WHITE);
+          this.detailLabel.setForeground(new Color(200, 210, 225));
+        } else {
+          if (symbol.kind() == ScriptOutline.Kind.CLASS) {
+            this.nameLabel.setForeground(Color.WHITE);
+          } else if (symbol.kind() == ScriptOutline.Kind.GROUP) {
+            this.nameLabel.setForeground(Style.mutedText());
+          } else {
+            this.nameLabel.setForeground(Style.text());
+          }
+          this.detailLabel.setForeground(new Color(130, 145, 165));
+        }
+      } else {
+        this.nameLabel.setText(Objects.toString(value, ""));
+        this.detailLabel.setText("");
+        this.detailLabel.setVisible(false);
+        this.iconLabel.setIcon(null);
       }
-      this.setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));
-      this.setBackgroundSelectionColor(Style.selection());
-      this.setTextNonSelectionColor(Style.text());
-      this.setTextSelectionColor(Style.text());
-      this.setBorderSelectionColor(null);
-      this.setOpaque(selected);
-      this.setBackground(selected ? Style.selection() : new Color(0, 0, 0, 0));
-      return this;
+      this.panel.setOpaque(selected);
+      this.panel.setBackground(selected ? Style.selection() : null);
+      return this.panel;
+    }
+  }
+
+  private static final class GlobalApiRenderer implements javax.swing.ListCellRenderer<GlobalApiItem> {
+    private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+    private final JLabel iconLabel = new JLabel();
+    private final JLabel nameLabel = new JLabel();
+    private final JLabel descLabel = new JLabel();
+
+    GlobalApiRenderer() {
+      this.panel.setOpaque(false);
+      this.panel.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+      this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
+      this.descLabel.setFont(Style.getDefaultFont().deriveFont(11f));
+      this.panel.add(this.iconLabel);
+      this.panel.add(this.nameLabel);
+      this.panel.add(this.descLabel);
     }
 
-    private static String label(ScriptOutline.Symbol symbol) {
-      String name = escapeHtml(symbol.name());
-      if (symbol.detail() == null || symbol.detail().isBlank()) {
-        if (symbol.kind() == ScriptOutline.Kind.CLASS) {
-          return "<html><span style='color:#ffffff;font-weight:600;font-size:11px'>" + name + "</span></html>";
-        }
-        return "<html><span style='color:#e1e1e6;font-size:11px'>" + name + "</span></html>";
+    @Override
+    public Component getListCellRendererComponent(JList<? extends GlobalApiItem> list, GlobalApiItem item, int index,
+                                                   boolean isSelected, boolean cellHasFocus) {
+      if (item != null) {
+        this.nameLabel.setText(item.label());
+        this.descLabel.setText(item.description());
+        this.iconLabel.setIcon(switch (item.badge()) {
+          case "h" -> Icons.SYMBOL_CLASS_16;
+          case "e" -> Icons.SYMBOL_DEPENDENCY_16;
+          case "c", "g" -> Icons.SYMBOL_FIELD_16;
+          case "m" -> Icons.SYMBOL_METHOD_16;
+          case "q" -> Icons.SEARCH_16;
+          default -> Icons.SYMBOL_DEPENDENCY_16;
+        });
       }
-
-      String detail = escapeHtml(symbol.detail());
-      if (symbol.kind() == ScriptOutline.Kind.METHOD) {
-        int colonIdx = detail.indexOf(':');
-        if (colonIdx >= 0) {
-          String params = detail.substring(0, colonIdx).strip();
-          String retType = detail.substring(colonIdx + 1).strip();
-          return "<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + name + "</span>"
-            + "<span style='color:#94a3b8;font-size:10px'>" + params + "</span>"
-            + "<span style='color:#64748b;font-size:10px'> : </span>"
-            + "<span style='color:#38bdf8;font-size:10px'>" + retType + "</span></html>";
-        }
-        return "<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + name + "</span>"
-          + "<span style='color:#94a3b8;font-size:10px'> " + detail + "</span></html>";
-      }
-
-      if (symbol.kind() == ScriptOutline.Kind.FIELD) {
-        return "<html><span style='color:#e1e1e6;font-weight:500;font-size:11px'>" + name + "</span>"
-          + "<span style='color:#64748b;font-size:10px'> : </span>"
-          + "<span style='color:#f43f5e;font-size:10px'>" + detail + "</span></html>";
-      }
-
-      if (symbol.kind() == ScriptOutline.Kind.GROUP) {
-        return "<html><span style='color:#64748b;font-weight:700;font-size:10px'>" + name.toUpperCase() + "</span>"
-          + "<span style='color:#475569;font-size:10px'> (" + detail + ")</span></html>";
-      }
-
-      return "<html><span style='color:#e1e1e6;font-size:11px'>" + name + "</span>"
-        + "<span style='color:#64748b;font-size:10px'> " + detail + "</span></html>";
-    }
-
-    private static String escapeHtml(String value) {
-      return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+      this.panel.setOpaque(isSelected);
+      this.panel.setBackground(isSelected ? Style.selection() : null);
+      this.nameLabel.setForeground(isSelected ? Color.WHITE : Style.text());
+      this.descLabel.setForeground(isSelected ? new Color(200, 210, 225) : Style.mutedText());
+      return this.panel;
     }
   }
 
