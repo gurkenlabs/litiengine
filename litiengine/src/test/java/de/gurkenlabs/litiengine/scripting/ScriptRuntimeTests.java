@@ -455,4 +455,25 @@ class ScriptRuntimeTests {
     assertEquals(2, edits.size(), "Should rename class name in annotation and class header.");
     assertTrue(edits.stream().allMatch(e -> e.text().equals("HeroScript")));
   }
+
+  @Test
+  void javaLanguageServiceProvidesSyntaxErrorQuickFixes() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("CreatureScript3", "java", null, "CreatureScript3", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class CreatureScript3 extends CreatureScript {
+        @Override
+        public void update()
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    List<ScriptLanguageService.CodeAction> actions = service.codeActions(doc, new ScriptLanguageService.Range(new ScriptLanguageService.Position(3, 0), new ScriptLanguageService.Position(3, 20)), List.of());
+
+    assertTrue(actions.stream().anyMatch(a -> a.title().contains("Add method body")), "Should suggest quick fix to add method body when '{' or ';' is expected.");
+  }
 }

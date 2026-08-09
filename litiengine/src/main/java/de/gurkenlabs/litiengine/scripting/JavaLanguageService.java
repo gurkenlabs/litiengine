@@ -185,6 +185,78 @@ public class JavaLanguageService implements ScriptLanguageService {
       }
     }
     actions.addAll(this.abstractMethodCodeActions(document, parsed));
+    actions.addAll(this.syntaxErrorCodeActions(document, parsed));
+    return actions;
+  }
+
+  private List<CodeAction> syntaxErrorCodeActions(Document document, ParsedDocument parsed) {
+    List<CodeAction> actions = new ArrayList<>();
+    String source = document.text();
+    String[] lines = source.split("\r?\n", -1);
+
+    for (ScriptDiagnostic diag : parsed.diagnostics()) {
+      if (diag.message() == null) continue;
+      int diagLine = Math.max(1, Math.min(lines.length, diag.line()));
+      String lineContent = lines[diagLine - 1];
+
+      if (diag.message().contains("'{' or ';' expected") || diag.message().contains("illegal start of type")) {
+        int lineLen = lineContent.length();
+        Position endOfLine = new Position(diagLine - 1, lineLen);
+        Range endRange = new Range(endOfLine, endOfLine);
+
+        actions.add(new CodeAction(
+          "Add method body '{\n}'",
+          "quickfix",
+          List.of(new TextEdit(endRange, " {\n    // TODO: implement\n  }"))
+        ));
+        actions.add(new CodeAction(
+          "Add ';'",
+          "quickfix",
+          List.of(new TextEdit(endRange, ";"))
+        ));
+      } else if (diag.message().contains("';' expected")) {
+        int lineLen = lineContent.length();
+        Position endOfLine = new Position(diagLine - 1, lineLen);
+        Range endRange = new Range(endOfLine, endOfLine);
+
+        actions.add(new CodeAction(
+          "Insert ';'",
+          "quickfix",
+          List.of(new TextEdit(endRange, ";"))
+        ));
+      } else if (diag.message().contains("')' expected")) {
+        int lineLen = lineContent.length();
+        Position endOfLine = new Position(diagLine - 1, lineLen);
+        Range endRange = new Range(endOfLine, endOfLine);
+
+        actions.add(new CodeAction(
+          "Insert ')'",
+          "quickfix",
+          List.of(new TextEdit(endRange, ")"))
+        ));
+      } else if (diag.message().contains("'}' expected") || diag.message().contains("reached end of file while parsing")) {
+        int lastLine = Math.max(0, lines.length - 1);
+        int lastLineLen = lines[lastLine].length();
+        Position endOfFile = new Position(lastLine, lastLineLen);
+        Range eofRange = new Range(endOfFile, endOfFile);
+
+        actions.add(new CodeAction(
+          "Insert missing '}'",
+          "quickfix",
+          List.of(new TextEdit(eofRange, "\n}"))
+        ));
+      } else if (diag.message().contains("missing return statement")) {
+        int lineLen = lineContent.length();
+        Position endOfLine = new Position(diagLine - 1, lineLen);
+        Range endRange = new Range(endOfLine, endOfLine);
+
+        actions.add(new CodeAction(
+          "Add 'return null;'",
+          "quickfix",
+          List.of(new TextEdit(endRange, "\n    return null;"))
+        ));
+      }
+    }
     return actions;
   }
 
