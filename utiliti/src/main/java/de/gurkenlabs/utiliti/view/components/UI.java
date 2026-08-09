@@ -758,6 +758,10 @@ public final class UI {
 
         return terminate;
       }
+
+      @Override public void terminated() {
+        MonacoScriptEditor.shutdownCef();
+      }
     });
 
     window.setLocationRelativeTo(null);

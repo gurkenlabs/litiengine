@@ -486,9 +486,41 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     if (this.client != null) { this.client.dispose(); this.client = null; }
     if (this.resources != null) { this.resources.close(); this.resources = null; }
     if (CEF_REFS.get() > 0 && CEF_REFS.decrementAndGet() <= 0) {
-      CompletableFuture<CefApp> future = CEF.getAndSet(null);
-      if (future != null) future.thenAccept(app -> app.dispose());
+      shutdownCef();
     }
+  }
+
+  public static synchronized void shutdownCef() {
+    CEF_REFS.set(0);
+    CompletableFuture<CefApp> future = CEF.getAndSet(null);
+    if (future != null) {
+      try {
+        if (future.isDone() && !future.isCompletedExceptionally()) {
+          CefApp app = future.getNow(null);
+          if (app != null) {
+            app.dispose();
+          }
+        }
+      } catch (Throwable error) {
+        log.log(Level.FINE, "Error disposing CEF app future", error);
+      }
+    }
+    try {
+      if (CefApp.getState() != CefApp.CefAppState.NONE && CefApp.getState() != CefApp.CefAppState.TERMINATED) {
+        CefApp.getInstance().dispose();
+      }
+    } catch (Throwable error) {
+      log.log(Level.FINE, "Error disposing CefApp instance", error);
+    }
+  }
+
+  static {
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      try {
+        shutdownCef();
+      } catch (Throwable ignored) {
+      }
+    }, "Monaco-CEF-Shutdown"));
   }
 
   private final class BridgeHandler extends CefMessageRouterHandlerAdapter {

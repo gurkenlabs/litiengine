@@ -208,6 +208,30 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
     this.tabs.addChangeListener(event -> this.activeTabChanged());
     this.refreshTheme();
+
+    Game.addGameListener(new de.gurkenlabs.litiengine.GameListener() {
+      @Override
+      public void terminated() {
+        ScriptWorkspacePanel.this.close();
+      }
+    });
+  }
+
+  public synchronized void close() {
+    if (this.externalChangeTimer != null) {
+      this.externalChangeTimer.stop();
+    }
+    for (ScriptTab tab : new ArrayList<>(this.openTabs.values())) {
+      if (tab != null) {
+        this.closeTab(tab);
+      }
+    }
+    this.openTabs.clear();
+    if (this.monaco != null) {
+      this.monaco.close();
+      this.monaco = null;
+    }
+    MonacoScriptEditor.shutdownCef();
   }
 
   @Override
