@@ -1511,13 +1511,13 @@ public final class UI {
 
       @Override
       protected void paintComponent(Graphics g) {
-        paintTreeRowVisuals(this, g);
         this.paintingBaseRows = true;
         try {
           super.paintComponent(g);
         } finally {
           this.paintingBaseRows = false;
         }
+        paintTreeRowVisuals(this, g);
       }
     };
     configureTreeVisuals(tree);
@@ -1544,10 +1544,12 @@ public final class UI {
         if (tree.isRowSelected(row)) {
           g2.setColor(Style.sceneRowSelected());
           g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
-          if (focused && row == leadRow) {
+          if (focused || row == leadRow) {
             g2.setColor(Style.selectionOutline());
             g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
           }
+          g2.setColor(Style.accent());
+          g2.fillRoundRect(4, y + 2, 3, Math.max(4, height - 4), 3, 3);
         } else if (row == hoverRow) {
           g2.setColor(Style.sceneRowHover());
           g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
@@ -1611,13 +1613,13 @@ public final class UI {
 
       @Override
       protected void paintComponent(Graphics g) {
-        paintListRowVisuals(this, g);
         this.paintingBaseRows = true;
         try {
           super.paintComponent(g);
         } finally {
           this.paintingBaseRows = false;
         }
+        paintListRowVisuals(this, g);
       }
     };
     configureListVisuals(list);
@@ -1644,10 +1646,12 @@ public final class UI {
         if (list.isSelectedIndex(index)) {
           g2.setColor(Style.sceneRowSelected());
           g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
-          if (focused && index == leadIndex) {
+          if (focused || index == leadIndex) {
             g2.setColor(Style.selectionOutline());
             g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
           }
+          g2.setColor(Style.accent());
+          g2.fillRoundRect(4, y + 2, 3, Math.max(4, height - 4), 3, 3);
         } else if (index == hoverIndex) {
           g2.setColor(Style.sceneRowHover());
           g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
