@@ -429,4 +429,30 @@ class ScriptRuntimeTests {
     assertTrue(formatted.contains("    if(cnt>0) {"));
     assertTrue(formatted.contains("      cnt++;"));
   }
+
+  @Test
+  void javaLanguageServiceRenamesSymbolsAcrossDocument() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("CreatureScript3", "java", null, "CreatureScript3", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      @ScriptInfo(id = "CreatureScript3", host = ScriptHostType.ENTITY)
+      public class CreatureScript3 extends CreatureScript {
+        private int counter = 0;
+        @Override
+        public void update() {
+          counter++;
+        }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    List<ScriptLanguageService.TextEdit> edits = service.rename(doc, new ScriptLanguageService.Position(2, 15), "HeroScript");
+
+    assertEquals(2, edits.size(), "Should rename class name in annotation and class header.");
+    assertTrue(edits.stream().allMatch(e -> e.text().equals("HeroScript")));
+  }
 }
