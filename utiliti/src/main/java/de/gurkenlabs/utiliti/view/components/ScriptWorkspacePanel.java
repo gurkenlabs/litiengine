@@ -1245,6 +1245,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private static String defaultSource(ScriptDefinition definition, String className, ScriptKind kind) {
     if (kind == ScriptKind.GAME) {
+      String base = "GameScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.GameScript" : "GameScript";
       return "import de.gurkenlabs.litiengine.*;\n"
         + "import de.gurkenlabs.litiengine.resources.*;\n"
         + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
@@ -1253,7 +1254,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         + " * Access global game state via {@code globals.put(\"key\", value)}.\n"
         + " */\n"
         + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.GAME)\n"
-        + "public class " + className + " extends GameScript {\n"
+        + "public class " + className + " extends " + base + " {\n"
         + "  @Override\n"
         + "  public void onStarted() {\n"
         + "    // The game loop is active.\n"
@@ -1265,6 +1266,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         + "}\n";
     }
     if (kind == ScriptKind.ENVIRONMENT) {
+      String base = "EnvironmentScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.EnvironmentScript" : "EnvironmentScript";
       return "import de.gurkenlabs.litiengine.*;\n"
         + "import de.gurkenlabs.litiengine.environment.Environment;\n"
         + "import de.gurkenlabs.litiengine.resources.*;\n"
@@ -1274,7 +1276,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         + " * Use {@code environment()} to query entities, triggers, and map properties.\n"
         + " */\n"
         + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENVIRONMENT)\n"
-        + "public class " + className + " extends EnvironmentScript {\n"
+        + "public class " + className + " extends " + base + " {\n"
         + "  @Override\n"
         + "  public void onLoaded() {\n"
         + "    // Map / Environment loaded.\n"
@@ -1285,6 +1287,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         + "  }\n"
         + "}\n";
     }
+    String base = "CreatureScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.CreatureScript" : "CreatureScript";
     return "import de.gurkenlabs.litiengine.*;\n"
       + "import de.gurkenlabs.litiengine.entities.Creature;\n"
       + "import de.gurkenlabs.litiengine.resources.*;\n"
@@ -1294,7 +1297,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       + " * Use {@code host()} to access creature movement, animation, and attributes.\n"
       + " */\n"
       + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENTITY, target = Creature.class)\n"
-      + "public class " + className + " extends CreatureScript {\n"
+      + "public class " + className + " extends " + base + " {\n"
       + "  @Override\n"
       + "  public void onLoaded() {\n"
       + "    // Creature and environment ready.\n"
@@ -1308,11 +1311,14 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   static String synchronizeDeclaration(String source, ScriptDefinition definition) {
     if (source == null || source.isBlank() || definition == null) return source;
+    String className = extractClassName(source);
+    if (className == null || className.isBlank()) className = definition.getImplementation();
+
     String annotation = "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType." + definition.getHost()
       + (definition.getHost() == ScriptHostType.ENTITY && definition.getTargetType() != null
         ? ", target = " + definition.getTargetType() + ".class" : "") + ")";
     String updated = source.replaceFirst("(?s)@ScriptInfo\\s*\\(.*?\\)", Matcher.quoteReplacement(annotation));
-    String base = scriptBase(definition);
+    String base = scriptBase(definition, className);
     updated = updated.replaceFirst("(?m)(\\bclass\\s+[A-Za-z_$][\\w$]*\\s+extends\\s+)[\\w.$<>?]+",
       "$1" + Matcher.quoteReplacement(base));
     if (definition.getHost() == ScriptHostType.GAME) {
@@ -1323,14 +1329,20 @@ public final class ScriptWorkspacePanel extends JPanel {
       .replaceAll("\\bvoid\\s+onStopped\\s*\\(", "void onUnloaded(");
   }
 
-  private static String scriptBase(ScriptDefinition definition) {
-    return switch (definition.getHost()) {
+  private static String scriptBase(ScriptDefinition definition, String className) {
+    String base = switch (definition.getHost()) {
       case GAME -> "GameScript";
       case ENVIRONMENT -> "EnvironmentScript";
       case ENTITY -> Creature.class.getName().equals(definition.getTargetType())
         ? "CreatureScript" : "EntityScript<" + Objects.requireNonNullElse(
           definition.getTargetType(), "de.gurkenlabs.litiengine.entities.IEntity") + ">";
     };
+
+    String simpleBase = base.contains("<") ? base.substring(0, base.indexOf('<')) : base;
+    if (className != null && className.equals(simpleBase)) {
+      return "de.gurkenlabs.litiengine.scripting." + base;
+    }
+    return base;
   }
 
   private static String displayName(ScriptDefinition definition) {

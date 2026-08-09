@@ -185,16 +185,19 @@ public class JavaLanguageService implements ScriptLanguageService {
       }
     }
     actions.addAll(this.abstractMethodCodeActions(document, parsed));
-    actions.addAll(this.syntaxErrorCodeActions(document, parsed));
+    actions.addAll(this.syntaxErrorCodeActions(document, parsed, diagnostics));
     return actions;
   }
 
-  private List<CodeAction> syntaxErrorCodeActions(Document document, ParsedDocument parsed) {
+  private List<CodeAction> syntaxErrorCodeActions(Document document, ParsedDocument parsed, List<ScriptDiagnostic> externalDiagnostics) {
     List<CodeAction> actions = new ArrayList<>();
     String source = document.text();
     String[] lines = source.split("\r?\n", -1);
 
-    for (ScriptDiagnostic diag : parsed.diagnostics()) {
+    List<ScriptDiagnostic> allDiagnostics = new ArrayList<>(parsed.diagnostics());
+    if (externalDiagnostics != null) allDiagnostics.addAll(externalDiagnostics);
+
+    for (ScriptDiagnostic diag : allDiagnostics) {
       if (diag.message() == null) continue;
       int diagLine = Math.max(1, Math.min(lines.length, diag.line()));
       String lineContent = lines[diagLine - 1];
@@ -255,6 +258,31 @@ public class JavaLanguageService implements ScriptLanguageService {
           "quickfix",
           List.of(new TextEdit(endRange, "\n    return null;"))
         ));
+      } else if (diag.message().contains("cyclic") || diag.message().contains("inheritance") || diag.message().contains("Vererbung")) {
+        String cls = null;
+        Matcher extendsM = Pattern.compile("class\\s+([A-Za-z_$][\\w$]*)\\s+extends\\s+([A-Za-z_$][\\w$]*)").matcher(lineContent);
+        if (extendsM.find() && extendsM.group(1).equals(extendsM.group(2))) {
+          cls = extendsM.group(1);
+        } else {
+          Matcher cyclicMatcher = Pattern.compile("(?:cyclic inheritance involving|zyklische Vererbung bei)\\s+([A-Za-z_$][\\w$.]*)").matcher(diag.message());
+          if (cyclicMatcher.find()) {
+            cls = cyclicMatcher.group(1);
+            if (cls.contains(".")) cls = cls.substring(cls.lastIndexOf('.') + 1);
+          }
+        }
+        if (cls != null) {
+          Pattern extendsPattern = Pattern.compile("(\\bclass\\s+[A-Za-z_$][\\w$]*\\s+extends\\s+)(" + Pattern.quote(cls) + ")(\\b)");
+          Matcher lineMatcher = extendsPattern.matcher(lineContent);
+          if (lineMatcher.find()) {
+            Position startPos = new Position(diagLine - 1, lineMatcher.start(2));
+            Position endPos = new Position(diagLine - 1, lineMatcher.end(2));
+            actions.add(new CodeAction(
+              "Qualify superclass 'de.gurkenlabs.litiengine.scripting." + cls + "'",
+              "quickfix",
+              List.of(new TextEdit(new Range(startPos, endPos), "de.gurkenlabs.litiengine.scripting." + cls))
+            ));
+          }
+        }
       }
     }
     return actions;
@@ -485,7 +513,7 @@ public class JavaLanguageService implements ScriptLanguageService {
           document.uri() == null ? null : document.uri().toString(),
           (int) diag.getLineNumber(),
           (int) diag.getColumnNumber(),
-          diag.getMessage(null)
+          diag.getMessage(java.util.Locale.ENGLISH)
         ));
       }
     }
