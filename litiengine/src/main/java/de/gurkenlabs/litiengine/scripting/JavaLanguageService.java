@@ -299,8 +299,23 @@ public class JavaLanguageService implements ScriptLanguageService {
       String description = ScriptDocumentation.get(cls);
       if (!description.isBlank()) {
         docs += "\n\n" + description;
-      } else if (!pkg.isEmpty()) {
-        docs += "\n\n`" + pkg + "`";
+      } else {
+        docs += "\n\n### " + cls.getSimpleName() + "\n";
+        if (cls.isInterface()) {
+          docs += "Interface in package `" + pkg + "`.\n";
+        } else if (cls.isEnum()) {
+          docs += "Enum in package `" + pkg + "`.\n";
+        } else {
+          docs += "Class in package `" + pkg + "`.\n";
+        }
+        Class<?> superCls = cls.getSuperclass();
+        if (superCls != null && superCls != Object.class) {
+          docs += "\n**Extends:** `" + superCls.getSimpleName() + "`\n";
+        }
+        Class<?>[] interfaces = cls.getInterfaces();
+        if (interfaces.length > 0) {
+          docs += "\n**Implements:** " + Arrays.stream(interfaces).map(i -> "`" + i.getSimpleName() + "`").reduce((a, b) -> a + ", " + b).orElse("") + "\n";
+        }
       }
       return Optional.of(new Hover(docs, null));
     }

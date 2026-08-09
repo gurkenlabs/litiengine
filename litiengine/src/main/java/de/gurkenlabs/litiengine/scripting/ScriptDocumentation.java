@@ -135,6 +135,109 @@ public final class ScriptDocumentation {
       - `played(Animation animation)` — Fired when animation starts or finishes.
       """);
 
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.entities.IEntity", """
+      ### IEntity
+      Core interface for all game objects and entities in LITIENGINE.
+
+      **Key Properties & Operations:**
+      - `getId()` / `getName()` — Unique identifier and map name.
+      - `getLocation()` / `setLocation(x, y)` — Map position coordinates.
+      - `getBoundingBox()` / `getCenter()` — Collision and bounds geometry.
+      - `hasTag(tag)` / `addTag(tag)` — Entity tags and classification.
+      - `onLoaded(listener)` / `onUnloaded(listener)` — Lifecycle listeners.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.environment.Environment", """
+      ### Environment
+      Active tile map environment container managing all loaded entities, light sources, emitters, triggers, and map properties.
+
+      **Key Operations:**
+      - `get(id)` / `get(name)` — Lookup entity by ID or map name.
+      - `getByType(Class)` — Query all entities of a given type.
+      - `add(entity)` / `remove(entity)` — Spawn or despawn entities dynamically.
+      - `addTrigger(trigger)` / `getTriggers()` — Query map triggers.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.entities.Creature", """
+      ### Creature
+      Base entity for moving characters, NPCs, enemies, and player avatars with physics velocity, animations, and attributes.
+
+      **Key Operations:**
+      - `getVelocity()` / `setVelocity(velocity)` — Movement speed and vector.
+      - `getHealth()` / `setHealth(hp)` — Hit points and health management.
+      - `isDead()` / `die()` — Mortality state check.
+      - `getFacingDirection()` — Cardinal direction orientation.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.entities.ICombatEntity", """
+      ### ICombatEntity
+      Interface for entities capable of dealing and receiving combat damage, health tracking, and mortality events.
+
+      **Key Operations:**
+      - `getHitPoints()` / `setHitPoints(hp)` — Current health points.
+      - `getMaxHitPoints()` — Maximum health capacity.
+      - `isDead()` / `die()` / `resurrect()` — Combat status.
+      - `hit(damage, source)` — Inflict damage.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.Game", """
+      ### Game
+      Static singleton hub for accessing global engine subsystems.
+
+      **Subsystems:**
+      - `Game.world()` — Active map and environment manager.
+      - `Game.loop()` — Main game loop tick provider.
+      - `Game.audio()` — Sound effects and music playback engine.
+      - `Game.physics()` — Collision detection and physics engine.
+      - `Game.graphics()` — Render engine, camera, and window graphics.
+      - `Game.config()` — Client and graphics configuration.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.GameWorld", """
+      ### GameWorld
+      Manages map loading, active environments, camera tracking, and scene transitions.
+
+      **Key Operations:**
+      - `environment()` — Active `Environment` instance.
+      - `camera()` — Camera controller for pan, zoom, and target tracking.
+      - `loadEnvironment(mapName)` — Load and display a new map.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.scripting.ScriptHostType", """
+      ### ScriptHostType
+      Enum defining the host binding target type for scripts.
+
+      **Values:**
+      - `ENTITY` — Script is attached to an individual entity instance.
+      - `ENVIRONMENT` — Script is attached to the active map environment.
+      - `GAME` — Script is attached globally to the game session.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.scripting.ScriptInfo", """
+      ### @ScriptInfo
+      Annotation declaring metadata for a script class (script ID, host type, target entity class).
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.entities.Prop", """
+      ### Prop
+      Static or destructible decorative map object (chests, trees, rocks, barrels).
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.entities.LightSource", """
+      ### LightSource
+      Point light or shape lighting entity emitting ambient or colored light onto the map.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.entities.Trigger", """
+      ### Trigger
+      Collision volume executing actions when entities enter or exit specified map areas.
+      """);
+
+    CLASS_DOCS.put("de.gurkenlabs.litiengine.entities.Spawnpoint", """
+      ### Spawnpoint
+      Map marker location for spawning player characters, enemies, or items.
+      """);
+
     METHOD_DOCS.put("onLoaded", "Executed when the script or entity is loaded into the active environment.");
     METHOD_DOCS.put("update", "Executed every frame tick during game loop updates for AI and custom logic.");
     METHOD_DOCS.put("onUnloaded", "Executed when the script or entity is removed or detached.");
@@ -143,8 +246,12 @@ public final class ScriptDocumentation {
     METHOD_DOCS.put("resurrect", "Event callback fired when the combat entity is revived.");
     METHOD_DOCS.put("loaded", "Event callback fired when the entity is loaded into the active environment.");
     METHOD_DOCS.put("unloaded", "Event callback fired when the entity is unloaded from the environment.");
+    METHOD_DOCS.put("removed", "Event callback fired when an entity is removed from the environment.");
     METHOD_DOCS.put("collision", "Event callback fired when a physics collision occurs.");
     METHOD_DOCS.put("played", "Event callback fired when an animation finishes or plays.");
+    METHOD_DOCS.put("host", "Returns the entity or script host instance bound to this script.");
+    METHOD_DOCS.put("environment", "Returns the active map environment.");
+    METHOD_DOCS.put("context", "Returns the script execution and binding context.");
   }
 
   private ScriptDocumentation() {}
