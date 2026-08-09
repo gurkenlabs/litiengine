@@ -192,9 +192,6 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
 
     this.bottomTabs.addTab("Problems", Icons.ERROR_16, new JScrollPane(this.problems));
-    this.output.setEditable(false);
-    this.output.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-    this.bottomTabs.addTab("Output", new JScrollPane(this.output));
     this.bottomTabs.setMinimumSize(new Dimension(0, 110));
     this.bottomTabs.setPreferredSize(new Dimension(0, BOTTOM_PANEL_HEIGHT));
 
