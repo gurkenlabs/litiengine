@@ -1447,7 +1447,7 @@ public final class UI {
   public static void configureTreeVisuals(JTree tree) {
     tree.putClientProperty("JTree.lineStyle", "None");
     tree.setOpaque(false);
-    tree.setBackground(Style.background());
+    tree.setBackground(Style.COLOR_BG);
 
     tree.addMouseMotionListener(new MouseAdapter() {
       @Override

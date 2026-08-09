@@ -361,10 +361,10 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   public void refreshTheme() {
-    this.setBackground(Style.background());
-    this.scripts.setBackground(Style.background());
+    this.setBackground(Style.COLOR_BG);
+    this.scripts.setBackground(Style.COLOR_BG);
     this.scripts.setForeground(Style.text());
-    this.outline.setBackground(Style.background());
+    this.outline.setBackground(Style.COLOR_BG);
     this.outline.setForeground(Style.text());
     this.problems.setBackground(Style.surface());
     this.problems.setForeground(Style.text());
