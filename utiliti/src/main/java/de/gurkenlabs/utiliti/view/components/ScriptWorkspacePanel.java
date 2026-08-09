@@ -189,10 +189,14 @@ public final class ScriptWorkspacePanel extends JPanel {
     JPanel statusBar = new JPanel(new BorderLayout());
     statusBar.setBackground(Style.COLOR_BG);
     statusBar.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()));
-    this.status.setFont(Style.getDefaultFont().deriveFont(11f));
+    Font statusBarFont = new Font(
+        Style.FONTNAME_CONSOLE,
+        Font.PLAIN,
+        Math.max(10, Math.round(11 * Editor.preferences().getUiScale())));
+    this.status.setFont(statusBarFont);
     this.status.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
     this.status.setForeground(Style.mutedText());
-    this.caretStatus.setFont(Style.getDefaultFont().deriveFont(11f));
+    this.caretStatus.setFont(statusBarFont);
     this.caretStatus.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
     this.caretStatus.setForeground(Style.mutedText());
     statusBar.add(this.status, BorderLayout.WEST);
