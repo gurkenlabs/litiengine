@@ -110,10 +110,12 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     JSplitPane outlineAndGlobals = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createOutline(), this.createGlobalsPanel());
     UI.configureSplitPane(outlineAndGlobals);
+    outlineAndGlobals.setBackground(Style.COLOR_BG);
     outlineAndGlobals.setResizeWeight(0.5);
 
     JSplitPane explorer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createScriptExplorer(), outlineAndGlobals);
     UI.configureSplitPane(explorer);
+    explorer.setBackground(Style.COLOR_BG);
     explorer.setResizeWeight(0.35);
     explorer.setDividerLocation(0.35);
     explorer.setMinimumSize(new Dimension(235, 0));
@@ -439,9 +441,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     panel.add(header, BorderLayout.NORTH);
 
     JPanel content = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
-    content.setBackground(Style.background());
-    header.setBackground(Style.background());
-    panel.setBackground(Style.background());
+    content.setBackground(Style.COLOR_BG);
+    header.setBackground(Style.COLOR_BG);
+    panel.setBackground(Style.COLOR_BG);
     this.search.setFont(Style.getDefaultFont());
     this.search.putClientProperty("JTextField.placeholderText", "Search scripts...");
     RoundedSearchBox searchBox = new RoundedSearchBox(this.search, 200);
@@ -449,7 +451,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.scripts.setRootVisible(false);
     this.scripts.setShowsRootHandles(true);
     this.scripts.setRowHeight(Style.TREE_ROW_HEIGHT);
-    this.scripts.setBackground(Style.background());
+    this.scripts.setBackground(Style.COLOR_BG);
     this.scripts.setOpaque(false);
     this.scripts.putClientProperty("JTree.lineStyle", "None");
     this.scripts.setCellRenderer(new ScriptTreeRenderer());
@@ -470,13 +472,13 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private JPanel createOutline() {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
-    panel.setBackground(Style.background());
+    panel.setBackground(Style.COLOR_BG);
     panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
     panel.add(sectionTitle("OUTLINE"), BorderLayout.NORTH);
     this.outline.setRootVisible(false);
     this.outline.setShowsRootHandles(true);
     this.outline.setRowHeight(Style.TREE_ROW_HEIGHT);
-    this.outline.setBackground(Style.background());
+    this.outline.setBackground(Style.COLOR_BG);
     this.outline.setOpaque(false);
     this.outline.putClientProperty("JTree.lineStyle", "None");
     this.outline.setCellRenderer(new OutlineTreeRenderer());
@@ -489,7 +491,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private JPanel createGlobalsPanel() {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
-    panel.setBackground(Style.background());
+    panel.setBackground(Style.COLOR_BG);
     panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
     panel.add(sectionTitle("GLOBALS & APIS"), BorderLayout.NORTH);
 
@@ -498,7 +500,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     JList<GlobalApiItem> list = UI.createStyledList(this.globalsModel);
     list.setCellRenderer(new GlobalApiRenderer());
     list.setFixedCellHeight(26);
-    list.setBackground(Style.background());
+    list.setBackground(Style.COLOR_BG);
     list.setOpaque(false);
     list.setSelectionBackground(Style.selection());
 
@@ -559,7 +561,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     scroll.setViewportBorder(null);
     scroll.setOpaque(false);
     scroll.getViewport().setOpaque(false);
-    scroll.getViewport().setBackground(new Color(0, 0, 0, 0));
+    scroll.getViewport().setBackground(Style.COLOR_BG);
     return scroll;
   }
 
@@ -1233,6 +1235,8 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     ScriptTreeRenderer() {
       this.panel.setOpaque(false);
+      this.iconLabel.setOpaque(false);
+      this.textLabel.setOpaque(false);
       this.textLabel.setFont(Style.getDefaultFont());
       this.panel.add(this.iconLabel);
       this.panel.add(this.textLabel);
@@ -1262,6 +1266,9 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     OutlineTreeRenderer() {
       this.panel.setOpaque(false);
+      this.iconLabel.setOpaque(false);
+      this.nameLabel.setOpaque(false);
+      this.detailLabel.setOpaque(false);
       this.nameLabel.setFont(Style.getDefaultFont());
       this.detailLabel.setFont(Style.getDefaultFont().deriveFont(11f));
       this.panel.add(this.iconLabel);
@@ -1325,6 +1332,9 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     GlobalApiRenderer() {
       this.panel.setOpaque(false);
+      this.iconLabel.setOpaque(false);
+      this.nameLabel.setOpaque(false);
+      this.descLabel.setOpaque(false);
       this.panel.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
       this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
       this.descLabel.setFont(Style.getDefaultFont().deriveFont(11f));

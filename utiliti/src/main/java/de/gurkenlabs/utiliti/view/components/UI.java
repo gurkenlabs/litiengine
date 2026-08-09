@@ -1477,10 +1477,47 @@ public final class UI {
    */
   public static JTree createStyledTree(javax.swing.tree.TreeModel model) {
     JTree tree = new JTree(model) {
+      private boolean paintingBaseRows;
+
+      @Override
+      public boolean isPathSelected(javax.swing.tree.TreePath path) {
+        return !this.paintingBaseRows && super.isPathSelected(path);
+      }
+
+      @Override
+      public boolean isRowSelected(int row) {
+        return !this.paintingBaseRows && super.isRowSelected(row);
+      }
+
+      @Override
+      public boolean hasFocus() {
+        return !this.paintingBaseRows && super.hasFocus();
+      }
+
+      @Override
+      public int getLeadSelectionRow() {
+        return this.paintingBaseRows ? -1 : super.getLeadSelectionRow();
+      }
+
+      @Override
+      public javax.swing.tree.TreePath getLeadSelectionPath() {
+        return this.paintingBaseRows ? null : super.getLeadSelectionPath();
+      }
+
+      @Override
+      public javax.swing.tree.TreePath getAnchorSelectionPath() {
+        return this.paintingBaseRows ? null : super.getAnchorSelectionPath();
+      }
+
       @Override
       protected void paintComponent(Graphics g) {
         paintTreeRowVisuals(this, g);
-        super.paintComponent(g);
+        this.paintingBaseRows = true;
+        try {
+          super.paintComponent(g);
+        } finally {
+          this.paintingBaseRows = false;
+        }
       }
     };
     configureTreeVisuals(tree);
@@ -1526,7 +1563,7 @@ public final class UI {
    */
   public static void configureListVisuals(JList<?> list) {
     list.setOpaque(false);
-    list.setBackground(Style.background());
+    list.setBackground(Style.COLOR_BG);
 
     list.addMouseMotionListener(new MouseAdapter() {
       @Override
@@ -1560,10 +1597,27 @@ public final class UI {
    */
   public static <T> JList<T> createStyledList(javax.swing.ListModel<T> model) {
     JList<T> list = new JList<T>(model) {
+      private boolean paintingBaseRows;
+
+      @Override
+      public boolean isSelectedIndex(int index) {
+        return !this.paintingBaseRows && super.isSelectedIndex(index);
+      }
+
+      @Override
+      public boolean hasFocus() {
+        return !this.paintingBaseRows && super.hasFocus();
+      }
+
       @Override
       protected void paintComponent(Graphics g) {
         paintListRowVisuals(this, g);
-        super.paintComponent(g);
+        this.paintingBaseRows = true;
+        try {
+          super.paintComponent(g);
+        } finally {
+          this.paintingBaseRows = false;
+        }
       }
     };
     configureListVisuals(list);
