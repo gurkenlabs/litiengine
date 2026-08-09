@@ -277,10 +277,14 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   }
 
   private void send(String method, JsonObject payload) {
-    if (this.browser == null || this.resources == null) return;
-    JsonObject message = Json.createObjectBuilder().add("method", method).add("payload", payload).build();
-    String base64 = java.util.Base64.getEncoder().encodeToString(message.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
-    this.browser.executeJavaScript("window.utilitiEditor.receive('" + base64 + "')", this.resources.editorUrl(), 0);
+    if (this.closed || this.browser == null || this.resources == null) return;
+    try {
+      JsonObject message = Json.createObjectBuilder().add("method", method).add("payload", payload).build();
+      String base64 = java.util.Base64.getEncoder().encodeToString(message.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+      this.browser.executeJavaScript("window.utilitiEditor && window.utilitiEditor.receive('" + base64 + "')", this.resources.editorUrl(), 0);
+    } catch (Exception error) {
+      log.log(Level.FINE, "Could not send message to Monaco editor: " + error.getMessage(), error);
+    }
   }
 
   private synchronized JsonObject handle(JsonObject request) {
@@ -493,8 +497,11 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
                            boolean persistent, CefQueryCallback callback) {
       try (JsonReader reader = Json.createReader(new java.io.StringReader(request))) {
         callback.success(MonacoScriptEditor.this.handle(reader.readObject()).toString());
-      } catch (RuntimeException error) {
-        callback.failure(500, error.getMessage());
+      } catch (Throwable error) {
+        String msg = error.getMessage();
+        if (msg == null || msg.isBlank()) msg = error.getClass().getSimpleName();
+        log.log(Level.WARNING, "Error processing Monaco bridge query", error);
+        callback.failure(500, msg);
       }
       return true;
     }

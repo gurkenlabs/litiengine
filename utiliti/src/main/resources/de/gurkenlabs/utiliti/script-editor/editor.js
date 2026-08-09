@@ -448,97 +448,113 @@
       }
     }
 
+    window.addEventListener('resize', function () {
+      if (typeof editor !== 'undefined' && typeof editor.layout === 'function') {
+        editor.layout();
+      }
+    });
+
     window.utilitiEditor = {
       receive(encoded) {
-        let raw;
         try {
-          raw = atob(encoded);
-        } catch (e) {
-          raw = encoded;
-        }
-        const bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
-        const jsonString = new TextDecoder().decode(bytes);
-        const { method, payload } = JSON.parse(jsonString);
-        if (method === 'open') {
-          const uri = monaco.Uri.parse(payload.uri);
-          let model = monaco.editor.getModel(uri) || models.get(payload.uri);
-          if (!model) {
-            const canonical = uri.toString().toLowerCase();
-            for (const m of monaco.editor.getModels()) {
-              if (m.uri.toString().toLowerCase() === canonical && !m.isDisposed()) {
-                model = m;
-                break;
-              }
-            }
-          }
-          modelGeneration++;
-          clearTimeout(analysisTimer);
-          applying = true;
+          let jsonString;
           try {
-            if (!model || model.isDisposed()) {
-              model = monaco.editor.createModel(payload.text, payload.language || 'java', uri);
-            } else {
-              if (model.getValue() !== payload.text) {
-                model.setValue(payload.text);
-              }
-            }
-            models.set(payload.uri, model);
-            models.set(uri.toString(), model);
-            editor.setModel(model);
-            setTimeout(() => {
-              if (typeof editor !== 'undefined' && typeof editor.layout === 'function') {
-                editor.layout();
-              }
-            }, 10);
+            const raw = atob(encoded);
+            const bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
+            jsonString = new TextDecoder().decode(bytes);
           } catch (e) {
-            console.error('Monaco model set error:', e);
-            if (model && !model.isDisposed()) {
-              try { editor.setModel(model); } catch (ignored) {}
-            }
-          } finally {
-            applying = false;
+            jsonString = encoded;
           }
-          analyze();
-        } else if (method === 'closeModel') {
-          const uri = monaco.Uri.parse(payload.uri);
-          let model = monaco.editor.getModel(uri) || models.get(payload.uri);
-          if (!model) {
-            const canonical = uri.toString().toLowerCase();
-            for (const m of monaco.editor.getModels()) {
-              if (m.uri.toString().toLowerCase() === canonical) {
-                model = m;
-                break;
+          const { method, payload } = JSON.parse(jsonString);
+          if (method === 'open') {
+            const uri = monaco.Uri.parse(payload.uri);
+            let model = monaco.editor.getModel(uri) || models.get(payload.uri);
+            if (model && model.isDisposed()) {
+              models.delete(payload.uri);
+              models.delete(uri.toString());
+              model = null;
+            }
+            if (!model) {
+              const canonical = uri.toString().toLowerCase();
+              for (const m of monaco.editor.getModels()) {
+                if (m.uri.toString().toLowerCase() === canonical) {
+                  if (m.isDisposed()) {
+                    models.delete(m.uri.toString());
+                  } else {
+                    model = m;
+                  }
+                  break;
+                }
               }
             }
+            modelGeneration++;
+            clearTimeout(analysisTimer);
+            applying = true;
+            try {
+              if (!model || model.isDisposed()) {
+                const existing = monaco.editor.getModel(uri);
+                if (existing) existing.dispose();
+                model = monaco.editor.createModel(payload.text, payload.language || 'java', uri);
+              } else {
+                if (model.getValue() !== payload.text) {
+                  model.setValue(payload.text);
+                }
+              }
+              models.set(payload.uri, model);
+              models.set(uri.toString(), model);
+              editor.setModel(model);
+              setTimeout(() => {
+                if (typeof editor !== 'undefined' && typeof editor.layout === 'function') {
+                  editor.layout();
+                }
+              }, 10);
+            } catch (e) {
+              console.error('Monaco model set error:', e);
+              if (model && !model.isDisposed()) {
+                try { editor.setModel(model); } catch (ignored) {}
+              }
+            } finally {
+              applying = false;
+            }
+            analyze();
+          } else if (method === 'closeModel') {
+            const uri = monaco.Uri.parse(payload.uri);
+            let model = monaco.editor.getModel(uri) || models.get(payload.uri);
+            if (model) {
+              try { model.dispose(); } catch (ignored) {}
+              models.delete(payload.uri);
+              models.delete(uri.toString());
+            }
+          } else if (method === 'theme') {
+            monaco.editor.setTheme(payload.dark ? 'utiliti-dark' : 'vs');
+          } else if (method === 'focus') {
+            try { editor.focus(); } catch (ignored) {}
+          } else if (method === 'revealLine') {
+            if (payload.line) {
+              try {
+                editor.revealLineInCenter(payload.line);
+                editor.setPosition({ lineNumber: payload.line, column: 1 });
+                editor.focus();
+              } catch (ignored) {}
+            }
+          } else if (method === 'insertText') {
+            if (payload.text && typeof editor !== 'undefined') {
+              try {
+                const selection = editor.getSelection();
+                const range = selection || new monaco.Range(1, 1, 1, 1);
+                const id = { major: 1, minor: 1 };
+                const op = { identifier: id, range: range, text: payload.text, forceMoveMarkers: true };
+                editor.executeEdits('insertText', [op]);
+                editor.focus();
+              } catch (ignored) {}
+            }
+          } else if (method === 'triggerFormat') {
+            if (typeof editor !== 'undefined') {
+              try { editor.getAction('editor.action.formatDocument')?.run(); } catch (ignored) {}
+            }
           }
-          if (model) {
-            model.dispose();
-            models.delete(payload.uri);
-            models.delete(uri.toString());
-          }
-        } else if (method === 'theme') {
-          monaco.editor.setTheme(payload.dark ? 'utiliti-dark' : 'vs');
-        } else if (method === 'focus') {
-          editor.focus();
-        } else if (method === 'revealLine') {
-          if (payload.line) {
-            editor.revealLineInCenter(payload.line);
-            editor.setPosition({ lineNumber: payload.line, column: 1 });
-            editor.focus();
-          }
-        } else if (method === 'insertText') {
-          if (payload.text && typeof editor !== 'undefined') {
-            const selection = editor.getSelection();
-            const range = selection || new monaco.Range(1, 1, 1, 1);
-            const id = { major: 1, minor: 1 };
-            const op = { identifier: id, range: range, text: payload.text, forceMoveMarkers: true };
-            editor.executeEdits('insertText', [op]);
-            editor.focus();
-          }
-        } else if (method === 'triggerFormat') {
-          if (typeof editor !== 'undefined') {
-            editor.getAction('editor.action.formatDocument')?.run();
-          }
+        } catch (globalError) {
+          console.error('Error in window.utilitiEditor.receive:', globalError);
         }
       }
     };
