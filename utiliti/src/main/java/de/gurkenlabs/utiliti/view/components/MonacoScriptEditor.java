@@ -223,7 +223,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.browserContainer.revalidate();
     this.browserContainer.repaint();
     this.cards.show(this, EDITOR);
-    this.timeoutTimer = new javax.swing.Timer(12000, event -> {
+    this.timeoutTimer = new javax.swing.Timer(30000, event -> {
       ((javax.swing.Timer) event.getSource()).stop();
       if (!this.ready) this.unavailable("Monaco did not finish loading. Check the application output for JavaScript or JCEF errors.");
     });
@@ -289,10 +289,12 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     return switch (method) {
       case "ready" -> {
         this.ready = true;
+        this.unavailableReason = null;
         if (this.timeoutTimer != null) {
           this.timeoutTimer.stop();
           this.timeoutTimer = null;
         }
+        SwingUtilities.invokeLater(() -> this.cards.show(this, EDITOR));
         if (this.uri != null) this.sendOpen();
         SwingUtilities.invokeLater(this.readyListener);
         yield success(Json.createObjectBuilder().build());
