@@ -32,6 +32,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
   protected UpdateLoop(String name, int tickRate) {
     super(name);
+    this.setDaemon(true);
     this.tickRate = tickRate;
   }
 

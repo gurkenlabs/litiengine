@@ -641,6 +641,7 @@ public final class Game {
 
   public static void exit() {
     if (terminating()) {
+      terminate();
       System.exit(Game.EXIT_GAME_CLOSED);
     }
   }
