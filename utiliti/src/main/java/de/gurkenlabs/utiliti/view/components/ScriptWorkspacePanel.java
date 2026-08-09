@@ -41,10 +41,13 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -59,6 +62,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -75,6 +79,7 @@ import javax.swing.tree.TreePath;
 
 /** First-class central workspace for project scripts. */
 public final class ScriptWorkspacePanel extends JPanel {
+  private static final Logger log = Logger.getLogger(ScriptWorkspacePanel.class.getName());
   private static final int BOTTOM_PANEL_HEIGHT = 190;
 
   private final DefaultMutableTreeNode scriptsRoot = new DefaultMutableTreeNode("Scripts");
@@ -515,6 +520,12 @@ public final class ScriptWorkspacePanel extends JPanel {
       @Override public void mousePressed(java.awt.event.MouseEvent e) { showTreeContextMenu(e); }
       @Override public void mouseReleased(java.awt.event.MouseEvent e) { showTreeContextMenu(e); }
     });
+
+    this.scripts.registerKeyboardAction(
+      evt -> renameScript(selectedDefinition()),
+      KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F2, 0),
+      JComponent.WHEN_FOCUSED
+    );
 
     content.add(createBorderlessScrollPane(this.scripts), BorderLayout.CENTER);
     panel.add(content, BorderLayout.CENTER);
@@ -1001,6 +1012,10 @@ public final class ScriptWorkspacePanel extends JPanel {
       dupItem.addActionListener(evt -> duplicateScript(selected));
       menu.add(dupItem);
 
+      JMenuItem renameItem = new JMenuItem("Rename Class...", Icons.RENAME_16);
+      renameItem.addActionListener(evt -> renameScript(selected));
+      menu.add(renameItem);
+
       JMenuItem deleteItem = new JMenuItem("Delete Script", Icons.DELETE_16);
       deleteItem.addActionListener(evt -> deleteScript(selected));
       menu.add(deleteItem);
@@ -1010,6 +1025,78 @@ public final class ScriptWorkspacePanel extends JPanel {
       menu.add(openIdeItem);
     }
     menu.show(e.getComponent(), e.getX(), e.getY());
+  }
+
+  public void renameScript(ScriptDefinition definition) {
+    if (definition == null) return;
+    String currentName = displayName(definition);
+    String input = (String) JOptionPane.showInputDialog(
+        this,
+        "Enter new class name:",
+        "Rename Script",
+        JOptionPane.QUESTION_MESSAGE,
+        Icons.RENAME_16,
+        null,
+        currentName);
+    if (input == null || input.isBlank() || input.trim().equals(currentName)) return;
+    renameScript(definition, input.trim());
+  }
+
+  public void renameScript(ScriptDefinition definition, String newClassName) {
+    if (definition == null || newClassName == null || newClassName.isBlank()) return;
+    String oldClassName = displayName(definition);
+    if (oldClassName.equals(newClassName)) return;
+    if (!newClassName.matches("[A-Za-z_$][\\w$]*")) {
+      JOptionPane.showMessageDialog(this, "Invalid Java identifier name.", "Rename Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+
+    Path oldPath = resolveSource(definition.getSource());
+    Path newPath = resolveSource("src/main/java/" + newClassName + ".java");
+    if (newPath == null) return;
+
+    String currentText = "";
+    ScriptTab tab = this.openTabs.get(definition.getId());
+    if (tab != null) {
+      currentText = tab.getText();
+    } else if (oldPath != null && Files.exists(oldPath)) {
+      try {
+        currentText = Files.readString(oldPath);
+      } catch (IOException ignored) {}
+    }
+
+    String updatedText = currentText
+        .replaceAll("\\b" + Pattern.quote(oldClassName) + "\\b", newClassName)
+        .replace("id = \"" + oldClassName + "\"", "id = \"" + newClassName + "\"");
+
+    definition.setId(newClassName);
+    definition.setName(newClassName);
+    definition.setSource("src/main/java/" + newClassName + ".java");
+
+    try {
+      if (newPath.getParent() != null) Files.createDirectories(newPath.getParent());
+      Files.writeString(newPath, updatedText);
+      if (oldPath != null && !oldPath.equals(newPath) && Files.exists(oldPath)) {
+        Files.deleteIfExists(oldPath);
+      }
+    } catch (IOException error) {
+      log.log(Level.SEVERE, "Failed to rename script file on disk", error);
+      return;
+    }
+
+    if (tab != null) {
+      this.openTabs.remove(oldClassName);
+      this.openTabs.put(newClassName, tab);
+      tab.setText(updatedText);
+      tab.updateTabTitle();
+      if (this.monacoTab == tab && this.monaco != null) {
+        this.monaco.open(newPath, updatedText, definition);
+      }
+    }
+
+    refreshScripts();
+    selectTreeNode(newClassName);
+    Editor.instance().save(true);
   }
 
   private boolean scriptIdExists(String id) {

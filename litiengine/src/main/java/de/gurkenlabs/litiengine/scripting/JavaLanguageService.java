@@ -728,6 +728,40 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   @Override
+  public List<TextEdit> rename(Document document, Position position, String newName) {
+    if (document == null || document.text() == null || newName == null || newName.isBlank()) return List.of();
+    String source = document.text();
+    int off = offset(source, position);
+    String targetWord = wordAt(source, off);
+    if (targetWord.isBlank() || !targetWord.matches("[A-Za-z_$][\\w$]*") || KEYWORDS.contains(targetWord)) {
+      return List.of();
+    }
+
+    String replacement = newName.trim();
+    if (!replacement.matches("[A-Za-z_$][\\w$]*") || KEYWORDS.contains(replacement)) {
+      return List.of();
+    }
+
+    List<TextEdit> edits = new ArrayList<>();
+    String[] lines = source.split("\\R", -1);
+    Pattern pattern = Pattern.compile("\\b" + Pattern.quote(targetWord) + "\\b");
+
+    for (int l = 0; l < lines.length; l++) {
+      String line = lines[l];
+      Matcher matcher = pattern.matcher(line);
+      while (matcher.find()) {
+        int startCol = matcher.start();
+        int endCol = matcher.end();
+        edits.add(new TextEdit(
+          new Range(new Position(l, startCol), new Position(l, endCol)),
+          replacement
+        ));
+      }
+    }
+    return edits;
+  }
+
+  @Override
   public String format(Document document) {
     if (document == null || document.text() == null) return "";
     String source = document.text();

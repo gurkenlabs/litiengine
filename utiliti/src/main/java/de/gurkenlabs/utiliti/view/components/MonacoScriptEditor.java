@@ -335,6 +335,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       case "codeActions" -> this.codeActions(payload);
       case "symbols" -> this.symbols();
       case "format" -> this.format();
+      case "rename" -> this.rename(payload);
       default -> failure("Unknown editor bridge method: " + method);
     };
   }
@@ -441,6 +442,25 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     if (this.languageService == null) return success(Json.createObjectBuilder().add("text", Objects.requireNonNullElse(this.text, "")).build());
     String formatted = this.languageService.format(this.document());
     return success(Json.createObjectBuilder().add("text", Objects.requireNonNullElse(formatted, "")).build());
+  }
+
+  private JsonObject rename(JsonObject payload) {
+    ScriptLanguageService.Position position = position(payload);
+    String newName = payload.getString("newName", "");
+    if (this.languageService == null || newName.isBlank()) {
+      return success(Json.createObjectBuilder().add("edits", Json.createArrayBuilder().build()).build());
+    }
+    List<ScriptLanguageService.TextEdit> edits = this.languageService.rename(this.document(), position, newName);
+    JsonArrayBuilder editsArr = Json.createArrayBuilder();
+    for (ScriptLanguageService.TextEdit edit : edits) {
+      editsArr.add(Json.createObjectBuilder()
+        .add("startLine", edit.range().start().line())
+        .add("startColumn", edit.range().start().column())
+        .add("endLine", edit.range().end().line())
+        .add("endColumn", edit.range().end().column())
+        .add("newText", edit.text()));
+    }
+    return success(Json.createObjectBuilder().add("edits", editsArr.build()).build());
   }
 
   private static JsonObject buildSymbol(ScriptLanguageService.Symbol symbol) {

@@ -37,6 +37,10 @@ public interface ScriptLanguageService extends AutoCloseable {
     return document.text();
   }
 
+  default List<TextEdit> rename(Document document, Position position, String newName) {
+    return List.of();
+  }
+
   @Override
   default void close() {}
 

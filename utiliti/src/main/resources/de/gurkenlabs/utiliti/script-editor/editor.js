@@ -369,6 +369,35 @@
         }
       });
 
+      monaco.languages.registerRenameProvider(lang, {
+        async provideRenameEdits(model, position, newName) {
+          try {
+            const gen = modelGeneration;
+            const value = await query('rename', {
+              line: position.lineNumber,
+              column: position.column,
+              newName: newName
+            });
+            if (gen !== modelGeneration || editor.getModel() !== model || !value || !value.edits) return { edits: [] };
+            return {
+              edits: value.edits.map(edit => ({
+                resource: model.uri,
+                textEdit: {
+                  range: new monaco.Range(
+                    edit.startLine + 1, edit.startColumn + 1,
+                    edit.endLine + 1, edit.endColumn + 1
+                  ),
+                  text: edit.newText
+                }
+              }))
+            };
+          } catch (error) {
+            console.error('Rename error:', error);
+            return { edits: [] };
+          }
+        }
+      });
+
       monaco.languages.registerDocumentSymbolProvider(lang, {
         async provideDocumentSymbols(model) {
           try {
