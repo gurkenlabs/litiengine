@@ -71,6 +71,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.AbstractAction;
@@ -81,12 +82,14 @@ import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -1431,6 +1434,169 @@ public final class UI {
       if (value instanceof javax.swing.plaf.FontUIResource) {
         UIManager.put(key, new FontUIResource(font));
       }
+    }
+  }
+
+  /**
+   * Configures a JTree with standard Utiliti focus, hover, selection, and line style visuals.
+   */
+  public static void configureTreeVisuals(JTree tree) {
+    tree.putClientProperty("JTree.lineStyle", "None");
+    tree.setOpaque(false);
+    tree.setBackground(Style.background());
+
+    tree.addMouseMotionListener(new MouseAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        int row = tree.getRowForLocation(e.getX(), e.getY());
+        Object prev = tree.getClientProperty("hoverRow");
+        if (!Objects.equals(prev, row)) {
+          tree.putClientProperty("hoverRow", row >= 0 ? row : null);
+          tree.repaint();
+        }
+      }
+    });
+
+    tree.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseExited(MouseEvent e) {
+        if (tree.getClientProperty("hoverRow") != null) {
+          tree.putClientProperty("hoverRow", null);
+          tree.repaint();
+        }
+      }
+    });
+  }
+
+  /**
+   * Creates a JTree initialized with model and Utiliti focus, hover, and selection rendering.
+   */
+  public static JTree createStyledTree(javax.swing.tree.TreeModel model) {
+    JTree tree = new JTree(model) {
+      @Override
+      protected void paintComponent(Graphics g) {
+        paintTreeRowVisuals(this, g);
+        super.paintComponent(g);
+      }
+    };
+    configureTreeVisuals(tree);
+    return tree;
+  }
+
+  public static void paintTreeRowVisuals(JTree tree, Graphics g) {
+    Graphics2D g2 = (Graphics2D) g.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      Object hoverVal = tree.getClientProperty("hoverRow");
+      int hoverRow = hoverVal instanceof Integer r ? r : -1;
+      int leadRow = tree.getLeadSelectionRow();
+      boolean focused = tree.hasFocus();
+
+      for (int row = 0; row < tree.getRowCount(); row++) {
+        java.awt.Rectangle bounds = tree.getRowBounds(row);
+        if (bounds == null || bounds.width <= 0) continue;
+        int x = bounds.x;
+        int y = bounds.y + 1;
+        int width = Math.max(1, tree.getWidth() - x - 8);
+        int height = Math.max(1, bounds.height - 2);
+
+        if (tree.isRowSelected(row)) {
+          g2.setColor(Style.sceneRowSelected());
+          g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+          if (focused && row == leadRow) {
+            g2.setColor(Style.selectionOutline());
+            g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+          }
+        } else if (row == hoverRow) {
+          g2.setColor(Style.sceneRowHover());
+          g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        }
+      }
+    } finally {
+      g2.dispose();
+    }
+  }
+
+  /**
+   * Configures a JList with standard Utiliti focus, hover, and selection visuals.
+   */
+  public static void configureListVisuals(JList<?> list) {
+    list.setOpaque(false);
+    list.setBackground(Style.background());
+
+    list.addMouseMotionListener(new MouseAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        int index = list.locationToIndex(e.getPoint());
+        if (index >= 0 && list.getCellBounds(index, index) != null
+            && !list.getCellBounds(index, index).contains(e.getPoint())) {
+          index = -1;
+        }
+        Object prev = list.getClientProperty("hoverIndex");
+        if (!Objects.equals(prev, index)) {
+          list.putClientProperty("hoverIndex", index >= 0 ? index : null);
+          list.repaint();
+        }
+      }
+    });
+
+    list.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseExited(MouseEvent e) {
+        if (list.getClientProperty("hoverIndex") != null) {
+          list.putClientProperty("hoverIndex", null);
+          list.repaint();
+        }
+      }
+    });
+  }
+
+  /**
+   * Creates a JList initialized with model and Utiliti focus, hover, and selection rendering.
+   */
+  public static <T> JList<T> createStyledList(javax.swing.ListModel<T> model) {
+    JList<T> list = new JList<T>(model) {
+      @Override
+      protected void paintComponent(Graphics g) {
+        paintListRowVisuals(this, g);
+        super.paintComponent(g);
+      }
+    };
+    configureListVisuals(list);
+    return list;
+  }
+
+  public static void paintListRowVisuals(JList<?> list, Graphics g) {
+    Graphics2D g2 = (Graphics2D) g.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      Object hoverVal = list.getClientProperty("hoverIndex");
+      int hoverIndex = hoverVal instanceof Integer idx ? idx : -1;
+      int leadIndex = list.getSelectedIndex();
+      boolean focused = list.hasFocus();
+
+      for (int index = 0; index < list.getModel().getSize(); index++) {
+        java.awt.Rectangle bounds = list.getCellBounds(index, index);
+        if (bounds == null) continue;
+        int x = bounds.x + 4;
+        int y = bounds.y + 1;
+        int width = Math.max(1, list.getWidth() - x - 8);
+        int height = Math.max(1, bounds.height - 2);
+
+        if (list.isSelectedIndex(index)) {
+          g2.setColor(Style.sceneRowSelected());
+          g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+          if (focused && index == leadIndex) {
+            g2.setColor(Style.selectionOutline());
+            g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+          }
+        } else if (index == hoverIndex) {
+          g2.setColor(Style.sceneRowHover());
+          g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        }
+      }
+    } finally {
+      g2.dispose();
     }
   }
 }
