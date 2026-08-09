@@ -180,11 +180,11 @@ public class ViewportToolbar extends JPanel {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().saveActive();
     }, null);
 
-    JButton btnCompileReload = button("Compile & reload", Icons.REWIND_16, () -> {
+    JButton btnCompileReload = button("Compile", Icons.COMPILE_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().reloadActive();
     }, null);
 
-    JButton btnReloadDisk = button("Reload from disk", Icons.REWIND_16, () -> {
+    JButton btnReloadDisk = button("Reload", Icons.RELOAD_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().reloadActiveFromDisk();
     }, null);
 
@@ -192,12 +192,8 @@ public class ViewportToolbar extends JPanel {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().openActiveExternally();
     }, null);
 
-    JButton btnFormatScript = button("Format code", Icons.PENCIL_16, () -> {
+    JButton btnFormatScript = button("Format code", Icons.FORMAT_CODE_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().formatActive();
-    }, null);
-
-    JButton btnConfigureIntelliJ = button("Configure IntelliJ", null, () -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().configureProjectForIntellij();
     }, null);
 
     addToControlGroup(scriptGroup, splitButton(btnNewScript, btnNewScriptMenu));
@@ -206,7 +202,6 @@ public class ViewportToolbar extends JPanel {
     addToControlGroup(scriptGroup, btnCompileReload);
     addToControlGroup(scriptGroup, btnReloadDisk);
     addToControlGroup(scriptGroup, btnOpenIde);
-    addToControlGroup(scriptGroup, btnConfigureIntelliJ);
     this.scriptControlsContainer.add(scriptGroup);
     this.scriptControlsContainer.setVisible(false);
     left.add(this.scriptControlsContainer);
