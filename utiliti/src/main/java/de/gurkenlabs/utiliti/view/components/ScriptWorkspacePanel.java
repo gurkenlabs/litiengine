@@ -109,7 +109,9 @@ public final class ScriptWorkspacePanel extends JPanel {
       @Override public boolean isCellEditable(int row, int column) { return false; }
     };
   private final JTable problems = new JTable(this.problemsModel);
+  private final JTabbedPane bottomTabs = new JTabbedPane();
   private final Map<String, Boolean> scriptErrorStates = new ConcurrentHashMap<>();
+  private final Map<String, List<ScriptDiagnostic>> projectDiagnostics = new ConcurrentHashMap<>();
   private final JTextArea output = new JTextArea();
   private final JLabel status = new JLabel(" ");
   private final JLabel caretStatus = new JLabel(" ");
@@ -189,13 +191,12 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     });
 
-    JTabbedPane bottomTabs = new JTabbedPane();
-    bottomTabs.addTab("Problems", new JScrollPane(this.problems));
+    this.bottomTabs.addTab("Problems", Icons.ERROR_16, new JScrollPane(this.problems));
     this.output.setEditable(false);
     this.output.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-    bottomTabs.addTab("Output", new JScrollPane(this.output));
-    bottomTabs.setMinimumSize(new Dimension(0, 110));
-    bottomTabs.setPreferredSize(new Dimension(0, BOTTOM_PANEL_HEIGHT));
+    this.bottomTabs.addTab("Output", new JScrollPane(this.output));
+    this.bottomTabs.setMinimumSize(new Dimension(0, 110));
+    this.bottomTabs.setPreferredSize(new Dimension(0, BOTTOM_PANEL_HEIGHT));
 
     try {
       this.monaco = new MonacoScriptEditor();
@@ -833,20 +834,53 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (target != null) {
       this.open(target);
     }
-
     if (this.monaco != null && this.monaco.isReady()) {
       this.monaco.revealPosition(line, column);
     }
   }
 
   private void showAnalysis(de.gurkenlabs.litiengine.scripting.ScriptLanguageService.Analysis analysis) {
-    this.problemsModel.setRowCount(0);
-    boolean currentHasError = analysis.diagnostics().stream()
-      .anyMatch(d -> d.severity() == ScriptDiagnostic.Severity.ERROR);
     if (this.monacoTab != null && this.monacoTab.definition != null) {
-      this.scriptErrorStates.put(this.monacoTab.definition.getId(), currentHasError);
+      this.projectDiagnostics.put(this.monacoTab.definition.getId(), analysis.diagnostics());
     }
-    analysis.diagnostics().forEach(diagnostic -> this.problemsModel.addRow(problemRow(diagnostic)));
+    refreshProblemsTable();
+  }
+
+  private void refreshProblemsTable() {
+    this.problemsModel.setRowCount(0);
+    this.scriptErrorStates.clear();
+
+    Map<String, List<ScriptDiagnostic>> allDiagnostics = new LinkedHashMap<>(this.projectDiagnostics);
+    for (ScriptDiagnostic diag : Game.scripts().getDiagnostics()) {
+      if (diag.scriptId() != null) {
+        allDiagnostics.computeIfAbsent(diag.scriptId(), k -> new ArrayList<>()).add(diag);
+      }
+    }
+
+    int totalCount = 0;
+    for (Map.Entry<String, List<ScriptDiagnostic>> entry : allDiagnostics.entrySet()) {
+      String scriptId = entry.getKey();
+      List<ScriptDiagnostic> list = entry.getValue();
+      if (list == null || list.isEmpty()) continue;
+
+      boolean scriptHasError = false;
+      for (ScriptDiagnostic diag : list) {
+        this.problemsModel.addRow(problemRow(diag));
+        totalCount++;
+        if (diag.severity() == ScriptDiagnostic.Severity.ERROR) {
+          scriptHasError = true;
+        }
+      }
+
+      if (scriptHasError) {
+        this.scriptErrorStates.put(scriptId, true);
+      }
+    }
+
+    if (this.bottomTabs != null && this.bottomTabs.getTabCount() > 0) {
+      this.bottomTabs.setTitleAt(0, totalCount > 0 ? "Problems (" + totalCount + ")" : "Problems");
+    }
+
     this.scripts.repaint();
   }
 
@@ -1502,7 +1536,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.textLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.errorLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.textLabel.setFont(Style.getDefaultFont());
-      this.errorLabel.setIcon(Icons.BUG_16);
+      this.errorLabel.setIcon(Icons.ERROR_16);
       this.errorLabel.setVisible(false);
       this.panel.add(this.iconLabel);
       this.panel.add(javax.swing.Box.createHorizontalStrut(4));
@@ -1661,7 +1695,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       super.getTableCellRendererComponent(table, "", isSelected, hasFocus, row, column);
       if (value instanceof ScriptDiagnostic.Severity severity) {
         if (severity == ScriptDiagnostic.Severity.ERROR) {
-          setIcon(Icons.BUG_16);
+          setIcon(Icons.ERROR_16);
           setText("Error");
           setForeground(isSelected ? Color.WHITE : new Color(255, 110, 110));
         } else {

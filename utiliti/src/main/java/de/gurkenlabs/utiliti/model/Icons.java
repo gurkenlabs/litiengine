@@ -60,6 +60,7 @@ public final class Icons {
   public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("animation.svg", 16, 16);
   public static final Icon API_16 = IconLoader.get().getUIAwareIcon("api.svg", 16, 16);
   public static final Icon SCRIPT_16 = IconLoader.get().getUIAwareIcon("script.svg", 16, 16);
+  public static final Icon ERROR_16 = IconLoader.get().getUIAwareIcon("error.svg", 16, 16);
   public static final Icon FORMAT_CODE_16 = IconLoader.get().getUIAwareIcon("format-code.svg", 16, 16);
   public static final Icon COMPILE_16 = IconLoader.get().getUIAwareIcon("compile.svg", 16, 16);
   public static final Icon RELOAD_16 = IconLoader.get().getUIAwareIcon("reload.svg", 16, 16);
