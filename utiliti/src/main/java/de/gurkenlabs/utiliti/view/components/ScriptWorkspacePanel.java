@@ -84,7 +84,19 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final DefaultMutableTreeNode outlineRoot = new DefaultMutableTreeNode("Outline");
   private final DefaultTreeModel outlineModel = new DefaultTreeModel(this.outlineRoot);
   private final JTree outline = UI.createStyledTree(this.outlineModel);
-  private final JTabbedPane tabs = new JTabbedPane();
+  private final JTabbedPane tabs = new JTabbedPane() {
+    @Override
+    public Dimension getPreferredSize() {
+      Dimension d = super.getPreferredSize();
+      if (getTabCount() > 0) {
+        java.awt.Rectangle bounds = getBoundsAt(0);
+        if (bounds != null && bounds.height > 0) {
+          return new Dimension(d.width, bounds.height);
+        }
+      }
+      return d;
+    }
+  };
   private final JPanel mainEditorArea = new JPanel(new BorderLayout());
   private final DefaultTableModel problemsModel = new DefaultTableModel(
     new Object[] {"Severity", "File", "Line", "Message"}, 0) {
