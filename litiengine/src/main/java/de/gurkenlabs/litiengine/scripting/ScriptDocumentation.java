@@ -37,7 +37,7 @@ public final class ScriptDocumentation {
       **Example:**
       ```java
       @Override
-      protected void update() {
+      public void update() {
         if (host().isDead()) return;
         // creature AI logic
       }

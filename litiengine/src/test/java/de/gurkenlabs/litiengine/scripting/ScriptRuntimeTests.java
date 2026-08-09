@@ -265,7 +265,7 @@ class ScriptRuntimeTests {
           globals.
         }
         @Override
-        protected void update() {
+        public void update() {
           host().
         }
       }
@@ -296,7 +296,7 @@ class ScriptRuntimeTests {
       import de.gurkenlabs.litiengine.scripting.*;
       public class CreatureScript1 extends CreatureScript {
         @Override
-        protected void update() {
+        public void update() {
           host().addCombatEntityListener(new 
         }
       }
