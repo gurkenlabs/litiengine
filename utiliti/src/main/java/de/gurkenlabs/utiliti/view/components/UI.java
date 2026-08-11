@@ -526,7 +526,15 @@ public final class UI {
     viewportPanel = new ViewportPanel(canvas);
     initDropTarget(canvas);
 
-    Component renderSplitPanel = initRenderSplitPanel(viewportPanel, winH);
+    scriptWorkspacePanel = new ScriptWorkspacePanel();
+    workspaceCards = new CardLayout();
+    workspaceHost = new JPanel(workspaceCards);
+    workspaceHost.add(viewportPanel, "map");
+    workspaceHost.add(scriptWorkspacePanel, "scripts");
+
+    Component workspaceWithBottomPanel = initRenderSplitPanel(workspaceHost, winH);
+
+    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, workspaceWithBottomPanel);
 
     int inspectorMinWidth = inspectorMinimumWidth();
     mapObjectPanel = new MapObjectInspector();
@@ -602,13 +610,6 @@ public final class UI {
         ? Math.min(Editor.preferences().getMainSplitterPosition(), SCENE_GRAPH_MAX_WIDTH)
         : prefHierarchyW;
 
-    scriptWorkspacePanel = new ScriptWorkspacePanel();
-    workspaceCards = new CardLayout();
-    workspaceHost = new JPanel(workspaceCards);
-    workspaceHost.add(renderSplitPanel, "map");
-    workspaceHost.add(scriptWorkspacePanel, "scripts");
-
-    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, workspaceHost);
     configureSplitPane(mainSplit);
     mainSplit.setContinuousLayout(false);
     mainSplit.setResizeWeight(0.0);

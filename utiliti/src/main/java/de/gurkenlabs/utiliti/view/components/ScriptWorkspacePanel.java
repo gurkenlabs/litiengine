@@ -195,11 +195,6 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     });
 
-    this.bottomTabs.addTab("Problems", Icons.ERROR_16, new JScrollPane(this.problems));
-    this.bottomTabs.addTab("Console", Icons.CONSOLE_16, UI.getConsole() != null ? UI.getConsole() : new JScrollPane(this.output));
-    this.bottomTabs.setMinimumSize(new Dimension(0, 110));
-    this.bottomTabs.setPreferredSize(new Dimension(0, BOTTOM_PANEL_HEIGHT));
-
     try {
       this.monaco = new MonacoScriptEditor();
       this.monaco.onChanged(text -> {
@@ -254,21 +249,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     statusBar.add(this.caretStatus, BorderLayout.EAST);
     this.mainEditorArea.add(statusBar, BorderLayout.SOUTH);
 
-    JSplitPane editorSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.mainEditorArea, bottomTabs);
-    UI.configureSplitPane(editorSplit);
-    editorSplit.setResizeWeight(1.0);
-    editorSplit.addComponentListener(new ComponentAdapter() {
-      private boolean initialized;
-
-      @Override public void componentResized(ComponentEvent event) {
-        if (!this.initialized && editorSplit.getHeight() > BOTTOM_PANEL_HEIGHT) {
-          editorSplit.setDividerLocation(editorSplit.getHeight() - BOTTOM_PANEL_HEIGHT);
-          this.initialized = true;
-        }
-      }
-    });
-
-    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, explorer, editorSplit);
+    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, explorer, this.mainEditorArea);
     UI.configureSplitPane(split);
     split.setResizeWeight(0.0);
     split.setDividerLocation(265);
