@@ -252,6 +252,7 @@ public class Editor extends Screen {
       Game.scripts().setProjectJavaVersion(Runtime.version().feature());
     }
     this.windowMetadataDirty.set(true);
+    de.gurkenlabs.utiliti.view.components.UI.updateRunControlStates();
   }
 
   public void create() {

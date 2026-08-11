@@ -120,6 +120,8 @@ public class ViewportToolbar extends JPanel {
     mapSelector.getAccessibleContext().setAccessibleName(Resources.strings().get("toolbar_activeMap"));
     left.add(controlGroup(mapSelector));
 
+    boolean initialHasProject = Editor.instance().getProjectPath() != null;
+
     JPanel runGroup = controlGroup();
     this.btnRunProject = button("", Icons.GREEN_PLAY_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) {
@@ -128,6 +130,7 @@ public class ViewportToolbar extends JPanel {
     }, null);
     Style.styleButton(this.btnRunProject, Style.ButtonVariant.TOOLBAR);
     this.btnRunProject.setToolTipText("Run Project (Shift+F10)");
+    this.btnRunProject.setEnabled(initialHasProject);
     makeIconOnly(this.btnRunProject, 28);
 
     this.btnStopProject = button("", Icons.RED_STOP_16, () -> {
