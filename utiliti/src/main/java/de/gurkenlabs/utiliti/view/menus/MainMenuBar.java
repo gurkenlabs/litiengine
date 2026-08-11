@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.view.menus;
 
+import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.Component;
 import java.awt.Insets;
@@ -27,6 +28,37 @@ public class MainMenuBar extends JMenuBar {
     this.add(this.scriptMenu);
     this.add(new RunMenu());
     this.add(new HelpMenu());
+
+    this.add(javax.swing.Box.createHorizontalGlue());
+
+    javax.swing.JPanel runControls = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.TRAILING, 4, 0));
+    runControls.setOpaque(false);
+
+    javax.swing.JButton btnRun = new javax.swing.JButton(Icons.PLAY_16);
+    Style.styleButton(btnRun, Style.ButtonVariant.TOOLBAR);
+    btnRun.setForeground(Style.COLOR_GREEN);
+    btnRun.setToolTipText("Run Project");
+    btnRun.setPreferredSize(new java.awt.Dimension(28, 22));
+    btnRun.addActionListener(e -> {
+      if (de.gurkenlabs.utiliti.view.components.UI.getScriptWorkspacePanel() != null) {
+        de.gurkenlabs.utiliti.view.components.UI.getScriptWorkspacePanel().runProject();
+      }
+    });
+
+    javax.swing.JButton btnStop = new javax.swing.JButton(Icons.POWER_16);
+    Style.styleButton(btnStop, Style.ButtonVariant.DESTRUCTIVE);
+    btnStop.setToolTipText("Stop Project");
+    btnStop.setPreferredSize(new java.awt.Dimension(28, 22));
+    btnStop.addActionListener(e -> {
+      if (de.gurkenlabs.utiliti.view.components.UI.getScriptWorkspacePanel() != null) {
+        de.gurkenlabs.utiliti.view.components.UI.getScriptWorkspacePanel().stopProject();
+      }
+    });
+
+    runControls.add(btnRun);
+    runControls.add(btnStop);
+    this.add(runControls);
+
     styleTopLevelMenus();
   }
 
