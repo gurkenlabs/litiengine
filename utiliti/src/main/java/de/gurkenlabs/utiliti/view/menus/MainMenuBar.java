@@ -11,11 +11,8 @@ import javax.swing.JMenuBar;
 public class MainMenuBar extends JMenuBar {
   private final MapMenu mapMenu;
   private final ScriptMenu scriptMenu;
-  private final javax.swing.JButton btnRun;
-  private final javax.swing.JButton btnStop;
 
   public MainMenuBar() {
-    this.setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.X_AXIS));
     this.setOpaque(true);
     this.setBackground(Style.COLOR_BG);
     this.setForeground(Style.COLOR_TEXT);
@@ -31,47 +28,7 @@ public class MainMenuBar extends JMenuBar {
     this.add(this.scriptMenu);
     this.add(new RunMenu());
     this.add(new HelpMenu());
-
-    this.add(javax.swing.Box.createHorizontalGlue());
-
-    javax.swing.JPanel runControls = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.TRAILING, 4, 0));
-    runControls.setOpaque(false);
-
-    boolean initialHasProject = de.gurkenlabs.utiliti.controller.Editor.instance().getProjectPath() != null;
-
-    this.btnRun = new javax.swing.JButton(Icons.GREEN_PLAY_16);
-    Style.styleButton(this.btnRun, Style.ButtonVariant.TOOLBAR);
-    this.btnRun.setToolTipText("Run Project (Shift+F10)");
-    this.btnRun.setPreferredSize(new java.awt.Dimension(28, 22));
-    this.btnRun.setEnabled(initialHasProject);
-    this.btnRun.addActionListener(e -> {
-      if (de.gurkenlabs.utiliti.view.components.UI.getScriptWorkspacePanel() != null) {
-        de.gurkenlabs.utiliti.view.components.UI.getScriptWorkspacePanel().runProject();
-      }
-    });
-
-    this.btnStop = new javax.swing.JButton(Icons.RED_STOP_16);
-    Style.styleButton(this.btnStop, Style.ButtonVariant.TOOLBAR);
-    this.btnStop.setToolTipText("Stop Project (Ctrl+F2)");
-    this.btnStop.setPreferredSize(new java.awt.Dimension(28, 22));
-    this.btnStop.setEnabled(false);
-    this.btnStop.addActionListener(e -> {
-      if (de.gurkenlabs.utiliti.view.components.UI.getScriptWorkspacePanel() != null) {
-        de.gurkenlabs.utiliti.view.components.UI.getScriptWorkspacePanel().stopProject();
-      }
-    });
-
-    runControls.add(this.btnRun);
-    runControls.add(this.btnStop);
-    this.add(runControls);
-
     styleTopLevelMenus();
-  }
-
-  public void updateRunState(boolean hasProject, boolean isRunning) {
-    this.btnRun.setEnabled(hasProject);
-    this.btnRun.setToolTipText(isRunning ? "Rerun Project (Shift+F10)" : "Run Project (Shift+F10)");
-    this.btnStop.setEnabled(isRunning);
   }
 
   public void setScriptMode(boolean scriptMode) {
