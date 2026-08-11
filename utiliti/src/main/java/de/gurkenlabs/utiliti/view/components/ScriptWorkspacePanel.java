@@ -918,7 +918,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       allDiagnostics.put(entry.getKey(), new ArrayList<>(entry.getValue()));
     }
     for (ScriptDiagnostic diag : Game.scripts().getDiagnostics()) {
-      if (diag.scriptId() != null) {
+      if (diag.scriptId() != null && !this.projectDiagnostics.containsKey(diag.scriptId())) {
         allDiagnostics.computeIfAbsent(diag.scriptId(), k -> new ArrayList<>()).add(diag);
       }
     }
