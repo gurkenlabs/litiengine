@@ -1142,15 +1142,32 @@ public class Editor extends Screen {
     getChangedMaps().forEach(m -> {
       UndoManager.save(m);
       String fileName = String.format("%s.%s", m.getName(), TmxMap.FILE_EXTENSION);
-      if (preferences().syncMaps()) {
+      if (preferences().syncMaps() && getProjectPath() != null && getProjectPath().getParent() != null) {
         Path searchRoot = getProjectPath().getParent();
-        try (Stream<Path> paths = Files.walk(searchRoot)) {
-          paths.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().equals(fileName)).forEach(p -> {
-            Path newFile = XmlUtilities.save(m, p);
-            log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
-          });
-        } catch (IOException e) {
-          log.log(Level.SEVERE, "Error walking file tree for map sync", e);
+        if (Files.exists(searchRoot)) {
+          try {
+            Files.walkFileTree(searchRoot, new java.nio.file.SimpleFileVisitor<Path>() {
+              @Override
+              public java.nio.file.FileVisitResult preVisitDirectory(Path dir, java.nio.file.attribute.BasicFileAttributes attrs) {
+                String name = dir.getFileName() != null ? dir.getFileName().toString() : "";
+                if (name.startsWith(".") || name.equalsIgnoreCase("build") || name.equalsIgnoreCase("target") || name.equalsIgnoreCase("bin") || name.equalsIgnoreCase("out") || name.equalsIgnoreCase("node_modules")) {
+                  return java.nio.file.FileVisitResult.SKIP_SUBTREE;
+                }
+                return java.nio.file.FileVisitResult.CONTINUE;
+              }
+
+              @Override
+              public java.nio.file.FileVisitResult visitFile(Path file, java.nio.file.attribute.BasicFileAttributes attrs) {
+                if (file.getFileName() != null && file.getFileName().toString().equals(fileName)) {
+                  Path newFile = XmlUtilities.save(m, file);
+                  log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
+                }
+                return java.nio.file.FileVisitResult.CONTINUE;
+              }
+            });
+          } catch (IOException e) {
+            log.log(Level.SEVERE, "Error walking file tree for map sync", e);
+          }
         }
       }
     });
