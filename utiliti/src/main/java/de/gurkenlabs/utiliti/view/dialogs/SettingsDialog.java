@@ -1239,12 +1239,17 @@ public final class SettingsDialog extends JDialog {
     }
 
     private String findConflict() {
-      Map<KeyStroke, Command> used = new HashMap<>();
+      Map<KeyBindings.Command.CommandGroup, Map<KeyStroke, Command>> groupUsed = new EnumMap<>(KeyBindings.Command.CommandGroup.class);
+      for (KeyBindings.Command.CommandGroup group : KeyBindings.Command.CommandGroup.values()) {
+        groupUsed.put(group, new HashMap<>());
+      }
+
       for (Command command : this.commands) {
         KeyStroke keyStroke = this.bindings.get(command);
         if (keyStroke == null) {
           continue;
         }
+        Map<KeyStroke, Command> used = groupUsed.get(command.group());
         Command existing = used.putIfAbsent(keyStroke, command);
         if (existing != null) {
           return KeyBindings.format(keyStroke) + " (" + text(existing.resourceKey()) + ", "

@@ -65,6 +65,18 @@ public final class KeyBindings {
       this.defaultKeyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
     }
 
+    public enum CommandGroup {
+      MAP,
+      SCRIPT
+    }
+
+    public CommandGroup group() {
+      if (this.name().startsWith("SCRIPT_")) {
+        return CommandGroup.SCRIPT;
+      }
+      return CommandGroup.MAP;
+    }
+
     public String resourceKey() {
       return this.resourceKey;
     }
