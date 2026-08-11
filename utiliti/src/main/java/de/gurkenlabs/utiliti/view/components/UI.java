@@ -113,6 +113,10 @@ public final class UI {
   private static int objectSelectionPopupY;
   private static AssetList assetComponent;
   private static ConsoleComponent consoleComponent;
+  private static JPanel bottomContentPanel;
+  private static JToggleButton bottomConsoleTab;
+  private static JToggleButton bottomProblemsTab;
+  private static JToggleButton bottomResourcesTab;
 
   private static MapObjectInspector mapObjectPanel;
   private static MapPropertyPanel mapPropertyPanel;
@@ -509,6 +513,29 @@ public final class UI {
   public static void createScript() {
     showScriptWorkspace();
     if (scriptWorkspacePanel != null) scriptWorkspacePanel.createScript();
+  }
+
+  public static void showConsoleTab() {
+    if (bottomContentPanel != null && bottomConsoleTab != null) {
+      bottomConsoleTab.setSelected(true);
+      ((CardLayout) bottomContentPanel.getLayout()).show(bottomContentPanel, "console");
+      if (assetComponent != null && assetComponent.getToolbar() != null) {
+        assetComponent.getToolbar().setVisible(false);
+      }
+    }
+  }
+
+  public static void showProblemsTab() {
+    if (bottomContentPanel != null && bottomProblemsTab != null) {
+      bottomProblemsTab.setSelected(true);
+      if (scriptWorkspacePanel != null) {
+        bottomContentPanel.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
+      }
+      ((CardLayout) bottomContentPanel.getLayout()).show(bottomContentPanel, "problems");
+      if (assetComponent != null && assetComponent.getToolbar() != null) {
+        assetComponent.getToolbar().setVisible(false);
+      }
+    }
   }
 
   private static void setupInterface() {
@@ -994,6 +1021,11 @@ public final class UI {
     header.setPreferredSize(headerSize);
     header.add(tabButtons, BorderLayout.WEST);
     header.add(assetComponent.getToolbar(), BorderLayout.CENTER);
+
+    bottomContentPanel = content;
+    bottomResourcesTab = resourcesTab;
+    bottomConsoleTab = consoleTab;
+    bottomProblemsTab = problemsTab;
 
     resourcesTab.addActionListener(e -> {
       ((CardLayout) content.getLayout()).show(content, "resources");

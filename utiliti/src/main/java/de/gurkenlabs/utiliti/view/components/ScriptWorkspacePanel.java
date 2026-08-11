@@ -111,10 +111,8 @@ public final class ScriptWorkspacePanel extends JPanel {
       @Override public boolean isCellEditable(int row, int column) { return false; }
     };
   private final JTable problems = new JTable(this.problemsModel);
-  private final JTabbedPane bottomTabs = new JTabbedPane();
   private final Map<String, Boolean> scriptErrorStates = new ConcurrentHashMap<>();
   private final Map<String, List<ScriptDiagnostic>> projectDiagnostics = new ConcurrentHashMap<>();
-  private final JTextArea output = new JTextArea();
   private final JLabel status = new JLabel(" ");
   private final JLabel caretStatus = new JLabel(" ");
   private final JPanel conflictBar = new JPanel(new BorderLayout(8, 0));
@@ -429,8 +427,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
     if (!this.saveAllScripts()) return;
     if (Editor.instance().getCurrentResourceFile() != null) Editor.instance().save(false);
-    this.output.setText("");
-    this.bottomTabs.setSelectedIndex(1);
+    UI.showConsoleTab();
     this.appendOutput("Resolving Gradle project model...");
     this.projectLaunchPending = true;
     Thread.ofVirtual().name("utiliti-project-launch").start(() -> {
@@ -538,9 +535,6 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.problems.setBackground(Style.surface());
     this.problems.setForeground(Style.text());
     this.problems.setGridColor(Style.border());
-    this.output.setBackground(Style.background());
-    this.output.setForeground(Style.text());
-    this.output.setCaretColor(Style.accent());
     if (this.monaco != null) {
       Color background = Style.background();
       this.monaco.setTheme(background.getRed() + background.getGreen() + background.getBlue() < 384);
@@ -949,10 +943,6 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     }
 
-    if (this.bottomTabs != null && this.bottomTabs.getTabCount() > 0) {
-      this.bottomTabs.setTitleAt(0, totalCount > 0 ? "Problems (" + totalCount + ")" : "Problems");
-    }
-
     this.scripts.repaint();
   }
 
@@ -1001,13 +991,9 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private void appendOutput(String message) {
-    if (!SwingUtilities.isEventDispatchThread()) {
-      SwingUtilities.invokeLater(() -> this.appendOutput(message));
-      return;
+    if (message != null && !message.isBlank()) {
+      log.info(message);
     }
-    if (!this.output.getText().isEmpty()) this.output.append(System.lineSeparator());
-    this.output.append(message);
-    this.output.setCaretPosition(this.output.getDocument().getLength());
   }
 
   private void insertScriptNode(ScriptDefinition definition) {
