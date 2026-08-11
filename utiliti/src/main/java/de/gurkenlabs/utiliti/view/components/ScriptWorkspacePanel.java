@@ -131,16 +131,10 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.setBackground(Style.background());
     this.add(this.createConflictBar(), BorderLayout.NORTH);
 
-    JSplitPane outlineAndGlobals = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createOutline(), this.createGlobalsPanel());
-    UI.configureSplitPane(outlineAndGlobals);
-    outlineAndGlobals.setBackground(Style.COLOR_BG);
-    outlineAndGlobals.setResizeWeight(0.5);
-
-    JSplitPane explorer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createScriptExplorer(), outlineAndGlobals);
+    JSplitPane explorer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createOutline(), this.createGlobalsPanel());
     UI.configureSplitPane(explorer);
     explorer.setBackground(Style.COLOR_BG);
-    explorer.setResizeWeight(0.35);
-    explorer.setDividerLocation(0.35);
+    explorer.setResizeWeight(0.5);
     explorer.setMinimumSize(new Dimension(235, 0));
     explorer.setPreferredSize(new Dimension(265, 0));
 
