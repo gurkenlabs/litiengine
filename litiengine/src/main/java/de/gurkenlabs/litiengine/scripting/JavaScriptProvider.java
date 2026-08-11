@@ -42,18 +42,24 @@ public class JavaScriptProvider implements ScriptProvider {
 
   @Override
   public CompiledScript compile(ScriptDefinition definition, URL source, ClassLoader parent) throws ScriptException {
+    return this.compile(definition, source, new ScriptCompilationContext(parent, List.of(), 0));
+  }
+
+  @Override
+  public CompiledScript compile(ScriptDefinition definition, URL source, ScriptCompilationContext context)
+      throws ScriptException {
     Path sourcePath = resolveSourcePath(definition, source);
     if (sourcePath != null && Files.isRegularFile(sourcePath)) {
       try {
         String code = Files.readString(sourcePath, StandardCharsets.UTF_8);
-        return compileSource(definition, sourcePath, code, parent);
+        return compileSource(definition, sourcePath, code, context);
       } catch (IOException e) {
         throw new ScriptException("Could not read Java source file: " + e.getMessage(), e);
       }
     }
 
     try {
-      Class<?> type = Class.forName(definition.getImplementation(), false, parent);
+      Class<?> type = Class.forName(definition.getImplementation(), false, context.parent());
       Class<? extends ScriptInstance> scriptType = type.asSubclass(ScriptInstance.class);
       scriptType.getConstructor();
       return new CompiledScript() {
@@ -94,6 +100,12 @@ public class JavaScriptProvider implements ScriptProvider {
   }
 
   static CompiledScript compileSource(ScriptDefinition definition, Path path, String sourceCode, ClassLoader parent) throws ScriptException {
+    return compileSource(definition, path, sourceCode, new ScriptCompilationContext(parent, List.of(), 0));
+  }
+
+  static CompiledScript compileSource(
+      ScriptDefinition definition, Path path, String sourceCode, ScriptCompilationContext context)
+      throws ScriptException {
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     if (compiler == null) {
       throw new ScriptException("No system Java compiler available. Ensure running on JDK.", List.of());
@@ -111,10 +123,19 @@ public class JavaScriptProvider implements ScriptProvider {
     MemoryFileManager fileManager = new MemoryFileManager(compiler.getStandardFileManager(diagnostics, null, StandardCharsets.UTF_8));
 
     List<String> options = new ArrayList<>();
-    String classpath = System.getProperty("java.class.path");
-    if (classpath != null && !classpath.isBlank()) {
+    List<String> classpathEntries = new ArrayList<>();
+    String processClasspath = System.getProperty("java.class.path");
+    if (processClasspath != null && !processClasspath.isBlank()) {
+      classpathEntries.addAll(List.of(processClasspath.split(java.util.regex.Pattern.quote(File.pathSeparator))));
+    }
+    context.classpath().stream().map(Path::toString).forEach(classpathEntries::add);
+    if (!classpathEntries.isEmpty()) {
       options.add("-classpath");
-      options.add(classpath);
+      options.add(String.join(File.pathSeparator, classpathEntries.stream().distinct().toList()));
+    }
+    if (context.javaVersion() > 0) {
+      options.add("--release");
+      options.add(Integer.toString(context.javaVersion()));
     }
 
     JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, options, null, List.of(sourceFile));
@@ -139,7 +160,7 @@ public class JavaScriptProvider implements ScriptProvider {
       }
     }
 
-    MemoryClassLoader classLoader = new MemoryClassLoader(fileManager.getByteCodeMap(), parent);
+    MemoryClassLoader classLoader = new MemoryClassLoader(fileManager.getByteCodeMap(), context.parent());
     try {
       Class<?> loadedClass = classLoader.loadClass(className);
       Class<? extends ScriptInstance> scriptType = loadedClass.asSubclass(ScriptInstance.class);

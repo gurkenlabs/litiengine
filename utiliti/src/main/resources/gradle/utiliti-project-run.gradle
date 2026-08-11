@@ -1,0 +1,21 @@
+import org.gradle.jvm.tasks.Jar
+
+def encodedArtifacts = System.getProperty("utiliti.reusableArtifacts", "")
+def reusableArtifacts = encodedArtifacts.isBlank()
+  ? [] as Set
+  : new String(Base64.decoder.decode(encodedArtifacts), "UTF-8")
+    .readLines()
+    .collect { it.toLowerCase(Locale.ROOT) }
+    .toSet()
+
+gradle.projectsLoaded {
+  gradle.rootProject.allprojects { target ->
+    target.tasks.withType(Jar).configureEach { jarTask ->
+      jarTask.onlyIf("artifact is not already loaded by utiLITI") {
+        def artifact = jarTask.archiveFile.get().asFile.toPath()
+          .toAbsolutePath().normalize().toString().toLowerCase(Locale.ROOT)
+        !reusableArtifacts.contains(artifact)
+      }
+    }
+  }
+}

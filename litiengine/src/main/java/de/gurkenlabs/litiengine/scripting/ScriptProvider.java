@@ -9,6 +9,12 @@ public interface ScriptProvider {
 
   CompiledScript compile(ScriptDefinition definition, URL source, ClassLoader parent) throws ScriptException;
 
+  /** Compiles a script with classpath and language-level information supplied by the project build. */
+  default CompiledScript compile(ScriptDefinition definition, URL source, ScriptCompilationContext context)
+      throws ScriptException {
+    return this.compile(definition, source, context.parent());
+  }
+
   /** Creates semantic tooling for this language when the provider supports editor integration. */
   default Optional<ScriptLanguageService> createLanguageService(ScriptLanguageService.Workspace workspace) {
     return Optional.empty();

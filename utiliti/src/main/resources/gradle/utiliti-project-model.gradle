@@ -1,0 +1,68 @@
+import groovy.json.JsonOutput
+
+gradle.projectsLoaded {
+  gradle.rootProject.allprojects { candidate ->
+    candidate.pluginManager.withPlugin("application") {
+      candidate.tasks.register("utilitiProjectModel") {
+        group = "utiliti"
+        description = "Exports the application project model for utiLITI."
+
+        doLast {
+          def applications = gradle.rootProject.allprojects.findAll {
+            it.pluginManager.hasPlugin("application")
+          }
+          def requested = gradle.startParameter.projectProperties["utilitiProjectLocation"]
+          def requestedPath = requested == null
+            ? null
+            : new File(requested).toPath().toAbsolutePath().normalize()
+          def matching = requestedPath == null ? [] : applications.findAll {
+            requestedPath.startsWith(it.projectDir.toPath().toAbsolutePath().normalize())
+          }
+          def target = matching.max { it.projectDir.toPath().nameCount }
+          if (target == null && applications.size() == 1) {
+            target = applications.first()
+          }
+          if (target == null) {
+            throw new GradleException(
+              "Could not select an application project for ${requested ?: 'the opened project'}.")
+          }
+          if (target != candidate) {
+            return
+          }
+
+          def sourceSets = candidate.extensions.findByName("sourceSets")
+          def main = sourceSets == null ? null : sourceSets.findByName("main")
+          if (main == null) {
+            throw new GradleException("The application project has no main source set.")
+          }
+
+          def application = candidate.extensions.findByName("application")
+          def javaExtension = candidate.extensions.findByName("java")
+          def languageVersion = javaExtension?.toolchain?.languageVersion?.orNull?.asInt()
+          if (languageVersion == null) {
+            languageVersion = javaExtension?.sourceCompatibility?.majorVersion as Integer
+          }
+
+          def outputs = new LinkedHashSet(main.output.classesDirs.files)
+          if (main.output.resourcesDir != null) {
+            outputs.add(main.output.resourcesDir)
+          }
+          def runTask = candidate.path == ":" ? ":run" : "${candidate.path}:run"
+          def model = [
+            projectRoot: candidate.projectDir.absolutePath,
+            runTask: runTask,
+            mainClass: application?.mainClass?.orNull,
+            javaVersion: languageVersion,
+            sourceRoots: main.allJava.srcDirs.collect { it.absolutePath },
+            outputDirectories: outputs.collect { it.absolutePath },
+            compileClasspath: main.compileClasspath.files.collect { it.absolutePath },
+            runtimeClasspath: main.runtimeClasspath.files.collect { it.absolutePath }
+          ]
+          def encoded = Base64.encoder.encodeToString(
+            JsonOutput.toJson(model).getBytes("UTF-8"))
+          println("UTILITI_PROJECT_MODEL:${encoded}")
+        }
+      }
+    }
+  }
+}

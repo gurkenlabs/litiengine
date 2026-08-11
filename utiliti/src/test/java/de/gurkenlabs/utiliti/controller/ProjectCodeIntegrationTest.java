@@ -67,6 +67,21 @@ class ProjectCodeIntegrationTest {
     }
   }
 
+  @Test
+  void reloadUsesOutputDirectoriesFromProjectModel(@TempDir Path tempDir) throws Exception {
+    Path customOutput = tempDir.resolve("custom-output");
+    copyClass(customOutput, DiscoverableController.class, true);
+    ProjectModel project = new ProjectModel(tempDir, null, ":run", null, 25,
+        java.util.List.of(), java.util.List.of(customOutput), java.util.List.of(), java.util.List.of());
+
+    try (ProjectCodeIntegration integration = new ProjectCodeIntegration()) {
+      integration.reloadProject(project);
+
+      assertTrue(integration.getControllerDefinitions().stream()
+        .anyMatch(definition -> definition.className().equals(DiscoverableController.class.getName())));
+    }
+  }
+
   public static final class DiscoverableController implements IEntityController {
     private final Creature entity;
 
@@ -86,8 +101,13 @@ class ProjectCodeIntegrationTest {
   }
 
   private static void copyClass(Path root, Class<?> type) throws Exception {
+    copyClass(root, type, false);
+  }
+
+  private static void copyClass(Path root, Class<?> type, boolean directOutput) throws Exception {
     String className = type.getName();
-    Path classFile = root.resolve("build/classes/java/main").resolve(className.replace('.', '/') + ".class");
+    Path classes = directOutput ? root : root.resolve("build/classes/java/main");
+    Path classFile = classes.resolve(className.replace('.', '/') + ".class");
     Files.createDirectories(classFile.getParent());
     try (var source = ProjectCodeIntegrationTest.class.getClassLoader()
       .getResourceAsStream(className.replace('.', '/') + ".class")) {

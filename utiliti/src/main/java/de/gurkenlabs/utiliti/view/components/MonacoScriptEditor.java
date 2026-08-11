@@ -61,9 +61,9 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private ScriptDefinition definition;
   private URI uri;
   private Path path;
-  private String text = "";
-  private long version;
-  private ScriptLanguageService languageService;
+  private volatile String text = "";
+  private volatile long version;
+  private volatile ScriptLanguageService languageService;
   private CefClient client;
   private CefBrowser browser;
   private CefMessageRouter router;

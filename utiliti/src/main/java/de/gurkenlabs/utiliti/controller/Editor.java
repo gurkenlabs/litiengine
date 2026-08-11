@@ -84,6 +84,9 @@ public class Editor extends Screen {
   private ResourceBundle gameFile = new ResourceBundle();
   private Path projectPath;
   private final ProjectCodeIntegration projectCodeIntegration = new ProjectCodeIntegration();
+  private final ProjectBuildService projectBuildService = new GradleProjectBuildService();
+  private ProjectModel projectModel;
+  private ProjectSession projectSession;
   private Path currentResourceFile;
 
   private long statusTick;
@@ -201,15 +204,53 @@ public class Editor extends Screen {
     return projectCodeIntegration;
   }
 
+  public ProjectModel getProjectModel() {
+    return this.projectModel;
+  }
+
+  public ProjectSession getProjectSession() {
+    return this.projectSession;
+  }
+
   /** Reloads compiled project classes for script completion and precompiled Java script generations. */
   public void reloadProjectCode() {
     if (this.projectPath == null) return;
-    this.projectCodeIntegration.reload(this.projectPath);
+    this.projectModel = this.projectBuildService.refresh(this.projectPath);
+    this.projectCodeIntegration.reloadProject(this.projectModel);
+    this.applyProjectModel();
+  }
+
+  private void applyProjectModel() {
     Game.scripts().setProjectClassLoader(this.projectCodeIntegration.getClassLoader());
+    if (this.projectModel == null) return;
+    Game.scripts().setProjectClasspath(this.projectModel.scriptCompilationClasspath());
+    Game.scripts().setProjectJavaVersion(this.projectModel.javaVersion());
+  }
+
+  /** Launches the opened project through its Gradle application run task. */
+  public synchronized ProjectSession runProject() throws IOException {
+    if (this.projectPath == null) throw new IOException("Open a project before running it.");
+    if (this.projectSession != null && this.projectSession.isActive()) {
+      throw new IOException("The project is already running.");
+    }
+    this.projectModel = this.projectBuildService.refresh(this.projectPath);
+    this.applyProjectModel();
+    this.projectSession = this.projectBuildService.launch(ProjectLaunchRequest.run(this.projectModel));
+    return this.projectSession;
+  }
+
+  public synchronized void stopProject() {
+    if (this.projectSession != null) this.projectSession.stop();
   }
 
   public void setProjectPath(Path projectPath) {
     this.projectPath = projectPath;
+    this.projectModel = projectPath == null ? null : this.projectBuildService.resolve(projectPath);
+    if (projectPath == null) {
+      Game.scripts().setProjectClassLoader(null);
+      Game.scripts().setProjectClasspath(List.of());
+      Game.scripts().setProjectJavaVersion(Runtime.version().feature());
+    }
     this.windowMetadataDirty.set(true);
   }
 
@@ -283,6 +324,7 @@ public class Editor extends Screen {
     getMapComponent().clearAll();
     UI.clearInspector();
     this.currentResourceFile = null;
+    this.stopProject();
     this.projectCodeIntegration.close();
     this.setProjectPath(null);
     this.mapComponent.loadMaps(List.of(), true);
@@ -338,8 +380,8 @@ public class Editor extends Screen {
       Game.scripts().setProjectRoot(gameFile.getParent());
       this.setProjectPath(gameFile);
       this.loadProjectTilesetTerrains(gameFile.getParent());
-      this.projectCodeIntegration.reload(gameFile);
-      Game.scripts().setProjectClassLoader(this.projectCodeIntegration.getClassLoader());
+      this.projectCodeIntegration.reloadProject(this.projectModel);
+      this.applyProjectModel();
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
@@ -432,8 +474,8 @@ public class Editor extends Screen {
 
         this.setProjectPath(gameFile);
         this.loadProjectTilesetTerrains(gameFile.getParent());
-        this.projectCodeIntegration.reload(gameFile);
-        Game.scripts().setProjectClassLoader(this.projectCodeIntegration.getClassLoader());
+        this.projectCodeIntegration.reloadProject(this.projectModel);
+        this.applyProjectModel();
 
         this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
 

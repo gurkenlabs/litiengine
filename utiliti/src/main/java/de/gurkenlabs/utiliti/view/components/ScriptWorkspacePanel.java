@@ -8,6 +8,8 @@ import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.GradleScriptProjectSupport;
 import de.gurkenlabs.utiliti.controller.IntellijIntegration;
+import de.gurkenlabs.utiliti.controller.ProjectSession;
+import de.gurkenlabs.utiliti.controller.ScriptSourcePaths;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
@@ -122,6 +124,8 @@ public final class ScriptWorkspacePanel extends JPanel {
   private MonacoScriptEditor monaco;
   private ScriptTab monacoTab;
   private ScriptTab conflictTab;
+  private boolean projectLaunchPending;
+  private boolean restartRequested;
   private Consumer<ScriptDefinition> selectionListener = ignored -> {};
 
   public ScriptWorkspacePanel() {
@@ -192,6 +196,10 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
 
     this.bottomTabs.addTab("Problems", Icons.ERROR_16, new JScrollPane(this.problems));
+    this.output.setEditable(false);
+    this.output.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 12));
+    this.output.setLineWrap(false);
+    this.bottomTabs.addTab("Output", Icons.CONSOLE_16, new JScrollPane(this.output));
     this.bottomTabs.setMinimumSize(new Dimension(0, 110));
     this.bottomTabs.setPreferredSize(new Dimension(0, BOTTOM_PANEL_HEIGHT));
 
@@ -429,6 +437,88 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.appendOutput(successful ? "Compilation successful; script reloaded." : "Compilation failed; previous generation kept active.");
     this.setStatus(successful ? "Compiled and reloaded " + displayName(tab.definition)
       : "Reload failed; the previous generation is still active", !successful);
+  }
+
+  /** Saves all open scripts and launches the project through its Gradle application run task. */
+  public void runProject() {
+    if (this.projectLaunchPending) {
+      this.setStatus("The project is already starting", false);
+      return;
+    }
+    if (!this.saveAllScripts()) return;
+    if (Editor.instance().getCurrentResourceFile() != null) Editor.instance().save(false);
+    this.output.setText("");
+    this.bottomTabs.setSelectedIndex(1);
+    this.appendOutput("Resolving Gradle project model...");
+    this.projectLaunchPending = true;
+    Thread.ofVirtual().name("utiliti-project-launch").start(() -> {
+      try {
+        ProjectSession session = Editor.instance().runProject();
+        session.onOutput(line -> SwingUtilities.invokeLater(() -> this.appendOutput(line)));
+        session.onStateChanged(
+            state -> SwingUtilities.invokeLater(() -> this.projectStateChanged(session, state)));
+      } catch (IOException error) {
+        SwingUtilities.invokeLater(() -> {
+          this.appendOutput("Could not start project: " + error.getMessage());
+          this.setStatus("Could not start project: " + error.getMessage(), true);
+        });
+      } finally {
+        SwingUtilities.invokeLater(() -> this.projectLaunchPending = false);
+      }
+    });
+  }
+
+  public void stopProject() {
+    ProjectSession session = Editor.instance().getProjectSession();
+    if (session == null || !session.isActive()) {
+      this.setStatus("No project is running", false);
+      return;
+    }
+    this.appendOutput("Stopping project...");
+    Editor.instance().stopProject();
+  }
+
+  public void restartProject() {
+    ProjectSession session = Editor.instance().getProjectSession();
+    if (session == null || !session.isActive()) {
+      this.runProject();
+      return;
+    }
+    this.restartRequested = true;
+    this.appendOutput("Restarting project...");
+    Editor.instance().stopProject();
+  }
+
+  private boolean saveAllScripts() {
+    for (ScriptTab tab : this.openTabs.values()) {
+      if (tab.dirty && !tab.save()) {
+        this.setStatus("Could not save " + displayName(tab.definition), true);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void projectStateChanged(ProjectSession session, ProjectSession.State state) {
+    switch (state) {
+      case STARTING -> this.setStatus("Starting project...", false);
+      case RUNNING -> this.setStatus("Project is running", false);
+      case STOPPING -> this.setStatus("Stopping project...", false);
+      case EXITED -> {
+        int exitCode = session.exitCode().orElse(-1);
+        this.appendOutput("Project exited with code " + exitCode + ".");
+        this.setStatus("Project exited with code " + exitCode, exitCode != 0);
+        if (this.restartRequested) {
+          this.restartRequested = false;
+          this.runProject();
+        }
+      }
+      case FAILED -> {
+        this.appendOutput("Project launch failed.");
+        this.setStatus("Project launch failed", true);
+        this.restartRequested = false;
+      }
+    }
   }
 
   public void openActiveExternally() {
@@ -926,6 +1016,10 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private void appendOutput(String message) {
+    if (!SwingUtilities.isEventDispatchThread()) {
+      SwingUtilities.invokeLater(() -> this.appendOutput(message));
+      return;
+    }
     if (!this.output.getText().isEmpty()) this.output.append(System.lineSeparator());
     this.output.append(message);
     this.output.setCaretPosition(this.output.getDocument().getLength());
@@ -934,7 +1028,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private void insertScriptNode(ScriptDefinition definition) {
     DefaultMutableTreeNode parent = this.scriptsRoot;
     String relative = Objects.toString(definition.getSource(), "").replace('\\', '/');
-    relative = relative.replaceFirst("^(?:.*?/)?src/main/(?:java|groovy)/", "");
+    relative = relative.replaceFirst("^(?:.*?/)?(?:src/main|scripts)/(?:java|groovy)/", "");
     String[] parts = relative.split("/");
     for (int i = 0; i < Math.max(0, parts.length - 1); i++) {
       if (parts[i].isBlank()) continue;
@@ -1005,12 +1099,12 @@ public final class ScriptWorkspacePanel extends JPanel {
     do {
       className = suffix == 1 ? prefix : prefix + suffix;
       id = className;
-      source = resolveSource("src/main/java/" + className + ".java");
+      source = resolveSource(ScriptSourcePaths.create("java", className));
       suffix++;
     } while (source != null && (Files.exists(source) || scriptIdExists(id)));
     if (source == null) return;
 
-    ScriptDefinition definition = new ScriptDefinition(className, "java", "src/main/java/" + className + ".java",
+    ScriptDefinition definition = new ScriptDefinition(className, "java", ScriptSourcePaths.create("java", className),
       className, hostType);
     definition.setName(className);
     if (targetType != null) {
@@ -1074,12 +1168,13 @@ public final class ScriptWorkspacePanel extends JPanel {
     do {
       className = baseName + "Copy" + (suffix == 1 ? "" : suffix);
       id = definition.getId() + "-copy" + (suffix == 1 ? "" : "-" + suffix);
-      source = resolveSource("src/main/java/" + className + ".java");
+      source = resolveSource(ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className));
       suffix++;
     } while (source != null && (Files.exists(source) || scriptIdExists(id)));
     if (source == null) return;
 
-    ScriptDefinition dup = new ScriptDefinition(id, "java", "src/main/java/" + className + ".java",
+    ScriptDefinition dup = new ScriptDefinition(id, definition.getLanguage(),
+      ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className),
       className, definition.getHost());
     dup.setTargetType(definition.getTargetType());
 
@@ -1192,7 +1287,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     Path oldPath = resolveSource(definition.getSource());
-    Path newPath = resolveSource("src/main/java/" + newClassName + ".java");
+    String newSource = ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), newClassName);
+    Path newPath = resolveSource(newSource);
     if (newPath == null) return;
 
     String currentText = "";
@@ -1211,7 +1307,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     definition.setId(newClassName);
     definition.setName(newClassName);
-    definition.setSource("src/main/java/" + newClassName + ".java");
+    definition.setSource(newSource);
 
     try {
       if (newPath.getParent() != null) Files.createDirectories(newPath.getParent());
@@ -1352,7 +1448,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final class ScriptTab extends JPanel {
     private final ScriptDefinition definition;
     private String text = "";
-    private final Path path;
+    private Path path;
     private FileTime loadedTime;
     private boolean dirty;
     private int caretLine = 1;
@@ -1475,9 +1571,8 @@ public final class ScriptWorkspacePanel extends JPanel {
       String oldId = this.definition.getId();
       Path oldPath = resolveSource(this.definition.getSource());
 
-      String ext = ".java";
-      String subfolder = "src/main/java/";
-      String newSourceRel = subfolder + newClassName + ext;
+      String newSourceRel = ScriptSourcePaths.rename(
+        this.definition.getSource(), this.definition.getLanguage(), newClassName);
       Path newPath = resolveSource(newSourceRel);
 
       if (oldPath != null && Files.exists(oldPath) && newPath != null && !oldPath.equals(newPath)) {
@@ -1491,6 +1586,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.definition.setName(newClassName);
       this.definition.setImplementation(newClassName);
       this.definition.setSource(newSourceRel);
+      this.path = newPath;
       String updatedText = ScriptWorkspacePanel.synchronizeDeclaration(this.getText(), this.definition);
       if (!Objects.equals(updatedText, this.getText())) {
         this.setText(updatedText);

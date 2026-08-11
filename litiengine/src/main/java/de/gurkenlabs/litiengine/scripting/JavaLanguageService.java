@@ -283,6 +283,31 @@ public class JavaLanguageService implements ScriptLanguageService {
             ));
           }
         }
+      } else if (diag.message().contains("should be declared in a file named")) {
+        Matcher fileMatcher = Pattern.compile("class\\s+([A-Za-z_$][\\w$]*)\\s+is public,\\s+should be declared in a file named\\s+([A-Za-z_$][\\w$]*)\\.java").matcher(diag.message());
+        String expectedClassName = null;
+        String classInCode = null;
+        if (fileMatcher.find()) {
+          classInCode = fileMatcher.group(1);
+          expectedClassName = fileMatcher.group(2);
+        } else if (document.definition() != null) {
+          expectedClassName = document.definition().getImplementation();
+          Matcher declM = Pattern.compile("public\\s+class\\s+([A-Za-z_$][\\w$]*)").matcher(lineContent);
+          if (declM.find()) classInCode = declM.group(1);
+        }
+        if (classInCode != null && expectedClassName != null) {
+          Pattern classDeclPattern = Pattern.compile("(\\bpublic\\s+class\\s+)(" + Pattern.quote(classInCode) + ")(\\b)");
+          Matcher lineMatcher = classDeclPattern.matcher(lineContent);
+          if (lineMatcher.find()) {
+            Position startPos = new Position(diagLine - 1, lineMatcher.start(2));
+            Position endPos = new Position(diagLine - 1, lineMatcher.end(2));
+            actions.add(new CodeAction(
+              "Rename class in editor to '" + expectedClassName + "'",
+              "quickfix",
+              List.of(new TextEdit(new Range(startPos, endPos), expectedClassName))
+            ));
+          }
+        }
       }
     }
     return actions;
@@ -484,7 +509,18 @@ public class JavaLanguageService implements ScriptLanguageService {
     return Optional.empty();
   }
 
+  private static final int MAX_PARSE_CACHE_SIZE = 32;
+  private final Map<String, ParsedDocument> parseCache = new ConcurrentHashMap<>();
+
   private ParsedDocument parse(Document document) {
+    if (document == null || document.text() == null) {
+      return new ParsedDocument(null, true, List.of(), List.of());
+    }
+
+    String cacheKey = (document.uri() == null ? "" : document.uri().toString()) + ":" + document.version() + ":" + document.text().hashCode();
+    ParsedDocument cached = this.parseCache.get(cacheKey);
+    if (cached != null) return cached;
+
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     if (compiler == null) return new ParsedDocument(document.uri(), true, List.of(), List.of());
 
@@ -517,7 +553,12 @@ public class JavaLanguageService implements ScriptLanguageService {
         ));
       }
     }
-    return new ParsedDocument(document.uri(), diagnostics.isEmpty(), List.copyOf(diagnostics), List.of());
+    ParsedDocument result = new ParsedDocument(document.uri(), diagnostics.isEmpty(), List.copyOf(diagnostics), List.of());
+    if (this.parseCache.size() > MAX_PARSE_CACHE_SIZE) {
+      this.parseCache.clear();
+    }
+    this.parseCache.put(cacheKey, result);
+    return result;
   }
 
   private Map<String, Class<?>> variables(Document document, String source) {

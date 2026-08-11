@@ -48,6 +48,8 @@ public final class ScriptManager implements IUpdateable {
   private final Object gameHost = new Object();
   private Path projectRoot;
   private ClassLoader projectClassLoader;
+  private List<Path> projectClasspath = List.of();
+  private int projectJavaVersion = Runtime.version().feature();
   private boolean attachedToLoop;
 
   public ScriptManager() {
@@ -176,6 +178,19 @@ public final class ScriptManager implements IUpdateable {
   /** Sets the compiled project class loader used as the parent of runtime-compiled scripts. */
   public void setProjectClassLoader(ClassLoader projectClassLoader) {
     this.projectClassLoader = projectClassLoader;
+  }
+
+  /** Sets build-resolved locations used by development-time source compilation. */
+  public void setProjectClasspath(Collection<Path> projectClasspath) {
+    this.projectClasspath = projectClasspath == null
+      ? List.of()
+      : projectClasspath.stream().filter(Objects::nonNull).map(Path::toAbsolutePath).map(Path::normalize).distinct().toList();
+  }
+
+  /** Sets the Java language level used for development-time source compilation. */
+  public void setProjectJavaVersion(int projectJavaVersion) {
+    if (projectJavaVersion <= 0) throw new IllegalArgumentException("Project Java version must be positive.");
+    this.projectJavaVersion = projectJavaVersion;
   }
 
   public List<ScriptDiagnostic> getDiagnostics() {
@@ -324,7 +339,8 @@ public final class ScriptManager implements IUpdateable {
     }
     ClassLoader parent = this.projectClassLoader != null ? this.projectClassLoader : Thread.currentThread().getContextClassLoader();
     if (parent == null) parent = ScriptManager.class.getClassLoader();
-    return provider.compile(definition, source, parent);
+    return provider.compile(definition, source,
+      new ScriptCompilationContext(parent, this.projectClasspath, this.projectJavaVersion));
   }
 
   private URL resolveSource(String configuredSource) throws ScriptException {

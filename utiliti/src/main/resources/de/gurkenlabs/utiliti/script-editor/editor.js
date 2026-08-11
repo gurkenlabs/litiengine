@@ -444,8 +444,12 @@
       analysisTimer = setTimeout(analyze, 220);
     });
 
+    let cursorTimer;
     editor.onDidChangeCursorPosition(event => {
-      query('cursor', currentPosition(event.position)).catch(console.error);
+      clearTimeout(cursorTimer);
+      cursorTimer = setTimeout(() => {
+        query('cursor', currentPosition(event.position)).catch(console.error);
+      }, 50);
     });
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => query('save').catch(console.error));

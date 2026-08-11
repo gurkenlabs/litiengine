@@ -500,4 +500,28 @@ class ScriptRuntimeTests {
 
     assertTrue(actions.stream().anyMatch(a -> a.title().contains("Qualify superclass")), "Should offer quick fix to qualify EnvironmentScript superclass.");
   }
+
+  @Test
+  void javaLanguageServiceFixesPublicClassNameMismatch() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("EnvironmentScript2", "java", null, "EnvironmentScript2", ScriptHostType.ENVIRONMENT);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class HospitalMap extends EnvironmentScript {
+        @Override
+        public void onLoaded() {}
+        @Override
+        public void update() {}
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    List<ScriptDiagnostic> diags = List.of(new ScriptDiagnostic(ScriptDiagnostic.Severity.ERROR, "EnvironmentScript2", null, 2, 1, "class HospitalMap is public, should be declared in a file named HospitalMap.java"));
+    List<ScriptLanguageService.CodeAction> actions = service.codeActions(doc, new ScriptLanguageService.Range(new ScriptLanguageService.Position(1, 0), new ScriptLanguageService.Position(1, 50)), diags);
+
+    assertTrue(actions.stream().anyMatch(a -> a.title().contains("Rename class in editor")), "Should offer quick fix to revert class name to match file name.");
+  }
 }

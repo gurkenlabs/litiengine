@@ -65,15 +65,21 @@ public final class ProjectCodeIntegration implements AutoCloseable {
   }
 
   public void reload(Path gameFile) {
-    close();
-    if (gameFile == null || gameFile.getParent() == null) {
-      return;
-    }
+    Path root = gameFile == null || gameFile.getParent() == null ? null : gameFile.getParent();
+    List<Path> outputs = root == null ? List.of() : CLASS_DIRECTORIES.stream().map(root::resolve).toList();
+    this.reload(outputs);
+  }
 
-    Path parent = gameFile.getParent();
-    List<Path> validDirectories = CLASS_DIRECTORIES.stream()
-      .map(parent::resolve)
+  /** Reloads project types from the output directories supplied by the resolved project model. */
+  public void reloadProject(ProjectModel project) {
+    this.reload(project == null ? List.of() : project.outputDirectories());
+  }
+
+  private void reload(List<Path> outputDirectories) {
+    close();
+    List<Path> validDirectories = outputDirectories.stream()
       .filter(Files::isDirectory)
+      .distinct()
       .toList();
 
     if (validDirectories.isEmpty()) {
