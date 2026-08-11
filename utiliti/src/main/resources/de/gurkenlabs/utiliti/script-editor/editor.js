@@ -29,7 +29,7 @@
           [/\/\*/, 'comment', '@comment'],
           [/\/\/.*$/, 'comment'],
           [/\[.*?\]/, 'tag'],
-          [/@[A-Za-z_$][\w$]*(?:\s*\([^)]*\))?/, 'annotation'],
+          [/@[A-Za-z_$][\w$]*/, 'annotation'],
           [/[A-Z][\w$]*/, 'type.identifier'],
           [/[a-z_$][\w$]*(?=\s*\()/, 'function'],
           [/[a-z_$][\w$]*/, { cases: { '@keywords': 'keyword', '@constants': 'constant', '@typeKeywords': 'type', '@default': 'identifier' } }],

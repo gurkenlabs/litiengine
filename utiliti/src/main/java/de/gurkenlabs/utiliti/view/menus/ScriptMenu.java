@@ -15,8 +15,36 @@ public class ScriptMenu extends JMenu {
     JMenu newSub = new JMenu("New Script");
     newSub.setIcon(Icons.ADD_16);
 
-    JMenuItem entityScript = new JMenuItem("Entity Script...");
-    entityScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY));
+    JMenu entitySub = new JMenu("Entity Script");
+
+    JMenuItem creatureScript = new JMenuItem("Creature Script...");
+    creatureScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Creature.class));
+
+    JMenuItem propScript = new JMenuItem("Prop Script...");
+    propScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Prop.class));
+
+    JMenuItem triggerScript = new JMenuItem("Trigger Script...");
+    triggerScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Trigger.class));
+
+    JMenuItem emitterScript = new JMenuItem("Emitter Script...");
+    emitterScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY, de.gurkenlabs.litiengine.graphics.emitters.Emitter.class));
+
+    JMenuItem collisionBoxScript = new JMenuItem("CollisionBox Script...");
+    collisionBoxScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.CollisionBox.class));
+
+    JMenuItem lightSourceScript = new JMenuItem("LightSource Script...");
+    lightSourceScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.LightSource.class));
+
+    JMenuItem genericEntityScript = new JMenuItem("Generic Entity Script...");
+    genericEntityScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.IEntity.class));
+
+    entitySub.add(creatureScript);
+    entitySub.add(propScript);
+    entitySub.add(triggerScript);
+    entitySub.add(emitterScript);
+    entitySub.add(collisionBoxScript);
+    entitySub.add(lightSourceScript);
+    entitySub.add(genericEntityScript);
 
     JMenuItem gameScript = new JMenuItem("Game Script...");
     gameScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.GAME));
@@ -24,7 +52,7 @@ public class ScriptMenu extends JMenu {
     JMenuItem envScript = new JMenuItem("Environment Script...");
     envScript.addActionListener(e -> UI.getScriptWorkspacePanel().createScript(ScriptKind.ENVIRONMENT));
 
-    newSub.add(entityScript);
+    newSub.add(entitySub);
     newSub.add(gameScript);
     newSub.add(envScript);
 

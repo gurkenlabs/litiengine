@@ -1050,18 +1050,23 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   public void createScript(ScriptKind kind) {
+    createScript(kind, kind == ScriptKind.ENTITY ? Creature.class : null);
+  }
+
+  public void createScript(ScriptKind kind, Class<?> targetClass) {
     if (Editor.instance().getGameFile() == null || Editor.instance().getProjectPath() == null) return;
+    String targetType = targetClass != null ? targetClass.getName() : (kind == ScriptKind.ENTITY ? Creature.class.getName() : null);
+    String targetSimple = targetClass != null ? targetClass.getSimpleName() : "Creature";
     String prefix = switch (kind) {
       case GAME -> "GameScript";
       case ENVIRONMENT -> "EnvironmentScript";
-      case ENTITY -> "CreatureScript";
+      case ENTITY -> "Creature".equals(targetSimple) ? "CreatureScript" : targetSimple + "Script";
     };
     ScriptHostType hostType = switch (kind) {
       case GAME -> ScriptHostType.GAME;
       case ENVIRONMENT -> ScriptHostType.ENVIRONMENT;
       case ENTITY -> ScriptHostType.ENTITY;
     };
-    String targetType = kind == ScriptKind.ENTITY ? Creature.class.getName() : null;
 
     int suffix = 1;
     String id;
@@ -1354,20 +1359,25 @@ public final class ScriptWorkspacePanel extends JPanel {
         + "  }\n"
         + "}\n";
     }
-    String base = "CreatureScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.CreatureScript" : "CreatureScript";
+    String targetType = definition.getTargetType() != null ? definition.getTargetType() : "de.gurkenlabs.litiengine.entities.Creature";
+    String targetSimple = targetType.substring(targetType.lastIndexOf('.') + 1);
+    String base = "Creature".equals(targetSimple)
+        ? ("CreatureScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.CreatureScript" : "CreatureScript")
+        : ("EntityScript<" + targetSimple + ">");
     return "import de.gurkenlabs.litiengine.*;\n"
-      + "import de.gurkenlabs.litiengine.entities.Creature;\n"
+      + "import " + targetType + ";\n"
+      + "import de.gurkenlabs.litiengine.entities.*;\n"
       + "import de.gurkenlabs.litiengine.resources.*;\n"
       + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
       + "/**\n"
-      + " * Creature script controller for {@link Creature}.\n"
-      + " * Use {@code host()} to access creature movement, animation, and attributes.\n"
+      + " * Entity script controller for {@link " + targetSimple + "}.\n"
+      + " * Use {@code host()} to access entity attributes and behavior.\n"
       + " */\n"
-      + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENTITY, target = Creature.class)\n"
+      + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENTITY, target = " + targetSimple + ".class)\n"
       + "public class " + className + " extends " + base + " {\n"
       + "  @Override\n"
       + "  public void onLoaded() {\n"
-      + "    // Creature and environment ready.\n"
+      + "    // Entity and environment ready.\n"
       + "  }\n\n"
       + "  @Override\n"
       + "  public void update() {\n"
