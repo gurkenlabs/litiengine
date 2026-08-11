@@ -1606,25 +1606,18 @@ public final class ScriptWorkspacePanel extends JPanel {
     private final JPanel panel = new JPanel();
     private final JLabel iconLabel = new JLabel();
     private final JLabel textLabel = new JLabel();
-    private final JLabel errorLabel = new JLabel();
 
     ScriptTreeRenderer() {
       this.panel.setLayout(new javax.swing.BoxLayout(this.panel, javax.swing.BoxLayout.X_AXIS));
       this.panel.setOpaque(false);
       this.iconLabel.setOpaque(false);
       this.textLabel.setOpaque(false);
-      this.errorLabel.setOpaque(false);
       this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.textLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-      this.errorLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.textLabel.setFont(Style.getDefaultFont());
-      this.errorLabel.setIcon(Icons.ERROR_16);
-      this.errorLabel.setVisible(false);
       this.panel.add(this.iconLabel);
       this.panel.add(javax.swing.Box.createHorizontalStrut(4));
       this.panel.add(this.textLabel);
-      this.panel.add(javax.swing.Box.createHorizontalStrut(4));
-      this.panel.add(this.errorLabel);
     }
 
     @Override
@@ -1633,22 +1626,11 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
         this.textLabel.setText(item.label());
         this.iconLabel.setIcon(item.definition() != null ? Icons.SCRIPT_16 : Icons.SYMBOL_GROUP_16);
-
-        boolean hasError = item.definition() != null
-          && Boolean.TRUE.equals(ScriptWorkspacePanel.this.scriptErrorStates.get(item.definition().getId()));
-        this.errorLabel.setVisible(hasError);
-
-        if (selected) {
-          this.textLabel.setForeground(Color.WHITE);
-        } else if (hasError) {
-          this.textLabel.setForeground(new Color(255, 110, 110));
-        } else {
-          this.textLabel.setForeground(Style.text());
-        }
+        this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
       } else {
         this.textLabel.setText(Objects.toString(value, ""));
         this.iconLabel.setIcon(null);
-        this.errorLabel.setVisible(false);
+        this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
       }
       this.panel.setOpaque(false);
       return this.panel;
