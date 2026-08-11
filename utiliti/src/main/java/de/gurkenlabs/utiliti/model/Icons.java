@@ -336,4 +336,47 @@ public final class Icons {
       }
     }
   }
+
+  public static final Icon GREEN_PLAY_16 = new VectorRunIcon(16, true);
+  public static final Icon RED_STOP_16 = new VectorRunIcon(16, false);
+
+  public static class VectorRunIcon implements Icon {
+    private final int size;
+    private final boolean isPlay;
+
+    public VectorRunIcon(int size, boolean isPlay) {
+      this.size = size;
+      this.isPlay = isPlay;
+    }
+
+    @Override
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+      g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+      boolean enabled = c == null || c.isEnabled();
+
+      if (isPlay) {
+        g2.setColor(enabled ? new java.awt.Color(53, 208, 115) : new java.awt.Color(80, 80, 85));
+        int padding = Math.max(2, size / 6);
+        int w = size - padding * 2;
+        int h = size - padding * 2;
+
+        java.awt.geom.Path2D triangle = new java.awt.geom.Path2D.Double();
+        triangle.moveTo(x + padding + 1, y + padding);
+        triangle.lineTo(x + padding + w, y + padding + h / 2.0);
+        triangle.lineTo(x + padding + 1, y + padding + h);
+        triangle.closePath();
+        g2.fill(triangle);
+      } else {
+        g2.setColor(enabled ? new java.awt.Color(229, 87, 86) : new java.awt.Color(80, 80, 85));
+        int padding = Math.max(3, size / 5);
+        int sz = size - padding * 2;
+        g2.fill(new java.awt.geom.RoundRectangle2D.Double(x + padding, y + padding, sz, sz, 3, 3));
+      }
+      g2.dispose();
+    }
+
+    @Override public int getIconWidth() { return size; }
+    @Override public int getIconHeight() { return size; }
+  }
 }

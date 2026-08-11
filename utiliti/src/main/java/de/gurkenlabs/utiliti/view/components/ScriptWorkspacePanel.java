@@ -492,6 +492,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.restartRequested = false;
       }
     }
+    UI.updateRunControlStates();
   }
 
   public void openActiveExternally() {

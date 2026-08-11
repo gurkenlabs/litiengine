@@ -557,6 +557,25 @@ public final class UI {
     }
   }
 
+  public static void updateRunControlStates() {
+    Runnable update = () -> {
+      boolean hasProject = Editor.instance().getProjectPath() != null;
+      boolean isRunning = Editor.instance().getProjectSession() != null && Editor.instance().getProjectSession().isActive();
+
+      if (Game.window() != null && Game.window().getHostControl() instanceof javax.swing.JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
+        menuBar.updateRunState(hasProject, isRunning);
+      }
+      if (viewportToolbar != null) {
+        viewportToolbar.updateRunState(hasProject, isRunning);
+      }
+    };
+    if (SwingUtilities.isEventDispatchThread()) {
+      update.run();
+    } else {
+      SwingUtilities.invokeLater(update);
+    }
+  }
+
   private static void setupInterface() {
     JFrame window = initWindow();
     installInspectorNavigationShortcuts(window);

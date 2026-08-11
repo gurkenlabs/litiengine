@@ -86,6 +86,8 @@ public class ViewportToolbar extends JPanel {
   private final JToggleButton btnCollision;
   private final List<JPanel> controlGroups = new ArrayList<>();
   private final List<JPanel> groupDividers = new ArrayList<>();
+  private final JButton btnRunProject;
+  private final JButton btnStopProject;
   private final JPanel mapControlsContainer;
   private final JPanel scriptControlsContainer;
   private final JPanel rightControlsContainer;
@@ -119,27 +121,27 @@ public class ViewportToolbar extends JPanel {
     left.add(controlGroup(mapSelector));
 
     JPanel runGroup = controlGroup();
-    JButton btnRunProject = button("", Icons.PLAY_16, () -> {
+    this.btnRunProject = button("", Icons.GREEN_PLAY_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) {
         UI.getScriptWorkspacePanel().runProject();
       }
     }, null);
-    Style.styleButton(btnRunProject, Style.ButtonVariant.TOOLBAR);
-    btnRunProject.setForeground(Style.COLOR_GREEN);
-    btnRunProject.setToolTipText("Run Project");
-    makeIconOnly(btnRunProject, 28);
+    Style.styleButton(this.btnRunProject, Style.ButtonVariant.TOOLBAR);
+    this.btnRunProject.setToolTipText("Run Project (Shift+F10)");
+    makeIconOnly(this.btnRunProject, 28);
 
-    JButton btnStopProject = button("", Icons.POWER_16, () -> {
+    this.btnStopProject = button("", Icons.RED_STOP_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) {
         UI.getScriptWorkspacePanel().stopProject();
       }
     }, null);
-    Style.styleButton(btnStopProject, Style.ButtonVariant.DESTRUCTIVE);
-    makeIconOnly(btnStopProject, 28);
-    btnStopProject.setToolTipText("Stop Project");
+    Style.styleButton(this.btnStopProject, Style.ButtonVariant.TOOLBAR);
+    this.btnStopProject.setEnabled(false);
+    makeIconOnly(this.btnStopProject, 28);
+    this.btnStopProject.setToolTipText("Stop Project (Ctrl+F2)");
 
-    addToControlGroup(runGroup, btnRunProject);
-    addToControlGroup(runGroup, btnStopProject);
+    addToControlGroup(runGroup, this.btnRunProject);
+    addToControlGroup(runGroup, this.btnStopProject);
     left.add(runGroup);
 
     this.mapControlsContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
@@ -286,6 +288,12 @@ public class ViewportToolbar extends JPanel {
 
     add(left, BorderLayout.WEST);
     add(right, BorderLayout.EAST);
+  }
+
+  public void updateRunState(boolean hasProject, boolean isRunning) {
+    this.btnRunProject.setEnabled(hasProject);
+    this.btnRunProject.setToolTipText(isRunning ? "Rerun Project (Shift+F10)" : "Run Project (Shift+F10)");
+    this.btnStopProject.setEnabled(isRunning);
   }
 
   public void setScriptMode(boolean scriptMode) {
