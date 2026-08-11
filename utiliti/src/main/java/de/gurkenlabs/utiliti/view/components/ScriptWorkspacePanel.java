@@ -924,6 +924,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     int totalCount = 0;
+    int errorCount = 0;
+    int warningCount = 0;
     for (Map.Entry<String, List<ScriptDiagnostic>> entry : allDiagnostics.entrySet()) {
       String scriptId = entry.getKey();
       List<ScriptDiagnostic> list = entry.getValue();
@@ -935,6 +937,9 @@ public final class ScriptWorkspacePanel extends JPanel {
         totalCount++;
         if (diag.severity() == ScriptDiagnostic.Severity.ERROR) {
           scriptHasError = true;
+          errorCount++;
+        } else if (diag.severity() == ScriptDiagnostic.Severity.WARNING) {
+          warningCount++;
         }
       }
 
@@ -943,6 +948,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     }
 
+    UI.updateProblemsStatus(warningCount, errorCount);
     this.scripts.repaint();
   }
 

@@ -538,6 +538,25 @@ public final class UI {
     }
   }
 
+  public static void updateProblemsStatus(int warnings, int errors) {
+    if (bottomProblemsTab != null) {
+      Runnable update = () -> {
+        bottomProblemsTab.putClientProperty("consoleWarnings", warnings);
+        bottomProblemsTab.putClientProperty("consoleErrors", errors);
+        bottomProblemsTab.setToolTipText(
+            warnings > 0 || errors > 0
+                ? (errors + " errors" + (warnings > 0 ? ", " + warnings + " warnings" : ""))
+                : null);
+        bottomProblemsTab.repaint();
+      };
+      if (SwingUtilities.isEventDispatchThread()) {
+        update.run();
+      } else {
+        SwingUtilities.invokeLater(update);
+      }
+    }
+  }
+
   private static void setupInterface() {
     JFrame window = initWindow();
     installInspectorNavigationShortcuts(window);
@@ -965,7 +984,7 @@ public final class UI {
 
     JToggleButton resourcesTab = createBottomTab(Resources.strings().get("assettree_assets"), true, false);
     JToggleButton consoleTab = createBottomTab(Resources.strings().get("assettree_console"), false, true);
-    JToggleButton problemsTab = createBottomTab("Problems", false, false);
+    JToggleButton problemsTab = createBottomTab("Problems", false, true);
 
     if (scriptWorkspacePanel != null) {
       content.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
