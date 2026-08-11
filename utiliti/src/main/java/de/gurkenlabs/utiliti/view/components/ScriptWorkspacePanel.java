@@ -1582,7 +1582,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     private void updateTabTitle() {
-      if (this.title != null) this.title.setText((this.dirty ? "● " : "") + displayName(this.definition));
+      if (this.title != null) this.title.setText((this.dirty ? "* " : "") + displayName(this.definition));
     }
   }
 
