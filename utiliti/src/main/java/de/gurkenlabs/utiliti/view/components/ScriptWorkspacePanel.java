@@ -991,11 +991,29 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.status.setForeground(error ? new Color(210, 80, 80) : new Color(100, 170, 110));
   }
 
+  private static final Pattern JUL_HEADER_PATTERN = Pattern.compile(
+      "^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z.]* \\d{1,2},? \\d{4} \\d{1,2}:\\d{2}:\\d{2} (?:AM|PM) .*",
+      Pattern.CASE_INSENSITIVE
+  );
+
+  private String pendingLogHeader = null;
+
   private void appendOutput(String message) {
-    if (message != null && !message.isBlank()) {
-      LevelAndMessage parsed = parseLevelAndMessage(message);
-      log.log(parsed.level(), parsed.message());
+    if (message == null || message.isBlank()) return;
+
+    String trimmed = message.trim();
+
+    if (JUL_HEADER_PATTERN.matcher(trimmed).matches()) {
+      if (this.pendingLogHeader != null) {
+        log.info(this.pendingLogHeader);
+      }
+      this.pendingLogHeader = trimmed;
+      return;
     }
+
+    LevelAndMessage parsed = parseLevelAndMessage(trimmed);
+    this.pendingLogHeader = null;
+    log.log(parsed.level(), parsed.message());
   }
 
   private static LevelAndMessage parseLevelAndMessage(String raw) {
@@ -1016,7 +1034,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       level = Level.WARNING;
     }
 
-    String cleaned = trimmed.replaceFirst("^(?i)(?:SEVERE|SCHWERWIEGEND|WARNING|WARNUNG|INFO|CONFIG|FINE|FINER|FINEST)\\s*:?\\s*", "");
+    String cleaned = trimmed.replaceFirst("^(?i)(?:SEVERE|SCHWERWIEGEND|WARNING|WARNUNG|INFORMATION|INFO|CONFIG|FINE|FINER|FINEST)\\b\\s*:?\\s*", "");
     if (cleaned.isBlank()) cleaned = trimmed;
 
     return new LevelAndMessage(level, cleaned);
