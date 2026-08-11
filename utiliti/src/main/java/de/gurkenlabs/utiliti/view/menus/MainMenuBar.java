@@ -25,6 +25,7 @@ public class MainMenuBar extends JMenuBar {
     this.scriptMenu.setVisible(false);
     this.add(this.mapMenu);
     this.add(this.scriptMenu);
+    this.add(new RunMenu());
     this.add(new HelpMenu());
     styleTopLevelMenus();
   }

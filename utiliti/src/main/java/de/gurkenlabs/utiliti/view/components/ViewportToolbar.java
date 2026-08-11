@@ -243,6 +243,34 @@ public class ViewportToolbar extends JPanel {
     this.btnCollision = viewToggle(Resources.strings().get("toolbar_outlines"), new MonochromeIcon(Icons.COLLISIONBOX_16), Editor.preferences().renderBoundingBoxes(), selected -> Editor.preferences().setRenderBoundingBoxes(selected), shortcut(KeyEvent.VK_H));
     JPanel viewControls = controlGroup(this.btnGrid, this.btnSnap, this.btnCollision);
 
+    JPanel runGroup = controlGroup();
+    JLabel lblRunConfig = new JLabel("Project");
+    lblRunConfig.setFont(lblRunConfig.getFont().deriveFont(java.awt.Font.BOLD, 12f));
+    lblRunConfig.setForeground(Style.COLOR_TEXT);
+    lblRunConfig.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+
+    JButton btnRunProject = button("Run", Icons.PLAY_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) {
+        UI.getScriptWorkspacePanel().runProject();
+      }
+    }, null);
+    Style.styleButton(btnRunProject, Style.ButtonVariant.TOOLBAR);
+    btnRunProject.setForeground(Style.COLOR_GREEN);
+    btnRunProject.setToolTipText("Run Project");
+
+    JButton btnStopProject = button("", Icons.POWER_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) {
+        UI.getScriptWorkspacePanel().stopProject();
+      }
+    }, null);
+    Style.styleButton(btnStopProject, Style.ButtonVariant.DESTRUCTIVE);
+    makeIconOnly(btnStopProject, 28);
+    btnStopProject.setToolTipText("Stop Project");
+
+    addToControlGroup(runGroup, lblRunConfig);
+    addToControlGroup(runGroup, btnRunProject);
+    addToControlGroup(runGroup, btnStopProject);
+
     this.zoomControls = new ZoomControls(
         () -> {
           Zoom.out();
@@ -255,6 +283,8 @@ public class ViewportToolbar extends JPanel {
         this::fitMap,
         Resources.strings().get("toolbar_fit"));
     this.zoomControls.setZoomText(formatZoom());
+    right.add(runGroup);
+    right.add(Box.createRigidArea(new Dimension(Style.SPACE_MEDIUM, 0)));
     right.add(viewControls);
     right.add(Box.createRigidArea(new Dimension(Style.SPACE_MEDIUM, 0)));
     right.add(this.zoomControls);

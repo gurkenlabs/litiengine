@@ -76,15 +76,6 @@ public class ScriptMenu extends JMenu {
     openIde.addActionListener(e -> UI.getScriptWorkspacePanel().openActiveExternally());
     KeyBindings.bind(openIde, Command.SCRIPT_OPEN_IDE);
 
-    JMenuItem runProject = new JMenuItem("Run Project", Icons.PLAY_16);
-    runProject.addActionListener(e -> UI.getScriptWorkspacePanel().runProject());
-
-    JMenuItem stopProject = new JMenuItem("Stop Project", Icons.POWER_16);
-    stopProject.addActionListener(e -> UI.getScriptWorkspacePanel().stopProject());
-
-    JMenuItem restartProject = new JMenuItem("Restart Project", Icons.RELOAD_16);
-    restartProject.addActionListener(e -> UI.getScriptWorkspacePanel().restartProject());
-
     this.add(newSub);
     this.addSeparator();
     this.add(save);
@@ -93,9 +84,5 @@ public class ScriptMenu extends JMenu {
     this.add(reload);
     this.addSeparator();
     this.add(openIde);
-    this.addSeparator();
-    this.add(runProject);
-    this.add(stopProject);
-    this.add(restartProject);
   }
 }
