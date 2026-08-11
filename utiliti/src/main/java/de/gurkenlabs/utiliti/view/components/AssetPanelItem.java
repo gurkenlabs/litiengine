@@ -786,6 +786,14 @@ public class AssetPanelItem extends JPanel {
           deleted = true;
         }
       }
+      case de.gurkenlabs.litiengine.scripting.ScriptDefinition scriptDefinition -> {
+        if (UI.getScriptWorkspacePanel() != null) {
+          UI.getScriptWorkspacePanel().deleteScript(scriptDefinition);
+        } else {
+          deleteScriptDefinition(scriptDefinition);
+        }
+        deleted = true;
+      }
       default -> {
       }
     }
@@ -794,6 +802,30 @@ public class AssetPanelItem extends JPanel {
       Editor.instance().getMapComponent().reloadEnvironment();
       UI.getAssetController().refresh();
     }
+  }
+
+  private static void deleteScriptDefinition(de.gurkenlabs.litiengine.scripting.ScriptDefinition definition) {
+    if (definition == null || Editor.instance().getGameFile() == null) return;
+    int choice = JOptionPane.showConfirmDialog(null,
+      "Are you sure you want to delete script '" + definition.getName() + "'?\nThis will remove the file from disk.",
+      "Delete Script", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+    if (choice != JOptionPane.YES_OPTION) return;
+
+    if (definition.getSource() != null && Editor.instance().getProjectPath() != null) {
+      try {
+        java.nio.file.Path root = Editor.instance().getProjectPath().getParent().toAbsolutePath().normalize();
+        java.nio.file.Path file = root.resolve(definition.getSource()).toAbsolutePath().normalize();
+        if (java.nio.file.Files.exists(file)) {
+          java.nio.file.Files.delete(file);
+        }
+      } catch (Exception ignored) {
+      }
+    }
+
+    Editor.instance().getGameFile().getScripts().remove(definition);
+    de.gurkenlabs.litiengine.Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
+    de.gurkenlabs.utiliti.controller.UndoManager.instance().recordChanges();
+    UI.getAssetController().refresh();
   }
 
   private boolean confirmDelete(String assetType, String assetName) {
@@ -988,7 +1020,7 @@ public class AssetPanelItem extends JPanel {
     } else if (origin instanceof Tileset || origin instanceof SoundResource) {
       btnAdd.setVisible(false);
       btnDelete.setVisible(origin instanceof SoundResource && visible);
-    } else if (origin instanceof Animation) {
+    } else if (origin instanceof Animation || origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition) {
       btnAdd.setVisible(false);
       btnDelete.setVisible(visible);
     }
