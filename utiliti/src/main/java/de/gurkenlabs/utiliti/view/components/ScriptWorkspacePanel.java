@@ -196,10 +196,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
 
     this.bottomTabs.addTab("Problems", Icons.ERROR_16, new JScrollPane(this.problems));
-    this.output.setEditable(false);
-    this.output.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 12));
-    this.output.setLineWrap(false);
-    this.bottomTabs.addTab("Output", Icons.CONSOLE_16, new JScrollPane(this.output));
+    this.bottomTabs.addTab("Console", Icons.CONSOLE_16, UI.getConsole() != null ? UI.getConsole() : new JScrollPane(this.output));
     this.bottomTabs.setMinimumSize(new Dimension(0, 110));
     this.bottomTabs.setPreferredSize(new Dimension(0, BOTTOM_PANEL_HEIGHT));
 
@@ -298,6 +295,10 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.focusOrOpenFirstScript();
       });
     });
+  }
+
+  public JComponent getProblemsComponent() {
+    return new JScrollPane(this.problems);
   }
 
   public synchronized void close() {
@@ -928,7 +929,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private void showAnalysis(de.gurkenlabs.litiengine.scripting.ScriptLanguageService.Analysis analysis) {
     if (this.monacoTab != null && this.monacoTab.definition != null) {
-      this.projectDiagnostics.put(this.monacoTab.definition.getId(), analysis.diagnostics());
+      this.projectDiagnostics.put(this.monacoTab.definition.getId(), new ArrayList<>(analysis.diagnostics()));
     }
     refreshProblemsTable();
   }
@@ -937,7 +938,10 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.problemsModel.setRowCount(0);
     this.scriptErrorStates.clear();
 
-    Map<String, List<ScriptDiagnostic>> allDiagnostics = new LinkedHashMap<>(this.projectDiagnostics);
+    Map<String, List<ScriptDiagnostic>> allDiagnostics = new LinkedHashMap<>();
+    for (Map.Entry<String, List<ScriptDiagnostic>> entry : this.projectDiagnostics.entrySet()) {
+      allDiagnostics.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+    }
     for (ScriptDiagnostic diag : Game.scripts().getDiagnostics()) {
       if (diag.scriptId() != null) {
         allDiagnostics.computeIfAbsent(diag.scriptId(), k -> new ArrayList<>()).add(diag);

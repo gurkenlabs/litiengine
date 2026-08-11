@@ -937,6 +937,12 @@ public final class UI {
 
     JToggleButton resourcesTab = createBottomTab(Resources.strings().get("assettree_assets"), true, false);
     JToggleButton consoleTab = createBottomTab(Resources.strings().get("assettree_console"), false, true);
+    JToggleButton problemsTab = createBottomTab("Problems", false, false);
+
+    if (scriptWorkspacePanel != null) {
+      content.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
+    }
+
     Runnable updateConsoleStatus =
         () -> {
           Runnable update =
@@ -962,6 +968,7 @@ public final class UI {
     ButtonGroup tabs = new ButtonGroup();
     tabs.add(resourcesTab);
     tabs.add(consoleTab);
+    tabs.add(problemsTab);
 
     JPanel tabButtons = new JPanel(new GridBagLayout());
     tabButtons.setOpaque(false);
@@ -970,6 +977,7 @@ public final class UI {
     tabConstraints.weighty = 1.0;
     tabButtons.add(resourcesTab, tabConstraints);
     tabButtons.add(consoleTab, tabConstraints);
+    tabButtons.add(problemsTab, tabConstraints);
 
     JPanel header = new JPanel(new BorderLayout()) {
       @Override
@@ -992,6 +1000,13 @@ public final class UI {
     });
     consoleTab.addActionListener(e -> {
       ((CardLayout) content.getLayout()).show(content, "console");
+      assetComponent.getToolbar().setVisible(false);
+    });
+    problemsTab.addActionListener(e -> {
+      if (scriptWorkspacePanel != null) {
+        content.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
+      }
+      ((CardLayout) content.getLayout()).show(content, "problems");
       assetComponent.getToolbar().setVisible(false);
     });
 

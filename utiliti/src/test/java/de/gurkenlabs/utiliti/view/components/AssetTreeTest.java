@@ -20,7 +20,7 @@ class AssetTreeTest {
     assertEquals("Spritesheets", root.getChildAt(0).toString());
     assertEquals(3, root.getChildAt(0).getChildCount());
     assertEquals("Resources", root.getChildAt(1).toString());
-    assertEquals(5, root.getChildAt(1).getChildCount());
+    assertEquals(6, root.getChildAt(1).getChildCount());
   }
 
   @Test

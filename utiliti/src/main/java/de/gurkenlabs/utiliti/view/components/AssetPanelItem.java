@@ -407,7 +407,11 @@ public class AssetPanelItem extends JPanel {
         }
         requestFocus();
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-          addEntity();
+          if (origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition scriptDef) {
+            UI.openScript(scriptDef);
+          } else {
+            addEntity();
+          }
         }
       }
     };
