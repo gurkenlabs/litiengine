@@ -992,9 +992,36 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private void appendOutput(String message) {
     if (message != null && !message.isBlank()) {
-      log.info(message);
+      LevelAndMessage parsed = parseLevelAndMessage(message);
+      log.log(parsed.level(), parsed.message());
     }
   }
+
+  private static LevelAndMessage parseLevelAndMessage(String raw) {
+    if (raw == null || raw.isBlank()) return new LevelAndMessage(Level.INFO, raw);
+
+    String trimmed = raw.trim();
+    String upper = trimmed.toUpperCase(Locale.ROOT);
+
+    Level level = Level.INFO;
+
+    if (upper.contains("SCHWERWIEGEND:") || upper.contains("SEVERE:") || upper.startsWith("SEVERE") || upper.startsWith("ERROR") || upper.startsWith("FATAL")) {
+      level = Level.SEVERE;
+    } else if (upper.contains("WARNUNG:") || upper.contains("WARNING:") || upper.startsWith("WARNING") || upper.startsWith("WARN")) {
+      level = Level.WARNING;
+    } else if (upper.startsWith("AT ") || upper.contains("EXCEPTION") || upper.contains("ERROR:") || upper.contains("FAILED")) {
+      level = Level.SEVERE;
+    } else if (upper.contains("COULD NOT BE LOADED")) {
+      level = Level.WARNING;
+    }
+
+    String cleaned = trimmed.replaceFirst("^(?i)(?:SEVERE|SCHWERWIEGEND|WARNING|WARNUNG|INFO|CONFIG|FINE|FINER|FINEST)\\s*:?\\s*", "");
+    if (cleaned.isBlank()) cleaned = trimmed;
+
+    return new LevelAndMessage(level, cleaned);
+  }
+
+  private record LevelAndMessage(Level level, String message) {}
 
   private void insertScriptNode(ScriptDefinition definition) {
     DefaultMutableTreeNode parent = this.scriptsRoot;
