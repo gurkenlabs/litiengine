@@ -53,6 +53,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -271,10 +272,59 @@ public class ViewportToolbar extends JPanel {
 
   private void showNewScriptMenu(Component invoker) {
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.SCRIPT_16);
-    entityScript.addActionListener(e -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY);
+
+    JMenu entitySub = new JMenu("Entity Script");
+    entitySub.setIcon(Icons.SCRIPT_16);
+
+    JMenuItem creatureScript = new JMenuItem("Creature Script...", Icons.SCRIPT_16);
+    creatureScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Creature.class);
     });
+
+    JMenuItem propScript = new JMenuItem("Prop Script...", Icons.SCRIPT_16);
+    propScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Prop.class);
+    });
+
+    JMenuItem triggerScript = new JMenuItem("Trigger Script...", Icons.SCRIPT_16);
+    triggerScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Trigger.class);
+    });
+
+    JMenuItem emitterScript = new JMenuItem("Emitter Script...", Icons.SCRIPT_16);
+    emitterScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.graphics.emitters.Emitter.class);
+    });
+
+    JMenuItem collisionBoxScript = new JMenuItem("CollisionBox Script...", Icons.SCRIPT_16);
+    collisionBoxScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.CollisionBox.class);
+    });
+
+    JMenuItem lightSourceScript = new JMenuItem("LightSource Script...", Icons.SCRIPT_16);
+    lightSourceScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.LightSource.class);
+    });
+
+    JMenuItem genericEntityScript = new JMenuItem("Generic Entity Script...", Icons.SCRIPT_16);
+    genericEntityScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.IEntity.class);
+    });
+
+    entitySub.add(creatureScript);
+    entitySub.add(propScript);
+    entitySub.add(triggerScript);
+    entitySub.add(emitterScript);
+    entitySub.add(collisionBoxScript);
+    entitySub.add(lightSourceScript);
+    entitySub.add(genericEntityScript);
 
     JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_16);
     gameScript.addActionListener(e -> {
@@ -286,7 +336,7 @@ public class ViewportToolbar extends JPanel {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENVIRONMENT);
     });
 
-    menu.add(entityScript);
+    menu.add(entitySub);
     menu.add(gameScript);
     menu.add(envScript);
     menu.show(invoker, 0, invoker.getHeight());
