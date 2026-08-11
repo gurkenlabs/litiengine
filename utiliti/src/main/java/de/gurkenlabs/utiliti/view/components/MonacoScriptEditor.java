@@ -587,7 +587,15 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private final class LoadHandler implements CefLoadHandler {
     @Override public void onLoadingStateChange(CefBrowser browser, boolean loading, boolean canGoBack, boolean canGoForward) {}
     @Override public void onLoadStart(CefBrowser browser, CefFrame frame, CefRequest.TransitionType transitionType) {}
-    @Override public void onLoadEnd(CefBrowser browser, CefFrame frame, int httpStatusCode) {}
+
+    @Override
+    public void onLoadEnd(CefBrowser browser, CefFrame frame, int httpStatusCode) {
+      if (frame != null && frame.isMain()) {
+        browser.executeJavaScript(
+          "if (typeof window.monaco !== 'undefined') { window.cefQuery({ request: JSON.stringify({ method: 'ready', payload: {} }) }); }",
+          frame.getURL(), 0);
+      }
+    }
 
     @Override
     public void onLoadError(CefBrowser browser, CefFrame frame, ErrorCode errorCode, String errorText, String failedUrl) {
