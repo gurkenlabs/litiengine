@@ -818,12 +818,27 @@ public class JavaLanguageService implements ScriptLanguageService {
   private static String receiverExpression(String text) {
     int end = text.length();
     while (end > 0 && Character.isWhitespace(text.charAt(end - 1))) end--;
+    int memberStart = end;
+    while (memberStart > 0 && Character.isJavaIdentifierPart(text.charAt(memberStart - 1))) memberStart--;
+    if (memberStart > 0 && text.charAt(memberStart - 1) == '.') end = memberStart;
     if (end <= 0 || text.charAt(end - 1) != '.') return null;
+
     int start = end - 1;
+    int parenthesisDepth = 0;
     while (start > 0) {
       char current = text.charAt(start - 1);
-      if (Character.isJavaIdentifierPart(current) || current == '.' || current == '(' || current == ')') start--;
-      else break;
+      if (current == ')') {
+        parenthesisDepth++;
+        start--;
+      } else if (current == '(') {
+        if (parenthesisDepth == 0) break;
+        parenthesisDepth--;
+        start--;
+      } else if (Character.isJavaIdentifierPart(current) || current == '.') {
+        start--;
+      } else {
+        break;
+      }
     }
     String expr = text.substring(start, end - 1).strip();
     return expr.isEmpty() ? null : expr;

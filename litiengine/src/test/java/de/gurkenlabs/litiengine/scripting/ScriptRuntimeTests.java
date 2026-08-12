@@ -284,6 +284,35 @@ class ScriptRuntimeTests {
   }
 
   @Test
+  void javaLanguageServiceCompletesPartiallyTypedStaticMemberInsideIfExpression() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(
+        null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+    ScriptDefinition definition = new ScriptDefinition(
+        "test-creature", "java", null, "NewScript", ScriptHostType.ENTITY);
+    definition.setTargetType(de.gurkenlabs.litiengine.entities.Creature.class.getName());
+    String code = """
+      import de.gurkenlabs.litiengine.Game;
+      public class NewScript extends CreatureScript {
+        public void update() {
+          if (Game.ti
+        }
+      }
+      """;
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+
+    List<ScriptLanguageService.Completion> completions = service.complete(
+        doc, new ScriptLanguageService.Position(3, "    if (Game.ti".length()));
+
+    assertTrue(completions.stream().anyMatch(c -> c.label().equals("time")),
+        "Should resolve Game as the static completion receiver.");
+    assertFalse(completions.stream().anyMatch(c -> c.label().equals("getTickVelocity")),
+        "Should not fall back to Creature host members.");
+    assertFalse(completions.stream().anyMatch(c -> c.label().equals("this")),
+        "Should not fall back to Java keywords.");
+  }
+
+  @Test
   void javaLanguageServiceInfersParameterTypesForNewExpression() {
     ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
     JavaLanguageService service = new JavaLanguageService(workspace);

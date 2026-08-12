@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.scripting.ScriptLanguageService;
 import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
@@ -9,6 +10,14 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class MonacoScriptEditorTest {
+  @Test
+  void readinessProbeWaitsForTheEditorReceiver() {
+    String probe = MonacoScriptEditor.readinessProbeScript();
+
+    assertTrue(probe.contains("window.utilitiEditor"));
+    assertTrue(probe.contains("typeof window.utilitiEditor.receive === 'function'"));
+  }
+
   @Test
   void runtimeHoverShowsPausedLocalVariable() {
     String hover = MonacoScriptEditor.runtimeHover(

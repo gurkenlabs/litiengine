@@ -53,6 +53,27 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private static final String FALLBACK = "fallback";
   private static final AtomicReference<CompletableFuture<CefApp>> CEF = new AtomicReference<>();
   private static final java.util.concurrent.atomic.AtomicInteger CEF_REFS = new java.util.concurrent.atomic.AtomicInteger();
+  private static final String READINESS_PROBE = """
+      (() => {
+        if (window.utilitiStartupError && window.utilitiReportStartupError) {
+          window.utilitiReportStartupError(window.utilitiStartupError);
+        }
+        if (window.cefQuery
+            && window.utilitiEditor
+            && typeof window.utilitiEditor.receive === 'function'
+            && !window.utilitiReadySent) {
+          window.utilitiReadySent = true;
+          window.cefQuery({
+            request: JSON.stringify({ method: 'ready', payload: {} }),
+            onSuccess: () => { window.utilitiEditorReady = true; },
+            onFailure: (_code, message) => {
+              window.utilitiReadySent = false;
+              if (window.utilitiReportStartupError) window.utilitiReportStartupError(message);
+            }
+          });
+        }
+      })()
+      """;
 
   private final CardLayout cards = new CardLayout();
   private final JPanel browserContainer = new JPanel(new BorderLayout());
@@ -322,24 +343,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       this.stopReadinessTimer();
       return;
     }
-    this.browser.executeJavaScript("""
-      (() => {
-        if (window.utilitiStartupError && window.utilitiReportStartupError) {
-          window.utilitiReportStartupError(window.utilitiStartupError);
-        }
-        if (window.cefQuery && !window.utilitiReadySent) {
-          window.utilitiReadySent = true;
-          window.cefQuery({
-            request: JSON.stringify({ method: 'ready', payload: {} }),
-            onSuccess: () => { window.utilitiEditorReady = true; },
-            onFailure: (_code, message) => {
-              window.utilitiReadySent = false;
-              if (window.utilitiReportStartupError) window.utilitiReportStartupError(message);
-            }
-          });
-        }
-      })()
-      """, this.resources.editorUrl(), 0);
+    this.browser.executeJavaScript(READINESS_PROBE, this.resources.editorUrl(), 0);
   }
 
   private void stopReadinessTimer() {
@@ -460,9 +464,11 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
           this.timeoutTimer = null;
         }
         this.stopReadinessTimer();
+        if (this.uri != null) {
+          SwingUtilities.invokeLater(this::sendOpen);
+        }
         if (firstReady) {
           SwingUtilities.invokeLater(() -> this.cards.show(this, EDITOR));
-          if (this.uri != null) this.sendOpen();
           SwingUtilities.invokeLater(this.readyListener);
         }
         yield success(Json.createObjectBuilder().build());
@@ -541,6 +547,10 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       .add("uri", this.uri.toString()).add("text", this.text)
       .add("language", this.definition == null ? "java" : this.definition.getLanguage())
       .add("breakpoints", lines).add("executionLine", this.executionLine).build());
+  }
+
+  static String readinessProbeScript() {
+    return READINESS_PROBE;
   }
 
   private JsonObject complete(ScriptLanguageService.Position position) {
