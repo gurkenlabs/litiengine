@@ -572,12 +572,16 @@ public final class UI {
   }
 
   public static void updateRunControlStates() {
+    updateRunControlStates(false);
+  }
+
+  public static void updateRunControlStates(boolean isStarting) {
     Runnable update = () -> {
       boolean hasProject = Editor.instance().getProjectPath() != null;
       boolean isRunning = Editor.instance().getProjectSession() != null && Editor.instance().getProjectSession().isActive();
 
       if (viewportToolbar != null) {
-        viewportToolbar.updateRunState(hasProject, isRunning);
+        viewportToolbar.updateRunState(hasProject, isRunning, isStarting);
       }
     };
     if (SwingUtilities.isEventDispatchThread()) {

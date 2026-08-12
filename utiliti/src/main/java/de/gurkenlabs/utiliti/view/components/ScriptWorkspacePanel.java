@@ -467,24 +467,29 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.setStatus("The project is already starting", false);
       return;
     }
-    if (!this.saveAllScripts()) return;
-    if (Editor.instance().getCurrentResourceFile() != null) Editor.instance().save(false);
-
-    List<ScriptDefinition> debugDefinitions = mode == ProjectLaunchRequest.Mode.DEBUG
-        ? Editor.instance().getGameFile().getScripts().stream().map(ScriptDefinition::new).toList()
-        : List.of();
 
     if (mode == ProjectLaunchRequest.Mode.DEBUG) {
       UI.showDebuggerTab();
       this.appendOutput("Saving project and preparing debugger...");
     } else {
       UI.showConsoleTab();
-      this.appendOutput("Resolving Gradle project model...");
+      this.appendOutput("Resolving Gradle project model and launching...");
     }
 
     this.projectLaunchPending = true;
+    UI.updateRunControlStates(true);
+
     Thread.ofVirtual().name("utiliti-project-launch").start(() -> {
       try {
+        if (!this.saveAllScripts()) return;
+        if (Editor.instance().getCurrentResourceFile() != null) {
+          Editor.instance().save(false);
+        }
+
+        List<ScriptDefinition> debugDefinitions = mode == ProjectLaunchRequest.Mode.DEBUG
+            ? Editor.instance().getGameFile().getScripts().stream().map(ScriptDefinition::new).toList()
+            : List.of();
+
         ProjectSession session = Editor.instance().runProject(mode);
         session.onOutput(line -> SwingUtilities.invokeLater(() -> this.appendOutput(line)));
         session.onStateChanged(
@@ -502,7 +507,10 @@ public final class ScriptWorkspacePanel extends JPanel {
           this.setStatus("Could not start project: " + error.getMessage(), true);
         });
       } finally {
-        SwingUtilities.invokeLater(() -> this.projectLaunchPending = false);
+        SwingUtilities.invokeLater(() -> {
+          this.projectLaunchPending = false;
+          UI.updateRunControlStates(false);
+        });
       }
     });
   }

@@ -56,6 +56,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
@@ -89,6 +90,7 @@ public class ViewportToolbar extends JPanel {
   private final JButton btnRunProject;
   private final JButton btnDebugProject;
   private final JButton btnStopProject;
+  private final JProgressBar launchProgressBar;
   private final JPanel mapControlsContainer;
   private final JPanel scriptControlsContainer;
   private final JPanel rightControlsContainer;
@@ -157,6 +159,14 @@ public class ViewportToolbar extends JPanel {
     addToControlGroup(runGroup, this.btnRunProject);
     addToControlGroup(runGroup, this.btnDebugProject);
     addToControlGroup(runGroup, this.btnStopProject);
+    this.launchProgressBar = new JProgressBar();
+    this.launchProgressBar.setPreferredSize(new Dimension(80, 16));
+    this.launchProgressBar.setMinimumSize(new Dimension(80, 16));
+    this.launchProgressBar.setMaximumSize(new Dimension(80, 16));
+    this.launchProgressBar.setToolTipText("Starting Project...");
+    this.launchProgressBar.setVisible(false);
+    runGroup.add(Box.createRigidArea(new Dimension(4, 0)));
+    runGroup.add(this.launchProgressBar);
     left.add(runGroup);
 
     this.mapControlsContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
@@ -313,7 +323,9 @@ public class ViewportToolbar extends JPanel {
     this.btnRunProject.setEnabled(hasProject && !isRunning && !isStarting);
     this.btnDebugProject.setEnabled(hasProject && !isRunning && !isStarting);
     this.btnRunProject.setToolTipText(isStarting ? "Starting Project..." : "Run Project (Shift+F10)");
-    this.btnStopProject.setEnabled(isRunning);
+    this.btnStopProject.setEnabled(isRunning || isStarting);
+    this.launchProgressBar.setIndeterminate(isStarting);
+    this.launchProgressBar.setVisible(isStarting);
   }
 
   public void setScriptMode(boolean scriptMode) {

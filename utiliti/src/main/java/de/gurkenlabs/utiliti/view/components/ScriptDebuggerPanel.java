@@ -407,16 +407,54 @@ final class ScriptDebuggerPanel extends JPanel {
     }
   }
 
+  private static final class DisclosureIcon implements Icon {
+    private final boolean expandable;
+    private final boolean expanded;
+
+    DisclosureIcon(boolean expandable, boolean expanded) {
+      this.expandable = expandable;
+      this.expanded = expanded;
+    }
+
+    @Override public int getIconWidth() { return 10; }
+    @Override public int getIconHeight() { return 10; }
+
+    @Override
+    public void paintIcon(Component c, Graphics g, int x, int y) {
+      if (!expandable) return;
+      Graphics2D g2 = (Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(Style.mutedText());
+        Path2D p = new Path2D.Double();
+        if (expanded) {
+          p.moveTo(x + 1, y + 3);
+          p.lineTo(x + 9, y + 3);
+          p.lineTo(x + 5, y + 8);
+        } else {
+          p.moveTo(x + 3, y + 1);
+          p.lineTo(x + 8, y + 5);
+          p.lineTo(x + 3, y + 9);
+        }
+        p.closePath();
+        g2.fill(p);
+      } finally {
+        g2.dispose();
+      }
+    }
+  }
+
   private static final class VariableRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean selected,
         boolean focused, int row, int column) {
       super.getTableCellRendererComponent(table, value, selected, focused, row, column);
+      this.setIcon(null);
       this.setBorder(BorderFactory.createEmptyBorder(0, 9, 0, 9));
       if (column == 0 && value instanceof VariableRow variableRow) {
-        String marker = variableRow.loading ? "◌ "
-            : variableRow.variable.expandable() ? variableRow.expanded ? "▾ " : "▸ " : "  ";
-        this.setText(marker + variableRow.variable.name());
+        this.setIcon(new DisclosureIcon(variableRow.variable.expandable(), variableRow.expanded));
+        this.setIconTextGap(6);
+        this.setText(variableRow.variable.name() + (variableRow.loading ? " (loading...)" : ""));
         this.setBorder(BorderFactory.createEmptyBorder(0, 9 + variableRow.depth * 16, 0, 9));
       }
       this.setFont(Style.getDefaultFont().deriveFont(column == 0 ? Font.BOLD : Font.PLAIN, 11f));
@@ -459,19 +497,24 @@ final class ScriptDebuggerPanel extends JPanel {
         g.setColor(component.isEnabled() ? Style.text() : Style.mutedText().darker());
         g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         if (this.kind == StepKind.OVER) {
-          g.drawArc(x + 2, y + 2, 10, 9, 20, 230);
+          g.drawArc(x + 2, y + 2, 11, 10, 10, 220);
           Path2D arrow = new Path2D.Double();
-          arrow.moveTo(x + 11, y + 2); arrow.lineTo(x + 15, y + 4); arrow.lineTo(x + 11, y + 6);
+          arrow.moveTo(x + 10, y + 2); arrow.lineTo(x + 14, y + 5); arrow.lineTo(x + 10, y + 8);
           g.draw(arrow);
           g.fillOval(x + 6, y + 12, 3, 3);
         } else {
           boolean into = this.kind == StepKind.INTO;
-          int tip = into ? y + 12 : y + 3;
-          int tail = into ? y + 3 : y + 12;
+          int tip = into ? y + 11 : y + 4;
+          int tail = into ? y + 4 : y + 11;
           g.drawLine(x + 8, tail, x + 8, tip);
-          g.drawLine(x + 5, into ? tip - 3 : tip + 3, x + 8, tip);
-          g.drawLine(x + 11, into ? tip - 3 : tip + 3, x + 8, tip);
-          int bar = into ? y + 14 : y + 1;
+          Path2D arrow = new Path2D.Double();
+          if (into) {
+            arrow.moveTo(x + 5, tip - 4); arrow.lineTo(x + 8, tip); arrow.lineTo(x + 11, tip - 4);
+          } else {
+            arrow.moveTo(x + 5, tip + 4); arrow.lineTo(x + 8, tip); arrow.lineTo(x + 11, tip + 4);
+          }
+          g.draw(arrow);
+          int bar = into ? y + 14 : y + 2;
           g.drawLine(x + 3, bar, x + 13, bar);
         }
       } finally {
