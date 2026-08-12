@@ -87,6 +87,7 @@ public class ViewportToolbar extends JPanel {
   private final List<JPanel> controlGroups = new ArrayList<>();
   private final List<JPanel> groupDividers = new ArrayList<>();
   private final JButton btnRunProject;
+  private final JButton btnDebugProject;
   private final JButton btnStopProject;
   private final JPanel mapControlsContainer;
   private final JPanel scriptControlsContainer;
@@ -133,6 +134,16 @@ public class ViewportToolbar extends JPanel {
     this.btnRunProject.setEnabled(initialHasProject);
     makeIconOnly(this.btnRunProject, 28);
 
+    this.btnDebugProject = button("", Icons.GREEN_DEBUG_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) {
+        UI.getScriptWorkspacePanel().debugProject();
+      }
+    }, null);
+    Style.styleButton(this.btnDebugProject, Style.ButtonVariant.TOOLBAR);
+    this.btnDebugProject.setToolTipText("Debug Project (Shift+F9)");
+    this.btnDebugProject.setEnabled(initialHasProject);
+    makeIconOnly(this.btnDebugProject, 28);
+
     this.btnStopProject = button("", Icons.RED_STOP_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) {
         UI.getScriptWorkspacePanel().stopProject();
@@ -144,6 +155,7 @@ public class ViewportToolbar extends JPanel {
     this.btnStopProject.setToolTipText("Stop Project (Ctrl+F2)");
 
     addToControlGroup(runGroup, this.btnRunProject);
+    addToControlGroup(runGroup, this.btnDebugProject);
     addToControlGroup(runGroup, this.btnStopProject);
     left.add(runGroup);
 
@@ -294,8 +306,13 @@ public class ViewportToolbar extends JPanel {
   }
 
   public void updateRunState(boolean hasProject, boolean isRunning) {
-    this.btnRunProject.setEnabled(hasProject);
-    this.btnRunProject.setToolTipText(isRunning ? "Rerun Project (Shift+F10)" : "Run Project (Shift+F10)");
+    this.updateRunState(hasProject, isRunning, false);
+  }
+
+  public void updateRunState(boolean hasProject, boolean isRunning, boolean isStarting) {
+    this.btnRunProject.setEnabled(hasProject && !isRunning && !isStarting);
+    this.btnDebugProject.setEnabled(hasProject && !isRunning && !isStarting);
+    this.btnRunProject.setToolTipText(isStarting ? "Starting Project..." : "Run Project (Shift+F10)");
     this.btnStopProject.setEnabled(isRunning);
   }
 

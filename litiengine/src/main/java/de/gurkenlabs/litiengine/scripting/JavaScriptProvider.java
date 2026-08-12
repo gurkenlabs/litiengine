@@ -123,6 +123,7 @@ public class JavaScriptProvider implements ScriptProvider {
     MemoryFileManager fileManager = new MemoryFileManager(compiler.getStandardFileManager(diagnostics, null, StandardCharsets.UTF_8));
 
     List<String> options = new ArrayList<>();
+    options.add("-g");
     List<String> classpathEntries = new ArrayList<>();
     String processClasspath = System.getProperty("java.class.path");
     if (processClasspath != null && !processClasspath.isBlank()) {

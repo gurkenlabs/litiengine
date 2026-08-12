@@ -58,6 +58,9 @@
     let applying = false;
     let analysisTimer;
     let modelGeneration = 0;
+    let breakpointDecorations = [];
+    let executionDecorations = [];
+    let executionLine = 0;
 
     monaco.editor.defineTheme('utiliti-dark', {
       base: 'vs-dark',
@@ -182,6 +185,46 @@
       renderWhitespace: 'selection'
     });
     window.editor = editor;
+
+    function breakpointLines() {
+      const model = editor.getModel();
+      if (!model) return [];
+      return breakpointDecorations
+        .map(id => model.getDecorationRange(id))
+        .filter(Boolean)
+        .map(range => range.startLineNumber)
+        .filter((line, index, lines) => lines.indexOf(line) === index)
+        .sort((left, right) => left - right);
+    }
+
+    function applyDebugState(state) {
+      const model = editor.getModel();
+      if (!model) return;
+      const lines = (state.breakpoints || []).filter(line => Number.isInteger(line) && line > 0 && line <= model.getLineCount());
+      breakpointDecorations = editor.deltaDecorations(breakpointDecorations, lines.map(line => ({
+        range: new monaco.Range(line, 1, line, 1),
+        options: {
+          glyphMarginClassName: 'utiliti-breakpoint',
+          glyphMarginHoverMessage: { value: `Breakpoint at line ${line}` },
+          stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+        }
+      })));
+      if (typeof state.executionLine === 'number') executionLine = state.executionLine;
+      executionDecorations = editor.deltaDecorations(executionDecorations, executionLine > 0 && executionLine <= model.getLineCount() ? [{
+        range: new monaco.Range(executionLine, 1, executionLine, 1),
+        options: { isWholeLine: true, className: 'utiliti-execution-line', glyphMarginClassName: 'utiliti-execution-glyph' }
+      }] : []);
+    }
+
+    editor.onMouseDown(event => {
+      if (event.target.type !== monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN || !event.target.position) return;
+      const line = event.target.position.lineNumber;
+      const lines = breakpointLines();
+      const next = lines.includes(line) ? lines.filter(candidate => candidate !== line) : [...lines, line];
+      applyDebugState({ breakpoints: next });
+      query('breakpoints', { lines: breakpointLines() }).catch(console.error);
+      event.event.preventDefault();
+    });
 
     function query(method, payload) {
       return new Promise((resolve, reject) => {
@@ -442,6 +485,7 @@
       query('change', { changes }).catch(console.error);
       clearTimeout(analysisTimer);
       analysisTimer = setTimeout(analyze, 220);
+      setTimeout(() => query('breakpoints', { lines: breakpointLines() }).catch(console.error), 0);
     });
 
     let cursorTimer;
@@ -459,6 +503,17 @@
     editor.addCommand(monaco.KeyCode.F12, () => {
       editor.getAction('editor.action.revealDefinition')?.run();
     });
+    editor.addCommand(monaco.KeyCode.F5, () => query('debugCommand', { command: 'continue' }).catch(console.error));
+    editor.addCommand(monaco.KeyCode.F10, () => query('debugCommand', { command: 'stepOver' }).catch(console.error));
+    editor.addCommand(monaco.KeyCode.F11, () => query('debugCommand', { command: 'stepInto' }).catch(console.error));
+    editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.F11,
+      () => query('debugCommand', { command: 'stepOut' }).catch(console.error));
+    editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.F10,
+      () => query('debugCommand', { command: 'run' }).catch(console.error));
+    editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.F9,
+      () => query('debugCommand', { command: 'debug' }).catch(console.error));
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.F2,
+      () => query('debugCommand', { command: 'stop' }).catch(console.error));
 
     async function analyze() {
       const model = editor.getModel();
@@ -536,6 +591,7 @@
               models.set(payload.uri, model);
               models.set(uri.toString(), model);
               editor.setModel(model);
+              applyDebugState(payload);
               setTimeout(() => {
                 if (typeof editor !== 'undefined' && typeof editor.layout === 'function') {
                   editor.layout();
@@ -585,6 +641,8 @@
             if (typeof editor !== 'undefined') {
               try { editor.getAction('editor.action.formatDocument')?.run(); } catch (ignored) {}
             }
+          } else if (method === 'debugState') {
+            applyDebugState(payload);
           }
         } catch (globalError) {
           console.error('Error in window.utilitiEditor.receive:', globalError);
@@ -592,6 +650,10 @@
       }
     };
 
-    query('ready').catch(console.error);
+    query('ready')
+      .then(() => { window.utilitiEditorReady = true; })
+      .catch(error => window.utilitiReportStartupError(error));
+  }, function (error) {
+    window.utilitiReportStartupError(error);
   });
 })();

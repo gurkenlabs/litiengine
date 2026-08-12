@@ -441,6 +441,10 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
   }
 
+  public void debugProject() {
+    this.runProject();
+  }
+
   public void stopProject() {
     ProjectSession session = Editor.instance().getProjectSession();
     if (session == null || !session.isActive()) {
@@ -1324,7 +1328,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     String updatedText = currentText
-        .replaceAll("\\b" + Pattern.quote(oldClassName) + "\\b", newClassName)
+        .replaceAll("\\b" + Pattern.quote(oldClassName) + "\\b", java.util.regex.Matcher.quoteReplacement(newClassName))
         .replace("id = \"" + oldClassName + "\"", "id = \"" + newClassName + "\"");
 
     definition.setId(newClassName);

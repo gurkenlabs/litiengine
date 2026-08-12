@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptLanguageService;
+import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -57,6 +58,8 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private Consumer<ScriptLanguageService.Analysis> analysisListener = ignored -> {};
   private Runnable readyListener = () -> {};
   private Consumer<ScriptLanguageService.Position> cursorListener = ignored -> {};
+  private Consumer<List<Integer>> breakpointListener = ignored -> {};
+  private Consumer<String> debugCommandListener = ignored -> {};
   private Consumer<String> unavailableListener = ignored -> {};
   private ScriptDefinition definition;
   private URI uri;
@@ -68,10 +71,15 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private CefBrowser browser;
   private CefMessageRouter router;
   private javax.swing.Timer timeoutTimer;
+  private javax.swing.Timer readinessTimer;
   private volatile boolean ready;
   private volatile boolean closed;
   private volatile String unavailableReason;
+  private volatile String startupError;
   private boolean started;
+  private List<Integer> breakpointLines = List.of();
+  private int executionLine;
+  private List<ScriptDebugSnapshot.Variable> debugVariables = List.of();
 
   MonacoScriptEditor() throws IOException {
     super();
@@ -145,6 +153,14 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.cursorListener = listener == null ? ignored -> {} : listener;
   }
 
+  void onBreakpointsChanged(Consumer<List<Integer>> listener) {
+    this.breakpointListener = listener == null ? ignored -> {} : listener;
+  }
+
+  void onDebugCommand(Consumer<String> listener) {
+    this.debugCommandListener = listener == null ? ignored -> {} : listener;
+  }
+
   void onUnavailable(Consumer<String> listener) {
     this.unavailableListener = listener == null ? ignored -> {} : listener;
     if (this.unavailableReason != null) this.unavailableListener.accept(this.unavailableReason);
@@ -180,6 +196,17 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
 
   void revealLine(int line) {
     revealPosition(line, 1);
+  }
+
+  void setDebugState(List<Integer> breakpoints, int executionLine,
+                     List<ScriptDebugSnapshot.Variable> variables) {
+    this.breakpointLines = breakpoints == null ? List.of() : breakpoints.stream().filter(line -> line != null && line > 0).distinct().sorted().toList();
+    this.executionLine = Math.max(0, executionLine);
+    this.debugVariables = variables == null ? List.of() : List.copyOf(variables);
+    if (!this.ready) return;
+    JsonArrayBuilder lines = Json.createArrayBuilder();
+    this.breakpointLines.forEach(lines::add);
+    this.send("debugState", Json.createObjectBuilder().add("breakpoints", lines).add("executionLine", this.executionLine).build());
   }
 
   void insertText(String text) {
@@ -229,10 +256,46 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.cards.show(this, EDITOR);
     this.timeoutTimer = new javax.swing.Timer(30000, event -> {
       ((javax.swing.Timer) event.getSource()).stop();
-      if (!this.ready) this.unavailable("Monaco did not finish loading. Check the application output for JavaScript or JCEF errors.");
+      if (!this.ready) {
+        String detail = this.startupError;
+        this.unavailable(detail == null || detail.isBlank()
+          ? "Monaco did not finish loading. The embedded browser did not complete its editor handshake."
+          : "Monaco failed to start: " + detail);
+      }
     });
     this.timeoutTimer.setRepeats(false);
     this.timeoutTimer.start();
+    this.readinessTimer = new javax.swing.Timer(500, event -> this.probeReadiness());
+    this.readinessTimer.setInitialDelay(100);
+    this.readinessTimer.start();
+  }
+
+  private void probeReadiness() {
+    if (this.ready || this.closed || this.browser == null || this.resources == null) {
+      this.stopReadinessTimer();
+      return;
+    }
+    this.browser.executeJavaScript("""
+      (() => {
+        if (window.utilitiStartupError && window.utilitiReportStartupError) {
+          window.utilitiReportStartupError(window.utilitiStartupError);
+        }
+        if (window.utilitiEditor && window.monaco && window.cefQuery) {
+          window.cefQuery({
+            request: JSON.stringify({ method: 'ready', payload: {} }),
+            onSuccess: () => { window.utilitiEditorReady = true; },
+            onFailure: (_code, message) => window.utilitiReportStartupError(message)
+          });
+        }
+      })()
+      """, this.resources.editorUrl(), 0);
+  }
+
+  private void stopReadinessTimer() {
+    if (this.readinessTimer != null) {
+      this.readinessTimer.stop();
+      this.readinessTimer = null;
+    }
   }
 
   private void unavailable(String reason) {
@@ -241,8 +304,10 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       this.timeoutTimer.stop();
       this.timeoutTimer = null;
     }
+    this.stopReadinessTimer();
     this.unavailableReason = reason;
     this.ready = false;
+    log.log(Level.WARNING, "Monaco unavailable: {0}", reason);
     this.fallback.setText("Monaco unavailable: " + reason);
     this.cards.show(this, FALLBACK);
     SwingUtilities.invokeLater(() -> this.unavailableListener.accept(reason));
@@ -296,15 +361,29 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     JsonObject payload = request.getJsonObject("payload");
     return switch (method) {
       case "ready" -> {
+        boolean firstReady = !this.ready;
         this.ready = true;
         this.unavailableReason = null;
+        this.startupError = null;
         if (this.timeoutTimer != null) {
           this.timeoutTimer.stop();
           this.timeoutTimer = null;
         }
-        SwingUtilities.invokeLater(() -> this.cards.show(this, EDITOR));
-        if (this.uri != null) this.sendOpen();
-        SwingUtilities.invokeLater(this.readyListener);
+        this.stopReadinessTimer();
+        if (firstReady) {
+          SwingUtilities.invokeLater(() -> this.cards.show(this, EDITOR));
+          if (this.uri != null) this.sendOpen();
+          SwingUtilities.invokeLater(this.readyListener);
+        }
+        yield success(Json.createObjectBuilder().build());
+      }
+      case "startupError" -> {
+        String detail = payload == null ? "Unknown JavaScript startup error"
+          : payload.getString("detail", "Unknown JavaScript startup error");
+        if (!this.ready) {
+          this.startupError = detail;
+          SwingUtilities.invokeLater(() -> this.unavailable("Monaco failed to start: " + detail));
+        }
         yield success(Json.createObjectBuilder().build());
       }
       case "change" -> {
@@ -329,6 +408,16 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       case "cursor" -> {
         ScriptLanguageService.Position position = position(payload);
         SwingUtilities.invokeLater(() -> this.cursorListener.accept(position));
+        yield success(Json.createObjectBuilder().build());
+      }
+      case "breakpoints" -> {
+        List<Integer> lines = payload.getJsonArray("lines").getValuesAs(value -> ((jakarta.json.JsonNumber) value).intValue());
+        SwingUtilities.invokeLater(() -> this.breakpointListener.accept(List.copyOf(lines)));
+        yield success(Json.createObjectBuilder().build());
+      }
+      case "debugCommand" -> {
+        String command = payload.getString("command", "");
+        SwingUtilities.invokeLater(() -> this.debugCommandListener.accept(command));
         yield success(Json.createObjectBuilder().build());
       }
       case "analyze" -> this.analyze();
@@ -356,9 +445,12 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   }
 
   private void sendOpen() {
+    JsonArrayBuilder lines = Json.createArrayBuilder();
+    this.breakpointLines.forEach(lines::add);
     this.send("open", Json.createObjectBuilder()
       .add("uri", this.uri.toString()).add("text", this.text)
-      .add("language", this.definition == null ? "java" : this.definition.getLanguage()).build());
+      .add("language", this.definition == null ? "java" : this.definition.getLanguage())
+      .add("breakpoints", lines).add("executionLine", this.executionLine).build());
   }
 
   private JsonObject complete(ScriptLanguageService.Position position) {
@@ -387,7 +479,41 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private JsonObject hover(ScriptLanguageService.Position position) {
     Optional<ScriptLanguageService.Hover> hover = this.languageService == null
       ? Optional.empty() : this.languageService.hover(this.document(), position);
-    return success(Json.createObjectBuilder().add("markdown", hover.map(ScriptLanguageService.Hover::markdown).orElse("")).build());
+    String runtime = runtimeHover(this.text, position, this.debugVariables);
+    String language = hover.map(ScriptLanguageService.Hover::markdown).orElse("");
+    String markdown = runtime.isBlank() ? language
+      : language.isBlank() ? runtime : runtime + "\n\n---\n\n" + language;
+    return success(Json.createObjectBuilder().add("markdown", markdown).build());
+  }
+
+  static String runtimeHover(String source, ScriptLanguageService.Position position,
+                             List<ScriptDebugSnapshot.Variable> variables) {
+    if (source == null || position == null || variables == null || variables.isEmpty()) return "";
+    String[] lines = source.split("\\R", -1);
+    if (position.line() >= lines.length) return "";
+    String line = lines[position.line()];
+    if (line.isEmpty()) return "";
+    int cursor = Math.min(position.column(), line.length() - 1);
+    if (!Character.isJavaIdentifierPart(line.charAt(cursor)) && cursor > 0
+        && Character.isJavaIdentifierPart(line.charAt(cursor - 1))) cursor--;
+    if (!Character.isJavaIdentifierPart(line.charAt(cursor))) return "";
+    int start = cursor;
+    int end = cursor + 1;
+    while (start > 0 && Character.isJavaIdentifierPart(line.charAt(start - 1))) start--;
+    while (end < line.length() && Character.isJavaIdentifierPart(line.charAt(end))) end++;
+    String identifier = line.substring(start, end);
+    Optional<ScriptDebugSnapshot.Variable> exact = variables.stream()
+      .filter(variable -> identifier.equals(variable.name())).findFirst();
+    ScriptDebugSnapshot.Variable variable = exact.orElseGet(() -> variables.stream()
+      .filter(candidate -> ("this." + identifier).equals(candidate.name())).findFirst().orElse(null));
+    if (variable == null) return "";
+    return "**" + markdown(variable.name()) + "** = `" + markdown(variable.value())
+      + "`\n\nType: `" + markdown(variable.type()) + "`";
+  }
+
+  private static String markdown(String value) {
+    return Objects.requireNonNullElse(value, "").replace("\\", "\\\\")
+        .replace("\r", "\\r").replace("\n", "\\n").replace("`", "\\`");
   }
 
   private JsonObject signature(ScriptLanguageService.Position position) {
@@ -498,6 +624,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       this.timeoutTimer.stop();
       this.timeoutTimer = null;
     }
+    this.stopReadinessTimer();
     if (this.languageService != null) {
       this.languageService.close();
       this.languageService = null;

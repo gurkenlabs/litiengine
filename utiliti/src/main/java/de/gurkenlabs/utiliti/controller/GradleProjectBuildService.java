@@ -80,7 +80,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
           .directory(fallback.projectRoot().toFile())
           .redirectErrorStream(true)
           .start();
-      StringBuilder output = new StringBuilder();
+      StringBuffer output = new StringBuffer();
       Thread reader = Thread.ofPlatform().daemon().name("utiliti-gradle-model").start(() -> {
         try (BufferedReader lines = process.inputReader(StandardCharsets.UTF_8)) {
           String line;
@@ -124,9 +124,9 @@ public final class GradleProjectBuildService implements ProjectBuildService {
 
     List<Path> reusableArtifacts = reusableArtifacts(
         model, System.getProperty("java.class.path", ""));
-    Path runInitScript = reusableArtifacts.isEmpty()
-        ? null
-        : copyInitScript("/gradle/utiliti-project-run.gradle", "utiliti-gradle-run-");
+    boolean configureDebugProject = request.mode() == ProjectLaunchRequest.Mode.DEBUG;
+    Path runInitScript = reusableArtifacts.isEmpty() && !configureDebugProject
+        ? null : copyInitScript("/gradle/utiliti-project-run.gradle", "utiliti-gradle-run-");
     List<String> command = command(request, runInitScript, reusableArtifacts);
     ProcessBuilder builder = new ProcessBuilder(command).directory(model.projectRoot().toFile());
     builder.redirectErrorStream(true);
@@ -192,20 +192,27 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     }
     command.add("--console=plain");
     command.add("--no-daemon");
-    if (runInitScript != null && reusableArtifacts != null && !reusableArtifacts.isEmpty()) {
-      String paths = reusableArtifacts.stream()
+    if (request.mode() == ProjectLaunchRequest.Mode.DEBUG) {
+      command.add("-Dutiliti.debugProject=true");
+      command.add("-Dutiliti.debugTask=" + model.runTask());
+      String debugPort = request.environment().get("UTILITI_DEBUG_PORT");
+      if (debugPort != null && !debugPort.isBlank()) command.add("-Dutiliti.debugPort=" + debugPort);
+    }
+    if (runInitScript != null) {
+      if (reusableArtifacts != null && !reusableArtifacts.isEmpty()) {
+        String paths = reusableArtifacts.stream()
           .map(Path::toAbsolutePath)
           .map(Path::normalize)
           .map(Path::toString)
           .map(path -> path.toLowerCase(java.util.Locale.ROOT))
           .collect(java.util.stream.Collectors.joining("\n"));
-      command.add("-Dutiliti.reusableArtifacts="
-          + Base64.getEncoder().encodeToString(paths.getBytes(StandardCharsets.UTF_8)));
+        command.add("-Dutiliti.reusableArtifacts="
+            + Base64.getEncoder().encodeToString(paths.getBytes(StandardCharsets.UTF_8)));
+      }
       command.add("--init-script");
       command.add(runInitScript.toString());
     }
     command.add(model.runTask());
-    if (request.mode() == ProjectLaunchRequest.Mode.DEBUG) command.add("--debug-jvm");
     command.addAll(request.buildArguments());
     if (!request.gameArguments().isEmpty()) {
       command.add("--args=" + String.join(" ", request.gameArguments()));
@@ -428,8 +435,10 @@ public final class GradleProjectBuildService implements ProjectBuildService {
       } catch (IOException e) {
         if (this.isActive()) {
           String message = "Could not read project output: " + e.getMessage();
-          this.output.add(message);
-          for (Consumer<String> listener : this.outputListeners) listener.accept(message);
+          synchronized (this.output) {
+            this.output.add(message);
+            for (Consumer<String> listener : this.outputListeners) listener.accept(message);
+          }
         }
       }
     }

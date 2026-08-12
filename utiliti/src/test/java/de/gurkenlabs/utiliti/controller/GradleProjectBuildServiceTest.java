@@ -71,18 +71,38 @@ class GradleProjectBuildServiceTest {
   void launchCommandKeepsApplicationRunContract(@TempDir Path root) throws Exception {
     Path wrapper = root.resolve(isWindows() ? "gradlew.bat" : "gradlew");
     Files.writeString(wrapper, "");
-    ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
+    ProjectModel model = new ProjectModel(root, wrapper, ":game:play", "example.Game", 25,
         List.of(), List.of(), List.of(), List.of());
     ProjectLaunchRequest request = new ProjectLaunchRequest(model, ProjectLaunchRequest.Mode.DEBUG,
-        List.of("--level", "hospital"), List.of("--stacktrace"), Map.of());
+        List.of("--level", "hospital"), List.of("--stacktrace"), Map.of("UTILITI_DEBUG_PORT", "51234"));
 
-    List<String> command = GradleProjectBuildService.command(request);
+    Path initScript = root.resolve("run.gradle");
+    List<String> command = GradleProjectBuildService.command(request, initScript, List.of());
 
-    assertTrue(command.contains(":run"));
+    assertTrue(command.contains(":game:play"));
     assertTrue(command.contains("--no-daemon"));
-    assertTrue(command.contains("--debug-jvm"));
+    assertTrue(command.contains("-Dutiliti.debugProject=true"));
+    assertTrue(command.contains("-Dutiliti.debugTask=:game:play"));
+    assertTrue(command.contains("-Dutiliti.debugPort=51234"));
+    assertFalse(command.contains("--debug-jvm"));
+    assertTrue(command.contains("--init-script"));
+    assertTrue(command.contains(initScript.toString()));
     assertTrue(command.contains("--stacktrace"));
     assertTrue(command.contains("--args=--level hospital"));
+  }
+
+  @Test
+  void debugProjectConfiguresTheApplicationJvmInsteadOfGradle() throws Exception {
+    try (var source = GradleProjectBuildService.class.getResourceAsStream(
+        "/gradle/utiliti-project-run.gradle")) {
+      String initScript = new String(source.readAllBytes(), StandardCharsets.UTF_8);
+
+      assertTrue(initScript.contains("withType(JavaExec)"));
+      assertTrue(initScript.contains("javaExecTask.path == debugTaskPath"));
+      assertTrue(initScript.contains("debugOptions"));
+      assertTrue(initScript.contains("port = debugPort"));
+      assertTrue(initScript.contains("suspend = true"));
+    }
   }
 
   @Test

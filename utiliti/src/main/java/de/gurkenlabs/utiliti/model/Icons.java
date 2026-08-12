@@ -338,7 +338,41 @@ public final class Icons {
   }
 
   public static final Icon GREEN_PLAY_16 = new VectorRunIcon(16, true);
+  public static final Icon GREEN_DEBUG_16 = new VectorDebugIcon(16);
   public static final Icon RED_STOP_16 = new VectorRunIcon(16, false);
+
+  public static class VectorDebugIcon implements Icon {
+    private final int size;
+
+    public VectorDebugIcon(int size) {
+      this.size = size;
+    }
+
+    @Override
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(c == null || c.isEnabled() ? new java.awt.Color(53, 208, 115) : new java.awt.Color(80, 80, 85));
+        int bodyWidth = Math.max(6, this.size / 2);
+        int bodyHeight = Math.max(7, this.size * 3 / 5);
+        int bodyX = x + (this.size - bodyWidth) / 2;
+        int bodyY = y + (this.size - bodyHeight) / 2 + 1;
+        g2.fillRoundRect(bodyX, bodyY, bodyWidth, bodyHeight, bodyWidth, bodyWidth);
+        g2.fillOval(x + this.size / 2 - 2, y + 1, 4, 4);
+        g2.setStroke(new java.awt.BasicStroke(1.4f, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
+        g2.drawLine(bodyX - 2, bodyY + 2, bodyX - 4, bodyY);
+        g2.drawLine(bodyX - 2, bodyY + bodyHeight - 2, bodyX - 4, bodyY + bodyHeight);
+        g2.drawLine(bodyX + bodyWidth + 2, bodyY + 2, bodyX + bodyWidth + 4, bodyY);
+        g2.drawLine(bodyX + bodyWidth + 2, bodyY + bodyHeight - 2, bodyX + bodyWidth + 4, bodyY + bodyHeight);
+      } finally {
+        g2.dispose();
+      }
+    }
+
+    @Override public int getIconWidth() { return this.size; }
+    @Override public int getIconHeight() { return this.size; }
+  }
 
   public static class VectorRunIcon implements Icon {
     private final int size;

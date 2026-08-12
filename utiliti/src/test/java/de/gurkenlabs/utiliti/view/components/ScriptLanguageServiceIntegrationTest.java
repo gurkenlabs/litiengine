@@ -18,7 +18,7 @@ class ScriptLanguageServiceIntegrationTest {
   void servesMonacoEditorAssetsOverLoopbackServer() throws Exception {
     try (MonacoResourceServer server = new MonacoResourceServer()) {
       String baseUrl = server.editorUrl().replace("/editor/index.html", "");
-      for (String path : java.util.List.of("/editor/index.html", "/editor/editor.js", "/editor/editor.css", "/monaco/min/vs/loader.js", "/monaco/min/vs/editor/editor.main.js")) {
+      for (String path : java.util.List.of("/editor/index.html", "/editor/bootstrap.js", "/editor/editor.js", "/editor/editor.css", "/monaco/min/vs/loader.js", "/monaco/min/vs/editor/editor.main.js")) {
         java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
         java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder(java.net.URI.create(baseUrl + path)).GET().build();
         java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());

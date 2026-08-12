@@ -255,6 +255,36 @@ public class Editor extends Screen {
     de.gurkenlabs.utiliti.view.components.UI.updateRunControlStates();
   }
 
+  static long buildConfigurationStamp(Path projectRoot) {
+    if (projectRoot == null) return 0;
+    List<Path> candidates = new ArrayList<>();
+    for (String name : List.of("settings.gradle", "settings.gradle.kts", "build.gradle", "build.gradle.kts",
+        "gradle.properties", "gradlew", "gradlew.bat")) {
+      candidates.add(projectRoot.resolve(name));
+    }
+    candidates.add(projectRoot.resolve("gradle/libs.versions.toml"));
+    candidates.add(projectRoot.resolve("gradle/wrapper/gradle-wrapper.properties"));
+    try (var children = java.nio.file.Files.list(projectRoot)) {
+      children.filter(java.nio.file.Files::isDirectory).forEach(child -> {
+        candidates.add(child.resolve("build.gradle"));
+        candidates.add(child.resolve("build.gradle.kts"));
+        candidates.add(child.resolve("gradle.properties"));
+      });
+    } catch (IOException ignored) {
+    }
+    long stamp = 1;
+    for (Path candidate : candidates.stream().sorted().toList()) {
+      try {
+        if (!java.nio.file.Files.isRegularFile(candidate)) continue;
+        stamp = 31 * stamp + candidate.toAbsolutePath().normalize().toString().hashCode();
+        stamp = 31 * stamp + java.nio.file.Files.getLastModifiedTime(candidate).toMillis();
+        stamp = 31 * stamp + java.nio.file.Files.size(candidate);
+      } catch (IOException ignored) {
+      }
+    }
+    return stamp;
+  }
+
   public void create() {
     JFileChooser chooser;
     try {
@@ -1007,7 +1037,7 @@ public class Editor extends Screen {
   }
 
   public void loadTileset(ITileset tileset, boolean embedded) {
-    if (tileset == null) {
+    if (tileset == null || tileset.getImage() == null) {
       return;
     }
     Spritesheet sprite = Resources.spritesheets().get(tileset.getImage().getSource());

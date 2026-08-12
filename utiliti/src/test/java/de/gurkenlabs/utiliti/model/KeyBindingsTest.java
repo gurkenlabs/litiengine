@@ -68,4 +68,16 @@ class KeyBindingsTest {
     assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
         bindings.get(Command.QUICK_SEARCH));
   }
+
+  @Test
+  void includesProjectLifecycleDefaults() {
+    EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
+
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.RUN_PROJECT));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.DEBUG_PROJECT));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK),
+        bindings.get(Command.STOP_PROJECT));
+  }
 }

@@ -57,6 +57,7 @@ public class UserPreferences extends ConfigurationGroup {
   private String preferredLanguage;
   private String preferredCountry;
   private String keyBindings;
+  private String scriptBreakpoints;
   private boolean reopenLastProject;
   private String editorFontFamily;
   private int editorFontSize;
@@ -89,6 +90,7 @@ public class UserPreferences extends ConfigurationGroup {
     this.compactMode = false;
     this.assetCardSize = 118;
     this.keyBindings = "";
+    this.scriptBreakpoints = "";
     this.reopenLastProject = true;
     this.editorFontFamily = "Roboto";
     this.editorFontSize = 12;
@@ -154,6 +156,14 @@ public class UserPreferences extends ConfigurationGroup {
 
   public void setKeyBindings(String keyBindings) {
     this.keyBindings = keyBindings;
+  }
+
+  public String getScriptBreakpoints() {
+    return this.scriptBreakpoints;
+  }
+
+  public void setScriptBreakpoints(String scriptBreakpoints) {
+    this.scriptBreakpoints = scriptBreakpoints == null ? "" : scriptBreakpoints;
   }
 
   public boolean reopenLastProject() {

@@ -55,7 +55,10 @@ public final class KeyBindings {
     SCRIPT_FORMAT("menu_script_format", KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK),
     SCRIPT_COMPILE("menu_script_compile", KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK),
     SCRIPT_RELOAD("menu_script_reload", KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK),
-    SCRIPT_OPEN_IDE("menu_script_openIde", KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
+    SCRIPT_OPEN_IDE("menu_script_openIde", KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+    RUN_PROJECT("menu_run_project", KeyEvent.VK_F10, InputEvent.SHIFT_DOWN_MASK),
+    DEBUG_PROJECT("menu_debug_project", KeyEvent.VK_F9, InputEvent.SHIFT_DOWN_MASK),
+    STOP_PROJECT("menu_stop_project", KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK);
 
     private final String resourceKey;
     private final KeyStroke defaultKeyStroke;

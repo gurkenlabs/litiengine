@@ -1212,8 +1212,9 @@ public final class UI {
       objectSelectionPopup.removeAll();
       for (IMapObject mapObject : mapObjects) {
         MapObjectType type = MapObjectType.get(mapObject.getType());
+        String typeName = type != null ? type.name() : (mapObject.getType() != null ? mapObject.getType() : "Object");
         String name = mapObject.getName() == null || mapObject.getName().isBlank()
-          ? type.name() : mapObject.getName();
+          ? typeName : mapObject.getName();
         JMenuItem item = new JMenuItem(name + " (#" + mapObject.getId() + ")", Icons.forMapObjectType(type));
         item.addActionListener(e -> {
           objectSelectionPopupInvoker = null;
