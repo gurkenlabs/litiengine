@@ -9,6 +9,8 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.GradleScriptProjectSupport;
 import de.gurkenlabs.utiliti.controller.IntellijIntegration;
 import de.gurkenlabs.utiliti.controller.ProjectLaunchRequest;
+import de.gurkenlabs.utiliti.controller.ProjectLaunchCancelledException;
+import de.gurkenlabs.utiliti.controller.ProjectLaunchPhase;
 import de.gurkenlabs.utiliti.controller.ProjectSession;
 import de.gurkenlabs.utiliti.controller.ScriptSourcePaths;
 import de.gurkenlabs.utiliti.controller.UndoManager;
@@ -29,7 +31,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -53,6 +54,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.SourceVersion;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -91,8 +93,7 @@ import javax.swing.tree.TreePath;
 public final class ScriptWorkspacePanel extends JPanel {
   private static final Logger log = Logger.getLogger(ScriptWorkspacePanel.class.getName());
   private static final int BOTTOM_PANEL_HEIGHT = 190;
-  private static final Pattern GRADLE_RUN_TASK = Pattern.compile("(?i).*?>\\s*Task\\s+:(?:.*:)?run\\b.*");
-
+  static final String DEFAULT_SCRIPT_NAME = "NewScript";
   private final DefaultMutableTreeNode scriptsRoot = new DefaultMutableTreeNode("Scripts");
   private final DefaultTreeModel scriptsModel = new DefaultTreeModel(this.scriptsRoot);
   private final JTree scripts = UI.createStyledTree(this.scriptsModel);
@@ -138,7 +139,8 @@ public final class ScriptWorkspacePanel extends JPanel {
   private String executionScriptId;
   private int executionLine;
   private List<ScriptDebugSnapshot.Variable> executionVariables = List.of();
-  private boolean projectLaunchPending;
+  private volatile boolean projectLaunchPending;
+  private volatile boolean debuggerLaunchFailed;
   private boolean restartRequested;
   private Consumer<ScriptDefinition> selectionListener = ignored -> {};
 
@@ -268,8 +270,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.caretStatus.setFont(statusBarFont);
     this.caretStatus.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
     this.caretStatus.setForeground(Style.mutedText());
-    statusBar.add(this.status, BorderLayout.WEST);
-    statusBar.add(this.caretStatus, BorderLayout.EAST);
+    statusBar.add(this.caretStatus, BorderLayout.WEST);
+    statusBar.add(this.status, BorderLayout.EAST);
     this.mainEditorArea.add(statusBar, BorderLayout.SOUTH);
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, explorer, this.mainEditorArea);
@@ -470,6 +472,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       return;
     }
     if (!this.saveAllScripts()) return;
+    Editor.instance().prepareProjectLaunch();
 
     if (mode == ProjectLaunchRequest.Mode.DEBUG) {
       UI.showDebuggerTab();
@@ -480,85 +483,81 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     this.projectLaunchPending = true;
-    UI.updateRunControlStates(true);
-
-    Window owner = SwingUtilities.getWindowAncestor(this);
-    ProjectLaunchDialog dialog = new ProjectLaunchDialog(owner,
-        mode == ProjectLaunchRequest.Mode.DEBUG ? "Starting Debugger" : "Launching Project");
-    dialog.onCancel(() -> Editor.instance().stopProject());
+    this.debuggerLaunchFailed = false;
+    this.setLaunchPhase(ProjectLaunchPhase.SAVING);
 
     Thread.ofVirtual().name("utiliti-project-launch").start(() -> {
       try {
-        if (dialog.isCancelled()) return;
-        dialog.updateStatus("Saving resource map files...");
         if (Editor.instance().getCurrentResourceFile() != null) {
           Editor.instance().save(false);
         }
 
-        if (dialog.isCancelled()) return;
-        dialog.updateStatus("Resolving Gradle project model...");
+        this.setLaunchPhase(ProjectLaunchPhase.RESOLVING_MODEL);
 
         List<ScriptDefinition> debugDefinitions = mode == ProjectLaunchRequest.Mode.DEBUG
             ? Editor.instance().getGameFile().getScripts().stream().map(ScriptDefinition::new).toList()
             : List.of();
 
         ProjectSession session = Editor.instance().runProject(mode);
-        session.onOutput(line -> {
-          SwingUtilities.invokeLater(() -> this.appendOutput(line));
-          dialog.updateStatus(line);
-          String lower = line.toLowerCase(Locale.ROOT);
-          if (mode == ProjectLaunchRequest.Mode.RUN && (
-              GRADLE_RUN_TASK.matcher(line).matches() ||
-              lower.contains("initialization") ||
-              lower.contains("loading game resources") ||
-              lower.contains("loaded") ||
-              lower.contains("litiengine") ||
-              lower.contains("game.init")
-          )) {
-            SwingUtilities.invokeLater(dialog::dispose);
-          }
-        });
+        session.onOutput(line -> SwingUtilities.invokeLater(() -> this.appendOutput(line)));
         session.onStateChanged(state -> {
           SwingUtilities.invokeLater(() -> this.projectStateChanged(session, state));
-          if (state == ProjectSession.State.EXITED || state == ProjectSession.State.FAILED) {
-            SwingUtilities.invokeLater(dialog::dispose);
-          }
         });
-        if (mode == ProjectLaunchRequest.Mode.DEBUG) {
-          this.attachDebugger(debugDefinitions, dialog);
+        if (this.projectLaunchPending
+            && Editor.instance().isProjectLaunchCancellationRequested()) {
+          session.stop();
+          this.finishProjectLaunch(ProjectLaunchPhase.CANCELLED);
+          return;
         }
+        if (mode == ProjectLaunchRequest.Mode.DEBUG) {
+          this.setLaunchPhase(ProjectLaunchPhase.ATTACHING_DEBUGGER);
+          this.attachDebugger(debugDefinitions);
+        }
+      } catch (ProjectLaunchCancelledException cancelled) {
+        this.finishProjectLaunch(ProjectLaunchPhase.CANCELLED);
+        SwingUtilities.invokeLater(() -> this.setStatus("Project launch cancelled", false));
       } catch (IOException error) {
         if (mode == ProjectLaunchRequest.Mode.DEBUG) {
           this.closeDebugger();
           Editor.instance().stopProject();
         }
+        this.finishProjectLaunch(ProjectLaunchPhase.FAILED);
         SwingUtilities.invokeLater(() -> {
-          dialog.dispose();
           this.appendOutput("Could not start project: " + error.getMessage());
           this.setStatus("Could not start project: " + error.getMessage(), true);
         });
-      } finally {
-        SwingUtilities.invokeLater(() -> {
-          this.projectLaunchPending = false;
-          UI.updateRunControlStates(false);
-        });
       }
     });
+  }
 
-    dialog.setVisible(true);
-    if (dialog.isCancelled()) {
-      Editor.instance().stopProject();
+  private void setLaunchPhase(ProjectLaunchPhase phase) {
+    UI.updateRunControlStates(phase);
+    if (phase != null && !phase.displayText().isBlank()) {
+      SwingUtilities.invokeLater(() -> this.setStatus(phase.displayText(), phase == ProjectLaunchPhase.FAILED));
     }
   }
 
-  private void attachDebugger(List<ScriptDefinition> debugDefinitions, ProjectLaunchDialog dialog) {
+  private void finishProjectLaunch(ProjectLaunchPhase phase) {
+    SwingUtilities.invokeLater(() -> {
+      this.projectLaunchPending = false;
+      UI.updateRunControlStates(phase);
+    });
+  }
+
+  private void attachDebugger(List<ScriptDefinition> debugDefinitions) {
     this.closeDebugger();
     JdiScriptDebuggerBackend backend = new JdiScriptDebuggerBackend(new ScriptDebuggerBackend.Listener() {
       @Override
       public void stateChanged(ScriptDebuggerBackend.State state, String detail) {
         SwingUtilities.invokeLater(() -> debuggerPanel.updateState(state, detail));
         if (state == ScriptDebuggerBackend.State.RUNNING || state == ScriptDebuggerBackend.State.PAUSED) {
-          SwingUtilities.invokeLater(dialog::dispose);
+          finishProjectLaunch(state == ScriptDebuggerBackend.State.PAUSED
+              ? ProjectLaunchPhase.PAUSED : ProjectLaunchPhase.RUNNING);
+        } else if (state == ScriptDebuggerBackend.State.FAILED) {
+          if (ScriptWorkspacePanel.this.projectLaunchPending) {
+            ScriptWorkspacePanel.this.debuggerLaunchFailed = true;
+          }
+          finishProjectLaunch(ProjectLaunchPhase.FAILED);
         }
       }
 
@@ -593,9 +592,18 @@ public final class ScriptWorkspacePanel extends JPanel {
       backend.setBreakpoints(this.currentProjectBreakpoints());
     } catch (IOException e) {
       log.log(Level.WARNING, "Failed to attach debugger on port " + port, e);
+      boolean cancelled = Editor.instance().isProjectLaunchCancellationRequested();
+      this.debuggerLaunchFailed = !cancelled;
+      if (cancelled) this.closeDebugger();
+      Editor.instance().stopProject();
+      this.finishProjectLaunch(cancelled ? ProjectLaunchPhase.CANCELLED : ProjectLaunchPhase.FAILED);
       SwingUtilities.invokeLater(() -> {
-        this.appendOutput("Debugger attach failed: " + e.getMessage());
-        this.setStatus("Debugger attach failed: " + e.getMessage(), true);
+        if (cancelled) {
+          this.setStatus("Project launch cancelled", false);
+        } else {
+          this.appendOutput("Debugger attach failed: " + e.getMessage());
+          this.setStatus("Debugger attach failed: " + e.getMessage(), true);
+        }
       });
     }
   }
@@ -704,6 +712,13 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void stopProject() {
     ProjectSession session = Editor.instance().getProjectSession();
+    if (this.projectLaunchPending) {
+      this.setLaunchPhase(ProjectLaunchPhase.STOPPING);
+      this.appendOutput("Cancelling project launch...");
+      Editor.instance().stopProject();
+      this.closeDebugger();
+      return;
+    }
     if (session == null || !session.isActive()) {
       this.setStatus("No project is running", false);
       return;
@@ -735,25 +750,54 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private void projectStateChanged(ProjectSession session, ProjectSession.State state) {
     switch (state) {
-      case STARTING -> this.setStatus("Starting project...", false);
-      case RUNNING -> this.setStatus("Project is running", false);
-      case STOPPING -> this.setStatus("Stopping project...", false);
+      case STARTING, BUILDING -> this.setLaunchPhase(ProjectLaunchPhase.BUILDING);
+      case STARTING_GAME -> this.setLaunchPhase(
+          Editor.instance().getProjectLaunchMode() == ProjectLaunchRequest.Mode.DEBUG
+              ? ProjectLaunchPhase.ATTACHING_DEBUGGER : ProjectLaunchPhase.STARTING_GAME);
+      case RUNNING -> {
+        this.setStatus("Project is running", false);
+        if (Editor.instance().getProjectLaunchMode() == ProjectLaunchRequest.Mode.RUN) {
+          this.finishProjectLaunch(ProjectLaunchPhase.RUNNING);
+        }
+      }
+      case STOPPING -> this.setLaunchPhase(ProjectLaunchPhase.STOPPING);
       case EXITED -> {
+        if (this.debuggerLaunchFailed) {
+          this.debuggerLaunchFailed = false;
+          this.finishProjectLaunch(ProjectLaunchPhase.FAILED);
+          this.restartRequested = false;
+          return;
+        }
+        if (this.projectLaunchPending
+            && Editor.instance().isProjectLaunchCancellationRequested()) {
+          this.setStatus("Project launch cancelled", false);
+          this.finishProjectLaunch(ProjectLaunchPhase.CANCELLED);
+          this.restartRequested = false;
+          return;
+        }
         int exitCode = session.exitCode().orElse(-1);
-        this.appendOutput("Project exited with code " + exitCode + ".");
-        this.setStatus("Project exited with code " + exitCode, exitCode != 0);
+        String failure = session.failureMessage().orElse(null);
+        if (exitCode != 0 && failure != null) {
+          this.appendOutput("Project launch failed: " + failure);
+          this.setStatus("Gradle setup failed; see Console for recovery steps", true);
+        } else {
+          this.appendOutput("Project exited with code " + exitCode + ".");
+          this.setStatus("Project exited with code " + exitCode, exitCode != 0);
+        }
+        this.finishProjectLaunch(exitCode == 0 ? ProjectLaunchPhase.IDLE : ProjectLaunchPhase.FAILED);
         if (this.restartRequested) {
           this.restartRequested = false;
           this.runProject();
         }
       }
       case FAILED -> {
-        this.appendOutput("Project launch failed.");
-        this.setStatus("Project launch failed", true);
+        String failure = session.failureMessage().orElse("Project launch failed.");
+        this.appendOutput(failure);
+        this.setStatus(failure, true);
+        this.finishProjectLaunch(ProjectLaunchPhase.FAILED);
         this.restartRequested = false;
       }
     }
-    UI.updateRunControlStates();
   }
 
   public void openActiveExternally() {
@@ -1363,28 +1407,16 @@ public final class ScriptWorkspacePanel extends JPanel {
   public void createScript(ScriptKind kind, Class<?> targetClass) {
     if (Editor.instance().getGameFile() == null || Editor.instance().getProjectPath() == null) return;
     String targetType = targetClass != null ? targetClass.getName() : (kind == ScriptKind.ENTITY ? Creature.class.getName() : null);
-    String targetSimple = targetClass != null ? targetClass.getSimpleName() : "Creature";
-    String prefix = switch (kind) {
-      case GAME -> "GameScript";
-      case ENVIRONMENT -> "EnvironmentScript";
-      case ENTITY -> "Creature".equals(targetSimple) ? "CreatureScript" : targetSimple + "Script";
-    };
     ScriptHostType hostType = switch (kind) {
       case GAME -> ScriptHostType.GAME;
       case ENVIRONMENT -> ScriptHostType.ENVIRONMENT;
       case ENTITY -> ScriptHostType.ENTITY;
     };
 
-    int suffix = 1;
-    String id;
-    String className;
-    Path source;
-    do {
-      className = suffix == 1 ? prefix : prefix + suffix;
-      id = className;
-      source = resolveSource(ScriptSourcePaths.create("java", className));
-      suffix++;
-    } while (source != null && (Files.exists(source) || scriptIdExists(id)));
+    String className = this.promptForNewScriptName(this.nextAvailableScriptName());
+    if (className == null) return;
+    String id = className;
+    Path source = resolveSource(ScriptSourcePaths.create("java", className));
     if (source == null) return;
 
     ScriptDefinition definition = new ScriptDefinition(className, "java", ScriptSourcePaths.create("java", className),
@@ -1406,6 +1438,53 @@ public final class ScriptWorkspacePanel extends JPanel {
     } catch (IOException e) {
       this.setStatus("Could not create script: " + e.getMessage(), true);
     }
+  }
+
+  private String nextAvailableScriptName() {
+    int suffix = 1;
+    while (true) {
+      String candidate = suffix == 1 ? DEFAULT_SCRIPT_NAME : DEFAULT_SCRIPT_NAME + suffix;
+      if (!this.scriptNameUnavailable(candidate)) return candidate;
+      suffix++;
+    }
+  }
+
+  private String promptForNewScriptName(String suggestion) {
+    String candidate = suggestion;
+    while (true) {
+      JTextField nameField = new JTextField(candidate, 28);
+      nameField.getAccessibleContext().setAccessibleName("Script name");
+      JPanel prompt = new JPanel(new BorderLayout(0, 6));
+      prompt.add(new JLabel("Name"), BorderLayout.NORTH);
+      prompt.add(nameField, BorderLayout.CENTER);
+      SwingUtilities.invokeLater(() -> {
+        nameField.requestFocusInWindow();
+        nameField.selectAll();
+      });
+      int result = JOptionPane.showConfirmDialog(
+          this, prompt, "New Script", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, Icons.SCRIPT_16);
+      if (result != JOptionPane.OK_OPTION) return null;
+
+      candidate = nameField.getText() == null ? "" : nameField.getText().strip();
+      String error = scriptNameValidationError(candidate, false);
+      if (error == null) error = scriptNameValidationError(candidate, this.scriptNameUnavailable(candidate));
+      if (error == null) return candidate;
+      JOptionPane.showMessageDialog(this, error, "Invalid Script Name", JOptionPane.ERROR_MESSAGE);
+    }
+  }
+
+  private boolean scriptNameUnavailable(String name) {
+    Path source = resolveSource(ScriptSourcePaths.create("java", name));
+    return source == null || Files.exists(source) || scriptIdExists(name);
+  }
+
+  static String scriptNameValidationError(String name, boolean unavailable) {
+    if (name == null || name.isBlank()) return "Enter a script name.";
+    if (!SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name)) {
+      return "The script name must be a valid Java class name.";
+    }
+    if (unavailable) return "A script or source file with this name already exists.";
+    return null;
   }
 
   public static String extractClassName(String source) {

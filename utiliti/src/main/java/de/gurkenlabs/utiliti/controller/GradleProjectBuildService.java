@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,10 @@ import java.util.regex.Pattern;
 public final class GradleProjectBuildService implements ProjectBuildService {
   private static final Logger log = Logger.getLogger(GradleProjectBuildService.class.getName());
   private static final String MODEL_MARKER = "UTILITI_PROJECT_MODEL:";
+  static final String LAUNCH_MARKER = "UTILITI_LAUNCH_PHASE:STARTING_GAME";
+  static final String WRAPPER_RETRY_MESSAGE =
+      "Gradle download was interrupted; retrying automatically (2/2)...";
+  private static final int MAX_WRAPPER_ATTEMPTS = 2;
   private static final Pattern MAIN_CLASS = Pattern.compile(
       "(?m)\\bmainClass(?:Name)?\\s*=\\s*['\"]([^'\"]+)['\"]");
   private static final Pattern TOOLCHAIN_VERSION = Pattern.compile(
@@ -46,8 +51,11 @@ public final class GradleProjectBuildService implements ProjectBuildService {
 
   private final AtomicReference<GradleProjectSession> activeSession = new AtomicReference<>();
   private final AtomicReference<Process> activeRefreshProcess = new AtomicReference<>();
+  private final java.util.concurrent.atomic.AtomicBoolean refreshCancellationRequested =
+      new java.util.concurrent.atomic.AtomicBoolean();
 
   public void cancelCurrentBuild() {
+    this.refreshCancellationRequested.set(true);
     Process refresh = this.activeRefreshProcess.getAndSet(null);
     if (refresh != null && refresh.isAlive()) {
       refresh.descendants().forEach(ProcessHandle::destroyForcibly);
@@ -57,6 +65,11 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     if (session != null) {
       session.stop();
     }
+  }
+
+  boolean isRefreshingProjectModel() {
+    Process process = this.activeRefreshProcess.get();
+    return process != null && process.isAlive();
   }
 
   @Override
@@ -79,6 +92,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
 
   @Override
   public ProjectModel refresh(Path projectLocation) {
+    this.refreshCancellationRequested.set(false);
     ProjectModel fallback = this.resolve(projectLocation);
     if (!fallback.canRun()) return fallback;
     Path initScript = null;
@@ -90,31 +104,42 @@ public final class GradleProjectBuildService implements ProjectBuildService {
         Files.copy(source, initScript, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
       }
       List<String> command = modelCommand(fallback, projectLocation, initScript);
-      process = new ProcessBuilder(command)
-          .directory(fallback.projectRoot().toFile())
-          .redirectErrorStream(true)
-          .start();
-      this.activeRefreshProcess.set(process);
-      final Process currentProc = process;
-      StringBuffer output = new StringBuffer();
-      Thread reader = Thread.ofPlatform().daemon().name("utiliti-gradle-model").start(() -> {
-        try (BufferedReader lines = currentProc.inputReader(StandardCharsets.UTF_8)) {
-          String line;
-          while ((line = lines.readLine()) != null) output.append(line).append('\n');
-        } catch (IOException ignored) {
+      for (int attempt = 1; attempt <= MAX_WRAPPER_ATTEMPTS; attempt++) {
+        if (this.refreshCancellationRequested.get()) return fallback;
+        process = new ProcessBuilder(command)
+            .directory(fallback.projectRoot().toFile())
+            .redirectErrorStream(true)
+            .start();
+        this.activeRefreshProcess.set(process);
+        final Process currentProc = process;
+        StringBuffer output = new StringBuffer();
+        Thread reader = Thread.ofPlatform().daemon().name("utiliti-gradle-model").start(() -> {
+          try (BufferedReader lines = currentProc.inputReader(StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = lines.readLine()) != null) output.append(line).append('\n');
+          } catch (IOException ignored) {
+          }
+        });
+        if (!process.waitFor(60, TimeUnit.SECONDS)) {
+          process.destroyForcibly();
+          log.warning("Timed out while resolving the Gradle project model; using conventional project paths.");
+          return fallback;
         }
-      });
-      if (!process.waitFor(60, TimeUnit.SECONDS)) {
-        process.destroyForcibly();
-        log.warning("Timed out while resolving the Gradle project model; using conventional project paths.");
+        reader.join(1000);
+        if (process.exitValue() == 0) {
+          return parseModel(output.toString(), fallback);
+        }
+        if (attempt < MAX_WRAPPER_ATTEMPTS && isTransientWrapperDownloadFailure(output.toString())) {
+          if (this.refreshCancellationRequested.get()) return fallback;
+          log.info(WRAPPER_RETRY_MESSAGE);
+          continue;
+        }
+        Optional<String> diagnosis = launchFailureMessage(output.toString(), fallback.projectRoot());
+        log.warning(diagnosis.orElse(
+            "Could not resolve the Gradle project model; using conventional project paths."));
         return fallback;
       }
-      reader.join(1000);
-      if (process.exitValue() != 0) {
-        log.log(Level.WARNING, "Could not resolve the Gradle project model; using conventional project paths. {0}", output);
-        return fallback;
-      }
-      return parseModel(output.toString(), fallback);
+      return fallback;
     } catch (IOException e) {
       log.log(Level.WARNING, "Could not resolve the Gradle project model; using conventional project paths.", e);
       return fallback;
@@ -143,14 +168,12 @@ public final class GradleProjectBuildService implements ProjectBuildService {
 
     List<Path> reusableArtifacts = reusableArtifacts(
         model, System.getProperty("java.class.path", ""));
-    boolean configureDebugProject = request.mode() == ProjectLaunchRequest.Mode.DEBUG;
-    Path runInitScript = reusableArtifacts.isEmpty() && !configureDebugProject
-        ? null : copyInitScript("/gradle/utiliti-project-run.gradle", "utiliti-gradle-run-");
+    Path runInitScript = copyInitScript("/gradle/utiliti-project-run.gradle", "utiliti-gradle-run-");
     List<String> command = command(request, runInitScript, reusableArtifacts);
     ProcessBuilder builder = new ProcessBuilder(command).directory(model.projectRoot().toFile());
     builder.redirectErrorStream(true);
     builder.environment().putAll(request.environment());
-    GradleProjectSession session = new GradleProjectSession(builder, runInitScript);
+    GradleProjectSession session = new GradleProjectSession(builder, runInitScript, request.mode());
     this.activeSession.set(session);
     session.onStateChanged(state -> {
       if (state == ProjectSession.State.EXITED || state == ProjectSession.State.FAILED) {
@@ -160,6 +183,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     try {
       session.start();
     } catch (IOException error) {
+      this.activeSession.compareAndSet(session, null);
       deleteQuietly(runInitScript);
       throw error;
     }
@@ -213,10 +237,10 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     command.add("--no-daemon");
     if (request.mode() == ProjectLaunchRequest.Mode.DEBUG) {
       command.add("-Dutiliti.debugProject=true");
-      command.add("-Dutiliti.debugTask=" + model.runTask());
       String debugPort = request.environment().get("UTILITI_DEBUG_PORT");
       if (debugPort != null && !debugPort.isBlank()) command.add("-Dutiliti.debugPort=" + debugPort);
     }
+    command.add("-Dutiliti.launchTask=" + model.runTask());
     if (runInitScript != null) {
       if (reusableArtifacts != null && !reusableArtifacts.isEmpty()) {
         String paths = reusableArtifacts.stream()
@@ -252,6 +276,48 @@ public final class GradleProjectBuildService implements ProjectBuildService {
         .filter(loadedArtifacts::contains)
         .distinct()
         .toList();
+  }
+
+  static boolean isLaunchMarker(String line) {
+    return line != null && LAUNCH_MARKER.equals(line.strip());
+  }
+
+  static boolean isTransientWrapperDownloadFailure(String output) {
+    if (output == null || output.isBlank()) return false;
+    String normalized = output.toLowerCase(java.util.Locale.ROOT);
+    boolean wrapperDownload = normalized.contains("org.gradle.wrapper.install")
+        || normalized.contains("services.gradle.org/distributions")
+        || normalized.contains("could not download gradle");
+    return wrapperDownload && isWrapperNetworkExceptionLine(output);
+  }
+
+  private static boolean isWrapperNetworkExceptionLine(String line) {
+    if (line == null || line.isBlank()) return false;
+    String normalized = line.toLowerCase(java.util.Locale.ROOT);
+    return normalized.contains("socketexception")
+        || normalized.contains("sockettimeoutexception")
+        || normalized.contains("connectexception")
+        || normalized.contains("unknownhostexception")
+        || normalized.contains("sslexception")
+        || normalized.contains("unexpected end of file from server");
+  }
+
+  private static boolean isWrapperDownloadLine(String line) {
+    if (line == null || line.isBlank()) return false;
+    String normalized = line.toLowerCase(java.util.Locale.ROOT);
+    return normalized.contains("services.gradle.org/distributions")
+        || normalized.contains("org.gradle.wrapper.install")
+        || normalized.contains("could not download gradle");
+  }
+
+  static Optional<String> launchFailureMessage(String output, Path projectRoot) {
+    if (!isTransientWrapperDownloadFailure(output)) return Optional.empty();
+    String wrapperCommand = isWindows() ? "gradlew.bat --version" : "./gradlew --version";
+    String location = projectRoot == null ? "the project directory" : projectRoot.toString();
+    return Optional.of(
+        "Gradle could not be downloaded after two attempts. Check access to services.gradle.org "
+            + "and GitHub release assets, then retry. You can also run '" + wrapperCommand
+            + "' once in " + location + " to install the project's Gradle version.");
   }
 
   static ProjectModel parseModel(String output, ProjectModel fallback) {
@@ -369,23 +435,32 @@ public final class GradleProjectBuildService implements ProjectBuildService {
   private static final class GradleProjectSession implements ProjectSession {
     private final ProcessBuilder builder;
     private final Path runInitScript;
+    private final ProjectLaunchRequest.Mode mode;
     private final List<String> output = new CopyOnWriteArrayList<>();
     private final List<Consumer<String>> outputListeners = new CopyOnWriteArrayList<>();
     private final List<Consumer<State>> stateListeners = new CopyOnWriteArrayList<>();
     private final AtomicReference<State> state = new AtomicReference<>(State.STARTING);
+    private final java.util.concurrent.atomic.AtomicBoolean stopRequested =
+        new java.util.concurrent.atomic.AtomicBoolean();
     private volatile Process process;
     private volatile Integer exitCode;
+    private volatile String failureMessage;
 
-    private GradleProjectSession(ProcessBuilder builder, Path runInitScript) {
+    private GradleProjectSession(ProcessBuilder builder, Path runInitScript,
+                                 ProjectLaunchRequest.Mode mode) {
       this.builder = builder;
       this.runInitScript = runInitScript;
+      this.mode = mode;
     }
 
     private void start() throws IOException {
       this.process = this.builder.start();
-      this.setState(State.RUNNING);
-      Thread outputThread = Thread.ofPlatform().daemon().name("utiliti-project-output").start(this::readOutput);
-      Thread.ofPlatform().daemon().name("utiliti-project-wait").start(() -> this.waitForExit(outputThread));
+      this.setState(State.BUILDING);
+      List<String> attemptOutput = new CopyOnWriteArrayList<>();
+      Thread outputThread = Thread.ofPlatform().daemon().name("utiliti-project-output")
+          .start(() -> this.readOutput(attemptOutput));
+      Thread.ofPlatform().daemon().name("utiliti-project-wait")
+          .start(() -> this.waitForExit(outputThread, attemptOutput));
     }
 
     @Override public State state() { return this.state.get(); }
@@ -393,6 +468,11 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     @Override
     public OptionalInt exitCode() {
       return this.exitCode == null ? OptionalInt.empty() : OptionalInt.of(this.exitCode);
+    }
+
+    @Override
+    public Optional<String> failureMessage() {
+      return Optional.ofNullable(this.failureMessage);
     }
 
     @Override
@@ -406,9 +486,11 @@ public final class GradleProjectBuildService implements ProjectBuildService {
 
     @Override
     public void stop() {
+      if (!this.isActive()) return;
+      this.stopRequested.set(true);
       Process current = this.process;
-      if (current == null || !current.isAlive()) return;
       this.setState(State.STOPPING);
+      if (current == null || !current.isAlive()) return;
       List<ProcessHandle> descendants = current.descendants().toList();
       descendants.forEach(ProcessHandle::destroy);
       current.destroy();
@@ -440,38 +522,86 @@ public final class GradleProjectBuildService implements ProjectBuildService {
       listener.accept(this.state());
     }
 
-    private void readOutput() {
+    private void readOutput(List<String> attemptOutput) {
+      boolean suppressWrapperStack = false;
+      boolean wrapperDownloadSeen = false;
       try (BufferedReader reader = new BufferedReader(
           new InputStreamReader(this.process.getInputStream(), StandardCharsets.UTF_8))) {
         String line;
         while ((line = reader.readLine()) != null) {
-          synchronized (this.output) {
-            this.output.add(line);
-            if (this.output.size() > 2000) this.output.removeFirst();
-            for (Consumer<String> listener : this.outputListeners) listener.accept(line);
+          attemptOutput.add(line);
+          wrapperDownloadSeen |= isWrapperDownloadLine(line);
+          if (isLaunchMarker(line)) {
+            this.setState(this.mode == ProjectLaunchRequest.Mode.DEBUG
+                ? State.STARTING_GAME : State.RUNNING);
+            continue;
           }
+          if (this.state() == State.BUILDING
+              && wrapperDownloadSeen
+              && isWrapperNetworkExceptionLine(line)) {
+            suppressWrapperStack = true;
+            continue;
+          }
+          if (suppressWrapperStack && (line.isBlank()
+              || line.stripLeading().startsWith("at ")
+              || line.stripLeading().startsWith("Caused by:"))) continue;
+          suppressWrapperStack = false;
+          this.emitOutput(line);
         }
       } catch (IOException e) {
         if (this.isActive()) {
-          String message = "Could not read project output: " + e.getMessage();
-          synchronized (this.output) {
-            this.output.add(message);
-            for (Consumer<String> listener : this.outputListeners) listener.accept(message);
-          }
+          this.emitOutput("Could not read project output: " + e.getMessage());
         }
       }
     }
 
-    private void waitForExit(Thread outputThread) {
+    private void waitForExit(Thread outputThread, List<String> attemptOutput) {
       try {
-        this.exitCode = this.process.waitFor();
-        outputThread.join(1000);
+        int attempt = 1;
+        while (true) {
+          this.exitCode = this.process.waitFor();
+          outputThread.join(1000);
+          String capturedOutput = String.join("\n", attemptOutput);
+          if (this.exitCode != 0
+              && attempt < MAX_WRAPPER_ATTEMPTS
+              && !this.stopRequested.get()
+              && isTransientWrapperDownloadFailure(capturedOutput)) {
+            attempt++;
+            this.emitOutput(WRAPPER_RETRY_MESSAGE);
+            if (this.stopRequested.get()) break;
+            attemptOutput = new CopyOnWriteArrayList<>();
+            this.process = this.builder.start();
+            if (this.stopRequested.get()) {
+              this.process.destroyForcibly();
+              break;
+            }
+            List<String> retryOutput = attemptOutput;
+            outputThread = Thread.ofPlatform().daemon().name("utiliti-project-output")
+                .start(() -> this.readOutput(retryOutput));
+            continue;
+          }
+          this.failureMessage = this.exitCode == 0
+              ? null
+              : launchFailureMessage(capturedOutput, this.builder.directory().toPath()).orElse(null);
+          break;
+        }
         this.setState(State.EXITED);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         this.setState(State.FAILED);
+      } catch (IOException e) {
+        this.failureMessage = "Could not retry the Gradle launch: " + e.getMessage();
+        this.setState(State.FAILED);
       } finally {
         deleteQuietly(this.runInitScript);
+      }
+    }
+
+    private void emitOutput(String line) {
+      synchronized (this.output) {
+        this.output.add(line);
+        if (this.output.size() > 2000) this.output.removeFirst();
+        for (Consumer<String> listener : this.outputListeners) listener.accept(line);
       }
     }
 

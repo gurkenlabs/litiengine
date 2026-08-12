@@ -83,11 +83,15 @@ public class Editor extends Screen {
 
   private final MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
-  private Path projectPath;
+  private volatile Path projectPath;
   private final ProjectCodeIntegration projectCodeIntegration = new ProjectCodeIntegration();
   private final ProjectBuildService projectBuildService = new GradleProjectBuildService();
-  private ProjectModel projectModel;
-  private ProjectSession projectSession;
+  private volatile ProjectModel projectModel;
+  private volatile ProjectSession projectSession;
+  private final java.util.concurrent.atomic.AtomicBoolean projectLaunchInProgress =
+      new java.util.concurrent.atomic.AtomicBoolean();
+  private final java.util.concurrent.atomic.AtomicBoolean projectLaunchCancelled =
+      new java.util.concurrent.atomic.AtomicBoolean();
   private Path currentResourceFile;
 
   private long statusTick;
@@ -209,7 +213,7 @@ public class Editor extends Screen {
     return this.projectModel;
   }
 
-  private ProjectLaunchRequest.Mode projectLaunchMode = ProjectLaunchRequest.Mode.RUN;
+  private volatile ProjectLaunchRequest.Mode projectLaunchMode = ProjectLaunchRequest.Mode.RUN;
   private int projectDebugPort = 5005;
   private long projectModelConfigurationStamp = Long.MIN_VALUE;
 
@@ -224,6 +228,15 @@ public class Editor extends Screen {
 
   public int getProjectDebugPort() {
     return this.projectDebugPort;
+  }
+
+  public boolean isProjectLaunchCancellationRequested() {
+    return this.projectLaunchCancelled.get();
+  }
+
+  /** Starts a new launch attempt before any asynchronous save or model-resolution work begins. */
+  public void prepareProjectLaunch() {
+    this.projectLaunchCancelled.set(false);
   }
 
   /** Reloads compiled project classes for script completion and precompiled Java script generations. */
@@ -242,40 +255,72 @@ public class Editor extends Screen {
   }
 
   /** Launches the opened project through its Gradle application run task. */
-  public synchronized ProjectSession runProject() throws IOException {
+  public ProjectSession runProject() throws IOException {
     return this.runProject(ProjectLaunchRequest.Mode.RUN);
   }
 
   /** Launches the opened project, optionally with a JVM debugger available to attach. */
-  public synchronized ProjectSession runProject(ProjectLaunchRequest.Mode mode) throws IOException {
-    if (this.projectPath == null) throw new IOException("Open a project before running it.");
-    if (this.projectSession != null && this.projectSession.isActive()) {
-      throw new IOException("The project is already running.");
+  public ProjectSession runProject(ProjectLaunchRequest.Mode mode) throws IOException {
+    if (!this.projectLaunchInProgress.compareAndSet(false, true)) {
+      throw new IOException("The project is already starting.");
     }
-    long configurationStamp = buildConfigurationStamp(
-        this.projectModel == null ? this.projectPath : this.projectModel.projectRoot());
-    if (this.projectModel == null || configurationStamp != this.projectModelConfigurationStamp) {
-      this.projectModel = this.projectBuildService.refresh(this.projectPath);
-      this.projectModelConfigurationStamp = buildConfigurationStamp(this.projectModel.projectRoot());
-    }
-    this.applyProjectModel();
-    this.projectLaunchMode = mode == null ? ProjectLaunchRequest.Mode.RUN : mode;
-    Map<String, String> environment = Map.of();
-    if (this.projectLaunchMode == ProjectLaunchRequest.Mode.DEBUG) {
-      try (java.net.ServerSocket socket = new java.net.ServerSocket(
-          0, 1, java.net.InetAddress.getLoopbackAddress())) {
-        this.projectDebugPort = socket.getLocalPort();
+    try {
+      Path launchPath = this.projectPath;
+      if (launchPath == null) throw new IOException("Open a project before running it.");
+      ProjectSession active = this.projectSession;
+      if (active != null && active.isActive()) throw new IOException("The project is already running.");
+
+      ProjectModel model = this.projectModel;
+      long configurationStamp = buildConfigurationStamp(
+          model == null ? launchPath : model.projectRoot());
+      if (model == null || configurationStamp != this.projectModelConfigurationStamp) {
+        this.checkProjectLaunchCancelled();
+        model = this.projectBuildService.refresh(launchPath);
+        this.checkProjectLaunchCancelled();
+        this.projectModel = model;
+        this.projectModelConfigurationStamp = buildConfigurationStamp(model.projectRoot());
       }
-      environment = Map.of("UTILITI_DEBUG_PORT", Integer.toString(this.projectDebugPort));
+      this.checkProjectLaunchCancelled();
+      this.applyProjectModel();
+      this.projectLaunchMode = mode == null ? ProjectLaunchRequest.Mode.RUN : mode;
+      Map<String, String> environment = Map.of();
+      if (this.projectLaunchMode == ProjectLaunchRequest.Mode.DEBUG) {
+        try (java.net.ServerSocket socket = new java.net.ServerSocket(
+            0, 1, java.net.InetAddress.getLoopbackAddress())) {
+          this.projectDebugPort = socket.getLocalPort();
+        }
+        environment = Map.of("UTILITI_DEBUG_PORT", Integer.toString(this.projectDebugPort));
+      }
+      this.checkProjectLaunchCancelled();
+      List<String> buildArguments;
+      try {
+        buildArguments = ProjectLaunchRequest.parseBuildArguments(
+            preferences().getGradleLaunchArguments());
+      } catch (IllegalArgumentException error) {
+        throw new IOException(error.getMessage(), error);
+      }
+      ProjectSession launched = this.projectBuildService.launch(new ProjectLaunchRequest(
+          model, this.projectLaunchMode, List.of(), buildArguments, environment));
+      if (this.projectLaunchCancelled.get()) {
+        launched.stop();
+        throw new ProjectLaunchCancelledException();
+      }
+      this.projectSession = launched;
+      return launched;
+    } finally {
+      this.projectLaunchInProgress.set(false);
     }
-    this.projectSession = this.projectBuildService.launch(new ProjectLaunchRequest(
-        this.projectModel, this.projectLaunchMode, List.of(), List.of(), environment));
-    return this.projectSession;
   }
 
-  public synchronized void stopProject() {
+  private void checkProjectLaunchCancelled() throws ProjectLaunchCancelledException {
+    if (this.projectLaunchCancelled.get()) throw new ProjectLaunchCancelledException();
+  }
+
+  public void stopProject() {
+    this.projectLaunchCancelled.set(true);
     this.projectBuildService.cancelCurrentBuild();
-    if (this.projectSession != null) this.projectSession.stop();
+    ProjectSession session = this.projectSession;
+    if (session != null) session.stop();
   }
 
   public void setProjectPath(Path projectPath) {

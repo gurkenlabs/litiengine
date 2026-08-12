@@ -118,14 +118,12 @@ final class ScriptDebuggerPanel extends JPanel {
     this.stepOver.setEnabled(pausedState);
     this.stepOut.setEnabled(pausedState);
     this.stop.setEnabled(state != ScriptDebuggerBackend.State.DISCONNECTED && state != ScriptDebuggerBackend.State.FAILED);
-    if (state == ScriptDebuggerBackend.State.DISCONNECTED) {
+    if (state == ScriptDebuggerBackend.State.DISCONNECTED
+        || state == ScriptDebuggerBackend.State.FAILED
+        || state == ScriptDebuggerBackend.State.RUNNING
+        || state == ScriptDebuggerBackend.State.ATTACHING) {
       this.allFrames = List.of();
       this.refreshFrames();
-      this.variablesModel.setRowCount(0);
-      this.variableTitle.setText("Variables (0)");
-    } else if (state == ScriptDebuggerBackend.State.RUNNING || state == ScriptDebuggerBackend.State.ATTACHING) {
-      this.variableRows.clear();
-      this.rebuildVariables();
     }
   }
 

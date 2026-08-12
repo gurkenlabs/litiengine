@@ -1,6 +1,8 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.entities.Creature;
@@ -18,6 +20,23 @@ class ScriptWorkspacePanelTest {
       void onLoaded() {}
     }
     """;
+
+  @Test
+  void newScriptsUseANeutralDefaultName() {
+    assertEquals("NewScript", ScriptWorkspacePanel.DEFAULT_SCRIPT_NAME);
+  }
+
+  @Test
+  void newScriptNameValidationRejectsInvalidKeywordsAndCollisions() {
+    assertEquals("Enter a script name.", ScriptWorkspacePanel.scriptNameValidationError(" ", false));
+    assertEquals("The script name must be a valid Java class name.",
+        ScriptWorkspacePanel.scriptNameValidationError("123 Script", false));
+    assertEquals("The script name must be a valid Java class name.",
+        ScriptWorkspacePanel.scriptNameValidationError("class", false));
+    assertEquals("A script or source file with this name already exists.",
+        ScriptWorkspacePanel.scriptNameValidationError("PlayerBehavior", true));
+    assertNull(ScriptWorkspacePanel.scriptNameValidationError("PlayerBehavior", false));
+  }
 
   @Test
   void inspectorMetadataUpdatesEntityAnnotationAndBaseType() {

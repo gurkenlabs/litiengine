@@ -3,13 +3,21 @@ package de.gurkenlabs.utiliti.view.components;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
+import de.gurkenlabs.utiliti.controller.ProjectLaunchPhase;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.AbstractButton;
+import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -19,6 +27,75 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SwingTestSuite.class)
 class ViewportToolbarTest {
+
+  @Test
+  void projectControlsExposeOnlyActionsValidForTheLaunchPhase() {
+    ViewportToolbar toolbar = new ViewportToolbar(new JComboBox<>());
+    AbstractButton run = findButton(toolbar, "Run Project (Shift+F10)");
+    AbstractButton debug = findButton(toolbar, "Debug Project (Shift+F9)");
+    AbstractButton stop = findButton(toolbar, "Stop Project (Ctrl+F2)");
+    ViewportToolbar.LaunchStatusIndicator status =
+        findComponent(toolbar, ViewportToolbar.LaunchStatusIndicator.class);
+
+    toolbar.updateRunState(true, false, ProjectLaunchPhase.BUILDING);
+    assertFalse(run.isVisible());
+    assertFalse(debug.isVisible());
+    assertTrue(stop.isVisible());
+    assertTrue(stop.isEnabled());
+    assertTrue(status.isVisible());
+
+    toolbar.updateRunState(true, false, ProjectLaunchPhase.STOPPING);
+    assertFalse(stop.isEnabled());
+    assertEquals("Stopping...", status.phaseText());
+
+    toolbar.updateRunState(true, true, ProjectLaunchPhase.RUNNING);
+    assertTrue(run.isVisible());
+    assertTrue(debug.isVisible());
+    assertFalse(run.isEnabled());
+    assertFalse(debug.isEnabled());
+    assertTrue(stop.isEnabled());
+    assertFalse(status.isVisible());
+
+    toolbar.updateRunState(true, false, ProjectLaunchPhase.IDLE);
+    assertTrue(run.isEnabled());
+    assertTrue(debug.isEnabled());
+    assertFalse(stop.isEnabled());
+  }
+
+  @Test
+  void launchStatusUsesCompactPhaseTextAndHidesWhenLaunchFinishes() {
+    ViewportToolbar.LaunchStatusIndicator indicator =
+        new ViewportToolbar.LaunchStatusIndicator();
+
+    indicator.setPhase(ProjectLaunchPhase.BUILDING, true);
+
+    assertTrue(indicator.isVisible());
+    assertEquals("Building...", indicator.phaseText());
+    assertEquals("Building...", indicator.getToolTipText());
+    int buildingWidth = indicator.getPreferredSize().width;
+    assertTrue(buildingWidth < 130);
+
+    indicator.setPhase(ProjectLaunchPhase.ATTACHING_DEBUGGER, true);
+    assertTrue(indicator.getPreferredSize().width > buildingWidth);
+
+    indicator.setSize(indicator.getPreferredSize());
+    BufferedImage image = new BufferedImage(
+        indicator.getWidth(), indicator.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    Graphics2D graphics = image.createGraphics();
+    try {
+      indicator.paint(graphics);
+    } finally {
+      graphics.dispose();
+    }
+    for (int x = 0; x < image.getWidth(); x++) {
+      assertEquals(0, image.getRGB(x, image.getHeight() - 2) >>> 24);
+    }
+
+    indicator.setPhase(ProjectLaunchPhase.RUNNING, false);
+
+    assertFalse(indicator.isVisible());
+    assertFalse(indicator.isAnimationRunning());
+  }
 
   @Test
   void largeHistoryPopupIsScrollableAndRetainsEveryEntry() {
@@ -66,5 +143,51 @@ class ViewportToolbarTest {
       history.add(new UndoManager.HistoryEntry("Change object " + index, 1));
     }
     return history;
+  }
+
+  private static AbstractButton findButton(Container root, String tooltip) {
+    for (Component component : root.getComponents()) {
+      if (component instanceof AbstractButton button
+          && tooltip.equals(button.getToolTipText())) return button;
+      if (component instanceof Container container) {
+        AbstractButton found = findButtonOrNull(container, tooltip);
+        if (found != null) return found;
+      }
+    }
+    throw new AssertionError("Button not found: " + tooltip);
+  }
+
+  private static AbstractButton findButtonOrNull(Container root, String tooltip) {
+    for (Component component : root.getComponents()) {
+      if (component instanceof AbstractButton button
+          && tooltip.equals(button.getToolTipText())) return button;
+      if (component instanceof Container container) {
+        AbstractButton found = findButtonOrNull(container, tooltip);
+        if (found != null) return found;
+      }
+    }
+    return null;
+  }
+
+  private static <T extends Component> T findComponent(Container root, Class<T> type) {
+    for (Component component : root.getComponents()) {
+      if (type.isInstance(component)) return type.cast(component);
+      if (component instanceof Container container) {
+        T found = findComponentOrNull(container, type);
+        if (found != null) return found;
+      }
+    }
+    throw new AssertionError("Component not found: " + type.getSimpleName());
+  }
+
+  private static <T extends Component> T findComponentOrNull(Container root, Class<T> type) {
+    for (Component component : root.getComponents()) {
+      if (type.isInstance(component)) return type.cast(component);
+      if (component instanceof Container container) {
+        T found = findComponentOrNull(container, type);
+        if (found != null) return found;
+      }
+    }
+    return null;
   }
 }

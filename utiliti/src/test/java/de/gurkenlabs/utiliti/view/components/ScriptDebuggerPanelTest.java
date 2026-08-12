@@ -85,6 +85,16 @@ class ScriptDebuggerPanelTest {
       assertTrue(resume.isEnabled());
       assertFalse(pause.isEnabled());
       assertTrue(stepOver.isEnabled());
+
+      panel.showSnapshot(new ScriptDebugSnapshot("main", List.of(
+          frame("example.CreatureScript", "update", List.of(
+              new ScriptDebugSnapshot.Variable("health", "int", "100"))))), null);
+      assertEquals(1, find(panel, JList.class).getModel().getSize());
+      assertEquals(1, find(panel, JTable.class).getRowCount());
+
+      panel.updateState(ScriptDebuggerBackend.State.RUNNING, "Project is running");
+      assertEquals(0, find(panel, JList.class).getModel().getSize());
+      assertEquals(0, find(panel, JTable.class).getRowCount());
     });
   }
 

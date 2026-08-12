@@ -62,6 +62,7 @@ public class UserPreferences extends ConfigurationGroup {
   private String editorFontFamily;
   private int editorFontSize;
   private int editorFpsCap;
+  private String gradleLaunchArguments;
   private int settingsDialogX;
   private int settingsDialogY;
   private int mcpPort;
@@ -95,6 +96,7 @@ public class UserPreferences extends ConfigurationGroup {
     this.editorFontFamily = "Roboto";
     this.editorFontSize = 12;
     this.editorFpsCap = 60;
+    this.gradleLaunchArguments = "";
     this.settingsDialogX = Integer.MIN_VALUE;
     this.settingsDialogY = Integer.MIN_VALUE;
     this.mcpPort = 8080;
@@ -198,6 +200,14 @@ public class UserPreferences extends ConfigurationGroup {
 
   public void setEditorFpsCap(int editorFpsCap) {
     this.editorFpsCap = Math.clamp(editorFpsCap, EDITOR_FPS_CAP_MIN, EDITOR_FPS_CAP_MAX);
+  }
+
+  public String getGradleLaunchArguments() {
+    return this.gradleLaunchArguments == null ? "" : this.gradleLaunchArguments;
+  }
+
+  public void setGradleLaunchArguments(String gradleLaunchArguments) {
+    this.gradleLaunchArguments = gradleLaunchArguments == null ? "" : gradleLaunchArguments.strip();
   }
 
   public int getSettingsDialogX() {

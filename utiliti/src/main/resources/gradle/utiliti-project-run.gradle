@@ -10,8 +10,8 @@ def reusableArtifacts = encodedArtifacts.isBlank()
     .toSet()
 def debugProject = Boolean.getBoolean("utiliti.debugProject")
 def debugPort = Integer.getInteger("utiliti.debugPort", 5005)
-def configuredDebugTask = System.getProperty("utiliti.debugTask", ":run")
-def debugTaskPath = configuredDebugTask.startsWith(":") ? configuredDebugTask : ":${configuredDebugTask}"
+def configuredLaunchTask = System.getProperty("utiliti.launchTask", ":run")
+def launchTaskPath = configuredLaunchTask.startsWith(":") ? configuredLaunchTask : ":${configuredLaunchTask}"
 
 gradle.projectsLoaded {
   gradle.rootProject.allprojects { target ->
@@ -22,9 +22,12 @@ gradle.projectsLoaded {
         !reusableArtifacts.contains(artifact)
       }
     }
-    if (debugProject) {
-      target.tasks.withType(JavaExec).configureEach { javaExecTask ->
-        if (javaExecTask.path == debugTaskPath) {
+    target.tasks.withType(JavaExec).configureEach { javaExecTask ->
+      if (javaExecTask.path == launchTaskPath) {
+        javaExecTask.doFirst {
+          println "UTILITI_LAUNCH_PHASE:STARTING_GAME"
+        }
+        if (debugProject) {
           javaExecTask.debugOptions {
             enabled = true
             port = debugPort

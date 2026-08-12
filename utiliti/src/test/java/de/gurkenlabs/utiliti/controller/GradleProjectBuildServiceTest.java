@@ -11,6 +11,9 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -82,7 +85,7 @@ class GradleProjectBuildServiceTest {
     assertTrue(command.contains(":game:play"));
     assertTrue(command.contains("--no-daemon"));
     assertTrue(command.contains("-Dutiliti.debugProject=true"));
-    assertTrue(command.contains("-Dutiliti.debugTask=:game:play"));
+    assertTrue(command.contains("-Dutiliti.launchTask=:game:play"));
     assertTrue(command.contains("-Dutiliti.debugPort=51234"));
     assertFalse(command.contains("--debug-jvm"));
     assertTrue(command.contains("--init-script"));
@@ -98,10 +101,168 @@ class GradleProjectBuildServiceTest {
       String initScript = new String(source.readAllBytes(), StandardCharsets.UTF_8);
 
       assertTrue(initScript.contains("withType(JavaExec)"));
-      assertTrue(initScript.contains("javaExecTask.path == debugTaskPath"));
+      assertTrue(initScript.contains("javaExecTask.path == launchTaskPath"));
+      assertTrue(initScript.contains(GradleProjectBuildService.LAUNCH_MARKER));
       assertTrue(initScript.contains("debugOptions"));
       assertTrue(initScript.contains("port = debugPort"));
       assertTrue(initScript.contains("suspend = true"));
+    }
+  }
+
+  @Test
+  void recognizesOnlyTheStructuredApplicationLaunchMarker() {
+    assertTrue(GradleProjectBuildService.isLaunchMarker(
+        "  " + GradleProjectBuildService.LAUNCH_MARKER + "  "));
+    assertFalse(GradleProjectBuildService.isLaunchMarker("> Task :run"));
+    assertFalse(GradleProjectBuildService.isLaunchMarker("> Configure project :litiengine"));
+    assertFalse(GradleProjectBuildService.isLaunchMarker("Loading game resources"));
+  }
+
+  @Test
+  void recognizesWrapperDownloadFailureAndProvidesRecovery(@TempDir Path root) {
+    String output = """
+        Downloading https://services.gradle.org/distributions/gradle-8.7-bin.zip
+        Exception in thread \"main\" java.net.SocketException: Unexpected end of file from server
+        at org.gradle.wrapper.Install.forceFetch(SourceFile:2)
+        """;
+
+    assertTrue(GradleProjectBuildService.isTransientWrapperDownloadFailure(output));
+    String message = GradleProjectBuildService.launchFailureMessage(output, root).orElseThrow();
+    assertTrue(message.contains("after two attempts"));
+    assertTrue(message.contains(isWindows() ? "gradlew.bat --version" : "./gradlew --version"));
+    assertTrue(message.contains(root.toString()));
+  }
+
+  @Test
+  void retriesInterruptedWrapperDownloadBeforeFailingLaunch(@TempDir Path root) throws Exception {
+    Path wrapper = createRetryingLaunchWrapper(root);
+    ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
+        List.of(), List.of(), List.of(), List.of());
+
+    try (GradleProjectBuildService service = new GradleProjectBuildService()) {
+      ProjectSession session = service.launch(ProjectLaunchRequest.run(model));
+      List<String> output = new CopyOnWriteArrayList<>();
+      session.onOutput(output::add);
+
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+      while (session.state() != ProjectSession.State.RUNNING && System.nanoTime() < deadline) {
+        Thread.sleep(20);
+      }
+
+      assertEquals(ProjectSession.State.RUNNING, session.state());
+      assertTrue(output.contains(GradleProjectBuildService.WRAPPER_RETRY_MESSAGE));
+      assertFalse(output.stream().anyMatch(line -> line.contains("SocketException")));
+      session.stop();
+    }
+  }
+
+  @Test
+  void cancellationBetweenWrapperAttemptsPreventsRetry(@TempDir Path root) throws Exception {
+    Path wrapper = createRetryingLaunchWrapper(root);
+    ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
+        List.of(), List.of(), List.of(), List.of());
+
+    try (GradleProjectBuildService service = new GradleProjectBuildService()) {
+      ProjectSession session = service.launch(ProjectLaunchRequest.run(model));
+      session.onOutput(line -> {
+        if (GradleProjectBuildService.WRAPPER_RETRY_MESSAGE.equals(line)) session.stop();
+      });
+
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+      while (session.isActive() && System.nanoTime() < deadline) {
+        Thread.sleep(20);
+      }
+
+      assertFalse(session.isActive());
+      assertFalse(Files.exists(root.resolve("second-attempt-started")));
+    }
+  }
+
+  @Test
+  void sessionRemainsBuildingUntilStructuredLaunchMarker(@TempDir Path root) throws Exception {
+    Path wrapper = createLaunchWrapper(root);
+    ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
+        List.of(), List.of(), List.of(), List.of());
+
+    try (GradleProjectBuildService service = new GradleProjectBuildService()) {
+      ProjectSession session = service.launch(ProjectLaunchRequest.run(model));
+      List<ProjectSession.State> states = new CopyOnWriteArrayList<>();
+      session.onStateChanged(states::add);
+
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+      while (session.state() != ProjectSession.State.RUNNING && System.nanoTime() < deadline) {
+        Thread.sleep(20);
+      }
+
+      assertTrue(states.contains(ProjectSession.State.BUILDING));
+      assertEquals(ProjectSession.State.RUNNING, session.state());
+      session.stop();
+    }
+  }
+
+  @Test
+  void debugSessionWaitsInStartingGameStateAfterLaunchMarker(@TempDir Path root) throws Exception {
+    Path wrapper = createLaunchWrapper(root);
+    ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
+        List.of(), List.of(), List.of(), List.of());
+    ProjectLaunchRequest request = new ProjectLaunchRequest(
+        model, ProjectLaunchRequest.Mode.DEBUG, List.of(), List.of(), Map.of());
+
+    try (GradleProjectBuildService service = new GradleProjectBuildService()) {
+      ProjectSession session = service.launch(request);
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+      while (session.state() != ProjectSession.State.STARTING_GAME
+          && System.nanoTime() < deadline) {
+        Thread.sleep(20);
+      }
+
+      assertEquals(ProjectSession.State.STARTING_GAME, session.state());
+      assertTrue(session.isActive());
+      session.stop();
+    }
+  }
+
+  @Test
+  void repeatedWrapperFailureExposesRecoveryWithoutStackNoise(@TempDir Path root) throws Exception {
+    Path wrapper = createFailingLaunchWrapper(root);
+    ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
+        List.of(), List.of(), List.of(), List.of());
+
+    try (GradleProjectBuildService service = new GradleProjectBuildService()) {
+      ProjectSession session = service.launch(ProjectLaunchRequest.run(model));
+      List<String> output = new CopyOnWriteArrayList<>();
+      session.onOutput(output::add);
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+      while (session.isActive() && System.nanoTime() < deadline) {
+        Thread.sleep(20);
+      }
+
+      assertEquals(ProjectSession.State.EXITED, session.state());
+      assertEquals(1, session.exitCode().orElseThrow());
+      assertTrue(session.failureMessage().orElseThrow().contains("after two attempts"));
+      assertTrue(output.contains(GradleProjectBuildService.WRAPPER_RETRY_MESSAGE));
+      assertFalse(output.stream().anyMatch(line -> line.contains("SocketException")));
+      assertFalse(output.stream().anyMatch(line -> line.stripLeading().startsWith("at ")));
+    }
+  }
+
+  @Test
+  void modelResolutionCanBeCancelledWithoutWaitingForItsTimeout(@TempDir Path root) throws Exception {
+    Path wrapper = createLaunchWrapper(root);
+    Files.writeString(root.resolve("build.gradle"), "plugins { id 'application' }");
+
+    try (GradleProjectBuildService service = new GradleProjectBuildService()) {
+      CompletableFuture<ProjectModel> refresh = CompletableFuture.supplyAsync(() -> service.refresh(root));
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+      while (!service.isRefreshingProjectModel() && System.nanoTime() < deadline) {
+        Thread.sleep(10);
+      }
+      assertTrue(service.isRefreshingProjectModel());
+
+      service.cancelCurrentBuild();
+
+      assertEquals(root.toAbsolutePath().normalize(),
+          refresh.get(5, TimeUnit.SECONDS).projectRoot());
     }
   }
 
@@ -175,5 +336,71 @@ class GradleProjectBuildServiceTest {
 
   private static boolean isWindows() {
     return System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT).contains("win");
+  }
+
+  private static Path createLaunchWrapper(Path root) throws Exception {
+    Path wrapper = root.resolve(isWindows() ? "gradlew.bat" : "gradlew");
+    if (isWindows()) {
+      Files.writeString(wrapper, "@echo off\r\nping 127.0.0.1 -n 2 > nul\r\n"
+          + "echo " + GradleProjectBuildService.LAUNCH_MARKER + "\r\n"
+          + "ping 127.0.0.1 -n 30 > nul\r\n");
+    } else {
+      Files.writeString(wrapper, "#!/bin/sh\nsleep 1\necho '"
+          + GradleProjectBuildService.LAUNCH_MARKER + "'\nsleep 30\n");
+      wrapper.toFile().setExecutable(true);
+    }
+    return wrapper;
+  }
+
+  private static Path createRetryingLaunchWrapper(Path root) throws Exception {
+    Path wrapper = root.resolve(isWindows() ? "gradlew.bat" : "gradlew");
+    if (isWindows()) {
+      Files.writeString(wrapper, "@echo off\r\n"
+          + "if exist \"%~dp0retry-complete\" goto success\r\n"
+          + "> \"%~dp0retry-complete\" echo first-attempt\r\n"
+          + "ping 127.0.0.1 -n 2 > nul\r\n"
+          + "echo Downloading https://services.gradle.org/distributions/gradle-8.7-bin.zip\r\n"
+          + "echo Exception in thread main java.net.SocketException: Unexpected end of file from server\r\n"
+          + "echo     at org.gradle.wrapper.Install.forceFetch(SourceFile:2)\r\n"
+          + "exit /b 1\r\n"
+          + ":success\r\n"
+          + "> \"%~dp0second-attempt-started\" echo started\r\n"
+          + "echo " + GradleProjectBuildService.LAUNCH_MARKER + "\r\n"
+          + "ping 127.0.0.1 -n 30 > nul\r\n");
+    } else {
+      Files.writeString(wrapper, "#!/bin/sh\n"
+          + "if [ ! -f \"$(dirname \"$0\")/retry-complete\" ]; then\n"
+          + "  touch \"$(dirname \"$0\")/retry-complete\"\n"
+          + "  sleep 1\n"
+          + "  echo 'Downloading https://services.gradle.org/distributions/gradle-8.7-bin.zip'\n"
+          + "  echo 'Exception in thread main java.net.SocketException: Unexpected end of file from server'\n"
+          + "  echo '    at org.gradle.wrapper.Install.forceFetch(SourceFile:2)'\n"
+          + "  exit 1\n"
+          + "fi\n"
+          + "touch \"$(dirname \"$0\")/second-attempt-started\"\n"
+          + "echo '" + GradleProjectBuildService.LAUNCH_MARKER + "'\n"
+          + "sleep 30\n");
+      wrapper.toFile().setExecutable(true);
+    }
+    return wrapper;
+  }
+
+  private static Path createFailingLaunchWrapper(Path root) throws Exception {
+    Path wrapper = root.resolve(isWindows() ? "gradlew.bat" : "gradlew");
+    if (isWindows()) {
+      Files.writeString(wrapper, "@echo off\r\n"
+          + "echo Downloading https://services.gradle.org/distributions/gradle-8.7-bin.zip\r\n"
+          + "echo Exception in thread main java.net.SocketException: Unexpected end of file from server\r\n"
+          + "echo     at org.gradle.wrapper.Install.forceFetch(SourceFile:2)\r\n"
+          + "exit /b 1\r\n");
+    } else {
+      Files.writeString(wrapper, "#!/bin/sh\n"
+          + "echo 'Downloading https://services.gradle.org/distributions/gradle-8.7-bin.zip'\n"
+          + "echo 'Exception in thread main java.net.SocketException: Unexpected end of file from server'\n"
+          + "echo '    at org.gradle.wrapper.Install.forceFetch(SourceFile:2)'\n"
+          + "exit 1\n");
+      wrapper.toFile().setExecutable(true);
+    }
+    return wrapper;
   }
 }

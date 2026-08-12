@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.utiliti.controller.Controller;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ProjectLaunchPhase;
 import de.gurkenlabs.utiliti.controller.EntityController;
 import de.gurkenlabs.utiliti.controller.LayerController;
 import de.gurkenlabs.utiliti.controller.MapController;
@@ -572,16 +573,20 @@ public final class UI {
   }
 
   public static void updateRunControlStates() {
-    updateRunControlStates(false);
+    updateRunControlStates(ProjectLaunchPhase.IDLE);
   }
 
   public static void updateRunControlStates(boolean isStarting) {
+    updateRunControlStates(isStarting ? ProjectLaunchPhase.BUILDING : ProjectLaunchPhase.IDLE);
+  }
+
+  public static void updateRunControlStates(ProjectLaunchPhase phase) {
     Runnable update = () -> {
       boolean hasProject = Editor.instance().getProjectPath() != null;
       boolean isRunning = Editor.instance().getProjectSession() != null && Editor.instance().getProjectSession().isActive();
 
       if (viewportToolbar != null) {
-        viewportToolbar.updateRunState(hasProject, isRunning, isStarting);
+        viewportToolbar.updateRunState(hasProject, isRunning, phase);
       }
     };
     if (SwingUtilities.isEventDispatchThread()) {

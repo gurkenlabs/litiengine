@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.controller;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
 
@@ -10,12 +11,17 @@ public interface ProjectSession extends AutoCloseable {
 
   default boolean isActive() {
     return switch (this.state()) {
-      case STARTING, RUNNING, STOPPING -> true;
+      case STARTING, BUILDING, STARTING_GAME, RUNNING, STOPPING -> true;
       case EXITED, FAILED -> false;
     };
   }
 
   OptionalInt exitCode();
+
+  /** A concise, actionable explanation when the external launch process could not start. */
+  default Optional<String> failureMessage() {
+    return Optional.empty();
+  }
 
   void writeInput(String input) throws IOException;
 
@@ -32,6 +38,8 @@ public interface ProjectSession extends AutoCloseable {
 
   enum State {
     STARTING,
+    BUILDING,
+    STARTING_GAME,
     RUNNING,
     STOPPING,
     EXITED,
