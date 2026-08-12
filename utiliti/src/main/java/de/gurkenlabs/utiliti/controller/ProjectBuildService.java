@@ -14,6 +14,8 @@ public interface ProjectBuildService extends AutoCloseable {
 
   ProjectSession launch(ProjectLaunchRequest request) throws IOException;
 
+  default void cancelCurrentBuild() {}
+
   @Override
   default void close() {}
 }

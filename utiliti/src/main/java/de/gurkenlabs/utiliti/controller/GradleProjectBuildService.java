@@ -45,6 +45,19 @@ public final class GradleProjectBuildService implements ProjectBuildService {
       Path.of("bin"));
 
   private final AtomicReference<GradleProjectSession> activeSession = new AtomicReference<>();
+  private final AtomicReference<Process> activeRefreshProcess = new AtomicReference<>();
+
+  public void cancelCurrentBuild() {
+    Process refresh = this.activeRefreshProcess.getAndSet(null);
+    if (refresh != null && refresh.isAlive()) {
+      refresh.descendants().forEach(ProcessHandle::destroyForcibly);
+      refresh.destroyForcibly();
+    }
+    GradleProjectSession session = this.activeSession.get();
+    if (session != null) {
+      session.stop();
+    }
+  }
 
   @Override
   public ProjectModel resolve(Path projectLocation) {
@@ -69,6 +82,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     ProjectModel fallback = this.resolve(projectLocation);
     if (!fallback.canRun()) return fallback;
     Path initScript = null;
+    Process process = null;
     try {
       initScript = Files.createTempFile("utiliti-gradle-model-", ".gradle");
       try (var source = GradleProjectBuildService.class.getResourceAsStream("/gradle/utiliti-project-model.gradle")) {
@@ -76,13 +90,15 @@ public final class GradleProjectBuildService implements ProjectBuildService {
         Files.copy(source, initScript, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
       }
       List<String> command = modelCommand(fallback, projectLocation, initScript);
-      Process process = new ProcessBuilder(command)
+      process = new ProcessBuilder(command)
           .directory(fallback.projectRoot().toFile())
           .redirectErrorStream(true)
           .start();
+      this.activeRefreshProcess.set(process);
+      final Process currentProc = process;
       StringBuffer output = new StringBuffer();
       Thread reader = Thread.ofPlatform().daemon().name("utiliti-gradle-model").start(() -> {
-        try (BufferedReader lines = process.inputReader(StandardCharsets.UTF_8)) {
+        try (BufferedReader lines = currentProc.inputReader(StandardCharsets.UTF_8)) {
           String line;
           while ((line = lines.readLine()) != null) output.append(line).append('\n');
         } catch (IOException ignored) {
@@ -106,6 +122,9 @@ public final class GradleProjectBuildService implements ProjectBuildService {
       Thread.currentThread().interrupt();
       return fallback;
     } finally {
+      if (process != null) {
+        this.activeRefreshProcess.compareAndSet(process, null);
+      }
       if (initScript != null) {
         try {
           Files.deleteIfExists(initScript);

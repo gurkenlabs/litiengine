@@ -274,6 +274,7 @@ public class Editor extends Screen {
   }
 
   public synchronized void stopProject() {
+    this.projectBuildService.cancelCurrentBuild();
     if (this.projectSession != null) this.projectSession.stop();
   }
 

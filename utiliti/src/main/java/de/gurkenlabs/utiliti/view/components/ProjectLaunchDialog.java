@@ -19,6 +19,7 @@ final class ProjectLaunchDialog extends JDialog {
   private final JProgressBar progressBar = new JProgressBar();
   private final JButton cancelButton = new JButton("Cancel");
   private volatile boolean cancelled = false;
+  private Runnable cancelHandler = () -> {};
 
   ProjectLaunchDialog(Window owner, String title) {
     super(owner, title, Dialog.ModalityType.APPLICATION_MODAL);
@@ -36,9 +37,11 @@ final class ProjectLaunchDialog extends JDialog {
     this.progressBar.setPreferredSize(new Dimension(340, 18));
     this.progressBar.setStringPainted(false);
 
-    this.cancelButton.addActionListener(e -> {
-      this.cancelled = true;
-      this.dispose();
+    this.cancelButton.addActionListener(e -> this.cancelAndClose());
+    this.addWindowListener(new java.awt.event.WindowAdapter() {
+      @Override public void windowClosing(java.awt.event.WindowEvent e) {
+        cancelAndClose();
+      }
     });
     Style.styleButton(this.cancelButton, Style.ButtonVariant.SECONDARY);
     this.cancelButton.setPreferredSize(new Dimension(90, 26));
@@ -60,6 +63,20 @@ final class ProjectLaunchDialog extends JDialog {
     if (owner != null) {
       this.setLocationRelativeTo(owner);
     }
+  }
+
+  void onCancel(Runnable cancelHandler) {
+    this.cancelHandler = cancelHandler == null ? () -> {} : cancelHandler;
+  }
+
+  private void cancelAndClose() {
+    if (this.cancelled) return;
+    this.cancelled = true;
+    try {
+      this.cancelHandler.run();
+    } catch (Exception ignored) {
+    }
+    this.dispose();
   }
 
   void updateStatus(String text) {

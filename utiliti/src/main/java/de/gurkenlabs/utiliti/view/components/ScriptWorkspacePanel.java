@@ -484,6 +484,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     Window owner = SwingUtilities.getWindowAncestor(this);
     ProjectLaunchDialog dialog = new ProjectLaunchDialog(owner,
         mode == ProjectLaunchRequest.Mode.DEBUG ? "Starting Debugger" : "Launching Project");
+    dialog.onCancel(() -> Editor.instance().stopProject());
 
     Thread.ofVirtual().name("utiliti-project-launch").start(() -> {
       try {
