@@ -7,6 +7,8 @@ import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.net.URI;
@@ -19,6 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -51,7 +55,9 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
 
   private final CardLayout cards = new CardLayout();
   private final JPanel browserContainer = new JPanel(new BorderLayout());
-  private final JLabel fallback = new JLabel("Starting Monaco...", SwingConstants.CENTER);
+  private final JLabel fallbackLabel = new JLabel("Starting Monaco...", SwingConstants.CENTER);
+  private final JButton retryButton = new JButton("Retry Loading Editor");
+  private int retryCount;
   private MonacoResourceServer resources;
   private Consumer<String> changeListener = ignored -> {};
   private Runnable saveListener = () -> {};
@@ -85,8 +91,29 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     super();
     this.setLayout(this.cards);
     this.add(this.browserContainer, EDITOR);
-    this.fallback.setForeground(Style.mutedText());
-    this.add(this.fallback, FALLBACK);
+
+    JPanel fallbackPanel = new JPanel(new BorderLayout(0, 12));
+    fallbackPanel.setOpaque(true);
+    fallbackPanel.setBackground(Style.background());
+    fallbackPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+    this.fallbackLabel.setFont(Style.getDefaultFont().deriveFont(12f));
+    this.fallbackLabel.setForeground(Style.mutedText());
+    this.fallbackLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+    this.retryButton.setFocusable(false);
+    Style.styleButton(this.retryButton, Style.ButtonVariant.SECONDARY);
+    this.retryButton.setPreferredSize(new Dimension(160, 26));
+    this.retryButton.addActionListener(e -> this.retryLoading());
+
+    JPanel center = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    center.setOpaque(false);
+    center.add(this.retryButton);
+
+    fallbackPanel.add(this.fallbackLabel, BorderLayout.CENTER);
+    fallbackPanel.add(center, BorderLayout.SOUTH);
+
+    this.add(fallbackPanel, FALLBACK);
     this.cards.show(this, FALLBACK);
   }
 
@@ -302,7 +329,46 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     }
   }
 
+  public void retryLoading() {
+    this.unavailableReason = null;
+    this.startupError = null;
+    this.ready = false;
+    if (this.timeoutTimer != null) {
+      this.timeoutTimer.stop();
+      this.timeoutTimer = null;
+    }
+    this.stopReadinessTimer();
+
+    this.cards.show(this, EDITOR);
+
+    if (this.browser != null && this.resources != null) {
+      this.browser.loadURL(this.resources.editorUrl());
+      this.timeoutTimer = new javax.swing.Timer(30000, event -> {
+        ((javax.swing.Timer) event.getSource()).stop();
+        if (!this.ready) {
+          String detail = this.startupError;
+          this.unavailable(detail == null || detail.isBlank()
+            ? "Monaco did not finish loading. The embedded browser did not complete its editor handshake."
+            : "Monaco failed to start: " + detail);
+        }
+      });
+      this.timeoutTimer.setRepeats(false);
+      this.timeoutTimer.start();
+      this.readinessTimer = new javax.swing.Timer(200, event -> this.probeReadiness());
+      this.readinessTimer.setInitialDelay(50);
+      this.readinessTimer.start();
+    } else {
+      this.start();
+    }
+  }
+
   private void unavailable(String reason) {
+    if (this.retryCount == 0 && this.browser != null && this.resources != null) {
+      this.retryCount++;
+      log.log(Level.INFO, "Retrying Monaco editor loading automatically (attempt {0})...", this.retryCount);
+      this.retryLoading();
+      return;
+    }
     if (this.unavailableReason != null) return;
     if (this.timeoutTimer != null) {
       this.timeoutTimer.stop();
@@ -312,7 +378,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.unavailableReason = reason;
     this.ready = false;
     log.log(Level.WARNING, "Monaco unavailable: {0}", reason);
-    this.fallback.setText("Monaco unavailable: " + reason);
+    this.fallbackLabel.setText("<html><center>" + reason + "</center></html>");
     this.cards.show(this, FALLBACK);
     SwingUtilities.invokeLater(() -> this.unavailableListener.accept(reason));
   }
