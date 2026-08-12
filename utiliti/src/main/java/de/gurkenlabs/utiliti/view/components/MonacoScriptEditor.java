@@ -10,6 +10,7 @@ import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.HierarchyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -110,6 +111,13 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     center.setOpaque(false);
     center.add(this.retryButton);
 
+    this.addHierarchyListener(e -> {
+      if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && this.isShowing()) {
+        this.ensureStarted();
+        this.notifyMoved();
+      }
+    });
+
     fallbackPanel.add(this.fallbackLabel, BorderLayout.CENTER);
     fallbackPanel.add(center, BorderLayout.SOUTH);
 
@@ -120,7 +128,18 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   @Override
   public void addNotify() {
     super.addNotify();
-    this.start();
+    if (this.isShowing()) {
+      this.ensureStarted();
+    }
+  }
+
+  void ensureStarted() {
+    if (this.started) return;
+    if (SwingUtilities.isEventDispatchThread()) {
+      this.start();
+    } else {
+      SwingUtilities.invokeLater(this::start);
+    }
   }
 
   private void start() {
@@ -194,6 +213,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   }
 
   synchronized void open(Path path, String content, ScriptDefinition definition) {
+    this.ensureStarted();
     this.path = path;
     this.definition = definition == null ? null : new ScriptDefinition(definition);
     this.uri = path == null ? URI.create("inmemory://script/" + (this.definition == null ? "untitled" : this.definition.getId())) : path.toUri();
