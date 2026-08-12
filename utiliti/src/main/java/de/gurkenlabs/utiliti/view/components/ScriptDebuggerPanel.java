@@ -56,7 +56,7 @@ final class ScriptDebuggerPanel extends JPanel {
   private final JButton stepInto = control(new StepIcon(StepKind.INTO), "Step Into (F11)");
   private final JButton stepOut = control(new StepIcon(StepKind.OUT), "Step Out (Shift+F11)");
   private final JButton stop = control(Icons.RED_STOP_16, "Stop Debugging (Ctrl+F2)");
-  private final JToggleButton showFrameworkFrames = new JToggleButton("All frames");
+  private final JToggleButton showFrameworkFrames = toggleControl(Icons.SYMBOL_DEPENDENCY_16, "Show engine and JDK frames");
   private List<ScriptDebugSnapshot.Frame> allFrames = List.of();
   private Runnable resumeAction = () -> {};
   private Runnable pauseAction = () -> {};
@@ -155,10 +155,6 @@ final class ScriptDebuggerPanel extends JPanel {
     this.stateLabel.setHorizontalAlignment(SwingConstants.CENTER);
     toolbar.add(this.stateLabel, BorderLayout.CENTER);
 
-    Style.styleButton(this.showFrameworkFrames, Style.ButtonVariant.GHOST);
-    this.showFrameworkFrames.setFocusable(false);
-    this.showFrameworkFrames.setToolTipText("Show engine and JDK frames");
-    toolbar.add(this.showFrameworkFrames, BorderLayout.EAST);
     return toolbar;
   }
 
@@ -201,8 +197,8 @@ final class ScriptDebuggerPanel extends JPanel {
 
     JScrollPane frameScroll = scroll(this.frames);
     JScrollPane variableScroll = scroll(this.variables);
-    JPanel stackPane = section("Call Stack", this.stackCount, frameScroll);
-    JPanel variablesPane = section("Variables", this.variableCount, variableScroll);
+    JPanel stackPane = section("Call Stack", this.stackCount, frameScroll, this.showFrameworkFrames);
+    JPanel variablesPane = section("Variables", this.variableCount, variableScroll, null);
     stackPane.setMinimumSize(new Dimension(260, 80));
     variablesPane.setMinimumSize(new Dimension(340, 80));
 
@@ -320,7 +316,20 @@ final class ScriptDebuggerPanel extends JPanel {
     return button;
   }
 
-  private static JPanel section(String title, JLabel count, Component content) {
+  private static JToggleButton toggleControl(Icon icon, String tooltip) {
+    JToggleButton button = new JToggleButton(icon);
+    button.setPreferredSize(CONTROL_SIZE);
+    button.setMinimumSize(CONTROL_SIZE);
+    button.setMaximumSize(CONTROL_SIZE);
+    button.setToolTipText(tooltip);
+    button.getAccessibleContext().setAccessibleName(tooltip);
+    button.setFocusable(false);
+    button.setMargin(new java.awt.Insets(0, 0, 0, 0));
+    Style.styleButton(button, Style.ButtonVariant.TOOLBAR);
+    return button;
+  }
+
+  private static JPanel section(String title, JLabel count, Component content, Component action) {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(true);
     panel.setBackground(Style.COLOR_BG);
@@ -329,12 +338,20 @@ final class ScriptDebuggerPanel extends JPanel {
     header.setBackground(Style.background());
     header.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
-        BorderFactory.createEmptyBorder(5, 10, 5, 8)));
+        BorderFactory.createEmptyBorder(2, 10, 2, 8)));
     JLabel label = new JLabel(title);
     label.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
     label.setForeground(Style.text());
     header.add(label, BorderLayout.WEST);
-    header.add(count, BorderLayout.EAST);
+
+    JPanel east = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+    east.setOpaque(false);
+    if (action != null) {
+      east.add(action);
+    }
+    east.add(count);
+    header.add(east, BorderLayout.EAST);
+
     panel.add(header, BorderLayout.NORTH);
     panel.add(content, BorderLayout.CENTER);
     return panel;

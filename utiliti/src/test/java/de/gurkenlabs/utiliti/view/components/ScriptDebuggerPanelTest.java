@@ -61,7 +61,7 @@ class ScriptDebuggerPanelTest {
       clickVariable(variables, 1);
       assertEquals(2, variables.getRowCount());
 
-      JToggleButton allFrames = findButton(panel, "All frames", JToggleButton.class);
+      JToggleButton allFrames = (JToggleButton) findAccessibleButton(panel, "Show engine and JDK frames");
       allFrames.doClick();
       assertEquals(3, stack.getModel().getSize());
       assertSame(script, stack.getSelectedValue());
