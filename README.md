@@ -83,7 +83,7 @@ And here's what you need to to:
 
 ## Star History (Compared with other 2D java game libraries / frameworks / engines)
 
-[![Star History Chart](https://star-history.dera.page/svg?repos=gurkenlabs/litiengine,AlmasB/FXGL,magefree/mage,b3dgs/lionengine,fastjengine/FastJ,cping/LGame,LWJGL/lwjgl3,playn/playn,mini2Dx/mini2Dx&type=Timeline)](https://star-history.dera.page/#gurkenlabs/litiengine&AlmasB/FXGL&magefree/mage&b3dgs/lionengine&fastjengine/FastJ&cping/LGame&LWJGL/lwjgl3&playn/playn&mini2Dx/mini2Dx&Timeline)
+[![Star History Chart](https://star-history.dera.page/svg?repos=gurkenlabs/litiengine,AlmasB/FXGL,magefree/mage,b3dgs/lionengine,fastjengine/FastJ,cping/LGame,LWJGL/lwjgl3,playn/playn,mini2Dx/mini2Dx&type=Timeline)](https://star-history.dera.page/#gurkenlabs/litiengine&AlmasB/FXGL&magefree/mage&b3dgs/lionengine&fastjengine/FastJ&cping/LGame&LWJGL/lwjgl3&playn/playn&mini2Dx/mini2Dx&logscale&Timeline)
 
 ## Contact
 
