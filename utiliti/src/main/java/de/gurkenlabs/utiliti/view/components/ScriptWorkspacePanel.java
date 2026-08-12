@@ -504,10 +504,13 @@ public final class ScriptWorkspacePanel extends JPanel {
         session.onOutput(line -> {
           SwingUtilities.invokeLater(() -> this.appendOutput(line));
           dialog.updateStatus(line);
+          if (mode == ProjectLaunchRequest.Mode.RUN && (line.contains("> Task :run") || line.contains("LITIengine") || line.contains("Starting"))) {
+            SwingUtilities.invokeLater(dialog::dispose);
+          }
         });
         session.onStateChanged(state -> {
           SwingUtilities.invokeLater(() -> this.projectStateChanged(session, state));
-          if (state == ProjectSession.State.RUNNING) {
+          if (state == ProjectSession.State.EXITED || state == ProjectSession.State.FAILED) {
             SwingUtilities.invokeLater(dialog::dispose);
           }
         });

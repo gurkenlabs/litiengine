@@ -41,6 +41,7 @@ final class ProjectLaunchDialog extends JDialog {
       this.dispose();
     });
     Style.styleButton(this.cancelButton, Style.ButtonVariant.SECONDARY);
+    this.cancelButton.setPreferredSize(new Dimension(90, 26));
 
     JPanel center = new JPanel(new BorderLayout(0, 8));
     center.setOpaque(false);
@@ -63,7 +64,15 @@ final class ProjectLaunchDialog extends JDialog {
 
   void updateStatus(String text) {
     if (text == null || text.isBlank()) return;
-    SwingUtilities.invokeLater(() -> this.statusLabel.setText(text));
+    String clean = text.strip();
+    if (clean.length() > 60) {
+      clean = clean.substring(0, 57) + "...";
+    }
+    String finalStatus = clean;
+    SwingUtilities.invokeLater(() -> {
+      this.statusLabel.setText(finalStatus);
+      this.statusLabel.repaint();
+    });
   }
 
   boolean isCancelled() {
