@@ -265,8 +265,8 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     });
     this.timeoutTimer.setRepeats(false);
     this.timeoutTimer.start();
-    this.readinessTimer = new javax.swing.Timer(500, event -> this.probeReadiness());
-    this.readinessTimer.setInitialDelay(100);
+    this.readinessTimer = new javax.swing.Timer(200, event -> this.probeReadiness());
+    this.readinessTimer.setInitialDelay(50);
     this.readinessTimer.start();
   }
 
@@ -280,11 +280,15 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
         if (window.utilitiStartupError && window.utilitiReportStartupError) {
           window.utilitiReportStartupError(window.utilitiStartupError);
         }
-        if (window.utilitiEditor && window.monaco && window.cefQuery) {
+        if (window.cefQuery && !window.utilitiReadySent) {
+          window.utilitiReadySent = true;
           window.cefQuery({
             request: JSON.stringify({ method: 'ready', payload: {} }),
             onSuccess: () => { window.utilitiEditorReady = true; },
-            onFailure: (_code, message) => window.utilitiReportStartupError(message)
+            onFailure: (_code, message) => {
+              window.utilitiReadySent = false;
+              if (window.utilitiReportStartupError) window.utilitiReportStartupError(message);
+            }
           });
         }
       })()
