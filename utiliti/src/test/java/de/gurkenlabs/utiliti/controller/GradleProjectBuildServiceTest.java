@@ -95,7 +95,7 @@ class GradleProjectBuildServiceTest {
   }
 
   @Test
-  void unixLaunchInvokesExecutableWrapperDirectly(@TempDir Path root) throws Exception {
+  void unixLaunchUsesShellSoWrapperDoesNotNeedExecutableBit(@TempDir Path root) throws Exception {
     Path wrapper = root.resolve("gradlew");
     Files.writeString(wrapper, "#!/bin/sh\n");
     ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
@@ -104,7 +104,8 @@ class GradleProjectBuildServiceTest {
     List<String> command = GradleProjectBuildService.command(
         ProjectLaunchRequest.run(model), root.resolve("run.gradle"), List.of(), false);
 
-    assertEquals(wrapper.toAbsolutePath().normalize().toString(), command.getFirst());
+    assertEquals("sh", command.getFirst());
+    assertEquals(wrapper.toAbsolutePath().normalize().toString(), command.get(1));
     assertFalse(command.contains("cmd.exe"));
     assertFalse(command.contains("/c"));
   }
@@ -372,7 +373,6 @@ class GradleProjectBuildServiceTest {
     } else {
       Files.writeString(wrapper, "#!/bin/sh\nsleep 1\necho '"
           + GradleProjectBuildService.LAUNCH_MARKER + "'\nsleep 30\n");
-      wrapper.toFile().setExecutable(true);
     }
     return wrapper;
   }
@@ -405,7 +405,6 @@ class GradleProjectBuildServiceTest {
           + "touch \"$(dirname \"$0\")/second-attempt-started\"\n"
           + "echo '" + GradleProjectBuildService.LAUNCH_MARKER + "'\n"
           + "sleep 30\n");
-      wrapper.toFile().setExecutable(true);
     }
     return wrapper;
   }
@@ -424,7 +423,6 @@ class GradleProjectBuildServiceTest {
           + "echo 'Exception in thread main java.net.SocketException: Unexpected end of file from server'\n"
           + "echo '    at org.gradle.wrapper.Install.forceFetch(SourceFile:2)'\n"
           + "exit 1\n");
-      wrapper.toFile().setExecutable(true);
     }
     return wrapper;
   }

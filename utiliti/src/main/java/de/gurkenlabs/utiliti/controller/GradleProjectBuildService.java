@@ -231,14 +231,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
       boolean windows) {
     ProjectModel model = request.project();
     List<String> command = new ArrayList<>();
-    if (windows) {
-      command.add(System.getenv().getOrDefault("COMSPEC", "cmd.exe"));
-      command.add("/d");
-      command.add("/c");
-      command.add(model.wrapper().toString());
-    } else {
-      command.add(model.wrapper().toString());
-    }
+    appendWrapperCommand(command, model.wrapper(), windows);
     command.add("--console=plain");
     command.add("--no-daemon");
     if (request.mode() == ProjectLaunchRequest.Mode.DEBUG) {
@@ -272,6 +265,19 @@ public final class GradleProjectBuildService implements ProjectBuildService {
   static String normalizeArtifactPath(String path, boolean windows) {
     if (path == null) return "";
     return windows ? path.toLowerCase(java.util.Locale.ROOT) : path;
+  }
+
+  private static void appendWrapperCommand(List<String> command, Path wrapper, boolean windows) {
+    if (windows) {
+      command.add(System.getenv().getOrDefault("COMSPEC", "cmd.exe"));
+      command.add("/d");
+      command.add("/c");
+    } else {
+      // Invoking the POSIX wrapper through sh also supports projects copied from filesystems
+      // that do not preserve Gradle's executable bit.
+      command.add("sh");
+    }
+    command.add(wrapper.toString());
   }
 
   static List<Path> reusableArtifacts(ProjectModel model, String processClasspath) {
@@ -363,12 +369,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
   private static List<String> modelCommand(
       ProjectModel model, Path projectLocation, Path initScript) {
     List<String> command = new ArrayList<>();
-    if (isWindows()) {
-      command.add(System.getenv().getOrDefault("COMSPEC", "cmd.exe"));
-      command.add("/d");
-      command.add("/c");
-    }
-    command.add(model.wrapper().toString());
+    appendWrapperCommand(command, model.wrapper(), isWindows());
     command.add("--console=plain");
     command.add("--no-daemon");
     command.add("--quiet");
