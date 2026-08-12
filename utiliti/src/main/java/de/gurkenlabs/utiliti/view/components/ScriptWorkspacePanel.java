@@ -505,7 +505,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         session.onOutput(line -> {
           SwingUtilities.invokeLater(() -> this.appendOutput(line));
           dialog.updateStatus(line);
-          if (mode == ProjectLaunchRequest.Mode.RUN && (line.contains("> Task :run") || line.contains("LITIengine") || line.contains("Starting"))) {
+          if (mode == ProjectLaunchRequest.Mode.RUN && (line.contains("LITIengine") || line.contains("Game.init") || line.contains("Initialized"))) {
             SwingUtilities.invokeLater(dialog::dispose);
           }
         });
@@ -516,7 +516,7 @@ public final class ScriptWorkspacePanel extends JPanel {
           }
         });
         if (mode == ProjectLaunchRequest.Mode.DEBUG) {
-          this.attachDebugger(debugDefinitions);
+          this.attachDebugger(debugDefinitions, dialog);
         }
       } catch (IOException error) {
         if (mode == ProjectLaunchRequest.Mode.DEBUG) {
@@ -524,12 +524,12 @@ public final class ScriptWorkspacePanel extends JPanel {
           Editor.instance().stopProject();
         }
         SwingUtilities.invokeLater(() -> {
+          dialog.dispose();
           this.appendOutput("Could not start project: " + error.getMessage());
           this.setStatus("Could not start project: " + error.getMessage(), true);
         });
       } finally {
         SwingUtilities.invokeLater(() -> {
-          dialog.dispose();
           this.projectLaunchPending = false;
           UI.updateRunControlStates(false);
         });
@@ -542,12 +542,15 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
   }
 
-  private void attachDebugger(List<ScriptDefinition> debugDefinitions) {
+  private void attachDebugger(List<ScriptDefinition> debugDefinitions, ProjectLaunchDialog dialog) {
     this.closeDebugger();
     JdiScriptDebuggerBackend backend = new JdiScriptDebuggerBackend(new ScriptDebuggerBackend.Listener() {
       @Override
       public void stateChanged(ScriptDebuggerBackend.State state, String detail) {
         SwingUtilities.invokeLater(() -> debuggerPanel.updateState(state, detail));
+        if (state == ScriptDebuggerBackend.State.RUNNING || state == ScriptDebuggerBackend.State.PAUSED) {
+          SwingUtilities.invokeLater(dialog::dispose);
+        }
       }
 
       @Override
