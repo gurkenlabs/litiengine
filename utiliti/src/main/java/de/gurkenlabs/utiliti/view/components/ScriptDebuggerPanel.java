@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
 import de.gurkenlabs.utiliti.controller.debug.ScriptDebuggerBackend;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.KeyBindings;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -56,7 +57,8 @@ final class ScriptDebuggerPanel extends JPanel {
   private final JButton stepOver = control(new StepIcon(StepKind.OVER), "Step Over (F10)");
   private final JButton stepInto = control(new StepIcon(StepKind.INTO), "Step Into (F11)");
   private final JButton stepOut = control(new StepIcon(StepKind.OUT), "Step Out (Shift+F11)");
-  private final JButton stop = control(Icons.RED_STOP_16, "Stop Debugging (Ctrl+F2)");
+  private final JButton stop = control(Icons.RED_STOP_16,
+      "Stop Debugging (" + KeyBindings.format(KeyBindings.get(KeyBindings.Command.STOP_PROJECT)) + ")");
   private final JToggleButton showFrameworkFrames = toggleControl(new FilterIcon(), "Show engine and JDK frames");
   private List<ScriptDebugSnapshot.Frame> allFrames = List.of();
   private Runnable resumeAction = () -> {};

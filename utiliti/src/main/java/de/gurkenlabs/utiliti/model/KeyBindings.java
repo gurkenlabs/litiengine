@@ -65,7 +65,8 @@ public final class KeyBindings {
 
     Command(String resourceKey, int keyCode, int modifiers) {
       this.resourceKey = resourceKey;
-      this.defaultKeyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
+      this.defaultKeyStroke = KeyStroke.getKeyStroke(
+          keyCode, platformModifiers(modifiers, System.getProperty("os.name", "")));
     }
 
     public enum CommandGroup {
@@ -90,6 +91,14 @@ public final class KeyBindings {
   }
 
   private KeyBindings() {
+  }
+
+  static int platformModifiers(int modifiers, String osName) {
+    if (osName == null || !osName.toLowerCase(java.util.Locale.ROOT).contains("mac")
+        || (modifiers & InputEvent.CTRL_DOWN_MASK) == 0) {
+      return modifiers;
+    }
+    return modifiers & ~InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK;
   }
 
   public static void bind(JMenuItem menuItem, Command command) {

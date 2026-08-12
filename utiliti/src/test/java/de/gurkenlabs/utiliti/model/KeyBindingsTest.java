@@ -17,8 +17,7 @@ class KeyBindingsTest {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.resolve(
         "SAVE_PROJECT=alt pressed S;DELETE=");
 
-    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK),
-        bindings.get(Command.NEW_PROJECT));
+    assertEquals(Command.NEW_PROJECT.defaultKeyStroke(), bindings.get(Command.NEW_PROJECT));
     assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK),
         bindings.get(Command.SAVE_PROJECT));
     assertNull(bindings.get(Command.DELETE));
@@ -65,8 +64,7 @@ class KeyBindingsTest {
   void includesQuickSearchDefault() {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
 
-    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
-        bindings.get(Command.QUICK_SEARCH));
+    assertEquals(Command.QUICK_SEARCH.defaultKeyStroke(), bindings.get(Command.QUICK_SEARCH));
   }
 
   @Test
@@ -77,7 +75,17 @@ class KeyBindingsTest {
         bindings.get(Command.RUN_PROJECT));
     assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.SHIFT_DOWN_MASK),
         bindings.get(Command.DEBUG_PROJECT));
-    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK),
-        bindings.get(Command.STOP_PROJECT));
+    assertEquals(Command.STOP_PROJECT.defaultKeyStroke(), bindings.get(Command.STOP_PROJECT));
+  }
+
+  @Test
+  void usesCommandInsteadOfControlForMacDefaults() {
+    assertEquals(
+        InputEvent.META_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK,
+        KeyBindings.platformModifiers(
+            InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK, "Mac OS X"));
+    assertEquals(
+        InputEvent.CTRL_DOWN_MASK,
+        KeyBindings.platformModifiers(InputEvent.CTRL_DOWN_MASK, "Linux"));
   }
 }

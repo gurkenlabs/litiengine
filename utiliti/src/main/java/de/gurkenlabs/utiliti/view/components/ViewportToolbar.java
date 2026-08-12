@@ -20,6 +20,7 @@ import de.gurkenlabs.utiliti.controller.tool.Tool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.controller.tool.TerrainBrushTool;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.KeyBindings;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.menus.AddMenu;
 import java.awt.BasicStroke;
@@ -159,7 +160,8 @@ public class ViewportToolbar extends JPanel {
     Style.styleButton(this.btnStopProject, Style.ButtonVariant.TOOLBAR);
     this.btnStopProject.setEnabled(false);
     makeIconOnly(this.btnStopProject, 28);
-    this.btnStopProject.setToolTipText("Stop Project (Ctrl+F2)");
+    this.btnStopProject.setToolTipText(
+        "Stop Project (" + KeyBindings.format(KeyBindings.get(KeyBindings.Command.STOP_PROJECT)) + ")");
 
     addToControlGroup(runGroup, this.btnRunProject);
     this.runDebugDivider = addToControlGroup(runGroup, this.btnDebugProject);

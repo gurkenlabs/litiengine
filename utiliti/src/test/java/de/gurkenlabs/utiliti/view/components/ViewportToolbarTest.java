@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import de.gurkenlabs.utiliti.controller.ProjectLaunchPhase;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.model.KeyBindings;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -33,7 +34,8 @@ class ViewportToolbarTest {
     ViewportToolbar toolbar = new ViewportToolbar(new JComboBox<>());
     AbstractButton run = findButton(toolbar, "Run Project (Shift+F10)");
     AbstractButton debug = findButton(toolbar, "Debug Project (Shift+F9)");
-    AbstractButton stop = findButton(toolbar, "Stop Project (Ctrl+F2)");
+    AbstractButton stop = findButton(toolbar, "Stop Project ("
+        + KeyBindings.format(KeyBindings.get(KeyBindings.Command.STOP_PROJECT)) + ")");
     ViewportToolbar.LaunchStatusIndicator status =
         findComponent(toolbar, ViewportToolbar.LaunchStatusIndicator.class);
 
