@@ -91,6 +91,7 @@ import javax.swing.tree.TreePath;
 public final class ScriptWorkspacePanel extends JPanel {
   private static final Logger log = Logger.getLogger(ScriptWorkspacePanel.class.getName());
   private static final int BOTTOM_PANEL_HEIGHT = 190;
+  private static final Pattern GRADLE_RUN_TASK = Pattern.compile("(?i).*?>\\s*Task\\s+:(?:.*:)?run\\b.*");
 
   private final DefaultMutableTreeNode scriptsRoot = new DefaultMutableTreeNode("Scripts");
   private final DefaultTreeModel scriptsModel = new DefaultTreeModel(this.scriptsRoot);
@@ -507,12 +508,12 @@ public final class ScriptWorkspacePanel extends JPanel {
           dialog.updateStatus(line);
           String lower = line.toLowerCase(Locale.ROOT);
           if (mode == ProjectLaunchRequest.Mode.RUN && (
+              GRADLE_RUN_TASK.matcher(line).matches() ||
               lower.contains("initialization") ||
               lower.contains("loading game resources") ||
               lower.contains("loaded") ||
               lower.contains("litiengine") ||
-              lower.contains("game.init") ||
-              lower.contains("started")
+              lower.contains("game.init")
           )) {
             SwingUtilities.invokeLater(dialog::dispose);
           }
