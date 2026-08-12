@@ -102,7 +102,7 @@ public final class UI {
   private static final int INSPECTOR_BASE_WIDTH = 380;
   private static final int SCENE_GRAPH_MIN_WIDTH = 260;
   private static final int SCENE_GRAPH_MAX_WIDTH = 340;
-  private static final int ASSET_PANEL_MIN_HEIGHT = 180;
+  private static final int ASSET_PANEL_MIN_HEIGHT = 280;
   private static final int ASSET_PANEL_MAX_HEIGHT = 420;
   private static final int SPLITTER_SIZE = 4;
 
@@ -867,7 +867,7 @@ public final class UI {
     if (Editor.preferences().getBottomSplitter() != 0) {
       renderSplitPanel.setDividerLocation(Editor.preferences().getBottomSplitter());
     } else {
-      renderSplitPanel.setDividerLocation((int) (winH * 0.72));
+      renderSplitPanel.setDividerLocation((int) (winH * 0.70));
     }
     renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
       int location = constrainBottomDivider(

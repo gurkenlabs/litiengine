@@ -160,7 +160,7 @@ class EditorStyleTest {
   @Test
   void assetPanelDividerKeepsHeightWithinBounds() {
     assertEquals(576, UI.constrainBottomDivider(1000, 4, 100));
-    assertEquals(816, UI.constrainBottomDivider(1000, 4, 900));
+    assertEquals(716, UI.constrainBottomDivider(1000, 4, 900));
     assertEquals(700, UI.constrainBottomDivider(1000, 4, 700));
   }
 

@@ -39,6 +39,7 @@ public class AssetList extends JSplitPane implements Controller {
   private final JSlider zoomSlider;
   private final JLabel summaryLabel;
   private final JPanel toolbar;
+  private final JScrollPane categoryScrollPane;
   private final JScrollPane scrollPane;
 
   public AssetList() {
@@ -64,7 +65,14 @@ public class AssetList extends JSplitPane implements Controller {
     leftPanel.setMinimumSize(new Dimension(RESOURCE_EXPLORER_MIN_WIDTH, 0));
     leftPanel.setPreferredSize(new Dimension(RESOURCE_EXPLORER_DEFAULT_WIDTH, 0));
     leftPanel.setMaximumSize(new Dimension(RESOURCE_EXPLORER_MAX_WIDTH, Integer.MAX_VALUE));
-    leftPanel.add(assetTree, BorderLayout.CENTER);
+    this.categoryScrollPane = new JScrollPane(
+        assetTree,
+        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    this.categoryScrollPane.setBorder(null);
+    this.categoryScrollPane.getVerticalScrollBar().setUnitIncrement(assetTree.getRowHeight());
+    this.categoryScrollPane.getViewport().setBackground(Style.assetExplorerBackground());
+    leftPanel.add(this.categoryScrollPane, BorderLayout.CENTER);
     this.setLeftComponent(leftPanel);
 
     new FileDrop(assetPanel, files -> Editor.instance().importResources(files));
@@ -211,6 +219,9 @@ public class AssetList extends JSplitPane implements Controller {
     }
     if (this.scrollPane != null) {
       this.scrollPane.getViewport().setBackground(Style.assetExplorerBackground());
+    }
+    if (this.categoryScrollPane != null) {
+      this.categoryScrollPane.getViewport().setBackground(Style.assetExplorerBackground());
     }
   }
 
