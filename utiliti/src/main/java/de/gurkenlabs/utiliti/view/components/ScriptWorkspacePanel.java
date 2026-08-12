@@ -8,9 +8,15 @@ import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.GradleScriptProjectSupport;
 import de.gurkenlabs.utiliti.controller.IntellijIntegration;
+import de.gurkenlabs.utiliti.controller.ProjectLaunchRequest;
 import de.gurkenlabs.utiliti.controller.ProjectSession;
 import de.gurkenlabs.utiliti.controller.ScriptSourcePaths;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.debug.JdiScriptDebuggerBackend;
+import de.gurkenlabs.utiliti.controller.debug.ScriptBreakpoint;
+import de.gurkenlabs.utiliti.controller.debug.ScriptBreakpointStore;
+import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
+import de.gurkenlabs.utiliti.controller.debug.ScriptDebuggerBackend;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
@@ -122,6 +128,14 @@ public final class ScriptWorkspacePanel extends JPanel {
   private MonacoScriptEditor monaco;
   private ScriptTab monacoTab;
   private ScriptTab conflictTab;
+  private final ScriptDebuggerPanel debuggerPanel = new ScriptDebuggerPanel();
+  private final List<ScriptBreakpoint> breakpoints = new java.util.concurrent.CopyOnWriteArrayList<>();
+  private final Timer breakpointSyncTimer = new Timer(300, e -> this.syncBreakpoints());
+  private final java.util.concurrent.ExecutorService breakpointSyncExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
+  private JdiScriptDebuggerBackend debugger;
+  private String executionScriptId;
+  private int executionLine;
+  private List<ScriptDebugSnapshot.Variable> executionVariables = List.of();
   private boolean projectLaunchPending;
   private boolean restartRequested;
   private Consumer<ScriptDefinition> selectionListener = ignored -> {};
@@ -209,6 +223,21 @@ public final class ScriptWorkspacePanel extends JPanel {
           this.updateCaretStatus(this.monacoTab);
         }
       });
+      this.monaco.onBreakpointsChanged(lines -> {
+        if (this.monacoTab != null && this.monacoTab.definition != null) {
+          this.replaceBreakpoints(this.monacoTab.definition, lines);
+        }
+      });
+      this.monaco.onDebugCommand(command -> {
+        if (this.debugger == null) return;
+        switch (command) {
+          case "resume" -> this.debugger.resume();
+          case "stepOver" -> this.debugger.stepOver();
+          case "stepInto" -> this.debugger.stepInto();
+          case "stepOut" -> this.debugger.stepOut();
+          default -> {}
+        }
+      });
     } catch (IOException error) {
       this.monaco = null;
       this.setStatus("Monaco is unavailable: " + error.getMessage(), true);
@@ -268,9 +297,14 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.focusOrOpenFirstScript();
       });
     });
+
+    String savedBreakpoints = Editor.preferences().getScriptBreakpoints();
+    if (savedBreakpoints != null && !savedBreakpoints.isBlank()) {
+      this.breakpoints.addAll(ScriptBreakpointStore.decode(savedBreakpoints));
+    }
   }
 
-  private final ScriptDebuggerPanel debuggerPanel = new ScriptDebuggerPanel();
+
 
   public JComponent getProblemsComponent() {
     return new JScrollPane(this.problems);
@@ -421,22 +455,48 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   /** Saves all open scripts and launches the project through its Gradle application run task. */
   public void runProject() {
+    this.runProject(ProjectLaunchRequest.Mode.RUN);
+  }
+
+  public void debugProject() {
+    this.runProject(ProjectLaunchRequest.Mode.DEBUG);
+  }
+
+  public void runProject(ProjectLaunchRequest.Mode mode) {
     if (this.projectLaunchPending) {
       this.setStatus("The project is already starting", false);
       return;
     }
     if (!this.saveAllScripts()) return;
     if (Editor.instance().getCurrentResourceFile() != null) Editor.instance().save(false);
-    UI.showConsoleTab();
-    this.appendOutput("Resolving Gradle project model...");
+
+    List<ScriptDefinition> debugDefinitions = mode == ProjectLaunchRequest.Mode.DEBUG
+        ? Editor.instance().getGameFile().getScripts().stream().map(ScriptDefinition::new).toList()
+        : List.of();
+
+    if (mode == ProjectLaunchRequest.Mode.DEBUG) {
+      UI.showDebuggerTab();
+      this.appendOutput("Saving project and preparing debugger...");
+    } else {
+      UI.showConsoleTab();
+      this.appendOutput("Resolving Gradle project model...");
+    }
+
     this.projectLaunchPending = true;
     Thread.ofVirtual().name("utiliti-project-launch").start(() -> {
       try {
-        ProjectSession session = Editor.instance().runProject();
+        ProjectSession session = Editor.instance().runProject(mode);
         session.onOutput(line -> SwingUtilities.invokeLater(() -> this.appendOutput(line)));
         session.onStateChanged(
             state -> SwingUtilities.invokeLater(() -> this.projectStateChanged(session, state)));
+        if (mode == ProjectLaunchRequest.Mode.DEBUG) {
+          this.attachDebugger(debugDefinitions);
+        }
       } catch (IOException error) {
+        if (mode == ProjectLaunchRequest.Mode.DEBUG) {
+          this.closeDebugger();
+          Editor.instance().stopProject();
+        }
         SwingUtilities.invokeLater(() -> {
           this.appendOutput("Could not start project: " + error.getMessage());
           this.setStatus("Could not start project: " + error.getMessage(), true);
@@ -447,9 +507,141 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
   }
 
-  public void debugProject() {
-    UI.showDebuggerTab();
-    this.runProject();
+  private void attachDebugger(List<ScriptDefinition> debugDefinitions) {
+    this.closeDebugger();
+    JdiScriptDebuggerBackend backend = new JdiScriptDebuggerBackend(new ScriptDebuggerBackend.Listener() {
+      @Override
+      public void stateChanged(ScriptDebuggerBackend.State state, String detail) {
+        SwingUtilities.invokeLater(() -> debuggerPanel.updateState(state, detail));
+      }
+
+      @Override
+      public void paused(ScriptDebugSnapshot snapshot) {
+        SwingUtilities.invokeLater(() -> handleDebugSnapshot(snapshot));
+      }
+    });
+
+    this.debuggerPanel.onResume(() -> backend.resume());
+    this.debuggerPanel.onPause(() -> backend.pause());
+    this.debuggerPanel.onStepOver(() -> backend.stepOver());
+    this.debuggerPanel.onStepInto(() -> backend.stepInto());
+    this.debuggerPanel.onStepOut(() -> backend.stepOut());
+    this.debuggerPanel.onStop(() -> {
+      this.closeDebugger();
+      Editor.instance().stopProject();
+    });
+
+    this.debugger = backend;
+    int port = Editor.instance().getProjectDebugPort();
+    try {
+      backend.attach("127.0.0.1", port, debugDefinitions);
+      backend.setBreakpoints(this.currentProjectBreakpoints());
+    } catch (IOException e) {
+      log.log(Level.WARNING, "Failed to attach debugger on port " + port, e);
+      SwingUtilities.invokeLater(() -> {
+        this.appendOutput("Debugger attach failed: " + e.getMessage());
+        this.setStatus("Debugger attach failed: " + e.getMessage(), true);
+      });
+    }
+  }
+
+  private void closeDebugger() {
+    if (this.debugger != null) {
+      try {
+        this.debugger.close();
+      } catch (Exception ignored) {}
+      this.debugger = null;
+    }
+    SwingUtilities.invokeLater(() -> {
+      this.handleDebugResumed();
+      this.debuggerPanel.updateState(ScriptDebuggerBackend.State.DISCONNECTED, "Debugger disconnected");
+    });
+  }
+
+  private void handleDebugSnapshot(ScriptDebugSnapshot snapshot) {
+    ScriptDebugSnapshot.Frame top = snapshot == null || snapshot.frames().isEmpty() ? null : snapshot.frames().getFirst();
+    this.debuggerPanel.showSnapshot(snapshot, top);
+    if (snapshot != null && top != null) {
+      ScriptDefinition def = definitionForClass(top.className());
+      this.executionScriptId = def == null ? null : def.getId();
+      this.executionLine = top.line();
+      this.executionVariables = top.variables();
+      if (def != null) {
+        this.open(def);
+        this.updateMonacoDebugState(def);
+      }
+    } else {
+      this.handleDebugResumed();
+    }
+  }
+
+  private void handleDebugResumed() {
+    this.executionScriptId = null;
+    this.executionLine = 0;
+    this.executionVariables = List.of();
+    this.debuggerPanel.showSnapshot(null, null);
+    if (this.monacoTab != null && this.monacoTab.definition != null) {
+      this.updateMonacoDebugState(this.monacoTab.definition);
+    }
+  }
+
+  private ScriptDefinition definitionForClass(String className) {
+    if (className == null || Editor.instance().getGameFile() == null) return null;
+    return Editor.instance().getGameFile().getScripts().stream().filter(definition -> {
+      String implementation = definition.getImplementation();
+      return implementation != null && (implementation.equals(className) || className.startsWith(implementation + "$"));
+    }).findFirst().orElse(null);
+  }
+
+  private void replaceBreakpoints(ScriptDefinition definition, List<Integer> lines) {
+    if (definition == null) return;
+    String project = this.projectKey();
+    String source = Objects.toString(definition.getSource(), "");
+    List<Integer> normalized = lines == null ? List.of() : lines.stream()
+        .filter(line -> line != null && line > 0).distinct().sorted().toList();
+    List<Integer> existing = this.breakpoints.stream()
+        .filter(item -> item.project().equals(project) && item.scriptId().equals(definition.getId()) && item.source().equals(source))
+        .map(ScriptBreakpoint::line).sorted().toList();
+    if (existing.equals(normalized)) return;
+    this.breakpoints.removeIf(item -> item.project().equals(project)
+        && item.scriptId().equals(definition.getId()) && item.source().equals(source));
+    normalized.forEach(line -> this.breakpoints.add(new ScriptBreakpoint(project, definition.getId(), source, line, true)));
+    this.breakpointSyncTimer.restart();
+    this.updateMonacoDebugState(definition);
+  }
+
+  private void syncBreakpoints() {
+    String serialized = ScriptBreakpointStore.encode(this.breakpoints);
+    List<ScriptBreakpoint> activeBreakpoints = this.currentProjectBreakpoints();
+    ScriptDebuggerBackend current = this.debugger;
+    this.breakpointSyncExecutor.execute(() -> {
+      Editor.preferences().setScriptBreakpoints(serialized);
+      Game.config().save();
+      if (current != null && current == this.debugger) current.setBreakpoints(activeBreakpoints);
+    });
+  }
+
+  private List<ScriptBreakpoint> currentProjectBreakpoints() {
+    String project = this.projectKey();
+    return this.breakpoints.stream().filter(item -> item.project().equals(project)).toList();
+  }
+
+  private void updateMonacoDebugState(ScriptDefinition definition) {
+    if (this.monaco == null || definition == null) return;
+    String project = this.projectKey();
+    String source = Objects.toString(definition.getSource(), "");
+    List<Integer> lines = this.breakpoints.stream()
+        .filter(item -> item.enabled() && item.project().equals(project)
+            && item.scriptId().equals(definition.getId()) && item.source().equals(source))
+        .map(ScriptBreakpoint::line).distinct().sorted().toList();
+    int currentLine = definition.getId().equals(this.executionScriptId) ? this.executionLine : 0;
+    List<ScriptDebugSnapshot.Variable> variables = currentLine > 0 ? this.executionVariables : List.of();
+    this.monaco.setDebugState(lines, currentLine, variables);
+  }
+
+  private String projectKey() {
+    Path project = Editor.instance().getProjectPath();
+    return project == null ? "" : project.toAbsolutePath().normalize().toString();
   }
 
   public void stopProject() {

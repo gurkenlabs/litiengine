@@ -54,6 +54,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -208,8 +209,21 @@ public class Editor extends Screen {
     return this.projectModel;
   }
 
+  private ProjectLaunchRequest.Mode projectLaunchMode = ProjectLaunchRequest.Mode.RUN;
+  private int projectDebugPort = 5005;
+  private long projectModelConfigurationStamp = Long.MIN_VALUE;
+
   public ProjectSession getProjectSession() {
     return this.projectSession;
+  }
+
+  /** Gets the mode used for the current or most recently launched project session. */
+  public ProjectLaunchRequest.Mode getProjectLaunchMode() {
+    return this.projectLaunchMode;
+  }
+
+  public int getProjectDebugPort() {
+    return this.projectDebugPort;
   }
 
   /** Reloads compiled project classes for script completion and precompiled Java script generations. */
@@ -229,13 +243,33 @@ public class Editor extends Screen {
 
   /** Launches the opened project through its Gradle application run task. */
   public synchronized ProjectSession runProject() throws IOException {
+    return this.runProject(ProjectLaunchRequest.Mode.RUN);
+  }
+
+  /** Launches the opened project, optionally with a JVM debugger available to attach. */
+  public synchronized ProjectSession runProject(ProjectLaunchRequest.Mode mode) throws IOException {
     if (this.projectPath == null) throw new IOException("Open a project before running it.");
     if (this.projectSession != null && this.projectSession.isActive()) {
       throw new IOException("The project is already running.");
     }
-    this.projectModel = this.projectBuildService.refresh(this.projectPath);
+    long configurationStamp = buildConfigurationStamp(
+        this.projectModel == null ? this.projectPath : this.projectModel.projectRoot());
+    if (this.projectModel == null || configurationStamp != this.projectModelConfigurationStamp) {
+      this.projectModel = this.projectBuildService.refresh(this.projectPath);
+      this.projectModelConfigurationStamp = buildConfigurationStamp(this.projectModel.projectRoot());
+    }
     this.applyProjectModel();
-    this.projectSession = this.projectBuildService.launch(ProjectLaunchRequest.run(this.projectModel));
+    this.projectLaunchMode = mode == null ? ProjectLaunchRequest.Mode.RUN : mode;
+    Map<String, String> environment = Map.of();
+    if (this.projectLaunchMode == ProjectLaunchRequest.Mode.DEBUG) {
+      try (java.net.ServerSocket socket = new java.net.ServerSocket(
+          0, 1, java.net.InetAddress.getLoopbackAddress())) {
+        this.projectDebugPort = socket.getLocalPort();
+      }
+      environment = Map.of("UTILITI_DEBUG_PORT", Integer.toString(this.projectDebugPort));
+    }
+    this.projectSession = this.projectBuildService.launch(new ProjectLaunchRequest(
+        this.projectModel, this.projectLaunchMode, List.of(), List.of(), environment));
     return this.projectSession;
   }
 
