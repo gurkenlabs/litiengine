@@ -534,6 +534,14 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.debuggerPanel.onStepOver(() -> backend.stepOver());
     this.debuggerPanel.onStepInto(() -> backend.stepInto());
     this.debuggerPanel.onStepOut(() -> backend.stepOut());
+    this.debuggerPanel.onExpandVariable(variable -> {
+      if (variable != null && variable.reference() != null) {
+        Thread.ofVirtual().name("utiliti-debug-expand").start(() -> {
+          List<ScriptDebugSnapshot.Variable> children = backend.expandVariable(variable.reference());
+          SwingUtilities.invokeLater(() -> this.debuggerPanel.showVariableChildren(variable.reference(), children));
+        });
+      }
+    });
     this.debuggerPanel.onStop(() -> {
       this.closeDebugger();
       Editor.instance().stopProject();

@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -41,8 +42,8 @@ import javax.swing.table.DefaultTableModel;
 final class ScriptDebuggerPanel extends JPanel {
   private static final Dimension CONTROL_SIZE = new Dimension(28, 26);
   private final JLabel stateLabel = new JLabel("Debugger disconnected");
-  private final JLabel stackCount = sectionCount();
-  private final JLabel variableCount = sectionCount();
+  private final JLabel stackTitle = sectionTitle("Call Stack (0)");
+  private final JLabel variableTitle = sectionTitle("Variables (0)");
   private final DefaultListModel<ScriptDebugSnapshot.Frame> framesModel = new DefaultListModel<>();
   private final JList<ScriptDebugSnapshot.Frame> frames = new JList<>(this.framesModel);
   private final DefaultTableModel variablesModel = new DefaultTableModel(new Object[] {"Name", "Value", "Type"}, 0) {
@@ -56,7 +57,7 @@ final class ScriptDebuggerPanel extends JPanel {
   private final JButton stepInto = control(new StepIcon(StepKind.INTO), "Step Into (F11)");
   private final JButton stepOut = control(new StepIcon(StepKind.OUT), "Step Out (Shift+F11)");
   private final JButton stop = control(Icons.RED_STOP_16, "Stop Debugging (Ctrl+F2)");
-  private final JToggleButton showFrameworkFrames = toggleControl(Icons.SYMBOL_DEPENDENCY_16, "Show engine and JDK frames");
+  private final JToggleButton showFrameworkFrames = toggleControl(new FilterIcon(), "Show engine and JDK frames");
   private List<ScriptDebugSnapshot.Frame> allFrames = List.of();
   private Runnable resumeAction = () -> {};
   private Runnable pauseAction = () -> {};
@@ -121,7 +122,7 @@ final class ScriptDebuggerPanel extends JPanel {
       this.allFrames = List.of();
       this.refreshFrames();
       this.variablesModel.setRowCount(0);
-      this.variableCount.setText("0");
+      this.variableTitle.setText("Variables (0)");
     } else if (state == ScriptDebuggerBackend.State.RUNNING || state == ScriptDebuggerBackend.State.ATTACHING) {
       this.variableRows.clear();
       this.rebuildVariables();
@@ -197,8 +198,8 @@ final class ScriptDebuggerPanel extends JPanel {
 
     JScrollPane frameScroll = scroll(this.frames);
     JScrollPane variableScroll = scroll(this.variables);
-    JPanel stackPane = section("Call Stack", this.stackCount, frameScroll, this.showFrameworkFrames);
-    JPanel variablesPane = section("Variables", this.variableCount, variableScroll, null);
+    JPanel stackPane = section(this.stackTitle, frameScroll, this.showFrameworkFrames);
+    JPanel variablesPane = section(this.variableTitle, variableScroll, null);
     stackPane.setMinimumSize(new Dimension(260, 80));
     variablesPane.setMinimumSize(new Dimension(340, 80));
 
@@ -224,7 +225,7 @@ final class ScriptDebuggerPanel extends JPanel {
         if (this.showFrameworkFrames.isSelected() || frame.equals(preferred) || !isFrameworkFrame(frame)
             || (!hasUserFrame && index == 0)) this.framesModel.addElement(frame);
       }
-      this.stackCount.setText(Integer.toString(this.framesModel.size()));
+      this.stackTitle.setText("Call Stack (" + this.framesModel.size() + ")");
       if (preferred != null && this.framesModel.contains(preferred)) this.frames.setSelectedValue(preferred, true);
       else if (!this.framesModel.isEmpty()) this.frames.setSelectedIndex(0);
     } finally {
@@ -291,10 +292,10 @@ final class ScriptDebuggerPanel extends JPanel {
 
   private void rebuildVariables() {
     this.variablesModel.setRowCount(0);
-    this.variableRows.forEach(row -> this.variablesModel.addRow(new Object[] {
-        row, row.variable.value(), row.variable.type()
-    }));
-    this.variableCount.setText(Integer.toString(this.variableRows.size()));
+    this.variableTitle.setText("Variables (" + this.variableRows.size() + ")");
+    for (VariableRow row : this.variableRows) {
+      this.variablesModel.addRow(new Object[] { row, row.variable.value(), row.variable.type() });
+    }
   }
 
   private static boolean isFrameworkFrame(ScriptDebugSnapshot.Frame frame) {
@@ -329,7 +330,14 @@ final class ScriptDebuggerPanel extends JPanel {
     return button;
   }
 
-  private static JPanel section(String title, JLabel count, Component content, Component action) {
+  private static JLabel sectionTitle(String text) {
+    JLabel label = new JLabel(text);
+    label.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
+    label.setForeground(Style.text());
+    return label;
+  }
+
+  private static JPanel section(JLabel titleLabel, Component content, Component action) {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(true);
     panel.setBackground(Style.COLOR_BG);
@@ -339,18 +347,11 @@ final class ScriptDebuggerPanel extends JPanel {
     header.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
         BorderFactory.createEmptyBorder(2, 10, 2, 8)));
-    JLabel label = new JLabel(title);
-    label.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
-    label.setForeground(Style.text());
-    header.add(label, BorderLayout.WEST);
+    header.add(titleLabel, BorderLayout.WEST);
 
-    JPanel east = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-    east.setOpaque(false);
     if (action != null) {
-      east.add(action);
+      header.add(action, BorderLayout.EAST);
     }
-    east.add(count);
-    header.add(east, BorderLayout.EAST);
 
     panel.add(header, BorderLayout.NORTH);
     panel.add(content, BorderLayout.CENTER);
@@ -483,6 +484,27 @@ final class ScriptDebuggerPanel extends JPanel {
     }
   }
 
+  private static final class FilterIcon implements Icon {
+    @Override public int getIconWidth() { return 16; }
+    @Override public int getIconHeight() { return 16; }
+
+    @Override
+    public void paintIcon(Component c, Graphics g, int x, int y) {
+      Graphics2D g2 = (Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        boolean selected = c instanceof AbstractButton b && b.isSelected();
+        g2.setColor(selected ? Style.COLOR_ACCENT_BLUE : c.isEnabled() ? Style.text() : Style.mutedText());
+        g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.drawLine(x + 2, y + 4, x + 14, y + 4);
+        g2.drawLine(x + 5, y + 8, x + 11, y + 8);
+        g2.drawLine(x + 7, y + 12, x + 9, y + 12);
+      } finally {
+        g2.dispose();
+      }
+    }
+  }
+
   private enum StepKind { OVER, INTO, OUT }
 
   private record StepIcon(StepKind kind) implements Icon {
@@ -497,25 +519,32 @@ final class ScriptDebuggerPanel extends JPanel {
         g.setColor(component.isEnabled() ? Style.text() : Style.mutedText().darker());
         g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         if (this.kind == StepKind.OVER) {
-          g.drawArc(x + 2, y + 2, 11, 10, 10, 220);
+          Path2D curve = new Path2D.Double();
+          curve.moveTo(x + 3, y + 9);
+          curve.curveTo(x + 3, y + 3, x + 13, y + 3, x + 13, y + 9);
+          g.draw(curve);
+
           Path2D arrow = new Path2D.Double();
-          arrow.moveTo(x + 10, y + 2); arrow.lineTo(x + 14, y + 5); arrow.lineTo(x + 10, y + 8);
+          arrow.moveTo(x + 10, y + 7);
+          arrow.lineTo(x + 13, y + 10);
+          arrow.lineTo(x + 16, y + 7);
           g.draw(arrow);
-          g.fillOval(x + 6, y + 12, 3, 3);
-        } else {
-          boolean into = this.kind == StepKind.INTO;
-          int tip = into ? y + 11 : y + 4;
-          int tail = into ? y + 4 : y + 11;
-          g.drawLine(x + 8, tail, x + 8, tip);
+        } else if (this.kind == StepKind.INTO) {
+          g.drawLine(x + 8, y + 3, x + 8, y + 11);
           Path2D arrow = new Path2D.Double();
-          if (into) {
-            arrow.moveTo(x + 5, tip - 4); arrow.lineTo(x + 8, tip); arrow.lineTo(x + 11, tip - 4);
-          } else {
-            arrow.moveTo(x + 5, tip + 4); arrow.lineTo(x + 8, tip); arrow.lineTo(x + 11, tip + 4);
-          }
+          arrow.moveTo(x + 5, y + 8);
+          arrow.lineTo(x + 8, y + 11);
+          arrow.lineTo(x + 11, y + 8);
           g.draw(arrow);
-          int bar = into ? y + 14 : y + 2;
-          g.drawLine(x + 3, bar, x + 13, bar);
+          g.drawLine(x + 3, y + 13, x + 13, y + 13);
+        } else if (this.kind == StepKind.OUT) {
+          g.drawLine(x + 8, y + 11, x + 8, y + 3);
+          Path2D arrow = new Path2D.Double();
+          arrow.moveTo(x + 5, y + 6);
+          arrow.lineTo(x + 8, y + 3);
+          arrow.lineTo(x + 11, y + 6);
+          g.draw(arrow);
+          g.drawLine(x + 3, y + 13, x + 13, y + 13);
         }
       } finally {
         g.dispose();
