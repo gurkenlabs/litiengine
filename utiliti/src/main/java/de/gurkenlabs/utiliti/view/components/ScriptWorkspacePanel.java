@@ -270,8 +270,14 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
   }
 
+  private final ScriptDebuggerPanel debuggerPanel = new ScriptDebuggerPanel();
+
   public JComponent getProblemsComponent() {
     return new JScrollPane(this.problems);
+  }
+
+  public JComponent getDebuggerComponent() {
+    return this.debuggerPanel;
   }
 
   public synchronized void close() {
@@ -442,6 +448,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   public void debugProject() {
+    UI.showDebuggerTab();
     this.runProject();
   }
 

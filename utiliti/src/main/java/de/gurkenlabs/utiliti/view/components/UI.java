@@ -117,6 +117,7 @@ public final class UI {
   private static JToggleButton bottomConsoleTab;
   private static JToggleButton bottomProblemsTab;
   private static JToggleButton bottomResourcesTab;
+  private static JToggleButton bottomDebuggerTab;
 
   private static MapObjectInspector mapObjectPanel;
   private static MapPropertyPanel mapPropertyPanel;
@@ -532,6 +533,19 @@ public final class UI {
         bottomContentPanel.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
       }
       ((CardLayout) bottomContentPanel.getLayout()).show(bottomContentPanel, "problems");
+      if (assetComponent != null && assetComponent.getToolbar() != null) {
+        assetComponent.getToolbar().setVisible(false);
+      }
+    }
+  }
+
+  public static void showDebuggerTab() {
+    if (bottomContentPanel != null && bottomDebuggerTab != null) {
+      bottomDebuggerTab.setSelected(true);
+      if (scriptWorkspacePanel != null) {
+        bottomContentPanel.add(scriptWorkspacePanel.getDebuggerComponent(), "debugger");
+      }
+      ((CardLayout) bottomContentPanel.getLayout()).show(bottomContentPanel, "debugger");
       if (assetComponent != null && assetComponent.getToolbar() != null) {
         assetComponent.getToolbar().setVisible(false);
       }
@@ -1001,6 +1015,7 @@ public final class UI {
     JToggleButton resourcesTab = createBottomTab(Resources.strings().get("assettree_assets"), true, false);
     JToggleButton consoleTab = createBottomTab(Resources.strings().get("assettree_console"), false, true);
     JToggleButton problemsTab = createBottomTab("Problems", false, true);
+    JToggleButton debuggerTab = createBottomTab("Debugger", false, false);
 
     if (scriptWorkspacePanel != null) {
       content.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
@@ -1032,6 +1047,7 @@ public final class UI {
     tabs.add(resourcesTab);
     tabs.add(consoleTab);
     tabs.add(problemsTab);
+    tabs.add(debuggerTab);
 
     JPanel tabButtons = new JPanel(new GridBagLayout());
     tabButtons.setOpaque(false);
@@ -1041,6 +1057,7 @@ public final class UI {
     tabButtons.add(resourcesTab, tabConstraints);
     tabButtons.add(consoleTab, tabConstraints);
     tabButtons.add(problemsTab, tabConstraints);
+    tabButtons.add(debuggerTab, tabConstraints);
 
     JPanel header = new JPanel(new BorderLayout()) {
       @Override
@@ -1061,6 +1078,7 @@ public final class UI {
     bottomResourcesTab = resourcesTab;
     bottomConsoleTab = consoleTab;
     bottomProblemsTab = problemsTab;
+    bottomDebuggerTab = debuggerTab;
 
     resourcesTab.addActionListener(e -> {
       ((CardLayout) content.getLayout()).show(content, "resources");
@@ -1077,6 +1095,7 @@ public final class UI {
       ((CardLayout) content.getLayout()).show(content, "problems");
       assetComponent.getToolbar().setVisible(false);
     });
+    debuggerTab.addActionListener(e -> showDebuggerTab());
 
     bottomPanel.add(header, BorderLayout.NORTH);
     bottomPanel.add(content, BorderLayout.CENTER);
