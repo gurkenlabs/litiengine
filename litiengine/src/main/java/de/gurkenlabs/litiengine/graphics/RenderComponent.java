@@ -194,8 +194,8 @@ public class RenderComponent extends Canvas {
     clearBackground(g);
     applyRenderingHints(g);
 
-    Screen currentScreen = Game.screens().current();
-    if (currentScreen != null) {
+    List<Screen> activeScreens = Game.screens().getActiveScreens();
+    for (Screen currentScreen : activeScreens) {
       renderScreen(g, currentScreen);
     }
 
@@ -203,8 +203,8 @@ public class RenderComponent extends Canvas {
     renderedConsumer.forEach(consumer -> consumer.accept(g));
     applyFadeOverlay(g);
 
-    if (takeScreenShot && currentScreen != null) {
-      takeAndSaveScreenshot(currentScreen);
+    if (takeScreenShot && !activeScreens.isEmpty()) {
+      takeAndSaveScreenshot(activeScreens);
     }
   }
 
@@ -265,14 +265,16 @@ public class RenderComponent extends Canvas {
   }
 
   /**
-   * Captures and saves a screenshot of the current screen.
+   * Captures and saves a screenshot of the current active screens.
    *
-   * @param screen The current {@link Screen} to capture.
+   * @param screens The currently active {@link Screen} instances to capture.
    */
-  private void takeAndSaveScreenshot(Screen screen) {
+  private void takeAndSaveScreenshot(List<Screen> screens) {
     BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics2D imgGraphics = img.createGraphics();
-    screen.render(imgGraphics);
+    for (Screen screen : screens) {
+      screen.render(imgGraphics);
+    }
     imgGraphics.dispose();
     saveScreenshot(img);
   }

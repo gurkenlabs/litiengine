@@ -5,6 +5,8 @@ import de.gurkenlabs.litiengine.GameWindow;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import java.awt.Dimension;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -13,7 +15,7 @@ import java.util.logging.Logger;
 
 /**
  * The {@code ScreenManager} holds instances of all available screens and handles whenever a different {@code Screen}
- * should be shown to the player. It provides the currently active Screen for the Game’s {@code RenderComponent} which
+ * should be shown to the player. It provides the currently active Screens for the Game's {@code RenderComponent} which
  * calls the {@code Screen.render(Graphics2D)} method on every tick of the {@code RenderLoop}. Overwriting this method
  * provides the ability to define a customized render pipeline that suits the need of a particular Screen
  * implementation. With the GameScreen, the LITIENGINE provides a simple default Screen implementation that renders the
@@ -32,7 +34,8 @@ public final class ScreenManager {
 
   private final List<Screen> screens;
 
-  private Screen currentScreen;
+  /** All screens currently being rendered, ordered by their screen layer. */
+  private final List<Screen> activeScreens;
 
   private int changeCooldown = DEFAULT_CHANGE_COOLDOWN;
   private long lastScreenChange = 0;
@@ -51,6 +54,7 @@ public final class ScreenManager {
 
     this.screenChangedListeners = new CopyOnWriteArrayList<>();
     this.screens = new CopyOnWriteArrayList<>();
+    this.activeScreens = new CopyOnWriteArrayList<>();
   }
 
   /**
@@ -102,6 +106,9 @@ public final class ScreenManager {
    */
   public void remove(Screen screen) {
     this.screens.remove(screen);
+    if (this.activeScreens.contains(screen)) {
+      this.removeScreen(screen);
+    }
     if (this.current() == screen) {
       if (!this.screens.isEmpty()) {
         this.display(this.screens.get(0));
@@ -112,40 +119,14 @@ public final class ScreenManager {
   }
 
   /**
-   * Displays the specified screen by setting
+   * Displays the specified screen by setting it as the (sole) active screen, replacing the previously active screen.
    *
    * @param screen
    *          The screen to be displayed.
    */
   public void display(final Screen screen) {
-    if (Game.hasStarted() && Game.time().since(this.lastScreenChange) < this.getChangeCooldown()) {
-      log.log(
-          Level.INFO,
-          "Skipping displaying of screen {0} because screen changing is currently on cooldown.",
-          screen != null ? screen.getName() : "");
-      return;
-    }
-
     final Screen previous = this.current();
-    if (previous != null) {
-      previous.suspend();
-    }
-
-    if (screen != null && !this.screens.contains(screen)) {
-      this.screens.add(screen);
-    }
-
-    this.currentScreen = screen;
-    if (!Game.isInNoGUIMode() && this.current() != null) {
-      this.current().prepare();
-    }
-
-    this.lastScreenChange = Game.loop().getTicks();
-
-    final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
-    for (final ScreenChangedListener listener : this.screenChangedListeners) {
-      listener.changed(event);
-    }
+    this.replaceDisplay(previous, screen);
   }
 
   /**
@@ -181,6 +162,117 @@ public final class ScreenManager {
   }
 
   /**
+   * Replaces the specified old active screen with the new screen.
+   *
+   * @param oldScreen The screen to remove from the active screens (may be {@code null}).
+   * @param newScreen The screen to add as an active screen (may be {@code null}).
+   */
+  public void replaceDisplay(final Screen oldScreen, final Screen newScreen) {
+    if (Game.hasStarted() && Game.time().since(this.lastScreenChange) < this.getChangeCooldown()) {
+      log.log(
+          Level.INFO,
+          "Skipping displaying of screen {0} because screen changing is currently on cooldown.",
+          newScreen != null ? newScreen.getName() : "");
+      return;
+    }
+
+    final Screen previous = this.current();
+
+    this.removeScreen(oldScreen);
+
+    if (newScreen == null) {
+      this.lastScreenChange = Game.loop().getTicks();
+      final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
+      for (final ScreenChangedListener listener : this.screenChangedListeners) {
+        listener.changed(event);
+      }
+      return;
+    }
+
+    if (this.activeScreens.contains(newScreen)) {
+      return;
+    }
+
+    if (!this.screens.contains(newScreen)) {
+      this.screens.add(newScreen);
+    }
+
+    this.activeScreens.add(newScreen);
+    this.activeScreens.sort(Comparator.comparingInt(Screen::getScreenLayer));
+
+    if (!Game.isInNoGUIMode()) {
+      newScreen.prepare();
+    }
+
+    this.lastScreenChange = Game.loop().getTicks();
+
+    final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
+    for (final ScreenChangedListener listener : this.screenChangedListeners) {
+      listener.changed(event);
+    }
+  }
+
+  /**
+   * Replaces the screen with the specified old name by the screen with the specified new name.
+   *
+   * @param oldScreenName The name of the screen to remove (may be {@code null}).
+   * @param newScreenName The name of the screen to add.
+   */
+  public void replaceDisplay(final String oldScreenName, final String newScreenName) {
+    Screen oldScreen = oldScreenName != null ? this.getActive(oldScreenName) : null;
+
+    Screen newScreen = this.get(newScreenName);
+    if (newScreen == null) {
+      log.log(Level.WARNING,
+          "Could not display the screen {0} because there is no screen with the specified name.",
+          newScreenName);
+    }
+
+    this.replaceDisplay(oldScreen, newScreen);
+  }
+
+  /**
+   * Adds the specified screen to the active screens without removing any existing ones.
+   *
+   * @param screen The screen to add as an active screen.
+   */
+  public void addDisplay(final Screen screen) {
+    this.replaceDisplay(null, screen);
+  }
+
+  /**
+   * Adds the screen with the specified name to the active screens without removing any existing ones.
+   *
+   * @param screenName The name of the screen to add.
+   */
+  public void addDisplay(final String screenName) {
+    this.replaceDisplay((String) null, screenName);
+  }
+
+  /**
+   * Removes the specified screen from the active screens.
+   *
+   * @param screen The screen to remove from the active screens (may be {@code null}).
+   */
+  public void removeScreen(final Screen screen) {
+    if (screen == null || !this.activeScreens.contains(screen)) {
+      return;
+    }
+    screen.suspend();
+    this.activeScreens.remove(screen);
+  }
+
+  /**
+   * Removes the screen with the specified name from the active screens.
+   *
+   * @param screenName The name of the screen to remove.
+   */
+  public void removeScreen(final String screenName) {
+    Screen screen = this.getActive(screenName);
+    this.removeScreen(screen);
+  }
+
+  /**
    * Gets the screen by its name.
    *
    * @param screenName
@@ -206,14 +298,27 @@ public final class ScreenManager {
   }
 
   /**
+   * Gets the currently active screens being rendered. The list is ordered by screen layer (ascending).
+   *
+   * @return An unmodifiable list of all currently active screens.
+   */
+  public List<Screen> getActiveScreens() {
+    return Collections.unmodifiableList(this.activeScreens);
+  }
+
+  /**
    * Gets the currently active screen that is being rendered by the {@code RenderComponent}.
+   * When multiple screens are active, returns the first one (lowest layer).
    *
    * @return The currently active screen.
    * @see GameWindow#getRenderComponent()
    * @see RenderComponent#render()
    */
   public Screen current() {
-    return this.currentScreen;
+    if (this.activeScreens.isEmpty()) {
+      return null;
+    }
+    return this.activeScreens.get(0);
   }
 
   /**
@@ -236,6 +341,13 @@ public final class ScreenManager {
    */
   public void setChangeCooldown(int changeCooldown) {
     this.changeCooldown = changeCooldown;
+  }
+
+  private Screen getActive(String screenName) {
+    return this.activeScreens.stream()
+        .filter(s -> s.getName().equalsIgnoreCase(screenName))
+        .findFirst()
+        .orElse(null);
   }
 
   private void onWindowResolutionChanged(Dimension newResolution) {

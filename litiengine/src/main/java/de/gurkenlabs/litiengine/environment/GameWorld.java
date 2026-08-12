@@ -45,7 +45,8 @@ public final class GameWorld implements IUpdateable {
   private final Map<String, Environment> environments = new ConcurrentHashMap<>();
 
   private Environment environment;
-  private ICamera camera;
+  private final List<ICamera> cameras = new CopyOnWriteArrayList<>();
+  private int currentCameraIndex = 0;
   private int gravity;
 
   /**
@@ -216,13 +217,60 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Gets the game's current {@code Camera}.
+   * Gets the game's current {@code Camera} (the camera at the current camera index).
    *
    * @return The currently active camera.
    * @see ICamera
    */
   public ICamera camera() {
-    return this.camera;
+    if (this.cameras.isEmpty()) {
+      return null;
+    }
+    return this.cameras.get(this.currentCameraIndex);
+  }
+
+  /**
+   * Gets the {@code Camera} at the specified index.
+   *
+   * @param index The index of the camera to retrieve.
+   * @return The camera at the specified index, or {@code null} if the index is out of bounds.
+   */
+  public ICamera camera(int index) {
+    if (index < 0 || index >= this.cameras.size()) {
+      return null;
+    }
+    return this.cameras.get(index);
+  }
+
+  /**
+   * Gets all cameras registered with the game world.
+   *
+   * @return An unmodifiable list of all cameras.
+   */
+  public List<ICamera> cameras() {
+    return Collections.unmodifiableList(this.cameras);
+  }
+
+  /**
+   * Gets the index of the currently active camera.
+   *
+   * @return The current camera index.
+   */
+  public int currentCameraIndex() {
+    return this.currentCameraIndex;
+  }
+
+  /**
+   * Sets the current camera index used for rendering.
+   *
+   * @param index The index of the camera to activate. If the index is out of bounds, it defaults to 0.
+   */
+  public void setCurrentCameraIndex(int index) {
+    if (index < 0 || index >= this.cameras.size()) {
+      this.currentCameraIndex = 0;
+    } else {
+      this.currentCameraIndex = index;
+    }
   }
 
   /**
@@ -250,7 +298,7 @@ public final class GameWorld implements IUpdateable {
   public void clear() {
     this.unloadEnvironment();
     this.environments.clear();
-    this.setCamera(null);
+    this.clearCameras();
     Game.physics().clear();
 
     this.environmentListeners.clear();
@@ -352,8 +400,9 @@ public final class GameWorld implements IUpdateable {
         if (mapName != null && this.environmentLoadedListeners.containsKey(mapName)) {
 
           // for the default camera we center the camera on the environment
-          if (this.camera().getClass().equals(Camera.class)) {
-            camera().setFocus(env.getCenter());
+          ICamera activeCamera = this.camera();
+          if (activeCamera != null && activeCamera.getClass().equals(Camera.class)) {
+            activeCamera.setFocus(env.getCenter());
           }
 
           for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
@@ -489,21 +538,92 @@ public final class GameWorld implements IUpdateable {
   }
 
   /**
-   * Sets the active camera of the game.
+   * Sets the active camera of the game (replaces the camera at the current camera index, or sets camera 0).
    *
    * @param cam The new camera to be set.
    */
   public void setCamera(final ICamera cam) {
-    if (this.camera() != null) {
-      Game.loop().detach(camera);
-    }
+    this.setCamera(this.currentCameraIndex, cam);
+  }
 
-    camera = cam;
+  /**
+   * Sets the camera at the specified index.
+   *
+   * @param index The index at which to set the camera.
+   * @param cam   The new camera to be set. If {@code null}, the slot is removed.
+   */
+  public void setCamera(int index, final ICamera cam) {
+    // detach old camera at index if present
+    if (index >= 0 && index < this.cameras.size()) {
+      ICamera old = this.cameras.get(index);
+      if (old != null) {
+        Game.loop().detach(old);
+      }
+      if (cam == null) {
+        this.cameras.remove(index);
+        if (this.currentCameraIndex >= this.cameras.size()) {
+          this.currentCameraIndex = Math.max(0, this.cameras.size() - 1);
+        }
+        return;
+      }
+      this.cameras.set(index, cam);
+    } else if (cam != null) {
+      this.cameras.add(cam);
+    }
 
     if (cam != null && !Game.isInNoGUIMode()) {
       Game.loop().attach(cam);
       cam.updateFocus();
     }
+  }
+
+  /**
+   * Adds a camera to the game world.
+   *
+   * @param cam The camera to add.
+   * @return The index at which the camera was added.
+   */
+  public int addCamera(final ICamera cam) {
+    if (cam == null) {
+      return -1;
+    }
+    this.cameras.add(cam);
+    int index = this.cameras.size() - 1;
+    if (!Game.isInNoGUIMode()) {
+      Game.loop().attach(cam);
+      cam.updateFocus();
+    }
+    return index;
+  }
+
+  /**
+   * Removes the specified camera from the game world.
+   *
+   * @param cam The camera to remove.
+   */
+  public void removeCamera(final ICamera cam) {
+    if (cam == null) {
+      return;
+    }
+    int index = this.cameras.indexOf(cam);
+    if (index >= 0) {
+      Game.loop().detach(cam);
+      this.cameras.remove(index);
+      if (this.currentCameraIndex >= this.cameras.size()) {
+        this.currentCameraIndex = Math.max(0, this.cameras.size() - 1);
+      }
+    }
+  }
+
+  /**
+   * Removes all cameras from the game world.
+   */
+  public void clearCameras() {
+    for (ICamera cam : this.cameras) {
+      Game.loop().detach(cam);
+    }
+    this.cameras.clear();
+    this.currentCameraIndex = 0;
   }
 
   /**
