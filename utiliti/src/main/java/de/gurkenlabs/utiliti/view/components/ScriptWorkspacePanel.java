@@ -29,6 +29,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -467,6 +468,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.setStatus("The project is already starting", false);
       return;
     }
+    if (!this.saveAllScripts()) return;
 
     if (mode == ProjectLaunchRequest.Mode.DEBUG) {
       UI.showDebuggerTab();
@@ -479,21 +481,36 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.projectLaunchPending = true;
     UI.updateRunControlStates(true);
 
+    Window owner = SwingUtilities.getWindowAncestor(this);
+    ProjectLaunchDialog dialog = new ProjectLaunchDialog(owner,
+        mode == ProjectLaunchRequest.Mode.DEBUG ? "Starting Debugger" : "Launching Project");
+
     Thread.ofVirtual().name("utiliti-project-launch").start(() -> {
       try {
-        if (!this.saveAllScripts()) return;
+        if (dialog.isCancelled()) return;
+        dialog.updateStatus("Saving resource map files...");
         if (Editor.instance().getCurrentResourceFile() != null) {
           Editor.instance().save(false);
         }
+
+        if (dialog.isCancelled()) return;
+        dialog.updateStatus("Resolving Gradle project model...");
 
         List<ScriptDefinition> debugDefinitions = mode == ProjectLaunchRequest.Mode.DEBUG
             ? Editor.instance().getGameFile().getScripts().stream().map(ScriptDefinition::new).toList()
             : List.of();
 
         ProjectSession session = Editor.instance().runProject(mode);
-        session.onOutput(line -> SwingUtilities.invokeLater(() -> this.appendOutput(line)));
-        session.onStateChanged(
-            state -> SwingUtilities.invokeLater(() -> this.projectStateChanged(session, state)));
+        session.onOutput(line -> {
+          SwingUtilities.invokeLater(() -> this.appendOutput(line));
+          dialog.updateStatus(line);
+        });
+        session.onStateChanged(state -> {
+          SwingUtilities.invokeLater(() -> this.projectStateChanged(session, state));
+          if (state == ProjectSession.State.RUNNING) {
+            SwingUtilities.invokeLater(dialog::dispose);
+          }
+        });
         if (mode == ProjectLaunchRequest.Mode.DEBUG) {
           this.attachDebugger(debugDefinitions);
         }
@@ -508,11 +525,17 @@ public final class ScriptWorkspacePanel extends JPanel {
         });
       } finally {
         SwingUtilities.invokeLater(() -> {
+          dialog.dispose();
           this.projectLaunchPending = false;
           UI.updateRunControlStates(false);
         });
       }
     });
+
+    dialog.setVisible(true);
+    if (dialog.isCancelled()) {
+      Editor.instance().stopProject();
+    }
   }
 
   private void attachDebugger(List<ScriptDefinition> debugDefinitions) {
