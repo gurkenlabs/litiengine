@@ -223,9 +223,15 @@ public final class GradleProjectBuildService implements ProjectBuildService {
 
   static List<String> command(
       ProjectLaunchRequest request, Path runInitScript, List<Path> reusableArtifacts) {
+    return command(request, runInitScript, reusableArtifacts, isWindows());
+  }
+
+  static List<String> command(
+      ProjectLaunchRequest request, Path runInitScript, List<Path> reusableArtifacts,
+      boolean windows) {
     ProjectModel model = request.project();
     List<String> command = new ArrayList<>();
-    if (isWindows()) {
+    if (windows) {
       command.add(System.getenv().getOrDefault("COMSPEC", "cmd.exe"));
       command.add("/d");
       command.add("/c");
@@ -247,7 +253,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
           .map(Path::toAbsolutePath)
           .map(Path::normalize)
           .map(Path::toString)
-          .map(path -> path.toLowerCase(java.util.Locale.ROOT))
+          .map(path -> normalizeArtifactPath(path, windows))
           .collect(java.util.stream.Collectors.joining("\n"));
         command.add("-Dutiliti.reusableArtifacts="
             + Base64.getEncoder().encodeToString(paths.getBytes(StandardCharsets.UTF_8)));
@@ -261,6 +267,11 @@ public final class GradleProjectBuildService implements ProjectBuildService {
       command.add("--args=" + String.join(" ", request.gameArguments()));
     }
     return List.copyOf(command);
+  }
+
+  static String normalizeArtifactPath(String path, boolean windows) {
+    if (path == null) return "";
+    return windows ? path.toLowerCase(java.util.Locale.ROOT) : path;
   }
 
   static List<Path> reusableArtifacts(ProjectModel model, String processClasspath) {

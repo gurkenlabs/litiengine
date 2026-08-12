@@ -17,6 +17,9 @@ class ProjectLaunchRequestTest {
     assertEquals(
         List.of("-Dshare=\\\\server\\gradle-cache"),
         ProjectLaunchRequest.parseBuildArguments("-Dshare=\\\\server\\gradle-cache"));
+    assertEquals(
+        List.of("-Pdirectory=/opt/game assets"),
+        ProjectLaunchRequest.parseBuildArguments("-Pdirectory=/opt/game\\ assets"));
   }
 
   @Test

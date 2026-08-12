@@ -34,7 +34,7 @@ public record ProjectLaunchRequest(
       char character = commandLine.charAt(index);
       if (character == '\\' && index + 1 < commandLine.length()) {
         char next = commandLine.charAt(index + 1);
-        if (next == '\'' || next == '"') {
+        if (next == '\'' || next == '"' || Character.isWhitespace(next)) {
           current.append(next);
           tokenStarted = true;
           index++;

@@ -95,6 +95,30 @@ class GradleProjectBuildServiceTest {
   }
 
   @Test
+  void unixLaunchInvokesExecutableWrapperDirectly(@TempDir Path root) throws Exception {
+    Path wrapper = root.resolve("gradlew");
+    Files.writeString(wrapper, "#!/bin/sh\n");
+    ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
+        List.of(), List.of(), List.of(), List.of());
+
+    List<String> command = GradleProjectBuildService.command(
+        ProjectLaunchRequest.run(model), root.resolve("run.gradle"), List.of(), false);
+
+    assertEquals(wrapper.toAbsolutePath().normalize().toString(), command.getFirst());
+    assertFalse(command.contains("cmd.exe"));
+    assertFalse(command.contains("/c"));
+  }
+
+  @Test
+  void artifactPathNormalizationRespectsFilesystemCaseSensitivity() {
+    String mixedCase = "/opt/LITIengine/Build/Game.jar";
+
+    assertEquals(mixedCase, GradleProjectBuildService.normalizeArtifactPath(mixedCase, false));
+    assertEquals(mixedCase.toLowerCase(java.util.Locale.ROOT),
+        GradleProjectBuildService.normalizeArtifactPath(mixedCase, true));
+  }
+
+  @Test
   void debugProjectConfiguresTheApplicationJvmInsteadOfGradle() throws Exception {
     try (var source = GradleProjectBuildService.class.getResourceAsStream(
         "/gradle/utiliti-project-run.gradle")) {
@@ -103,6 +127,7 @@ class GradleProjectBuildServiceTest {
       assertTrue(initScript.contains("withType(JavaExec)"));
       assertTrue(initScript.contains("javaExecTask.path == launchTaskPath"));
       assertTrue(initScript.contains(GradleProjectBuildService.LAUNCH_MARKER));
+      assertTrue(initScript.contains("File.separatorChar == '\\\\'"));
       assertTrue(initScript.contains("debugOptions"));
       assertTrue(initScript.contains("port = debugPort"));
       assertTrue(initScript.contains("suspend = true"));
