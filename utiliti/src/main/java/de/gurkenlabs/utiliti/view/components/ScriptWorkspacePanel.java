@@ -505,7 +505,15 @@ public final class ScriptWorkspacePanel extends JPanel {
         session.onOutput(line -> {
           SwingUtilities.invokeLater(() -> this.appendOutput(line));
           dialog.updateStatus(line);
-          if (mode == ProjectLaunchRequest.Mode.RUN && (line.contains("LITIengine") || line.contains("Game.init") || line.contains("Initialized"))) {
+          String lower = line.toLowerCase(Locale.ROOT);
+          if (mode == ProjectLaunchRequest.Mode.RUN && (
+              lower.contains("initialization") ||
+              lower.contains("loading game resources") ||
+              lower.contains("loaded") ||
+              lower.contains("litiengine") ||
+              lower.contains("game.init") ||
+              lower.contains("started")
+          )) {
             SwingUtilities.invokeLater(dialog::dispose);
           }
         });
