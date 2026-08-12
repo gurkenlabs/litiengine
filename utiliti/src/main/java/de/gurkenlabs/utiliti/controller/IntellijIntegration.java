@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.controller;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,10 +63,33 @@ public final class IntellijIntegration {
       conventional.add(Path.of(System.getProperty("user.home"), "Applications/IntelliJ IDEA.app/Contents/MacOS/idea"));
     } else {
       conventional.add(Path.of("/opt/idea/bin/idea.sh"));
-      conventional.add(Path.of(System.getProperty("user.home"), ".local/share/JetBrains/Toolbox/apps"));
+      conventional.add(Path.of("/usr/local/bin/idea"));
+      conventional.add(Path.of("/usr/bin/idea"));
+      conventional.add(Path.of("/snap/intellij-idea-ultimate/current/bin/idea.sh"));
+      conventional.add(Path.of("/snap/intellij-idea-community/current/bin/idea.sh"));
     }
     return conventional.stream().filter(Files::isRegularFile).findFirst()
+      .or(() -> findOnPath(os, System.getenv("PATH")))
       .or(() -> findToolboxExecutable(os));
+  }
+
+  static Optional<Path> findOnPath(String os, String pathEnvironment) {
+    if (pathEnvironment == null || pathEnvironment.isBlank()) return Optional.empty();
+    List<String> names = os.contains("win") ? List.of("idea64.exe", "idea.exe", "idea.bat")
+      : os.contains("mac") ? List.of("idea") : List.of("idea", "idea.sh");
+    for (String directory : pathEnvironment.split(java.util.regex.Pattern.quote(File.pathSeparator))) {
+      if (directory.isBlank()) continue;
+      try {
+        Path root = Path.of(directory);
+        for (String name : names) {
+          Path candidate = root.resolve(name);
+          if (Files.isRegularFile(candidate)) return Optional.of(candidate.toAbsolutePath().normalize());
+        }
+      } catch (RuntimeException ignored) {
+        // Ignore malformed PATH entries and continue with the remaining locations.
+      }
+    }
+    return Optional.empty();
   }
 
   private static void addWindowsInstallations(List<Path> candidates, String root) {
@@ -82,9 +106,11 @@ public final class IntellijIntegration {
         ? Path.of(System.getProperty("user.home"), "Library", "Application Support", "JetBrains", "Toolbox", "apps")
         : Path.of(System.getProperty("user.home"), ".local", "share", "JetBrains", "Toolbox", "apps");
     if (!Files.isDirectory(root)) return Optional.empty();
-    String fileName = os.contains("win") ? "idea64.exe" : os.contains("mac") ? "idea" : "idea.sh";
+    List<String> fileNames = os.contains("win") ? List.of("idea64.exe", "idea.exe")
+      : os.contains("mac") ? List.of("idea") : List.of("idea", "idea.sh");
     try (Stream<Path> paths = Files.find(root, 8,
-      (path, attributes) -> attributes.isRegularFile() && path.getFileName().toString().equalsIgnoreCase(fileName))) {
+      (path, attributes) -> attributes.isRegularFile() && fileNames.stream()
+        .anyMatch(name -> path.getFileName().toString().equalsIgnoreCase(name)))) {
       return paths.sorted(Comparator.comparingLong(IntellijIntegration::lastModified).reversed()).findFirst();
     } catch (IOException ignored) {
       return Optional.empty();
