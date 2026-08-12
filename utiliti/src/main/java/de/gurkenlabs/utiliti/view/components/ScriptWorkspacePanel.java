@@ -615,8 +615,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     List<ScriptBreakpoint> activeBreakpoints = this.currentProjectBreakpoints();
     ScriptDebuggerBackend current = this.debugger;
     this.breakpointSyncExecutor.execute(() -> {
-      Editor.preferences().setScriptBreakpoints(serialized);
-      Game.config().save();
+      String previous = Editor.preferences().getScriptBreakpoints();
+      if (!Objects.equals(previous, serialized)) {
+        Editor.preferences().setScriptBreakpoints(serialized);
+        Game.config().save();
+      }
       if (current != null && current == this.debugger) current.setBreakpoints(activeBreakpoints);
     });
   }

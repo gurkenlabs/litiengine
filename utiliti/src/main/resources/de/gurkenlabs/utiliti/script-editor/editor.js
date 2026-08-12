@@ -475,6 +475,16 @@
       });
     });
 
+    let lastBreakpointLinesStr = '';
+    function checkBreakpointsChanged() {
+      const lines = breakpointLines();
+      const currentStr = lines.join(',');
+      if (currentStr !== lastBreakpointLinesStr) {
+        lastBreakpointLinesStr = currentStr;
+        query('breakpoints', { lines }).catch(console.error);
+      }
+    }
+
     editor.onDidChangeModelContent(event => {
       if (applying) return;
       const changes = event.changes.map(change => ({
@@ -485,7 +495,7 @@
       query('change', { changes }).catch(console.error);
       clearTimeout(analysisTimer);
       analysisTimer = setTimeout(analyze, 220);
-      setTimeout(() => query('breakpoints', { lines: breakpointLines() }).catch(console.error), 0);
+      setTimeout(checkBreakpointsChanged, 0);
     });
 
     let cursorTimer;
