@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -36,7 +37,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
       "Gradle download was interrupted; retrying automatically (2/2)...";
   private static final int MAX_WRAPPER_ATTEMPTS = 2;
   private static final Pattern MAIN_CLASS = Pattern.compile(
-      "(?m)\\bmainClass(?:Name)?\\s*=\\s*['\"]([^'\"]+)['\"]");
+      "(?m)(?:\\bmainClass(?:Name)?\\s*=\\s*['\"]|\\bmainClass(?:Name)?\\.set\\(['\"]|<mainClass>)([^'\"]+?)(?:['\"]\\)?|</mainClass>)");
   private static final Pattern TOOLCHAIN_VERSION = Pattern.compile(
       "(?m)\\blanguageVersion\\s*=\\s*JavaLanguageVersion\\.of\\((\\d+)\\)");
   private static final Pattern SOURCE_VERSION = Pattern.compile(
@@ -47,7 +48,8 @@ public final class GradleProjectBuildService implements ProjectBuildService {
       Path.of("build", "classes", "groovy", "main"),
       Path.of("build", "resources", "main"),
       Path.of("bin", "main"),
-      Path.of("bin"));
+      Path.of("bin"),
+      Path.of("target", "classes"));
 
   private final AtomicReference<GradleProjectSession> activeSession = new AtomicReference<>();
   private final AtomicReference<Process> activeRefreshProcess = new AtomicReference<>();
@@ -58,7 +60,6 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     this.refreshCancellationRequested.set(true);
     Process refresh = this.activeRefreshProcess.getAndSet(null);
     if (refresh != null && refresh.isAlive()) {
-      refresh.descendants().forEach(ProcessHandle::destroyForcibly);
       refresh.destroyForcibly();
     }
     GradleProjectSession session = this.activeSession.get();
@@ -82,12 +83,73 @@ public final class GradleProjectBuildService implements ProjectBuildService {
 
     Path wrapper = root.resolve(isWindows() ? "gradlew.bat" : "gradlew");
     if (!Files.isRegularFile(wrapper)) wrapper = null;
-    List<Path> sourceRoots = List.of(root.resolve("src/main/java"), root.resolve("src"))
-        .stream().filter(Files::isDirectory).distinct().toList();
+    List<Path> sourceRoots = discoverSourceRoots(root);
     List<Path> outputs = OUTPUT_DIRECTORIES.stream().map(root::resolve).filter(Files::isDirectory).toList();
     String mainClass = readMainClass(root);
     return new ProjectModel(root, wrapper, ":run", mainClass, readJavaVersion(root),
         sourceRoots, outputs, outputs, outputs);
+  }
+
+  static List<Path> discoverSourceRoots(Path root) {
+    if (root == null) return List.of();
+
+    // 1. Check Eclipse .classpath file if present
+    Path classpathFile = root.resolve(".classpath");
+    if (Files.isRegularFile(classpathFile)) {
+      try {
+        String content = Files.readString(classpathFile);
+        Matcher matcher = Pattern.compile("kind=[\"']src[\"']\\s+path=[\"']([^\"']+)[\"']").matcher(content);
+        List<Path> eclipseRoots = new ArrayList<>();
+        while (matcher.find()) {
+          String srcPath = matcher.group(1);
+          if (!srcPath.startsWith("/") && !srcPath.toLowerCase(Locale.ROOT).contains("test")) {
+            Path resolved = root.resolve(srcPath);
+            if (Files.isDirectory(resolved)) {
+              eclipseRoots.add(resolved);
+            }
+          }
+        }
+        if (!eclipseRoots.isEmpty()) {
+          return List.copyOf(eclipseRoots);
+        }
+      } catch (IOException ignored) {
+      }
+    }
+
+    // 2. Check if 'src' directly contains package folders (flat layout e.g. src/de/...)
+    Path src = root.resolve("src");
+    if (Files.isDirectory(src) && isFlatSourceRoot(src)) {
+      return List.of(src);
+    }
+
+    // 3. Check standard Maven/Gradle layouts
+    List<Path> candidates = List.of(
+        root.resolve("src/main/java"),
+        root.resolve("src/main/groovy"),
+        root.resolve("src/main/kotlin"),
+        root.resolve("sources"),
+        root.resolve("source"),
+        root.resolve("game/src/main/java"),
+        root.resolve("core/src/main/java"),
+        root.resolve("app/src/main/java"),
+        root.resolve("desktop/src/main/java"),
+        root.resolve("desktop/src"),
+        src);
+
+    List<Path> valid = candidates.stream().filter(Files::isDirectory).distinct().toList();
+    return valid.isEmpty() && Files.isDirectory(src) ? List.of(src) : valid;
+  }
+
+  static boolean isFlatSourceRoot(Path src) {
+    if (!Files.isDirectory(src)) return false;
+    try (var stream = Files.list(src)) {
+      return stream.filter(Files::isDirectory)
+          .map(p -> p.getFileName().toString())
+          .anyMatch(name -> !"main".equals(name) && !"test".equals(name) && !"resources".equals(name)
+              && !"target".equals(name) && !"build".equals(name) && !"bin".equals(name) && !name.startsWith("."));
+    } catch (IOException ignored) {
+      return false;
+    }
   }
 
   @Override
