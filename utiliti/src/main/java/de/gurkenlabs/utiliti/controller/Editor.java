@@ -345,6 +345,14 @@ public class Editor extends Screen {
     if (session != null) session.stop();
   }
 
+  /** Stops external project processes before the editor JVM exits. */
+  public void shutdown() {
+    this.projectLaunchCancelled.set(true);
+    this.projectBuildService.close();
+    this.projectSession = null;
+    this.projectCodeIntegration.close();
+  }
+
   public void setProjectPath(Path projectPath) {
     this.projectPath = projectPath;
     this.projectModel = projectPath == null ? null : this.projectBuildService.resolve(projectPath);

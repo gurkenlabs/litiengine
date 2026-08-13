@@ -227,6 +227,33 @@ class GradleProjectBuildServiceTest {
   }
 
   @Test
+  void closingServiceWaitsForActiveProjectProcessToExit(@TempDir Path root) throws Exception {
+    Path childPid = root.resolve("child.pid");
+    Path wrapper = createLaunchWrapperWithChild(root, childPid);
+    ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
+        List.of(), List.of(), List.of(), List.of());
+    GradleProjectBuildService service = new GradleProjectBuildService();
+    ProjectSession session = service.launch(ProjectLaunchRequest.run(model));
+
+    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+    while (session.state() != ProjectSession.State.RUNNING && System.nanoTime() < deadline) {
+      Thread.sleep(20);
+    }
+    assertEquals(ProjectSession.State.RUNNING, session.state());
+    deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+    while (!Files.isRegularFile(childPid) && System.nanoTime() < deadline) Thread.sleep(10);
+    long pid = Long.parseLong(Files.readString(childPid).strip());
+    assertTrue(ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false));
+
+    service.close();
+
+    deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2);
+    while (session.isActive() && System.nanoTime() < deadline) Thread.sleep(10);
+    assertFalse(session.isActive());
+    assertFalse(ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false));
+  }
+
+  @Test
   void debugSessionWaitsInStartingGameStateAfterLaunchMarker(@TempDir Path root) throws Exception {
     Path wrapper = createLaunchWrapper(root);
     ProjectModel model = new ProjectModel(root, wrapper, ":run", "example.Game", 25,
@@ -373,6 +400,22 @@ class GradleProjectBuildServiceTest {
     } else {
       Files.writeString(wrapper, "#!/bin/sh\nsleep 1\necho '"
           + GradleProjectBuildService.LAUNCH_MARKER + "'\nsleep 30\n");
+    }
+    return wrapper;
+  }
+
+  private static Path createLaunchWrapperWithChild(Path root, Path childPid) throws Exception {
+    Path wrapper = root.resolve(isWindows() ? "gradlew.bat" : "gradlew");
+    if (isWindows()) {
+      String pidPath = childPid.toAbsolutePath().normalize().toString().replace("'", "''");
+      Files.writeString(wrapper, "@echo off\r\npowershell -NoProfile -Command \""
+          + "$p = Start-Process -FilePath ping.exe -ArgumentList '127.0.0.1','-n','30' "
+          + "-PassThru -WindowStyle Hidden; Set-Content -Path '" + pidPath + "' -Value $p.Id; "
+          + "Write-Output '" + GradleProjectBuildService.LAUNCH_MARKER + "'; Wait-Process -Id $p.Id\"\r\n");
+    } else {
+      String pidPath = childPid.toAbsolutePath().normalize().toString().replace("'", "'\\''");
+      Files.writeString(wrapper, "#!/bin/sh\nsleep 30 &\nchild=$!\necho $child > '" + pidPath
+          + "'\necho '" + GradleProjectBuildService.LAUNCH_MARKER + "'\nwait $child\n");
     }
     return wrapper;
   }

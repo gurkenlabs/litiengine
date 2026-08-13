@@ -862,6 +862,7 @@ public final class UI {
       }
 
       @Override public void terminated() {
+        Editor.instance().shutdown();
         MonacoScriptEditor.shutdownCef();
       }
     });

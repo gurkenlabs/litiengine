@@ -254,8 +254,11 @@ public final class GradleProjectBuildService implements ProjectBuildService {
 
   @Override
   public void close() {
+    this.refreshCancellationRequested.set(true);
+    Process refresh = this.activeRefreshProcess.getAndSet(null);
+    if (refresh != null && refresh.isAlive()) GradleProjectSession.terminateProcessTree(refresh);
     GradleProjectSession session = this.activeSession.getAndSet(null);
-    if (session != null) session.stop();
+    if (session != null) session.stopAndWait();
   }
 
   static Path findProjectRoot(Path location) {
@@ -517,6 +520,7 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     private final java.util.concurrent.atomic.AtomicBoolean stopRequested =
         new java.util.concurrent.atomic.AtomicBoolean();
     private volatile Process process;
+    private volatile Thread stopThread;
     private volatile Integer exitCode;
     private volatile String failureMessage;
 
@@ -559,25 +563,43 @@ public final class GradleProjectBuildService implements ProjectBuildService {
     }
 
     @Override
-    public void stop() {
-      if (!this.isActive()) return;
+    public synchronized void stop() {
+      if (!this.isActive() || this.stopThread != null) return;
       this.stopRequested.set(true);
-      Process current = this.process;
       this.setState(State.STOPPING);
+      Process current = this.process;
       if (current == null || !current.isAlive()) return;
-      List<ProcessHandle> descendants = current.descendants().toList();
-      descendants.forEach(ProcessHandle::destroy);
-      current.destroy();
-      Thread.ofPlatform().daemon().name("utiliti-project-stop").start(() -> {
-        try {
-          if (!current.waitFor(3, TimeUnit.SECONDS)) {
-            current.destroyForcibly();
-          }
-          descendants.stream().filter(ProcessHandle::isAlive).forEach(ProcessHandle::destroyForcibly);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-        }
-      });
+      this.stopThread = Thread.ofPlatform().daemon().name("utiliti-project-stop")
+          .start(() -> terminateProcessTree(current));
+    }
+
+    private void stopAndWait() {
+      this.stop();
+      Thread stopping = this.stopThread;
+      if (stopping == null) return;
+      try {
+        stopping.join(5_000);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      Process current = this.process;
+      if (current != null && current.isAlive()) terminateProcessTree(current);
+    }
+
+    private static void terminateProcessTree(Process process) {
+      List<ProcessHandle> descendants = process.descendants().toList();
+      descendants.reversed().forEach(ProcessHandle::destroy);
+      process.destroy();
+      try {
+        if (!process.waitFor(3, TimeUnit.SECONDS)) process.destroyForcibly();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        process.destroyForcibly();
+      } finally {
+        descendants.reversed().stream()
+            .filter(ProcessHandle::isAlive)
+            .forEach(ProcessHandle::destroyForcibly);
+      }
     }
 
     @Override
