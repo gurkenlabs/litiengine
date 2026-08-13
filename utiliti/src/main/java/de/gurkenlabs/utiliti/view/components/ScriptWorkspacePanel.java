@@ -1216,15 +1216,36 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     }
 
-    if (target == null && activeTab() != null) {
-      target = activeTab().definition;
-    }
-
     if (target != null) {
       this.open(target);
-    }
-    if (this.monaco != null && this.monaco.isReady()) {
-      this.monaco.revealPosition(line, column);
+      if (this.monaco != null && this.monaco.isReady()) {
+        this.monaco.revealPosition(line, column);
+      }
+    } else if (Editor.instance().getMapComponent() != null && Game.world().environment() != null) {
+      de.gurkenlabs.litiengine.environment.tilemap.IMap map = Game.world().environment().getMap();
+      if (map != null) {
+        de.gurkenlabs.litiengine.environment.tilemap.IMapObject matchingObject = null;
+        if (diag != null && diag.message() != null) {
+          java.util.regex.Matcher m = java.util.regex.Pattern.compile("entity #(\\d+)").matcher(diag.message());
+          if (m.find()) {
+            int entityId = Integer.parseInt(m.group(1));
+            matchingObject = map.getMapObject(entityId);
+          }
+        }
+        if (matchingObject == null && scriptId != null) {
+          for (de.gurkenlabs.litiengine.environment.tilemap.IMapObject obj : map.getMapObjects()) {
+            String scriptBindings = obj.getStringValue(de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty.SCRIPT_BINDINGS);
+            if (scriptBindings != null && scriptBindings.contains(scriptId)) {
+              matchingObject = obj;
+              break;
+            }
+          }
+        }
+        if (matchingObject != null) {
+          Editor.instance().getMapComponent().setSelection(matchingObject, true);
+          Editor.instance().getMapComponent().setFocus(matchingObject, true);
+        }
+      }
     }
   }
 
@@ -1235,7 +1256,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     refreshProblemsTable();
   }
 
-  private void refreshProblemsTable() {
+  public void refreshProblemsTable() {
     this.problemsModel.setRowCount(0);
     this.scriptErrorStates.clear();
 
@@ -1244,6 +1265,20 @@ public final class ScriptWorkspacePanel extends JPanel {
       allDiagnostics.put(entry.getKey(), new ArrayList<>(entry.getValue()));
     }
     for (ScriptDiagnostic diag : Game.scripts().getDiagnostics()) {
+      if (diag.message() != null && diag.message().contains("No script definition is registered for binding")) {
+        if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
+          java.util.regex.Matcher m = java.util.regex.Pattern.compile("entity #(\\d+)").matcher(diag.message());
+          if (m.find()) {
+            int entityId = Integer.parseInt(m.group(1));
+            de.gurkenlabs.litiengine.environment.tilemap.IMapObject obj = Game.world().environment().getMap().getMapObject(entityId);
+            if (obj == null) continue;
+            String bindingsStr = obj.getStringValue(de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty.SCRIPT_BINDINGS);
+            if (bindingsStr == null || diag.scriptId() == null || !bindingsStr.contains(diag.scriptId())) {
+              continue;
+            }
+          }
+        }
+      }
       if (diag.scriptId() != null && !this.projectDiagnostics.containsKey(diag.scriptId())) {
         allDiagnostics.computeIfAbsent(diag.scriptId(), k -> new ArrayList<>()).add(diag);
       }
@@ -1442,10 +1477,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     String className = this.promptForNewScriptName(this.nextAvailableScriptName());
     if (className == null) return;
     String id = className;
-    Path source = resolveSource(ScriptSourcePaths.create("java", className));
+    String relPath = ScriptSourcePaths.create(Editor.instance().getProjectModel(), "java", className);
+    Path source = resolveSource(relPath);
     if (source == null) return;
 
-    ScriptDefinition definition = new ScriptDefinition(className, "java", ScriptSourcePaths.create("java", className),
+    ScriptDefinition definition = new ScriptDefinition(className, "java", relPath,
       className, hostType);
     definition.setName(className);
     if (targetType != null) {
@@ -1500,7 +1536,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private boolean scriptNameUnavailable(String name) {
-    Path source = resolveSource(ScriptSourcePaths.create("java", name));
+    Path source = resolveSource(ScriptSourcePaths.create(Editor.instance().getProjectModel(), "java", name));
     return source == null || Files.exists(source) || scriptIdExists(name);
   }
 
@@ -1728,9 +1764,14 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static String defaultSource(ScriptDefinition definition, String className, ScriptKind kind) {
+    String packageName = ScriptSourcePaths.derivePackageName(
+        Editor.instance().getProjectModel(), definition.getSource());
+    String packageHeader = (packageName != null && !packageName.isBlank()) ? "package " + packageName + ";\n\n" : "";
+
     if (kind == ScriptKind.GAME) {
       String base = "GameScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.GameScript" : "GameScript";
-      return "import de.gurkenlabs.litiengine.*;\n"
+      return packageHeader
+        + "import de.gurkenlabs.litiengine.*;\n"
         + "import de.gurkenlabs.litiengine.resources.*;\n"
         + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
         + "/**\n"
@@ -1751,7 +1792,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
     if (kind == ScriptKind.ENVIRONMENT) {
       String base = "EnvironmentScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.EnvironmentScript" : "EnvironmentScript";
-      return "import de.gurkenlabs.litiengine.*;\n"
+      return packageHeader
+        + "import de.gurkenlabs.litiengine.*;\n"
         + "import de.gurkenlabs.litiengine.environment.Environment;\n"
         + "import de.gurkenlabs.litiengine.resources.*;\n"
         + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
@@ -1776,7 +1818,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     String base = "Creature".equals(targetSimple)
         ? ("CreatureScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.CreatureScript" : "CreatureScript")
         : ("EntityScript<" + targetSimple + ">");
-    return "import de.gurkenlabs.litiengine.*;\n"
+    return packageHeader
+      + "import de.gurkenlabs.litiengine.*;\n"
       + "import " + targetType + ";\n"
       + "import de.gurkenlabs.litiengine.entities.*;\n"
       + "import de.gurkenlabs.litiengine.resources.*;\n"
@@ -2005,10 +2048,15 @@ public final class ScriptWorkspacePanel extends JPanel {
   private static Path resolveSource(String source) {
     if (source == null || source.isBlank() || Editor.instance().getProjectPath() == null) return null;
     try {
-      Path root = Editor.instance().getProjectPath().getParent().toAbsolutePath().normalize();
+      Path root = Editor.instance().getProjectModel() != null && Editor.instance().getProjectModel().projectRoot() != null
+          ? Editor.instance().getProjectModel().projectRoot()
+          : Editor.instance().getProjectPath().getParent().toAbsolutePath().normalize();
       Path configured = Path.of(source);
       Path resolved = (configured.isAbsolute() ? configured : root.resolve(configured)).toAbsolutePath().normalize();
-      return resolved.startsWith(root) ? resolved : null;
+      if (resolved.startsWith(root)) return resolved;
+      Path fallbackRoot = Editor.instance().getProjectPath().getParent().toAbsolutePath().normalize();
+      Path fallbackResolved = (configured.isAbsolute() ? configured : fallbackRoot.resolve(configured)).toAbsolutePath().normalize();
+      return fallbackResolved.startsWith(fallbackRoot) ? fallbackResolved : null;
     } catch (InvalidPathException ignored) {
       return null;
     }

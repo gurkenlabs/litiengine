@@ -75,9 +75,17 @@ class ScriptRuntimeTests {
   void missingDefinitionsProduceActionableDiagnostics() {
     Game.scripts().setDefinitions(List.of());
     this.host = new TestEntity();
+    this.host.setMapId(42);
+    this.host.setName("Goblin");
 
     assertEquals(null, Game.scripts().attach(this.host, new ScriptBinding("missing")));
-    assertTrue(Game.scripts().getDiagnostics().getLast().message().contains("No script definition"));
+    String msg = Game.scripts().getDiagnostics().getLast().message();
+    assertTrue(msg.contains("No script definition"));
+    assertTrue(msg.contains("entity #42"));
+    assertTrue(msg.contains("'Goblin'"));
+
+    Game.scripts().clearDiagnostics(this.host);
+    assertTrue(Game.scripts().getDiagnostics().isEmpty());
   }
 
   @Test

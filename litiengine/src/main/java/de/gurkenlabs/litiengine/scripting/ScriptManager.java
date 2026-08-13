@@ -187,12 +187,6 @@ public final class ScriptManager implements IUpdateable {
       : projectClasspath.stream().filter(Objects::nonNull).map(Path::toAbsolutePath).map(Path::normalize).distinct().toList();
   }
 
-  /** Sets the Java language level used for development-time source compilation. */
-  public void setProjectJavaVersion(int projectJavaVersion) {
-    if (projectJavaVersion <= 0) throw new IllegalArgumentException("Project Java version must be positive.");
-    this.projectJavaVersion = projectJavaVersion;
-  }
-
   public List<ScriptDiagnostic> getDiagnostics() {
     return List.copyOf(this.diagnostics);
   }
@@ -201,12 +195,21 @@ public final class ScriptManager implements IUpdateable {
     this.diagnostics.clear();
   }
 
+  public void clearDiagnostics(Object host) {
+    if (host == null) return;
+    if (host instanceof IEntity entity) {
+      String marker = "entity #" + entity.getMapId();
+      this.diagnostics.removeIf(d -> d.message() != null && d.message().contains(marker));
+    }
+  }
+
   public List<ScriptInstance> attachAll(Object host, Collection<ScriptBinding> bindings) {
     return this.attachAll(host, bindings, false);
   }
 
   List<ScriptInstance> attachAll(Object host, Collection<ScriptBinding> bindings, boolean controllerManaged) {
     if (bindings == null) return List.of();
+    this.clearDiagnostics(host);
     List<ScriptInstance> instances = new ArrayList<>();
     bindings.stream().filter(ScriptBinding::isEnabled).sorted(Comparator.comparingInt(ScriptBinding::getOrder)).forEach(binding -> {
       ScriptInstance instance = this.attach(host, binding, controllerManaged);
@@ -224,11 +227,18 @@ public final class ScriptManager implements IUpdateable {
     Objects.requireNonNull(binding);
     ScriptDefinition definition = this.definitions.get(binding.getScript());
     if (definition == null) {
-      this.report(binding.getScript(), null, "No script definition is registered for this binding.", null);
+      String hostInfo = "";
+      if (host instanceof IEntity entity) {
+        String name = entity.getName();
+        int mapId = entity.getMapId();
+        hostInfo = " on entity #" + mapId + (name != null && !name.isBlank() ? " ('" + name + "')" : "");
+      }
+      this.report(binding.getScript(), null, "No script definition is registered for binding '" + binding.getScript() + "'" + hostInfo + ".", null);
       return null;
     }
     if (!this.isCompatible(definition, host)) {
-      this.report(definition.getId(), definition.getSource(), "Script is incompatible with host " + host.getClass().getName() + ".", null);
+      String hostInfo = host instanceof IEntity entity ? " on entity #" + entity.getMapId() + (entity.getName() != null && !entity.getName().isBlank() ? " ('" + entity.getName() + "')" : "") : " with host " + host.getClass().getName();
+      this.report(definition.getId(), definition.getSource(), "Script '" + definition.getId() + "' is incompatible" + hostInfo + ".", null);
       return null;
     }
     ScriptContext<Object> context = null;
@@ -280,13 +290,21 @@ public final class ScriptManager implements IUpdateable {
   }
 
   public void detach(Object host) {
+    this.clearDiagnostics(host);
     this.attachments.stream().filter(attachment -> attachment.host == host).toList().forEach(this::detachAttachment);
   }
 
   void detach(Object host, boolean controllerManaged) {
+    this.clearDiagnostics(host);
     this.attachments.stream()
       .filter(attachment -> attachment.host == host && attachment.controllerManaged == controllerManaged)
       .toList().forEach(this::detachAttachment);
+  }
+
+  /** Sets the Java language level used for development-time source compilation. */
+  public void setProjectJavaVersion(int projectJavaVersion) {
+    if (projectJavaVersion <= 0) throw new IllegalArgumentException("Project Java version must be positive.");
+    this.projectJavaVersion = projectJavaVersion;
   }
 
   public void detachAll() {
