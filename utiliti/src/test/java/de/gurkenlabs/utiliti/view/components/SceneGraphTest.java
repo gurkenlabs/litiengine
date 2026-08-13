@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import java.awt.Rectangle;
 import java.lang.reflect.Method;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -118,6 +119,15 @@ class SceneGraphTest {
 
     assertEquals(1, SceneGraph.rowAtY(tree, y));
     assertEquals(-1, SceneGraph.rowAtY(tree, 99));
+  }
+
+  @Test
+  void rowsWithoutActionsRenderSelectionToTheVisibleEdge() {
+    Rectangle visible = new Rectangle(0, 0, 480, 200);
+    Rectangle actions = new Rectangle(430, 2, 24, 22);
+
+    assertEquals(476, SceneGraph.selectionRightEdge(visible, actions, false));
+    assertEquals(426, SceneGraph.selectionRightEdge(visible, actions, true));
   }
 
   @Test

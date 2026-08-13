@@ -824,11 +824,10 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       if (hoveredRow >= 0 && !this.tree.isRowSelected(hoveredRow)) {
         Rectangle bounds = this.tree.getRowBounds(hoveredRow);
         if (bounds != null && isPaintableSceneRow(hoveredRow)) {
-          Rectangle action = miscActionBounds(hoveredRow);
           g2.setColor(Style.sceneRowHover());
           g2.fillRoundRect(
               bounds.x, bounds.y + 2,
-              Math.max(1, action.x - bounds.x - 4),
+              Math.max(1, rowSelectionRight(hoveredRow) - bounds.x),
               Math.max(1, bounds.height - 4),
               Style.CORNER_RADIUS, Style.CORNER_RADIUS);
         }
@@ -857,10 +856,9 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       if (bounds == null) {
         continue;
       }
-      Rectangle action = miscActionBounds(row);
       int x = bounds.x;
       int y = bounds.y + 2;
-      int width = Math.max(1, action.x - x - 4);
+      int width = Math.max(1, rowSelectionRight(row) - x);
       int height = Math.max(1, bounds.height - 4);
       graphics.setColor(Style.sceneRowSelected());
       graphics.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
@@ -915,7 +913,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
       if (leadRow >= 0 && this.tree.isRowSelected(leadRow)) {
         Rectangle bounds = this.tree.getRowBounds(leadRow);
         if (bounds != null) {
-          int right = miscActionBounds(leadRow).x - 4;
+          int right = rowSelectionRight(leadRow);
           g2.setColor(Style.accent());
           g2.setStroke(new BasicStroke(1f));
           g2.drawRoundRect(
@@ -1012,6 +1010,24 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
         rowBounds.y + 2,
         ROW_ACTION_SIZE,
         Math.max(0, rowBounds.height - 4));
+  }
+
+  private int rowSelectionRight(int row) {
+    Rectangle visible = this.tree.getVisibleRect();
+    Rectangle actions = miscActionBounds(row);
+    return selectionRightEdge(visible, actions, hasRowActions(row));
+  }
+
+  private boolean hasRowActions(int row) {
+    TreePath path = this.tree.getPathForRow(row);
+    return path != null
+        && path.getLastPathComponent() instanceof DefaultMutableTreeNode treeNode
+        && treeNode.getUserObject() instanceof SceneNode node
+        && !node.isMap() && !node.isSection();
+  }
+
+  static int selectionRightEdge(Rectangle visible, Rectangle actions, boolean hasActions) {
+    return hasActions ? actions.x - 4 : visible.x + visible.width - 4;
   }
 
   private void showHoverPreview(MouseEvent event, int row) {
