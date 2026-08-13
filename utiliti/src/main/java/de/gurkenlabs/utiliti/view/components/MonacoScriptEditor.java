@@ -421,6 +421,22 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
         CefAppBuilder builder = new CefAppBuilder();
         builder.setInstallDir(Path.of(System.getProperty("user.home"), ".litiengine", "jcef-146").toFile());
         builder.getCefSettings().windowless_rendering_enabled = false;
+        builder.setProgressHandler((progress, percentage) -> {
+          switch (progress) {
+            case DOWNLOADING -> {
+              if (percentage >= 0) {
+                log.log(Level.INFO, "Downloading script editor runtime (CEF): {0}%", String.format("%.0f", percentage));
+              }
+            }
+            case EXTRACTING -> {
+              if (percentage >= 0) {
+                log.log(Level.INFO, "Extracting script editor runtime (CEF): {0}%", String.format("%.0f", percentage));
+              }
+            }
+            case INITIALIZED -> log.log(Level.INFO, "Script editor runtime (CEF) initialized.");
+            default -> log.log(Level.FINE, "Script editor runtime: {0}", progress);
+          }
+        });
         return builder.build();
       } catch (Exception error) {
         throw new IllegalStateException("Could not initialize JCEF", error);

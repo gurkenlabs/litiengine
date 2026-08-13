@@ -690,7 +690,7 @@ public final class UI {
     inspectorNavigation.add(inspectorForwardButton);
     inspectorHeader.add(inspectorNavigation, BorderLayout.EAST);
     updateInspectorNavigation.run();
-    JPanel inspectorPanel = new JPanel(new BorderLayout());
+    JPanel inspectorPanel = new RoundedPanel(new BorderLayout());
     inspectorPanel.add(inspectorHeader, BorderLayout.NORTH);
     inspectorPanel.add(inspectorHost, BorderLayout.CENTER);
     inspectorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
@@ -962,9 +962,7 @@ public final class UI {
     });
     UI.setMapCombo(leftMapCombo);
 
-    JPanel leftPanel = new JPanel(new BorderLayout());
-    leftPanel.setOpaque(true);
-    leftPanel.setBackground(Style.COLOR_BG);
+    JPanel leftPanel = new RoundedPanel(new BorderLayout());
     leftPanel.add(sceneGraph, BorderLayout.CENTER);
     leftPanel.setMinimumSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 120));
     leftPanel.setPreferredSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 0));
