@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 /** A panel shell that clips its complete contents to rounded corners. */
@@ -20,6 +21,7 @@ final class RoundedPanel extends JPanel {
     super(layout);
     this.arc = arc;
     setOpaque(false);
+    setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
   }
 
   @Override
@@ -29,6 +31,9 @@ final class RoundedPanel extends JPanel {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setColor(Style.background());
       g2.fill(createShape());
+      g2.setColor(Style.border());
+      g2.draw(new RoundRectangle2D.Double(
+          0.5, 0.5, Math.max(0, getWidth() - 1.0), Math.max(0, getHeight() - 1.0), this.arc, this.arc));
     } finally {
       g2.dispose();
     }
@@ -44,15 +49,6 @@ final class RoundedPanel extends JPanel {
       g2.dispose();
     }
 
-    Graphics2D borderGraphics = (Graphics2D) graphics.create();
-    try {
-      borderGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      borderGraphics.setColor(Style.border());
-      borderGraphics.draw(new RoundRectangle2D.Double(
-          0.5, 0.5, Math.max(0, getWidth() - 1.0), Math.max(0, getHeight() - 1.0), this.arc, this.arc));
-    } finally {
-      borderGraphics.dispose();
-    }
   }
 
   private RoundRectangle2D createShape() {

@@ -150,9 +150,9 @@ public class LayerPropertyPanel extends JPanel {
     ExpandableCard propertiesCard =
         new ExpandableCard(Resources.strings().get("layerProperties_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), false);
 
-    this.generalCard.setContentInsets(8, 0, 8, 0);
-    renderingCard.setContentInsets(8, 0, 8, 0);
-    propertiesCard.setContentInsets(8, 0, 8, 0);
+    this.generalCard.setInspectorContentInsets();
+    renderingCard.setInspectorContentInsets();
+    propertiesCard.setInspectorContentInsets();
 
     this.accordion.add(this.generalCard);
     this.accordion.add(renderingCard);
@@ -169,7 +169,7 @@ public class LayerPropertyPanel extends JPanel {
 
   ExpandableCard addSection(String title, JComponent content, boolean expanded) {
     ExpandableCard card = new ExpandableCard(title, content, expanded);
-    card.setContentInsets(8, 0, 8, 0);
+    card.setInspectorContentInsets();
     this.accordion.add(card);
     this.accordion.revalidate();
     return card;

@@ -23,11 +23,21 @@ import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.border.EmptyBorder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SwingTestSuite.class)
 class ViewportToolbarTest {
+
+  @Test
+  void toolbarUsesSpacingWithoutAFullWidthOutline() {
+    ViewportToolbar toolbar = new ViewportToolbar(new JComboBox<>());
+
+    assertInstanceOf(EmptyBorder.class, toolbar.getBorder());
+    assertEquals(0, toolbar.getInsets().left);
+    assertEquals(0, toolbar.getInsets().right);
+  }
 
   @Test
   void projectControlsExposeOnlyActionsValidForTheLaunchPhase() {

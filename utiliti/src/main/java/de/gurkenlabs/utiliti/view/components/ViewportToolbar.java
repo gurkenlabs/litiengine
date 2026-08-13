@@ -105,10 +105,7 @@ public class ViewportToolbar extends JPanel {
     super(new BorderLayout());
     setOpaque(true);
     setBackground(Style.background());
-    setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
-        BorderFactory.createEmptyBorder(
-            0, Style.SPACE_MEDIUM, TOOLBAR_VERTICAL_PADDING, Style.SPACE_MEDIUM)));
+    setBorder(BorderFactory.createEmptyBorder(0, 0, TOOLBAR_VERTICAL_PADDING, 0));
 
     JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
     left.setOpaque(false);
@@ -429,10 +426,7 @@ public class ViewportToolbar extends JPanel {
 
   void refreshTheme() {
     setBackground(Style.background());
-    setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
-        BorderFactory.createEmptyBorder(
-            0, 0, TOOLBAR_VERTICAL_PADDING, 0)));
+    setBorder(BorderFactory.createEmptyBorder(0, 0, TOOLBAR_VERTICAL_PADDING, 0));
     this.zoomControls.refreshStyle();
     for (JPanel group : this.controlGroups) {
       group.setBackground(Style.surface());

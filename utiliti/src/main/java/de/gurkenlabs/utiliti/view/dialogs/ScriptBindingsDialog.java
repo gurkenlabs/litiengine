@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.scripting.ScriptBindingCodec;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -104,6 +105,7 @@ public final class ScriptBindingsDialog extends JDialog {
       (value.getName() == null || value.getName().isBlank() ? value.getId() : value.getName())));
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, inspector);
+    UI.configureSplitPane(split);
     split.setResizeWeight(0.32);
     split.setDividerLocation(280);
     this.add(split, BorderLayout.CENTER);

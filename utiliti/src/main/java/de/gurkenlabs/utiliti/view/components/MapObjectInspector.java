@@ -201,14 +201,14 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         new ExpandableCard(
             Resources.strings().get("panel_customProperties"), this.customPanel, true);
 
-    generalCard.setContentInsets(8, 0, 8, 0);
+    generalCard.setInspectorContentInsets();
     generalCard.setHeaderTrailing(headerContent);
-    typeCard.setContentInsets(8, 0, 8, 0);
-    collisionCard.setContentInsets(8, 0, 8, 0);
-    combatCard.setContentInsets(8, 0, 8, 0);
-    movementCard.setContentInsets(8, 0, 8, 0);
-    scriptsCard.setContentInsets(8, 0, 8, 0);
-    customCard.setContentInsets(8, 0, 8, 0);
+    typeCard.setInspectorContentInsets();
+    collisionCard.setInspectorContentInsets();
+    combatCard.setInspectorContentInsets();
+    movementCard.setInspectorContentInsets();
+    scriptsCard.setInspectorContentInsets();
+    customCard.setInspectorContentInsets();
 
     typeCard.setVisible(false);
     collisionCard.setVisible(false);

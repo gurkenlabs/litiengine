@@ -173,11 +173,11 @@ public class MapPropertyPanel extends JPanel {
     });
     propertiesCard.setHeaderTrailing(scripts);
 
-    this.generalCard.setContentInsets(8, 0, 8, 0);
-    lightingCard.setContentInsets(8, 0, 8, 0);
-    propertiesCard.setContentInsets(8, 0, 8, 0);
+    this.generalCard.setInspectorContentInsets();
+    lightingCard.setInspectorContentInsets();
+    propertiesCard.setInspectorContentInsets();
     ExpandableCard tilesetsCard = new ExpandableCard(Resources.strings().get("assettree_tilesets"), createTilesetsPanel(), true);
-    tilesetsCard.setContentInsets(8, 0, 8, 0);
+    tilesetsCard.setInspectorContentInsets();
     tilesetsCard.setFillsAvailableHeight(true);
     tilesetsCard.setHeaderTrailing(this.tilesetPanel.getCommands());
 

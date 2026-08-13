@@ -51,6 +51,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -82,6 +83,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -100,11 +102,12 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public final class UI {
   private static final int INSPECTOR_BASE_WIDTH = 380;
-  private static final int SCENE_GRAPH_MIN_WIDTH = 260;
-  private static final int SCENE_GRAPH_MAX_WIDTH = 340;
+  private static final int SCENE_GRAPH_MIN_WIDTH = 340;
+  private static final int SCENE_GRAPH_MAX_WIDTH = 480;
   private static final int ASSET_PANEL_MIN_HEIGHT = 280;
   private static final int ASSET_PANEL_MAX_HEIGHT = 420;
   private static final int SPLITTER_SIZE = 4;
+  private static final String INVISIBLE_SPLITTER_CONFIGURED = "Editor.invisibleSplitterConfigured";
 
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static JPopupMenu canvasPopup;
@@ -669,9 +672,8 @@ public final class UI {
     JLabel inspectorTitle = new JLabel(Resources.strings().get("panel_inspector"));
     inspectorTitle.setFont(inspectorTitle.getFont().deriveFont(Font.BOLD));
     JPanel inspectorHeader = new JPanel(new BorderLayout());
-    inspectorHeader.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
-        BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+    inspectorHeader.setBorder(BorderFactory.createEmptyBorder(
+        Style.SPACE_MEDIUM, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM));
     inspectorHeader.add(inspectorTitle, BorderLayout.WEST);
     inspectorBackButton = Style.iconButton(Icons.BACK_16);
     inspectorBackButton.addActionListener(event -> Editor.instance().getMapComponent().navigateInspectorBack());
@@ -684,7 +686,7 @@ public final class UI {
     };
     Editor.instance().getMapComponent().onInspectorNavigationChanged(updateInspectorNavigation);
     Editor.instance().getMapComponent().onMapLoaded(ignored -> updateInspectorNavigation.run());
-    JPanel inspectorNavigation = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+    JPanel inspectorNavigation = new JPanel(new GridLayout(1, 2, Style.SPACE_SMALL, 0));
     inspectorNavigation.setOpaque(false);
     inspectorNavigation.add(inspectorBackButton);
     inspectorNavigation.add(inspectorForwardButton);
@@ -694,11 +696,12 @@ public final class UI {
     inspectorPanel.add(inspectorHeader, BorderLayout.NORTH);
     inspectorPanel.add(inspectorHost, BorderLayout.CENTER);
     inspectorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
+    JPanel inspectorContainer = createDockPanel(inspectorPanel);
 
     int prefInspectorW = Math.max(inspectorMinWidth, (int) (winW * 0.20));
     int prefHierarchyW = Math.max(SCENE_GRAPH_MIN_WIDTH, Math.min(SCENE_GRAPH_MAX_WIDTH, (int) (winW * 0.18)));
     int initialHierarchyW = Editor.preferences().getMainSplitterPosition() != 0
-        ? Math.min(Editor.preferences().getMainSplitterPosition(), SCENE_GRAPH_MAX_WIDTH)
+        ? constrainSceneGraphWidth(Editor.preferences().getMainSplitterPosition())
         : prefHierarchyW;
 
     configureSplitPane(mainSplit);
@@ -710,7 +713,8 @@ public final class UI {
     leftWorkspaceContainer.add(initWorkspaceModeBar(), BorderLayout.WEST);
     leftWorkspaceContainer.add(mainSplit, BorderLayout.CENTER);
 
-    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWorkspaceContainer, inspectorPanel);
+    JSplitPane centerRightSplit = new JSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, leftWorkspaceContainer, inspectorContainer);
     configureSplitPane(centerRightSplit);
     centerRightSplit.setContinuousLayout(false);
     centerRightSplit.setResizeWeight(1.0);
@@ -725,10 +729,9 @@ public final class UI {
       }
     });
     mainSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
-      int location = mainSplit.getDividerLocation();
-      if (location > SCENE_GRAPH_MAX_WIDTH) {
-        mainSplit.setDividerLocation(SCENE_GRAPH_MAX_WIDTH);
-        location = SCENE_GRAPH_MAX_WIDTH;
+      int location = constrainSceneGraphWidth(mainSplit.getDividerLocation());
+      if (location != mainSplit.getDividerLocation()) {
+        mainSplit.setDividerLocation(location);
       }
       Editor.preferences().setMainSplitter(location);
     });
@@ -752,29 +755,36 @@ public final class UI {
     window.validate();
   }
 
-  private static Component initWorkspaceModeBar() {
+  static Component initWorkspaceModeBar() {
     JPanel rail = new JPanel();
     rail.setLayout(new javax.swing.BoxLayout(rail, javax.swing.BoxLayout.Y_AXIS));
-    rail.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Style.border()));
-    rail.setPreferredSize(new Dimension(44, 0));
-    rail.setBackground(Style.COLOR_BG);
-    workspaceMapButton = new JToggleButton(Icons.MAP_16);
+    rail.setPreferredSize(new Dimension(43 + Style.SPACE_MEDIUM, 0));
+    rail.setBackground(Style.background());
+    rail.setBorder(BorderFactory.createEmptyBorder(0, Style.SPACE_MEDIUM, 0, 0));
+    workspaceMapButton = createWorkspaceModeButton(Icons.MAP_16);
     workspaceMapButton.setToolTipText("Map editor");
-    workspaceMapButton.setPreferredSize(new Dimension(43, 42));
-    workspaceMapButton.setMaximumSize(new Dimension(43, 42));
     workspaceMapButton.addActionListener(event -> showMapWorkspace());
-    workspaceScriptButton = new JToggleButton(Icons.SCRIPT_16);
+    workspaceScriptButton = createWorkspaceModeButton(Icons.SCRIPT_16);
     workspaceScriptButton.setToolTipText("Script editor");
-    workspaceScriptButton.setPreferredSize(new Dimension(43, 42));
-    workspaceScriptButton.setMaximumSize(new Dimension(43, 42));
     workspaceScriptButton.addActionListener(event -> showScriptWorkspace());
     ButtonGroup modes = new ButtonGroup();
     modes.add(workspaceMapButton);
     modes.add(workspaceScriptButton);
     workspaceMapButton.setSelected(true);
     rail.add(workspaceMapButton);
+    rail.add(javax.swing.Box.createVerticalStrut(Style.SPACE_MEDIUM));
     rail.add(workspaceScriptButton);
     return rail;
+  }
+
+  private static JToggleButton createWorkspaceModeButton(Icon icon) {
+    JToggleButton button = Style.iconToggleButton(icon, false);
+    Dimension size = new Dimension(43, 42);
+    button.setPreferredSize(size);
+    button.setMinimumSize(size);
+    button.setMaximumSize(size);
+    button.setAlignmentX(Component.CENTER_ALIGNMENT);
+    return button;
   }
 
   private static void installInspectorNavigationShortcuts(JFrame window) {
@@ -905,25 +915,60 @@ public final class UI {
     return Math.max(minimumLocation, Math.min(maximumLocation, dividerLocation));
   }
 
-  static void configureSplitPane(JSplitPane splitPane) {
-    splitPane.setBorder(null);
-    splitPane.setDividerSize(SPLITTER_SIZE);
-    splitPane.setUI(new BasicSplitPaneUI() {
-      @Override public BasicSplitPaneDivider createDefaultDivider() {
-        return new BasicSplitPaneDivider(this) {
-          {
-            setBorder(null);
-            setBackground(Style.COLOR_BG);
-          }
+  static int constrainSceneGraphWidth(int width) {
+    return Math.max(SCENE_GRAPH_MIN_WIDTH, Math.min(SCENE_GRAPH_MAX_WIDTH, width));
+  }
 
-          @Override public void paint(Graphics g) {
-            g.setColor(Style.COLOR_BG);
-            g.fillRect(0, 0, getWidth(), getHeight());
-          }
-        };
-      }
-    });
+  public static void configureSplitPane(JSplitPane splitPane) {
+    if (!Boolean.TRUE.equals(splitPane.getClientProperty(INVISIBLE_SPLITTER_CONFIGURED))) {
+      splitPane.putClientProperty(INVISIBLE_SPLITTER_CONFIGURED, true);
+      splitPane.addPropertyChangeListener("UI", event -> {
+        if (!(splitPane.getUI() instanceof InvisibleSplitPaneUI)) {
+          installInvisibleSplitPaneUI(splitPane);
+        }
+      });
+    }
+    installInvisibleSplitPaneUI(splitPane);
+  }
+
+  private static void installInvisibleSplitPaneUI(JSplitPane splitPane) {
+    BasicSplitPaneUI ui = new InvisibleSplitPaneUI();
+    splitPane.setUI(ui);
+    if (ui.getDivider() != null) {
+      ui.getDivider().setBorder(null);
+      ui.getDivider().setBackground(Style.background());
+    }
+    splitPane.setBorder(null);
+    splitPane.setOpaque(true);
+    splitPane.setBackground(Style.background());
     splitPane.setDividerSize(SPLITTER_SIZE);
+  }
+
+  private static final class InvisibleSplitPaneUI extends BasicSplitPaneUI {
+    @Override
+    public BasicSplitPaneDivider createDefaultDivider() {
+      return new BasicSplitPaneDivider(this) {
+        @Override
+        public void paint(Graphics graphics) {
+          graphics.setColor(getBackground());
+          graphics.fillRect(0, 0, getWidth(), getHeight());
+        }
+      };
+    }
+  }
+
+  static JPanel createDockPanel(Component content) {
+    return createDockPanel(content, Style.SPACE_SMALL);
+  }
+
+  static JPanel createDockPanel(Component content, int topInset) {
+    JPanel container = new JPanel(new BorderLayout());
+    container.setOpaque(true);
+    container.setBackground(Style.background());
+    container.setBorder(BorderFactory.createEmptyBorder(
+        topInset, Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL));
+    container.add(content, BorderLayout.CENTER);
+    return container;
   }
 
   private static Component initLeftPanel() {
@@ -962,8 +1007,10 @@ public final class UI {
     });
     UI.setMapCombo(leftMapCombo);
 
-    JPanel leftPanel = new RoundedPanel(new BorderLayout());
-    leftPanel.add(sceneGraph, BorderLayout.CENTER);
+    JPanel scenePanel = new RoundedPanel(new BorderLayout());
+    scenePanel.add(sceneGraph, BorderLayout.CENTER);
+
+    JPanel leftPanel = createDockPanel(scenePanel, 0);
     leftPanel.setMinimumSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 120));
     leftPanel.setPreferredSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 0));
     leftPanel.setMaximumSize(new Dimension(SCENE_GRAPH_MAX_WIDTH, Integer.MAX_VALUE));

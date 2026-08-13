@@ -3,22 +3,28 @@ package de.gurkenlabs.utiliti.view.components;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
-import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.model.Style;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
-import javax.swing.plaf.UIResource;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.UIResource;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -116,9 +122,44 @@ class EditorStyleTest {
   }
 
   @Test
+  void workspaceModeButtonsAlignWithDockedPanelAndUseSharedStyle() {
+    JPanel rail = (JPanel) UI.initWorkspaceModeBar();
+    JToggleButton mapButton = (JToggleButton) rail.getComponent(0);
+
+    assertEquals(0, rail.getInsets().top);
+    assertEquals(Style.SPACE_MEDIUM, rail.getInsets().left);
+    assertEquals(
+        mapButton.getPreferredSize().width + Style.SPACE_MEDIUM,
+        rail.getPreferredSize().width);
+    assertEquals(Style.SPACE_MEDIUM, rail.getComponent(1).getPreferredSize().height);
+    assertEquals(Style.ButtonVariant.TOOLBAR, mapButton.getClientProperty("Editor.buttonVariant"));
+    assertFalse(mapButton.isBorderPainted());
+  }
+
+  @Test
   void expandableCardHeaderSupportsKeyboardToggle() {
     ExpandableCard card = new ExpandableCard("General", new JPanel(), true);
     JPanel header = (JPanel) card.getComponent(0);
+    JPanel content = (JPanel) card.getComponent(1);
+
+    assertEquals(Style.SPACE_SMALL, card.getInsets().bottom);
+
+    card.setInspectorContentInsets();
+
+    assertEquals(0, content.getInsets().left);
+    assertEquals(Style.SPACE_MEDIUM, content.getInsets().right);
+
+    card.setSize(160, 80);
+    card.doLayout();
+    BufferedImage image = new BufferedImage(160, 80, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D graphics = image.createGraphics();
+    graphics.setColor(Color.MAGENTA);
+    graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+    card.paint(graphics);
+    graphics.dispose();
+
+    assertEquals(Style.surface().getRGB(), image.getRGB(80, 75));
+    assertEquals(Color.MAGENTA.getRGB(), image.getRGB(80, 79));
 
     header.getActionMap().get("toggle").actionPerformed(null);
 
@@ -148,6 +189,41 @@ class EditorStyleTest {
     int divider = UI.initialInspectorDivider(1920, 300, 380, 380, 0);
 
     assertEquals(380, 1920 - divider);
+  }
+
+  @Test
+  void sceneGraphWidthKeepsCommandStripVisible() {
+    assertEquals(340, UI.constrainSceneGraphWidth(260));
+    assertEquals(400, UI.constrainSceneGraphWidth(400));
+    assertEquals(480, UI.constrainSceneGraphWidth(520));
+  }
+
+  @Test
+  void splitPaneDividerIsAnInvisibleDragTarget() {
+    JSplitPane splitPane = new JSplitPane();
+
+    UI.configureSplitPane(splitPane);
+
+    BasicSplitPaneUI splitPaneUI = (BasicSplitPaneUI) splitPane.getUI();
+    assertNull(splitPane.getBorder());
+    assertEquals(Style.background(), splitPane.getBackground());
+    assertNull(splitPaneUI.getDivider().getBorder());
+
+    splitPane.updateUI();
+
+    splitPaneUI = (BasicSplitPaneUI) splitPane.getUI();
+    assertNull(splitPane.getBorder());
+    assertNull(splitPaneUI.getDivider().getBorder());
+
+    splitPaneUI.getDivider().setSize(8, 24);
+    BufferedImage dividerImage = new BufferedImage(8, 24, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D dividerGraphics = dividerImage.createGraphics();
+    dividerGraphics.setColor(Color.MAGENTA);
+    dividerGraphics.fillRect(0, 0, dividerImage.getWidth(), dividerImage.getHeight());
+    splitPaneUI.getDivider().paint(dividerGraphics);
+    dividerGraphics.dispose();
+
+    assertEquals(Style.background().getRGB(), dividerImage.getRGB(4, 12));
   }
 
   @Test

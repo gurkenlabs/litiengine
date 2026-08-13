@@ -145,7 +145,7 @@ public class TilesetEditorPanel extends JPanel {
     this.tilesetPropertyTable = createPropertyTable(this.tilesetPropertyModel);
     ExpandableCard tilesetProperties = new ExpandableCard(Resources.strings().get("tilesetEditor_tilesetProperties"), createTablePanel(this.tilesetPropertyTable, this.tilesetPropertyModel,
       () -> this.tilesetPropertyModel.addRow(new Object[] {"", ""}), true), false);
-    tilesetProperties.setContentInsets(8, 0, 8, 0);
+    tilesetProperties.setInspectorContentInsets();
 
     JPanel tilesetControls = new JPanel();
     tilesetControls.setLayout(new BoxLayout(tilesetControls, BoxLayout.Y_AXIS));
@@ -292,17 +292,17 @@ public class TilesetEditorPanel extends JPanel {
     controls.add(javax.swing.Box.createVerticalStrut(6));
     ExpandableCard propertyPanel = new ExpandableCard(Resources.strings().get("tilesetEditor_tileProperties"), createTablePanel(this.tilePropertyTable, this.tilePropertyModel,
       () -> this.tilePropertyModel.addRow(new Object[] {"", ""}), true), false);
-    propertyPanel.setContentInsets(8, 0, 8, 0);
+    propertyPanel.setInspectorContentInsets();
     ExpandableCard animationPanel = new ExpandableCard(Resources.strings().get("tilesetEditor_tileAnimation"), createTablePanel(this.animationTable, this.animationModel,
       () -> this.animationModel.addRow(new Object[] {String.valueOf(Math.max(0, this.tileGrid.selectedTile)), "100"}), true), false);
-    animationPanel.setContentInsets(8, 0, 8, 0);
+    animationPanel.setInspectorContentInsets();
     controls.add(propertyPanel);
     controls.add(javax.swing.Box.createVerticalStrut(6));
     controls.add(animationPanel);
     controls.add(javax.swing.Box.createVerticalStrut(6));
     ExpandableCard collisionPanel = new ExpandableCard(
       Resources.strings().get("tilesetEditor_collisionEditing"), this.collisionEditor, true);
-    collisionPanel.setContentInsets(8, 0, 8, 0);
+    collisionPanel.setInspectorContentInsets();
     controls.add(collisionPanel);
     selectedTilePanel.add(controls, BorderLayout.CENTER);
     bodyPanel.add(selectedTilePanel, BorderLayout.SOUTH);
@@ -694,7 +694,7 @@ public class TilesetEditorPanel extends JPanel {
     content.add(javax.swing.Box.createVerticalStrut(8));
     content.add(maskSection);
     ExpandableCard panel = new ExpandableCard(Resources.strings().get("tilesetEditor_terrainEditing"), content, false);
-    panel.setContentInsets(8, 0, 8, 0);
+    panel.setInspectorContentInsets();
     return panel;
   }
 
