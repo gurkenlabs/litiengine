@@ -77,7 +77,7 @@ public class JavaScriptProvider implements ScriptProvider {
           return scriptType;
         }
       };
-    } catch (ClassNotFoundException | ClassCastException | NoSuchMethodException e) {
+    } catch (ClassNotFoundException | ClassCastException | NoSuchMethodException | LinkageError e) {
       throw new ScriptException("Could not resolve script implementation " + definition.getImplementation() + ".", e);
     }
   }
@@ -111,12 +111,14 @@ public class JavaScriptProvider implements ScriptProvider {
       throw new ScriptException("No system Java compiler available. Ensure running on JDK.", List.of());
     }
 
-    String className = definition.getImplementation();
-    if (className == null || className.isBlank()) {
-      className = extractClassName(sourceCode);
-    }
+    String className = extractClassName(sourceCode);
+    String filenameClass = className;
+    if (filenameClass == null || filenameClass.isBlank()) filenameClass = definition.getImplementation();
+    if (filenameClass == null || filenameClass.isBlank()) filenameClass = "Script";
 
-    String filename = path == null ? className + ".java" : path.getFileName().toString();
+    String filename = path == null
+      ? filenameClass.substring(filenameClass.lastIndexOf('.') + 1) + ".java"
+      : path.getFileName().toString();
     JavaSourceFileObject sourceFile = new JavaSourceFileObject(filename, sourceCode);
 
     DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
@@ -171,13 +173,15 @@ public class JavaScriptProvider implements ScriptProvider {
       if (!errorList.isEmpty()) {
         throw new ScriptException("Java compilation failed for " + definition.getId() + ".", errorList);
       }
+      if (!success) {
+        throw new ScriptException("Java compiler failed without reporting a diagnostic for " + definition.getId() + ".");
+      }
     }
 
     MemoryClassLoader classLoader = new MemoryClassLoader(fileManager.getByteCodeMap(), context.parent());
     try {
-      Class<?> loadedClass = classLoader.loadClass(className);
-      Class<? extends ScriptInstance> scriptType = loadedClass.asSubclass(ScriptInstance.class);
-      scriptType.getConstructor();
+      Class<? extends ScriptInstance> scriptType = resolveCompiledType(
+        definition, className, fileManager.getByteCodeMap(), classLoader);
 
       return new CompiledScript() {
         @Override
@@ -194,14 +198,60 @@ public class JavaScriptProvider implements ScriptProvider {
           return scriptType;
         }
       };
-    } catch (Exception e) {
-      throw new ScriptException("Could not load compiled Java script class " + className + ".", e);
+    } catch (Exception | LinkageError e) {
+      String expected = className == null || className.isBlank() ? definition.getImplementation() : className;
+      throw new ScriptException("Could not load compiled Java script class " + expected + ".", e);
     }
   }
 
+  private static Class<? extends ScriptInstance> resolveCompiledType(
+      ScriptDefinition definition, String declaredClassName,
+      Map<String, MemoryByteCode> byteCode, ClassLoader classLoader)
+      throws ClassNotFoundException {
+    java.util.LinkedHashSet<String> candidates = new java.util.LinkedHashSet<>();
+    if (declaredClassName != null && !declaredClassName.isBlank()) candidates.add(declaredClassName);
+    if (definition.getImplementation() != null && !definition.getImplementation().isBlank()) {
+      candidates.add(definition.getImplementation());
+      String expectedSimpleName = simpleName(definition.getImplementation());
+      byteCode.keySet().stream()
+        .filter(name -> simpleName(name).equals(expectedSimpleName))
+        .sorted().forEach(candidates::add);
+    }
+    byteCode.keySet().stream().filter(name -> !name.contains("$"))
+      .sorted().forEach(candidates::add);
+
+    for (String candidate : candidates) {
+      if (!byteCode.containsKey(candidate)) continue;
+      try {
+        Class<?> loaded = classLoader.loadClass(candidate);
+        if (!ScriptInstance.class.isAssignableFrom(loaded)) continue;
+        Class<? extends ScriptInstance> scriptType = loaded.asSubclass(ScriptInstance.class);
+        scriptType.getConstructor();
+        return scriptType;
+      } catch (ClassNotFoundException | ClassCastException | NoSuchMethodException | LinkageError ignored) {
+        // Try the compiler's remaining top-level outputs before reporting the mismatch.
+      }
+    }
+    throw new ClassNotFoundException(
+      "No public no-argument ScriptInstance implementation was produced. Compiled classes: "
+        + String.join(", ", byteCode.keySet().stream().sorted().toList()));
+  }
+
+  private static String simpleName(String className) {
+    int separator = Math.max(className.lastIndexOf('.'), className.lastIndexOf('$'));
+    return className.substring(separator + 1);
+  }
+
   private static String extractClassName(String source) {
-    var matcher = java.util.regex.Pattern.compile("(?m)^\\s*(?:public\\s+)?class\\s+([A-Za-z_$][\\w$]*)").matcher(source);
-    return matcher.find() ? matcher.group(1) : "Script";
+    if (source == null || source.isBlank()) return null;
+    var classMatcher = java.util.regex.Pattern
+      .compile("(?m)^\\s*(?:(?:public|protected|private|abstract|final|sealed|non-sealed|static)\\s+)*class\\s+([A-Za-z_$][\\w$]*)")
+      .matcher(source);
+    if (!classMatcher.find()) return null;
+    String className = classMatcher.group(1);
+    var packageMatcher = java.util.regex.Pattern
+      .compile("(?m)^\\s*﻿?\\s*package\\s+([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*;").matcher(source);
+    return packageMatcher.find() ? packageMatcher.group(1) + "." + className : className;
   }
 
   private static class JavaSourceFileObject extends SimpleJavaFileObject {
@@ -260,6 +310,15 @@ public class JavaScriptProvider implements ScriptProvider {
     MemoryClassLoader(Map<String, MemoryByteCode> byteCodeMap, ClassLoader parent) {
       super(parent);
       this.byteCodeMap = byteCodeMap;
+    }
+
+    @Override
+    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+      if (!this.byteCodeMap.containsKey(name)) return super.loadClass(name, resolve);
+      Class<?> loaded = findLoadedClass(name);
+      if (loaded == null) loaded = findClass(name);
+      if (resolve) resolveClass(loaded);
+      return loaded;
     }
 
     @Override

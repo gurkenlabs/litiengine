@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Entity;
@@ -254,6 +255,46 @@ class ScriptRuntimeTests {
     instance.attach(context);
     assertEquals(42, Game.scripts().globals().get("dynTest", Integer.class));
     instance.detach();
+  }
+
+  @Test
+  void javaScriptProviderLoadsPackagedSourceWhenDefinitionUsesSimpleImplementation() throws Exception {
+    ScriptDefinition definition = new ScriptDefinition(
+        "packaged-java", "java", null, "PackagedScript", ScriptHostType.GAME);
+    String code = """
+      package example.scripts;
+      import de.gurkenlabs.litiengine.scripting.*;
+      public final class PackagedScript extends GameScript {}
+      """;
+
+    try {
+      try (CompiledScript compiled = JavaScriptProvider.compileSource(
+          definition, null, code, getClass().getClassLoader())) {
+        assertEquals("example.scripts.PackagedScript", compiled.implementationType().getName());
+        assertNotNull(compiled.create());
+      }
+    } catch (ScriptException error) {
+      fail(error.getDiagnostics().toString(), error);
+    }
+  }
+
+  @Test
+  void dynamicJavaSourceOverridesAParentClasspathClassWithTheSameName() throws Exception {
+    ScriptDefinition definition = new ScriptDefinition(
+        "shadowed-java", "java", null, ParentVisibleScript.class.getName(), ScriptHostType.GAME);
+    String code = """
+      package de.gurkenlabs.litiengine.scripting;
+      public class ParentVisibleScript extends GameScript {
+        public int marker() { return 2; }
+      }
+      """;
+
+    try (CompiledScript compiled = JavaScriptProvider.compileSource(
+        definition, null, code, getClass().getClassLoader())) {
+      ScriptInstance instance = compiled.create();
+      assertEquals(2, instance.getClass().getMethod("marker").invoke(instance));
+      assertFalse(instance.getClass() == ParentVisibleScript.class);
+    }
   }
 
   @Test
@@ -627,5 +668,11 @@ class ScriptRuntimeTests {
     List<ScriptLanguageService.Completion> hostCompletions = service.complete(hostDoc, new ScriptLanguageService.Position(7, 11));
     assertTrue(hostCompletions.stream().anyMatch(c -> c.label().equals("getMaterial")),
         "Should offer Prop-specific method getMaterial directly on host().");
+  }
+}
+
+class ParentVisibleScript extends GameScript {
+  public int marker() {
+    return 1;
   }
 }
