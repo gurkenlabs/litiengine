@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.GradleScriptProjectSupport;
 import de.gurkenlabs.utiliti.controller.IntellijIntegration;
+import de.gurkenlabs.utiliti.controller.ProjectCodeIntegration;
 import de.gurkenlabs.utiliti.controller.ProjectLaunchRequest;
 import de.gurkenlabs.utiliti.controller.ProjectLaunchCancelledException;
 import de.gurkenlabs.utiliti.controller.ProjectLaunchPhase;
@@ -43,6 +44,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -127,6 +129,10 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final JPanel conflictBar = new JPanel(new BorderLayout(8, 0));
   private final JLabel conflictMessage = new JLabel();
   private final Map<String, ScriptTab> openTabs = new LinkedHashMap<>();
+  private final Map<ScriptDefinition, Path> projectSourcePaths = new IdentityHashMap<>();
+  private final Map<String, ScriptDefinition> projectSourceDefinitions = new LinkedHashMap<>();
+  private final Map<String, ScriptDefinition> navigatedProjectDefinitions = new LinkedHashMap<>();
+  private final Map<String, Path> navigatedProjectSources = new LinkedHashMap<>();
   private final Timer externalChangeTimer = new Timer(900, event -> this.checkExternalChanges());
   private MonacoScriptEditor monaco;
   private ScriptTab monacoTab;
@@ -135,6 +141,8 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final List<ScriptBreakpoint> breakpoints = new java.util.concurrent.CopyOnWriteArrayList<>();
   private final Timer breakpointSyncTimer = new Timer(300, e -> this.syncBreakpoints());
   private final java.util.concurrent.ExecutorService breakpointSyncExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
+  private final java.util.concurrent.atomic.AtomicBoolean projectSourceBuildInProgress =
+    new java.util.concurrent.atomic.AtomicBoolean();
   private JdiScriptDebuggerBackend debugger;
   private String executionScriptId;
   private int executionLine;
@@ -341,13 +349,24 @@ public final class ScriptWorkspacePanel extends JPanel {
   public void refreshScripts() {
     String selectedId = this.selectedDefinition() == null ? null : this.selectedDefinition().getId();
     this.scriptsRoot.removeAllChildren();
+    this.refreshProjectSourceDocuments();
     if (Editor.instance().getGameFile() != null) {
       String query = this.search.getText().strip().toLowerCase(Locale.ROOT);
       Editor.instance().getGameFile().getScripts().stream()
         .filter(definition -> query.isEmpty() || displayName(definition).toLowerCase(Locale.ROOT).contains(query)
-          || Objects.toString(definition.getSource(), "").toLowerCase(Locale.ROOT).contains(query))
+          || Objects.toString(definition.getSource(), "").toLowerCase(Locale.ROOT).contains(query)
+          || Objects.toString(definition.getImplementation(), "").toLowerCase(Locale.ROOT).contains(query))
         .sorted(Comparator.comparing(ScriptWorkspacePanel::displayName, String.CASE_INSENSITIVE_ORDER))
-        .forEach(this::insertScriptNode);
+        .forEach(definition -> {
+          if (this.isProjectSource(definition)) this.insertProjectSourceNode(definition);
+          else this.insertScriptNode(definition);
+        });
+      this.projectSourceDefinitions.values().stream()
+        .filter(definition -> query.isEmpty()
+          || displayName(definition).toLowerCase(Locale.ROOT).contains(query)
+          || definition.getImplementation().toLowerCase(Locale.ROOT).contains(query))
+        .sorted(Comparator.comparing(ScriptWorkspacePanel::displayName, String.CASE_INSENSITIVE_ORDER))
+        .forEach(this::insertProjectSourceNode);
     }
     this.scriptsModel.reload();
     for (int row = 0; row < this.scripts.getRowCount(); row++) this.scripts.expandRow(row);
@@ -361,8 +380,10 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void open(ScriptDefinition definition) {
     if (definition == null) return;
-    ScriptTab tab = this.openTabs.computeIfAbsent(definition.getId(), ignored -> {
-      ScriptTab created = new ScriptTab(definition);
+    String key = documentKey(definition);
+    ScriptTab tab = this.openTabs.computeIfAbsent(key, ignored -> {
+      Path projectSource = this.projectSourcePaths.get(definition);
+      ScriptTab created = new ScriptTab(definition, projectSource, projectSource != null);
       this.tabs.addTab(displayName(definition), Icons.SCRIPT_16, created, definition.getSource());
       this.tabs.setTabComponentAt(this.tabs.indexOfComponent(created), this.createTabHeader(created));
       return created;
@@ -372,15 +393,140 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.activeTabChanged();
   }
 
+  private void refreshProjectSourceDocuments() {
+    this.projectSourcePaths.clear();
+    if (Editor.instance().getGameFile() == null) return;
+    Map<String, ScriptDefinition> registeredByImplementation = new LinkedHashMap<>();
+    Map<String, ScriptDefinition> registeredById = new LinkedHashMap<>();
+    for (ScriptDefinition definition : Editor.instance().getGameFile().getScripts()) {
+      registeredByImplementation.put(definition.getImplementation(), definition);
+      registeredById.put(definition.getId(), definition);
+    }
+
+    Map<String, ScriptDefinition> nextProjectDefinitions = new LinkedHashMap<>();
+    List<ProjectCodeIntegration.ScriptClassDefinition> discoveredScripts =
+      Editor.instance().getProjectCodeIntegration().getScriptDefinitions();
+    Map<String, Long> discoveredIdCounts = discoveredScripts.stream().collect(
+      java.util.stream.Collectors.groupingBy(
+        ProjectCodeIntegration.ScriptClassDefinition::id, java.util.stream.Collectors.counting()));
+    for (var discovered : discoveredScripts) {
+      if (discovered.sourcePath() == null) continue;
+      ScriptDefinition registered = registeredByImplementation.get(discovered.className());
+      if (registered == null && discoveredIdCounts.getOrDefault(discovered.id(), 0L) == 1L) {
+        registered = registeredById.get(discovered.id());
+      }
+      if (registered != null) {
+        this.projectSourcePaths.put(registered, discovered.sourcePath());
+        continue;
+      }
+
+      ScriptDefinition definition = this.projectSourceDefinitions.get(discovered.className());
+      if (definition == null) {
+        definition = new ScriptDefinition(
+          discovered.id(), languageFor(discovered.sourcePath()), null,
+          discovered.className(), discovered.host());
+      }
+      definition.setName(discovered.displayName());
+      definition.setTargetType(discovered.targetType());
+      nextProjectDefinitions.put(discovered.className(), definition);
+      this.projectSourcePaths.put(definition, discovered.sourcePath());
+    }
+    for (Map.Entry<String, ScriptDefinition> entry : this.navigatedProjectDefinitions.entrySet()) {
+      Path source = this.navigatedProjectSources.get(entry.getKey());
+      if (source != null && Files.isRegularFile(source)) {
+        nextProjectDefinitions.putIfAbsent(entry.getKey(), entry.getValue());
+        this.projectSourcePaths.put(entry.getValue(), source);
+      }
+    }
+    this.projectSourceDefinitions.clear();
+    this.projectSourceDefinitions.putAll(nextProjectDefinitions);
+    this.reconcileOpenProjectTabs();
+  }
+
+  private void reconcileOpenProjectTabs() {
+    for (ScriptTab tab : List.copyOf(this.openTabs.values())) {
+      Path source = this.projectSourcePaths.get(tab.definition);
+      if (source == null) continue;
+      String previousKey = tab.key;
+      tab.projectSource = true;
+      tab.path = source;
+      tab.key = projectDocumentKey(source);
+      if (!tab.key.equals(previousKey)) {
+        ScriptTab existing = this.openTabs.get(tab.key);
+        if (existing == null || existing == tab) {
+          this.openTabs.remove(previousKey, tab);
+          this.openTabs.put(tab.key, tab);
+        } else {
+          tab.key = previousKey;
+        }
+      }
+    }
+  }
+
+  private void openProjectDefinition(MonacoScriptEditor.DefinitionTarget target) {
+    if (target == null || target.path() == null || !Files.isRegularFile(target.path())) return;
+    Path source = target.path().toAbsolutePath().normalize();
+    ScriptDefinition definition = this.projectSourcePaths.entrySet().stream()
+      .filter(entry -> source.equals(entry.getValue()))
+      .map(Map.Entry::getKey)
+      .findFirst().orElse(null);
+    if (definition == null) {
+      String implementation = target.className();
+      if (implementation == null || implementation.isBlank()) {
+        String filename = source.getFileName().toString();
+        int extension = filename.lastIndexOf('.');
+        implementation = extension > 0 ? filename.substring(0, extension) : filename;
+      }
+      String definitionKey = implementation;
+      definition = this.navigatedProjectDefinitions.computeIfAbsent(definitionKey, className -> {
+        String simpleName = className.substring(className.lastIndexOf('.') + 1);
+        ScriptDefinition created = new ScriptDefinition(
+          className, languageFor(source), null, className, ScriptHostType.ENTITY);
+        created.setName(simpleName);
+        return created;
+      });
+      this.navigatedProjectSources.put(definitionKey, source);
+      this.projectSourcePaths.put(definition, source);
+      this.projectSourceDefinitions.putIfAbsent(definitionKey, definition);
+      this.refreshScripts();
+    }
+    this.open(definition);
+    if (this.monaco != null) this.monaco.revealPosition(target.line() + 1, target.column() + 1);
+  }
+
+  private static String languageFor(Path source) {
+    String name = source == null ? "" : source.getFileName().toString().toLowerCase(Locale.ROOT);
+    if (name.endsWith(".groovy")) return "groovy";
+    if (name.endsWith(".kt")) return "kotlin";
+    return "java";
+  }
+
+  private boolean isProjectSource(ScriptDefinition definition) {
+    return definition != null && this.projectSourcePaths.containsKey(definition);
+  }
+
+  private String documentKey(ScriptDefinition definition) {
+    Path source = this.projectSourcePaths.get(definition);
+    return source == null ? "runtime:" + definition.getId() : projectDocumentKey(source);
+  }
+
+  private static String projectDocumentKey(Path source) {
+    return "project:" + source.toAbsolutePath().normalize();
+  }
+
   public void saveActive() {
     ScriptTab tab = this.activeTab();
-    if (tab != null && tab.save()) this.setStatus("Saved " + tab.definition.getSource(), false);
+    if (tab != null && tab.save()) this.setStatus("Saved " + tab.path, false);
   }
 
   /** Applies inspector metadata to the active definition and its source declaration. */
   public void updateActiveMetadata(String name, ScriptHostType host, String targetType) {
     ScriptTab tab = this.activeTab();
     if (tab == null || host == null) return;
+    if (tab.projectSource) {
+      this.setStatus("Project script metadata is owned by its @ScriptInfo declaration", false);
+      return;
+    }
     ScriptDefinition definition = tab.definition;
     definition.setName(name == null || name.isBlank() ? definition.getId() : name.strip());
     definition.setHost(host);
@@ -400,7 +546,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     ScriptTab tab = this.activeTab();
     if (tab == null) return;
     tab.load();
-    this.setStatus("Reloaded " + tab.definition.getSource(), false);
+    this.setStatus("Reloaded " + tab.path, false);
   }
 
   public void formatActive() {
@@ -413,6 +559,10 @@ public final class ScriptWorkspacePanel extends JPanel {
   public void reloadActive() {
     ScriptTab tab = this.activeTab();
     if (tab == null || !tab.save()) return;
+    if (tab.projectSource) {
+      this.rebuildProjectSource(tab);
+      return;
+    }
     this.appendOutput("Compiling " + displayName(tab.definition) + " ...");
     Editor.instance().reloadProjectCode();
     Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
@@ -422,6 +572,52 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.appendOutput(successful ? "Compilation successful; script reloaded." : "Compilation failed; previous generation kept active.");
     this.setStatus(successful ? "Compiled and reloaded " + displayName(tab.definition)
       : "Reload failed; the previous generation is still active", !successful);
+  }
+
+  private void rebuildProjectSource(ScriptTab tab) {
+    if (!this.projectSourceBuildInProgress.compareAndSet(false, true)) {
+      this.setStatus("A project source build is already running", true);
+      return;
+    }
+    this.appendOutput("Building project implementation " + tab.definition.getImplementation() + " ...");
+    Thread.ofVirtual().name("utiliti-project-script-build").start(() -> {
+      try {
+        var session = Editor.instance().buildProjectClasses();
+        session.onOutput(this::appendOutput);
+        var completed = new java.util.concurrent.CountDownLatch(1);
+        session.onStateChanged(state -> {
+          if (state == de.gurkenlabs.utiliti.controller.ProjectSession.State.EXITED
+            || state == de.gurkenlabs.utiliti.controller.ProjectSession.State.FAILED) completed.countDown();
+        });
+        if (!session.isActive()) completed.countDown();
+        completed.await();
+        boolean successful = session.exitCode().orElse(-1) == 0;
+        if (successful) {
+          Editor.instance().reloadProjectCode();
+          Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
+          if (Editor.instance().getGameFile().getScripts().contains(tab.definition)) {
+            Game.scripts().clearDiagnostics();
+            successful = Game.scripts().reload(tab.definition.getId());
+          }
+        }
+        boolean result = successful;
+        SwingUtilities.invokeLater(() -> {
+          this.refreshScripts();
+          this.showDiagnostics(tab.definition);
+          this.appendOutput(result ? "Project classes built and reloaded." : "Project build or script reload failed.");
+          this.setStatus(result ? "Built and reloaded " + displayName(tab.definition)
+            : "Build failed; the previous implementation is still active", !result);
+        });
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        SwingUtilities.invokeLater(() -> this.setStatus("Project build was interrupted", true));
+      } catch (Exception e) {
+        log.log(Level.WARNING, "Could not build and reload project source", e);
+        SwingUtilities.invokeLater(() -> this.setStatus("Could not build project: " + e.getMessage(), true));
+      } finally {
+        this.projectSourceBuildInProgress.set(false);
+      }
+    });
   }
 
   /** Saves all open scripts and launches the project through its Gradle application run task. */
@@ -555,8 +751,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.debugger = backend;
     int port = Editor.instance().getProjectDebugPort();
     try {
-      backend.attach("127.0.0.1", port, debugDefinitions);
       backend.setBreakpoints(this.currentProjectBreakpoints());
+      backend.attach("127.0.0.1", port, debugDefinitions);
     } catch (IOException e) {
       log.log(Level.WARNING, "Failed to attach debugger on port " + port, e);
       boolean cancelled = Editor.instance().isProjectLaunchCancellationRequested();
@@ -593,7 +789,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.debuggerPanel.showSnapshot(snapshot, top);
     if (snapshot != null && top != null) {
       ScriptDefinition def = definitionForClass(top.className());
-      this.executionScriptId = def == null ? null : def.getId();
+      this.executionScriptId = def == null ? null : this.breakpointIdentity(def);
       this.executionLine = top.line();
       this.executionVariables = top.variables();
       if (def != null) {
@@ -617,7 +813,12 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private ScriptDefinition definitionForClass(String className) {
     if (className == null || Editor.instance().getGameFile() == null) return null;
-    return Editor.instance().getGameFile().getScripts().stream().filter(definition -> {
+    ScriptDefinition runtimeDefinition = Editor.instance().getGameFile().getScripts().stream().filter(definition -> {
+      String implementation = definition.getImplementation();
+      return implementation != null && (implementation.equals(className) || className.startsWith(implementation + "$"));
+    }).findFirst().orElse(null);
+    if (runtimeDefinition != null) return runtimeDefinition;
+    return this.projectSourcePaths.keySet().stream().filter(definition -> {
       String implementation = definition.getImplementation();
       return implementation != null && (implementation.equals(className) || className.startsWith(implementation + "$"));
     }).findFirst().orElse(null);
@@ -626,16 +827,17 @@ public final class ScriptWorkspacePanel extends JPanel {
   private void replaceBreakpoints(ScriptDefinition definition, List<Integer> lines) {
     if (definition == null) return;
     String project = this.projectKey();
+    String scriptId = this.breakpointIdentity(definition);
     String source = Objects.toString(definition.getSource(), "");
     List<Integer> normalized = lines == null ? List.of() : lines.stream()
         .filter(line -> line != null && line > 0).distinct().sorted().toList();
     List<Integer> existing = this.breakpoints.stream()
-        .filter(item -> item.project().equals(project) && item.scriptId().equals(definition.getId()) && item.source().equals(source))
+        .filter(item -> item.project().equals(project) && item.scriptId().equals(scriptId) && item.source().equals(source))
         .map(ScriptBreakpoint::line).sorted().toList();
     if (existing.equals(normalized)) return;
     this.breakpoints.removeIf(item -> item.project().equals(project)
-        && item.scriptId().equals(definition.getId()) && item.source().equals(source));
-    normalized.forEach(line -> this.breakpoints.add(new ScriptBreakpoint(project, definition.getId(), source, line, true)));
+        && item.scriptId().equals(scriptId) && item.source().equals(source));
+    normalized.forEach(line -> this.breakpoints.add(new ScriptBreakpoint(project, scriptId, source, line, true)));
     this.breakpointSyncTimer.restart();
     this.updateMonacoDebugState(definition);
   }
@@ -662,14 +864,24 @@ public final class ScriptWorkspacePanel extends JPanel {
   private void updateMonacoDebugState(ScriptDefinition definition) {
     if (this.monaco == null || definition == null) return;
     String project = this.projectKey();
+    String scriptId = this.breakpointIdentity(definition);
     String source = Objects.toString(definition.getSource(), "");
     List<Integer> lines = this.breakpoints.stream()
         .filter(item -> item.enabled() && item.project().equals(project)
-            && item.scriptId().equals(definition.getId()) && item.source().equals(source))
+            && item.scriptId().equals(scriptId) && item.source().equals(source))
         .map(ScriptBreakpoint::line).distinct().sorted().toList();
-    int currentLine = definition.getId().equals(this.executionScriptId) ? this.executionLine : 0;
+    int currentLine = scriptId.equals(this.executionScriptId) ? this.executionLine : 0;
     List<ScriptDebugSnapshot.Variable> variables = currentLine > 0 ? this.executionVariables : List.of();
     this.monaco.setDebugState(lines, currentLine, variables);
+  }
+
+  private String breakpointIdentity(ScriptDefinition definition) {
+    if (Editor.instance().getGameFile() != null
+        && Editor.instance().getGameFile().getScripts().stream().anyMatch(candidate -> candidate == definition)) {
+      return definition.getId();
+    }
+    String implementation = definition.getImplementation();
+    return implementation == null || implementation.isBlank() ? definition.getId() : implementation;
   }
 
   private String projectKey() {
@@ -679,6 +891,11 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void stopProject() {
     ProjectSession session = Editor.instance().getProjectSession();
+    if (this.projectSourceBuildInProgress.get()) {
+      this.setStatus("Cancelling project source build...", false);
+      Editor.instance().stopProject();
+      return;
+    }
     if (this.projectLaunchPending) {
       this.setLaunchPhase(ProjectLaunchPhase.STOPPING);
       this.appendOutput("Cancelling project launch...");
@@ -1041,7 +1258,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (this.monacoTab == tab) {
       this.monacoTab = null;
     }
-    this.openTabs.remove(tab.definition.getId());
+    this.openTabs.remove(tab.key);
     this.tabs.remove(tab);
     this.activeTabChanged();
   }
@@ -1061,10 +1278,11 @@ public final class ScriptWorkspacePanel extends JPanel {
       });
       this.monaco.onSave(() -> {
         if (this.monacoTab != null && this.monacoTab.save()) {
-          this.setStatus("Saved " + this.monacoTab.definition.getSource(), false);
+          this.setStatus("Saved " + this.monacoTab.path, false);
         }
       });
       this.monaco.onAnalysis(this::showAnalysis);
+      this.monaco.onDefinition(this::openProjectDefinition);
       this.monaco.onReady(this::activeTabChanged);
       this.monaco.onUnavailable(reason -> {
         this.setStatus("Monaco unavailable: " + reason, true);
@@ -1420,6 +1638,16 @@ public final class ScriptWorkspacePanel extends JPanel {
     parent.add(new DefaultMutableTreeNode(new ScriptTreeItem(displayName(definition), definition)));
   }
 
+  private void insertProjectSourceNode(ScriptDefinition definition) {
+    DefaultMutableTreeNode parent = childFolder(this.scriptsRoot, "Project Sources");
+    String implementation = Objects.toString(definition.getImplementation(), definition.getId());
+    String[] parts = implementation.split("\\.");
+    for (int i = 0; i < Math.max(0, parts.length - 1); i++) {
+      if (!parts[i].isBlank()) parent = childFolder(parent, parts[i]);
+    }
+    parent.add(new DefaultMutableTreeNode(new ScriptTreeItem(displayName(definition), definition)));
+  }
+
   private static DefaultMutableTreeNode childFolder(DefaultMutableTreeNode parent, String name) {
     Enumeration<?> children = parent.children();
     while (children.hasMoreElements()) {
@@ -1557,12 +1785,16 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void deleteScript(ScriptDefinition definition) {
     if (definition == null || Editor.instance().getGameFile() == null) return;
+    if (this.isProjectSource(definition)) {
+      this.setStatus("Project source files cannot be deleted from the script workspace", true);
+      return;
+    }
     int choice = JOptionPane.showConfirmDialog(this,
       "Are you sure you want to delete script '" + displayName(definition) + "'?\nThis will remove the file from disk.",
       "Delete Script", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
     if (choice != JOptionPane.YES_OPTION) return;
 
-    ScriptTab tab = this.openTabs.get(definition.getId());
+    ScriptTab tab = this.openTabs.get(this.documentKey(definition));
     if (tab != null) closeTab(tab);
 
     Path file = resolveSource(definition.getSource());
@@ -1584,6 +1816,10 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void duplicateScript(ScriptDefinition definition) {
     if (definition == null || Editor.instance().getGameFile() == null) return;
+    if (this.isProjectSource(definition)) {
+      this.setStatus("Project source files cannot be duplicated from the script workspace", true);
+      return;
+    }
     int suffix = 1;
     String id;
     String className;
@@ -1667,17 +1903,19 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     if (selected != null) {
       menu.addSeparator();
-      JMenuItem dupItem = new JMenuItem("Duplicate Script", Icons.COPY_16);
-      dupItem.addActionListener(evt -> duplicateScript(selected));
-      menu.add(dupItem);
+      if (!this.isProjectSource(selected)) {
+        JMenuItem dupItem = new JMenuItem("Duplicate Script", Icons.COPY_16);
+        dupItem.addActionListener(evt -> duplicateScript(selected));
+        menu.add(dupItem);
 
-      JMenuItem renameItem = new JMenuItem("Rename Class...", Icons.RENAME_16);
-      renameItem.addActionListener(evt -> renameScript(selected));
-      menu.add(renameItem);
+        JMenuItem renameItem = new JMenuItem("Rename Class...", Icons.RENAME_16);
+        renameItem.addActionListener(evt -> renameScript(selected));
+        menu.add(renameItem);
 
-      JMenuItem deleteItem = new JMenuItem("Delete Script", Icons.DELETE_16);
-      deleteItem.addActionListener(evt -> deleteScript(selected));
-      menu.add(deleteItem);
+        JMenuItem deleteItem = new JMenuItem("Delete Script", Icons.DELETE_16);
+        deleteItem.addActionListener(evt -> deleteScript(selected));
+        menu.add(deleteItem);
+      }
 
       JMenuItem openIdeItem = new JMenuItem("Open in IDE", Icons.EXTERNAL_16);
       openIdeItem.addActionListener(evt -> openActiveExternally());
@@ -1688,6 +1926,10 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void renameScript(ScriptDefinition definition) {
     if (definition == null) return;
+    if (this.isProjectSource(definition)) {
+      this.setStatus("Rename project classes with the project refactoring tools", true);
+      return;
+    }
     String currentName = displayName(definition);
     String input = (String) JOptionPane.showInputDialog(
         this,
@@ -1703,6 +1945,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void renameScript(ScriptDefinition definition, String newClassName) {
     if (definition == null || newClassName == null || newClassName.isBlank()) return;
+    if (this.isProjectSource(definition)) return;
     String oldClassName = displayName(definition);
     if (oldClassName.equals(newClassName)) return;
     if (!newClassName.matches("[A-Za-z_$][\\w$]*")) {
@@ -1716,7 +1959,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (newPath == null) return;
 
     String currentText = "";
-    ScriptTab tab = this.openTabs.get(definition.getId());
+    ScriptTab tab = this.openTabs.get(this.documentKey(definition));
     if (tab != null) {
       currentText = tab.getText();
     } else if (oldPath != null && Files.exists(oldPath)) {
@@ -1731,6 +1974,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     definition.setId(newClassName);
     definition.setName(newClassName);
+    definition.setImplementation(newClassName);
     definition.setSource(newSource);
 
     try {
@@ -1745,8 +1989,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     if (tab != null) {
-      this.openTabs.remove(oldClassName);
-      this.openTabs.put(newClassName, tab);
+      this.openTabs.remove(tab.key);
+      tab.key = this.documentKey(definition);
+      this.openTabs.put(tab.key, tab);
       tab.setText(updatedText);
       tab.updateTabTitle();
       if (this.monacoTab == tab && this.monaco != null) {
@@ -1883,6 +2128,8 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private final class ScriptTab extends JPanel {
     private final ScriptDefinition definition;
+    private String key;
+    private boolean projectSource;
     private String text = "";
     private Path path;
     private FileTime loadedTime;
@@ -1891,9 +2138,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     private int caretColumn = 1;
     private JLabel title;
 
-    private ScriptTab(ScriptDefinition definition) {
+    private ScriptTab(ScriptDefinition definition, Path projectPath, boolean projectSource) {
       this.definition = definition;
-      this.path = resolveSource(definition.getSource());
+      this.projectSource = projectSource;
+      this.path = projectPath != null ? projectPath : resolveSource(definition.getSource());
+      this.key = projectSource ? projectDocumentKey(this.path) : "runtime:" + definition.getId();
       this.setPreferredSize(new Dimension(0, 0));
       this.setMinimumSize(new Dimension(0, 0));
       this.setMaximumSize(new Dimension(0, 0));
@@ -1910,6 +2159,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     private void synchronizeDeclaration() {
+      if (this.projectSource) return;
       String updated = ScriptWorkspacePanel.synchronizeDeclaration(this.getText(), this.definition);
       if (!Objects.equals(updated, this.getText())) this.setText(updated);
       if (ScriptWorkspacePanel.this.monacoTab == this && ScriptWorkspacePanel.this.monaco != null) {
@@ -1986,7 +2236,8 @@ public final class ScriptWorkspacePanel extends JPanel {
 
         String currentText = this.getText();
         String declaredClass = ScriptWorkspacePanel.extractClassName(currentText);
-        if (declaredClass != null && !declaredClass.isBlank() && !declaredClass.equals(this.definition.getImplementation())) {
+        if (!this.projectSource && declaredClass != null && !declaredClass.isBlank()
+          && !declaredClass.equals(this.definition.getImplementation())) {
           this.renameToClass(declaredClass);
         }
 
@@ -1995,7 +2246,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.loadedTime = Files.getLastModifiedTime(this.path);
         this.dirty = false;
         this.updateTabTitle();
-        UndoManager.instance().recordChanges();
+        if (!this.projectSource) UndoManager.instance().recordChanges();
         return true;
       } catch (IOException e) {
         setStatus("Could not save source: " + e.getMessage(), true);
@@ -2004,7 +2255,6 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     private void renameToClass(String newClassName) {
-      String oldId = this.definition.getId();
       Path oldPath = resolveSource(this.definition.getSource());
 
       String newSourceRel = ScriptSourcePaths.rename(
@@ -2028,8 +2278,9 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.setText(updatedText);
       }
 
-      ScriptWorkspacePanel.this.openTabs.remove(oldId);
-      ScriptWorkspacePanel.this.openTabs.put(newClassName, this);
+      ScriptWorkspacePanel.this.openTabs.remove(this.key);
+      this.key = ScriptWorkspacePanel.this.documentKey(this.definition);
+      ScriptWorkspacePanel.this.openTabs.put(this.key, this);
 
       Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
       UI.getAssetController().refresh();

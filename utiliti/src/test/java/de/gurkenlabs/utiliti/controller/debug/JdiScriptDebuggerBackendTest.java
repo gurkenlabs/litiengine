@@ -15,6 +15,97 @@ import org.junit.jupiter.api.Test;
 
 class JdiScriptDebuggerBackendTest {
   @Test
+  void installsProjectBreakpointAddedAfterAttachForNestedClassPreparedLater() throws Exception {
+    int port;
+    try (ServerSocket socket = new ServerSocket(0)) {
+      port = socket.getLocalPort();
+    }
+    Path java = Path.of(System.getProperty("java.home"), "bin", isWindows() ? "java.exe" : "java");
+    Process process = new ProcessBuilder(
+        java.toString(),
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:" + port,
+        "-cp", System.getProperty("java.class.path"),
+        JdiLateLoadedDebuggeeFixture.class.getName())
+        .redirectErrorStream(true)
+        .start();
+    LinkedBlockingQueue<ScriptDebugSnapshot> snapshots = new LinkedBlockingQueue<>();
+    JdiScriptDebuggerBackend debugger = new JdiScriptDebuggerBackend(new ScriptDebuggerBackend.Listener() {
+      @Override
+      public void paused(ScriptDebugSnapshot value) {
+        snapshots.add(value);
+      }
+    });
+
+    try {
+      debugger.attach("127.0.0.1", port, List.of());
+      debugger.setBreakpoints(List.of(new ScriptBreakpoint(
+          "test", JdiLateLoadedDebuggeeFixture.class.getName(),
+          "JdiLateLoadedDebuggeeFixture.java", 12, true)));
+
+      ScriptDebugSnapshot snapshot = snapshots.poll(10, TimeUnit.SECONDS);
+      assertTrue(snapshot != null);
+      ScriptDebugSnapshot.Frame frame = snapshot.frames().stream()
+          .filter(item -> item.className().equals(JdiLateLoadedDebuggeeFixture.class.getName() + "$Worker"))
+          .findFirst().orElseThrow();
+      assertEquals(12, frame.line());
+      assertTrue(frame.variables().stream().anyMatch(variable -> variable.name().equals("value")
+          && variable.value().equals("41")));
+
+      debugger.resume();
+      assertTrue(process.waitFor(10, TimeUnit.SECONDS));
+      assertEquals(0, process.exitValue());
+    } finally {
+      debugger.close();
+      if (process.isAlive()) process.destroyForcibly();
+    }
+  }
+
+  @Test
+  void stopsAtBreakpointInOrdinaryProjectClassWithoutScriptDefinition() throws Exception {
+    int port;
+    try (ServerSocket socket = new ServerSocket(0)) {
+      port = socket.getLocalPort();
+    }
+    Path java = Path.of(System.getProperty("java.home"), "bin", isWindows() ? "java.exe" : "java");
+    Process process = new ProcessBuilder(
+        java.toString(),
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:" + port,
+        "-cp", System.getProperty("java.class.path"),
+        JdiDebuggeeFixture.class.getName())
+        .redirectErrorStream(true)
+        .start();
+    LinkedBlockingQueue<ScriptDebugSnapshot> snapshots = new LinkedBlockingQueue<>();
+    JdiScriptDebuggerBackend debugger = new JdiScriptDebuggerBackend(new ScriptDebuggerBackend.Listener() {
+      @Override
+      public void paused(ScriptDebugSnapshot value) {
+        snapshots.add(value);
+      }
+    });
+
+    try {
+      debugger.setBreakpoints(List.of(new ScriptBreakpoint(
+          "test", JdiDebuggeeFixture.class.getName(), "JdiDebuggeeFixture.java", 17, true)));
+      debugger.attach("127.0.0.1", port, List.of());
+
+      ScriptDebugSnapshot snapshot = snapshots.poll(10, TimeUnit.SECONDS);
+      assertTrue(snapshot != null);
+      ScriptDebugSnapshot.Frame frame = snapshot.frames().stream()
+          .filter(item -> item.className().equals(JdiDebuggeeFixture.class.getName()))
+          .findFirst().orElseThrow();
+      assertEquals(17, frame.line());
+      assertTrue(frame.variables().stream().anyMatch(variable -> variable.name().equals("value")
+          && variable.value().equals("41")));
+
+      debugger.resume();
+      assertTrue(process.waitFor(10, TimeUnit.SECONDS));
+      assertEquals(0, process.exitValue());
+    } finally {
+      debugger.close();
+      if (process.isAlive()) process.destroyForcibly();
+    }
+  }
+
+  @Test
   void stopsAtScriptBreakpointExposesVariablesAndStepsOver() throws Exception {
     int port;
     try (ServerSocket socket = new ServerSocket(0)) {

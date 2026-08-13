@@ -22,7 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +46,7 @@ public final class ProjectCodeIntegration implements AutoCloseable {
   private List<Definition> definitions = List.of();
   private List<ScriptClassDefinition> scriptDefinitions = List.of();
   private List<ControllerDefinition> controllerDefinitions = List.of();
+  private Map<String, Path> projectSources = Map.of();
 
   public List<Definition> getDefinitions() {
     return definitions;
@@ -64,10 +67,18 @@ public final class ProjectCodeIntegration implements AutoCloseable {
     return this.classLoader;
   }
 
+  /** Returns the editable project source that declares the requested compiled class. */
+  public Path findSource(String className) {
+    if (className == null || className.isBlank()) return null;
+    Path source = this.projectSources.get(className);
+    int nested = className.indexOf('$');
+    return source != null || nested < 0 ? source : this.projectSources.get(className.substring(0, nested));
+  }
+
   public void reload(Path gameFile) {
     Path root = gameFile == null || gameFile.getParent() == null ? null : gameFile.getParent();
     List<Path> outputs = root == null ? List.of() : CLASS_DIRECTORIES.stream().map(root::resolve).toList();
-    this.reload(outputs);
+    this.reload(outputs, List.of());
   }
 
   /** Reloads project types from the output directories supplied by the resolved project model. */
@@ -85,10 +96,10 @@ public final class ProjectCodeIntegration implements AutoCloseable {
         }
       }
     }
-    this.reload(outputs);
+    this.reload(outputs, project == null ? List.of() : project.sourceRoots());
   }
 
-  private void reload(List<Path> outputDirectories) {
+  private void reload(List<Path> outputDirectories, List<Path> sourceRoots) {
     close();
     List<Path> validDirectories = outputDirectories.stream()
       .filter(Files::isDirectory)
@@ -105,22 +116,25 @@ public final class ProjectCodeIntegration implements AutoCloseable {
         urls[i] = validDirectories.get(i).toUri().toURL();
       }
       classLoader = new URLClassLoader(urls, getClass().getClassLoader());
+      this.projectSources = Map.copyOf(indexProjectSources(sourceRoots));
       List<Definition> discovered = new ArrayList<>();
       List<ScriptClassDefinition> discoveredScripts = new ArrayList<>();
       List<ControllerDefinition> discoveredControllers = new ArrayList<>();
+      java.util.Set<String> classNames = new java.util.LinkedHashSet<>();
 
       for (Path classesDirectory : validDirectories) {
         try (var paths = Files.walk(classesDirectory)) {
           paths.filter(path -> path.toString().endsWith(".class"))
             .map(path -> className(classesDirectory, path))
             .filter(name -> !name.endsWith("module-info") && !name.contains("$$"))
-            .forEach(name -> {
-              discover(name, discovered);
-              discoverScript(name, discoveredScripts);
-              discoverController(name, discoveredControllers);
-            });
+            .forEach(classNames::add);
         }
       }
+      classNames.forEach(name -> {
+        discover(name, discovered);
+        discoverScript(name, this.projectSources, discoveredScripts);
+        discoverController(name, discoveredControllers);
+      });
       discovered.sort(Comparator.comparing(Definition::displayName));
       definitions = List.copyOf(discovered);
       discoveredScripts.sort(Comparator.comparing(ScriptClassDefinition::displayName));
@@ -145,7 +159,8 @@ public final class ProjectCodeIntegration implements AutoCloseable {
     }
   }
 
-  private void discoverScript(String className, List<ScriptClassDefinition> discovered) {
+  private void discoverScript(
+      String className, Map<String, Path> projectSources, List<ScriptClassDefinition> discovered) {
     try {
       Class<?> type = Class.forName(className, false, this.classLoader);
       if (!ScriptInstance.class.isAssignableFrom(type) || type.isInterface() || Modifier.isAbstract(type.getModifiers())) return;
@@ -162,13 +177,68 @@ public final class ProjectCodeIntegration implements AutoCloseable {
       }
       String displayName = info.name().isBlank() ? type.getSimpleName() : info.name();
       String targetType = info.target() == Object.class ? null : info.target().getName();
-      discovered.add(new ScriptClassDefinition(info.id(), displayName, type.getName(), info.host(), targetType, List.copyOf(properties)));
+      Path sourcePath = projectSources.get(type.getName());
+      if (sourcePath == null && type.getName().contains("$")) {
+        sourcePath = projectSources.get(type.getName().substring(0, type.getName().indexOf('$')));
+      }
+      discovered.add(new ScriptClassDefinition(
+          info.id(), displayName, type.getName(), info.host(), targetType,
+          List.copyOf(properties), sourcePath));
     } catch (LinkageError | ClassNotFoundException | NoSuchMethodException e) {
       // Only complete, compatible script classes are shown.
     }
   }
 
+  static Map<String, Path> indexProjectSources(List<Path> sourceRoots) {
+    Map<String, Path> sources = new HashMap<>();
+    if (sourceRoots == null) return sources;
+    for (Path root : sourceRoots) {
+      if (root == null || !Files.isDirectory(root)) continue;
+      try (var paths = Files.walk(root)) {
+        paths.filter(Files::isRegularFile)
+            .filter(ProjectCodeIntegration::isJvmSource)
+            .forEach(path -> {
+              String className = sourceClassName(root, path);
+              if (className != null) sources.putIfAbsent(className, path.toAbsolutePath().normalize());
+            });
+      } catch (IOException e) {
+        log.log(Level.FINE, "Could not index project sources in " + root, e);
+      }
+    }
+    return sources;
+  }
 
+  private static boolean isJvmSource(Path path) {
+    String name = path.getFileName().toString().toLowerCase(java.util.Locale.ROOT);
+    return name.endsWith(".java") || name.endsWith(".groovy") || name.endsWith(".kt");
+  }
+
+  static String sourceClassName(Path sourceRoot, Path sourceFile) {
+    if (sourceRoot == null || sourceFile == null || !sourceFile.normalize().startsWith(sourceRoot.normalize())) {
+      return null;
+    }
+    Path relative = sourceRoot.normalize().relativize(sourceFile.normalize());
+    String name = relative.toString().replace('\\', '.').replace('/', '.');
+    int extension = name.lastIndexOf('.');
+    if (extension <= 0) return null;
+    String fallback = name.substring(0, extension);
+    try (var reader = Files.newBufferedReader(sourceFile)) {
+      char[] prefix = new char[16 * 1024];
+      int length = reader.read(prefix);
+      if (length <= 0) return fallback;
+      String source = new String(prefix, 0, length);
+      var packageMatcher = java.util.regex.Pattern.compile(
+        "(?m)^\\s*﻿?\\s*package\\s+([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*;?")
+        .matcher(source);
+      if (!packageMatcher.find()) return fallback;
+      String filename = sourceFile.getFileName().toString();
+      int fileExtension = filename.lastIndexOf('.');
+      String simpleName = fileExtension > 0 ? filename.substring(0, fileExtension) : filename;
+      return packageMatcher.group(1) + "." + simpleName;
+    } catch (IOException ignored) {
+      return fallback;
+    }
+  }
 
   private static String className(Path root, Path classFile) {
     return root.relativize(classFile).toString().replace('\\', '.').replace('/', '.').replaceFirst("\\.class$", "");
@@ -205,6 +275,7 @@ public final class ProjectCodeIntegration implements AutoCloseable {
     definitions = List.of();
     scriptDefinitions = List.of();
     controllerDefinitions = List.of();
+    projectSources = Map.of();
     if (classLoader != null) {
       try {
         classLoader.close();
@@ -219,7 +290,8 @@ public final class ProjectCodeIntegration implements AutoCloseable {
   }
 
   public record ScriptClassDefinition(String id, String displayName, String className, ScriptHostType host,
-                                      String targetType, List<ScriptPropertyDefinition> properties) {
+                                       String targetType, List<ScriptPropertyDefinition> properties,
+                                       Path sourcePath) {
   }
 
   public record ScriptPropertyDefinition(String name, String displayName, String description, String category,

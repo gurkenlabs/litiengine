@@ -82,6 +82,61 @@ class ProjectCodeIntegrationTest {
     }
   }
 
+  @Test
+  void duplicateCompiledOutputsAreDiscoveredOnlyOnce(@TempDir Path tempDir) throws Exception {
+    Path firstOutput = tempDir.resolve("first-output");
+    Path secondOutput = tempDir.resolve("second-output");
+    copyClass(firstOutput, DiscoverableController.class, true);
+    copyClass(secondOutput, DiscoverableController.class, true);
+    ProjectModel project = new ProjectModel(tempDir, null, ":run", null, 25,
+        java.util.List.of(), java.util.List.of(firstOutput, secondOutput),
+        java.util.List.of(), java.util.List.of());
+
+    try (ProjectCodeIntegration integration = new ProjectCodeIntegration()) {
+      integration.reloadProject(project);
+
+      assertEquals(1, integration.getControllerDefinitions().stream()
+        .filter(definition -> definition.className().equals(DiscoverableController.class.getName()))
+        .count());
+    }
+  }
+
+  @Test
+  void discoveredScriptsRetainTheirProjectSourcePath(@TempDir Path tempDir) throws Exception {
+    Path customOutput = tempDir.resolve("custom-output");
+    copyClass(customOutput, DiscoverableScript.class, true);
+    Path sourceRoot = tempDir.resolve("src/main/java");
+    Path source = sourceRoot.resolve(ProjectCodeIntegrationTest.class.getName().replace('.', '/') + ".java");
+    Files.createDirectories(source.getParent());
+    Files.writeString(source, "// source location used by the editor");
+    ProjectModel project = new ProjectModel(tempDir, null, ":run", null, 25,
+        java.util.List.of(sourceRoot), java.util.List.of(customOutput), java.util.List.of(), java.util.List.of());
+
+    try (ProjectCodeIntegration integration = new ProjectCodeIntegration()) {
+      integration.reloadProject(project);
+
+      var definition = integration.getScriptDefinitions().stream()
+          .filter(candidate -> candidate.className().equals(DiscoverableScript.class.getName()))
+          .findFirst().orElseThrow();
+      assertEquals(source.toAbsolutePath().normalize(), definition.sourcePath());
+      assertEquals(source.toAbsolutePath().normalize(), integration.findSource(DiscoverableScript.class.getName()));
+    }
+  }
+
+  @Test
+  void sourceIndexUsesTheDeclaredPackageWhenFoldersDoNotMatch(@TempDir Path tempDir) throws Exception {
+    Path sourceRoot = tempDir.resolve("sources");
+    Path source = sourceRoot.resolve("legacy/layout/Janitor.java");
+    Files.createDirectories(source.getParent());
+    Files.writeString(source, "package de.gurkenlabs.game;\npublic class Janitor {}\n");
+
+    assertEquals("de.gurkenlabs.game.Janitor",
+      ProjectCodeIntegration.sourceClassName(sourceRoot, source));
+  }
+
+  @ScriptInfo(id = "discoverable", host = ScriptHostType.ENTITY, target = Creature.class)
+  public static final class DiscoverableScript extends CreatureScript {}
+
   public static final class DiscoverableController implements IEntityController {
     private final Creature entity;
 

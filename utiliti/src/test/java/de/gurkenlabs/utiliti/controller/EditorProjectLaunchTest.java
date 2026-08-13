@@ -10,6 +10,13 @@ import org.junit.jupiter.api.io.TempDir;
 
 class EditorProjectLaunchTest {
   @Test
+  void classesTaskPreservesTheRunTaskProjectPath() {
+    assertEquals(":classes", Editor.classesTaskFor(":run"));
+    assertEquals(":game:classes", Editor.classesTaskFor(":game:run"));
+    assertEquals("classes", Editor.classesTaskFor("run"));
+  }
+
+  @Test
   void buildConfigurationStampChangesOnlyForLaunchModelInputs(@TempDir Path root) throws Exception {
     Files.writeString(root.resolve("settings.gradle"), "rootProject.name = 'game'");
     Path game = Files.createDirectories(root.resolve("game"));

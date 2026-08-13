@@ -112,6 +112,7 @@ public final class JdiScriptDebuggerBackend implements ScriptDebuggerBackend {
     try {
       EventRequestManager requests = current.eventRequestManager();
       requests.deleteEventRequests(new ArrayList<>(requests.breakpointRequests()));
+      this.configureClassPrepareRequests(requests);
       for (ReferenceType type : current.allClasses()) this.installBreakpoints(type);
     } catch (VMDisconnectedException ignored) {
       this.disconnected();
@@ -188,15 +189,18 @@ public final class JdiScriptDebuggerBackend implements ScriptDebuggerBackend {
   }
 
   private void configureRequests() {
-    for (ScriptDefinition definition : this.definitions) {
-      String implementation = definition.getImplementation();
-      if (implementation == null || implementation.isBlank()) continue;
-      ClassPrepareRequest prepare = this.vm.eventRequestManager().createClassPrepareRequest();
-      prepare.addClassFilter(implementation + "*");
+    this.configureClassPrepareRequests(this.vm.eventRequestManager());
+    for (ReferenceType type : this.vm.allClasses()) this.installBreakpoints(type);
+  }
+
+  private void configureClassPrepareRequests(EventRequestManager requests) {
+    requests.deleteEventRequests(new ArrayList<>(requests.classPrepareRequests()));
+    this.breakpointClassNames().forEach(className -> {
+      ClassPrepareRequest prepare = requests.createClassPrepareRequest();
+      prepare.addClassFilter(className + "*");
       prepare.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
       prepare.enable();
-    }
-    for (ReferenceType type : this.vm.allClasses()) this.installBreakpoints(type);
+    });
   }
 
   private void eventLoop() {
@@ -239,10 +243,9 @@ public final class JdiScriptDebuggerBackend implements ScriptDebuggerBackend {
   }
 
   private void installBreakpoints(ReferenceType type) {
-    ScriptDefinition definition = this.definitionFor(type.name());
-    if (definition == null) return;
     for (ScriptBreakpoint breakpoint : this.breakpoints) {
-      if (!breakpoint.enabled() || !definition.getId().equals(breakpoint.scriptId())) continue;
+      String className = this.classNameFor(breakpoint);
+      if (!breakpoint.enabled() || className == null || !isClassOrNested(type.name(), className)) continue;
       try {
         for (Location location : type.locationsOfLine(breakpoint.line())) {
           BreakpointRequest request = this.vm.eventRequestManager().createBreakpointRequest(location);
@@ -264,15 +267,42 @@ public final class JdiScriptDebuggerBackend implements ScriptDebuggerBackend {
     return null;
   }
 
+  private String classNameFor(ScriptBreakpoint breakpoint) {
+    for (ScriptDefinition definition : this.definitions) {
+      if (!definition.getId().equals(breakpoint.scriptId())) continue;
+      String implementation = definition.getImplementation();
+      return implementation == null || implementation.isBlank() ? null : implementation;
+    }
+    String scriptId = breakpoint.scriptId();
+    return scriptId == null || scriptId.isBlank() ? null : scriptId;
+  }
+
+  private java.util.Set<String> breakpointClassNames() {
+    return this.breakpoints.stream()
+        .filter(ScriptBreakpoint::enabled)
+        .map(this::classNameFor)
+        .filter(Objects::nonNull)
+        .collect(java.util.stream.Collectors.toUnmodifiableSet());
+  }
+
+  private boolean isDebugClass(String className) {
+    if (this.definitionFor(className) != null) return true;
+    return this.breakpointClassNames().stream().anyMatch(target -> isClassOrNested(className, target));
+  }
+
+  private static boolean isClassOrNested(String className, String target) {
+    return target.equals(className) || className.startsWith(target + "$");
+  }
+
   private ScriptDebugSnapshot snapshot(ThreadReference thread) {
     List<ScriptDebugSnapshot.Frame> result = new ArrayList<>();
     try {
       List<StackFrame> frames = thread.frames(0, Math.min(thread.frameCount(), MAX_FRAMES));
       boolean hasScriptFrame = frames.stream()
-          .anyMatch(frame -> this.definitionFor(frame.location().declaringType().name()) != null);
+          .anyMatch(frame -> this.isDebugClass(frame.location().declaringType().name()));
       for (StackFrame frame : frames) {
         Location location = frame.location();
-        boolean inspectVariables = this.definitionFor(location.declaringType().name()) != null
+        boolean inspectVariables = this.isDebugClass(location.declaringType().name())
             || (!hasScriptFrame && result.isEmpty());
         List<ScriptDebugSnapshot.Variable> variables = inspectVariables ? variables(frame) : List.of();
         String source;
@@ -414,7 +444,7 @@ public final class JdiScriptDebuggerBackend implements ScriptDebuggerBackend {
         List<StackFrame> frames = candidate.frames(0, Math.min(candidate.frameCount(), MAX_FRAMES));
         if (frames.isEmpty()) continue;
         if (fallback == null || "main".equals(candidate.name())) fallback = candidate;
-        if (frames.stream().anyMatch(frame -> this.definitionFor(frame.location().declaringType().name()) != null)) {
+        if (frames.stream().anyMatch(frame -> this.isDebugClass(frame.location().declaringType().name()))) {
           return candidate;
         }
       } catch (IncompatibleThreadStateException | VMDisconnectedException ignored) {

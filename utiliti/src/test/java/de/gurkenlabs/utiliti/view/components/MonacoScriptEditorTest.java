@@ -5,11 +5,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.scripting.ScriptLanguageService;
 import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class MonacoScriptEditorTest {
+  @Test
+  void classUrisResolveToFullyQualifiedNames() {
+    assertEquals("de.gurkenlabs.game.Janitor",
+      MonacoScriptEditor.classNameFromUri(URI.create("class:///de/gurkenlabs/game/Janitor.java")));
+  }
+
+  @Test
+  void typeDefinitionNavigationTargetsTheDeclaration(@TempDir Path tempDir) throws Exception {
+    Path source = tempDir.resolve("Janitor.java");
+    Files.writeString(source, "package game;\n\npublic class Janitor {\n}\n");
+
+    ScriptLanguageService.Position position = MonacoScriptEditor.typeDeclarationPosition(
+      source, "game.Janitor", new ScriptLanguageService.Position(0, 0));
+
+    assertEquals(new ScriptLanguageService.Position(2, 13), position);
+  }
+
   @Test
   void readinessProbeWaitsForTheEditorReceiver() {
     String probe = MonacoScriptEditor.readinessProbeScript();

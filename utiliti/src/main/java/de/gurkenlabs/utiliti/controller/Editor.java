@@ -247,6 +247,28 @@ public class Editor extends Screen {
     this.applyProjectModel();
   }
 
+  /** Builds the opened project's ordinary source set without launching the game. */
+  public ProjectSession buildProjectClasses() throws IOException {
+    Path buildPath = this.projectPath;
+    if (buildPath == null) throw new IOException("Open a project before building its scripts.");
+    ProjectModel model = this.projectBuildService.refresh(buildPath);
+    if (model == null || !model.canRun()) {
+      throw new IOException("The opened project has no usable Gradle wrapper.");
+    }
+    this.projectModel = model;
+    String classesTask = classesTaskFor(model.runTask());
+    ProjectModel buildModel = new ProjectModel(
+        model.projectRoot(), model.wrapper(), classesTask, model.mainClass(), model.javaVersion(),
+        model.sourceRoots(), model.outputDirectories(), model.compileClasspath(), model.runtimeClasspath());
+    return this.projectBuildService.launch(ProjectLaunchRequest.run(buildModel));
+  }
+
+  static String classesTaskFor(String runTask) {
+    String task = runTask == null || runTask.isBlank() ? ":run" : runTask.strip();
+    int separator = task.lastIndexOf(':');
+    return separator < 0 ? "classes" : task.substring(0, separator + 1) + "classes";
+  }
+
   private void applyProjectModel() {
     Game.scripts().setProjectClassLoader(this.projectCodeIntegration.getClassLoader());
     if (this.projectModel == null) return;

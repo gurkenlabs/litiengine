@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptLanguageService;
+import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
@@ -88,6 +89,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private Consumer<ScriptLanguageService.Position> cursorListener = ignored -> {};
   private Consumer<List<Integer>> breakpointListener = ignored -> {};
   private Consumer<String> debugCommandListener = ignored -> {};
+  private Consumer<DefinitionTarget> definitionListener = ignored -> {};
   private Consumer<String> unavailableListener = ignored -> {};
   private ScriptDefinition definition;
   private URI uri;
@@ -108,6 +110,8 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private List<Integer> breakpointLines = List.of();
   private int executionLine;
   private List<ScriptDebugSnapshot.Variable> debugVariables = List.of();
+  private int pendingRevealLine;
+  private int pendingRevealColumn;
 
   MonacoScriptEditor() throws IOException {
     super();
@@ -228,6 +232,10 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.debugCommandListener = listener == null ? ignored -> {} : listener;
   }
 
+  void onDefinition(Consumer<DefinitionTarget> listener) {
+    this.definitionListener = listener == null ? ignored -> {} : listener;
+  }
+
   void onUnavailable(Consumer<String> listener) {
     this.unavailableListener = listener == null ? ignored -> {} : listener;
     if (this.unavailableReason != null) this.unavailableListener.accept(this.unavailableReason);
@@ -240,6 +248,8 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.uri = path == null ? URI.create("inmemory://script/" + (this.definition == null ? "untitled" : this.definition.getId())) : path.toUri();
     this.text = Objects.requireNonNullElse(content, "");
     this.version++;
+    this.pendingRevealLine = 0;
+    this.pendingRevealColumn = 0;
     this.replaceLanguageService();
     if (this.ready) this.sendOpen();
   }
@@ -259,7 +269,9 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   }
 
   void revealPosition(int line, int column) {
-    if (this.ready) this.send("revealLine", Json.createObjectBuilder().add("line", line).add("column", column).build());
+    this.pendingRevealLine = Math.max(1, line);
+    this.pendingRevealColumn = Math.max(1, column);
+    if (this.ready) this.sendPendingReveal();
   }
 
   void revealLine(int line) {
@@ -563,6 +575,15 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
       .add("uri", this.uri.toString()).add("text", this.text)
       .add("language", this.definition == null ? "java" : this.definition.getLanguage())
       .add("breakpoints", lines).add("executionLine", this.executionLine).build());
+    this.sendPendingReveal();
+  }
+
+  private void sendPendingReveal() {
+    if (!this.ready || this.pendingRevealLine <= 0) return;
+    this.send("revealLine", Json.createObjectBuilder()
+      .add("line", this.pendingRevealLine).add("column", this.pendingRevealColumn).build());
+    this.pendingRevealLine = 0;
+    this.pendingRevealColumn = 0;
   }
 
   static String readinessProbeScript() {
@@ -652,10 +673,78 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private JsonObject definition(ScriptLanguageService.Position position) {
     if (this.languageService == null) return success(Json.createObjectBuilder().add("uri", "").add("line", 0).add("column", 0).build());
     Optional<ScriptLanguageService.Location> loc = this.languageService.definition(this.document(), position);
+    Optional<DefinitionTarget> target = loc.flatMap(this::projectDefinitionTarget);
+    target.ifPresent(value -> SwingUtilities.invokeLater(() -> this.definitionListener.accept(value)));
+    if (target.isPresent()) {
+      return success(Json.createObjectBuilder().add("uri", "").add("line", 0).add("column", 0).build());
+    }
+    if (loc.map(ScriptLanguageService.Location::uri)
+        .map(URI::getScheme).filter("class"::equalsIgnoreCase).isPresent()) {
+      return success(Json.createObjectBuilder().add("uri", "").add("line", 0).add("column", 0).build());
+    }
     return success(loc.map(l -> Json.createObjectBuilder()
       .add("uri", l.uri() == null ? "" : l.uri().toString())
       .add("line", l.range().start().line()).add("column", l.range().start().column()).build())
       .orElse(Json.createObjectBuilder().add("uri", "").add("line", 0).add("column", 0).build()));
+  }
+
+  private Optional<DefinitionTarget> projectDefinitionTarget(ScriptLanguageService.Location location) {
+    if (location == null || location.uri() == null) return Optional.empty();
+    Path source = null;
+    String className = classNameFromUri(location.uri());
+    if (className != null) {
+      source = Editor.instance().getProjectCodeIntegration().findSource(className);
+    } else if ("file".equalsIgnoreCase(location.uri().getScheme())) {
+      try {
+        source = Path.of(location.uri()).toAbsolutePath().normalize();
+      } catch (Exception ignored) {
+        return Optional.empty();
+      }
+    }
+    if (source == null || !java.nio.file.Files.isRegularFile(source)) return Optional.empty();
+    try {
+      source = source.toRealPath();
+      Path projectRoot = Editor.instance().getProjectModel() == null
+        ? null : Editor.instance().getProjectModel().projectRoot();
+      if (projectRoot == null || !source.startsWith(projectRoot.toRealPath())) return Optional.empty();
+    } catch (IOException ignored) {
+      return Optional.empty();
+    }
+    ScriptLanguageService.Position position = className == null
+      ? location.range().start() : typeDeclarationPosition(source, className, location.range().start());
+    return Optional.of(new DefinitionTarget(source, className, position.line(), position.column()));
+  }
+
+  static ScriptLanguageService.Position typeDeclarationPosition(
+      Path source, String className, ScriptLanguageService.Position fallback) {
+    if (source == null || className == null) return fallback;
+    try {
+      String text = java.nio.file.Files.readString(source);
+      String simpleName = className.substring(Math.max(className.lastIndexOf('.'), className.lastIndexOf('$')) + 1);
+      var matcher = java.util.regex.Pattern.compile(
+        "\\b(?:class|interface|enum|record|trait|object)\\s+(" + java.util.regex.Pattern.quote(simpleName) + ")\\b")
+        .matcher(text);
+      if (!matcher.find()) return fallback;
+      int line = 0;
+      int lineStart = 0;
+      for (int index = 0; index < matcher.start(1); index++) {
+        if (text.charAt(index) == '\n') {
+          line++;
+          lineStart = index + 1;
+        }
+      }
+      return new ScriptLanguageService.Position(line, matcher.start(1) - lineStart);
+    } catch (IOException ignored) {
+      return fallback;
+    }
+  }
+
+  static String classNameFromUri(URI target) {
+    if (target == null || !"class".equalsIgnoreCase(target.getScheme())) return null;
+    String path = Objects.requireNonNullElse(target.getPath(), "");
+    while (path.startsWith("/")) path = path.substring(1);
+    if (!path.endsWith(".java")) return null;
+    return path.substring(0, path.length() - ".java".length()).replace('/', '.').replace('\\', '.');
   }
 
   private JsonObject codeActions(JsonObject payload) {
@@ -731,6 +820,8 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private static JsonObject failure(String message) {
     return Json.createObjectBuilder().add("ok", false).add("error", message).build();
   }
+
+  record DefinitionTarget(Path path, String className, int line, int column) {}
 
   @Override
   public synchronized void close() {
