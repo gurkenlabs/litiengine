@@ -73,12 +73,13 @@ public final class EngineTypeCatalog {
   private static List<Class<?>> loadAll(ClassLoader loader) {
     List<Class<?>> result = new ArrayList<>(loadEngine(loader));
     try {
-      java.net.URL[] urls = loader instanceof java.net.URLClassLoader urlLoader ? urlLoader.getURLs() : null;
-      if (urls != null) {
-        for (java.net.URL url : urls) {
-          Path path = Path.of(url.toURI());
-          if (Files.isDirectory(path)) result.addAll(fromDirectory(path, loader, ""));
-          else if (path.toString().endsWith(".jar")) result.addAll(fromJar(path, loader, ""));
+      for (ClassLoader cl = loader; cl != null; cl = cl.getParent()) {
+        if (cl instanceof java.net.URLClassLoader urlLoader) {
+          for (java.net.URL url : urlLoader.getURLs()) {
+            Path path = Path.of(url.toURI());
+            if (Files.isDirectory(path)) result.addAll(fromDirectory(path, loader, ""));
+            else if (path.toString().endsWith(".jar")) result.addAll(fromJar(path, loader, ""));
+          }
         }
       }
     } catch (Exception ignored) {

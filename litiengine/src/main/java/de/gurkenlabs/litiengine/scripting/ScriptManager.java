@@ -85,7 +85,7 @@ public final class ScriptManager implements IUpdateable {
     ClassLoader loader = this.projectClassLoader != null
       ? this.projectClassLoader : Thread.currentThread().getContextClassLoader();
     if (loader == null) loader = ScriptManager.class.getClassLoader();
-    return provider.createLanguageService(new ScriptLanguageService.Workspace(this.projectRoot, loader, Map.of()));
+    return provider.createLanguageService(new ScriptLanguageService.Workspace(this.projectRoot, loader, this.projectClasspath, Map.of()));
   }
 
   public void setDefinitions(Collection<ScriptDefinition> definitions) {

@@ -44,8 +44,13 @@ public interface ScriptLanguageService extends AutoCloseable {
   @Override
   default void close() {}
 
-  record Workspace(Path projectRoot, ClassLoader classLoader, Map<String, String> options) {
+  record Workspace(Path projectRoot, ClassLoader classLoader, java.util.Collection<Path> projectClasspath, Map<String, String> options) {
+    public Workspace(Path projectRoot, ClassLoader classLoader, Map<String, String> options) {
+      this(projectRoot, classLoader, List.of(), options);
+    }
+
     public Workspace {
+      projectClasspath = projectClasspath == null ? List.of() : List.copyOf(projectClasspath);
       options = options == null ? Map.of() : Map.copyOf(options);
     }
   }

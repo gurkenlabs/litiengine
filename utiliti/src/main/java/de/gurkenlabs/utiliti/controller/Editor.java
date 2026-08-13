@@ -379,6 +379,8 @@ public class Editor extends Screen {
         Game.world().unloadEnvironment();
       }
 
+      UI.clearConsole();
+
       // set up project settings
       this.setProjectPath(chooser.getSelectedFile().toPath());
 
@@ -392,7 +394,9 @@ public class Editor extends Screen {
         this.loadSpriteSheets(map);
       }
 
+    if (UI.getAssetController() != null) {
       UI.getAssetController().refresh();
+    }
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
@@ -441,7 +445,9 @@ public class Editor extends Screen {
     this.mapComponent.loadMaps(List.of(), true);
     Resources.clearAll();
     this.gameFile = null;
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
 
@@ -469,6 +475,7 @@ public class Editor extends Screen {
       return;
     }
 
+    final boolean isDifferentProject = !Objects.equals(this.currentResourceFile, gameFile);
     final long currentTime = System.nanoTime();
     Cursors.apply(Cursors.LOAD);
 
@@ -480,6 +487,10 @@ public class Editor extends Screen {
       ResourceBundle loadedGameFile = ResourceBundle.load(gameFile.toString());
       if (loadedGameFile == null) {
         throw new IllegalArgumentException("The game file " + gameFile + " could not be loaded!");
+      }
+
+      if (isDifferentProject) {
+        UI.clearConsole();
       }
 
       // Replace the current project only after the new resource bundle was parsed successfully.
@@ -520,7 +531,9 @@ public class Editor extends Screen {
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
+    if (UI.getAssetController() != null) {
       UI.getAssetController().refresh();
+    }
 
       // display first available map after loading all stuff
       // also switch to map component
@@ -561,6 +574,7 @@ public class Editor extends Screen {
       return;
     }
 
+    final boolean isDifferentProject = !Objects.equals(this.currentResourceFile, gameFile);
     final long currentTime = System.nanoTime();
     Cursors.apply(Cursors.LOAD);
     this.loading = true;
@@ -575,6 +589,10 @@ public class Editor extends Screen {
       try {
         UndoManager.clearAll();
         ToolManager.instance().clearSelections();
+
+        if (isDifferentProject) {
+          UI.clearConsole();
+        }
 
         this.currentResourceFile = gameFile;
         this.gameFile = loadedBundle;
@@ -608,7 +626,9 @@ public class Editor extends Screen {
         }
 
         loadCustomEmitters(this.getGameFile().getEmitters());
-        UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
 
         if (!this.mapComponent.getMaps().isEmpty()) {
           this.mapComponent.loadEnvironment(this.mapComponent.getMaps().getFirst());
@@ -710,7 +730,9 @@ public class Editor extends Screen {
         log.log(Level.SEVERE, "could not import animation from " + file + ": " + e.getMessage(), e);
       }
     }
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   public void exportSpriteFile() {
@@ -776,7 +798,9 @@ public class Editor extends Screen {
       }
     }
 
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   public void importSpriteSheets(TextureAtlas atlas) {
@@ -944,7 +968,9 @@ public class Editor extends Screen {
 
   public void importEmitters(Path... files) {
     Stream.of(files).forEach(this::importEmitter);
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   private void importEmitter(Path file) {
@@ -976,7 +1002,9 @@ public class Editor extends Screen {
 
   public void importBlueprints(Path... files) {
     Stream.of(files).forEach(this::importBlueprint);
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   private void importBlueprint(Path file) {
@@ -1011,7 +1039,9 @@ public class Editor extends Screen {
 
   public void importTilesets(Path... files) {
     Stream.of(files).forEach(this::importTileset);
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   private void importTileset(Path file) {

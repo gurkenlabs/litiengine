@@ -9,8 +9,11 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptHostType;
+import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(SwingTestSuite.class)
 class ScriptWorkspacePanelTest {
   private static final String SOURCE = """
     import de.gurkenlabs.litiengine.scripting.*
@@ -72,6 +75,18 @@ class ScriptWorkspacePanelTest {
     String updated = ScriptWorkspacePanel.synchronizeDeclaration(SOURCE, definition);
 
     assertTrue(updated.contains("extends EntityScript<" + TypedCreature.class.getName() + ">"));
+  }
+
+  @Test
+  void monacoEditorIsLoadedOnlyAfterScriptIsDisplayed() {
+    de.gurkenlabs.litiengine.Game.init(de.gurkenlabs.litiengine.Game.COMMANDLINE_ARG_NOGUI);
+    ScriptWorkspacePanel panel = new ScriptWorkspacePanel();
+    assertNull(panel.getMonaco(), "Monaco editor should not be loaded on ScriptWorkspacePanel creation");
+
+    ScriptDefinition definition = definition();
+    panel.open(definition);
+
+    org.junit.jupiter.api.Assertions.assertNotNull(panel.getMonaco(), "Monaco editor should be loaded once a script is displayed");
   }
 
   private static ScriptDefinition definition() {

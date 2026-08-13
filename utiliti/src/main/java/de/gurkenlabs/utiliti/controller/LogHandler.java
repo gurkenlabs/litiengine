@@ -170,6 +170,7 @@ public class LogHandler extends java.util.logging.Handler {
       SwingUtilities.invokeLater(flushTask);
     }
 
+    this.recentLogs.clear();
     this.warningCount.set(0);
     this.errorCount.set(0);
     this.latestErrorStack = null;

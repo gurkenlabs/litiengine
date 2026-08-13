@@ -59,6 +59,7 @@ class LogHandlerTest {
     assertEquals(0, logHandler.getWarningCount());
     assertEquals(0, logHandler.getErrorCount());
     assertNull(logHandler.getLatestErrorStack());
+    assertTrue(logHandler.getRecentLogs().isEmpty());
   }
 
   @Test

@@ -172,6 +172,14 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.problems.getTableHeader().setForeground(Style.mutedText());
       this.problems.getTableHeader().setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
       this.problems.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
+      javax.swing.table.TableCellRenderer defaultHeaderRenderer = this.problems.getTableHeader().getDefaultRenderer();
+      this.problems.getTableHeader().setDefaultRenderer((table, value, isSelected, hasFocus, row, column) -> {
+        Component c = defaultHeaderRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        if (c instanceof JLabel label) {
+          label.setHorizontalAlignment(SwingConstants.LEADING);
+        }
+        return c;
+      });
     }
 
     this.problems.getColumnModel().getColumn(0).setPreferredWidth(85);
@@ -205,57 +213,12 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     });
 
-    try {
-      this.monaco = new MonacoScriptEditor();
-      this.monaco.onChanged(text -> {
-        if (this.monacoTab != null) this.monacoTab.setTextFromMonaco(text);
-      });
-      this.monaco.onSave(() -> {
-        if (this.monacoTab != null && this.monacoTab.save()) {
-          this.setStatus("Saved " + this.monacoTab.definition.getSource(), false);
-        }
-      });
-      this.monaco.onAnalysis(this::showAnalysis);
-      this.monaco.onReady(this::activeTabChanged);
-      this.monaco.onUnavailable(reason -> {
-        this.setStatus("Monaco unavailable: " + reason, true);
-      });
-      this.monaco.onCursor(position -> {
-        if (this.monacoTab != null) {
-          this.monacoTab.caretLine = position.line() + 1;
-          this.monacoTab.caretColumn = position.column() + 1;
-          this.updateCaretStatus(this.monacoTab);
-        }
-      });
-      this.monaco.onBreakpointsChanged(lines -> {
-        if (this.monacoTab != null && this.monacoTab.definition != null) {
-          this.replaceBreakpoints(this.monacoTab.definition, lines);
-        }
-      });
-      this.monaco.onDebugCommand(command -> {
-        if (this.debugger == null) return;
-        switch (command) {
-          case "resume" -> this.debugger.resume();
-          case "stepOver" -> this.debugger.stepOver();
-          case "stepInto" -> this.debugger.stepInto();
-          case "stepOut" -> this.debugger.stepOut();
-          default -> {}
-        }
-      });
-    } catch (IOException error) {
-      this.monaco = null;
-      this.setStatus("Monaco is unavailable: " + error.getMessage(), true);
-    }
-
     this.tabs.putClientProperty("JTabbedPane.noContentBorder", Boolean.TRUE);
     this.tabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);
     this.tabs.putClientProperty("JTabbedPane.contentInsets", new java.awt.Insets(0, 0, 0, 0));
     this.tabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 0, 0, 0));
 
     this.mainEditorArea.add(this.tabs, BorderLayout.NORTH);
-    if (this.monaco != null) {
-      this.mainEditorArea.add(this.monaco, BorderLayout.CENTER);
-    }
 
     JPanel statusBar = new JPanel(new BorderLayout());
     statusBar.setBackground(Style.COLOR_BG);
@@ -298,7 +261,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     Editor.instance().onLoaded(() -> {
       javax.swing.SwingUtilities.invokeLater(() -> {
         this.refreshScripts();
-        this.focusOrOpenFirstScript();
+        if (UI.isScriptWorkspaceActive()) {
+          this.focusOrOpenFirstScript();
+        }
       });
     });
 
@@ -340,7 +305,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     super.addNotify();
     this.externalChangeTimer.start();
     this.refreshScripts();
-    this.focusOrOpenFirstScript();
+    if (UI.isScriptWorkspaceActive()) {
+      this.focusOrOpenFirstScript();
+    }
   }
 
   @Override
@@ -386,7 +353,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     for (int row = 0; row < this.scripts.getRowCount(); row++) this.scripts.expandRow(row);
     if (selectedId != null) {
       this.selectTreeNode(selectedId);
-    } else {
+    } else if (UI.isScriptWorkspaceActive() || !this.openTabs.isEmpty()) {
       this.focusOrOpenFirstScript();
     }
     this.refreshGlobals();
@@ -1079,18 +1046,77 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.activeTabChanged();
   }
 
-  private void activeTabChanged() {
-    ScriptTab active = this.activeTab();
-    if (active != null && this.monaco != null && !this.monaco.isUnavailable()) {
-      this.monacoTab = active;
-      this.monaco.open(active.path, active.getText(), active.definition);
-      if (this.monaco.isReady()) this.monaco.focusEditor();
-      this.monaco.notifyMoved();
+  MonacoScriptEditor getMonaco() {
+    return this.monaco;
+  }
+
+  private synchronized MonacoScriptEditor ensureMonaco() {
+    if (this.monaco != null) {
+      return this.monaco;
+    }
+    try {
+      this.monaco = new MonacoScriptEditor();
+      this.monaco.onChanged(text -> {
+        if (this.monacoTab != null) this.monacoTab.setTextFromMonaco(text);
+      });
+      this.monaco.onSave(() -> {
+        if (this.monacoTab != null && this.monacoTab.save()) {
+          this.setStatus("Saved " + this.monacoTab.definition.getSource(), false);
+        }
+      });
+      this.monaco.onAnalysis(this::showAnalysis);
+      this.monaco.onReady(this::activeTabChanged);
+      this.monaco.onUnavailable(reason -> {
+        this.setStatus("Monaco unavailable: " + reason, true);
+      });
+      this.monaco.onCursor(position -> {
+        if (this.monacoTab != null) {
+          this.monacoTab.caretLine = position.line() + 1;
+          this.monacoTab.caretColumn = position.column() + 1;
+          this.updateCaretStatus(this.monacoTab);
+        }
+      });
+      this.monaco.onBreakpointsChanged(lines -> {
+        if (this.monacoTab != null && this.monacoTab.definition != null) {
+          this.replaceBreakpoints(this.monacoTab.definition, lines);
+        }
+      });
+      this.monaco.onDebugCommand(command -> {
+        if (this.debugger == null) return;
+        switch (command) {
+          case "resume" -> this.debugger.resume();
+          case "stepOver" -> this.debugger.stepOver();
+          case "stepInto" -> this.debugger.stepInto();
+          case "stepOut" -> this.debugger.stepOut();
+          default -> {}
+        }
+      });
+      this.mainEditorArea.add(this.monaco, BorderLayout.CENTER);
+      this.refreshTheme();
       this.mainEditorArea.revalidate();
       this.mainEditorArea.repaint();
-    } else if (active == null) {
+    } catch (IOException error) {
+      this.monaco = null;
+      this.setStatus("Monaco is unavailable: " + error.getMessage(), true);
+    }
+    return this.monaco;
+  }
+
+  private void activeTabChanged() {
+    ScriptTab active = this.activeTab();
+    if (active != null) {
+      MonacoScriptEditor editor = this.ensureMonaco();
+      if (editor != null && !editor.isUnavailable()) {
+        this.monacoTab = active;
+        editor.open(active.path, active.getText(), active.definition);
+        if (editor.isReady()) editor.focusEditor();
+        editor.notifyMoved();
+        this.mainEditorArea.revalidate();
+        this.mainEditorArea.repaint();
+      }
+    } else if (this.monaco != null) {
       this.monacoTab = null;
-      if (this.monaco != null && !this.monaco.isUnavailable()) {
+      if (!this.monaco.isUnavailable()) {
         this.monaco.open(null, "", null);
       }
     }

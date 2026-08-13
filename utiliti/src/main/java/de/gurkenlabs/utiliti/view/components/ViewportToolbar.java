@@ -148,6 +148,7 @@ public class ViewportToolbar extends JPanel {
       }
     }, null);
     Style.styleButton(this.btnDebugProject, Style.ButtonVariant.TOOLBAR);
+    this.btnDebugProject.setDisabledIcon(Icons.DISABLED_DEBUG_16);
     this.btnDebugProject.setToolTipText("Debug Project (Shift+F9)");
     this.btnDebugProject.setEnabled(initialHasProject);
     makeIconOnly(this.btnDebugProject, 28);

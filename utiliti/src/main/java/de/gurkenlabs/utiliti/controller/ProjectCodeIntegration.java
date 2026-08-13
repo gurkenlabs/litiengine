@@ -72,7 +72,20 @@ public final class ProjectCodeIntegration implements AutoCloseable {
 
   /** Reloads project types from the output directories supplied by the resolved project model. */
   public void reloadProject(ProjectModel project) {
-    this.reload(project == null ? List.of() : project.outputDirectories());
+    List<Path> outputs = new ArrayList<>();
+    if (project != null) {
+      outputs.addAll(project.outputDirectories());
+    }
+    Path root = project != null ? project.projectRoot() : (Editor.instance().getProjectPath() != null && Editor.instance().getProjectPath().getParent() != null ? Editor.instance().getProjectPath().getParent() : null);
+    if (root != null) {
+      for (Path classDir : CLASS_DIRECTORIES) {
+        Path resolved = root.resolve(classDir);
+        if (Files.isDirectory(resolved)) {
+          outputs.add(resolved);
+        }
+      }
+    }
+    this.reload(outputs);
   }
 
   private void reload(List<Path> outputDirectories) {

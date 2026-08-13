@@ -226,6 +226,12 @@ public final class UI {
     return consoleComponent;
   }
 
+  public static void clearConsole() {
+    if (consoleComponent != null && consoleComponent.getLogHandler() != null) {
+      consoleComponent.getLogHandler().flush();
+    }
+  }
+
   public static void showObjectInspector() {
     if (inspectorCards == null || inspectorHost == null) {
       return;

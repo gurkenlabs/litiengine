@@ -130,9 +130,21 @@ public class JavaScriptProvider implements ScriptProvider {
       classpathEntries.addAll(List.of(processClasspath.split(java.util.regex.Pattern.quote(File.pathSeparator))));
     }
     context.classpath().stream().map(Path::toString).forEach(classpathEntries::add);
+    for (ClassLoader cl = context.parent(); cl != null; cl = cl.getParent()) {
+      if (cl instanceof java.net.URLClassLoader ucl) {
+        for (URL url : ucl.getURLs()) {
+          try {
+            classpathEntries.add(Path.of(url.toURI()).toString());
+          } catch (Exception ignored) {
+            String pathStr = url.getPath();
+            if (pathStr != null && !pathStr.isBlank()) classpathEntries.add(pathStr);
+          }
+        }
+      }
+    }
     if (!classpathEntries.isEmpty()) {
       options.add("-classpath");
-      options.add(String.join(File.pathSeparator, classpathEntries.stream().distinct().toList()));
+      options.add(String.join(File.pathSeparator, classpathEntries.stream().filter(s -> s != null && !s.isBlank()).distinct().toList()));
     }
     if (context.javaVersion() > 0) {
       options.add("--release");

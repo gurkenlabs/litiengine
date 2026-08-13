@@ -181,9 +181,19 @@ final class ScriptDebuggerPanel extends JPanel {
     this.variables.setShowVerticalLines(false);
     this.variables.setIntercellSpacing(new Dimension(0, 0));
     this.variables.setDefaultRenderer(Object.class, new VariableRenderer());
-    this.variables.getTableHeader().setBackground(Style.background());
-    this.variables.getTableHeader().setForeground(Style.mutedText());
-    this.variables.getTableHeader().setReorderingAllowed(false);
+    if (this.variables.getTableHeader() != null) {
+      this.variables.getTableHeader().setBackground(Style.background());
+      this.variables.getTableHeader().setForeground(Style.mutedText());
+      this.variables.getTableHeader().setReorderingAllowed(false);
+      javax.swing.table.TableCellRenderer defaultHeaderRenderer = this.variables.getTableHeader().getDefaultRenderer();
+      this.variables.getTableHeader().setDefaultRenderer((table, value, isSelected, hasFocus, row, column) -> {
+        Component c = defaultHeaderRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        if (c instanceof JLabel label) {
+          label.setHorizontalAlignment(SwingConstants.LEADING);
+        }
+        return c;
+      });
+    }
     this.variables.getColumnModel().getColumn(0).setPreferredWidth(150);
     this.variables.getColumnModel().getColumn(1).setPreferredWidth(320);
     this.variables.getColumnModel().getColumn(2).setPreferredWidth(220);

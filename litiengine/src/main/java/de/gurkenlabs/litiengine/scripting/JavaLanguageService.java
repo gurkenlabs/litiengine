@@ -32,7 +32,7 @@ import javax.tools.ToolProvider;
 
 /** Language service providing Monaco intellisense (completion, hover, diagnostics, definition) for Java scripts. */
 public class JavaLanguageService implements ScriptLanguageService {
-  private static final Pattern IMPORT = Pattern.compile("(?m)^\\s*import\\s+([\\w.$]+)(?:\\s+as\\s+([A-Za-z_$][\\w$]*))?\\s*;?\\s*$");
+  private static final Pattern IMPORT = Pattern.compile("(?m)^\\s*import\\s+(?:static\\s+)?([\\w.$]+(?:\\.\\*)?)(?:\\s+as\\s+([A-Za-z_$][\\w$]*))?\\s*;?\\s*$");
   private static final Set<String> KEYWORDS = Set.of(
     "abstract", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue",
     "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto",
@@ -525,16 +525,30 @@ public class JavaLanguageService implements ScriptLanguageService {
     if (compiler == null) return new ParsedDocument(document.uri(), true, List.of(), List.of());
 
     DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
-    String filename = document.uri() == null ? "Script.java" : Path.of(document.uri()).getFileName().toString();
+    String filename;
+    if (document.uri() != null && document.uri().isAbsolute() && !"string".equalsIgnoreCase(document.uri().getScheme())
+        && !"inmemory".equalsIgnoreCase(document.uri().getScheme())) {
+      try {
+        filename = Path.of(document.uri()).getFileName().toString();
+      } catch (Exception ignored) {
+        String className = document.definition() != null && document.definition().getImplementation() != null && !document.definition().getImplementation().isBlank()
+            ? document.definition().getImplementation() : extractClassName(document.text());
+        filename = className + ".java";
+      }
+    } else {
+      String className = document.definition() != null && document.definition().getImplementation() != null && !document.definition().getImplementation().isBlank()
+          ? document.definition().getImplementation() : extractClassName(document.text());
+      filename = className + ".java";
+    }
     SimpleJavaFileObject file = new SimpleJavaFileObject(URI.create("string:///" + filename), JavaFileObject.Kind.SOURCE) {
       @Override public CharSequence getCharContent(boolean ignoreEncodingErrors) { return document.text(); }
     };
 
     List<String> options = new ArrayList<>();
-    String classpath = System.getProperty("java.class.path");
-    if (classpath != null && !classpath.isBlank()) {
+    List<String> classpathEntries = this.buildCompilerClasspath();
+    if (!classpathEntries.isEmpty()) {
       options.add("-classpath");
-      options.add(classpath);
+      options.add(String.join(java.io.File.pathSeparator, classpathEntries));
     }
 
     JavaCompiler.CompilationTask task = compiler.getTask(null, null, collector, options, null, List.of(file));
@@ -563,11 +577,58 @@ public class JavaLanguageService implements ScriptLanguageService {
 
   private Map<String, Class<?>> variables(Document document, String source) {
     Map<String, Class<?>> variables = new LinkedHashMap<>(this.importedTypes(source));
-    ScriptDefinition definition = document.definition();
-    this.hostType(definition).ifPresent(type -> variables.put("host", type));
+    ScriptDefinition definition = document == null ? null : document.definition();
+    this.hostType(definition, source).ifPresent(type -> variables.put("host", type));
     variables.put("context", ScriptContext.class);
     variables.put("environment", Environment.class);
     variables.put("globals", ScriptGlobals.class);
+
+    if (source == null || source.isBlank()) return variables;
+
+    Set<String> keywords = KEYWORDS;
+
+    // 1. var x = (Type) ...
+    Matcher varCastMatcher = Pattern.compile("(?m)\\bvar\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\(\\s*([A-Za-z0-9_$]+)\\s*\\)").matcher(source);
+    while (varCastMatcher.find()) {
+      String varName = varCastMatcher.group(1);
+      String typeName = varCastMatcher.group(2);
+      if (!keywords.contains(varName)) {
+        this.resolveType(typeName, source).ifPresent(type -> variables.put(varName, type));
+      }
+    }
+
+    // 2. var x = new Type(...)
+    Matcher varNewMatcher = Pattern.compile("(?m)\\bvar\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*new\\s+([A-Za-z0-9_$]+)\\s*\\(").matcher(source);
+    while (varNewMatcher.find()) {
+      String varName = varNewMatcher.group(1);
+      String typeName = varNewMatcher.group(2);
+      if (!keywords.contains(varName)) {
+        this.resolveType(typeName, source).ifPresent(type -> variables.put(varName, type));
+      }
+    }
+
+    // 3. var x = host() / environment() / context()
+    Matcher varCallMatcher = Pattern.compile("(?m)\\bvar\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(host|environment|context)\\s*\\(\\s*\\)").matcher(source);
+    while (varCallMatcher.find()) {
+      String varName = varCallMatcher.group(1);
+      String call = varCallMatcher.group(2);
+      if (!keywords.contains(varName)) {
+        if ("host".equals(call)) this.hostType(definition, source).ifPresent(type -> variables.put(varName, type));
+        else if ("environment".equals(call)) variables.put(varName, Environment.class);
+        else if ("context".equals(call)) variables.put(varName, ScriptContext.class);
+      }
+    }
+
+    // 4. Type varName = ... or Type varName; or (Type varName, ...) or for (Type varName : ...)
+    Matcher typedVarMatcher = Pattern.compile("(?m)\\b([A-Za-z0-9_$]+)\\s+([A-Za-z_$][\\w$]*)\\s*(?:=[^;\\n]+|;|,|\\)|:)").matcher(source);
+    while (typedVarMatcher.find()) {
+      String typeName = typedVarMatcher.group(1);
+      String varName = typedVarMatcher.group(2);
+      if (!keywords.contains(varName) && !keywords.contains(typeName) && !"var".equals(typeName) && !"void".equals(typeName) && !"return".equals(typeName)) {
+        this.resolveType(typeName, source).ifPresent(type -> variables.putIfAbsent(varName, type));
+      }
+    }
+
     return variables;
   }
 
@@ -585,12 +646,31 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private ResolvedType resolveRoot(String root, ScriptDefinition definition, Map<String, Class<?>> variables, String source) {
+    if (root == null || root.isBlank()) return null;
+    root = root.strip();
+
+    // Check for cast: (Janitor)host() or (Janitor) host()
+    Matcher castMatcher = Pattern.compile("^\\(\\s*([A-Za-z0-9_$]+)\\s*\\)\\s*(.*)$").matcher(root);
+    if (castMatcher.matches()) {
+      String castTypeName = castMatcher.group(1);
+      Optional<Class<?>> castType = this.resolveType(castTypeName, source);
+      if (castType.isPresent()) return new ResolvedType(castType.get(), null, false);
+    }
+
+    // Check for parenthesized expression: (expr)
+    if (root.startsWith("(") && root.endsWith(")")) {
+      return resolveRoot(root.substring(1, root.length() - 1).strip(), definition, variables, source);
+    }
+
     if (root.endsWith("()")) {
       String methodName = root.substring(0, root.length() - 2);
-      if (methodName.equals("host")) return this.hostType(definition).map(t -> new ResolvedType(t, null, false)).orElse(null);
+      if (methodName.equals("host")) return this.hostType(definition, source).map(t -> new ResolvedType(t, null, false)).orElse(null);
       if (methodName.equals("context")) return new ResolvedType(ScriptContext.class, null, false);
       if (methodName.equals("environment")) return new ResolvedType(Environment.class, null, false);
       if (methodName.equals("globals")) return new ResolvedType(ScriptGlobals.class, null, false);
+    }
+    if (root.equals("this") || root.equals("super")) {
+      return this.hostType(definition, source).map(t -> new ResolvedType(t, null, false)).orElse(null);
     }
     Class<?> varType = variables.get(root);
     if (varType != null) return new ResolvedType(varType, null, false);
@@ -674,6 +754,22 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private Optional<Class<?>> hostType(ScriptDefinition definition) {
+    return this.hostType(definition, null);
+  }
+
+  private Optional<Class<?>> hostType(ScriptDefinition definition, String source) {
+    if (source != null && !source.isBlank()) {
+      Matcher extendsMatcher = Pattern.compile("(?m)\\bextends\\s+(?:EntityScript|CreatureScript|AbstractScript)\\s*<\\s*([A-Za-z0-9_$]+)\\s*>").matcher(source);
+      if (extendsMatcher.find()) {
+        Optional<Class<?>> fromExtends = this.resolveType(extendsMatcher.group(1), source);
+        if (fromExtends.isPresent()) return fromExtends;
+      }
+      Matcher targetMatcher = Pattern.compile("(?m)@ScriptInfo\\s*\\([^)]*target\\s*=\\s*([A-Za-z0-9_$]+)\\.class").matcher(source);
+      if (targetMatcher.find()) {
+        Optional<Class<?>> fromAnnotation = this.resolveType(targetMatcher.group(1), source);
+        if (fromAnnotation.isPresent()) return fromAnnotation;
+      }
+    }
     if (definition == null || definition.getTargetType() == null || definition.getTargetType().isBlank()) return Optional.empty();
     try {
       return Optional.of(Class.forName(definition.getTargetType(), false, this.workspace.classLoader()));
@@ -686,6 +782,53 @@ public class JavaLanguageService implements ScriptLanguageService {
     return this.hostType(definition).map(type -> new ResolvedType(type, null, false)).orElse(null);
   }
 
+  private List<String> buildCompilerClasspath() {
+    List<String> classpathEntries = new ArrayList<>();
+    String processClasspath = System.getProperty("java.class.path");
+    if (processClasspath != null && !processClasspath.isBlank()) {
+      classpathEntries.addAll(List.of(processClasspath.split(java.util.regex.Pattern.quote(java.io.File.pathSeparator))));
+    }
+    if (this.workspace.projectClasspath() != null) {
+      this.workspace.projectClasspath().stream().filter(Objects::nonNull).map(Path::toString).forEach(classpathEntries::add);
+    }
+    for (ClassLoader cl = this.workspace.classLoader(); cl != null; cl = cl.getParent()) {
+      if (cl instanceof java.net.URLClassLoader ucl) {
+        for (java.net.URL url : ucl.getURLs()) {
+          try {
+            classpathEntries.add(Path.of(url.toURI()).toString());
+          } catch (Exception ignored) {
+            String path = url.getPath();
+            if (path != null && !path.isBlank()) {
+              classpathEntries.add(path);
+            }
+          }
+        }
+      }
+    }
+    if (this.workspace.projectRoot() != null) {
+      List<Path> commonDirs = List.of(
+        Path.of("build", "classes", "java", "main"),
+        Path.of("build", "classes", "kotlin", "main"),
+        Path.of("build", "classes", "groovy", "main"),
+        Path.of("target", "classes"),
+        Path.of("bin", "main"),
+        Path.of("bin"),
+        Path.of("out", "production", "main"),
+        Path.of("out", "production", "classes")
+      );
+      for (Path commonDir : commonDirs) {
+        Path resolved = this.workspace.projectRoot().resolve(commonDir);
+        if (Files.isDirectory(resolved)) {
+          classpathEntries.add(resolved.toAbsolutePath().toString());
+        }
+      }
+    }
+    return classpathEntries.stream()
+      .filter(entry -> entry != null && !entry.isBlank())
+      .distinct()
+      .toList();
+  }
+
   private Map<String, Class<?>> importedTypes(String source) {
     Map<String, Class<?>> imports = new LinkedHashMap<>();
     Matcher matcher = IMPORT.matcher(source);
@@ -693,10 +836,19 @@ public class JavaLanguageService implements ScriptLanguageService {
     while (matcher.find()) {
       String fqn = matcher.group(1);
       String alias = matcher.group(2);
-      try {
-        Class<?> type = Class.forName(fqn, false, loader);
-        imports.put(alias == null ? type.getSimpleName() : alias, type);
-      } catch (ClassNotFoundException | LinkageError ignored) {
+      if (fqn.endsWith(".*")) {
+        String pkg = fqn.substring(0, fqn.length() - 2);
+        for (Class<?> type : EngineTypeCatalog.projectTypes(loader)) {
+          if (type.getPackageName().equals(pkg)) {
+            imports.put(type.getSimpleName(), type);
+          }
+        }
+      } else {
+        try {
+          Class<?> type = Class.forName(fqn, false, loader);
+          imports.put(alias == null ? type.getSimpleName() : alias, type);
+        } catch (ClassNotFoundException | LinkageError ignored) {
+        }
       }
     }
     return imports;
@@ -993,6 +1145,12 @@ public class JavaLanguageService implements ScriptLanguageService {
       }
     }
     return count;
+  }
+
+  private static String extractClassName(String source) {
+    if (source == null || source.isBlank()) return "Script";
+    var matcher = java.util.regex.Pattern.compile("(?m)^\\s*(?:public\\s+)?class\\s+([A-Za-z_$][\\w$]*)").matcher(source);
+    return matcher.find() ? matcher.group(1) : "Script";
   }
 
   private record ParsedDocument(URI uri, boolean valid, List<ScriptDiagnostic> diagnostics, List<Symbol> symbols) {}

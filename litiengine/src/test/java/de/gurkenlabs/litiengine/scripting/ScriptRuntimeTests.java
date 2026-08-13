@@ -553,4 +553,71 @@ class ScriptRuntimeTests {
 
     assertTrue(actions.stream().anyMatch(a -> a.title().contains("Rename class in editor")), "Should offer quick fix to revert class name to match file name.");
   }
+  @Test
+  void javaLanguageServiceIncludesProjectClasspathInCompilerOptions() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(
+        null, getClass().getClassLoader(), List.of(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("CreatureScript3", "java", null, "CreatureScript3", ScriptHostType.ENTITY);
+    String code = """
+      import de.gurkenlabs.litiengine.entities.Creature;
+      import de.gurkenlabs.litiengine.scripting.*;
+      @ScriptInfo(id = "CreatureScript3", host = ScriptHostType.ENTITY, target = Creature.class)
+      public class CreatureScript3 extends CreatureScript {
+        @Override
+        public void update() {}
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    ScriptLanguageService.Analysis analysis = service.analyze(doc);
+    assertTrue(analysis.diagnostics().isEmpty(), "Compilation diagnostics should be empty: " + analysis.diagnostics());
+  }
+  @Test
+  void javaLanguageServiceCompletesTypeSpecificMembersOnVariablesAndCasts() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(
+        null, getClass().getClassLoader(), List.of(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("CreatureScript3", "java", null, "CreatureScript3", ScriptHostType.ENTITY);
+    String code = """
+      import de.gurkenlabs.litiengine.entities.Prop;
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class CreatureScript3 extends EntityScript<Prop> {
+        @Override
+        public void update() {
+          var prop = (Prop)host();
+          prop.
+        }
+      }
+      """;
+
+    // Position after 'prop.' on line 6 (0-indexed: line 6, col 15)
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    List<ScriptLanguageService.Completion> completions = service.complete(doc, new ScriptLanguageService.Position(6, 9));
+
+    assertTrue(completions.stream().anyMatch(c -> c.label().equals("getMaterial")),
+        "Should offer Prop-specific method getMaterial on 'var prop = (Prop)host()'.");
+    assertTrue(completions.stream().anyMatch(c -> c.label().equals("getState")),
+        "Should offer Prop-specific method getState on 'var prop = (Prop)host()'.");
+
+    // Also test direct host() completion when generic type Prop is in extends clause
+    String hostCode = """
+      import de.gurkenlabs.litiengine.entities.Creature;
+      import de.gurkenlabs.litiengine.entities.Prop;
+      import de.gurkenlabs.litiengine.scripting.*;
+      @ScriptInfo(id = "CreatureScript3", host = ScriptHostType.ENTITY, target = Creature.class)
+      public class CreatureScript3 extends EntityScript<Prop> {
+        @Override
+        public void update() {
+          host().
+        }
+      }
+      """;
+    ScriptLanguageService.Document hostDoc = new ScriptLanguageService.Document(null, hostCode, 1, definition);
+    List<ScriptLanguageService.Completion> hostCompletions = service.complete(hostDoc, new ScriptLanguageService.Position(7, 11));
+    assertTrue(hostCompletions.stream().anyMatch(c -> c.label().equals("getMaterial")),
+        "Should offer Prop-specific method getMaterial directly on host().");
+  }
 }
