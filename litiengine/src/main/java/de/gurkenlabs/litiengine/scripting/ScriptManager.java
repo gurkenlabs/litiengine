@@ -140,6 +140,10 @@ public final class ScriptManager implements IUpdateable {
     }
   }
 
+  public List<ScriptBinding> getGameBindings() {
+    return this.gameBindings.stream().map(ScriptBinding::new).toList();
+  }
+
   /** Replaces reusable bindings that are automatically applied when matching entities are loaded. */
   public void setEntityBindings(Collection<EntityScriptBinding> bindings) {
     this.entityBindings.clear();
@@ -471,6 +475,49 @@ public final class ScriptManager implements IUpdateable {
     entity.addListener(entityListener);
     attachment.context.manage(() -> entity.removeListener(messageListener));
     attachment.context.manage(() -> entity.removeListener(entityListener));
+
+    if (entity instanceof de.gurkenlabs.litiengine.entities.ICombatEntity combatEntity) {
+      de.gurkenlabs.litiengine.entities.CombatEntityHitListener hitListener = event -> {
+        if (attachment.instance instanceof EntityScript<?> script) {
+          try {
+            script.dispatchHit(event);
+          } catch (Exception e) {
+            this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script hit handler failed: " + e.getMessage(), e);
+            this.detachAttachment(attachment);
+          }
+        }
+      };
+      combatEntity.onHit(hitListener);
+      attachment.context.manage(() -> combatEntity.removeListener(hitListener));
+
+      de.gurkenlabs.litiengine.entities.CombatEntityDeathListener deathListener = (deadEntity, hitEvent) -> {
+        if (attachment.instance instanceof EntityScript<?> script) {
+          try {
+            script.dispatchDeath(deadEntity, hitEvent);
+          } catch (Exception e) {
+            this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script death handler failed: " + e.getMessage(), e);
+            this.detachAttachment(attachment);
+          }
+        }
+      };
+      combatEntity.onDeath(deathListener);
+      attachment.context.manage(() -> combatEntity.removeListener(deathListener));
+    }
+
+    if (entity instanceof de.gurkenlabs.litiengine.entities.ICollisionEntity collisionEntity) {
+      de.gurkenlabs.litiengine.entities.CollisionListener collisionListener = event -> {
+        if (attachment.instance instanceof EntityScript<?> script) {
+          try {
+            script.dispatchCollision(event);
+          } catch (Exception e) {
+            this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script collision handler failed: " + e.getMessage(), e);
+            this.detachAttachment(attachment);
+          }
+        }
+      };
+      collisionEntity.onCollision(collisionListener);
+      attachment.context.manage(() -> collisionEntity.removeCollisionListener(collisionListener));
+    }
   }
 
   private void registerEnvironmentLifecycle(Attachment attachment, Environment environment) {
@@ -486,8 +533,29 @@ public final class ScriptManager implements IUpdateable {
         }
       }
     };
+    de.gurkenlabs.litiengine.environment.EnvironmentEntityListener entityListener = new de.gurkenlabs.litiengine.environment.EnvironmentEntityListener() {
+      @Override public void entityAdded(IEntity entity) {
+        try {
+          script.dispatchEntityAdded(entity);
+        } catch (Exception e) {
+          report(attachment.definition.getId(), attachment.definition.getSource(),
+            "Script entity-added handler failed: " + e.getMessage(), e);
+        }
+      }
+
+      @Override public void entityRemoved(IEntity entity) {
+        try {
+          script.dispatchEntityRemoved(entity);
+        } catch (Exception e) {
+          report(attachment.definition.getId(), attachment.definition.getSource(),
+            "Script entity-removed handler failed: " + e.getMessage(), e);
+        }
+      }
+    };
     environment.addListener(listener);
+    environment.addEntityListener(entityListener);
     attachment.context.manage(() -> environment.removeListener(listener));
+    attachment.context.manage(() -> environment.removeEntityListener(entityListener));
   }
 
   private void detachAttachment(Attachment attachment) {

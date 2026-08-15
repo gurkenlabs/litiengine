@@ -1,9 +1,13 @@
 package de.gurkenlabs.litiengine.scripting;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.EntityQuery;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.scripting.combat.ScriptedAbilityBuilder;
+import de.gurkenlabs.litiengine.scripting.combat.ScriptedProjectileBuilder;
+import de.gurkenlabs.litiengine.scripting.ui.ScriptUiOverlay;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -16,6 +20,7 @@ public final class ScriptContext<T> implements AutoCloseable {
   private final T host;
   private final Subscriptions subscriptions = new Subscriptions();
   private final Logger logger;
+  private ScriptUiOverlay uiOverlay;
 
   ScriptContext(ScriptDefinition definition, ScriptBinding binding, T host) {
     this.definition = Objects.requireNonNull(definition);
@@ -44,6 +49,33 @@ public final class ScriptContext<T> implements AutoCloseable {
     Environment environment = this.environment();
     if (environment == null) return new EntityQuery<>(java.util.List.of());
     return environment.query(type);
+  }
+
+  /** Begins building a scripted ability executed by the current host creature. */
+  public ScriptedAbilityBuilder createAbility(String name) {
+    if (!(this.host instanceof Creature creature)) {
+      throw new IllegalStateException("The script host is not a Creature. Specify the executor explicitly via createAbility(executor, name).");
+    }
+    return new ScriptedAbilityBuilder(creature, name);
+  }
+
+  /** Begins building a scripted ability for a specific executor creature. */
+  public ScriptedAbilityBuilder createAbility(Creature executor, String name) {
+    return new ScriptedAbilityBuilder(executor, name);
+  }
+
+  /** Begins building and spawning a scripted projectile in the current environment. */
+  public ScriptedProjectileBuilder spawnProjectile() {
+    return new ScriptedProjectileBuilder(this.environment());
+  }
+
+  /** Returns the scripted UI overlay service owned by this context. */
+  public synchronized ScriptUiOverlay ui() {
+    if (this.uiOverlay == null) {
+      this.uiOverlay = new ScriptUiOverlay();
+      this.manage(this.uiOverlay);
+    }
+    return this.uiOverlay;
   }
 
   /** Adds a registration that will be released when the script is detached or reloaded. */

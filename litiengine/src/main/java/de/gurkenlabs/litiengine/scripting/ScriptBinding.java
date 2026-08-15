@@ -25,6 +25,11 @@ public final class ScriptBinding {
     this.script = script;
   }
 
+  public ScriptBinding(String script, boolean enabled) {
+    this.script = script;
+    this.enabled = enabled;
+  }
+
   /** Creates an independent copy suitable for controller ownership. */
   public ScriptBinding(ScriptBinding binding) {
     this.script = binding.script;

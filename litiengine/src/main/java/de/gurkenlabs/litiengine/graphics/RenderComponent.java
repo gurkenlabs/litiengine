@@ -168,6 +168,15 @@ public class RenderComponent extends Canvas {
   }
 
   /**
+   * Unregisters a consumer from being notified after the component has been rendered.
+   *
+   * @param renderedConsumer The consumer to remove.
+   */
+  public void removeRenderedConsumer(final Consumer<Graphics2D> renderedConsumer) {
+    this.renderedConsumer.remove(renderedConsumer);
+  }
+
+  /**
    * Renders the game screen, including handling fade effects, cursor rendering, and screenshot capture.
    */
   public void render() {

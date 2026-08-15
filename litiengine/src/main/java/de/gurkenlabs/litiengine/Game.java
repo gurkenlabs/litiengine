@@ -703,7 +703,10 @@ public final class Game {
     return true;
   }
 
-  static void terminate() {
+  /**
+   * Terminates the game, releases all engine resources, saves configuration, and notifies listeners.
+   */
+  public static void terminate() {
     if (!initialized) {
       return;
     }

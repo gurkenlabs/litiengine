@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.scripting;
 
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 
 /** Base class for scripts attached to one loaded environment. */
@@ -16,6 +17,12 @@ public abstract class EnvironmentScript extends AbstractScript<Environment> {
   /** Called when the attached environment is cleared while it remains active. */
   protected void onCleared() throws Exception {}
 
+  /** Called when an entity is added to the attached environment. */
+  protected void onEntityAdded(IEntity entity) throws Exception {}
+
+  /** Called when an entity is removed from the attached environment. */
+  protected void onEntityRemoved(IEntity entity) throws Exception {}
+
   /** @deprecated Override {@link #onLoaded()} in new scripts. */
   @Deprecated
   protected void loaded() throws Exception {}
@@ -26,5 +33,13 @@ public abstract class EnvironmentScript extends AbstractScript<Environment> {
 
   final void dispatchCleared() throws Exception {
     this.onCleared();
+  }
+
+  final void dispatchEntityAdded(IEntity entity) throws Exception {
+    this.onEntityAdded(entity);
+  }
+
+  final void dispatchEntityRemoved(IEntity entity) throws Exception {
+    this.onEntityRemoved(entity);
   }
 }
