@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.view.components;
 
+import com.github.weisj.darklaf.ui.text.DarkTextUI;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
@@ -99,10 +100,14 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final DefaultMutableTreeNode scriptsRoot = new DefaultMutableTreeNode("Scripts");
   private final DefaultTreeModel scriptsModel = new DefaultTreeModel(this.scriptsRoot);
   private final JTree scripts = UI.createStyledTree(this.scriptsModel);
-  private final JTextField search = new JTextField();
+  private final JTextField search = createSearchTextField("Search scripts...");
   private final DefaultMutableTreeNode outlineRoot = new DefaultMutableTreeNode("Outline");
   private final DefaultTreeModel outlineModel = new DefaultTreeModel(this.outlineRoot);
   private final JTree outline = UI.createStyledTree(this.outlineModel);
+  private final DefaultMutableTreeNode globalsRoot = new DefaultMutableTreeNode("Globals & APIs");
+  private final DefaultTreeModel globalsTreeModel = new DefaultTreeModel(this.globalsRoot);
+  private final JTree globalsTree = UI.createStyledTree(this.globalsTreeModel);
+  private final JTextField globalsSearch = createSearchTextField("Search APIs & events...");
   private final JTabbedPane tabs = new JTabbedPane() {
     @Override
     public Dimension getPreferredSize() {
@@ -1081,9 +1086,19 @@ public final class ScriptWorkspacePanel extends JPanel {
     deleteBtn.setToolTipText("Delete selected script");
     deleteBtn.addActionListener(event -> deleteScript(selectedDefinition()));
 
+    JButton configGameBtn = Style.iconButton(Icons.SETTINGS_16);
+    configGameBtn.setToolTipText("Configure Game Scripts & Startup Settings");
+    configGameBtn.addActionListener(event -> de.gurkenlabs.utiliti.view.dialogs.GameScriptsDialog.showDialog());
+
+    JButton guideBtn = Style.iconButton(Icons.DOCUMENTATION_16);
+    guideBtn.setToolTipText("Open Scripting Architecture & Getting Started Guide");
+    guideBtn.addActionListener(event -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showGuide());
+
     actions.add(addBtn);
     actions.add(dupBtn);
     actions.add(deleteBtn);
+    actions.add(configGameBtn);
+    actions.add(guideBtn);
     header.add(actions, BorderLayout.EAST);
     panel.add(header, BorderLayout.NORTH);
 
@@ -1091,9 +1106,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     content.setBackground(Style.COLOR_BG);
     header.setBackground(Style.COLOR_BG);
     panel.setBackground(Style.COLOR_BG);
-    this.search.setFont(Style.getDefaultFont());
-    this.search.putClientProperty("JTextField.placeholderText", "Search scripts...");
-    RoundedSearchBox searchBox = new RoundedSearchBox(this.search, 200);
+    RoundedSearchBox searchBox = new RoundedSearchBox(this.search, 0);
+    searchBox.getClearButton().addActionListener(e -> {
+      this.search.setText("");
+      this.refreshScripts();
+    });
     content.add(searchBox, BorderLayout.NORTH);
     this.scripts.setRootVisible(false);
     this.scripts.setShowsRootHandles(true);
@@ -1140,71 +1157,267 @@ public final class ScriptWorkspacePanel extends JPanel {
     return panel;
   }
 
-  private DefaultListModel<GlobalApiItem> globalsModel = new DefaultListModel<>();
-
   private JPanel createGlobalsPanel() {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
     panel.setBackground(Style.COLOR_BG);
     panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
-    panel.add(sectionTitle("GLOBALS & APIS"), BorderLayout.NORTH);
 
-    this.refreshGlobals();
+    JPanel header = new JPanel(new BorderLayout());
+    header.setOpaque(false);
+    header.add(sectionTitle("GLOBALS & APIS"), BorderLayout.WEST);
 
-    JList<GlobalApiItem> list = UI.createStyledList(this.globalsModel);
-    list.setCellRenderer(new GlobalApiRenderer());
-    list.setFixedCellHeight(26);
-    list.setBackground(Style.COLOR_BG);
-    list.setOpaque(false);
-    list.setSelectionBackground(Style.selection());
+    JButton exploreButton = Style.iconButton(Icons.API_16);
+    exploreButton.setToolTipText("Open Script Events & API Explorer");
+    exploreButton.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showDialog());
+    header.add(exploreButton, BorderLayout.EAST);
 
-    list.addMouseListener(new java.awt.event.MouseAdapter() {
+    panel.add(header, BorderLayout.NORTH);
+
+    JPanel content = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
+    content.setBackground(Style.COLOR_BG);
+
+    RoundedSearchBox searchBox = new RoundedSearchBox(this.globalsSearch, 0);
+    searchBox.getClearButton().addActionListener(e -> {
+      this.globalsSearch.setText("");
+      this.refreshGlobals();
+    });
+    content.add(searchBox, BorderLayout.NORTH);
+
+    this.globalsTree.setRootVisible(false);
+    this.globalsTree.setShowsRootHandles(true);
+    this.globalsTree.setRowHeight(Style.TREE_ROW_HEIGHT);
+    this.globalsTree.setBackground(Style.COLOR_BG);
+    this.globalsTree.setOpaque(false);
+    this.globalsTree.putClientProperty("JTree.lineStyle", "None");
+    this.globalsTree.setCellRenderer(new GlobalApiTreeRenderer());
+
+    this.globalsTree.addMouseListener(new java.awt.event.MouseAdapter() {
       @Override public void mouseClicked(java.awt.event.MouseEvent event) {
-        if (event.getClickCount() == 2 && list.getSelectedValue() != null) {
-          GlobalApiItem item = list.getSelectedValue();
-          insertTextToActiveScript(item.snippet());
+        if (event.getClickCount() == 2) {
+          TreePath path = globalsTree.getSelectionPath();
+          if (path != null && path.getLastPathComponent() instanceof DefaultMutableTreeNode node) {
+            if (node.getUserObject() instanceof GlobalApiItem item) {
+              insertTextToActiveScript(item.snippet());
+            }
+          }
         }
       }
     });
 
-    panel.add(createBorderlessScrollPane(list), BorderLayout.CENTER);
+    this.globalsSearch.getDocument().addDocumentListener(new DocumentListener() {
+      @Override public void insertUpdate(DocumentEvent e) { refreshGlobals(); }
+      @Override public void removeUpdate(DocumentEvent e) { refreshGlobals(); }
+      @Override public void changedUpdate(DocumentEvent e) { refreshGlobals(); }
+    });
+
+    this.refreshGlobals();
+
+    content.add(createBorderlessScrollPane(this.globalsTree), BorderLayout.CENTER);
+    panel.add(content, BorderLayout.CENTER);
     return panel;
   }
 
-  public void refreshGlobals() {
-    this.globalsModel.clear();
-
-    // 1. Builtin Globals & Services
-    this.globalsModel.addElement(new GlobalApiItem("host()", "host()", "Entity / Creature script instance", "h"));
-    this.globalsModel.addElement(new GlobalApiItem("environment()", "environment()", "Active map environment", "e"));
-    this.globalsModel.addElement(new GlobalApiItem("context()", "context()", "Script context & properties", "c"));
-    this.globalsModel.addElement(new GlobalApiItem("globals", "globals", "Shared ScriptGlobals store", "g"));
-    this.globalsModel.addElement(new GlobalApiItem("Game.world()", "Game.world()", "Map & world entity manager", "m"));
-    this.globalsModel.addElement(new GlobalApiItem("Game.loop()", "Game.loop()", "Main loop & frame updates", "m"));
-    this.globalsModel.addElement(new GlobalApiItem("Game.audio()", "Game.audio()", "Sound & music engine", "m"));
-    this.globalsModel.addElement(new GlobalApiItem("Game.physics()", "Game.physics()", "Collision & physics engine", "m"));
-    this.globalsModel.addElement(new GlobalApiItem("Game.graphics()", "Game.graphics()", "Render engine & camera", "m"));
-    this.globalsModel.addElement(new GlobalApiItem("EntityQuery", "EntityQuery.in(environment(), Creature.class)", "Fluent entity finder", "q"));
-
-    // 2. Active Map Entities
-    if (Game.world() != null && Game.world().environment() != null) {
-      for (de.gurkenlabs.litiengine.entities.IEntity entity : Game.world().environment().getEntities()) {
-        String name = entity.getName();
-        String identifier = (name != null && !name.isBlank()) ? name : String.valueOf(entity.getMapId());
-        String snippet = "environment().get(\"" + identifier + "\")";
-        String typeName = entity.getClass().getSimpleName();
-        String label = (name != null && !name.isBlank()) ? name : typeName + " #" + entity.getMapId();
-        this.globalsModel.addElement(new GlobalApiItem(label, snippet, typeName + " on active map", "e"));
+  private ScriptHostType getActiveHostType() {
+    ScriptTab active = this.activeTab();
+    if (active == null) return null;
+    if (active.definition != null && active.definition.getHost() != null) {
+      return active.definition.getHost();
+    }
+    String text = active.getText();
+    if (text != null) {
+      if (text.contains("extends GameScript") || text.contains("ScriptHostType.GAME")) {
+        return ScriptHostType.GAME;
+      }
+      if (text.contains("extends EnvironmentScript") || text.contains("ScriptHostType.ENVIRONMENT")) {
+        return ScriptHostType.ENVIRONMENT;
+      }
+      if (text.contains("extends CreatureScript") || text.contains("extends EntityScript") || text.contains("ScriptHostType.ENTITY")) {
+        return ScriptHostType.ENTITY;
       }
     }
+    return null;
+  }
 
-    // 3. Registered ScriptGlobals Entries
-    if (Game.scripts() != null && Game.scripts().globals() != null) {
+  public void refreshGlobals() {
+    this.globalsRoot.removeAllChildren();
+    String query = this.globalsSearch.getText() == null ? "" : this.globalsSearch.getText().toLowerCase(Locale.ROOT).trim();
+    ScriptHostType hostType = this.getActiveHostType();
+
+    if (hostType == ScriptHostType.GAME) {
+      // --- GAME SCRIPT CONTEXT ---
+      DefaultMutableTreeNode servicesGroup = new DefaultMutableTreeNode("Game APIs & Services");
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("globals", "globals.put(\"key\", value);", "Shared state across maps", "g"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("loadMap(...)", "loadMap(\"level1\");", "Transition / load starting map", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("playMusic(...)", "playMusic(\"main_theme\");", "Play background music track", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("stopMusic()", "stopMusic();", "Stop background soundtrack", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.world()", "Game.world()", "Map & world manager", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.loop()", "Game.loop()", "Main loop & frame updates", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.audio()", "Game.audio()", "Sound & music engine", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.physics()", "Game.physics()", "Collision & physics engine", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.graphics()", "Game.graphics()", "Render engine & camera", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Input.keyboard()", "Input.keyboard().onKeyTyped(KeyEvent.VK_ESCAPE, event -> {});", "Global keyboard hotkeys", "m"), query);
+      if (servicesGroup.getChildCount() > 0) this.globalsRoot.add(servicesGroup);
+
+      DefaultMutableTreeNode hooksGroup = new DefaultMutableTreeNode("Game Lifecycle Hooks");
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onStarted()", "\n  @Override\n  public void onStarted() {\n    // Game startup initialization\n  }\n", "Game boot & startup hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("update()", "\n  @Override\n  public void update() {\n    // Global game tick loop\n  }\n", "Global game tick loop", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onStopped()", "\n  @Override\n  public void onStopped() {\n    // Game shutdown cleanup\n  }\n", "Game shutdown hook", "hook"), query);
+      if (hooksGroup.getChildCount() > 0) this.globalsRoot.add(hooksGroup);
+
+      DefaultMutableTreeNode uiGroup = new DefaultMutableTreeNode("Global UI & Timers");
+      addGlobalItemIfMatches(uiGroup, new GlobalApiItem("context().ui().showBanner(...)", "context().ui().showBanner(\"TITLE\", \"Subtitle\", 3000);", "Announcement banner", "u"), query);
+      addGlobalItemIfMatches(uiGroup, new GlobalApiItem("context().ui().drawScreenText(...)", "context().ui().drawScreenText(\"SCORE: \" + score, 16, 24, Color.WHITE);", "Screen-space HUD text", "u"), query);
+      addGlobalItemIfMatches(uiGroup, new GlobalApiItem("context().schedule(...)", "context().schedule(1000, () -> {});", "Managed delayed execution", "u"), query);
+      if (uiGroup.getChildCount() > 0) this.globalsRoot.add(uiGroup);
+
+    } else if (hostType == ScriptHostType.ENVIRONMENT) {
+      // --- ENVIRONMENT SCRIPT CONTEXT ---
+      DefaultMutableTreeNode servicesGroup = new DefaultMutableTreeNode("Environment APIs");
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("environment()", "environment()", "Active map environment", "e"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("globals", "globals", "Shared ScriptGlobals store", "g"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("context()", "context()", "Script context & properties", "c"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("EntityQuery", "EntityQuery.in(environment(), Creature.class)", "Fluent entity finder", "q"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.world()", "Game.world()", "Map & world entity manager", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.audio()", "Game.audio()", "Sound & music engine", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.graphics()", "Game.graphics()", "Render engine & camera", "m"), query);
+      if (servicesGroup.getChildCount() > 0) this.globalsRoot.add(servicesGroup);
+
+      DefaultMutableTreeNode hooksGroup = new DefaultMutableTreeNode("Environment Lifecycle Hooks");
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onLoaded()", "\n  @Override\n  public void onLoaded() {\n    // Map loaded and active\n  }\n", "Map loaded and active hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("update()", "\n  @Override\n  public void update() {\n    // Map tick loop\n  }\n", "Map tick loop", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onEntityAdded(entity)", "\n  @Override\n  protected void onEntityAdded(IEntity entity) {\n  }\n", "Environment entity spawned hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onEntityRemoved(entity)", "\n  @Override\n  protected void onEntityRemoved(IEntity entity) {\n    // Enemy defeated / removed hook\n  }\n", "Environment entity despawned hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onUnloaded()", "\n  @Override\n  public void onUnloaded() {\n  }\n", "Map unloading hook", "hook"), query);
+      if (hooksGroup.getChildCount() > 0) this.globalsRoot.add(hooksGroup);
+
+      DefaultMutableTreeNode actionsGroup = new DefaultMutableTreeNode("Map Actions & Cinematics");
+      addGlobalItemIfMatches(actionsGroup, new GlobalApiItem("context().ui().showBanner(...)", "context().ui().showBanner(\"STAGE 1\", \"Fight!\", 3000);", "Show announcement banner", "u"), query);
+      addGlobalItemIfMatches(actionsGroup, new GlobalApiItem("context().ui().drawScreenText(...)", "context().ui().drawScreenText(\"WAVE: 1\", 16, 24, Color.YELLOW);", "Screen-space HUD text", "u"), query);
+      addGlobalItemIfMatches(actionsGroup, new GlobalApiItem("cameraPanTo(target, ticks)", "context().sequence().cameraPanTo(targetEntity, 60);", "Cinematic camera pan", "u"), query);
+      addGlobalItemIfMatches(actionsGroup, new GlobalApiItem("cameraZoom(zoom, duration)", "context().sequence().cameraZoom(1.5f, 500);", "Cinematic camera zoom", "u"), query);
+      addGlobalItemIfMatches(actionsGroup, new GlobalApiItem("screenShake(strength, dur)", "context().sequence().screenShake(8.0f, 30, 20);", "Camera screen shake", "u"), query);
+      addGlobalItemIfMatches(actionsGroup, new GlobalApiItem("context().schedule(...)", "context().schedule(2000, () -> {});", "Managed timer action", "u"), query);
+      if (actionsGroup.getChildCount() > 0) this.globalsRoot.add(actionsGroup);
+
+      // Named Map Entities on this map
+      if (Game.world() != null && Game.world().environment() != null) {
+        DefaultMutableTreeNode entitiesGroup = new DefaultMutableTreeNode("Named Map Entities");
+        for (de.gurkenlabs.litiengine.entities.IEntity entity : Game.world().environment().getEntities()) {
+          String name = entity.getName();
+          if (name != null && !name.isBlank()) {
+            String snippet = "environment().get(\"" + name + "\")";
+            String typeName = entity.getClass().getSimpleName();
+            String badge = switch (typeName) {
+              case "Creature" -> "creature";
+              case "Prop" -> "prop";
+              case "Trigger" -> "trigger";
+              case "Emitter" -> "emitter";
+              default -> "entity";
+            };
+            addGlobalItemIfMatches(entitiesGroup, new GlobalApiItem(name, snippet, typeName + " on map", badge), query);
+          }
+        }
+        if (entitiesGroup.getChildCount() > 0) this.globalsRoot.add(entitiesGroup);
+      }
+
+    } else if (hostType == ScriptHostType.ENTITY) {
+      // --- ENTITY / CREATURE SCRIPT CONTEXT ---
+      DefaultMutableTreeNode servicesGroup = new DefaultMutableTreeNode("Entity APIs");
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("host()", "host()", "Entity / Creature script instance", "h"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("environment()", "environment()", "Active map environment", "e"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("context()", "context()", "Script context & properties", "c"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("globals", "globals", "Shared ScriptGlobals store", "g"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("EntityQuery", "EntityQuery.in(environment(), Creature.class)", "Fluent entity finder", "q"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.audio()", "Game.audio()", "Sound & music engine", "m"), query);
+      if (servicesGroup.getChildCount() > 0) this.globalsRoot.add(servicesGroup);
+
+      DefaultMutableTreeNode hooksGroup = new DefaultMutableTreeNode("Entity Lifecycle Hooks");
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onLoaded()", "\n  @Override\n  public void onLoaded() {\n  }\n", "Entity loaded into map", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("update()", "\n  @Override\n  public void update() {\n  }\n", "Entity tick loop", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onHit(event)", "\n  @Override\n  protected void onHit(EntityHitEvent event) {\n    int damage = event.getDamage();\n  }\n", "Damage received hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onDeath(entity, hitEvent)", "\n  @Override\n  protected void onDeath(ICombatEntity entity, EntityHitEvent hitEvent) {\n    remove();\n  }\n", "Entity mortality hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onCollision(event)", "\n  @Override\n  protected void onCollision(CollisionEvent event) {\n  }\n", "Obstacle collision hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onInteract(source)", "\n  @Override\n  protected void onInteract(IEntity source) {\n  }\n", "Player interaction hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onMessage(msg, sender)", "\n  @Override\n  protected void onMessage(String message, Object sender) {\n  }\n", "Message received hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onUnloaded()", "\n  @Override\n  public void onUnloaded() {\n  }\n", "Entity unloaded hook", "hook"), query);
+      if (hooksGroup.getChildCount() > 0) this.globalsRoot.add(hooksGroup);
+
+      DefaultMutableTreeNode combatGroup = new DefaultMutableTreeNode("Combat & Actions");
+      addGlobalItemIfMatches(combatGroup, new GlobalApiItem("createAbility(name)", "createAbility(\"Fireball\").range(200).cooldown(1000).onCast(exec -> {}).cast();", "Build & cast ability", "a"), query);
+      addGlobalItemIfMatches(combatGroup, new GlobalApiItem("spawnProjectile()", "spawnProjectile().from(host().getCenter()).speed(300).damage(20).splash(30, 10).spawn();", "Launch projectile", "p"), query);
+      addGlobalItemIfMatches(combatGroup, new GlobalApiItem("moveTowards(target)", "moveTowards(targetEntity);", "Move creature towards target", "m"), query);
+      addGlobalItemIfMatches(combatGroup, new GlobalApiItem("floatText(text, entity, color)", "context().ui().floatText(\"-25\", host(), Color.RED);", "Floating combat text", "u"), query);
+      addGlobalItemIfMatches(combatGroup, new GlobalApiItem("sendMessage(target, msg)", "sendMessage(targetEntity, \"alert\");", "Send entity message", "m"), query);
+      addGlobalItemIfMatches(combatGroup, new GlobalApiItem("remove()", "remove();", "Despawn host entity", "m"), query);
+      if (combatGroup.getChildCount() > 0) this.globalsRoot.add(combatGroup);
+
+      // Named Map Entities
+      if (Game.world() != null && Game.world().environment() != null) {
+        DefaultMutableTreeNode entitiesGroup = new DefaultMutableTreeNode("Named Map Entities");
+        for (de.gurkenlabs.litiengine.entities.IEntity entity : Game.world().environment().getEntities()) {
+          String name = entity.getName();
+          if (name != null && !name.isBlank()) {
+            String snippet = "environment().get(\"" + name + "\")";
+            String typeName = entity.getClass().getSimpleName();
+            String badge = switch (typeName) {
+              case "Creature" -> "creature";
+              case "Prop" -> "prop";
+              case "Trigger" -> "trigger";
+              case "Emitter" -> "emitter";
+              default -> "entity";
+            };
+            addGlobalItemIfMatches(entitiesGroup, new GlobalApiItem(name, snippet, typeName + " on map", badge), query);
+          }
+        }
+        if (entitiesGroup.getChildCount() > 0) this.globalsRoot.add(entitiesGroup);
+      }
+
+    } else {
+      // --- GENERAL / UNKNOWN CONTEXT ---
+      DefaultMutableTreeNode servicesGroup = new DefaultMutableTreeNode("Globals & Services");
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("host()", "host()", "Entity script instance", "h"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("environment()", "environment()", "Active map environment", "e"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("context()", "context()", "Script context & properties", "c"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("globals", "globals", "Shared ScriptGlobals store", "g"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("Game.world()", "Game.world()", "Map & world entity manager", "m"), query);
+      addGlobalItemIfMatches(servicesGroup, new GlobalApiItem("EntityQuery", "EntityQuery.in(environment(), Creature.class)", "Fluent entity finder", "q"), query);
+      if (servicesGroup.getChildCount() > 0) this.globalsRoot.add(servicesGroup);
+
+      DefaultMutableTreeNode hooksGroup = new DefaultMutableTreeNode("Lifecycle Hooks");
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onStarted()", "\n  @Override\n  public void onStarted() {\n  }\n", "Game startup hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onLoaded()", "\n  @Override\n  public void onLoaded() {\n  }\n", "Map/Entity loaded hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("update()", "\n  @Override\n  public void update() {\n  }\n", "Tick update loop", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onHit(event)", "\n  @Override\n  protected void onHit(EntityHitEvent event) {\n  }\n", "Damage received hook", "hook"), query);
+      addGlobalItemIfMatches(hooksGroup, new GlobalApiItem("onDeath(entity, hitEvent)", "\n  @Override\n  protected void onDeath(ICombatEntity entity, EntityHitEvent hitEvent) {\n  }\n", "Entity mortality hook", "hook"), query);
+      if (hooksGroup.getChildCount() > 0) this.globalsRoot.add(hooksGroup);
+    }
+
+    // Registered Global Variables (relevant for all contexts)
+    if (Game.scripts() != null && Game.scripts().globals() != null && !Game.scripts().globals().getEntries().isEmpty()) {
+      DefaultMutableTreeNode varsGroup = new DefaultMutableTreeNode("Global Variables (globals)");
       for (Map.Entry<String, Object> entry : Game.scripts().globals().getEntries().entrySet()) {
         String key = entry.getKey();
         Object val = entry.getValue();
         String typeName = val == null ? "Object" : val.getClass().getSimpleName();
-        this.globalsModel.addElement(new GlobalApiItem(key, "globals.get(\"" + key + "\")", "Global variable (" + typeName + ")", "g"));
+        addGlobalItemIfMatches(varsGroup, new GlobalApiItem(key, "globals.get(\"" + key + "\")", "Global variable (" + typeName + ")", "g"), query);
       }
+      if (varsGroup.getChildCount() > 0) this.globalsRoot.add(varsGroup);
+    }
+
+    this.globalsTreeModel.reload();
+
+    // Expand top-level groups by default or when searching
+    for (int i = 0; i < this.globalsTree.getRowCount(); i++) {
+      this.globalsTree.expandRow(i);
+    }
+  }
+
+  private static void addGlobalItemIfMatches(DefaultMutableTreeNode group, GlobalApiItem item, String query) {
+    if (query.isEmpty()
+        || item.label().toLowerCase(Locale.ROOT).contains(query)
+        || item.description().toLowerCase(Locale.ROOT).contains(query)
+        || item.snippet().toLowerCase(Locale.ROOT).contains(query)) {
+      group.add(new DefaultMutableTreeNode(item));
     }
   }
 
@@ -1261,6 +1474,30 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.openTabs.remove(tab.key);
     this.tabs.remove(tab);
     this.activeTabChanged();
+  }
+
+  private static JTextField createSearchTextField(String placeholder) {
+    JTextField field = new JTextField() {
+      @Override
+      public void updateUI() {
+        super.updateUI();
+        setBorder(BorderFactory.createEmptyBorder());
+        setOpaque(false);
+        putClientProperty("JComponent.outline", "none");
+      }
+
+      @Override
+      protected void paintBorder(Graphics g) {
+        // The parent search box owns the only visible border.
+      }
+    };
+    field.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, placeholder);
+    field.setToolTipText(placeholder);
+    field.setBorder(BorderFactory.createEmptyBorder());
+    field.setOpaque(false);
+    field.putClientProperty("JComponent.outline", "none");
+    field.setFont(Style.getDefaultFont());
+    return field;
   }
 
   MonacoScriptEditor getMonaco() {
@@ -1343,6 +1580,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.showDiagnostics(definition);
     this.refreshOutline(active);
     this.updateCaretStatus(active);
+    this.refreshGlobals();
   }
 
   private ScriptTab activeTab() {
@@ -2017,21 +2255,42 @@ public final class ScriptWorkspacePanel extends JPanel {
       String base = "GameScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.GameScript" : "GameScript";
       return packageHeader
         + "import de.gurkenlabs.litiengine.*;\n"
+        + "import de.gurkenlabs.litiengine.input.Input;\n"
         + "import de.gurkenlabs.litiengine.resources.*;\n"
-        + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
+        + "import de.gurkenlabs.litiengine.scripting.*;\n"
+        + "import java.awt.event.KeyEvent;\n\n"
         + "/**\n"
-        + " * Global game lifecycle script controller.\n"
-        + " * Access global game state via {@code globals.put(\"key\", value)}.\n"
+        + " * Global game lifecycle script controller (entry point).\n"
+        + " *\n"
+        + " * <p>Responsibilities:\n"
+        + " * <ul>\n"
+        + " *   <li>Initialize persistent game state: {@code globals.put(\"score\", 0)}</li>\n"
+        + " *   <li>Load starting map: {@code loadMap(\"map1\")}</li>\n"
+        + " *   <li>Play background soundtracks: {@code playMusic(\"theme\")}</li>\n"
+        + " *   <li>Register global inputs: pause, restart, hotkeys</li>\n"
+        + " * </ul>\n"
         + " */\n"
         + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.GAME)\n"
         + "public class " + className + " extends " + base + " {\n"
         + "  @Override\n"
         + "  public void onStarted() {\n"
-        + "    // The game loop is active.\n"
+        + "    // 1. Initialize persistent global variables across maps\n"
+        + "    globals.put(\"score\", 0);\n"
+        + "    globals.put(\"lives\", 3);\n\n"
+        + "    // 2. Play background soundtrack (optional)\n"
+        + "    // playMusic(\"bg_music\");\n\n"
+        + "    // 3. Load initial map (if not already loaded by launcher/editor)\n"
+        + "    if (Game.world().environment() == null) {\n"
+        + "      // loadMap(\"level1\");\n"
+        + "    }\n\n"
+        + "    // 4. Global input shortcuts (e.g. Pause on ESC)\n"
+        + "    Input.keyboard().onKeyTyped(KeyEvent.VK_ESCAPE, event -> {\n"
+        + "      // Toggle pause or open menu\n"
+        + "    });\n"
         + "  }\n\n"
         + "  @Override\n"
         + "  public void update() {\n"
-        + "    // Global game-level script logic.\n"
+        + "    // Global game-level update loop (runs continuously across all maps)\n"
         + "  }\n"
         + "}\n";
     }
@@ -2039,22 +2298,38 @@ public final class ScriptWorkspacePanel extends JPanel {
       String base = "EnvironmentScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.EnvironmentScript" : "EnvironmentScript";
       return packageHeader
         + "import de.gurkenlabs.litiengine.*;\n"
+        + "import de.gurkenlabs.litiengine.entities.*;\n"
         + "import de.gurkenlabs.litiengine.environment.Environment;\n"
         + "import de.gurkenlabs.litiengine.resources.*;\n"
         + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
         + "/**\n"
         + " * Map environment script controller.\n"
-        + " * Use {@code environment()} to query entities, triggers, and map properties.\n"
+        + " *\n"
+        + " * <p>Responsibilities:\n"
+        + " * <ul>\n"
+        + " *   <li>Map initialization & wave spawning on {@code onLoaded()}</li>\n"
+        + " *   <li>Objective tracking: {@code onEntityRemoved(IEntity)}</li>\n"
+        + " *   <li>Level clear transitions & ambient cinematics</li>\n"
+        + " * </ul>\n"
         + " */\n"
         + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENVIRONMENT)\n"
         + "public class " + className + " extends " + base + " {\n"
         + "  @Override\n"
         + "  public void onLoaded() {\n"
-        + "    // Map / Environment loaded.\n"
+        + "    // Map is loaded and active. Announce level start:\n"
+        + "    context().ui().showBanner(\"LEVEL START\", \"Defeat all enemies!\", 2500);\n"
+        + "  }\n\n"
+        + "  @Override\n"
+        + "  protected void onEntityRemoved(IEntity entity) {\n"
+        + "    // Check if level objective is complete\n"
+        + "    var remainingMonsters = EntityQuery.in(environment(), Creature.class).alive().list();\n"
+        + "    if (remainingMonsters.isEmpty()) {\n"
+        + "      context().ui().showBanner(\"VICTORY\", \"Stage Cleared!\", 3000);\n"
+        + "    }\n"
         + "  }\n\n"
         + "  @Override\n"
         + "  public void update() {\n"
-        + "    // Environment-level script logic.\n"
+        + "    // Map-level update logic\n"
         + "  }\n"
         + "}\n";
     }
@@ -2068,20 +2343,38 @@ public final class ScriptWorkspacePanel extends JPanel {
       + "import " + targetType + ";\n"
       + "import de.gurkenlabs.litiengine.entities.*;\n"
       + "import de.gurkenlabs.litiengine.resources.*;\n"
-      + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
+      + "import de.gurkenlabs.litiengine.scripting.*;\n"
+      + "import java.awt.Color;\n\n"
       + "/**\n"
       + " * Entity script controller for {@link " + targetSimple + "}.\n"
-      + " * Use {@code host()} to access entity attributes and behavior.\n"
+      + " *\n"
+      + " * <p>Responsibilities:\n"
+      + " * <ul>\n"
+      + " *   <li>AI movement & navigation: {@code moveTowards(target)}</li>\n"
+      + " *   <li>Combat abilities & projectiles: {@code createAbility()}, {@code spawnProjectile()}</li>\n"
+      + " *   <li>Reactions: {@code onHit(event)}, {@code onDeath(entity, hitEvent)}</li>\n"
+      + " * </ul>\n"
       + " */\n"
       + "@ScriptInfo(id = \"" + definition.getId() + "\", host = ScriptHostType.ENTITY, target = " + targetSimple + ".class)\n"
       + "public class " + className + " extends " + base + " {\n"
       + "  @Override\n"
       + "  public void onLoaded() {\n"
-      + "    // Entity and environment ready.\n"
+      + "    // Entity spawned and ready in the environment\n"
       + "  }\n\n"
       + "  @Override\n"
       + "  public void update() {\n"
-      + "    // Entity-level script logic.\n"
+      + "    if (isDead()) return;\n\n"
+      + "    // Entity AI / movement logic\n"
+      + "  }\n\n"
+      + "  @Override\n"
+      + "  protected void onHit(EntityHitEvent event) {\n"
+      + "    // Display floating combat damage number\n"
+      + "    context().ui().floatText(\"-\" + event.getDamage(), host(), Color.RED);\n"
+      + "  }\n\n"
+      + "  @Override\n"
+      + "  protected void onDeath(ICombatEntity entity, EntityHitEvent hitEvent) {\n"
+      + "    // Entity mortality handling\n"
+      + "    remove();\n"
       + "  }\n"
       + "}\n";
   }
@@ -2421,49 +2714,71 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
   }
 
-  private static final class GlobalApiRenderer implements javax.swing.ListCellRenderer<GlobalApiItem> {
+  private static final class GlobalApiTreeRenderer implements TreeCellRenderer {
     private final JPanel panel = new JPanel();
     private final JLabel iconLabel = new JLabel();
     private final JLabel nameLabel = new JLabel();
-    private final JLabel descLabel = new JLabel();
+    private final JLabel detailLabel = new JLabel();
 
-    GlobalApiRenderer() {
+    GlobalApiTreeRenderer() {
       this.panel.setLayout(new javax.swing.BoxLayout(this.panel, javax.swing.BoxLayout.X_AXIS));
       this.panel.setOpaque(false);
       this.iconLabel.setOpaque(false);
       this.nameLabel.setOpaque(false);
-      this.descLabel.setOpaque(false);
+      this.detailLabel.setOpaque(false);
       this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.nameLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-      this.descLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-      this.panel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-      this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
-      this.descLabel.setFont(Style.getDefaultFont().deriveFont(11f));
+      this.detailLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.panel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 4));
       this.panel.add(this.iconLabel);
-      this.panel.add(javax.swing.Box.createHorizontalStrut(6));
+      this.panel.add(javax.swing.Box.createHorizontalStrut(5));
       this.panel.add(this.nameLabel);
       this.panel.add(javax.swing.Box.createHorizontalStrut(6));
-      this.panel.add(this.descLabel);
+      this.panel.add(this.detailLabel);
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends GlobalApiItem> list, GlobalApiItem item, int index,
-                                                   boolean isSelected, boolean cellHasFocus) {
-      if (item != null) {
-        this.nameLabel.setText(item.label());
-        this.descLabel.setText(item.description());
-        this.iconLabel.setIcon(switch (item.badge()) {
-          case "h" -> Icons.SYMBOL_CLASS_16;
-          case "e" -> Icons.SYMBOL_DEPENDENCY_16;
-          case "c", "g" -> Icons.SYMBOL_FIELD_16;
-          case "m" -> Icons.SYMBOL_METHOD_16;
-          case "q" -> Icons.SEARCH_16;
-          default -> Icons.SYMBOL_DEPENDENCY_16;
-        });
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
+                                                   boolean leaf, int row, boolean focused) {
+      if (value instanceof DefaultMutableTreeNode node) {
+        Object userObj = node.getUserObject();
+        if (userObj instanceof GlobalApiItem item) {
+          this.iconLabel.setIcon(switch (item.badge()) {
+            case "h" -> Icons.SYMBOL_CLASS_16;
+            case "e" -> Icons.SYMBOL_DEPENDENCY_16;
+            case "c", "g" -> Icons.SYMBOL_FIELD_16;
+            case "m", "hook", "a", "p" -> Icons.SYMBOL_METHOD_16;
+            case "q" -> Icons.SEARCH_16;
+            case "u" -> Icons.DOCUMENTATION_16;
+            case "creature" -> Icons.CREATURE_16;
+            case "prop" -> Icons.PROP_16;
+            case "trigger" -> Icons.TRIGGER_16;
+            case "emitter" -> Icons.EMITTER_16;
+            default -> Icons.API_16;
+          });
+
+          this.nameLabel.setText(item.label());
+          this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.PLAIN, 11.5f));
+          this.nameLabel.setForeground(selected ? Color.WHITE : Style.COLOR_TEXT);
+
+          this.detailLabel.setText(item.description());
+          this.detailLabel.setFont(Style.getDefaultFont().deriveFont(10.5f));
+          this.detailLabel.setForeground(selected ? new Color(200, 210, 240) : Style.COLOR_SUBTEXT);
+          this.detailLabel.setVisible(true);
+
+          this.panel.setToolTipText("<html><b>" + item.label() + "</b>: " + item.description() + "<br><code>" + item.snippet().replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>") + "</code><br><i>Double-click to insert</i></html>");
+        } else {
+          // Group Category Node
+          this.iconLabel.setIcon(expanded ? Icons.FOLDER_OPEN_16 : Icons.GROUP_16);
+          this.nameLabel.setText(Objects.toString(userObj, ""));
+          this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
+          this.nameLabel.setForeground(selected ? Color.WHITE : Style.COLOR_SUBTEXT);
+          this.detailLabel.setText("");
+          this.detailLabel.setVisible(false);
+          this.panel.setToolTipText(null);
+        }
       }
       this.panel.setOpaque(false);
-      this.nameLabel.setForeground(isSelected ? Color.WHITE : Style.text());
-      this.descLabel.setForeground(isSelected ? new Color(200, 210, 225) : Style.mutedText());
       return this.panel;
     }
   }

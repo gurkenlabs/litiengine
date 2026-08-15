@@ -91,6 +91,10 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
     this.downButton.setToolTipText("Move down");
     this.downButton.addActionListener(event -> this.moveSelectedScript(1));
 
+    JButton helpButton = Style.iconButton(Icons.API_16);
+    helpButton.setToolTipText("Explore script events and API cheat sheet");
+    helpButton.addActionListener(event -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showDialog());
+
     JPanel toolButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
     toolButtons.setOpaque(false);
     toolButtons.add(this.addButton);
@@ -98,6 +102,7 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
     toolButtons.add(this.openButton);
     toolButtons.add(this.upButton);
     toolButtons.add(this.downButton);
+    toolButtons.add(helpButton);
 
     JPanel picker = new JPanel(new BorderLayout(Style.SPACE_SMALL, 0));
     picker.setOpaque(false);

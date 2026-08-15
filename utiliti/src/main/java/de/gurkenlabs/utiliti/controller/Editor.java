@@ -1283,6 +1283,15 @@ public class Editor extends Screen {
     try {
       Files.deleteIfExists(target);
 
+      if (Game.scripts() != null) {
+        getGameFile().getScripts().clear();
+        getGameFile().getScripts().addAll(Game.scripts().getDefinitions());
+        getGameFile().getGameScripts().clear();
+        getGameFile().getGameScripts().addAll(Game.scripts().getGameBindings());
+        getGameFile().getEntityScripts().clear();
+        getGameFile().getEntityScripts().addAll(Game.scripts().getEntityBindings());
+      }
+
       getGameFile().save(target.toString(), preferences().compressFile());
       AutoSaveManager.deleteBackup(target);
       this.currentResourceFile = target;

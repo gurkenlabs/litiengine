@@ -76,7 +76,19 @@ public class ScriptMenu extends JMenu {
     openIde.addActionListener(e -> UI.getScriptWorkspacePanel().openActiveExternally());
     KeyBindings.bind(openIde, Command.SCRIPT_OPEN_IDE);
 
+    JMenuItem exploreEvents = new JMenuItem("Script Events & API Explorer...", Icons.API_16);
+    exploreEvents.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showDialog());
+
+    JMenuItem configGameScripts = new JMenuItem("Configure Game Scripts...", Icons.SETTINGS_16);
+    configGameScripts.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.GameScriptsDialog.showDialog());
+
+    JMenuItem guideItem = new JMenuItem("Scripting Guide & Getting Started...", Icons.DOCUMENTATION_16);
+    guideItem.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showGuide());
+
     this.add(newSub);
+    this.add(configGameScripts);
+    this.add(exploreEvents);
+    this.add(guideItem);
     this.addSeparator();
     this.add(save);
     this.add(formatCode);
