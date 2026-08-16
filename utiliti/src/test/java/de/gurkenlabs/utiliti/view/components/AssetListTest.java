@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.view.components;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -34,5 +35,19 @@ class AssetListTest {
     assertTrue(AssetList.hasAssetInspectorTarget(new Tileset()));
     assertTrue(AssetList.hasAssetInspectorTarget(
       new SpritesheetResource(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "sprite", 1, 1)));
+  }
+
+  @Test
+  void testScriptModeToggle() {
+    AssetList assets = new AssetList();
+    assertFalse(assets.isScriptMode());
+    assertNotNull(assets.getAssetTree());
+    assertNotNull(assets.getScriptTree());
+
+    assets.setScriptMode(true);
+    assertTrue(assets.isScriptMode());
+
+    assets.setScriptMode(false);
+    assertFalse(assets.isScriptMode());
   }
 }

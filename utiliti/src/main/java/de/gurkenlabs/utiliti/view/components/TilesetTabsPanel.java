@@ -45,6 +45,19 @@ final class TilesetTabsPanel extends JPanel {
     this.commands.add(addAll);
     this.commands.add(create);
     this.commands.add(remove);
+    this.tabs.putClientProperty("JTabbedPane.noContentBorder", Boolean.TRUE);
+    this.tabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);
+    this.tabs.putClientProperty("JTabbedPane.contentInsets", new java.awt.Insets(0, 0, 0, 0));
+    this.tabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 0, 0, 0));
+    this.tabs.putClientProperty("JTabbedPane.tabType", "underlined");
+    this.tabs.putClientProperty("JTabbedPane.showTabSeparators", Boolean.TRUE);
+    this.tabs.putClientProperty("JTabbedPane.tabHeight", 28);
+    this.tabs.putClientProperty("JTabbedPane.tabInsets", new java.awt.Insets(2, 10, 2, 10));
+    this.tabs.putClientProperty("JTabbedPane.underlineColor", Style.accent());
+    this.tabs.putClientProperty("JTabbedPane.underlineHeight", 2);
+    this.tabs.putClientProperty("JTabbedPane.selectedBackground", Style.surface());
+    this.tabs.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
+    this.tabs.setBackground(Style.background());
     add(this.tabs, BorderLayout.CENTER);
     this.tabs.addChangeListener(_ -> publishSelectedEditor());
   }

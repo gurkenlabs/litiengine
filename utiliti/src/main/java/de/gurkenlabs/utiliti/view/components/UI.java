@@ -498,6 +498,12 @@ public final class UI {
     if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
       menuBar.setScriptMode(false);
     }
+    if (assetComponent != null) {
+      assetComponent.setScriptMode(false);
+    }
+    if (bottomResourcesTab != null) {
+      bottomResourcesTab.setText(Resources.strings().get("assettree_assets"));
+    }
     if (viewportPanel != null) viewportPanel.requestFocusInWindow();
   }
 
@@ -510,6 +516,12 @@ public final class UI {
     if (viewportToolbar != null) viewportToolbar.setScriptMode(true);
     if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
       menuBar.setScriptMode(true);
+    }
+    if (assetComponent != null) {
+      assetComponent.setScriptMode(true);
+    }
+    if (bottomResourcesTab != null) {
+      bottomResourcesTab.setText("Scripts");
     }
   }
 
@@ -524,6 +536,22 @@ public final class UI {
   public static void createScript() {
     showScriptWorkspace();
     if (scriptWorkspacePanel != null) scriptWorkspacePanel.createScript();
+  }
+
+  public static AssetList getAssetComponent() {
+    return assetComponent;
+  }
+
+  public static void refreshScriptInspectors() {
+    if (mapObjectPanel != null) {
+      mapObjectPanel.refreshScripts();
+    }
+    if (mapPropertyPanel != null) {
+      mapPropertyPanel.refreshScripts();
+    }
+    if (assetComponent != null && assetComponent.isScriptMode()) {
+      assetComponent.refresh();
+    }
   }
 
   public static void showConsoleTab() {

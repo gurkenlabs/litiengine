@@ -135,8 +135,9 @@ public class TilesetEditorPanel extends JPanel {
     ControlBehavior.apply(this.tileOffsetYSpinner);
     this.tileOffsetXSpinner.addChangeListener(_ -> applyTilesetRenderSettings());
     this.tileOffsetYSpinner.addChangeListener(_ -> applyTilesetRenderSettings());
-    JPanel renderSettings = new JPanel(new BorderLayout(0, 4));
+    JPanel renderSettings = new JPanel(new BorderLayout(6, 0));
     renderSettings.setOpaque(false);
+    renderSettings.setMaximumSize(new Dimension(Integer.MAX_VALUE, Style.CONTROL_HEIGHT));
     JPanel terrainHost = new JPanel(new BorderLayout());
     terrainHost.setOpaque(false);
 
@@ -151,11 +152,10 @@ public class TilesetEditorPanel extends JPanel {
     tilesetControls.setLayout(new BoxLayout(tilesetControls, BoxLayout.Y_AXIS));
     tilesetControls.setOpaque(false);
     tilesetControls.add(namePanel);
-    tilesetControls.add(javax.swing.Box.createVerticalStrut(6));
+    tilesetControls.add(javax.swing.Box.createVerticalStrut(Style.SPACE_SMALL));
     tilesetControls.add(renderSettings);
-    tilesetControls.add(javax.swing.Box.createVerticalStrut(6));
+    tilesetControls.add(javax.swing.Box.createVerticalStrut(Style.SPACE_SMALL));
     tilesetControls.add(tilesetProperties);
-    tilesetControls.add(javax.swing.Box.createVerticalStrut(6));
     tilesetControls.add(terrainHost);
     add(tilesetControls, BorderLayout.NORTH);
 
@@ -186,8 +186,9 @@ public class TilesetEditorPanel extends JPanel {
         () -> setGridZoom(this.tileGrid.zoom * 1.25f),
         this::fitGrid,
         Resources.strings().get("tilesetEditor_fitTileset"));
-    JPanel zoomControls = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 8, 0));
+    JPanel zoomControls = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
     zoomControls.setOpaque(false);
+    zoomControls.setMaximumSize(new Dimension(Integer.MAX_VALUE, Style.CONTROL_HEIGHT));
     zoomControls.add(this.zoomControls);
     renderSettings.add(labeledOffsets(), BorderLayout.CENTER);
     renderSettings.add(zoomControls, BorderLayout.EAST);
@@ -289,7 +290,7 @@ public class TilesetEditorPanel extends JPanel {
     controls.add(typePanel);
     controls.add(javax.swing.Box.createVerticalStrut(4));
     controls.add(probabilityPanel);
-    controls.add(javax.swing.Box.createVerticalStrut(6));
+    controls.add(javax.swing.Box.createVerticalStrut(Style.SPACE_SMALL));
     ExpandableCard propertyPanel = new ExpandableCard(Resources.strings().get("tilesetEditor_tileProperties"), createTablePanel(this.tilePropertyTable, this.tilePropertyModel,
       () -> this.tilePropertyModel.addRow(new Object[] {"", ""}), true), false);
     propertyPanel.setInspectorContentInsets();
@@ -297,9 +298,7 @@ public class TilesetEditorPanel extends JPanel {
       () -> this.animationModel.addRow(new Object[] {String.valueOf(Math.max(0, this.tileGrid.selectedTile)), "100"}), true), false);
     animationPanel.setInspectorContentInsets();
     controls.add(propertyPanel);
-    controls.add(javax.swing.Box.createVerticalStrut(6));
     controls.add(animationPanel);
-    controls.add(javax.swing.Box.createVerticalStrut(6));
     ExpandableCard collisionPanel = new ExpandableCard(
       Resources.strings().get("tilesetEditor_collisionEditing"), this.collisionEditor, true);
     collisionPanel.setInspectorContentInsets();
@@ -542,6 +541,7 @@ public class TilesetEditorPanel extends JPanel {
   private static JPanel labeledField(String labelText, JTextField field) {
     JPanel panel = new JPanel(new BorderLayout(6, 0));
     panel.setOpaque(false);
+    panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Style.CONTROL_HEIGHT));
     JLabel label = new JLabel(labelText);
     label.setForeground(Style.text());
     label.setPreferredSize(new Dimension(82, Style.CONTROL_HEIGHT));
@@ -553,6 +553,7 @@ public class TilesetEditorPanel extends JPanel {
   private JPanel labeledProbability() {
     JPanel panel = new JPanel(new BorderLayout(6, 0));
     panel.setOpaque(false);
+    panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Style.CONTROL_HEIGHT));
     JLabel label = new JLabel(Resources.strings().get("tilesetEditor_probability"));
     label.setForeground(Style.text());
     label.setPreferredSize(new Dimension(82, Style.CONTROL_HEIGHT));
@@ -575,6 +576,7 @@ public class TilesetEditorPanel extends JPanel {
   private JPanel labeledOffsets() {
     JPanel panel = new JPanel(new BorderLayout(6, 0));
     panel.setOpaque(false);
+    panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Style.CONTROL_HEIGHT));
     JLabel label = new JLabel(Resources.strings().get("panel_offset"));
     label.setForeground(Style.text());
     label.setPreferredSize(new Dimension(82, Style.CONTROL_HEIGHT));
