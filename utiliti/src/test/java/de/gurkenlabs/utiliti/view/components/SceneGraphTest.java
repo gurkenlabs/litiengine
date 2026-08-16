@@ -40,6 +40,21 @@ class SceneGraphTest {
   }
 
   @Test
+  void scriptModeDisablesSpecializedSceneFilters() {
+    SceneGraph sceneGraph = new SceneGraph();
+    assertTrue(sceneGraph.isFilterBarVisible());
+    assertTrue(sceneGraph.areFiltersEnabled());
+
+    sceneGraph.setScriptMode(true);
+    assertTrue(sceneGraph.isFilterBarVisible());
+    assertFalse(sceneGraph.areFiltersEnabled());
+
+    sceneGraph.setScriptMode(false);
+    assertTrue(sceneGraph.isFilterBarVisible());
+    assertTrue(sceneGraph.areFiltersEnabled());
+  }
+
+  @Test
   void displaysLastRenderedLayerOnTop() {
     TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
     MapObjectLayer bottom = new MapObjectLayer();

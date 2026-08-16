@@ -58,7 +58,6 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeBlueprints;
   private final DefaultMutableTreeNode nodeCreatures;
   private final DefaultMutableTreeNode nodeAnimations;
-  private final DefaultMutableTreeNode nodeScripts;
   private final Map<DefaultMutableTreeNode, Integer> categoryCounts = new IdentityHashMap<>();
   private int hoveredRow = -1;
 
@@ -91,7 +90,6 @@ public class AssetTree extends JTree {
     this.nodeBlueprints = categoryNode(Resources.strings().get("assettree_blueprints"), Icons.BLUEPRINT_16, false);
     this.nodeCreatures = categoryNode(Resources.strings().get("assettree_creatures"), Icons.CREATURE_16, false);
     this.nodeAnimations = categoryNode(Resources.strings().get("assettree_animations"), Icons.ANIMATION_16, false);
-    this.nodeScripts = categoryNode("Scripts", Icons.SCRIPT_16, false);
 
     this.nodeSpritesheets.add(this.nodeSpriteProps);
     this.nodeSpritesheets.add(this.nodeCreatures);
@@ -103,7 +101,6 @@ public class AssetTree extends JTree {
     this.nodeResources.add(this.nodeTileSets);
     this.nodeResources.add(this.nodeSounds);
     this.nodeResources.add(this.nodeAnimations);
-    this.nodeResources.add(this.nodeScripts);
     this.nodeRoot.add(this.nodeResources);
 
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
@@ -186,16 +183,10 @@ public class AssetTree extends JTree {
     final TreePath blueprintPath = new TreePath(this.nodeBlueprints.getPath());
     final TreePath soundPath = new TreePath(this.nodeSounds.getPath());
     final TreePath animationPath = new TreePath(this.nodeAnimations.getPath());
-    final TreePath scriptPath = new TreePath(this.nodeScripts.getPath());
 
     final ResourceBundle gameFile = Editor.instance().getGameFile();
     if (gameFile == null) {
       this.assetPanel.clearAssets();
-      return;
-    }
-
-    if (selectedPath.equals(scriptPath)) {
-      this.assetPanel.loadScripts(gameFile.getScripts());
       return;
     }
 
@@ -374,7 +365,6 @@ public class AssetTree extends JTree {
       this.categoryCounts.put(this.nodeTileSets, collectAllTilesets(gameFile).size());
       this.categoryCounts.put(this.nodeSounds, gameFile.getSounds().size());
       this.categoryCounts.put(this.nodeAnimations, Resources.animations().getAll().size());
-      this.categoryCounts.put(this.nodeScripts, gameFile.getScripts().size());
     }
     repaint();
   }

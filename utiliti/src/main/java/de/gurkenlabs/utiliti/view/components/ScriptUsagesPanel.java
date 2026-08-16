@@ -37,7 +37,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 /** Reverse-reference view for the assignments of the script currently open in the editor. */
 final class ScriptUsagesPanel extends JPanel {
-  private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Used By");
+  private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Used in");
   private final DefaultTreeModel model = new DefaultTreeModel(this.root);
   private final JTree usages = UI.createStyledTree(this.model);
   private final JLabel count = new JLabel("No uses");
@@ -70,7 +70,7 @@ final class ScriptUsagesPanel extends JPanel {
     this.toggle.setPreferredSize(new Dimension(20, 20));
     this.toggle.setToolTipText("Show or hide script usages");
     this.toggle.addActionListener(event -> this.setExpanded(!this.expanded));
-    JLabel heading = new JLabel("Used By");
+    JLabel heading = new JLabel("Used in");
     heading.setFont(heading.getFont().deriveFont(Font.BOLD, 11f));
     heading.setForeground(Style.text());
     title.add(this.toggle, BorderLayout.WEST);

@@ -587,6 +587,26 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     return this.btnAddLayer;
   }
 
+  public void setScriptMode(boolean scriptMode) {
+    this.chipPanel.setVisible(true);
+    this.filterButtons.values().forEach(button -> button.setEnabled(!scriptMode));
+    if (scriptMode && this.activeFilter != FilterChip.ALL) {
+      this.activeFilter = FilterChip.ALL;
+      this.filterButtons.values().forEach(button -> button.setSelected(false));
+      this.filterButtons.get(FilterChip.ALL).setSelected(true);
+      this.updateFilterButtonStyles();
+      this.search();
+    }
+  }
+
+  boolean isFilterBarVisible() {
+    return this.chipPanel.isVisible();
+  }
+
+  boolean areFiltersEnabled() {
+    return this.filterButtons.get(FilterChip.ALL) != null && this.filterButtons.get(FilterChip.ALL).isEnabled();
+  }
+
   public JButton getDuplicateLayerButton() {
     return this.btnDuplicateLayer;
   }

@@ -129,7 +129,7 @@ public final class ScriptEventExplorerDialog extends JDialog {
       public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         if (value instanceof ScriptEventItem item) {
-          label.setText(item.name + " (" + item.category + ")");
+          label.setText(item.name() + " (" + item.category() + ")");
           label.setIcon(Icons.SYMBOL_METHOD_16);
         }
         return label;
@@ -325,11 +325,11 @@ public final class ScriptEventExplorerDialog extends JDialog {
 
     this.listModel.clear();
     for (ScriptEventItem item : this.allItems) {
-      boolean matchesCat = "All Categories".equals(cat) || item.category.equalsIgnoreCase(cat);
+      boolean matchesCat = "All Categories".equals(cat) || item.category().equalsIgnoreCase(cat);
       boolean matchesSearch = search.isEmpty()
-          || item.name.toLowerCase(Locale.ROOT).contains(search)
-          || item.description.toLowerCase(Locale.ROOT).contains(search)
-          || item.codeSnippet.toLowerCase(Locale.ROOT).contains(search);
+          || item.name().toLowerCase(Locale.ROOT).contains(search)
+          || item.description().toLowerCase(Locale.ROOT).contains(search)
+          || item.codeSnippet().toLowerCase(Locale.ROOT).contains(search);
       if (matchesCat && matchesSearch) {
         this.listModel.addElement(item);
       }
@@ -351,10 +351,10 @@ public final class ScriptEventExplorerDialog extends JDialog {
       this.copyButton.setEnabled(false);
       return;
     }
-    this.titleLabel.setText(item.name);
-    this.hostBadge.setText(item.hostType);
-    this.descriptionArea.setText(item.description);
-    this.codeArea.setCode(item.codeSnippet);
+    this.titleLabel.setText(item.name());
+    this.hostBadge.setText(item.hostType());
+    this.descriptionArea.setText(item.description());
+    this.codeArea.setCode(item.codeSnippet());
     this.insertButton.setEnabled(true);
     this.copyButton.setEnabled(true);
     this.statusLabel.setText(" ");
@@ -362,16 +362,16 @@ public final class ScriptEventExplorerDialog extends JDialog {
 
   private void copySelected() {
     ScriptEventItem item = this.eventList.getSelectedValue();
-    if (item == null || item.codeSnippet == null) return;
-    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(item.codeSnippet), null);
+    if (item == null || item.codeSnippet() == null) return;
+    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(item.codeSnippet()), null);
     this.statusLabel.setText("Copied to clipboard!");
   }
 
   private void insertSelected() {
     ScriptEventItem item = this.eventList.getSelectedValue();
-    if (item == null || item.codeSnippet == null) return;
+    if (item == null || item.codeSnippet() == null) return;
     try {
-      UI.getScriptWorkspacePanel().insertTextToActiveScript("\n" + item.codeSnippet + "\n");
+      UI.getScriptWorkspacePanel().insertTextToActiveScript("\n" + item.codeSnippet() + "\n");
       this.statusLabel.setText("Inserted into active script!");
     } catch (Exception e) {
       this.statusLabel.setText("Could not insert: " + e.getMessage());
@@ -677,26 +677,5 @@ public final class ScriptEventExplorerDialog extends JDialog {
           .alive()
           .list();"""
     ));
-  }
-
-  private static final class ScriptEventItem {
-    final String name;
-    final String category;
-    final String hostType;
-    final String description;
-    final String codeSnippet;
-
-    ScriptEventItem(String name, String category, String hostType, String description, String codeSnippet) {
-      this.name = name;
-      this.category = category;
-      this.hostType = hostType;
-      this.description = description;
-      this.codeSnippet = codeSnippet;
-    }
-
-    @Override
-    public String toString() {
-      return this.name;
-    }
   }
 }
