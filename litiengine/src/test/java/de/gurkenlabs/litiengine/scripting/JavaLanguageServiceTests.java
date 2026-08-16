@@ -9,6 +9,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -197,6 +198,40 @@ class JavaLanguageServiceTests {
     assertTrue(titles.contains("Add '@ScriptProperty' to field 'speed'"), "Should offer to add @ScriptProperty to field 'speed'");
     assertTrue(titles.stream().anyMatch(t -> t.startsWith("Add '@ScriptProperty(name = \"speed\"")), "Should offer configured @ScriptProperty for 'speed'");
     assertTrue(titles.contains("Convert field 'active' to '@ScriptProperty'"), "Should offer to convert other field 'active' too");
+  }
+
+  @Test
+  void testHoverOnScriptPropertyReturnsRichDocumentation() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class Loader extends GameScript {
+          @ScriptProperty(name = "speed", description = "Movement speed")
+          private int speed;
+        }
+        """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///Loader.java"),
+      code,
+      1,
+      null
+    );
+
+    // Hover on ScriptProperty
+    Optional<ScriptLanguageService.Hover> hover = this.service.hover(doc, new ScriptLanguageService.Position(4, 5));
+    assertTrue(hover.isPresent(), "Hover on @ScriptProperty should return documentation");
+    String markdown = hover.get().markdown();
+    assertTrue(markdown.contains("### @ScriptProperty"), "Hover should include ### @ScriptProperty");
+    assertTrue(markdown.contains("utiLITI Inspector"), "Hover should explain utiLITI Inspector integration");
+    assertTrue(markdown.contains("Supported Field Types:"), "Hover should list supported field types");
+    assertTrue(markdown.contains("Attributes:"), "Hover should explain attributes");
+
+    // Hover on attribute `name`
+    Optional<ScriptLanguageService.Hover> attrHover = this.service.hover(doc, new ScriptLanguageService.Position(4, 19));
+    assertTrue(attrHover.isPresent(), "Hover on attribute 'name' should return attribute documentation");
+    assertTrue(attrHover.get().markdown().contains("**name**"), "Attribute hover should contain **name**");
   }
 }
 

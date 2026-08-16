@@ -654,6 +654,11 @@ public class JavaLanguageService implements ScriptLanguageService {
       return Optional.of(new Hover("**" + word + "**\n\n" + methodDoc, null));
     }
 
+    String attrDoc = ScriptDocumentation.getAttributeDoc(word);
+    if (!attrDoc.isBlank()) {
+      return Optional.of(new Hover(attrDoc, null));
+    }
+
     return Optional.empty();
   }
 
