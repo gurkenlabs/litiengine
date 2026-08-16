@@ -458,7 +458,7 @@ public final class StatusBar extends JPanel {
     };
   }
 
-  private JPanel separator() {
+  public static JPanel separator() {
     JPanel wrapper = new JPanel();
     wrapper.setOpaque(false);
     wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
@@ -468,7 +468,6 @@ public final class StatusBar extends JPanel {
     line.setPreferredSize(new Dimension(1, 12));
     line.setMaximumSize(new Dimension(1, 12));
     line.setBackground(Style.border());
-    this.separatorLines.add(line);
     wrapper.add(line);
     return wrapper;
   }

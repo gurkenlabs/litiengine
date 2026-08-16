@@ -462,13 +462,15 @@ public final class Game {
       if (SwingUtilities.isEventDispatchThread()) {
         throw new AWTError("Cannot call init(Runnable, Runnable, String...) from the event dispatcher thread!");
       }
-      log().log(Level.INFO, "PreInitialization started");
+      log().log(Level.FINE, "PreInitialization started");
       SwingUtilities.invokeAndWait(preInitialization);
-      log().log(Level.INFO, "PreInitialization complete");
+      log().log(Level.FINE, "PreInitialization complete");
       init(true, args);
-      log().log(Level.INFO, "PostInitialization started");
+      log().log(Level.FINE, "PostInitialization started");
       SwingUtilities.invokeAndWait(postInitialization);
-      log().log(Level.INFO, "PostInitialization complete.");
+      String name = Game.info().getName() != null && !Game.info().getName().isBlank() ? Game.info().getName() : "LITIengine";
+      String version = Game.info().getVersion() != null && !Game.info().getVersion().isBlank() ? " v" + Game.info().getVersion() : "";
+      log().log(Level.INFO, "{0}{1} loaded successfully and is ready.", new Object[] {name, version});
     } catch (InvocationTargetException | InterruptedException e) {
       throw new Error(e);
     }
@@ -555,7 +557,7 @@ public final class Game {
       Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
 
       initialized = true;
-      log().log(Level.INFO, "Initialization complete");
+      log().log(Level.FINE, "Initialization complete");
     };
   }
 
