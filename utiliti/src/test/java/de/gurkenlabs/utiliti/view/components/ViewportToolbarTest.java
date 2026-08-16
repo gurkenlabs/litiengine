@@ -149,6 +149,23 @@ class ViewportToolbarTest {
     assertFalse(message.isEnabled());
   }
 
+  @Test
+  void advancedScriptActionsLiveInTheOverflowMenu() {
+    JComboBox<Object> mapSelector = new JComboBox<>();
+    ViewportToolbar toolbar = new ViewportToolbar(mapSelector);
+
+    toolbar.setScriptMode(true);
+
+    assertTrue(mapSelector.getParent().isVisible());
+    AbstractButton overflow = findButton(toolbar, "More script actions");
+    assertTrue(overflow.isVisible());
+    JPopupMenu menu = toolbar.createScriptActionsMenu();
+    assertEquals("Format code", ((JMenuItem) menu.getComponent(0)).getText());
+    assertEquals("Build", ((JMenuItem) menu.getComponent(1)).getText());
+    assertEquals("Reload from disk", ((JMenuItem) menu.getComponent(2)).getText());
+    assertEquals("Configure game scripts...", ((JMenuItem) menu.getComponent(4)).getText());
+  }
+
   private static List<UndoManager.HistoryEntry> history(int size) {
     List<UndoManager.HistoryEntry> history = new ArrayList<>(size);
     for (int index = 1; index <= size; index++) {

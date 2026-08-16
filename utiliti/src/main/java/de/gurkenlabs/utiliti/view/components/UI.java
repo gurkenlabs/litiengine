@@ -497,6 +497,7 @@ public final class UI {
     workspaceCards.show(workspaceHost, "map");
     if (inspectorCards != null) inspectorCards.show(inspectorHost, activeInspectorCard);
     if (viewportToolbar != null) viewportToolbar.setScriptMode(false);
+    if (sceneGraph != null) sceneGraph.setScriptMode(false);
     if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
       menuBar.setScriptMode(false);
     }
@@ -516,6 +517,7 @@ public final class UI {
     scriptWorkspacePanel.refreshScripts();
     workspaceCards.show(workspaceHost, "scripts");
     if (viewportToolbar != null) viewportToolbar.setScriptMode(true);
+    if (sceneGraph != null) sceneGraph.setScriptMode(true);
     if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
       menuBar.setScriptMode(true);
     }
@@ -1093,7 +1095,7 @@ public final class UI {
   private static JPanel initBottomPanel() {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     bottomPanel.setOpaque(true);
-    bottomPanel.setBackground(Style.COLOR_BG);
+    bottomPanel.setBackground(Style.background());
     bottomPanel.setMinimumSize(new Dimension(600, ASSET_PANEL_MIN_HEIGHT));
     bottomPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, ASSET_PANEL_MAX_HEIGHT));
 
@@ -1160,10 +1162,24 @@ public final class UI {
     };
     header.setOpaque(true);
     Dimension headerSize = new Dimension(0, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
-    header.setMinimumSize(headerSize);
-    header.setPreferredSize(headerSize);
+    JPanel consoleToolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+    consoleToolbar.setOpaque(false);
+
+    JButton clearBtn = Style.iconButton(Icons.CLEAR_CONSOLE_16);
+    clearBtn.setToolTipText(Resources.strings().get("console_clear"));
+    clearBtn.addActionListener(e -> consoleComponent.getLogHandler().flush());
+
+    JButton scrollBtn = Style.iconButton(Icons.SCROLL_DOWN_16);
+    scrollBtn.setToolTipText(Resources.strings().get("console_scroll_to_end"));
+    scrollBtn.addActionListener(e -> consoleComponent.getLogHandler().scrollToLast());
+
+    consoleToolbar.add(clearBtn);
+    consoleToolbar.add(scrollBtn);
+    consoleToolbar.setVisible(false);
+
     header.add(tabButtons, BorderLayout.WEST);
     header.add(assetComponent.getToolbar(), BorderLayout.CENTER);
+    header.add(consoleToolbar, BorderLayout.EAST);
 
     bottomContentPanel = content;
     bottomResourcesTab = resourcesTab;
@@ -1174,10 +1190,12 @@ public final class UI {
     resourcesTab.addActionListener(e -> {
       ((CardLayout) content.getLayout()).show(content, "resources");
       assetComponent.getToolbar().setVisible(true);
+      consoleToolbar.setVisible(false);
     });
     consoleTab.addActionListener(e -> {
       ((CardLayout) content.getLayout()).show(content, "console");
       assetComponent.getToolbar().setVisible(false);
+      consoleToolbar.setVisible(true);
     });
     problemsTab.addActionListener(e -> {
       if (scriptWorkspacePanel != null) {
@@ -1185,8 +1203,12 @@ public final class UI {
       }
       ((CardLayout) content.getLayout()).show(content, "problems");
       assetComponent.getToolbar().setVisible(false);
+      consoleToolbar.setVisible(false);
     });
-    debuggerTab.addActionListener(e -> showDebuggerTab());
+    debuggerTab.addActionListener(e -> {
+      showDebuggerTab();
+      consoleToolbar.setVisible(false);
+    });
 
     bottomPanel.add(header, BorderLayout.NORTH);
     bottomPanel.add(content, BorderLayout.CENTER);
@@ -1381,6 +1403,9 @@ public final class UI {
     if (scriptWorkspacePanel != null) {
       scriptWorkspacePanel.refreshTheme();
     }
+    if (Game.window() != null && Game.window().getHostControl() instanceof javax.swing.JFrame window && window.getJMenuBar() instanceof de.gurkenlabs.utiliti.view.menus.MainMenuBar mainMenuBar) {
+      mainMenuBar.refreshTheme();
+    }
     updateOrphanComponents();
     loadingTheme = false;
   }
@@ -1434,7 +1459,7 @@ public final class UI {
     UIManager.put("TextArea.borderColor", Style.COLOR_BORDER);
     UIManager.put("TextArea.border.enabled", Style.COLOR_BORDER);
     UIManager.put("TextArea.border.focus", Style.COLOR_ACCENT_BLUE);
-    UIManager.put("TextPane.background", Style.COLOR_ASSET_EXPLORER);
+    UIManager.put("TextPane.background", Style.COLOR_BG);
     UIManager.put("TextPane.foreground", Style.COLOR_TEXT);
     UIManager.put("FormattedTextField.background", INPUT_BG);
     UIManager.put("FormattedTextField.foreground", Style.COLOR_TEXT);
@@ -1516,6 +1541,10 @@ public final class UI {
     UIManager.put("Windows.TitlePane.foreground", Style.COLOR_TEXT);
     UIManager.put("Windows.TitlePane.inactiveForeground", Style.COLOR_SUBTEXT);
     UIManager.put("Windows.TitlePane.borderColor", Style.COLOR_BG);
+    UIManager.put("MenuBar.borderColor", Style.COLOR_BG);
+    UIManager.put("MenuBar.border", BorderFactory.createEmptyBorder());
+    UIManager.put("ToolBar.borderColor", Style.COLOR_BG);
+    UIManager.put("ToolBar.border", BorderFactory.createEmptyBorder());
     // ScrollBars - thinner, cleaner
     UIManager.put("ScrollBar.background", Style.COLOR_BG);
     UIManager.put("ScrollBar.foreground", Style.COLOR_BORDER);
@@ -1589,6 +1618,12 @@ public final class UI {
     UIManager.put("PasswordField.border", new DarkTextBorder());
     UIManager.put("Spinner.border", new DarkSpinnerBorder());
     UIManager.put("Table.gridColor", Style.COLOR_LIGHT_GRID);
+    Color lightBg = panel != null ? panel : new Color(248, 248, 248);
+    UIManager.put("Windows.TitlePane.borderColor", lightBg);
+    UIManager.put("MenuBar.borderColor", lightBg);
+    UIManager.put("MenuBar.border", BorderFactory.createEmptyBorder());
+    UIManager.put("ToolBar.borderColor", lightBg);
+    UIManager.put("ToolBar.border", BorderFactory.createEmptyBorder());
 
     applyMenuOverrides(
         panel != null ? panel : new Color(248, 248, 248),
@@ -1801,7 +1836,7 @@ public final class UI {
             g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
           }
           g2.setColor(Style.accent());
-          g2.fillRoundRect(4, y + 2, 3, Math.max(4, height - 4), 3, 3);
+          g2.fillRoundRect(x + 1, y + 2, 3, Math.max(4, height - 4), 3, 3);
         } else if (row == hoverRow) {
           g2.setColor(Style.sceneRowHover());
           g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);

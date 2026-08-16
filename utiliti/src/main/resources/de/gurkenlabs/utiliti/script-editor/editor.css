@@ -3,7 +3,7 @@ html, body, #editor {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background: #121214;
+  background: transparent;
 }
 
 .utiliti-breakpoint {

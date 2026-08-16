@@ -270,7 +270,10 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     }
   }
 
+  private boolean currentThemeDark = Editor.preferences().getTheme() == Style.Theme.DARK;
+
   void setTheme(boolean dark) {
+    this.currentThemeDark = dark;
     if (this.ready) this.send("theme", Json.createObjectBuilder().add("dark", dark).build());
   }
 
@@ -520,6 +523,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
           this.timeoutTimer = null;
         }
         this.stopReadinessTimer();
+        this.send("theme", Json.createObjectBuilder().add("dark", this.currentThemeDark).build());
         if (this.uri != null) {
           SwingUtilities.invokeLater(this::sendOpen);
         }

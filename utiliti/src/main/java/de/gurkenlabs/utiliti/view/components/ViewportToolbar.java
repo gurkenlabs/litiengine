@@ -22,6 +22,8 @@ import de.gurkenlabs.utiliti.controller.tool.TerrainBrushTool;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.KeyBindings;
 import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.view.dialogs.GameScriptsDialog;
+import de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog;
 import de.gurkenlabs.utiliti.view.menus.AddMenu;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -97,6 +99,7 @@ public class ViewportToolbar extends JPanel {
   private final JPanel runDebugDivider;
   private final JPanel launchStatusDivider;
   private final JPanel stopDivider;
+  private final JPanel mapSelectorContainer;
   private final JPanel mapControlsContainer;
   private final JPanel scriptControlsContainer;
   private final JPanel rightControlsContainer;
@@ -124,7 +127,8 @@ public class ViewportToolbar extends JPanel {
     mapSelector.putClientProperty("JComponent.roundRect", true);
     mapSelector.putClientProperty("JComponent.outline", "none");
     mapSelector.getAccessibleContext().setAccessibleName(Resources.strings().get("toolbar_activeMap"));
-    left.add(controlGroup(mapSelector));
+    this.mapSelectorContainer = controlGroup(mapSelector);
+    left.add(this.mapSelectorContainer);
 
     boolean initialHasProject = Editor.instance().getProjectPath() != null;
 
@@ -233,32 +237,32 @@ public class ViewportToolbar extends JPanel {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().saveActive();
     }, null);
 
-    JButton btnCompileReload = button("Compile", Icons.COMPILE_16, () -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().reloadActive();
+    JButton btnDuplicateScript = button("Duplicate", Icons.COPY_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().duplicateActiveOrSelected();
     }, null);
+    sizeLabeledButton(btnDuplicateScript);
 
-    JButton btnReloadDisk = button("Reload", Icons.RELOAD_16, () -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().reloadActiveFromDisk();
-    }, null);
+    JButton btnDeleteScript = button("Delete", Icons.DELETE_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().deleteActiveOrSelected();
+    }, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+    Style.styleButton(btnDeleteScript, Style.ButtonVariant.DESTRUCTIVE);
+    sizeLabeledButton(btnDeleteScript);
 
-    JButton btnOpenIde = button("Open in IDE", Icons.EXTERNAL_16, () -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().openActiveExternally();
-    }, null);
-
-    JButton btnFormatScript = button("Format code", Icons.FORMAT_CODE_16, () -> {
-      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().formatActive();
-    }, null);
+    JButton btnMoreScriptActions = button("", Icons.MISC_24, () -> {}, null);
+    makeIconOnly(btnMoreScriptActions, 28);
+    btnMoreScriptActions.setToolTipText("More script actions");
+    btnMoreScriptActions.getAccessibleContext().setAccessibleName("More script actions");
+    btnMoreScriptActions.addActionListener(event ->
+      this.createScriptActionsMenu().show(btnMoreScriptActions, 0, btnMoreScriptActions.getHeight()));
 
     addToControlGroup(scriptGroup, splitButton(btnNewScript, btnNewScriptMenu));
     addToControlGroup(scriptGroup, btnSaveScript);
-    addToControlGroup(scriptGroup, btnFormatScript);
-    addToControlGroup(scriptGroup, btnCompileReload);
-    addToControlGroup(scriptGroup, btnReloadDisk);
-    addToControlGroup(scriptGroup, btnOpenIde);
+    addToControlGroup(scriptGroup, btnDuplicateScript);
+    addToControlGroup(scriptGroup, btnDeleteScript);
+    addToControlGroup(scriptGroup, btnMoreScriptActions);
     addToControlStrip(this.scriptControlsContainer, scriptGroup);
     this.scriptControlsContainer.setVisible(false);
     left.add(this.scriptControlsContainer);
-
     this.btnUndo.setEnabled(false);
     this.btnRedo.setEnabled(false);
     this.btnUndoHistory.setEnabled(false);
@@ -344,9 +348,38 @@ public class ViewportToolbar extends JPanel {
   }
 
   public void setScriptMode(boolean scriptMode) {
+    this.mapSelectorContainer.setVisible(true);
     this.mapControlsContainer.setVisible(!scriptMode);
     this.scriptControlsContainer.setVisible(scriptMode);
     this.rightControlsContainer.setVisible(!scriptMode);
+  }
+
+  JPopupMenu createScriptActionsMenu() {
+    JPopupMenu menu = new JPopupMenu();
+    JMenuItem format = new JMenuItem("Format code", Icons.FORMAT_CODE_16);
+    format.addActionListener(event -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().formatActive();
+    });
+    JMenuItem build = new JMenuItem("Build", Icons.COMPILE_16);
+    build.addActionListener(event -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().build();
+    });
+    JMenuItem reload = new JMenuItem("Reload from disk", Icons.RELOAD_16);
+    reload.addActionListener(event -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().reloadActiveFromDisk();
+    });
+    JMenuItem configure = new JMenuItem("Configure game scripts...", Icons.SETTINGS_16);
+    configure.addActionListener(event -> GameScriptsDialog.showDialog());
+    JMenuItem guide = new JMenuItem("Scripting guide", Icons.DOCUMENTATION_16);
+    guide.addActionListener(event -> ScriptEventExplorerDialog.showGuide());
+
+    menu.add(format);
+    menu.add(build);
+    menu.add(reload);
+    menu.addSeparator();
+    menu.add(configure);
+    menu.add(guide);
+    return menu;
   }
 
   private void showNewScriptMenu(Component invoker) {

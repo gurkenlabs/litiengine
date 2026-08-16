@@ -73,7 +73,7 @@ final class ScriptDebuggerPanel extends JPanel {
 
   ScriptDebuggerPanel() {
     super(new BorderLayout());
-    this.setBackground(Style.COLOR_BG);
+    this.setBackground(Style.background());
     this.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()));
     this.add(this.createToolbar(), BorderLayout.NORTH);
     this.add(this.createContent(), BorderLayout.CENTER);
@@ -86,6 +86,16 @@ final class ScriptDebuggerPanel extends JPanel {
     this.stop.addActionListener(event -> this.stopAction.run());
     this.showFrameworkFrames.addActionListener(event -> this.refreshFrames());
     this.updateState(ScriptDebuggerBackend.State.DISCONNECTED, "Debugger disconnected");
+  }
+
+  void refreshTheme() {
+    this.setBackground(Style.background());
+    this.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()));
+    this.frames.setBackground(Style.surface());
+    this.frames.setForeground(Style.text());
+    this.variables.setBackground(Style.surface());
+    this.variables.setForeground(Style.text());
+    this.repaint();
   }
 
   void onResume(Runnable action) { this.resumeAction = action == null ? () -> {} : action; }
@@ -161,7 +171,7 @@ final class ScriptDebuggerPanel extends JPanel {
 
   private Component createContent() {
     this.frames.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    this.frames.setBackground(Style.COLOR_BG);
+    this.frames.setBackground(Style.surface());
     this.frames.setForeground(Style.text());
     this.frames.setSelectionBackground(Style.sceneRowSelected());
     this.frames.setFixedCellHeight(28);
@@ -173,7 +183,7 @@ final class ScriptDebuggerPanel extends JPanel {
       if (frame != null) this.frameAction.accept(frame);
     });
 
-    this.variables.setBackground(Style.COLOR_BG);
+    this.variables.setBackground(Style.surface());
     this.variables.setForeground(Style.text());
     this.variables.setSelectionBackground(Style.sceneRowSelected());
     this.variables.setGridColor(Style.border());
@@ -350,7 +360,7 @@ final class ScriptDebuggerPanel extends JPanel {
   private static JPanel section(JLabel titleLabel, Component content, Component action) {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setOpaque(true);
-    panel.setBackground(Style.COLOR_BG);
+    panel.setBackground(Style.background());
     JPanel header = new JPanel(new BorderLayout());
     header.setOpaque(true);
     header.setBackground(Style.background());
@@ -378,7 +388,7 @@ final class ScriptDebuggerPanel extends JPanel {
   private static JScrollPane scroll(Component component) {
     JScrollPane scroll = new JScrollPane(component);
     scroll.setBorder(null);
-    scroll.getViewport().setBackground(Style.COLOR_BG);
+    scroll.getViewport().setBackground(Style.surface());
     return scroll;
   }
 
@@ -411,7 +421,7 @@ final class ScriptDebuggerPanel extends JPanel {
       this.method.setText(simpleClass + "." + frame.method() + "()");
       this.location.setText(frame.source() + ":" + frame.line());
       this.setOpaque(true);
-      this.setBackground(selected ? Style.sceneRowSelected() : Style.COLOR_BG);
+      this.setBackground(selected ? Style.sceneRowSelected() : Style.surface());
       this.method.setForeground(selected ? Color.WHITE : Style.text());
       this.location.setForeground(selected ? new Color(205, 215, 230) : Style.mutedText());
       return this;
@@ -470,7 +480,7 @@ final class ScriptDebuggerPanel extends JPanel {
       }
       this.setFont(Style.getDefaultFont().deriveFont(column == 0 ? Font.BOLD : Font.PLAIN, 11f));
       this.setForeground(selected ? Color.WHITE : column == 2 ? Style.mutedText() : Style.text());
-      this.setBackground(selected ? Style.sceneRowSelected() : Style.COLOR_BG);
+      this.setBackground(selected ? Style.sceneRowSelected() : Style.surface());
       this.setToolTipText(value == null ? null : value.toString());
       return this;
     }

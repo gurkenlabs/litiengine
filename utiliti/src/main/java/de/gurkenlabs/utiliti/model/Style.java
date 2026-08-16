@@ -105,8 +105,8 @@ public final class Style {
   public static final Color COLOR_SCENE_ROW_SELECTED = new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 30);
   public static final Color COLOR_WORKSPACE_TOP = new Color(24, 24, 28);
   public static final Color COLOR_WORKSPACE_BOTTOM = new Color(14, 14, 17);
-  public static final Color COLOR_ASSET_EXPLORER = new Color(14, 14, 16);
-  public static final Color COLOR_ASSET_EXPLORER_LIGHT = new Color(245, 245, 247);
+  public static final Color COLOR_ASSET_EXPLORER = COLOR_BG;
+  public static final Color COLOR_ASSET_EXPLORER_LIGHT = new Color(248, 248, 248);
   public static final Color COLOR_MAP_BACKING = new Color(10, 10, 12);
   public static final Color COLOR_MAP_BORDER = new Color(92, 92, 104, 180);
 
@@ -545,9 +545,7 @@ public final class Style {
   }
 
   public static Color assetExplorerBackground() {
-    return Editor.preferences().getTheme() == Theme.DARK
-      ? COLOR_ASSET_EXPLORER
-      : COLOR_ASSET_EXPLORER_LIGHT;
+    return background();
   }
 
   public static Color mapBacking() {

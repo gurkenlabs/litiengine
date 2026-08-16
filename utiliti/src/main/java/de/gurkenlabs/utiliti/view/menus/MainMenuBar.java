@@ -14,8 +14,8 @@ public class MainMenuBar extends JMenuBar {
 
   public MainMenuBar() {
     this.setOpaque(true);
-    this.setBackground(Style.COLOR_BG);
-    this.setForeground(Style.COLOR_TEXT);
+    this.setBackground(Style.background());
+    this.setForeground(Style.text());
     this.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
     this.add(new FileMenu());
     this.add(new EditMenu());
@@ -28,6 +28,14 @@ public class MainMenuBar extends JMenuBar {
     this.add(this.scriptMenu);
     this.add(new HelpMenu());
     styleTopLevelMenus();
+  }
+
+  public void refreshTheme() {
+    this.setBackground(Style.background());
+    this.setForeground(Style.text());
+    this.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+    styleTopLevelMenus();
+    repaint();
   }
 
   public void setScriptMode(boolean scriptMode) {
@@ -62,6 +70,7 @@ public class MainMenuBar extends JMenuBar {
       if (component instanceof JMenu menu) {
         menu.setFont(menu.getFont().deriveFont(13f));
         menu.setOpaque(false);
+        menu.setForeground(Style.text());
         menu.setMargin(new Insets(6, 12, 6, 12));
         menu.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
       }

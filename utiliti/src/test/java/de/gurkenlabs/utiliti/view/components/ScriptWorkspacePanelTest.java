@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -13,6 +14,7 @@ import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.ScriptBindingService;
 import de.gurkenlabs.utiliti.controller.ScriptBindingTarget;
+import de.gurkenlabs.utiliti.model.Icons;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -106,13 +108,21 @@ class ScriptWorkspacePanelTest {
   @Test
   void scriptContextDescribesHostWithoutExposingAssignmentsAsBindings() {
     ScriptDefinition entity = definition();
-    assertEquals("Entity · Creature", ScriptWorkspacePanel.scriptContext(entity));
+    assertEquals("Entity Script · Creature", ScriptWorkspacePanel.scriptContext(entity));
 
     entity.setHost(ScriptHostType.ENVIRONMENT);
-    assertEquals("Map", ScriptWorkspacePanel.scriptContext(entity));
+    assertEquals("Map Script", ScriptWorkspacePanel.scriptContext(entity));
 
     entity.setHost(ScriptHostType.GAME);
-    assertEquals("Game", ScriptWorkspacePanel.scriptContext(entity));
+    assertEquals("Game Script", ScriptWorkspacePanel.scriptContext(entity));
+
+    assertNotNull(ScriptWorkspacePanel.scriptContextIcon(entity));
+    assertEquals(Icons.CREATURE_16, ScriptWorkspacePanel.entityTypeIcon("Creature"));
+    assertEquals(Icons.PROP_16, ScriptWorkspacePanel.entityTypeIcon("de.gurkenlabs.litiengine.entities.Prop"));
+    assertEquals(Icons.EMITTER_16, ScriptWorkspacePanel.entityTypeIcon("Emitter"));
+    assertEquals(Icons.BULB_16, ScriptWorkspacePanel.entityTypeIcon("LightSource"));
+    assertEquals(Icons.TRIGGER_16, ScriptWorkspacePanel.entityTypeIcon("Trigger"));
+    assertEquals(Icons.SPAWNPOINT_16, ScriptWorkspacePanel.entityTypeIcon("Spawnpoint"));
   }
 
   @Test
@@ -129,7 +139,7 @@ class ScriptWorkspacePanelTest {
   }
 
   @Test
-  void testRefreshScriptsCompactsEmptyPackages() {
+  void scriptListDoesNotExposeSourcePackages() {
     de.gurkenlabs.litiengine.Game.init(de.gurkenlabs.litiengine.Game.COMMANDLINE_ARG_NOGUI);
     if (Editor.instance().getGameFile() == null) {
       Editor.instance().load(null, false);
@@ -143,15 +153,16 @@ class ScriptWorkspacePanelTest {
 
     panel.refreshScripts();
 
-    boolean found = false;
+    boolean foundAtRoot = false;
     for (int i = 0; i < panel.getScriptsRoot().getChildCount(); i++) {
       javax.swing.tree.DefaultMutableTreeNode node = (javax.swing.tree.DefaultMutableTreeNode) panel.getScriptsRoot().getChildAt(i);
-      if ("de.gurkenlabs.game.scripts".equals(node.getUserObject().toString())) {
-        found = true;
+      if ("HeroAI".equals(node.getUserObject().toString())) {
+        foundAtRoot = true;
+        assertTrue(node.isLeaf());
         break;
       }
     }
-    assertTrue(found, "Compacted package folder de.gurkenlabs.game.scripts should exist");
+    assertTrue(foundAtRoot, "Scripts should be listed directly without Java package folders");
     panel.close();
   }
 

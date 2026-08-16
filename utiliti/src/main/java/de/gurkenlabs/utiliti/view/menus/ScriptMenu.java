@@ -65,17 +65,13 @@ public class ScriptMenu extends JMenu {
     formatCode.addActionListener(e -> UI.getScriptWorkspacePanel().formatActive());
     KeyBindings.bind(formatCode, Command.SCRIPT_FORMAT);
 
-    JMenuItem compile = new JMenuItem("Compile", Icons.COMPILE_16);
-    compile.addActionListener(e -> UI.getScriptWorkspacePanel().reloadActive());
-    KeyBindings.bind(compile, Command.SCRIPT_COMPILE);
+    JMenuItem build = new JMenuItem("Build", Icons.COMPILE_16);
+    build.addActionListener(e -> UI.getScriptWorkspacePanel().build());
+    KeyBindings.bind(build, Command.SCRIPT_COMPILE);
 
     JMenuItem reload = new JMenuItem("Reload", Icons.RELOAD_16);
     reload.addActionListener(e -> UI.getScriptWorkspacePanel().reloadActiveFromDisk());
     KeyBindings.bind(reload, Command.SCRIPT_RELOAD);
-
-    JMenuItem openIde = new JMenuItem("Open in IDE", Icons.EXTERNAL_16);
-    openIde.addActionListener(e -> UI.getScriptWorkspacePanel().openActiveExternally());
-    KeyBindings.bind(openIde, Command.SCRIPT_OPEN_IDE);
 
     JMenuItem exploreEvents = new JMenuItem("Script Events & API Explorer...", Icons.API_16);
     exploreEvents.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showDialog());
@@ -93,9 +89,7 @@ public class ScriptMenu extends JMenu {
     this.addSeparator();
     this.add(save);
     this.add(formatCode);
-    this.add(compile);
+    this.add(build);
     this.add(reload);
-    this.addSeparator();
-    this.add(openIde);
   }
 }

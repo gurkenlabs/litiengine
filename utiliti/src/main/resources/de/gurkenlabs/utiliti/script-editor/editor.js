@@ -140,6 +140,35 @@
       }
     });
 
+
+    monaco.editor.defineTheme('utiliti-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        { token: '', foreground: '1E1E23', background: 'FFFFFF' },
+        { token: 'comment', foreground: '565F89', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '7C3AED' },
+        { token: 'keyword.control', foreground: '7C3AED' },
+        { token: 'keyword.type', foreground: '0284C7' },
+        { token: 'string', foreground: '15803D' },
+        { token: 'string.escape', foreground: '0284C7' },
+        { token: 'number', foreground: 'D97706' },
+        { token: 'annotation', foreground: 'D97706' },
+        { token: 'function', foreground: '2563EB' },
+        { token: 'variable', foreground: '1E1E23' },
+        { token: 'property', foreground: '2563EB' },
+      ],
+      colors: {
+        'editor.background': '#FFFFFF',
+        'editor.foreground': '#1E1E23',
+        'editorLineNumber.foreground': '#94A3B8',
+        'editorLineNumber.activeForeground': '#1E1E23',
+        'editorCursor.foreground': '#3574F2',
+        'editorGutter.background': '#FFFFFF',
+        'minimap.background': '#FFFFFF',
+      }
+    });
+
     const editor = monaco.editor.create(document.getElementById('editor'), {
       automaticLayout: true,
       theme: 'utiliti-dark',
@@ -648,7 +677,8 @@
               models.delete(uri.toString());
             }
           } else if (method === 'theme') {
-            monaco.editor.setTheme(payload.dark ? 'utiliti-dark' : 'vs');
+            monaco.editor.setTheme(payload.dark ? 'utiliti-dark' : 'utiliti-light');
+            document.body.style.background = payload.dark ? '#121214' : '#FFFFFF';
           } else if (method === 'focus') {
             try { editor.focus(); } catch (ignored) {}
           } else if (method === 'blur') {
