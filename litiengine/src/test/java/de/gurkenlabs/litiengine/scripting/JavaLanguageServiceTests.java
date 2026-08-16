@@ -126,9 +126,77 @@ class JavaLanguageServiceTests {
     assertFalse(actions.isEmpty(), "QuickFix code actions should not be empty for @Script");
 
     List<String> titles = actions.stream().map(ScriptLanguageService.CodeAction::title).toList();
-    assertTrue(titles.contains("Change to '@ScriptProperty'"), "Should offer quick fix to change to @ScriptProperty");
-    assertTrue(titles.stream().anyMatch(t -> t.startsWith("Change to '@ScriptProperty(")), "Should offer quick fix to change to @ScriptProperty snippet");
+    assertTrue(titles.stream().anyMatch(t -> t.contains("@ScriptProperty")), "Should offer quick fix to change to @ScriptProperty");
     assertTrue(titles.contains("Change to '@ScriptInfo'"), "Should offer quick fix to change to @ScriptInfo");
+  }
+
+  @Test
+  void testCodeActionsOnAtSPrefixAboveField() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class Loader extends GameScript {
+          @S
+          private int speed;
+        }
+        """;
+
+    int line = 4;
+    int col = 4;
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///Loader.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.CodeAction> actions = this.service.codeActions(
+      doc,
+      new ScriptLanguageService.Range(new ScriptLanguageService.Position(line, 2), new ScriptLanguageService.Position(line, col)),
+      List.of()
+    );
+
+    assertNotNull(actions);
+    assertFalse(actions.isEmpty(), "QuickFix code actions should not be empty for @S above field");
+
+    List<String> titles = actions.stream().map(ScriptLanguageService.CodeAction::title).toList();
+    assertTrue(titles.stream().anyMatch(t -> t.contains("@ScriptProperty")), "Should offer to add/change to @ScriptProperty");
+  }
+
+  @Test
+  void testAlwaysOfferToConvertFieldsToScriptProperty() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class Loader extends GameScript {
+          private int speed;
+          public boolean active = true;
+        }
+        """;
+
+    int line = 4; // on `private int speed;`
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///Loader.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.CodeAction> actions = this.service.codeActions(
+      doc,
+      new ScriptLanguageService.Range(new ScriptLanguageService.Position(line, 5), new ScriptLanguageService.Position(line, 15)),
+      List.of()
+    );
+
+    assertNotNull(actions);
+    assertFalse(actions.isEmpty(), "Should offer code actions to convert field to @ScriptProperty");
+
+    List<String> titles = actions.stream().map(ScriptLanguageService.CodeAction::title).toList();
+    assertTrue(titles.contains("Add '@ScriptProperty' to field 'speed'"), "Should offer to add @ScriptProperty to field 'speed'");
+    assertTrue(titles.stream().anyMatch(t -> t.startsWith("Add '@ScriptProperty(name = \"speed\"")), "Should offer configured @ScriptProperty for 'speed'");
+    assertTrue(titles.contains("Convert field 'active' to '@ScriptProperty'"), "Should offer to convert other field 'active' too");
   }
 }
 

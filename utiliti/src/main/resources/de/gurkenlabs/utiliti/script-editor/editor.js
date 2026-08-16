@@ -273,24 +273,37 @@
             const value = await query('complete', currentPosition(position));
             if (gen !== modelGeneration || editor.getModel() !== model) return { suggestions: [] };
             const word = model.getWordUntilPosition(position);
-            const range = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
+            const lineContent = model.getLineContent(position.lineNumber);
+            const lineUntilPos = lineContent.substring(0, position.column - 1);
+            const atIndex = lineUntilPos.lastIndexOf('@');
+            const isAnnotationContext = atIndex >= 0 && /^@\s*[A-Za-z0-9_$]*$/.test(lineUntilPos.substring(atIndex));
+
+            const wordRange = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
+            const atRange = isAnnotationContext ? new monaco.Range(position.lineNumber, atIndex + 1, position.lineNumber, word.endColumn) : wordRange;
+
             return { suggestions: value.items.map(item => {
-              const filterText = (item.label || item.insertText || '').replace(/\(.*\)/, '');
-              const sortPrefix = item.label.startsWith('ScriptProperty') ? '000_'
-                : item.label.startsWith('ScriptInfo') ? '001_'
+              const label = item.label || '';
+              const insertText = item.insertText || label;
+              const hasAtInInsert = insertText.startsWith('@');
+              const targetRange = hasAtInInsert && isAnnotationContext ? atRange : wordRange;
+              const filterText = (label || insertText).replace(/^@/, '').replace(/\(.*\)/, '');
+              const isProp = label.includes('ScriptProperty') || label === 'prop' || label.startsWith('@ScriptProperty');
+              const isInfo = label.includes('ScriptInfo') || label.startsWith('@ScriptInfo');
+              const sortPrefix = isProp ? '000_'
+                : isInfo ? '001_'
                 : item.kind === 'SNIPPET' ? '010_'
                 : item.kind === 'PROPERTY' ? '020_'
                 : item.kind === 'FIELD' || item.kind === 'METHOD' ? '030_'
                 : '100_';
               const suggestion = {
-                label: item.label,
+                label: label,
                 kind: completionKind(item.kind),
                 detail: item.detail + (item.returnType ? `  ${item.returnType}` : ''),
-                insertText: item.insertText,
+                insertText: insertText,
                 insertTextRules: item.kind === 'SNIPPET' ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet : undefined,
                 filterText: filterText,
-                sortText: sortPrefix + item.label,
-                range,
+                sortText: sortPrefix + label,
+                range: targetRange,
                 additionalTextEdits: (item.additionalTextEdits || []).map(edit => ({
                   range: new monaco.Range(edit.startLine + 1, edit.startColumn + 1, edit.endLine + 1, edit.endColumn + 1),
                   text: edit.text

@@ -173,7 +173,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final Consumer<ScriptBindingTarget> scriptBindingChangeListener = ignored ->
     SwingUtilities.invokeLater(this::scriptBindingsChanged);
   private final Consumer<UndoManager> undoStackChangeListener = ignored ->
-    SwingUtilities.invokeLater(this.usagesPanel::refresh);
+    SwingUtilities.invokeLater(this::refreshActiveUsages);
   private JSplitPane editorSplit;
 
   public ScriptWorkspacePanel() {
@@ -294,6 +294,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.editorSplit.setResizeWeight(1.0);
     this.editorSplit.setDividerSize(0);
     this.editorSplit.setDividerLocation(1.0);
+    this.usagesPanel.setVisible(false);
     this.mainEditorArea.add(this.editorSplit, BorderLayout.CENTER);
 
     JPanel statusBar = new JPanel(new BorderLayout());
@@ -345,7 +346,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         if (UI.isScriptWorkspaceActive()) {
           this.focusOrOpenFirstScript();
         }
-        this.usagesPanel.refresh();
+        this.refreshActiveUsages();
       });
     });
 
@@ -483,7 +484,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.scriptUsageCounts = this.visibleUsageCounts();
     this.scripts.treeDidChange();
     ScriptTab active = this.activeTab();
-    this.usagesPanel.showScript(active == null ? null : active.definition);
+    this.updateUsagesPanel(active == null ? null : active.definition);
   }
 
   private void scriptBindingsChanged() {
@@ -1761,7 +1762,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.scriptContext.setText(scriptContext(definition));
     this.scriptContext.setIcon(scriptContextIcon(definition));
     this.scriptContext.setVisible(definition != null);
-    this.usagesPanel.showScript(definition);
+    this.updateUsagesPanel(definition);
     this.selectionListener.accept(definition);
     this.showDiagnostics(definition);
     this.refreshOutline(active);
@@ -1774,11 +1775,33 @@ public final class ScriptWorkspacePanel extends JPanel {
     SwingUtilities.invokeLater(() -> {
       int height = this.editorSplit.getHeight();
       if (height <= 0) return;
+      if (!this.usagesPanel.isVisible()) {
+        this.editorSplit.setDividerSize(0);
+        this.editorSplit.setDividerLocation(height);
+        return;
+      }
       int panelHeight = expanded
         ? Math.min(180, Math.max(120, height / 4)) : this.usagesPanel.collapsedHeight();
       this.editorSplit.setDividerSize(expanded ? 3 : 0);
       this.editorSplit.setDividerLocation(Math.max(0, height - panelHeight - this.editorSplit.getDividerSize()));
     });
+  }
+
+  private void updateUsagesPanel(ScriptDefinition definition) {
+    boolean visible = showsUsagesFor(definition);
+    this.usagesPanel.setVisible(visible);
+    this.usagesPanel.showScript(visible ? definition : null);
+    this.resizeUsagesPanel(false);
+  }
+
+  private void refreshActiveUsages() {
+    if (this.usagesPanel.isVisible()) {
+      this.usagesPanel.refresh();
+    }
+  }
+
+  static boolean showsUsagesFor(ScriptDefinition definition) {
+    return definition != null && definition.getHost() != ScriptHostType.GAME;
   }
 
   private void navigateToUsage(ScriptBindingService.ScriptUsage usage) {
@@ -2516,12 +2539,14 @@ public final class ScriptWorkspacePanel extends JPanel {
       openIdeItem.addActionListener(evt -> openActiveExternally());
       menu.add(openIdeItem);
 
-      JMenuItem usagesItem = new JMenuItem("Find Usages", Icons.SEARCH_16);
-      usagesItem.addActionListener(evt -> {
-        open(selected);
-        usagesPanel.reveal();
-      });
-      menu.add(usagesItem);
+      if (showsUsagesFor(selected)) {
+        JMenuItem usagesItem = new JMenuItem("Find Usages", Icons.SEARCH_16);
+        usagesItem.addActionListener(evt -> {
+          open(selected);
+          usagesPanel.reveal();
+        });
+        menu.add(usagesItem);
+      }
     }
     menu.show(e.getComponent(), e.getX(), e.getY());
   }

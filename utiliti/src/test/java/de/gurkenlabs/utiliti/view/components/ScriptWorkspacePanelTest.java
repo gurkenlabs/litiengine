@@ -116,6 +116,19 @@ class ScriptWorkspacePanelTest {
   }
 
   @Test
+  void usedByIsHiddenForGameScripts() {
+    ScriptDefinition definition = definition();
+    assertTrue(ScriptWorkspacePanel.showsUsagesFor(definition));
+
+    definition.setHost(ScriptHostType.ENVIRONMENT);
+    assertTrue(ScriptWorkspacePanel.showsUsagesFor(definition));
+
+    definition.setHost(ScriptHostType.GAME);
+    assertFalse(ScriptWorkspacePanel.showsUsagesFor(definition));
+    assertFalse(ScriptWorkspacePanel.showsUsagesFor(null));
+  }
+
+  @Test
   void testRefreshScriptsCompactsEmptyPackages() {
     de.gurkenlabs.litiengine.Game.init(de.gurkenlabs.litiengine.Game.COMMANDLINE_ARG_NOGUI);
     if (Editor.instance().getGameFile() == null) {

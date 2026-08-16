@@ -180,6 +180,91 @@ public class JavaLanguageService implements ScriptLanguageService {
 
     List<CodeAction> actions = new ArrayList<>();
     String[] lines = source.split("\r?\n", -1);
+    List<DeclaredScriptField> declaredFields = scanDeclaredFields(source);
+    int targetLine = range.start().line();
+
+    DeclaredScriptField targetField = declaredFields.stream()
+      .filter(f -> f.line() == targetLine || f.annotationLine() == targetLine || (f.line() >= range.start().line() && f.line() <= range.end().line()))
+      .findFirst().orElse(null);
+
+    if (targetField != null) {
+      if (!targetField.hasScriptProperty()) {
+        List<TextEdit> propEdits = new ArrayList<>();
+        if (targetField.annotationRange() != null && targetField.annotationLine() >= 0 && lines[targetField.annotationLine()].trim().matches("^@\\s*[A-Za-z0-9_$]*$")) {
+          propEdits.add(new TextEdit(targetField.annotationRange(), targetField.indentation() + "@ScriptProperty"));
+        } else {
+          propEdits.add(new TextEdit(new Range(new Position(targetField.line(), 0), new Position(targetField.line(), 0)),
+            targetField.indentation() + "@ScriptProperty\n"));
+        }
+        if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+          propEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+        }
+        actions.add(new CodeAction("Add '@ScriptProperty' to field '" + targetField.name() + "'", "quickfix", propEdits));
+
+        List<TextEdit> propParamEdits = new ArrayList<>();
+        String snippet = targetField.indentation() + "@ScriptProperty(name = \"" + targetField.name() + "\", description = \"\")";
+        if (targetField.annotationRange() != null && targetField.annotationLine() >= 0 && lines[targetField.annotationLine()].trim().matches("^@\\s*[A-Za-z0-9_$]*$")) {
+          propParamEdits.add(new TextEdit(targetField.annotationRange(), snippet));
+        } else {
+          propParamEdits.add(new TextEdit(new Range(new Position(targetField.line(), 0), new Position(targetField.line(), 0)),
+            snippet + "\n"));
+        }
+        if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+          propParamEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+        }
+        actions.add(new CodeAction("Add '@ScriptProperty(name = \"" + targetField.name() + "\", description = \"...\")' to field '" + targetField.name() + "'", "quickfix", propParamEdits));
+      } else if (!targetField.hasAnnotationParams() && targetField.annotationRange() != null) {
+        actions.add(new CodeAction("Configure '@ScriptProperty' attributes for '" + targetField.name() + "'", "refactor",
+          List.of(new TextEdit(targetField.annotationRange(), targetField.indentation() + "@ScriptProperty(name = \"" + targetField.name() + "\", description = \"\")"))));
+      }
+    }
+
+    if (targetLine >= 0 && targetLine < lines.length) {
+      String lineStr = lines[targetLine];
+      Matcher atLineMatcher = Pattern.compile("^(\\s*)@\\s*([A-Za-z0-9_$]*)").matcher(lineStr);
+      if (atLineMatcher.find()) {
+        String indent = atLineMatcher.group(1);
+        String annotName = atLineMatcher.group(2);
+        Range annotReplaceRange = new Range(new Position(targetLine, atLineMatcher.start()), new Position(targetLine, atLineMatcher.end()));
+
+        if (!annotName.equals("ScriptProperty") && actions.stream().noneMatch(a -> a.title().contains("@ScriptProperty"))) {
+          List<TextEdit> propEdits = new ArrayList<>();
+          propEdits.add(new TextEdit(annotReplaceRange, indent + "@ScriptProperty"));
+          if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+            propEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+          }
+          actions.add(new CodeAction("Change to '@ScriptProperty'", "quickfix", propEdits));
+
+          List<TextEdit> propParamEdits = new ArrayList<>();
+          propParamEdits.add(new TextEdit(annotReplaceRange, indent + "@ScriptProperty(name = \"" + annotName.toLowerCase(java.util.Locale.ROOT) + "\", description = \"\")"));
+          if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+            propParamEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+          }
+          actions.add(new CodeAction("Change to '@ScriptProperty(name = \"...\", description = \"...\")'", "quickfix", propParamEdits));
+        }
+
+        if (!annotName.equals("ScriptInfo") && actions.stream().noneMatch(a -> a.title().contains("@ScriptInfo"))) {
+          List<TextEdit> infoEdits = new ArrayList<>();
+          infoEdits.add(new TextEdit(annotReplaceRange, indent + "@ScriptInfo"));
+          if (!importedFqns.contains(ScriptInfo.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+            infoEdits.add(new TextEdit(insertRange, "import " + ScriptInfo.class.getName() + ";\n"));
+          }
+          actions.add(new CodeAction("Change to '@ScriptInfo'", "quickfix", infoEdits));
+        }
+      }
+    }
+
+    for (DeclaredScriptField field : declaredFields) {
+      if (!field.hasScriptProperty() && (targetField == null || !field.name().equals(targetField.name()))) {
+        List<TextEdit> edits = new ArrayList<>();
+        edits.add(new TextEdit(new Range(new Position(field.line(), 0), new Position(field.line(), 0)),
+          field.indentation() + "@ScriptProperty\n"));
+        if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+          edits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+        }
+        actions.add(new CodeAction("Convert field '" + field.name() + "' to '@ScriptProperty'", "refactor", edits));
+      }
+    }
 
     for (String symbol : missingSymbols) {
       // 1. Check if the symbol is used as an annotation (@symbol)
@@ -199,28 +284,32 @@ public class JavaLanguageService implements ScriptLanguageService {
 
       if (isAnnotationUsage || symbol.startsWith("Script") || symbol.startsWith("Prop") || symbol.equalsIgnoreCase("Property")) {
         // Offer @ScriptProperty
-        List<TextEdit> propEdits = new ArrayList<>();
-        propEdits.add(new TextEdit(symbolRange, "ScriptProperty"));
-        if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
-          propEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
-        }
-        actions.add(new CodeAction("Change to '@ScriptProperty'", "quickfix", propEdits));
+        if (actions.stream().noneMatch(a -> a.title().contains("@ScriptProperty"))) {
+          List<TextEdit> propEdits = new ArrayList<>();
+          propEdits.add(new TextEdit(symbolRange, "ScriptProperty"));
+          if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+            propEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+          }
+          actions.add(new CodeAction("Change to '@ScriptProperty'", "quickfix", propEdits));
 
-        // Offer @ScriptProperty with parameters snippet/template
-        List<TextEdit> propParamEdits = new ArrayList<>();
-        propParamEdits.add(new TextEdit(symbolRange, "ScriptProperty(name = \"" + symbol.toLowerCase(java.util.Locale.ROOT) + "\", description = \"\")"));
-        if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
-          propParamEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+          // Offer @ScriptProperty with parameters snippet/template
+          List<TextEdit> propParamEdits = new ArrayList<>();
+          propParamEdits.add(new TextEdit(symbolRange, "ScriptProperty(name = \"" + symbol.toLowerCase(java.util.Locale.ROOT) + "\", description = \"\")"));
+          if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+            propParamEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+          }
+          actions.add(new CodeAction("Change to '@ScriptProperty(name = \"...\", description = \"...\")'", "quickfix", propParamEdits));
         }
-        actions.add(new CodeAction("Change to '@ScriptProperty(name = \"...\", description = \"...\")'", "quickfix", propParamEdits));
 
         // Offer @ScriptInfo
-        List<TextEdit> infoEdits = new ArrayList<>();
-        infoEdits.add(new TextEdit(symbolRange, "ScriptInfo"));
-        if (!importedFqns.contains(ScriptInfo.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
-          infoEdits.add(new TextEdit(insertRange, "import " + ScriptInfo.class.getName() + ";\n"));
+        if (actions.stream().noneMatch(a -> a.title().contains("@ScriptInfo"))) {
+          List<TextEdit> infoEdits = new ArrayList<>();
+          infoEdits.add(new TextEdit(symbolRange, "ScriptInfo"));
+          if (!importedFqns.contains(ScriptInfo.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+            infoEdits.add(new TextEdit(insertRange, "import " + ScriptInfo.class.getName() + ";\n"));
+          }
+          actions.add(new CodeAction("Change to '@ScriptInfo'", "quickfix", infoEdits));
         }
-        actions.add(new CodeAction("Change to '@ScriptInfo'", "quickfix", infoEdits));
 
         // Offer @Override if symbol is close
         if ("Override".toLowerCase(java.util.Locale.ROOT).contains(symbol.toLowerCase(java.util.Locale.ROOT)) || symbol.equalsIgnoreCase("Over")) {
@@ -820,6 +909,65 @@ public class JavaLanguageService implements ScriptLanguageService {
     }
   }
 
+  private record DeclaredScriptField(int line, String indentation, String type, String name, boolean hasScriptProperty, boolean hasAnnotationParams, int annotationLine, Range annotationRange) {}
+
+  private static List<DeclaredScriptField> scanDeclaredFields(String source) {
+    List<DeclaredScriptField> fields = new ArrayList<>();
+    String[] lines = source.split("\r?\n", -1);
+    Pattern fieldPattern = Pattern.compile(
+      "^(\\s*)(?:(?:public|protected|private|static|final|transient|volatile)\\s+)*([A-Za-z0-9_$<>]+(?:\\[\\])?)\\s+([A-Za-z_$][\\w$]*)\\s*(?:=[^;]+)?;");
+    Set<String> keywords = Set.of("if", "while", "for", "switch", "catch", "new", "super", "this", "return", "class", "interface", "enum", "record", "import", "package");
+
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
+      if (line.contains("(") || line.contains(" class ") || line.contains(" interface ") || line.contains(" enum ") || line.contains(" record ")) continue;
+      Matcher m = fieldPattern.matcher(line);
+      if (m.find()) {
+        String indent = m.group(1);
+        String type = m.group(2);
+        String name = m.group(3);
+        if (keywords.contains(name) || keywords.contains(type)) continue;
+
+        boolean hasProp = false;
+        boolean hasParams = false;
+        int annotLine = -1;
+        Range annotRange = null;
+
+        for (int k = i - 1; k >= Math.max(0, i - 4); k--) {
+          String prev = lines[k].trim();
+          if (prev.isEmpty()) continue;
+          if (prev.startsWith("@")) {
+            annotLine = k;
+            int atIdx = lines[k].indexOf('@');
+            annotRange = new Range(new Position(k, atIdx), new Position(k, lines[k].length()));
+            if (prev.contains("ScriptProperty")) {
+              hasProp = true;
+              hasParams = prev.contains("name") || prev.contains("description") || prev.contains("value");
+            }
+          } else {
+            break;
+          }
+        }
+        if (line.trim().startsWith("@")) {
+          int atIdx = line.indexOf('@');
+          int afterAnnot = line.indexOf(' ', atIdx);
+          if (afterAnnot > atIdx) {
+            String annotText = line.substring(atIdx, afterAnnot);
+            annotLine = i;
+            annotRange = new Range(new Position(i, atIdx), new Position(i, afterAnnot));
+            if (annotText.contains("ScriptProperty")) {
+              hasProp = true;
+              hasParams = annotText.contains("name") || annotText.contains("description");
+            }
+          }
+        }
+
+        fields.add(new DeclaredScriptField(i, indent, type, name, hasProp, hasParams, annotLine, annotRange));
+      }
+    }
+    return fields;
+  }
+
   private static void addScriptDeclaredMembers(List<Completion> result, String source) {
     Pattern methodPattern = Pattern.compile(
       "\\b(?:public|protected|private|static|final|abstract|synchronized|native|strictfp|void|[A-Za-z0-9_$<>]+)\\s+([A-Za-z_$][\\w$]*)\\s*\\(([^)]*)\\)");
@@ -1051,9 +1199,25 @@ public class JavaLanguageService implements ScriptLanguageService {
       "Exports this field to the utiLITI inspector for live configuration and map persistence.",
       "ScriptProperty", ScriptProperty.class.getName(), List.of(), propEdits));
 
+    result.add(new Completion("@ScriptProperty", CompletionKind.PROPERTY, ScriptProperty.class.getName(),
+      "Exports this field to the utiLITI inspector for live configuration and map persistence.",
+      "@ScriptProperty", ScriptProperty.class.getName(), List.of(), propEdits));
+
     result.add(new Completion("ScriptProperty(...)", CompletionKind.SNIPPET, "@ScriptProperty(name = \"...\", description = \"...\")",
       "Snippet for @ScriptProperty with configurable metadata attributes.",
       "ScriptProperty(name = \"${1:name}\", description = \"${2:description}\")", ScriptProperty.class.getName(), List.of(), propEdits));
+
+    result.add(new Completion("@ScriptProperty(...)", CompletionKind.SNIPPET, "@ScriptProperty(name = \"...\", description = \"...\")",
+      "Snippet for @ScriptProperty with configurable metadata attributes.",
+      "@ScriptProperty(name = \"${1:name}\", description = \"${2:description}\")", ScriptProperty.class.getName(), List.of(), propEdits));
+
+    result.add(new Completion("scriptproperty", CompletionKind.SNIPPET, "Property field template",
+      "Generates an annotated @ScriptProperty field.",
+      "@ScriptProperty\nprivate ${1:int} ${2:propertyName};\n", ScriptProperty.class.getName(), List.of(), propEdits));
+
+    result.add(new Completion("prop", CompletionKind.SNIPPET, "Property field template",
+      "Generates an annotated @ScriptProperty field.",
+      "@ScriptProperty\nprivate ${1:int} ${2:propertyName};\n", ScriptProperty.class.getName(), List.of(), propEdits));
 
     List<TextEdit> infoEdits = (importedFqns.contains(ScriptInfo.class.getName()) || isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) ? List.of()
       : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
@@ -1063,13 +1227,25 @@ public class JavaLanguageService implements ScriptLanguageService {
       "Declares the script identifier, host type, and target entity class.",
       "ScriptInfo", ScriptInfo.class.getName(), List.of(), infoEdits));
 
+    result.add(new Completion("@ScriptInfo", CompletionKind.CLASS, ScriptInfo.class.getName(),
+      "Declares the script identifier, host type, and target entity class.",
+      "@ScriptInfo", ScriptInfo.class.getName(), List.of(), infoEdits));
+
     result.add(new Completion("ScriptInfo(...)", CompletionKind.SNIPPET, "@ScriptInfo(id = \"...\", host = ...)",
       "Snippet for @ScriptInfo declaration.",
       "ScriptInfo(id = \"${1:id}\", host = ScriptHostType.${2|GAME,ENVIRONMENT,ENTITY|})", ScriptInfo.class.getName(), List.of(), infoEdits));
 
+    result.add(new Completion("@ScriptInfo(...)", CompletionKind.SNIPPET, "@ScriptInfo(id = \"...\", host = ...)",
+      "Snippet for @ScriptInfo declaration.",
+      "@ScriptInfo(id = \"${1:id}\", host = ScriptHostType.${2|GAME,ENVIRONMENT,ENTITY|})", ScriptInfo.class.getName(), List.of(), infoEdits));
+
     result.add(new Completion("Override", CompletionKind.CLASS, "java.lang.Override",
       "Indicates that a method declaration is intended to override a method declaration in a supertype.",
       "Override", "java.lang.Override", List.of(), List.of()));
+
+    result.add(new Completion("@Override", CompletionKind.CLASS, "java.lang.Override",
+      "Indicates that a method declaration is intended to override a method declaration in a supertype.",
+      "@Override", "java.lang.Override", List.of(), List.of()));
 
     result.add(new Completion("Deprecated", CompletionKind.CLASS, "java.lang.Deprecated",
       "Marks the annotated element as deprecated.",
@@ -1110,6 +1286,8 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private static int memberRank(Completion completion) {
+    if (completion.label().contains("ScriptProperty") || completion.label().equals("prop")) return -2;
+    if (completion.label().contains("ScriptInfo")) return -1;
     return switch (completion.kind()) {
       case METHOD, FIELD, PROPERTY, VARIABLE -> 0;
       case SNIPPET -> 1;
