@@ -741,6 +741,7 @@ public class McpToolHandler {
     McpAssetHandler.addToolDefinitions(toolsArr);
     McpAnimationHandler.addToolDefinitions(toolsArr);
     McpTilesetHandler.addToolDefinitions(toolsArr);
+    McpScriptHandler.addToolDefinitions(toolsArr);
 
     return Json.createObjectBuilder().add("tools", toolsArr).build();
   }
@@ -873,6 +874,9 @@ public class McpToolHandler {
     }
     if (McpTilesetHandler.handles(name)) {
       return McpTilesetHandler.handle(name, args);
+    }
+    if (McpScriptHandler.handles(name)) {
+      return McpScriptHandler.handle(name, args);
     }
 
     switch (name) {

@@ -17,6 +17,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 import java.net.URI;
 import java.util.Map;
 
@@ -42,6 +43,12 @@ public class McpResourceHandler {
         "uti://editor/logs", "Editor Logs", "Recent editor log messages and error summary"));
     resources.add(resource(
         "uti://editor/property-docs", "Property Documentation", "Catalog of annotated map object properties, categories, data types, defaults, and type metadata"));
+    resources.add(resource(
+        "uti://project/scripts", "Project Scripts", "Registered script definitions and host types"));
+    resources.add(resource(
+        "uti://project/scripts/diagnostics", "Script Diagnostics", "Current compiler and linter diagnostics for project scripts"));
+    resources.add(resource(
+        "uti://project/scripts/game-bindings", "Game Script Bindings", "Game-level startup scripts and orchestrators"));
     return Json.createObjectBuilder().add("resources", resources).build();
   }
 
@@ -51,6 +58,8 @@ public class McpResourceHandler {
         "uti://map/{name}/layers", "Map Layers", "Layers on a project map selected by name"));
     templates.add(resourceTemplate(
         "uti://map/{name}/entities", "Map Entities", "Entities on a project map selected by name"));
+    templates.add(resourceTemplate(
+        "uti://project/scripts/{name}", "Script Source", "Source code and properties of a script by name or ID"));
     return Json.createObjectBuilder().add("resourceTemplates", templates).build();
   }
 
@@ -84,6 +93,15 @@ public class McpResourceHandler {
       return getEditorLogs();
     } else if (fullPath.equals("editor/property-docs")) {
       return getPropertyDocs();
+    } else if (fullPath.equals("project/scripts")) {
+      return getProjectScripts();
+    } else if (fullPath.equals("project/scripts/diagnostics")) {
+      return getScriptDiagnostics();
+    } else if (fullPath.equals("project/scripts/game-bindings")) {
+      return getGameScriptBindings();
+    } else if (fullPath.startsWith("project/scripts/")) {
+      String scriptName = fullPath.substring("project/scripts/".length());
+      return getScriptSource(scriptName);
     } else if (fullPath.startsWith("map/")) {
       String rest = fullPath.substring(4);
       if (rest.endsWith("/layers")) {
@@ -347,6 +365,22 @@ public class McpResourceHandler {
 
     builder.add("entities", entitiesArr);
     return builder.build();
+  }
+
+  public static JsonObject getProjectScripts() {
+    return McpScriptHandler.handle("list-scripts", JsonValue.EMPTY_JSON_OBJECT);
+  }
+
+  public static JsonObject getScriptDiagnostics() {
+    return McpScriptHandler.handle("get-script-diagnostics", JsonValue.EMPTY_JSON_OBJECT);
+  }
+
+  public static JsonObject getGameScriptBindings() {
+    return McpScriptHandler.handle("get-script-bindings", Json.createObjectBuilder().add("targetType", "game").build());
+  }
+
+  public static JsonObject getScriptSource(String name) {
+    return McpScriptHandler.handle("get-script", Json.createObjectBuilder().add("id", name).build());
   }
 
   private static IMap getTargetMap(String mapName) {

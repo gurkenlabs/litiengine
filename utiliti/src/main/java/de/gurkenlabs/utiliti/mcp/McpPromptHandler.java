@@ -41,6 +41,23 @@ public class McpPromptHandler {
         "Level-design review prompt for evaluating spatial structure, readability, pacing, encounters, and collision topology.",
         reviewArgs.build()));
 
+    // Scripting Prompts
+    JsonArrayBuilder createScriptArgs = Json.createArrayBuilder()
+        .add(createArg("name", "Name of the script class to create", true))
+        .add(createArg("host", "Host type: GAME, ENVIRONMENT, or ENTITY", false))
+        .add(createArg("intent", "Gameplay purpose or behavior description", true));
+    promptsArr.add(createPromptDef(
+        "create_litiengine_script",
+        "Authoring guide for creating LITIENGINE scripts conforming to the 3-tier architecture (GameScript, EnvironmentScript, CreatureScript), fluent combat builders, and lifecycle hooks.",
+        createScriptArgs.build()));
+
+    JsonArrayBuilder debugScriptArgs = Json.createArrayBuilder()
+        .add(createArg("id", "Script ID or class name to diagnose and fix", true));
+    promptsArr.add(createPromptDef(
+        "debug_litiengine_script",
+        "Diagnostic and troubleshooting guide for fixing compiler errors and logic issues in LITIENGINE scripts.",
+        debugScriptArgs.build()));
+
     // Existing templates
     promptsArr.add(createPromptDef("build-dungeon-room", "Template for constructing a classic dungeon room with props, light sources, and spawnpoints", null));
     promptsArr.add(createPromptDef("create-boss-arena", "Template for setting up a boss fight arena with combat entities, triggers, and collision boxes", null));
@@ -128,6 +145,34 @@ public class McpPromptHandler {
               + "8. Collision & traversal quality (no trapped spawns or clipping)\n"
               + "9. Technical integrity (no broken entity/trigger links)\n\n"
               + "Use `analyze_project` and `validate_map_plan` to inspect structural evidence. For tile readability and geometry, inspect the atlas with `render_tileset`, compare existing adjacency with `find_tile_usage`, render local context, and review candidate edits through `preview_tile_edits` before recommending a change.");
+
+      case "create_litiengine_script" -> createPromptResult(
+          "LITIENGINE Script Authoring Guide",
+          "You are an expert game developer authoring scripts for LITIENGINE.\n\n"
+              + "Core Architectural Principles:\n"
+              + "1. 3-Tier Hierarchy:\n"
+              + "   - GameScript: Game-wide lifecycle (onStarted, update, onStopped), soundtrack, map loading, and global input.\n"
+              + "   - EnvironmentScript: Map-level mechanics (onLoaded, onEntityAdded, onEntityRemoved, onUnloaded), wave spawning, objective checking, and map cinematics.\n"
+              + "   - EntityScript<T> / CreatureScript: Individual entity controller (onLoaded, update, onHit, onDeath, onCollision, onInteract, onMessage), AI navigation, combat abilities, and projectiles.\n\n"
+              + "2. Combat & FX Helpers:\n"
+              + "   - Abilities: `createAbility(\"Slash\").cooldown(800).range(40).onHit(target -> ...)`\n"
+              + "   - Projectiles: `spawnProjectile(\"arrow\").speed(120).damage(15).spawn()`\n"
+              + "   - Visuals: `context().ui().floatText(\"-25\", host(), Color.RED)` and `context().ui().showBanner(\"VICTORY\", \"Stage Cleared!\")`\n"
+              + "   - Sequences: `context().sequence().cameraPanTo(target, 60).screenShake(5, 300)`\n\n"
+              + "3. Property Annotations:\n"
+              + "   - Annotate fields with `@ScriptProperty(description = \"...\", defaultValue = \"...\")` so game designers can configure parameters directly inside utiLITI.\n\n"
+              + "4. Safe Creation & Updates:\n"
+              + "   - Use the `create-script` MCP tool to scaffold the script file, or `update-script` to write source code and trigger compile diagnostics.");
+
+      case "debug_litiengine_script" -> createPromptResult(
+          "LITIENGINE Script Debugging Guide",
+          "Analyze the script with `get-script` and `get-script-diagnostics` to identify syntax errors, missing imports, type mismatches, or lifecycle issues.\n\n"
+              + "Common Issues to Check:\n"
+              + "1. Host Type Mismatch: Calling entity-only methods (e.g. `moveTowards`, `isDead`) in a `GameScript` or `EnvironmentScript`.\n"
+              + "2. Null Entity Checks: Forgetting `if (isDead() || host() == null) return;` in `update()` loops.\n"
+              + "3. Unclosed Subscriptions: Storing timers or event listeners without calling `sub.unsubscribe()` or using `context().events()`.\n"
+              + "4. Annotations: Missing `@ScriptInfo(id = \"...\", host = ...)` on the script class.\n\n"
+              + "Apply corrections using `update-script` and verify with `get-script-diagnostics`.");
 
       case "build-dungeon-room" -> createPromptResult(
           "Instructions for dungeon room layout",
