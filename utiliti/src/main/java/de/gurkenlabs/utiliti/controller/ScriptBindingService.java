@@ -857,8 +857,8 @@ public final class ScriptBindingService {
 
   private record ResolvedEntityDefault(EntityScriptBinding binding, int distance, int index) {}
 
-  private record ProjectSnapshot(List<ScriptDefinition> definitions, List<ScriptBinding> gameBindings,
-                                 List<EntityScriptBinding> entityBindings, Map<IMap, Map<String, String>> serialized) {
+  private record ProjectSnapshot(List<DefinitionSnapshot> definitions, List<ScriptBinding> gameBindings,
+                                  List<EntityScriptBinding> entityBindings, Map<IMap, Map<String, String>> serialized) {
     private static ProjectSnapshot capture() {
       var bundle = Editor.instance().getGameFile();
       Map<IMap, Map<String, String>> serialized = new LinkedHashMap<>();
@@ -871,19 +871,17 @@ public final class ScriptBindingService {
         serialized.put(map, values);
       }
       return new ProjectSnapshot(bundle.getScripts().stream().filter(Objects::nonNull)
-        .map(ScriptDefinition::new).toList(), copyBindings(bundle.getGameScripts()),
+        .map(definition -> new DefinitionSnapshot(definition, new ScriptDefinition(definition))).toList(),
+        copyBindings(bundle.getGameScripts()),
         bundle.getEntityScripts().stream().filter(Objects::nonNull).map(EntityScriptBinding::new).toList(), serialized);
     }
 
     private void restore() {
       var bundle = Editor.instance().getGameFile();
-      List<ScriptDefinition> current = new ArrayList<>(bundle.getScripts());
       List<ScriptDefinition> restored = new ArrayList<>();
-      for (ScriptDefinition snapshot : this.definitions) {
-        ScriptDefinition definition = findMatchingDefinition(current, snapshot);
-        if (definition == null) definition = new ScriptDefinition(snapshot);
-        else copyDefinition(snapshot, definition);
-        restored.add(definition);
+      for (DefinitionSnapshot snapshot : this.definitions) {
+        copyDefinition(snapshot.value(), snapshot.identity());
+        restored.add(snapshot.identity());
       }
       bundle.getScripts().clear();
       bundle.getScripts().addAll(restored);
@@ -897,20 +895,6 @@ public final class ScriptBindingService {
           restoreRaw(object, MapObjectProperty.SCRIPT_BINDINGS, values.get("entity:" + object.getId()));
         }
       });
-    }
-
-    private static ScriptDefinition findMatchingDefinition(List<ScriptDefinition> current,
-                                                           ScriptDefinition snapshot) {
-      ScriptDefinition match = current.stream()
-        .filter(definition -> Objects.equals(definition.getId(), snapshot.getId())).findFirst().orElse(null);
-      if (match == null) {
-        match = current.stream()
-          .filter(definition -> Objects.equals(definition.getImplementation(), snapshot.getImplementation())
-            && Objects.equals(definition.getSource(), snapshot.getSource()))
-          .findFirst().orElse(null);
-      }
-      if (match != null) current.remove(match);
-      return match;
     }
 
     private static void copyDefinition(ScriptDefinition source, ScriptDefinition target) {
@@ -929,4 +913,6 @@ public final class ScriptBindingService {
       else target.setValue(property, raw);
     }
   }
+
+  private record DefinitionSnapshot(ScriptDefinition identity, ScriptDefinition value) {}
 }

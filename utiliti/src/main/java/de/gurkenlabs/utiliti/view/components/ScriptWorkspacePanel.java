@@ -44,6 +44,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -169,7 +171,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final ScriptUsagesPanel usagesPanel =
     new ScriptUsagesPanel(this::navigateToUsage, this::resizeUsagesPanel);
   private final Consumer<ScriptBindingTarget> scriptBindingChangeListener = ignored ->
-    SwingUtilities.invokeLater(this::refreshUsageIndicators);
+    SwingUtilities.invokeLater(this::scriptBindingsChanged);
   private final Consumer<UndoManager> undoStackChangeListener = ignored ->
     SwingUtilities.invokeLater(this.usagesPanel::refresh);
   private JSplitPane editorSplit;
@@ -482,6 +484,30 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.scripts.treeDidChange();
     ScriptTab active = this.activeTab();
     this.usagesPanel.showScript(active == null ? null : active.definition);
+  }
+
+  private void scriptBindingsChanged() {
+    this.reconcileOpenRuntimeTabs();
+    this.refreshUsageIndicators();
+  }
+
+  private void reconcileOpenRuntimeTabs() {
+    for (ScriptTab tab : List.copyOf(this.openTabs.values())) {
+      if (tab.projectSource || tab.definition == null) continue;
+      String expectedKey = this.documentKey(tab.definition);
+      Path expectedPath = resolveSource(tab.definition.getSource());
+      if (Objects.equals(tab.key, expectedKey) && Objects.equals(tab.path, expectedPath)) continue;
+      ScriptTab conflicting = this.openTabs.get(expectedKey);
+      if (conflicting != null && conflicting != tab) {
+        this.closeTab(tab);
+        continue;
+      }
+      this.openTabs.remove(tab.key, tab);
+      tab.key = expectedKey;
+      tab.path = expectedPath;
+      this.openTabs.put(expectedKey, tab);
+      tab.loadPreservingCaret();
+    }
   }
 
   private Map<String, Integer> visibleUsageCounts() {
@@ -2327,8 +2353,17 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.setStatus("Project source files cannot be deleted from the script workspace", true);
       return;
     }
+    ScriptBindingService.ScriptMutationPlan plan = ScriptBindingService.instance().planDelete(definition.getId());
+    if (!plan.valid()) {
+      this.setStatus(String.join(" ", plan.errors()), true);
+      return;
+    }
+    int usageCount = plan.usages().usages().size();
+    String assignmentWarning = usageCount == 0 ? "" : " and remove " + usageCount
+      + (usageCount == 1 ? " assignment" : " assignments");
     int choice = JOptionPane.showConfirmDialog(this,
-      "Are you sure you want to delete script '" + displayName(definition) + "'?\nThis will remove the file from disk.",
+      "Are you sure you want to delete script '" + displayName(definition) + "'?\n"
+        + "This will remove its source file" + assignmentWarning + ".",
       "Delete Script", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
     if (choice != JOptionPane.YES_OPTION) return;
 
@@ -2336,19 +2371,25 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (tab != null) closeTab(tab);
 
     Path file = resolveSource(definition.getSource());
-    if (file != null && Files.exists(file)) {
-      try {
-        Files.delete(file);
-      } catch (IOException e) {
-        setStatus("Could not delete file: " + e.getMessage(), true);
-      }
+    SourceFileMutation sourceMutation = null;
+    try {
+      if (file != null && Files.exists(file)) sourceMutation = SourceFileMutation.delete(file);
+    } catch (IOException error) {
+      this.setStatus("Could not prepare source deletion: " + error.getMessage(), true);
+      if (tab != null) this.open(definition);
+      return;
     }
 
-    Editor.instance().getGameFile().getScripts().remove(definition);
-    Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
-    UndoManager.instance().recordChanges();
+    ScriptBindingService.MutationResult result = ScriptBindingService.instance()
+      .execute(plan, ignored -> {}, sourceMutation);
+    if (!result.success()) {
+      this.setStatus(result.message(), true);
+      if (tab != null) this.open(definition);
+      return;
+    }
     UI.getAssetController().refresh();
     refreshScripts();
+    Editor.instance().save(true);
     setStatus("Deleted script " + displayName(definition), false);
   }
 
@@ -2505,55 +2546,93 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   public void renameScript(ScriptDefinition definition, String newClassName) {
-    if (definition == null || newClassName == null || newClassName.isBlank()) return;
-    if (this.isProjectSource(definition)) return;
-    String oldClassName = displayName(definition);
-    if (oldClassName.equals(newClassName)) return;
+    this.renameScript(definition, newClassName, null, true);
+  }
+
+  private boolean renameScript(ScriptDefinition definition, String newClassName, String sourceText,
+                               boolean saveProject) {
+    if (definition == null || newClassName == null || newClassName.isBlank()) return false;
+    if (this.isProjectSource(definition)) return false;
+    String oldId = definition.getId();
+    if (Objects.equals(oldId, newClassName)) return true;
     if (!newClassName.matches("[A-Za-z_$][\\w$]*")) {
       JOptionPane.showMessageDialog(this, "Invalid Java identifier name.", "Rename Error", JOptionPane.ERROR_MESSAGE);
-      return;
+      return false;
+    }
+
+    ScriptBindingService.ScriptMutationPlan plan = ScriptBindingService.instance().planRename(oldId, newClassName);
+    if (!plan.valid()) {
+      this.setStatus(String.join(" ", plan.errors()), true);
+      return false;
     }
 
     Path oldPath = resolveSource(definition.getSource());
     String newSource = ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), newClassName);
     Path newPath = resolveSource(newSource);
-    if (newPath == null) return;
-
-    String currentText = "";
-    ScriptTab tab = this.openTabs.get(this.documentKey(definition));
-    if (tab != null) {
-      currentText = tab.getText();
-    } else if (oldPath != null && Files.exists(oldPath)) {
-      try {
-        currentText = Files.readString(oldPath);
-      } catch (IOException ignored) {}
+    if (oldPath == null || !Files.isRegularFile(oldPath) || newPath == null) {
+      this.setStatus("The script source file could not be resolved.", true);
+      return false;
+    }
+    if (!oldPath.equals(newPath) && Files.exists(newPath)) {
+      this.setStatus("A source file named '" + newPath.getFileName() + "' already exists.", true);
+      return false;
     }
 
+    ScriptTab tab = this.openTabs.get(this.documentKey(definition));
+    String currentText = sourceText;
+    if (currentText == null && tab != null) currentText = tab.getText();
+    if (currentText == null) {
+      try {
+        currentText = Files.readString(oldPath);
+      } catch (IOException error) {
+        this.setStatus("Could not read script source: " + error.getMessage(), true);
+        return false;
+      }
+    }
+
+    String oldClassName = Objects.requireNonNullElse(extractClassName(currentText), displayName(definition));
     String updatedText = currentText
         .replaceAll("\\b" + Pattern.quote(oldClassName) + "\\b", java.util.regex.Matcher.quoteReplacement(newClassName))
-        .replace("id = \"" + oldClassName + "\"", "id = \"" + newClassName + "\"");
+        .replace("id = \"" + oldId + "\"", "id = \"" + newClassName + "\"");
+    String implementation = extractFullyQualifiedClassName(updatedText);
+    if (implementation == null || implementation.isBlank()) {
+      String oldImplementation = Objects.toString(definition.getImplementation(), "");
+      int packageSeparator = oldImplementation.lastIndexOf('.');
+      implementation = packageSeparator < 0 ? newClassName
+        : oldImplementation.substring(0, packageSeparator + 1) + newClassName;
+    }
 
-    definition.setId(newClassName);
-    definition.setName(newClassName);
-    definition.setImplementation(newClassName);
-    definition.setSource(newSource);
-
+    SourceFileMutation sourceMutation;
     try {
-      if (newPath.getParent() != null) Files.createDirectories(newPath.getParent());
-      Files.writeString(newPath, updatedText);
-      if (oldPath != null && !oldPath.equals(newPath) && Files.exists(oldPath)) {
-        Files.deleteIfExists(oldPath);
-      }
+      sourceMutation = SourceFileMutation.rename(oldPath, newPath, updatedText);
     } catch (IOException error) {
-      log.log(Level.SEVERE, "Failed to rename script file on disk", error);
-      return;
+      this.setStatus("Could not prepare script rename: " + error.getMessage(), true);
+      return false;
+    }
+
+    String renamedImplementation = implementation;
+    ScriptBindingService.MutationResult result = ScriptBindingService.instance().execute(plan, renamed -> {
+      renamed.setName(newClassName);
+      renamed.setImplementation(renamedImplementation);
+      renamed.setSource(newSource);
+    }, sourceMutation);
+    if (!result.success()) {
+      this.setStatus(result.message(), true);
+      return false;
     }
 
     if (tab != null) {
       this.openTabs.remove(tab.key);
       tab.key = this.documentKey(definition);
+      tab.path = newPath;
       this.openTabs.put(tab.key, tab);
       tab.setText(updatedText);
+      tab.dirty = false;
+      try {
+        tab.loadedTime = Files.getLastModifiedTime(newPath);
+      } catch (IOException ignored) {
+        tab.loadedTime = null;
+      }
       tab.updateTabTitle();
       if (this.monacoTab == tab && this.monaco != null) {
         this.monaco.open(newPath, updatedText, definition);
@@ -2562,7 +2641,9 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     refreshScripts();
     selectTreeNode(newClassName);
-    Editor.instance().save(true);
+    if (saveProject) Editor.instance().save(true);
+    this.setStatus("Renamed script to " + newClassName, false);
+    return true;
   }
 
   private boolean scriptIdExists(String id) {
@@ -2586,6 +2667,55 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private static String displayName(ScriptDefinition definition) {
     return definition.getName() == null || definition.getName().isBlank() ? definition.getId() : definition.getName();
+  }
+
+  private static final class SourceFileMutation implements ScriptBindingService.MutationParticipant {
+    private final Path oldPath;
+    private final Path newPath;
+    private final byte[] oldContent;
+    private final byte[] newContent;
+
+    private SourceFileMutation(Path oldPath, Path newPath, byte[] oldContent, byte[] newContent) {
+      this.oldPath = oldPath;
+      this.newPath = newPath;
+      this.oldContent = oldContent;
+      this.newContent = newContent;
+    }
+
+    private static SourceFileMutation delete(Path path) throws IOException {
+      return new SourceFileMutation(path, null, Files.readAllBytes(path), null);
+    }
+
+    private static SourceFileMutation rename(Path oldPath, Path newPath, String content) throws IOException {
+      return new SourceFileMutation(oldPath, newPath, Files.readAllBytes(oldPath),
+        content.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public void apply() {
+      try {
+        if (this.newPath == null) {
+          Files.deleteIfExists(this.oldPath);
+          return;
+        }
+        if (this.newPath.getParent() != null) Files.createDirectories(this.newPath.getParent());
+        Files.write(this.newPath, this.newContent);
+        if (!this.oldPath.equals(this.newPath)) Files.deleteIfExists(this.oldPath);
+      } catch (IOException error) {
+        throw new UncheckedIOException(error);
+      }
+    }
+
+    @Override
+    public void rollback() {
+      try {
+        if (this.oldPath.getParent() != null) Files.createDirectories(this.oldPath.getParent());
+        Files.write(this.oldPath, this.oldContent);
+        if (this.newPath != null && !this.oldPath.equals(this.newPath)) Files.deleteIfExists(this.newPath);
+      } catch (IOException error) {
+        throw new UncheckedIOException(error);
+      }
+    }
   }
 
   private final class ScriptTab extends JPanel {
@@ -2712,9 +2842,11 @@ public final class ScriptWorkspacePanel extends JPanel {
         String declaredFqcn = ScriptWorkspacePanel.extractFullyQualifiedClassName(currentText);
         String simpleClassName = ScriptWorkspacePanel.extractClassName(currentText);
         if (!this.projectSource && declaredFqcn != null && !declaredFqcn.isBlank()) {
-          this.definition.setImplementation(declaredFqcn);
-          if (simpleClassName != null && !simpleClassName.isBlank() && !simpleClassName.equals(this.definition.getName())) {
-            this.renameToClass(simpleClassName);
+          if (simpleClassName != null && !simpleClassName.isBlank()
+              && !simpleClassName.equals(this.definition.getName())) {
+            if (!this.renameToClass(simpleClassName)) return false;
+          } else {
+            this.definition.setImplementation(declaredFqcn);
           }
         }
 
@@ -2731,41 +2863,8 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     }
 
-    private void renameToClass(String newClassName) {
-      Path oldPath = resolveSource(this.definition.getSource());
-
-      String newSourceRel = ScriptSourcePaths.rename(
-        this.definition.getSource(), this.definition.getLanguage(), newClassName);
-      Path newPath = resolveSource(newSourceRel);
-
-      if (oldPath != null && Files.exists(oldPath) && newPath != null && !oldPath.equals(newPath)) {
-        try {
-          if (newPath.getParent() != null) Files.createDirectories(newPath.getParent());
-          Files.move(oldPath, newPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ignored) {}
-      }
-
-      this.definition.setId(newClassName);
-      this.definition.setName(newClassName);
-      this.definition.setImplementation(newClassName);
-      this.definition.setSource(newSourceRel);
-      this.path = newPath;
-      String updatedText = ScriptWorkspacePanel.synchronizeDeclaration(this.getText(), this.definition);
-      if (!Objects.equals(updatedText, this.getText())) {
-        this.setText(updatedText);
-      }
-
-      ScriptWorkspacePanel.this.openTabs.remove(this.key);
-      this.key = ScriptWorkspacePanel.this.documentKey(this.definition);
-      ScriptWorkspacePanel.this.openTabs.put(this.key, this);
-
-      Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
-      UI.getAssetController().refresh();
-      ScriptWorkspacePanel.this.refreshScripts();
-      ScriptWorkspacePanel.this.selectTreeNode(newClassName);
-      if (ScriptWorkspacePanel.this.monacoTab == this && ScriptWorkspacePanel.this.monaco != null) {
-        ScriptWorkspacePanel.this.monaco.open(newPath, this.getText(), this.definition);
-      }
+    private boolean renameToClass(String newClassName) {
+      return ScriptWorkspacePanel.this.renameScript(this.definition, newClassName, this.getText(), false);
     }
 
     private void updateTabTitle() {

@@ -394,6 +394,59 @@ class ScriptBindingServiceTest {
   }
 
   @Test
+  void mutationParticipantSharesRollbackAndUndoRedoWithProjectData() {
+    ScriptDefinition definition = new ScriptDefinition(
+      "before", "java", "before.java", "com.game.Before", ScriptHostType.GAME);
+    Editor.instance().getGameFile().getScripts().add(definition);
+    Editor.instance().getGameFile().getGameScripts().add(new ScriptBinding("before"));
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    Game.world().loadEnvironment(this.map);
+    java.util.concurrent.atomic.AtomicInteger applies = new java.util.concurrent.atomic.AtomicInteger();
+    java.util.concurrent.atomic.AtomicInteger rollbacks = new java.util.concurrent.atomic.AtomicInteger();
+    ScriptBindingService.MutationParticipant participant = new ScriptBindingService.MutationParticipant() {
+      @Override public void apply() { applies.incrementAndGet(); }
+      @Override public void rollback() { rollbacks.incrementAndGet(); }
+    };
+
+    var result = this.service.execute(this.service.planRename("before", "after"), renamed -> {
+      renamed.setImplementation("com.game.After");
+      renamed.setSource("after.java");
+    }, participant);
+
+    assertTrue(result.success(), result.message());
+    assertEquals(1, applies.get());
+    assertEquals("com.game.After", definition.getImplementation());
+    UndoManager.forMap(this.map).undo();
+    assertEquals(1, rollbacks.get());
+    assertEquals("before", definition.getId());
+    assertEquals("com.game.Before", definition.getImplementation());
+    UndoManager.forMap(this.map).redo();
+    assertEquals(2, applies.get());
+    assertEquals("after", definition.getId());
+    assertEquals("com.game.After", definition.getImplementation());
+  }
+
+  @Test
+  void failingMutationParticipantRestoresProjectReferences() {
+    ScriptDefinition definition = new ScriptDefinition(
+      "before", "java", null, "com.game.Before", ScriptHostType.GAME);
+    Editor.instance().getGameFile().getScripts().add(definition);
+    Editor.instance().getGameFile().getGameScripts().add(new ScriptBinding("before"));
+    java.util.concurrent.atomic.AtomicBoolean rolledBack = new java.util.concurrent.atomic.AtomicBoolean();
+    ScriptBindingService.MutationParticipant participant = new ScriptBindingService.MutationParticipant() {
+      @Override public void apply() { throw new IllegalStateException("source failure"); }
+      @Override public void rollback() { rolledBack.set(true); }
+    };
+
+    var result = this.service.execute(this.service.planRename("before", "after"), ignored -> {}, participant);
+
+    assertFalse(result.success());
+    assertTrue(rolledBack.get());
+    assertEquals("before", definition.getId());
+    assertEquals("before", Editor.instance().getGameFile().getGameScripts().getFirst().getScript());
+  }
+
+  @Test
   void entityInstanceCompatibilityUsesItsActualMapObjectType() {
     MapObject prop = new MapObject();
     prop.setId(77);
