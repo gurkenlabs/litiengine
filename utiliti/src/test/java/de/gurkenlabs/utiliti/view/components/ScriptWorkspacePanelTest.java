@@ -143,7 +143,6 @@ class ScriptWorkspacePanelTest {
 
     panel.refreshScripts();
 
-    // Verify compacted package node "de.gurkenlabs.game.scripts" exists
     boolean found = false;
     for (int i = 0; i < panel.getScriptsRoot().getChildCount(); i++) {
       javax.swing.tree.DefaultMutableTreeNode node = (javax.swing.tree.DefaultMutableTreeNode) panel.getScriptsRoot().getChildAt(i);
