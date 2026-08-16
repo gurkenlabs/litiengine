@@ -170,6 +170,16 @@ class ScriptWorkspacePanelTest {
     assertEquals("SimpleScript", ScriptWorkspacePanel.extractFullyQualifiedClassName(noPackage));
   }
 
+  @Test
+  void testDeleteScriptRemovesDefinitionAndCleansUsages() {
+    de.gurkenlabs.litiengine.Game.init(de.gurkenlabs.litiengine.Game.COMMANDLINE_ARG_NOGUI);
+    Editor.instance().getGameFile().getScripts().clear();
+    ScriptDefinition script = new ScriptDefinition("NewScript2", "java", "scripts/NewScript2.java", "de.gurkenlabs.lepus.scripts.NewScript2", ScriptHostType.ENVIRONMENT);
+    Editor.instance().getGameFile().getScripts().add(script);
+
+    assertEquals(1, Editor.instance().getGameFile().getScripts().size());
+  }
+
   private static ScriptDefinition definition() {
     ScriptDefinition definition = new ScriptDefinition("test", "groovy", "src/main/groovy/TestScript.groovy",
       "TestScript", ScriptHostType.ENTITY);

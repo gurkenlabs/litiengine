@@ -2338,8 +2338,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (unavailable) return "A script or source file with this name already exists.";
     return null;
   }
-
-  public static String extractClassName(String source) {
+  public static String extractClassName(String source) {
     return ScriptSourcePaths.extractClassName(source);
   }
 
@@ -2348,6 +2347,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private void repairProjectScriptDefinitions() {
+
     if (Editor.instance().getGameFile() == null) return;
     boolean changed = false;
     for (ScriptDefinition def : Editor.instance().getGameFile().getScripts()) {
@@ -2370,18 +2370,18 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
   }
 
+  private boolean scriptIdExists(String id) {
+    return Editor.instance().getGameFile().getScripts().stream().anyMatch(candidate -> candidate.getId().equals(id));
+  }
+
   public void deleteScript(ScriptDefinition definition) {
     if (definition == null || Editor.instance().getGameFile() == null) return;
-    if (this.isProjectSource(definition)) {
-      this.setStatus("Project source files cannot be deleted from the script workspace", true);
-      return;
-    }
+
+    Path file = this.projectSourcePaths.get(definition);
+    if (file == null) file = resolveSource(definition.getSource());
+
     ScriptBindingService.ScriptMutationPlan plan = ScriptBindingService.instance().planDelete(definition.getId());
-    if (!plan.valid()) {
-      this.setStatus(String.join(" ", plan.errors()), true);
-      return;
-    }
-    int usageCount = plan.usages().usages().size();
+    int usageCount = plan.valid() ? plan.usages().usages().size() : 0;
     String assignmentWarning = usageCount == 0 ? "" : " and remove " + usageCount
       + (usageCount == 1 ? " assignment" : " assignments");
     int choice = JOptionPane.showConfirmDialog(this,
@@ -2393,7 +2393,6 @@ public final class ScriptWorkspacePanel extends JPanel {
     ScriptTab tab = this.openTabs.get(this.documentKey(definition));
     if (tab != null) closeTab(tab);
 
-    Path file = resolveSource(definition.getSource());
     SourceFileMutation sourceMutation = null;
     try {
       if (file != null && Files.exists(file)) sourceMutation = SourceFileMutation.delete(file);
@@ -2403,13 +2402,30 @@ public final class ScriptWorkspacePanel extends JPanel {
       return;
     }
 
-    ScriptBindingService.MutationResult result = ScriptBindingService.instance()
-      .execute(plan, ignored -> {}, sourceMutation);
-    if (!result.success()) {
-      this.setStatus(result.message(), true);
-      if (tab != null) this.open(definition);
-      return;
+    if (plan.valid()) {
+      ScriptBindingService.MutationResult result = ScriptBindingService.instance()
+        .execute(plan, ignored -> {}, sourceMutation);
+      if (!result.success()) {
+        this.setStatus(result.message(), true);
+        if (tab != null) this.open(definition);
+        return;
+      }
+    } else {
+      if (sourceMutation != null) {
+        try {
+          sourceMutation.apply();
+        } catch (RuntimeException error) {
+          this.setStatus("Could not delete source file: " + error.getMessage(), true);
+          if (tab != null) this.open(definition);
+          return;
+        }
+      }
+      Editor.instance().getGameFile().getScripts().remove(definition);
+      Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
     }
+
+    this.projectSourcePaths.remove(definition);
+    this.projectSourceDefinitions.values().remove(definition);
     UI.getAssetController().refresh();
     refreshScripts();
     Editor.instance().save(true);
@@ -2430,22 +2446,34 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void duplicateScript(ScriptDefinition definition) {
     if (definition == null || Editor.instance().getGameFile() == null) return;
-    if (this.isProjectSource(definition)) {
-      this.setStatus("Project source files cannot be duplicated from the script workspace", true);
-      return;
-    }
+    Path originalFile = this.projectSourcePaths.get(definition);
+    if (originalFile == null) originalFile = resolveSource(definition.getSource());
+
     int suffix = 1;
     String id;
     String className;
     Path source;
-    String baseName = definition.getName() == null ? "Script" : definition.getName();
+    String baseName = displayName(definition);
     do {
       className = baseName + "Copy" + (suffix == 1 ? "" : suffix);
       id = definition.getId() + "-copy" + (suffix == 1 ? "" : "-" + suffix);
-      source = resolveSource(ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className));
+      if (originalFile != null && originalFile.getParent() != null) {
+        String newFileName = className + "." + languageFor(originalFile);
+        source = originalFile.getParent().resolve(newFileName);
+      } else {
+        source = resolveSource(ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className));
+      }
       suffix++;
     } while (source != null && (Files.exists(source) || scriptIdExists(id)));
-    String newSourceRel = ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className);
+
+    String newSourceRel;
+    if (originalFile != null && Editor.instance().getProjectPath() != null && source != null) {
+      Path projectParent = Editor.instance().getProjectPath().getParent().toAbsolutePath().normalize();
+      newSourceRel = projectParent.relativize(source.toAbsolutePath().normalize()).toString().replace('\\', '/');
+    } else {
+      newSourceRel = ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className);
+    }
+
     String packageName = ScriptSourcePaths.derivePackageName(
         Editor.instance().getProjectModel(), newSourceRel);
     String implementation = (packageName != null && !packageName.isBlank())
@@ -2456,20 +2484,24 @@ public final class ScriptWorkspacePanel extends JPanel {
       newSourceRel, implementation, definition.getHost());
     dup.setTargetType(definition.getTargetType());
 
-    Path originalFile = resolveSource(definition.getSource());
     String content = "";
     if (originalFile != null && Files.exists(originalFile)) {
       try {
         content = Files.readString(originalFile);
-        content = content.replaceFirst("(?m)^(\\s*public\\s+)?class\\s+\\w+", "$1class " + className);
+        String oldClassName = Objects.requireNonNullElse(extractClassName(content), displayName(definition));
+        content = content
+            .replaceAll("\\b" + Pattern.quote(oldClassName) + "\\b", java.util.regex.Matcher.quoteReplacement(className))
+            .replace("id = \"" + definition.getId() + "\"", "id = \"" + id + "\"");
       } catch (IOException ignored) {}
     } else {
       content = defaultSource(dup, className, ScriptKind.ENTITY);
     }
 
     try {
-      Files.createDirectories(source.getParent());
-      Files.writeString(source, content);
+      if (source != null && source.getParent() != null) {
+        Files.createDirectories(source.getParent());
+        Files.writeString(source, content);
+      }
       Editor.instance().getGameFile().getScripts().add(dup);
       Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
       UndoManager.instance().recordChanges();
@@ -2521,19 +2553,17 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     if (selected != null) {
       menu.addSeparator();
-      if (!this.isProjectSource(selected)) {
-        JMenuItem dupItem = new JMenuItem("Duplicate Script", Icons.COPY_16);
-        dupItem.addActionListener(evt -> duplicateScript(selected));
-        menu.add(dupItem);
+      JMenuItem dupItem = new JMenuItem("Duplicate Script", Icons.COPY_16);
+      dupItem.addActionListener(evt -> duplicateScript(selected));
+      menu.add(dupItem);
 
-        JMenuItem renameItem = new JMenuItem("Rename Class...", Icons.RENAME_16);
-        renameItem.addActionListener(evt -> renameScript(selected));
-        menu.add(renameItem);
+      JMenuItem renameItem = new JMenuItem("Rename Class...", Icons.RENAME_16);
+      renameItem.addActionListener(evt -> renameScript(selected));
+      menu.add(renameItem);
 
-        JMenuItem deleteItem = new JMenuItem("Delete Script", Icons.DELETE_16);
-        deleteItem.addActionListener(evt -> deleteScript(selected));
-        menu.add(deleteItem);
-      }
+      JMenuItem deleteItem = new JMenuItem("Delete Script", Icons.DELETE_16);
+      deleteItem.addActionListener(evt -> deleteScript(selected));
+      menu.add(deleteItem);
 
       JMenuItem openIdeItem = new JMenuItem("Open in IDE", Icons.EXTERNAL_16);
       openIdeItem.addActionListener(evt -> openActiveExternally());
@@ -2553,10 +2583,6 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void renameScript(ScriptDefinition definition) {
     if (definition == null) return;
-    if (this.isProjectSource(definition)) {
-      this.setStatus("Rename project classes with the project refactoring tools", true);
-      return;
-    }
     String currentName = displayName(definition);
     String input = (String) JOptionPane.showInputDialog(
         this,
@@ -2577,7 +2603,6 @@ public final class ScriptWorkspacePanel extends JPanel {
   private boolean renameScript(ScriptDefinition definition, String newClassName, String sourceText,
                                boolean saveProject) {
     if (definition == null || newClassName == null || newClassName.isBlank()) return false;
-    if (this.isProjectSource(definition)) return false;
     String oldId = definition.getId();
     if (Objects.equals(oldId, newClassName)) return true;
     if (!newClassName.matches("[A-Za-z_$][\\w$]*")) {
@@ -2585,21 +2610,32 @@ public final class ScriptWorkspacePanel extends JPanel {
       return false;
     }
 
-    ScriptBindingService.ScriptMutationPlan plan = ScriptBindingService.instance().planRename(oldId, newClassName);
-    if (!plan.valid()) {
-      this.setStatus(String.join(" ", plan.errors()), true);
-      return false;
+    Path oldPath = this.projectSourcePaths.get(definition);
+    if (oldPath == null) oldPath = resolveSource(definition.getSource());
+    Path newPath;
+    String newSource;
+    if (oldPath != null) {
+      String newFileName = newClassName + "." + languageFor(oldPath);
+      newPath = oldPath.getParent().resolve(newFileName);
+      newSource = Editor.instance().getProjectPath() != null
+          ? Editor.instance().getProjectPath().getParent().toAbsolutePath().normalize().relativize(newPath.toAbsolutePath().normalize()).toString().replace('\\', '/')
+          : ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), newClassName);
+    } else {
+      newSource = ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), newClassName);
+      newPath = resolveSource(newSource);
     }
-
-    Path oldPath = resolveSource(definition.getSource());
-    String newSource = ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), newClassName);
-    Path newPath = resolveSource(newSource);
     if (oldPath == null || !Files.isRegularFile(oldPath) || newPath == null) {
       this.setStatus("The script source file could not be resolved.", true);
       return false;
     }
     if (!oldPath.equals(newPath) && Files.exists(newPath)) {
       this.setStatus("A source file named '" + newPath.getFileName() + "' already exists.", true);
+      return false;
+    }
+
+    ScriptBindingService.ScriptMutationPlan plan = ScriptBindingService.instance().planRename(oldId, newClassName);
+    if (!plan.valid() && Editor.instance().getGameFile().getScripts().stream().anyMatch(d -> d != null && oldId.equals(d.getId()))) {
+      this.setStatus(String.join(" ", plan.errors()), true);
       return false;
     }
 
@@ -2636,14 +2672,26 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     String renamedImplementation = implementation;
-    ScriptBindingService.MutationResult result = ScriptBindingService.instance().execute(plan, renamed -> {
-      renamed.setName(newClassName);
-      renamed.setImplementation(renamedImplementation);
-      renamed.setSource(newSource);
-    }, sourceMutation);
-    if (!result.success()) {
-      this.setStatus(result.message(), true);
-      return false;
+    if (plan.valid()) {
+      ScriptBindingService.MutationResult result = ScriptBindingService.instance().execute(plan, renamed -> {
+        renamed.setName(newClassName);
+        renamed.setImplementation(renamedImplementation);
+        renamed.setSource(newSource);
+      }, sourceMutation);
+      if (!result.success()) {
+        this.setStatus(result.message(), true);
+        return false;
+      }
+    } else {
+      try {
+        sourceMutation.apply();
+      } catch (RuntimeException error) {
+        this.setStatus("Could not rename source file: " + error.getMessage(), true);
+        return false;
+      }
+      definition.setName(newClassName);
+      definition.setImplementation(renamedImplementation);
+      definition.setSource(newSource);
     }
 
     if (tab != null) {
@@ -2670,11 +2718,6 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.setStatus("Renamed script to " + newClassName, false);
     return true;
   }
-
-  private boolean scriptIdExists(String id) {
-    return Editor.instance().getGameFile().getScripts().stream().anyMatch(candidate -> candidate.getId().equals(id));
-  }
-
   private static String defaultSource(ScriptDefinition definition, String className, ScriptKind kind) {
     String packageName = ScriptSourcePaths.derivePackageName(
         Editor.instance().getProjectModel(), definition.getSource());
