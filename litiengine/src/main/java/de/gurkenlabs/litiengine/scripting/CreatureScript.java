@@ -88,4 +88,70 @@ public abstract class CreatureScript extends EntityScript<Creature> {
   public boolean isOnCooldown(String name) {
     return this.host() != null && this.host().isOnCooldown(name);
   }
+
+  /**
+   * Configures top-down WASD keyboard movement for this creature and binds its lifecycle to this script.
+   */
+  public de.gurkenlabs.litiengine.input.KeyboardEntityController<Creature> enableTopDownMovement() {
+    return this.enableTopDownMovement(java.awt.event.KeyEvent.VK_W, java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.VK_A, java.awt.event.KeyEvent.VK_D);
+  }
+
+  /**
+   * Configures top-down keyboard movement with custom keys for this creature and binds its lifecycle to this script.
+   */
+  public de.gurkenlabs.litiengine.input.KeyboardEntityController<Creature> enableTopDownMovement(int up, int down, int left, int right) {
+    if (this.host() == null) {
+      throw new IllegalStateException("Creature host is not attached.");
+    }
+    var controller = new de.gurkenlabs.litiengine.input.KeyboardEntityController<>(this.host(), up, down, left, right);
+    this.host().setController(de.gurkenlabs.litiengine.physics.IMovementController.class, controller);
+    this.context().manage(controller::detach);
+    return controller;
+  }
+
+  /**
+   * Configures platforming movement (A/D/Space) for this creature and binds its lifecycle to this script.
+   */
+  public de.gurkenlabs.litiengine.input.PlatformingMovementController<Creature> enablePlatformingMovement() {
+    return this.enablePlatformingMovement(java.awt.event.KeyEvent.VK_A, java.awt.event.KeyEvent.VK_D, java.awt.event.KeyEvent.VK_SPACE);
+  }
+
+  /**
+   * Configures platforming movement with custom keys for this creature and binds its lifecycle to this script.
+   */
+  public de.gurkenlabs.litiengine.input.PlatformingMovementController<Creature> enablePlatformingMovement(int left, int right, int jump) {
+    if (this.host() == null) {
+      throw new IllegalStateException("Creature host is not attached.");
+    }
+    var controller = new de.gurkenlabs.litiengine.input.PlatformingMovementController<>(this.host(), jump);
+    controller.setLeftKeys(left);
+    controller.setRightKeys(right);
+    this.host().setController(de.gurkenlabs.litiengine.physics.IMovementController.class, controller);
+    this.context().manage(controller::detach);
+    return controller;
+  }
+
+  /** Disables and removes active movement controllers on this creature. */
+  public void disableMovementController() {
+    if (this.host() != null) {
+      var current = this.host().getController(de.gurkenlabs.litiengine.physics.IMovementController.class);
+      if (current != null) {
+        current.detach();
+      }
+    }
+  }
+
+
+  /** Called when the platforming movement controller executes a jump action. */
+  protected void onJump() throws Exception {}
+
+  @Override
+  final void dispatchAction(String action) throws Exception {
+    if ("jump".equalsIgnoreCase(action)) {
+      this.onJump();
+    }
+    super.dispatchAction(action);
+  }
 }
+
+

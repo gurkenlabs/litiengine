@@ -5,4 +5,9 @@ package de.gurkenlabs.litiengine.scripting;
 public interface Subscription extends AutoCloseable {
   @Override
   void close();
+
+  default void unsubscribe() {
+    this.close();
+  }
 }
+

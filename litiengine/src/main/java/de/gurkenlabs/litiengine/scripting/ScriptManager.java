@@ -5,17 +5,25 @@ import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.EntityListener;
 import de.gurkenlabs.litiengine.entities.EntityMessageListener;
+import de.gurkenlabs.litiengine.entities.EntityRenderedListener;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentListener;
+import de.gurkenlabs.litiengine.environment.EnvironmentRenderedListener;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.input.IKeyboard;
+import de.gurkenlabs.litiengine.input.IMouse;
+import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
+import java.awt.Graphics2D;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -261,9 +269,12 @@ public final class ScriptManager implements IUpdateable {
       Attachment attachment = new Attachment(host, definition, binding, instance, context, controllerManaged);
       this.attachments.add(attachment);
       if (!controllerManaged) this.ensureUpdateAttached();
+      if (instance instanceof AbstractScript<?> abstractScript) this.registerInputLifecycle(attachment, abstractScript);
+      this.registerRenderLifecycle(attachment);
       if (host instanceof IEntity entity) this.registerEntityLifecycle(attachment, entity);
       if (host instanceof Environment environment) this.registerEnvironmentLifecycle(attachment, environment);
       return instance;
+
     } catch (CompilationFailure e) {
       this.record(definition, e.scriptException);
     } catch (Exception | LinkageError e) {
@@ -518,7 +529,185 @@ public final class ScriptManager implements IUpdateable {
       collisionEntity.onCollision(collisionListener);
       attachment.context.manage(() -> collisionEntity.removeCollisionListener(collisionListener));
     }
+
+    if (entity instanceof de.gurkenlabs.litiengine.entities.Entity concreteEntity && attachment.instance instanceof EntityScript<?> script) {
+      if (!concreteEntity.actions().exists(de.gurkenlabs.litiengine.input.PlatformingMovementController.JUMP_ACTION)) {
+        var jumpAction = concreteEntity.register(de.gurkenlabs.litiengine.input.PlatformingMovementController.JUMP_ACTION, () -> {
+          if (attachment.faulted) return;
+          try {
+            script.dispatchAction(de.gurkenlabs.litiengine.input.PlatformingMovementController.JUMP_ACTION);
+          } catch (Exception e) {
+            attachment.faulted = true;
+            this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script jump action handler failed: " + e.getMessage(), e);
+            this.detachAttachment(attachment);
+          }
+        });
+        attachment.context.manage(() -> concreteEntity.actions().unregister(jumpAction));
+      }
+    }
   }
+
+  private void registerInputLifecycle(Attachment attachment, AbstractScript<?> script) {
+    if (Input.keyboard() != null) {
+      IKeyboard.KeyPressedListener keyPressed = event -> {
+        if (attachment.faulted) return;
+        try {
+          script.dispatchKeyPressed(event);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script keyPressed handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      IKeyboard.KeyReleasedListener keyReleased = event -> {
+        if (attachment.faulted) return;
+        try {
+          script.dispatchKeyReleased(event);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script keyReleased handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      IKeyboard.KeyTypedListener keyTyped = event -> {
+        if (attachment.faulted) return;
+        try {
+          script.dispatchKeyTyped(event);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script keyTyped handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      Input.keyboard().onKeyPressed(keyPressed);
+      Input.keyboard().onKeyReleased(keyReleased);
+      Input.keyboard().onKeyTyped(keyTyped);
+      attachment.context.manage(() -> {
+        if (Input.keyboard() != null) {
+          Input.keyboard().removeKeyPressedListener(keyPressed);
+          Input.keyboard().removeKeyReleasedListener(keyReleased);
+          Input.keyboard().removeKeyTypedListener(keyTyped);
+        }
+      });
+    }
+
+    if (Input.mouse() != null) {
+      IMouse.MouseClickedListener mouseClicked = event -> {
+        if (attachment.faulted) return;
+        try {
+          script.dispatchMouseClicked(event);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script mouseClicked handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      IMouse.MousePressedListener mousePressed = event -> {
+        if (attachment.faulted) return;
+        try {
+          script.dispatchMousePressed(event);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script mousePressed handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      IMouse.MouseReleasedListener mouseReleased = event -> {
+        if (attachment.faulted) return;
+        try {
+          script.dispatchMouseReleased(event);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script mouseReleased handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      IMouse.MouseMovedListener mouseMoved = event -> {
+        if (attachment.faulted) return;
+        try {
+          script.dispatchMouseMoved(event);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script mouseMoved handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      java.awt.event.MouseWheelListener mouseWheel = event -> {
+        if (attachment.faulted) return;
+        try {
+          script.dispatchMouseWheel(event);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script mouseWheel handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      Input.mouse().onClicked(mouseClicked);
+      Input.mouse().onPressed(mousePressed);
+      Input.mouse().onReleased(mouseReleased);
+      Input.mouse().onMoved(mouseMoved);
+      Input.mouse().onWheelMoved(mouseWheel);
+      attachment.context.manage(() -> {
+        if (Input.mouse() != null) {
+          Input.mouse().removeMouseClickedListener(mouseClicked);
+          Input.mouse().removeMousePressedListener(mousePressed);
+          Input.mouse().removeMouseReleasedListener(mouseReleased);
+          Input.mouse().removeMouseMovedListener(mouseMoved);
+          Input.mouse().removeMouseWheelListener(mouseWheel);
+        }
+      });
+    }
+  }
+
+  private void registerRenderLifecycle(Attachment attachment) {
+    if (attachment.host instanceof IEntity entity) {
+      EntityRenderedListener listener = event -> {
+        if (attachment.faulted) return;
+        try {
+          attachment.instance.render(event.getGraphics());
+        } catch (Exception | LinkageError e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script render failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      entity.onRendered(listener);
+      attachment.context.manage(() -> entity.removeListener(listener));
+    } else if (attachment.host instanceof Environment environment) {
+      EnvironmentRenderedListener listener = (graphics, renderType) -> {
+        if (attachment.faulted) return;
+        try {
+          attachment.instance.render(graphics);
+        } catch (Exception | LinkageError e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script render failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      environment.onRendered(RenderType.OVERLAY, listener);
+      attachment.context.manage(() -> environment.removeListener(listener));
+    } else if (attachment.host == this.gameHost) {
+      if (!Game.isInNoGUIMode() && Game.window() != null && Game.window().getRenderComponent() != null) {
+        java.util.function.Consumer<Graphics2D> renderConsumer = g -> {
+          if (attachment.faulted) return;
+          try {
+            attachment.instance.render(g);
+          } catch (Exception | LinkageError e) {
+            attachment.faulted = true;
+            this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script render failed: " + e.getMessage(), e);
+            this.detachAttachment(attachment);
+          }
+        };
+        Game.window().getRenderComponent().onRendered(renderConsumer);
+        attachment.context.manage(() -> {
+          if (Game.window() != null && Game.window().getRenderComponent() != null) {
+            Game.window().getRenderComponent().removeRenderedConsumer(renderConsumer);
+          }
+        });
+      }
+    }
+  }
+
 
   private void registerEnvironmentLifecycle(Attachment attachment, Environment environment) {
     if (!(attachment.instance instanceof EnvironmentScript script)) return;

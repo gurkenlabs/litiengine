@@ -112,6 +112,63 @@ public final class ScriptContext<T> implements AutoCloseable {
     return this.uiOverlay;
   }
 
+  private ScriptInput scriptInput;
+
+  /** Returns the managed input helper owned by this context. */
+  public synchronized ScriptInput input() {
+    if (this.scriptInput == null) {
+      this.scriptInput = new ScriptInput(this);
+    }
+    return this.scriptInput;
+  }
+
+  /** Returns a fluent spawner for creating entities in the current environment. */
+  public ScriptedSpawner spawner() {
+    Environment environment = this.environment();
+    if (environment == null) throw new IllegalStateException("No environment is currently active to spawn entities into.");
+    return new ScriptedSpawner(environment);
+  }
+
+  /** Spawns a creature with the given sprite prefix at the specified coordinates. */
+  public Creature spawnCreature(String spritePrefix, double x, double y) {
+    return this.spawner().creature(spritePrefix).at(x, y).spawn();
+  }
+
+  /** Spawns a creature with the given sprite prefix at the specified location. */
+  public Creature spawnCreature(String spritePrefix, java.awt.geom.Point2D location) {
+    return this.spawner().creature(spritePrefix).at(location).spawn();
+  }
+
+  /** Spawns a prop with the given spritesheet at the specified coordinates. */
+  public de.gurkenlabs.litiengine.entities.Prop spawnProp(String spriteSheet, double x, double y) {
+    return this.spawner().prop(spriteSheet).at(x, y).spawn();
+  }
+
+  /** Spawns a prop with the given spritesheet at the specified location. */
+  public de.gurkenlabs.litiengine.entities.Prop spawnProp(String spriteSheet, java.awt.geom.Point2D location) {
+    return this.spawner().prop(spriteSheet).at(location).spawn();
+  }
+
+  /** Spawns an entity of the given type at the specified coordinates. */
+  public <E extends IEntity> E spawn(Class<E> entityType, double x, double y) {
+    return this.spawner().entity(entityType).at(x, y).spawn();
+  }
+
+  /** Spawns an entity of the given type at the specified location. */
+  public <E extends IEntity> E spawn(Class<E> entityType, java.awt.geom.Point2D location) {
+    return this.spawner().entity(entityType).at(location).spawn();
+  }
+
+  /** Spawns the given entity at the specified coordinates. */
+  public <E extends IEntity> E spawn(E entity, double x, double y) {
+    return this.spawner().entity(entity).at(x, y).spawn();
+  }
+
+  /** Spawns the given entity at the specified location. */
+  public <E extends IEntity> E spawn(E entity, java.awt.geom.Point2D location) {
+    return this.spawner().entity(entity).at(location).spawn();
+  }
+
   /** Adds a registration that will be released when the script is detached or reloaded. */
   public <S extends Subscription> S manage(S subscription) {
     return this.subscriptions.add(subscription);
@@ -151,3 +208,4 @@ public final class ScriptContext<T> implements AutoCloseable {
     this.subscriptions.close();
   }
 }
+

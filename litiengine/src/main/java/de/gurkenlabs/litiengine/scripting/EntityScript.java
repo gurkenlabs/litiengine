@@ -54,8 +54,12 @@ public abstract class EntityScript<T extends IEntity> extends AbstractScript<T> 
   /** Called when another entity interacts with the attached entity. */
   protected void onInteract(IEntity source) throws Exception {}
 
+  /** Called when an entity action is performed on the attached entity. */
+  protected void onAction(String action) throws Exception {}
+
   /** Sends a message from this entity to all of its listeners. */
   public void sendMessage(String message) {
+
     if (this.host() != null) {
       this.host().sendMessage(this.host(), message);
     }
@@ -136,4 +140,10 @@ public abstract class EntityScript<T extends IEntity> extends AbstractScript<T> 
   final void dispatchInteract(IEntity source) throws Exception {
     this.onInteract(source);
   }
+
+  void dispatchAction(String action) throws Exception {
+    this.onAction(action);
+  }
 }
+
+
