@@ -30,11 +30,26 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
     @Override public boolean isCellEditable(int row, int column) { return column == 1; }
   };
   private final JTable parameterTable = new JTable(this.parameters);
+  private final JButton newScriptButton;
   private final JButton addButton;
   private final JButton removeButton;
   private final JButton openButton;
   private final JButton upButton;
   private final JButton downButton;
+
+  private static final String CARD_EMPTY = "empty";
+  private static final String CARD_CONTENT = "content";
+  private static final String PARAM_EMPTY = "empty";
+  private static final String PARAM_NONE = "none";
+  private static final String PARAM_TABLE = "table";
+
+  private final CardLayout mainCardLayout = new CardLayout();
+  private final JPanel mainContainer = new JPanel(this.mainCardLayout);
+
+  private final CardLayout paramCardLayout = new CardLayout();
+  private final JPanel paramContainer = new JPanel(this.paramCardLayout);
+
+  private final JLabel scriptsHeaderLabel = new JLabel("Attached Scripts (0)");
 
   private IMap dataSource;
   private boolean updating;
@@ -43,8 +58,27 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
     this.setLayout(new BorderLayout(0, Style.SPACE_SMALL));
     this.setOpaque(false);
 
-    this.availableScripts.setRenderer((list, value, index, selected, focused) -> new JLabel(displayName(value)));
+    this.availableScripts.setRenderer((list, value, index, selected, focused) -> {
+      JLabel label = new JLabel();
+      if (value == null) {
+        label.setText("<No compatible environment scripts>");
+        label.setForeground(Style.mutedText());
+        label.setIcon(Icons.API_16);
+      } else {
+        label.setText(displayName(value));
+        label.setIcon(Icons.SYMBOL_METHOD_16);
+      }
+      label.setOpaque(true);
+      label.setBackground(selected ? list.getSelectionBackground() : list.getBackground());
+      label.setForeground(selected ? list.getSelectionForeground() : (value == null ? Style.mutedText() : list.getForeground()));
+      label.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+      return label;
+    });
     this.availableScripts.addActionListener(event -> this.updateButtonStates());
+
+    this.newScriptButton = Style.iconButton(Icons.SCRIPT_16);
+    this.newScriptButton.setToolTipText("Create a new environment script and attach it");
+    this.newScriptButton.addActionListener(event -> this.createNewScript());
 
     this.addButton = Style.iconButton(Icons.ADD_16);
     this.addButton.setToolTipText("Attach selected environment script");
@@ -72,6 +106,7 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
 
     JPanel toolButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
     toolButtons.setOpaque(false);
+    toolButtons.add(this.newScriptButton);
     toolButtons.add(this.addButton);
     toolButtons.add(this.removeButton);
     toolButtons.add(this.openButton);
@@ -91,6 +126,7 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
       ScriptDefinition definition = definition(value == null ? null : value.getScript());
       JLabel label = new JLabel((value != null && value.isEnabled() ? "" : "(disabled) ")
           + (definition == null ? value == null ? "" : value.getScript() : displayName(definition)));
+      label.setIcon(Icons.SYMBOL_METHOD_16);
       label.setOpaque(true);
       label.setBackground(selected ? list.getSelectionBackground() : list.getBackground());
       label.setForeground(selected ? list.getSelectionForeground() : list.getForeground());
@@ -108,22 +144,46 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
     this.parameterTable.getColumnModel().getColumn(0).setPreferredWidth(100);
     this.parameterTable.getColumnModel().getColumn(1).setPreferredWidth(120);
 
-    JScrollPane bindingsScroll = new JScrollPane(this.bindings);
-    bindingsScroll.setPreferredSize(new Dimension(140, 90));
-    bindingsScroll.setMinimumSize(new Dimension(100, 70));
+    // Empty state card
+    JPanel emptyCard = createEmptyStatePanel();
 
+    // Top section: Attached scripts
+    JPanel scriptsPanel = new JPanel(new BorderLayout(0, 2));
+    scriptsPanel.setOpaque(false);
+    this.scriptsHeaderLabel.setFont(this.scriptsHeaderLabel.getFont().deriveFont(Font.BOLD, 11f));
+    this.scriptsHeaderLabel.setForeground(Style.mutedText());
+    scriptsPanel.add(this.scriptsHeaderLabel, BorderLayout.NORTH);
+    scriptsPanel.add(new JScrollPane(this.bindings), BorderLayout.CENTER);
+
+    // Bottom section: Parameters
     JPanel details = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
     details.setOpaque(false);
-    details.add(this.enabled, BorderLayout.NORTH);
-    JScrollPane paramScroll = new JScrollPane(this.parameterTable);
-    paramScroll.setPreferredSize(new Dimension(160, 90));
-    details.add(paramScroll, BorderLayout.CENTER);
 
-    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, bindingsScroll, details);
+    JPanel detailsHeader = new JPanel(new BorderLayout());
+    detailsHeader.setOpaque(false);
+    detailsHeader.add(this.enabled, BorderLayout.WEST);
+    JLabel propTitle = new JLabel("Script Properties");
+    propTitle.setFont(propTitle.getFont().deriveFont(Font.BOLD, 11f));
+    propTitle.setForeground(Style.mutedText());
+    detailsHeader.add(propTitle, BorderLayout.EAST);
+    details.add(detailsHeader, BorderLayout.NORTH);
+
+    this.paramContainer.setOpaque(false);
+    this.paramContainer.add(createParamEmptyPanel("Select an attached script above to configure its properties."), PARAM_EMPTY);
+    this.paramContainer.add(createParamEmptyPanel("No @ScriptProperty parameters defined in this script."), PARAM_NONE);
+    this.paramContainer.add(new JScrollPane(this.parameterTable), PARAM_TABLE);
+    details.add(this.paramContainer, BorderLayout.CENTER);
+
+    JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scriptsPanel, details);
+    UI.configureSplitPane(split);
     split.setResizeWeight(0.45);
-    split.setOpaque(false);
-    split.setBorder(BorderFactory.createLineBorder(Style.border()));
-    this.add(split, BorderLayout.CENTER);
+    split.setDividerLocation(90);
+    split.setPreferredSize(new Dimension(0, 210));
+
+    this.mainContainer.setOpaque(false);
+    this.mainContainer.add(emptyCard, CARD_EMPTY);
+    this.mainContainer.add(split, CARD_CONTENT);
+    this.add(this.mainContainer, BorderLayout.CENTER);
 
     this.enabled.addActionListener(event -> {
       if (this.updating || this.bindings.getSelectedValue() == null) return;
@@ -137,6 +197,60 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
     });
 
     this.updateButtonStates();
+  }
+
+  private JPanel createEmptyStatePanel() {
+    JPanel panel = new JPanel(new GridBagLayout());
+    panel.setOpaque(true);
+    panel.setBackground(Style.surface());
+    panel.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(Style.border()),
+        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
+
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.insets = new Insets(0, 0, 4, 0);
+    gbc.anchor = GridBagConstraints.CENTER;
+
+    JLabel iconLabel = new JLabel(Icons.API_16);
+    panel.add(iconLabel, gbc);
+
+    gbc.gridy = 1;
+    JLabel title = new JLabel("No Environment Scripts Attached");
+    title.setFont(title.getFont().deriveFont(Font.BOLD, 12f));
+    title.setForeground(Style.text());
+    panel.add(title, gbc);
+
+    gbc.gridy = 2;
+    gbc.insets = new Insets(2, 0, 0, 0);
+    JLabel hint = new JLabel("<html><center style='color:#969eb9;'>Select a script above and click <b>'+'</b><br>to bind map-level objectives & cinematics.</center></html>");
+    hint.setFont(hint.getFont().deriveFont(11f));
+    panel.add(hint, gbc);
+
+    gbc.gridy = 3;
+    gbc.insets = new Insets(8, 0, 0, 0);
+    JButton createBtn = new JButton("Create New Script", Icons.SCRIPT_16);
+    createBtn.setFont(createBtn.getFont().deriveFont(11f));
+    createBtn.addActionListener(event -> this.createNewScript());
+    panel.add(createBtn, gbc);
+
+    return panel;
+  }
+
+  private JPanel createParamEmptyPanel(String message) {
+    JPanel panel = new JPanel(new GridBagLayout());
+    panel.setOpaque(true);
+    panel.setBackground(Style.surface());
+    panel.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(Style.border()),
+        BorderFactory.createEmptyBorder(6, 6, 6, 6)));
+
+    JLabel hint = new JLabel("<html><center style='color:#969eb9;'>" + message + "</center></html>");
+    hint.setFont(hint.getFont().deriveFont(11f));
+    panel.add(hint);
+
+    return panel;
   }
 
   public void bind(IMap map) {
@@ -177,17 +291,32 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
     } finally {
       this.updating = false;
     }
+    this.mainCardLayout.show(this.mainContainer, CARD_EMPTY);
     this.updateButtonStates();
   }
 
-  private void refreshAvailableScripts() {
-    if (Editor.instance().getGameFile() == null) return;
+  public void refreshAvailableScripts() {
+    if (Editor.instance().getGameFile() == null || Editor.instance().getGameFile().getScripts() == null) {
+      this.availableScripts.setModel(new DefaultComboBoxModel<>());
+      this.updateButtonStates();
+      return;
+    }
     List<ScriptDefinition> definitions = Editor.instance().getGameFile().getScripts().stream()
         .filter(definition -> definition.getHost() == ScriptHostType.ENVIRONMENT)
         .sorted(Comparator.comparing(EnvironmentScriptInspectorPanel::displayName, String.CASE_INSENSITIVE_ORDER))
         .toList();
     this.availableScripts.setModel(new DefaultComboBoxModel<>(definitions.toArray(ScriptDefinition[]::new)));
     this.updateButtonStates();
+  }
+
+  private void createNewScript() {
+    if (UI.getScriptWorkspacePanel() == null || this.dataSource == null) return;
+    ScriptDefinition created = UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENVIRONMENT, null);
+    if (created != null) {
+      this.refreshAvailableScripts();
+      this.availableScripts.setSelectedItem(created);
+      this.addSelectedScript();
+    }
   }
 
   private void addSelectedScript() {
@@ -235,10 +364,21 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
     this.updating = true;
     try {
       this.parameters.setRowCount(0);
+      if (this.bindingsModel.isEmpty()) {
+        this.mainCardLayout.show(this.mainContainer, CARD_EMPTY);
+        this.enabled.setEnabled(false);
+        this.enabled.setSelected(false);
+        return;
+      }
+      this.mainCardLayout.show(this.mainContainer, CARD_CONTENT);
+
       ScriptBinding binding = this.bindings.getSelectedValue();
       this.enabled.setEnabled(binding != null);
       this.enabled.setSelected(binding != null && binding.isEnabled());
-      if (binding == null) return;
+      if (binding == null) {
+        this.paramCardLayout.show(this.paramContainer, PARAM_EMPTY);
+        return;
+      }
       Set<String> names = new LinkedHashSet<>();
       var discovered = Editor.instance().getProjectCodeIntegration().getScriptDefinitions().stream()
           .filter(candidate -> candidate.id().equals(binding.getScript())).findFirst().orElse(null);
@@ -250,6 +390,12 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
       names.addAll(binding.getParameters().keySet());
       for (String name : names) {
         this.parameters.addRow(new Object[]{name, binding.getParameters().getOrDefault(name, "")});
+      }
+
+      if (this.parameters.getRowCount() == 0) {
+        this.paramCardLayout.show(this.paramContainer, PARAM_NONE);
+      } else {
+        this.paramCardLayout.show(this.paramContainer, PARAM_TABLE);
       }
     } finally {
       this.updating = false;
@@ -303,6 +449,8 @@ public final class EnvironmentScriptInspectorPanel extends JPanel {
     boolean hasAvailable = this.availableScripts.getSelectedItem() != null;
     int count = this.bindingsModel.size();
 
+    this.scriptsHeaderLabel.setText("Attached Scripts (" + count + ")");
+    this.newScriptButton.setEnabled(this.dataSource != null && Editor.instance().getGameFile() != null);
     this.addButton.setEnabled(hasAvailable);
     this.removeButton.setEnabled(hasSelection);
     this.openButton.setEnabled(hasSelection);

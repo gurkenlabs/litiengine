@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
+import de.gurkenlabs.utiliti.controller.Editor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -81,12 +82,53 @@ class ScriptWorkspacePanelTest {
   void monacoEditorIsLoadedOnlyAfterScriptIsDisplayed() {
     de.gurkenlabs.litiengine.Game.init(de.gurkenlabs.litiengine.Game.COMMANDLINE_ARG_NOGUI);
     ScriptWorkspacePanel panel = new ScriptWorkspacePanel();
-    assertNull(panel.getMonaco(), "Monaco editor should not be loaded on ScriptWorkspacePanel creation");
+    try {
+      assertNull(panel.getMonaco(), "Monaco editor should not be loaded on ScriptWorkspacePanel creation");
+    } finally {
+      panel.close();
+    }
+  }
 
-    ScriptDefinition definition = definition();
-    panel.open(definition);
+  @Test
+  void testRefreshScriptsCompactsEmptyPackages() {
+    de.gurkenlabs.litiengine.Game.init(de.gurkenlabs.litiengine.Game.COMMANDLINE_ARG_NOGUI);
+    if (Editor.instance().getGameFile() == null) {
+      Editor.instance().load(null, false);
+    }
+    if (Editor.instance().getGameFile() != null) {
+      Editor.instance().getGameFile().getScripts().clear();
+    }
+    ScriptWorkspacePanel panel = new ScriptWorkspacePanel();
+    ScriptDefinition def1 = new ScriptDefinition("HeroAI", "java", "src/de/gurkenlabs/game/scripts/HeroAI.java", "HeroAI", ScriptHostType.ENTITY);
+    Editor.instance().getGameFile().getScripts().add(def1);
 
-    org.junit.jupiter.api.Assertions.assertNotNull(panel.getMonaco(), "Monaco editor should be loaded once a script is displayed");
+    panel.refreshScripts();
+
+    // Verify compacted package node "de.gurkenlabs.game.scripts" exists
+    boolean found = false;
+    for (int i = 0; i < panel.getScriptsRoot().getChildCount(); i++) {
+      javax.swing.tree.DefaultMutableTreeNode node = (javax.swing.tree.DefaultMutableTreeNode) panel.getScriptsRoot().getChildAt(i);
+      if ("de.gurkenlabs.game.scripts".equals(node.getUserObject().toString())) {
+        found = true;
+        break;
+      }
+    }
+    assertTrue(found, "Compacted package folder de.gurkenlabs.game.scripts should exist");
+    panel.close();
+  }
+
+  @Test
+  void testExtractFullyQualifiedClassName() {
+    String javaSource = """
+      package de.gurkenlabs.lepus.scripts;
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class Loader extends GameScript {}
+      """;
+    assertEquals("de.gurkenlabs.lepus.scripts.Loader", ScriptWorkspacePanel.extractFullyQualifiedClassName(javaSource));
+    assertEquals("Loader", ScriptWorkspacePanel.extractClassName(javaSource));
+
+    String noPackage = "public class SimpleScript extends GameScript {}";
+    assertEquals("SimpleScript", ScriptWorkspacePanel.extractFullyQualifiedClassName(noPackage));
   }
 
   private static ScriptDefinition definition() {

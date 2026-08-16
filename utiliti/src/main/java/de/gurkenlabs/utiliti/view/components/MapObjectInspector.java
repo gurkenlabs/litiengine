@@ -504,6 +504,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     repaint();
   }
 
+  public void refreshScripts() {
+    if (this.scriptsPanel != null) {
+      this.scriptsPanel.refreshAvailableScripts(getDataSource());
+    }
+  }
+
   @Override
   public void setMapObjectType(MapObjectType type) {
     this.type = type;

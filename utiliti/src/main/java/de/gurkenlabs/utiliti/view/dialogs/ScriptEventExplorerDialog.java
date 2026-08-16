@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.view.components.JavaCodeSnippetPane;
 import de.gurkenlabs.utiliti.view.components.ScriptWorkspacePanel.ScriptKind;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.BorderLayout;
@@ -50,7 +51,7 @@ public final class ScriptEventExplorerDialog extends JDialog {
   private final JLabel titleLabel = new JLabel("Select an event or API");
   private final JLabel hostBadge = new JLabel("");
   private final JTextArea descriptionArea = new JTextArea();
-  private final JTextArea codeArea = new JTextArea();
+  private final JavaCodeSnippetPane codeArea = new JavaCodeSnippetPane();
   private final JButton insertButton;
   private final JButton copyButton;
   private final JLabel statusLabel = new JLabel(" ");
@@ -162,14 +163,8 @@ public final class ScriptEventExplorerDialog extends JDialog {
     this.descriptionArea.setFont(this.descriptionArea.getFont().deriveFont(12.5f));
     this.descriptionArea.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 0));
 
-    this.codeArea.setEditable(false);
-    this.codeArea.setFont(new Font("Consolas", Font.PLAIN, 12));
-    this.codeArea.setBackground(new Color(30, 30, 30));
-    this.codeArea.setForeground(new Color(220, 220, 220));
-    this.codeArea.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(new Color(60, 60, 60)),
-        BorderFactory.createEmptyBorder(6, 6, 6, 6)));
     JScrollPane codeScroll = new JScrollPane(this.codeArea);
+    codeScroll.setBorder(BorderFactory.createEmptyBorder());
 
     JPanel centerDetails = new JPanel(new BorderLayout(0, 4));
     centerDetails.add(this.descriptionArea, BorderLayout.NORTH);
@@ -351,7 +346,7 @@ public final class ScriptEventExplorerDialog extends JDialog {
       this.titleLabel.setText("No selection");
       this.hostBadge.setText("");
       this.descriptionArea.setText("");
-      this.codeArea.setText("");
+      this.codeArea.setCode("");
       this.insertButton.setEnabled(false);
       this.copyButton.setEnabled(false);
       return;
@@ -359,7 +354,7 @@ public final class ScriptEventExplorerDialog extends JDialog {
     this.titleLabel.setText(item.name);
     this.hostBadge.setText(item.hostType);
     this.descriptionArea.setText(item.description);
-    this.codeArea.setText(item.codeSnippet);
+    this.codeArea.setCode(item.codeSnippet);
     this.insertButton.setEnabled(true);
     this.copyButton.setEnabled(true);
     this.statusLabel.setText(" ");

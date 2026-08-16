@@ -432,6 +432,12 @@ public class MapPropertyPanel extends JPanel {
     this.tilesetPanel.bind(this.dataSource);
   }
 
+  public void refreshScripts() {
+    if (this.scriptsPanel != null) {
+      this.scriptsPanel.refreshAvailableScripts();
+    }
+  }
+
   void refreshTilesets(IMap map) {
     if (this.dataSource == map) {
       refreshTilesets();

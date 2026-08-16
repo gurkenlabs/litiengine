@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptDiagnostic;
 import de.gurkenlabs.litiengine.scripting.ScriptHostType;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.GradleScriptProjectSupport;
 import de.gurkenlabs.utiliti.controller.IntellijIntegration;
@@ -23,6 +24,7 @@ import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
 import de.gurkenlabs.utiliti.controller.debug.ScriptDebuggerBackend;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -49,9 +51,10 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -162,10 +165,27 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.setBackground(Style.background());
     this.add(this.createConflictBar(), BorderLayout.NORTH);
 
-    JSplitPane explorer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createOutline(), this.createGlobalsPanel());
+    JTabbedPane sidebarTabs = new JTabbedPane(JTabbedPane.TOP);
+    sidebarTabs.putClientProperty("JTabbedPane.noContentBorder", Boolean.TRUE);
+    sidebarTabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);
+    sidebarTabs.putClientProperty("JTabbedPane.contentInsets", new java.awt.Insets(0, 0, 0, 0));
+    sidebarTabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 0, 0, 0));
+    sidebarTabs.putClientProperty("JTabbedPane.tabType", "underlined");
+    sidebarTabs.putClientProperty("JTabbedPane.showTabSeparators", Boolean.TRUE);
+    sidebarTabs.putClientProperty("JTabbedPane.tabHeight", 28);
+    sidebarTabs.putClientProperty("JTabbedPane.tabInsets", new java.awt.Insets(2, 10, 2, 10));
+    sidebarTabs.putClientProperty("JTabbedPane.underlineColor", Style.accent());
+    sidebarTabs.putClientProperty("JTabbedPane.underlineHeight", 2);
+    sidebarTabs.putClientProperty("JTabbedPane.selectedBackground", Style.surface());
+    sidebarTabs.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
+    sidebarTabs.setBackground(Style.background());
+    sidebarTabs.addTab("Outline", Icons.SYMBOL_GROUP_16, this.createOutline());
+    sidebarTabs.addTab("Globals & APIs", Icons.API_16, this.createGlobalsPanel());
+
+    JSplitPane explorer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.createScriptExplorer(), sidebarTabs);
     UI.configureSplitPane(explorer);
     explorer.setBackground(Style.COLOR_BG);
-    explorer.setResizeWeight(0.5);
+    explorer.setResizeWeight(0.55);
     explorer.setMinimumSize(new Dimension(235, 0));
     explorer.setPreferredSize(new Dimension(265, 0));
 
@@ -230,6 +250,17 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.tabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);
     this.tabs.putClientProperty("JTabbedPane.contentInsets", new java.awt.Insets(0, 0, 0, 0));
     this.tabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 0, 0, 0));
+    this.tabs.putClientProperty("JTabbedPane.tabType", "underlined");
+    this.tabs.putClientProperty("JTabbedPane.showTabSeparators", Boolean.TRUE);
+    this.tabs.putClientProperty("JTabbedPane.tabSeparatorsFullHeight", Boolean.FALSE);
+    this.tabs.putClientProperty("JTabbedPane.tabHeight", 30);
+    this.tabs.putClientProperty("JTabbedPane.tabInsets", new java.awt.Insets(3, 10, 3, 6));
+    this.tabs.putClientProperty("JTabbedPane.underlineColor", Style.accent());
+    this.tabs.putClientProperty("JTabbedPane.underlineHeight", 2);
+    this.tabs.putClientProperty("JTabbedPane.selectedBackground", Style.surface());
+    this.tabs.putClientProperty("JTabbedPane.tabAreaBackground", Style.background());
+    this.tabs.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
+    this.tabs.setBackground(Style.background());
 
     this.mainEditorArea.add(this.tabs, BorderLayout.NORTH);
 
@@ -246,8 +277,13 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.caretStatus.setFont(statusBarFont);
     this.caretStatus.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
     this.caretStatus.setForeground(Style.mutedText());
+    JPanel rightStatus = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+    rightStatus.setOpaque(false);
+    rightStatus.add(this.status);
+    JLabel mcpBadge = StatusBar.createMcpBadge();
+    rightStatus.add(mcpBadge);
     statusBar.add(this.caretStatus, BorderLayout.WEST);
-    statusBar.add(this.status, BorderLayout.EAST);
+    statusBar.add(rightStatus, BorderLayout.EAST);
     this.mainEditorArea.add(statusBar, BorderLayout.SOUTH);
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, explorer, this.mainEditorArea);
@@ -294,6 +330,10 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public JComponent getDebuggerComponent() {
     return this.debuggerPanel;
+  }
+
+  DefaultMutableTreeNode getScriptsRoot() {
+    return this.scriptsRoot;
   }
 
   public synchronized void close() {
@@ -354,9 +394,20 @@ public final class ScriptWorkspacePanel extends JPanel {
   public void refreshScripts() {
     String selectedId = this.selectedDefinition() == null ? null : this.selectedDefinition().getId();
     this.scriptsRoot.removeAllChildren();
+    this.repairProjectScriptDefinitions();
     this.refreshProjectSourceDocuments();
     if (Editor.instance().getGameFile() != null) {
       String query = this.search.getText().strip().toLowerCase(Locale.ROOT);
+      Set<String> gameScriptIds = Editor.instance().getGameFile().getScripts().stream()
+          .map(d -> Objects.toString(d.getId(), ""))
+          .collect(java.util.stream.Collectors.toSet());
+      Set<String> gameScriptSources = Editor.instance().getGameFile().getScripts().stream()
+          .map(d -> Objects.toString(d.getSource(), ""))
+          .collect(java.util.stream.Collectors.toSet());
+      Set<String> gameScriptImpls = Editor.instance().getGameFile().getScripts().stream()
+          .map(d -> Objects.toString(d.getImplementation(), ""))
+          .collect(java.util.stream.Collectors.toSet());
+
       Editor.instance().getGameFile().getScripts().stream()
         .filter(definition -> query.isEmpty() || displayName(definition).toLowerCase(Locale.ROOT).contains(query)
           || Objects.toString(definition.getSource(), "").toLowerCase(Locale.ROOT).contains(query)
@@ -367,11 +418,16 @@ public final class ScriptWorkspacePanel extends JPanel {
           else this.insertScriptNode(definition);
         });
       this.projectSourceDefinitions.values().stream()
+        .filter(definition -> !gameScriptIds.contains(definition.getId())
+            && !gameScriptSources.contains(definition.getSource())
+            && !gameScriptImpls.contains(definition.getImplementation()))
         .filter(definition -> query.isEmpty()
           || displayName(definition).toLowerCase(Locale.ROOT).contains(query)
           || definition.getImplementation().toLowerCase(Locale.ROOT).contains(query))
         .sorted(Comparator.comparing(ScriptWorkspacePanel::displayName, String.CASE_INSENSITIVE_ORDER))
         .forEach(this::insertProjectSourceNode);
+
+      compactEmptyFolders(this.scriptsRoot);
     }
     this.scriptsModel.reload();
     for (int row = 0; row < this.scripts.getRowCount(); row++) this.scripts.expandRow(row);
@@ -381,6 +437,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.focusOrOpenFirstScript();
     }
     this.refreshGlobals();
+    UI.refreshScriptInspectors();
   }
 
   public void open(ScriptDefinition definition) {
@@ -1065,10 +1122,14 @@ public final class ScriptWorkspacePanel extends JPanel {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
     panel.setBorder(BorderFactory.createEmptyBorder(8, 8, 6, 8));
 
-    JPanel header = new JPanel(new BorderLayout(5, 0));
-    header.add(sectionTitle("SCRIPTS"), BorderLayout.WEST);
+    JPanel header = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
+    header.setOpaque(false);
 
-    JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+    JPanel titleRow = new JPanel(new BorderLayout(5, 0));
+    titleRow.setOpaque(false);
+    titleRow.add(sectionTitle("SCRIPTS"), BorderLayout.WEST);
+
+    JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
     actions.setOpaque(false);
 
     JButton addBtn = Style.iconButton(Icons.ADD_16);
@@ -1099,7 +1160,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     actions.add(deleteBtn);
     actions.add(configGameBtn);
     actions.add(guideBtn);
-    header.add(actions, BorderLayout.EAST);
+
+    header.add(titleRow, BorderLayout.NORTH);
+    header.add(actions, BorderLayout.SOUTH);
     panel.add(header, BorderLayout.NORTH);
 
     JPanel content = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
@@ -1144,7 +1207,6 @@ public final class ScriptWorkspacePanel extends JPanel {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
     panel.setBackground(Style.COLOR_BG);
     panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
-    panel.add(sectionTitle("OUTLINE"), BorderLayout.NORTH);
     this.outline.setRootVisible(false);
     this.outline.setShowsRootHandles(true);
     this.outline.setRowHeight(Style.TREE_ROW_HEIGHT);
@@ -1162,26 +1224,25 @@ public final class ScriptWorkspacePanel extends JPanel {
     panel.setBackground(Style.COLOR_BG);
     panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
 
-    JPanel header = new JPanel(new BorderLayout());
-    header.setOpaque(false);
-    header.add(sectionTitle("GLOBALS & APIS"), BorderLayout.WEST);
-
-    JButton exploreButton = Style.iconButton(Icons.API_16);
-    exploreButton.setToolTipText("Open Script Events & API Explorer");
-    exploreButton.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showDialog());
-    header.add(exploreButton, BorderLayout.EAST);
-
-    panel.add(header, BorderLayout.NORTH);
-
-    JPanel content = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
-    content.setBackground(Style.COLOR_BG);
+    JPanel searchRow = new JPanel(new BorderLayout(4, 0));
+    searchRow.setOpaque(false);
 
     RoundedSearchBox searchBox = new RoundedSearchBox(this.globalsSearch, 0);
     searchBox.getClearButton().addActionListener(e -> {
       this.globalsSearch.setText("");
       this.refreshGlobals();
     });
-    content.add(searchBox, BorderLayout.NORTH);
+    searchRow.add(searchBox, BorderLayout.CENTER);
+
+    JButton exploreButton = Style.iconButton(Icons.API_16);
+    exploreButton.setToolTipText("Open Script Events & API Explorer");
+    exploreButton.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showDialog());
+    searchRow.add(exploreButton, BorderLayout.EAST);
+
+    panel.add(searchRow, BorderLayout.NORTH);
+
+    JPanel content = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
+    content.setBackground(Style.COLOR_BG);
 
     this.globalsTree.setRootVisible(false);
     this.globalsTree.setShowsRootHandles(true);
@@ -1446,20 +1507,74 @@ public final class ScriptWorkspacePanel extends JPanel {
     return title;
   }
 
+  private static final class TabCloseButton extends JButton {
+    private boolean hovered;
+
+    TabCloseButton(Runnable onClose) {
+      setContentAreaFilled(false);
+      setBorderPainted(false);
+      setFocusPainted(false);
+      setFocusable(false);
+      setOpaque(false);
+      setRolloverEnabled(true);
+      setPreferredSize(new Dimension(18, 18));
+      setMaximumSize(new Dimension(18, 18));
+      setMinimumSize(new Dimension(18, 18));
+      setToolTipText(Resources.strings().get("close"));
+      addMouseListener(new MouseAdapter() {
+        @Override public void mouseEntered(MouseEvent e) { hovered = true; repaint(); }
+        @Override public void mouseExited(MouseEvent e) { hovered = false; repaint(); }
+      });
+      addActionListener(_ -> onClose.run());
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      Graphics2D g2 = (Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        if (hovered || getModel().isPressed()) {
+          g2.setColor(getModel().isPressed() ? new Color(255, 255, 255, 35) : new Color(255, 255, 255, 20));
+          g2.fillRoundRect(0, 0, getWidth(), getHeight(), 4, 4);
+        }
+        g2.setColor(hovered ? Style.text() : Style.mutedText());
+        g2.setStroke(new BasicStroke(1.25f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        int cx = getWidth() / 2;
+        int cy = getHeight() / 2;
+        int r = 3;
+        g2.drawLine(cx - r, cy - r, cx + r, cy + r);
+        g2.drawLine(cx - r, cy + r, cx + r, cy - r);
+      } finally {
+        g2.dispose();
+      }
+    }
+  }
+
   private JPanel createTabHeader(ScriptTab tab) {
-    JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    JPanel header = new JPanel(new BorderLayout(6, 0));
     header.setOpaque(false);
+    header.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+
     JLabel label = new JLabel(displayName(tab.definition), Icons.SCRIPT_16, SwingConstants.LEADING);
-    label.setFont(Style.getDefaultFont());
+    label.setFont(Style.getDefaultFont().deriveFont(12f));
+    label.setForeground(tab == activeTab() ? Style.text() : Style.mutedText());
     tab.title = label;
-    JButton close = new JButton("×");
-    close.setFont(Style.getDefaultFont().deriveFont(12f));
-    close.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-    close.setContentAreaFilled(false);
-    close.setFocusable(false);
-    close.addActionListener(event -> this.closeTab(tab));
-    header.add(label);
-    header.add(close);
+
+    TabCloseButton close = new TabCloseButton(() -> this.closeTab(tab));
+
+    header.addMouseListener(new MouseAdapter() {
+      @Override public void mouseClicked(MouseEvent e) {
+        if (javax.swing.SwingUtilities.isMiddleMouseButton(e)) {
+          closeTab(tab);
+        } else if (javax.swing.SwingUtilities.isLeftMouseButton(e)) {
+          tabs.setSelectedComponent(tab);
+        }
+      }
+    });
+
+    header.add(label, BorderLayout.CENTER);
+    header.add(close, BorderLayout.EAST);
     return header;
   }
 
@@ -1559,6 +1674,12 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private void activeTabChanged() {
     ScriptTab active = this.activeTab();
+    for (int i = 0; i < this.tabs.getTabCount(); i++) {
+      Component c = this.tabs.getComponentAt(i);
+      if (c instanceof ScriptTab tabComponent && tabComponent.title != null) {
+        tabComponent.title.setForeground(tabComponent == active ? Style.text() : Style.mutedText());
+      }
+    }
     if (active != null) {
       MonacoScriptEditor editor = this.ensureMonaco();
       if (editor != null && !editor.isUnavailable()) {
@@ -1735,8 +1856,12 @@ public final class ScriptWorkspacePanel extends JPanel {
           }
         }
       }
-      if (diag.scriptId() != null && !this.projectDiagnostics.containsKey(diag.scriptId())) {
-        allDiagnostics.computeIfAbsent(diag.scriptId(), k -> new ArrayList<>()).add(diag);
+      if (diag.scriptId() != null) {
+        List<ScriptDiagnostic> list = allDiagnostics.computeIfAbsent(diag.scriptId(), k -> new ArrayList<>());
+        boolean exists = list.stream().anyMatch(d -> Objects.equals(d.message(), diag.message()) && d.line() == diag.line());
+        if (!exists) {
+          list.add(diag);
+        }
       }
     }
 
@@ -1867,7 +1992,15 @@ public final class ScriptWorkspacePanel extends JPanel {
   private void insertScriptNode(ScriptDefinition definition) {
     DefaultMutableTreeNode parent = this.scriptsRoot;
     String relative = Objects.toString(definition.getSource(), "").replace('\\', '/');
-    relative = relative.replaceFirst("^(?:.*?/)?(?:src/main|scripts)/(?:java|groovy)/", "");
+    if (relative.startsWith("src/main/java/")) {
+      relative = relative.substring("src/main/java/".length());
+    } else if (relative.startsWith("src/main/groovy/")) {
+      relative = relative.substring("src/main/groovy/".length());
+    } else if (relative.startsWith("src/")) {
+      relative = relative.substring("src/".length());
+    } else if (relative.startsWith("scripts/")) {
+      relative = relative.substring("scripts/".length());
+    }
     String[] parts = relative.split("/");
     for (int i = 0; i < Math.max(0, parts.length - 1); i++) {
       if (parts[i].isBlank()) continue;
@@ -1884,6 +2017,34 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (!parts[i].isBlank()) parent = childFolder(parent, parts[i]);
     }
     parent.add(new DefaultMutableTreeNode(new ScriptTreeItem(displayName(definition), definition)));
+  }
+
+  private static void compactEmptyFolders(DefaultMutableTreeNode node) {
+    if (node == null) return;
+    for (int i = 0; i < node.getChildCount(); i++) {
+      DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+      compactEmptyFolders(child);
+    }
+    if (node.getUserObject() instanceof ScriptTreeItem item && item.definition() == null && !"Project Sources".equals(item.label())) {
+      while (node.getChildCount() == 1) {
+        DefaultMutableTreeNode onlyChild = (DefaultMutableTreeNode) node.getChildAt(0);
+        if (onlyChild.getUserObject() instanceof ScriptTreeItem childItem && childItem.definition() == null) {
+          String merged = item.label() + "." + childItem.label();
+          item = new ScriptTreeItem(merged, null);
+          node.setUserObject(item);
+          node.removeAllChildren();
+          List<DefaultMutableTreeNode> grandChildren = new ArrayList<>();
+          for (int k = 0; k < onlyChild.getChildCount(); k++) {
+            grandChildren.add((DefaultMutableTreeNode) onlyChild.getChildAt(k));
+          }
+          for (DefaultMutableTreeNode gc : grandChildren) {
+            node.add(gc);
+          }
+        } else {
+          break;
+        }
+      }
+    }
   }
 
   private static DefaultMutableTreeNode childFolder(DefaultMutableTreeNode parent, String name) {
@@ -1923,16 +2084,16 @@ public final class ScriptWorkspacePanel extends JPanel {
     ENVIRONMENT
   }
 
-  public void createScript() {
-    createScript(ScriptKind.ENTITY);
+  public ScriptDefinition createScript() {
+    return createScript(ScriptKind.ENTITY);
   }
 
-  public void createScript(ScriptKind kind) {
-    createScript(kind, kind == ScriptKind.ENTITY ? Creature.class : null);
+  public ScriptDefinition createScript(ScriptKind kind) {
+    return createScript(kind, kind == ScriptKind.ENTITY ? Creature.class : null);
   }
 
-  public void createScript(ScriptKind kind, Class<?> targetClass) {
-    if (Editor.instance().getGameFile() == null || Editor.instance().getProjectPath() == null) return;
+  public ScriptDefinition createScript(ScriptKind kind, Class<?> targetClass) {
+    if (Editor.instance().getGameFile() == null || Editor.instance().getProjectPath() == null) return null;
     String targetType = targetClass != null ? targetClass.getName() : (kind == ScriptKind.ENTITY ? Creature.class.getName() : null);
     ScriptHostType hostType = switch (kind) {
       case GAME -> ScriptHostType.GAME;
@@ -1941,14 +2102,20 @@ public final class ScriptWorkspacePanel extends JPanel {
     };
 
     String className = this.promptForNewScriptName(this.nextAvailableScriptName());
-    if (className == null) return;
+    if (className == null) return null;
     String id = className;
     String relPath = ScriptSourcePaths.create(Editor.instance().getProjectModel(), "java", className);
     Path source = resolveSource(relPath);
-    if (source == null) return;
+    if (source == null) return null;
+
+    String packageName = ScriptSourcePaths.derivePackageName(
+        Editor.instance().getProjectModel(), relPath);
+    String implementation = (packageName != null && !packageName.isBlank())
+        ? packageName + "." + className
+        : className;
 
     ScriptDefinition definition = new ScriptDefinition(className, "java", relPath,
-      className, hostType);
+      implementation, hostType);
     definition.setName(className);
     if (targetType != null) {
       definition.setTargetType(targetType);
@@ -1963,8 +2130,10 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.refreshScripts();
       this.open(definition);
       this.setStatus("Created " + definition.getSource(), false);
+      return definition;
     } catch (IOException e) {
       this.setStatus("Could not create script: " + e.getMessage(), true);
+      return null;
     }
   }
 
@@ -2021,6 +2190,43 @@ public final class ScriptWorkspacePanel extends JPanel {
     return matcher.find() ? matcher.group(1) : null;
   }
 
+  public static String extractFullyQualifiedClassName(String source) {
+    if (source == null || source.isBlank()) return null;
+    String simpleName = extractClassName(source);
+    if (simpleName == null) return null;
+    var pkgMatcher = Pattern.compile("(?m)^\\s*package\\s+([A-Za-z_$][\\w$.]*)\\s*;").matcher(source);
+    if (pkgMatcher.find()) {
+      String pkg = pkgMatcher.group(1).trim();
+      if (!pkg.isEmpty()) {
+        return pkg + "." + simpleName;
+      }
+    }
+    return simpleName;
+  }
+
+  private void repairProjectScriptDefinitions() {
+    if (Editor.instance().getGameFile() == null) return;
+    boolean changed = false;
+    for (ScriptDefinition def : Editor.instance().getGameFile().getScripts()) {
+      if (def == null) continue;
+      Path path = resolveSource(def.getSource());
+      if (path != null && Files.isRegularFile(path)) {
+        try {
+          String content = Files.readString(path);
+          String fqcn = extractFullyQualifiedClassName(content);
+          if (fqcn != null && !fqcn.isBlank() && !fqcn.equals(def.getImplementation())) {
+            def.setImplementation(fqcn);
+            changed = true;
+          }
+        } catch (Exception ignored) {
+        }
+      }
+    }
+    if (changed) {
+      Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
+    }
+  }
+
   public void deleteScript(ScriptDefinition definition) {
     if (definition == null || Editor.instance().getGameFile() == null) return;
     if (this.isProjectSource(definition)) {
@@ -2052,6 +2258,18 @@ public final class ScriptWorkspacePanel extends JPanel {
     setStatus("Deleted script " + displayName(definition), false);
   }
 
+  public void closeTab(ScriptDefinition definition) {
+    if (definition == null) return;
+    ScriptTab tab = this.openTabs.get(this.documentKey(definition));
+    if (tab != null) closeTab(tab);
+  }
+
+  public void reloadTab(ScriptDefinition definition) {
+    if (definition == null) return;
+    ScriptTab tab = this.openTabs.get(this.documentKey(definition));
+    if (tab != null) tab.loadPreservingCaret();
+  }
+
   public void duplicateScript(ScriptDefinition definition) {
     if (definition == null || Editor.instance().getGameFile() == null) return;
     if (this.isProjectSource(definition)) {
@@ -2069,11 +2287,15 @@ public final class ScriptWorkspacePanel extends JPanel {
       source = resolveSource(ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className));
       suffix++;
     } while (source != null && (Files.exists(source) || scriptIdExists(id)));
-    if (source == null) return;
+    String newSourceRel = ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className);
+    String packageName = ScriptSourcePaths.derivePackageName(
+        Editor.instance().getProjectModel(), newSourceRel);
+    String implementation = (packageName != null && !packageName.isBlank())
+        ? packageName + "." + className
+        : className;
 
     ScriptDefinition dup = new ScriptDefinition(id, definition.getLanguage(),
-      ScriptSourcePaths.rename(definition.getSource(), definition.getLanguage(), className),
-      className, definition.getHost());
+      newSourceRel, implementation, definition.getHost());
     dup.setTargetType(definition.getTargetType());
 
     Path originalFile = resolveSource(definition.getSource());
@@ -2472,6 +2694,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         if (this.path != null && Files.isRegularFile(this.path)) {
           this.text = Files.readString(this.path);
           this.repairGeneratedCreatureTarget();
+          this.repairScriptImplementation();
           this.loadedTime = Files.getLastModifiedTime(this.path);
         } else {
           this.text = "";
@@ -2519,6 +2742,17 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     }
 
+    private void repairScriptImplementation() {
+      if (this.definition == null) return;
+      String currentText = this.getText();
+      String declaredFqcn = ScriptWorkspacePanel.extractFullyQualifiedClassName(currentText);
+      if (declaredFqcn != null && !declaredFqcn.isBlank()
+          && !declaredFqcn.equals(this.definition.getImplementation())) {
+        this.definition.setImplementation(declaredFqcn);
+        Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
+      }
+    }
+
     private boolean save() {
       if (this.path == null) return false;
       try {
@@ -2528,10 +2762,13 @@ public final class ScriptWorkspacePanel extends JPanel {
         }
 
         String currentText = this.getText();
-        String declaredClass = ScriptWorkspacePanel.extractClassName(currentText);
-        if (!this.projectSource && declaredClass != null && !declaredClass.isBlank()
-          && !declaredClass.equals(this.definition.getImplementation())) {
-          this.renameToClass(declaredClass);
+        String declaredFqcn = ScriptWorkspacePanel.extractFullyQualifiedClassName(currentText);
+        String simpleClassName = ScriptWorkspacePanel.extractClassName(currentText);
+        if (!this.projectSource && declaredFqcn != null && !declaredFqcn.isBlank()) {
+          this.definition.setImplementation(declaredFqcn);
+          if (simpleClassName != null && !simpleClassName.isBlank() && !simpleClassName.equals(this.definition.getName())) {
+            this.renameToClass(simpleClassName);
+          }
         }
 
         if (this.path.getParent() != null) Files.createDirectories(this.path.getParent());
@@ -2633,7 +2870,15 @@ public final class ScriptWorkspacePanel extends JPanel {
                                                    boolean leaf, int row, boolean focused) {
       if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
         this.textLabel.setText(item.label());
-        this.iconLabel.setIcon(item.definition() != null ? Icons.SCRIPT_16 : Icons.SYMBOL_GROUP_16);
+        javax.swing.Icon icon;
+        if (item.definition() != null) {
+          icon = Icons.SCRIPT_16;
+        } else if ("Project Sources".equals(item.label())) {
+          icon = Icons.FOLDER_OPEN_16;
+        } else {
+          icon = Icons.PACKAGE_16;
+        }
+        this.iconLabel.setIcon(icon);
         this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
       } else {
         this.textLabel.setText(Objects.toString(value, ""));

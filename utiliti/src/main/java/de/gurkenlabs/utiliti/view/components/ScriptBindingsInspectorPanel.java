@@ -23,8 +23,13 @@ import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -33,6 +38,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -57,6 +63,7 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
     @Override public boolean isCellEditable(int row, int column) { return column == 1; }
   };
   private final JTable parameterTable = new JTable(this.parameters);
+  private final JButton newScriptButton;
   private final JButton addButton;
   private final JButton removeButton;
   private final JButton openButton;
@@ -64,12 +71,48 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
   private final JButton downButton;
   private boolean updating;
 
+  private static final String CARD_EMPTY = "empty";
+  private static final String CARD_CONTENT = "content";
+  private static final String PARAM_EMPTY = "empty";
+  private static final String PARAM_NONE = "none";
+  private static final String PARAM_TABLE = "table";
+
+  private final CardLayout mainCardLayout = new CardLayout();
+  private final JPanel mainContainer = new JPanel(this.mainCardLayout);
+
+  private final CardLayout paramCardLayout = new CardLayout();
+  private final JPanel paramContainer = new JPanel(this.paramCardLayout);
+
+  private final JLabel scriptsHeaderLabel = new JLabel("Attached Scripts (0)");
+
   public ScriptBindingsInspectorPanel() {
     super("panel_scriptBindings", Icons.API_16);
     this.setLayout(new BorderLayout(0, Style.SPACE_SMALL));
 
-    this.availableScripts.setRenderer((list, value, index, selected, focused) -> new JLabel(displayName(value)));
+    this.availableScripts.setRenderer((list, value, index, selected, focused) -> {
+      JLabel label = new JLabel();
+      if (value == null) {
+        label.setText("<No compatible scripts in project>");
+        label.setForeground(Style.mutedText());
+        label.setIcon(Icons.API_16);
+      } else {
+        String targetTag = value.getTargetType() != null && !value.getTargetType().isBlank()
+            ? " [" + value.getTargetType().substring(value.getTargetType().lastIndexOf('.') + 1) + "]"
+            : "";
+        label.setText(displayName(value) + targetTag);
+        label.setIcon(Icons.SYMBOL_METHOD_16);
+      }
+      label.setOpaque(true);
+      label.setBackground(selected ? list.getSelectionBackground() : list.getBackground());
+      label.setForeground(selected ? list.getSelectionForeground() : (value == null ? Style.mutedText() : list.getForeground()));
+      label.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+      return label;
+    });
     this.availableScripts.addActionListener(event -> this.updateButtonStates());
+
+    this.newScriptButton = Style.iconButton(Icons.SCRIPT_16);
+    this.newScriptButton.setToolTipText("Create a new entity script and attach it");
+    this.newScriptButton.addActionListener(event -> this.createNewScript());
 
     this.addButton = Style.iconButton(Icons.ADD_16);
     this.addButton.setToolTipText("Attach selected script");
@@ -97,6 +140,7 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
 
     JPanel toolButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
     toolButtons.setOpaque(false);
+    toolButtons.add(this.newScriptButton);
     toolButtons.add(this.addButton);
     toolButtons.add(this.removeButton);
     toolButtons.add(this.openButton);
@@ -116,9 +160,11 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
       ScriptDefinition definition = definition(value == null ? null : value.getScript());
       JLabel label = new JLabel((value != null && value.isEnabled() ? "" : "(disabled) ")
         + (definition == null ? value == null ? "" : value.getScript() : displayName(definition)));
+      label.setIcon(Icons.SYMBOL_METHOD_16);
       label.setOpaque(true);
       label.setBackground(selected ? list.getSelectionBackground() : list.getBackground());
       label.setForeground(selected ? list.getSelectionForeground() : list.getForeground());
+      label.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
       return label;
     });
     this.bindings.addListSelectionListener(event -> {
@@ -166,16 +212,52 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
     popup.add(downItem);
     this.bindings.setComponentPopupMenu(popup);
 
+    this.parameterTable.setRowHeight(Style.TREE_ROW_HEIGHT);
+    this.parameterTable.setShowGrid(false);
+    this.parameterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.parameterTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+    this.parameterTable.getColumnModel().getColumn(1).setPreferredWidth(120);
+
+    // Empty state card
+    JPanel emptyCard = createEmptyStatePanel();
+
+    // Top section: Attached scripts
+    JPanel scriptsPanel = new JPanel(new BorderLayout(0, 2));
+    scriptsPanel.setOpaque(false);
+    this.scriptsHeaderLabel.setFont(this.scriptsHeaderLabel.getFont().deriveFont(java.awt.Font.BOLD, 11f));
+    this.scriptsHeaderLabel.setForeground(Style.mutedText());
+    scriptsPanel.add(this.scriptsHeaderLabel, BorderLayout.NORTH);
+    scriptsPanel.add(new JScrollPane(this.bindings), BorderLayout.CENTER);
+
+    // Bottom section: Parameters
     JPanel details = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
     details.setOpaque(false);
-    details.add(this.enabled, BorderLayout.NORTH);
-    details.add(new JScrollPane(this.parameterTable), BorderLayout.CENTER);
-    JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(this.bindings), details);
+
+    JPanel detailsHeader = new JPanel(new BorderLayout());
+    detailsHeader.setOpaque(false);
+    detailsHeader.add(this.enabled, BorderLayout.WEST);
+    JLabel propTitle = new JLabel("Script Properties");
+    propTitle.setFont(propTitle.getFont().deriveFont(java.awt.Font.BOLD, 11f));
+    propTitle.setForeground(Style.mutedText());
+    detailsHeader.add(propTitle, BorderLayout.EAST);
+    details.add(detailsHeader, BorderLayout.NORTH);
+
+    this.paramContainer.setOpaque(false);
+    this.paramContainer.add(createParamEmptyPanel("Select an attached script above to configure its properties."), PARAM_EMPTY);
+    this.paramContainer.add(createParamEmptyPanel("No @ScriptProperty parameters defined in this script."), PARAM_NONE);
+    this.paramContainer.add(new JScrollPane(this.parameterTable), PARAM_TABLE);
+    details.add(this.paramContainer, BorderLayout.CENTER);
+
+    JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scriptsPanel, details);
     UI.configureSplitPane(split);
-    split.setResizeWeight(0.42);
-    split.setDividerLocation(82);
+    split.setResizeWeight(0.45);
+    split.setDividerLocation(90);
     split.setPreferredSize(new Dimension(0, 210));
-    this.add(split, BorderLayout.CENTER);
+
+    this.mainContainer.setOpaque(false);
+    this.mainContainer.add(emptyCard, CARD_EMPTY);
+    this.mainContainer.add(split, CARD_CONTENT);
+    this.add(this.mainContainer, BorderLayout.CENTER);
 
     this.enabled.addActionListener(event -> {
       if (this.updating || this.bindings.getSelectedValue() == null) return;
@@ -189,12 +271,68 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
     this.updateButtonStates();
   }
 
+  private JPanel createEmptyStatePanel() {
+    JPanel panel = new JPanel(new java.awt.GridBagLayout());
+    panel.setOpaque(true);
+    panel.setBackground(Style.surface());
+    panel.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(Style.border()),
+        BorderFactory.createEmptyBorder(12, 12, 12, 12)));
+
+    java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.insets = new java.awt.Insets(0, 0, 4, 0);
+    gbc.anchor = java.awt.GridBagConstraints.CENTER;
+
+    JLabel iconLabel = new JLabel(Icons.API_16);
+    panel.add(iconLabel, gbc);
+
+    gbc.gridy = 1;
+    JLabel title = new JLabel("No Scripts Attached");
+    title.setFont(title.getFont().deriveFont(java.awt.Font.BOLD, 12f));
+    title.setForeground(Style.text());
+    panel.add(title, gbc);
+
+    gbc.gridy = 2;
+    gbc.insets = new java.awt.Insets(2, 0, 0, 0);
+    JLabel hint = new JLabel("<html><center style='color:#969eb9;'>Select a script above and click <b>'+'</b><br>to bind behaviors & parameters.</center></html>");
+    hint.setFont(hint.getFont().deriveFont(11f));
+    panel.add(hint, gbc);
+
+    gbc.gridy = 3;
+    gbc.insets = new java.awt.Insets(8, 0, 0, 0);
+    JButton createBtn = new JButton("Create New Script", Icons.SCRIPT_16);
+    createBtn.setFont(createBtn.getFont().deriveFont(11f));
+    createBtn.addActionListener(event -> this.createNewScript());
+    panel.add(createBtn, gbc);
+
+    return panel;
+  }
+
+  private JPanel createParamEmptyPanel(String message) {
+    JPanel panel = new JPanel(new java.awt.GridBagLayout());
+    panel.setOpaque(true);
+    panel.setBackground(Style.surface());
+    panel.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(Style.border()),
+        BorderFactory.createEmptyBorder(6, 6, 6, 6)));
+
+    JLabel hint = new JLabel("<html><center style='color:#969eb9;'>" + message + "</center></html>");
+    hint.setFont(hint.getFont().deriveFont(11f));
+    panel.add(hint);
+
+    return panel;
+  }
+
   private void updateButtonStates() {
     int selectedIndex = this.bindings.getSelectedIndex();
     boolean hasSelection = selectedIndex >= 0;
     boolean hasAvailable = this.availableScripts.getSelectedItem() != null;
     int count = this.bindingsModel.size();
 
+    this.scriptsHeaderLabel.setText("Attached Scripts (" + count + ")");
+    this.newScriptButton.setEnabled(this.getDataSource() != null && Editor.instance().getGameFile() != null);
     this.addButton.setEnabled(hasAvailable);
     this.removeButton.setEnabled(hasSelection);
     this.openButton.setEnabled(hasSelection);
@@ -213,6 +351,7 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
     } finally {
       this.updating = false;
     }
+    this.mainCardLayout.show(this.mainContainer, CARD_EMPTY);
     this.updateButtonStates();
   }
 
@@ -235,14 +374,31 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
     this.bindSelection();
   }
 
-  private void refreshAvailableScripts(IMapObject mapObject) {
-    List<ScriptDefinition> definitions = Editor.instance().getGameFile().getScripts().stream()
-      .filter(definition -> definition.getHost() == ScriptHostType.ENTITY)
-      .filter(definition -> compatible(definition, mapObject))
-      .sorted(Comparator.comparing(ScriptBindingsInspectorPanel::displayName, String.CASE_INSENSITIVE_ORDER))
-      .toList();
+  public void refreshAvailableScripts() {
+    this.refreshAvailableScripts(this.getDataSource());
+  }
+
+  public void refreshAvailableScripts(IMapObject mapObject) {
+    List<ScriptDefinition> definitions = Editor.instance().getGameFile() != null && Editor.instance().getGameFile().getScripts() != null
+      ? Editor.instance().getGameFile().getScripts().stream()
+          .filter(definition -> definition.getHost() == ScriptHostType.ENTITY)
+          .filter(definition -> compatible(definition, mapObject))
+          .sorted(Comparator.comparing(ScriptBindingsInspectorPanel::displayName, String.CASE_INSENSITIVE_ORDER))
+          .toList()
+      : List.of();
     this.availableScripts.setModel(new DefaultComboBoxModel<>(definitions.toArray(ScriptDefinition[]::new)));
     this.updateButtonStates();
+  }
+
+  private void createNewScript() {
+    if (UI.getScriptWorkspacePanel() == null || this.getDataSource() == null) return;
+    Class<?> targetClass = resolveEntityType(this.getDataSource());
+    ScriptDefinition created = UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, targetClass);
+    if (created != null) {
+      this.refreshAvailableScripts(this.getDataSource());
+      this.availableScripts.setSelectedItem(created);
+      this.addSelectedScript();
+    }
   }
 
   private void addSelectedScript() {
@@ -283,10 +439,21 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
     this.updating = true;
     try {
       this.parameters.setRowCount(0);
+      if (this.bindingsModel.isEmpty()) {
+        this.mainCardLayout.show(this.mainContainer, CARD_EMPTY);
+        this.enabled.setEnabled(false);
+        this.enabled.setSelected(false);
+        return;
+      }
+      this.mainCardLayout.show(this.mainContainer, CARD_CONTENT);
+
       ScriptBinding binding = this.bindings.getSelectedValue();
       this.enabled.setEnabled(binding != null);
       this.enabled.setSelected(binding != null && binding.isEnabled());
-      if (binding == null) return;
+      if (binding == null) {
+        this.paramCardLayout.show(this.paramContainer, PARAM_EMPTY);
+        return;
+      }
       Set<String> names = new LinkedHashSet<>();
       var discovered = Editor.instance().getProjectCodeIntegration().getScriptDefinitions().stream()
         .filter(candidate -> candidate.id().equals(binding.getScript())).findFirst().orElse(null);
@@ -296,6 +463,12 @@ public final class ScriptBindingsInspectorPanel extends PropertyPanel {
       names.addAll(binding.getParameters().keySet());
       for (String name : names) {
         this.parameters.addRow(new Object[] {name, binding.getParameters().getOrDefault(name, "")});
+      }
+
+      if (this.parameters.getRowCount() == 0) {
+        this.paramCardLayout.show(this.paramContainer, PARAM_NONE);
+      } else {
+        this.paramCardLayout.show(this.paramContainer, PARAM_TABLE);
       }
     } finally {
       this.updating = false;
