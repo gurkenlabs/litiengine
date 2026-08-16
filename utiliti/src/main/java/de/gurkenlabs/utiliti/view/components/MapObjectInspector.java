@@ -283,7 +283,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     bindPanel(this.combatPanel, supportsCollisionAndCombat ? targets : List.of());
     bindPanel(this.movementPanel, commonType == MapObjectType.CREATURE ? targets : List.of());
     boolean supportsScripts = commonType != null && commonType != MapObjectType.AREA;
-    bindPanel(this.scriptsPanel, supportsScripts && targets.size() == 1 ? targets : List.of());
+    this.scriptsPanel.bind(supportsScripts && targets.size() == 1 ? targets.get(0) : null);
     this.scriptsCard.setVisible(supportsScripts && targets.size() == 1);
 
     bindPanel(this.customPanel, targets.size() == 1 ? targets : List.of());

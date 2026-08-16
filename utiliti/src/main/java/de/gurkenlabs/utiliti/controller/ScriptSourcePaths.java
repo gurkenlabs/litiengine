@@ -206,6 +206,46 @@ public final class ScriptSourcePaths {
     return directory + className + suffix;
   }
 
+  /** Extracts simple class name from Java/Groovy source text. */
+  public static String extractClassName(String source) {
+    if (source == null || source.isBlank()) return null;
+    var matcher = Pattern.compile("(?m)^\\s*(?:public\\s+)?(?:class|interface|enum|record)\\s+([A-Za-z_$][\\w$]*)").matcher(source);
+    return matcher.find() ? matcher.group(1) : null;
+  }
+
+  /** Extracts fully-qualified class name (package + simple name) from source text. */
+  public static String extractFullyQualifiedClassName(String source) {
+    if (source == null || source.isBlank()) return null;
+    String simpleName = extractClassName(source);
+    if (simpleName == null) return null;
+    Matcher pkgMatcher = PACKAGE_PATTERN.matcher(source);
+    if (pkgMatcher.find()) {
+      String pkg = pkgMatcher.group(1).trim();
+      if (!pkg.isEmpty()) {
+        return pkg + "." + simpleName;
+      }
+    }
+    return simpleName;
+  }
+
+  /** Resolves a relative script source path against the project file path or root directory. */
+  public static Path resolvePath(Path projectPath, String relative) {
+    if (relative == null || relative.isBlank()) return null;
+    if (projectPath == null) return Path.of(relative);
+    Path root = Files.isDirectory(projectPath) ? projectPath : projectPath.toAbsolutePath().normalize().getParent();
+    return root != null ? root.resolve(relative).normalize() : Path.of(relative);
+  }
+
+  /** Resolves standard scripts directory (src/main/java or scripts/) for a project. */
+  public static Path resolveScriptsDirectory(Path projectPath) {
+    if (projectPath == null) return null;
+    Path root = Files.isDirectory(projectPath) ? projectPath : projectPath.toAbsolutePath().normalize().getParent();
+    if (root == null) return null;
+    Path standardSrc = root.resolve("src/main/java");
+    if (Files.isDirectory(standardSrc)) return standardSrc;
+    return root.resolve("scripts");
+  }
+
   private static String normalizeLanguage(String language) {
     return language == null || language.isBlank() ? "java" : language.toLowerCase(Locale.ROOT);
   }

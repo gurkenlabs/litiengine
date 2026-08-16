@@ -12,6 +12,8 @@ import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.litiengine.scripting.ScriptManager;
 import de.gurkenlabs.litiengine.scripting.ScriptPropertyMetadata;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ScriptSourcePaths;
+import de.gurkenlabs.utiliti.controller.ScriptTemplateFactory;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.view.components.UI;
 import jakarta.json.Json;
@@ -595,21 +597,11 @@ final class McpScriptHandler {
   }
 
   private static Path resolvePath(String relative) {
-    if (relative == null || relative.isBlank()) return null;
-    Path project = Editor.instance().getProjectPath();
-    if (project == null) return Path.of(relative);
-    Path root = project.toAbsolutePath().normalize().getParent();
-    return root != null ? root.resolve(relative) : Path.of(relative);
+    return ScriptSourcePaths.resolvePath(Editor.instance().getProjectPath(), relative);
   }
 
   private static Path resolveScriptsDirectory() {
-    Path project = Editor.instance().getProjectPath();
-    if (project == null) return null;
-    Path root = project.toAbsolutePath().normalize().getParent();
-    if (root == null) return null;
-    Path standardSrc = root.resolve("src/main/java");
-    if (Files.isDirectory(standardSrc)) return standardSrc;
-    return root.resolve("scripts");
+    return ScriptSourcePaths.resolveScriptsDirectory(Editor.instance().getProjectPath());
   }
 
   private static ScriptHostType parseHostType(String hostStr) {
@@ -622,77 +614,6 @@ final class McpScriptHandler {
   }
 
   private static String generateTemplateCode(String className, ScriptHostType host, String targetType, String packageName) {
-    String pkgHeader = packageName != null && !packageName.isBlank() ? "package " + packageName + ";\n\n" : "";
-    if (host == ScriptHostType.GAME) {
-      return pkgHeader
-          + "import de.gurkenlabs.litiengine.*;\n"
-          + "import de.gurkenlabs.litiengine.input.Input;\n"
-          + "import de.gurkenlabs.litiengine.scripting.*;\n"
-          + "import java.awt.event.KeyEvent;\n\n"
-          + "/**\n"
-          + " * Game-level orchestrator script.\n"
-          + " */\n"
-          + "@ScriptInfo(id = \"" + className + "\", host = ScriptHostType.GAME)\n"
-          + "public class " + className + " extends GameScript {\n"
-          + "  @Override\n"
-          + "  public void onStarted() {\n"
-          + "    // Startup game initialization\n"
-          + "  }\n\n"
-          + "  @Override\n"
-          + "  public void update() {\n"
-          + "    // Global game tick update\n"
-          + "  }\n"
-          + "}\n";
-    } else if (host == ScriptHostType.ENVIRONMENT) {
-      return pkgHeader
-          + "import de.gurkenlabs.litiengine.*;\n"
-          + "import de.gurkenlabs.litiengine.entities.*;\n"
-          + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
-          + "/**\n"
-          + " * Map environment script.\n"
-          + " */\n"
-          + "@ScriptInfo(id = \"" + className + "\", host = ScriptHostType.ENVIRONMENT)\n"
-          + "public class " + className + " extends EnvironmentScript {\n"
-          + "  @Override\n"
-          + "  public void onLoaded() {\n"
-          + "    // Map loaded hook\n"
-          + "    context().ui().showBanner(\"STAGE 1\", \"Fight!\", 2500);\n"
-          + "  }\n\n"
-          + "  @Override\n"
-          + "  public void update() {\n"
-          + "    // Map update tick\n"
-          + "  }\n"
-          + "}\n";
-    } else {
-      String simpleTarget = targetType != null ? targetType.substring(targetType.lastIndexOf('.') + 1) : "Creature";
-      String base = "Creature".equals(simpleTarget) ? "CreatureScript" : "EntityScript<" + simpleTarget + ">";
-      return pkgHeader
-          + "import de.gurkenlabs.litiengine.*;\n"
-          + "import de.gurkenlabs.litiengine.entities.*;\n"
-          + "import de.gurkenlabs.litiengine.scripting.*;\n"
-          + "import java.awt.Color;\n\n"
-          + "/**\n"
-          + " * Entity script for " + simpleTarget + ".\n"
-          + " */\n"
-          + "@ScriptInfo(id = \"" + className + "\", host = ScriptHostType.ENTITY, target = " + simpleTarget + ".class)\n"
-          + "public class " + className + " extends " + base + " {\n"
-          + "  @Override\n"
-          + "  public void onLoaded() {\n"
-          + "    // Entity ready\n"
-          + "  }\n\n"
-          + "  @Override\n"
-          + "  public void update() {\n"
-          + "    if (isDead()) return;\n"
-          + "  }\n\n"
-          + "  @Override\n"
-          + "  protected void onHit(EntityHitEvent event) {\n"
-          + "    context().ui().floatText(\"-\" + event.getDamage(), host(), Color.RED);\n"
-          + "  }\n\n"
-          + "  @Override\n"
-          + "  protected void onDeath(ICombatEntity entity, EntityHitEvent hitEvent) {\n"
-          + "    remove();\n"
-          + "  }\n"
-          + "}\n";
-    }
+    return ScriptTemplateFactory.generateTemplate(className, host, targetType, packageName, className);
   }
 }
