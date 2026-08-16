@@ -58,8 +58,34 @@ public class JavaScriptProvider implements ScriptProvider {
       }
     }
 
+    Class<?> type = null;
+    String impl = definition.getImplementation();
     try {
-      Class<?> type = Class.forName(definition.getImplementation(), false, context.parent());
+      if (impl != null && !impl.isBlank()) {
+        type = Class.forName(impl, false, context.parent());
+      }
+    } catch (ClassNotFoundException ignored) {
+    }
+
+    if (type == null && definition.getSource() != null) {
+      String derived = definition.getSource().replace('\\', '/')
+          .replaceFirst("^(?:.*?/)?(?:src/main/java|src/main/groovy|src/main|src|scripts)/(?:java|groovy)?/?", "")
+          .replaceFirst("\\.[^.]+$", "")
+          .replace('/', '.');
+      if (!derived.isBlank() && !derived.equals(impl)) {
+        try {
+          type = Class.forName(derived, false, context.parent());
+          definition.setImplementation(derived);
+        } catch (ClassNotFoundException ignored) {
+        }
+      }
+    }
+
+    if (type == null) {
+      throw new ScriptException("Could not resolve script implementation " + (impl != null ? impl : definition.getId()) + ".");
+    }
+
+    try {
       Class<? extends ScriptInstance> scriptType = type.asSubclass(ScriptInstance.class);
       scriptType.getConstructor();
       return new CompiledScript() {
@@ -77,7 +103,7 @@ public class JavaScriptProvider implements ScriptProvider {
           return scriptType;
         }
       };
-    } catch (ClassNotFoundException | ClassCastException | NoSuchMethodException | LinkageError e) {
+    } catch (ClassCastException | NoSuchMethodException | LinkageError e) {
       throw new ScriptException("Could not resolve script implementation " + definition.getImplementation() + ".", e);
     }
   }
@@ -132,6 +158,13 @@ public class JavaScriptProvider implements ScriptProvider {
       classpathEntries.addAll(List.of(processClasspath.split(java.util.regex.Pattern.quote(File.pathSeparator))));
     }
     context.classpath().stream().map(Path::toString).forEach(classpathEntries::add);
+    try {
+      java.security.CodeSource cs = ScriptInstance.class.getProtectionDomain().getCodeSource();
+      if (cs != null && cs.getLocation() != null) {
+        classpathEntries.add(Path.of(cs.getLocation().toURI()).toString());
+      }
+    } catch (Exception ignored) {
+    }
     for (ClassLoader cl = context.parent(); cl != null; cl = cl.getParent()) {
       if (cl instanceof java.net.URLClassLoader ucl) {
         for (URL url : ucl.getURLs()) {

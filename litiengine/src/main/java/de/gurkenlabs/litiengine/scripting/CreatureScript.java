@@ -39,16 +39,19 @@ public abstract class CreatureScript extends EntityScript<Creature> {
   }
 
   /** Checks if the creature is currently dead. */
+  @Override
   public boolean isDead() {
     return this.host() != null && this.host().isDead();
   }
 
   /** Returns current health / hitpoints. */
+  @Override
   public int getHealth() {
     return this.host() != null ? this.host().getHitPoints().getModifiedValue() : 0;
   }
 
   /** Returns maximum health / hitpoints. */
+  @Override
   public int getMaxHealth() {
     return this.host() != null ? this.host().getHitPoints().getMax() : 0;
   }

@@ -28,13 +28,28 @@ public abstract class EntityScript<T extends IEntity> extends AbstractScript<T> 
   protected void onMessage(String message, Object sender) throws Exception {}
 
   /** Called when the attached combat entity is hit. */
-  protected void onHit(de.gurkenlabs.litiengine.entities.EntityHitEvent event) throws Exception {}
+  protected void onHit(de.gurkenlabs.litiengine.entities.EntityHitEvent event) throws Exception {
+    this.onHit();
+  }
+
+  /** Called when the attached combat entity is hit. */
+  protected void onHit() throws Exception {}
 
   /** Called when the attached combat entity dies. */
-  protected void onDeath(de.gurkenlabs.litiengine.entities.ICombatEntity entity, de.gurkenlabs.litiengine.entities.EntityHitEvent hitEvent) throws Exception {}
+  protected void onDeath(de.gurkenlabs.litiengine.entities.ICombatEntity entity, de.gurkenlabs.litiengine.entities.EntityHitEvent hitEvent) throws Exception {
+    this.onDeath();
+  }
+
+  /** Called when the attached combat entity dies. */
+  protected void onDeath() throws Exception {}
 
   /** Called when the attached collision entity collides with another collision entity. */
-  protected void onCollision(de.gurkenlabs.litiengine.physics.CollisionEvent event) throws Exception {}
+  protected void onCollision(de.gurkenlabs.litiengine.physics.CollisionEvent event) throws Exception {
+    this.onCollision();
+  }
+
+  /** Called when the attached collision entity collides with another collision entity. */
+  protected void onCollision() throws Exception {}
 
   /** Called when another entity interacts with the attached entity. */
   protected void onInteract(IEntity source) throws Exception {}
@@ -59,6 +74,35 @@ public abstract class EntityScript<T extends IEntity> extends AbstractScript<T> 
     if (this.host() != null && this.host().getEnvironment() != null) {
       this.host().getEnvironment().remove(this.host());
     }
+  }
+
+  /** Checks if the host entity is dead (if it is a combat entity). */
+  public boolean isDead() {
+    return this.host() instanceof de.gurkenlabs.litiengine.entities.ICombatEntity combat && combat.isDead();
+  }
+
+  /** Marks the host combat entity as dead. */
+  public void die() {
+    if (this.host() instanceof de.gurkenlabs.litiengine.entities.ICombatEntity combat) {
+      combat.die();
+    }
+  }
+
+  /** Resurrects the host combat entity. */
+  public void resurrect() {
+    if (this.host() instanceof de.gurkenlabs.litiengine.entities.ICombatEntity combat) {
+      combat.resurrect();
+    }
+  }
+
+  /** Returns current health / hitpoints (or 0 if not a combat entity). */
+  public int getHealth() {
+    return this.host() instanceof de.gurkenlabs.litiengine.entities.ICombatEntity combat ? combat.getHitPoints().getModifiedValue() : 0;
+  }
+
+  /** Returns maximum health / hitpoints (or 0 if not a combat entity). */
+  public int getMaxHealth() {
+    return this.host() instanceof de.gurkenlabs.litiengine.entities.ICombatEntity combat ? combat.getHitPoints().getMax() : 0;
   }
 
   /** @deprecated Override {@link #onLoaded()} in new scripts. */

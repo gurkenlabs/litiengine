@@ -9,8 +9,34 @@ final class ClasspathScriptProvider implements ScriptProvider {
 
   @Override
   public CompiledScript compile(ScriptDefinition definition, URL source, ClassLoader parent) throws ScriptException {
+    Class<?> type = null;
+    String impl = definition.getImplementation();
     try {
-      Class<?> type = Class.forName(definition.getImplementation(), false, parent);
+      if (impl != null && !impl.isBlank()) {
+        type = Class.forName(impl, false, parent);
+      }
+    } catch (ClassNotFoundException ignored) {
+    }
+
+    if (type == null && definition.getSource() != null) {
+      String derived = definition.getSource().replace('\\', '/')
+          .replaceFirst("^(?:.*?/)?(?:src/main/java|src/main/groovy|src/main|src|scripts)/(?:java|groovy)?/?", "")
+          .replaceFirst("\\.[^.]+$", "")
+          .replace('/', '.');
+      if (!derived.isBlank() && !derived.equals(impl)) {
+        try {
+          type = Class.forName(derived, false, parent);
+          definition.setImplementation(derived);
+        } catch (ClassNotFoundException ignored) {
+        }
+      }
+    }
+
+    if (type == null) {
+      throw new ScriptException("Could not resolve script implementation " + (impl != null ? impl : definition.getId()) + ".");
+    }
+
+    try {
       Class<? extends ScriptInstance> scriptType = type.asSubclass(ScriptInstance.class);
       scriptType.getConstructor();
       return new CompiledScript() {
@@ -24,7 +50,7 @@ final class ClasspathScriptProvider implements ScriptProvider {
 
         @Override public Class<? extends ScriptInstance> implementationType() { return scriptType; }
       };
-    } catch (ClassNotFoundException | ClassCastException | NoSuchMethodException e) {
+    } catch (ClassCastException | NoSuchMethodException e) {
       throw new ScriptException("Could not resolve script implementation " + definition.getImplementation() + ".", e);
     }
   }
