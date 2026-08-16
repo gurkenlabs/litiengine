@@ -40,6 +40,7 @@ class ScriptOutlineTest {
     assertEquals("CreatureScript", outline.detail());
     assertEquals(List.of("Fields", "Methods", "Dependencies"),
       outline.children().stream().map(ScriptOutline.Symbol::name).toList());
+    assertTrue(outline.children().stream().allMatch(group -> group.detail().isEmpty()));
     assertEquals(List.of("displayName", "component"), names(group(outline, "Fields")));
     assertEquals(List.of("onLoaded", "update"), names(group(outline, "Methods")));
     assertEquals(List.of("ZombieAIComponent"), names(group(outline, "Dependencies")));

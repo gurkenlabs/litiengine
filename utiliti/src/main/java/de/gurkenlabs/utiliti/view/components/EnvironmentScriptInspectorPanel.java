@@ -1,13 +1,9 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.scripting.ScriptBinding;
-import de.gurkenlabs.litiengine.scripting.ScriptBindingCodec;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptHostType;
-import de.gurkenlabs.litiengine.scripting.ScriptManager;
-import de.gurkenlabs.utiliti.controller.UndoManager;
-import java.util.List;
+import de.gurkenlabs.utiliti.controller.ScriptBindingTarget;
 
 /**
  * Inline script attachment and property inspector for map environment scripts.
@@ -19,25 +15,9 @@ public final class EnvironmentScriptInspectorPanel extends AbstractScriptBinding
   }
 
   @Override
-  protected List<ScriptBinding> readBindings(IMap source) {
-    if (source == null) return List.of();
-    try {
-      return ScriptBindingCodec.decode(source.getStringValue(ScriptManager.BINDINGS_PROPERTY, null));
-    } catch (IllegalArgumentException e) {
-      return List.of();
-    }
-  }
-
-  @Override
-  protected void persistBindings(IMap source, List<ScriptBinding> bindings) {
-    if (source == null) return;
-    UndoManager.instance().mapChanging(source);
-    if (bindings == null || bindings.isEmpty()) {
-      source.removeProperty(ScriptManager.BINDINGS_PROPERTY);
-    } else {
-      source.setValue(ScriptManager.BINDINGS_PROPERTY, ScriptBindingCodec.encode(bindings));
-    }
-    UndoManager.instance().mapChanged(source);
+  protected ScriptBindingTarget getBindingTarget(IMap source) {
+    return source == null || source.getName() == null || source.getName().isBlank()
+      ? null : new ScriptBindingTarget.Environment(source.getName());
   }
 
   @Override
@@ -63,7 +43,7 @@ public final class EnvironmentScriptInspectorPanel extends AbstractScriptBinding
 
   @Override
   protected String getEmptyStateHint() {
-    return "Select a script above and click <b>'+'</b><br>to bind map-level objectives & cinematics.";
+    return "Select a script above and click <b>'+'</b><br>to attach map-level objectives and cinematics.";
   }
 
   @Override

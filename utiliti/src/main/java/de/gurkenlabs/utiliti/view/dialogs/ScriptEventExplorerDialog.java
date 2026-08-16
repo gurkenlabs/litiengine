@@ -300,8 +300,8 @@ public final class ScriptEventExplorerDialog extends JDialog {
       UI.getScriptWorkspacePanel().createScript(ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Creature.class);
     });
 
-    JButton configGameBtn = new JButton("Configure Startup...", Icons.SETTINGS_16);
-    configGameBtn.setToolTipText("Open Game Script & Startup Configuration");
+    JButton configGameBtn = new JButton("Game Scripts...", Icons.SETTINGS_16);
+    configGameBtn.setToolTipText("Manage scripts attached to the game lifecycle");
     configGameBtn.addActionListener(e -> {
       this.dispose();
       GameScriptsDialog.showDialog();

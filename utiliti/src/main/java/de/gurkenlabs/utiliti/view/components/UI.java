@@ -3,6 +3,8 @@ package de.gurkenlabs.utiliti.view.components;
 import com.github.weisj.darklaf.LafManager;
 import com.github.weisj.darklaf.theme.IntelliJTheme;
 import com.github.weisj.darklaf.theme.OneDarkTheme;
+import com.github.weisj.darklaf.ui.spinner.DarkSpinnerBorder;
+import com.github.weisj.darklaf.ui.text.DarkTextBorder;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
@@ -1386,10 +1388,15 @@ public final class UI {
   private static void applyTokyoNightOverrides() {
     // Rounded corners for modern look
     applyCompactMetrics();
-    UIManager.put("Button.arc", 6);
-    UIManager.put("Component.arc", 6);
-    UIManager.put("TextComponent.arc", 5);
-    UIManager.put("TabbedPane.arc", 5);
+    UIManager.put("Button.arc", Style.CORNER_RADIUS);
+    UIManager.put("Component.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextField.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextComponent.arc", Style.CORNER_RADIUS);
+    UIManager.put("FormattedTextField.arc", Style.CORNER_RADIUS);
+    UIManager.put("PasswordField.arc", Style.CORNER_RADIUS);
+    UIManager.put("TabbedPane.arc", Style.CORNER_RADIUS);
+    UIManager.put("Spinner.arc", Style.CORNER_RADIUS);
+    UIManager.put("ComboBox.arc", Style.CORNER_RADIUS);
 
     // Panels - borderless design with subtle contrast
     UIManager.put("Panel.background", Style.COLOR_BG);
@@ -1407,19 +1414,57 @@ public final class UI {
     UIManager.put("Editor.mapBacking", Style.COLOR_MAP_BACKING);
     UIManager.put("Editor.mapBorder", Style.COLOR_MAP_BORDER);
     Color INPUT_BG = Style.COLOR_INPUT_BG;
+    UIManager.put("TextField.borderThickness", 0);
+    UIManager.put("TextArea.borderThickness", 0);
+    UIManager.put("FormattedTextField.borderThickness", 0);
+    UIManager.put("PasswordField.borderThickness", 0);
+    UIManager.put("ComboBox.borderThickness", 0);
+    UIManager.put("Spinner.borderThickness", 0);
+
     UIManager.put("TextField.background", INPUT_BG);
     UIManager.put("TextField.foreground", Style.COLOR_TEXT);
     UIManager.put("TextField.caretForeground", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("TextField.borderColor", Style.COLOR_BORDER);
+    UIManager.put("TextField.border.enabled", Style.COLOR_BORDER);
+    UIManager.put("TextField.border.focus", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("TextArea.arc", Style.CORNER_RADIUS);
     UIManager.put("TextArea.background", INPUT_BG);
     UIManager.put("TextArea.foreground", Style.COLOR_TEXT);
+    UIManager.put("TextArea.caretForeground", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("TextArea.borderColor", Style.COLOR_BORDER);
+    UIManager.put("TextArea.border.enabled", Style.COLOR_BORDER);
+    UIManager.put("TextArea.border.focus", Style.COLOR_ACCENT_BLUE);
     UIManager.put("TextPane.background", Style.COLOR_ASSET_EXPLORER);
     UIManager.put("TextPane.foreground", Style.COLOR_TEXT);
     UIManager.put("FormattedTextField.background", INPUT_BG);
     UIManager.put("FormattedTextField.foreground", Style.COLOR_TEXT);
+    UIManager.put("FormattedTextField.borderColor", Style.COLOR_BORDER);
+    UIManager.put("FormattedTextField.border.enabled", Style.COLOR_BORDER);
+    UIManager.put("FormattedTextField.border.focus", Style.COLOR_ACCENT_BLUE);
     UIManager.put("PasswordField.background", INPUT_BG);
     UIManager.put("PasswordField.foreground", Style.COLOR_TEXT);
+    UIManager.put("PasswordField.borderColor", Style.COLOR_BORDER);
+    UIManager.put("PasswordField.border.enabled", Style.COLOR_BORDER);
+    UIManager.put("PasswordField.border.focus", Style.COLOR_ACCENT_BLUE);
     UIManager.put("ComboBox.background", INPUT_BG);
     UIManager.put("ComboBox.foreground", Style.COLOR_TEXT);
+    UIManager.put("ComboBox.borderColor", Style.COLOR_BORDER);
+    UIManager.put("ComboBox.activeBorderColor", Style.COLOR_BORDER);
+    UIManager.put("ComboBox.focusBorderColor", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("Spinner.background", INPUT_BG);
+    UIManager.put("Spinner.borderColor", Style.COLOR_BORDER);
+    UIManager.put("Spinner.activeBorderColor", Style.COLOR_BORDER);
+    UIManager.put("Spinner.focusBorderColor", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("border.color", Style.COLOR_BORDER);
+    UIManager.put("Component.borderColor", Style.COLOR_BORDER);
+    UIManager.put("Component.focusColor", Style.COLOR_ACCENT_BLUE);
+
+    UIManager.put("TextField.border", new DarkTextBorder());
+    UIManager.put("TextArea.border", new DarkTextBorder());
+    UIManager.put("FormattedTextField.border", new DarkTextBorder());
+    UIManager.put("PasswordField.border", new DarkTextBorder());
+    UIManager.put("Spinner.border", new DarkSpinnerBorder());
+
     UIManager.put("ComboBox.selectionBackground", Style.COLOR_SELECTION_INACTIVE);
     UIManager.put("ComboBox.selectionForeground", Style.COLOR_TEXT);
     UIManager.put("List.background", Style.COLOR_BG);
@@ -1510,8 +1555,18 @@ public final class UI {
     applyCompactMetrics();
     UIManager.put("Button.arc", Style.CORNER_RADIUS);
     UIManager.put("Component.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextField.arc", Style.CORNER_RADIUS);
     UIManager.put("TextComponent.arc", Style.CORNER_RADIUS);
+    UIManager.put("FormattedTextField.arc", Style.CORNER_RADIUS);
+    UIManager.put("PasswordField.arc", Style.CORNER_RADIUS);
     UIManager.put("TabbedPane.arc", Style.CORNER_RADIUS);
+    UIManager.put("Spinner.arc", Style.CORNER_RADIUS);
+    UIManager.put("ComboBox.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextField.borderThickness", 0);
+    UIManager.put("FormattedTextField.borderThickness", 0);
+    UIManager.put("PasswordField.borderThickness", 0);
+    UIManager.put("ComboBox.borderThickness", 0);
+    UIManager.put("Spinner.borderThickness", 0);
     Color panel = UIManager.getColor("Panel.background");
     Color control = UIManager.getColor("TextField.background");
     Color separator = UIManager.getColor("Separator.foreground");
@@ -1528,8 +1583,13 @@ public final class UI {
     UIManager.put("Editor.assetExplorerBackground", Style.COLOR_ASSET_EXPLORER_LIGHT);
     UIManager.put("TextPane.background", Style.COLOR_ASSET_EXPLORER_LIGHT);
     UIManager.put("Editor.mapBacking", Color.WHITE);
-    UIManager.put("Editor.mapBorder", new Color(105, 120, 136, 180));
+    UIManager.put("TextField.border", new DarkTextBorder());
+    UIManager.put("TextArea.border", new DarkTextBorder());
+    UIManager.put("FormattedTextField.border", new DarkTextBorder());
+    UIManager.put("PasswordField.border", new DarkTextBorder());
+    UIManager.put("Spinner.border", new DarkSpinnerBorder());
     UIManager.put("Table.gridColor", Style.COLOR_LIGHT_GRID);
+
     applyMenuOverrides(
         panel != null ? panel : new Color(248, 248, 248),
         new Color(53, 116, 242, 48),
@@ -1851,6 +1911,52 @@ public final class UI {
       }
     } finally {
       g2.dispose();
+    }
+  }
+
+  public static javax.swing.JTextField createSearchTextField(String placeholder) {
+    javax.swing.JTextField field = new javax.swing.JTextField() {
+      @Override
+      public void updateUI() {
+        super.updateUI();
+        setBorder(BorderFactory.createEmptyBorder());
+        setOpaque(false);
+        putClientProperty("JComponent.outline", "none");
+      }
+
+      @Override
+      protected void paintBorder(Graphics g) {
+        // The parent search box owns the only visible border.
+      }
+    };
+    field.putClientProperty(com.github.weisj.darklaf.ui.text.DarkTextUI.KEY_DEFAULT_TEXT, placeholder);
+    field.setToolTipText(placeholder);
+    field.setBorder(BorderFactory.createEmptyBorder());
+    field.setOpaque(false);
+    field.putClientProperty("JComponent.outline", "none");
+    field.setFont(Style.getDefaultFont());
+    return field;
+  }
+
+  public static void openProjectScript(String className) {
+    if (scriptWorkspacePanel != null && className != null && Editor.instance().getGameFile() != null) {
+      var def = Editor.instance().getGameFile().getScripts().stream()
+        .filter(s -> className.equals(s.getImplementation()) || className.equals(s.getId()))
+        .findFirst().orElse(null);
+      if (def != null) {
+        scriptWorkspacePanel.open(def);
+      }
+    }
+  }
+
+  public static void registerProjectScript(String className) {
+    if (scriptWorkspacePanel != null && className != null && Editor.instance().getGameFile() != null) {
+      var def = Editor.instance().getGameFile().getScripts().stream()
+        .filter(s -> className.equals(s.getImplementation()) || className.equals(s.getId()))
+        .findFirst().orElse(null);
+      if (def != null) {
+        scriptWorkspacePanel.open(def);
+      }
     }
   }
 }

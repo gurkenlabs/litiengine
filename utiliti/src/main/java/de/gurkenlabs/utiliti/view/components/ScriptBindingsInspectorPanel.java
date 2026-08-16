@@ -1,24 +1,11 @@
 package de.gurkenlabs.utiliti.view.components;
 
-import de.gurkenlabs.litiengine.entities.CollisionBox;
-import de.gurkenlabs.litiengine.entities.Creature;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.LightSource;
-import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.litiengine.entities.SoundSource;
-import de.gurkenlabs.litiengine.entities.Spawnpoint;
-import de.gurkenlabs.litiengine.entities.StaticShadow;
-import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
-import de.gurkenlabs.litiengine.scripting.ScriptBinding;
-import de.gurkenlabs.litiengine.scripting.ScriptBindingCodec;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptHostType;
-import de.gurkenlabs.utiliti.controller.UndoManager;
-import java.util.List;
+import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ScriptBindingTarget;
+import de.gurkenlabs.utiliti.controller.ScriptBindingTypeResolver;
 
 /**
  * Inline script attachment and exported-property inspector shared by all entity map-object types.
@@ -30,25 +17,12 @@ public final class ScriptBindingsInspectorPanel extends AbstractScriptBindingsPa
   }
 
   @Override
-  protected List<ScriptBinding> readBindings(IMapObject source) {
-    if (source == null) return List.of();
-    try {
-      return ScriptBindingCodec.decode(source.getStringValue(MapObjectProperty.SCRIPT_BINDINGS, null));
-    } catch (IllegalArgumentException e) {
-      return List.of();
-    }
-  }
-
-  @Override
-  protected void persistBindings(IMapObject source, List<ScriptBinding> bindings) {
-    if (source == null) return;
-    UndoManager.instance().mapObjectChanging(source);
-    if (bindings == null || bindings.isEmpty()) {
-      source.removeProperty(MapObjectProperty.SCRIPT_BINDINGS);
-    } else {
-      source.setValue(MapObjectProperty.SCRIPT_BINDINGS, ScriptBindingCodec.encode(bindings));
-    }
-    UndoManager.instance().mapObjectChanged(source);
+  protected ScriptBindingTarget getBindingTarget(IMapObject source) {
+    if (source == null || Editor.instance().getGameFile() == null) return null;
+    var map = Editor.instance().getGameFile().getMaps().stream()
+      .filter(candidate -> candidate.getMapObject(source.getId()) == source).findFirst().orElse(null);
+    return map == null || map.getName() == null || map.getName().isBlank()
+      ? null : new ScriptBindingTarget.EntityInstance(map.getName(), source.getId());
   }
 
   @Override
@@ -85,7 +59,7 @@ public final class ScriptBindingsInspectorPanel extends AbstractScriptBindingsPa
 
   @Override
   protected String getEmptyStateHint() {
-    return "Select a script above and click <b>'+'</b><br>to bind behaviors & parameters.";
+    return "Select a script above and click <b>'+'</b><br>to attach behavior and parameters.";
   }
 
   @Override
@@ -118,34 +92,7 @@ public final class ScriptBindingsInspectorPanel extends AbstractScriptBindingsPa
     }
   }
 
-  static Class<?> resolveEntityType(IMapObject mapObject) {
-    if (mapObject == null || mapObject.getType() == null) return IEntity.class;
-    String implementation = mapObject.getStringValue(MapObjectProperty.IMPLEMENTATION, null);
-    if (implementation != null && !implementation.isBlank()) {
-      var discovered = de.gurkenlabs.utiliti.controller.Editor.instance().getProjectCodeIntegration().getDefinitions().stream()
-          .filter(d -> implementation.equals(d.id())).findFirst().orElse(null);
-      if (discovered != null) {
-        try {
-          return Class.forName(discovered.className(), false,
-              de.gurkenlabs.utiliti.controller.Editor.instance().getProjectCodeIntegration().getClassLoader());
-        } catch (ClassNotFoundException | LinkageError ignored) {
-          // Fall back to map object type
-        }
-      }
-    }
-    MapObjectType type = MapObjectType.get(mapObject.getType());
-    if (type == null) return IEntity.class;
-    return switch (type) {
-      case PROP -> Prop.class;
-      case CREATURE -> Creature.class;
-      case LIGHTSOURCE -> LightSource.class;
-      case TRIGGER -> Trigger.class;
-      case SPAWNPOINT -> Spawnpoint.class;
-      case COLLISIONBOX -> CollisionBox.class;
-      case STATICSHADOW -> StaticShadow.class;
-      case SOUNDSOURCE -> SoundSource.class;
-      case EMITTER -> Emitter.class;
-      default -> IEntity.class;
-    };
+  public static Class<?> resolveEntityType(IMapObject mapObject) {
+    return ScriptBindingTypeResolver.resolve(mapObject);
   }
 }

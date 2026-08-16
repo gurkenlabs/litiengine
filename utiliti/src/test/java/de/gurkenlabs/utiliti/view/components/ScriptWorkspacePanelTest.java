@@ -11,6 +11,9 @@ import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ScriptBindingService;
+import de.gurkenlabs.utiliti.controller.ScriptBindingTarget;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -87,6 +90,29 @@ class ScriptWorkspacePanelTest {
     } finally {
       panel.close();
     }
+  }
+
+  @Test
+  void usedByShowsAssignmentsButNotEntityCompatibilityOrDefaults() {
+    ScriptBindingService.UsageIndex usages = new ScriptBindingService.UsageIndex("test", List.of(
+      new ScriptBindingService.ScriptUsage(new ScriptBindingTarget.Game(), "Game", 0),
+      new ScriptBindingService.ScriptUsage(new ScriptBindingTarget.Environment("map"), "map", 0),
+      new ScriptBindingService.ScriptUsage(new ScriptBindingTarget.EntityType(Creature.class.getName()),
+        "Creature", 0)), List.of());
+
+    assertEquals(2, ScriptUsagesPanel.displayableUsages(usages).size());
+  }
+
+  @Test
+  void scriptContextDescribesHostWithoutExposingAssignmentsAsBindings() {
+    ScriptDefinition entity = definition();
+    assertEquals("Entity · Creature", ScriptWorkspacePanel.scriptContext(entity));
+
+    entity.setHost(ScriptHostType.ENVIRONMENT);
+    assertEquals("Map", ScriptWorkspacePanel.scriptContext(entity));
+
+    entity.setHost(ScriptHostType.GAME);
+    assertEquals("Game", ScriptWorkspacePanel.scriptContext(entity));
   }
 
   @Test

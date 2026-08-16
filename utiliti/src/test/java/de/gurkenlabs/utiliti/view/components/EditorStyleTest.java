@@ -270,7 +270,7 @@ class EditorStyleTest {
       SwingUtilities.updateComponentTreeUI(tags);
       SwingUtilities.updateComponentTreeUI(tilesetEditor);
 
-      assertEquals(Style.raisedSurface(), tags.getBackground());
+      assertEquals(Style.inputBackground(), tags.getBackground());
       assertEquals(Style.background(), tilesetEditor.getBackground());
     } finally {
       UI.setTheme(original);

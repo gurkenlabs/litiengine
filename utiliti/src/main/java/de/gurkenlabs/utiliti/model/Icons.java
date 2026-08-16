@@ -135,6 +135,7 @@ public final class Icons {
   public static final Icon REDO_16 = IconLoader.get().getUIAwareIcon("redo.svg", 16, 16);
   public static final Icon REWIND_16 = IconLoader.get().getUIAwareIcon("rewind.svg", 16, 16);
   public static final Icon SCROLL_DOWN_16 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 16, 16);
+  public static final Icon SCROLL_RIGHT_16 = IconLoader.get().getUIAwareIcon("scroll_right.svg", 16, 16);
   public static final Icon SAVE_16 = IconLoader.get().getUIAwareIcon("save.svg", 16, 16);
   public static final Icon SEARCH_16 = IconLoader.get().getUIAwareIcon("search.svg", 16, 16);
   public static final Icon SHADOWBOX_16 = IconLoader.get().getUIAwareIcon("shadowbox.svg", 16, 16);

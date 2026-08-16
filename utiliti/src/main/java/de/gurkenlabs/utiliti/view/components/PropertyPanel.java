@@ -501,6 +501,7 @@ public abstract class PropertyPanel extends JPanel {
     if (property == null || property.isEmpty()) {
       return;
     }
+    ControlBehavior.apply(textField);
     textField.addFocusListener(new MapObjectPropertyFocusListener(textField,
       m -> !Objects.equals(m.getStringValue(property, null), textField.getText()),
       m -> m.setValue(property, textField.getText())));

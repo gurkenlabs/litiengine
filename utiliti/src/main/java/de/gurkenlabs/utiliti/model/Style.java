@@ -88,7 +88,7 @@ public final class Style {
   public static final Color COLOR_STATUS = Color.WHITE;
 
   // Semantic UI state colors
-  public static final Color COLOR_INPUT_BG = new Color(36, 37, 42);
+  public static final Color COLOR_INPUT_BG = COLOR_SURFACE2;
   public static final Color COLOR_HOVER = new Color(38, 42, 52);
   public static final Color COLOR_PLACEHOLDER = new Color(74, 74, 74);
   public static final Color COLOR_SELECT = new Color(59, 66, 97);
@@ -470,6 +470,10 @@ public final class Style {
 
   public static Color raisedSurface() {
     return uiColor("Editor.surfaceRaised", COLOR_SURFACE2);
+  }
+
+  public static Color inputBackground() {
+    return uiColor("TextField.background", COLOR_INPUT_BG);
   }
 
   public static Color border() {

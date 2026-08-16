@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.scripting.ScriptLanguageService;
@@ -10,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -37,6 +40,17 @@ class MonacoScriptEditorTest {
 
     assertTrue(probe.contains("window.utilitiEditor"));
     assertTrue(probe.contains("typeof window.utilitiEditor.receive === 'function'"));
+  }
+
+  @Test
+  void browserRelinquishesFocusWhenANativeControlBecomesFocused() {
+    JPanel browserHost = new JPanel();
+    JPanel browserChild = new JPanel();
+    browserHost.add(browserChild);
+
+    assertFalse(MonacoScriptEditor.shouldRelinquishEditorFocus(browserHost, browserHost));
+    assertFalse(MonacoScriptEditor.shouldRelinquishEditorFocus(browserChild, browserHost));
+    assertTrue(MonacoScriptEditor.shouldRelinquishEditorFocus(new JTextField(), browserHost));
   }
 
   @Test
@@ -82,6 +96,16 @@ class MonacoScriptEditorTest {
       String script = new String(source.readAllBytes(), StandardCharsets.UTF_8);
 
       assertEquals(7, script.split("query\\('debugCommand'", -1).length - 1);
+    }
+  }
+
+  @Test
+  void editorSupportsExplicitFocusRelease() throws Exception {
+    try (var source = MonacoScriptEditor.class.getResourceAsStream("/de/gurkenlabs/utiliti/script-editor/editor.js")) {
+      String script = new String(source.readAllBytes(), StandardCharsets.UTF_8);
+
+      assertTrue(script.contains("method === 'blur'"));
+      assertTrue(script.contains("active.blur()"));
     }
   }
 

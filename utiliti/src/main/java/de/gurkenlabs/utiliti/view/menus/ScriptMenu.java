@@ -5,6 +5,7 @@ import de.gurkenlabs.utiliti.model.KeyBindings;
 import de.gurkenlabs.utiliti.model.KeyBindings.Command;
 import de.gurkenlabs.utiliti.view.components.ScriptWorkspacePanel.ScriptKind;
 import de.gurkenlabs.utiliti.view.components.UI;
+import de.gurkenlabs.utiliti.view.dialogs.GameScriptsDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
@@ -80,7 +81,7 @@ public class ScriptMenu extends JMenu {
     exploreEvents.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showDialog());
 
     JMenuItem configGameScripts = new JMenuItem("Configure Game Scripts...", Icons.SETTINGS_16);
-    configGameScripts.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.GameScriptsDialog.showDialog());
+    configGameScripts.addActionListener(e -> GameScriptsDialog.showDialog());
 
     JMenuItem guideItem = new JMenuItem("Scripting Guide & Getting Started...", Icons.DOCUMENTATION_16);
     guideItem.addActionListener(e -> de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog.showGuide());

@@ -72,6 +72,23 @@ class ScriptInspectorPanelTest {
     assertEquals("TestCreatureScript", combo.getItemAt(0).getId());
   }
 
+  @Test
+  void gameScriptInspectorOnlyOffersGameScripts() {
+    ScriptDefinition gameScript = new ScriptDefinition(
+      "GameController", "java", "GameController.java", "GameController", ScriptHostType.GAME);
+    ScriptDefinition mapScript = new ScriptDefinition(
+      "MapController", "java", "MapController.java", "MapController", ScriptHostType.ENVIRONMENT);
+    Editor.instance().getGameFile().getScripts().addAll(List.of(gameScript, mapScript));
+
+    GameScriptInspectorPanel panel = new GameScriptInspectorPanel();
+    panel.bindGame();
+
+    JComboBox<ScriptDefinition> combo = findComboBox(panel);
+    assertNotNull(combo);
+    assertEquals(1, combo.getItemCount());
+    assertEquals("GameController", combo.getItemAt(0).getId());
+  }
+
   @SuppressWarnings("unchecked")
   private static JComboBox<ScriptDefinition> findComboBox(java.awt.Container container) {
     for (java.awt.Component comp : container.getComponents()) {

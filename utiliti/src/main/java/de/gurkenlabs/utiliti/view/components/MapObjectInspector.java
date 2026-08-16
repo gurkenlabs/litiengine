@@ -365,7 +365,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     lblH.setHorizontalAlignment(SwingConstants.TRAILING);
 
     int transformLabelWidth = SECTION_LABEL_WIDTH;
-    int secondaryLabelWidth = 24;
+    int secondaryLabelWidth = (int) (18 * Editor.preferences().getUiScale());
+    int gutter = GUTTER_WIDTH;
     int gap = CONTROL_MARGIN;
 
     gl.setAutoCreateGaps(false);
@@ -374,28 +375,32 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
           .addComponent(lblX, transformLabelWidth, transformLabelWidth, transformLabelWidth)
           .addComponent(lblW, transformLabelWidth, transformLabelWidth, transformLabelWidth))
-        .addGap(gap)
+        .addGap(gutter)
         .addGroup(gl.createParallelGroup()
-          .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
-          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH))
-        .addGap(gap)
+          .addComponent(spnX, 0, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addComponent(spnW, 0, SPINNER_WIDTH, Integer.MAX_VALUE))
+        .addGap(gutter)
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
           .addComponent(lblY, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth)
           .addComponent(lblH, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth))
-        .addGap(gap)
+        .addGap(gutter)
         .addGroup(gl.createParallelGroup()
-          .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
-          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)));
+          .addComponent(spnY, 0, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addComponent(spnH, 0, SPINNER_WIDTH, Integer.MAX_VALUE)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
         .addGap(2)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblX).addComponent(spnX)
-          .addComponent(lblY).addComponent(spnY))
+          .addComponent(lblX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(spnX, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(lblY, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(spnY, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblW).addComponent(spnW)
-          .addComponent(lblH).addComponent(spnH))
+          .addComponent(lblW, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(spnW, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(lblH, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(spnH, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(2));
     return grid;
   }
@@ -413,6 +418,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
     lblTags.setHorizontalAlignment(SwingConstants.TRAILING);
 
+    int gutter = GUTTER_WIDTH;
     int gap = CONTROL_MARGIN;
 
     gl.setAutoCreateGaps(false);
@@ -422,9 +428,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
            .addComponent(lblName, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
            .addComponent(labelImplementation, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
            .addComponent(lblRenderType, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
-          .addGap(PropertyPanel.CONTROL_HEIGHT)
           .addComponent(lblTags, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH))
-        .addGap(gap)
+        .addGap(gutter)
         .addGroup(gl.createParallelGroup()
            .addComponent(textFieldName, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
            .addComponent(implementation, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
@@ -435,22 +440,22 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
       gl.createSequentialGroup()
         .addGap(2)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-           .addComponent(lblName)
-           .addComponent(textFieldName))
+           .addComponent(lblName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+           .addComponent(textFieldName, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(labelImplementation)
-          .addComponent(implementation))
+          .addComponent(labelImplementation, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(implementation, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblRenderType)
-          .addComponent(renderType))
+          .addComponent(lblRenderType, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(renderType, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(gap)
-        .addComponent(checkBoxRenderWithLayer)
+        .addComponent(checkBoxRenderWithLayer, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblTags)
-          .addComponent(tagPanel))
+          .addComponent(lblTags, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(tagPanel, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE, Integer.MAX_VALUE))
         .addGap(2));
     return panel;
   }

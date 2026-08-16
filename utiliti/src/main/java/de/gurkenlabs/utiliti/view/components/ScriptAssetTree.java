@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ScriptCatalogService;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
@@ -168,15 +169,10 @@ public class ScriptAssetTree extends JTree {
       this.assetPanel.loadScripts(allScripts.stream()
           .filter(s -> s.getHost() == ScriptHostType.GAME).toList());
     } else if (selectedPath.getLastPathComponent() == this.nodeSources) {
-      List<ScriptDefinition> sources = new ArrayList<>();
-      if (Editor.instance().getProjectCodeIntegration() != null) {
-        sources.addAll(Editor.instance().getProjectCodeIntegration().getScriptDefinitions().stream()
-            .map(desc -> {
-              ScriptDefinition def = new ScriptDefinition(desc.id(), "java", desc.id(), desc.id(), desc.host());
-              def.setName(desc.id());
-              return def;
-            }).toList());
-      }
+      List<ScriptDefinition> sources = ScriptCatalogService.instance().entries().stream()
+        .filter(entry -> entry.state() == ScriptCatalogService.State.REGISTERED_PROJECT
+          || entry.state() == ScriptCatalogService.State.DISCOVERED_PROJECT)
+        .map(ScriptCatalogService.Entry::definition).toList();
       this.assetPanel.loadScripts(sources);
     }
   }
@@ -190,9 +186,9 @@ public class ScriptAssetTree extends JTree {
       int entityCount = (int) scripts.stream().filter(s -> s.getHost() == ScriptHostType.ENTITY).count();
       int envCount = (int) scripts.stream().filter(s -> s.getHost() == ScriptHostType.ENVIRONMENT).count();
       int gameCount = (int) scripts.stream().filter(s -> s.getHost() == ScriptHostType.GAME).count();
-      int sourceCount = Editor.instance().getProjectCodeIntegration() != null
-          ? Editor.instance().getProjectCodeIntegration().getScriptDefinitions().size()
-          : 0;
+      int sourceCount = (int) ScriptCatalogService.instance().entries().stream()
+        .filter(entry -> entry.state() == ScriptCatalogService.State.REGISTERED_PROJECT
+          || entry.state() == ScriptCatalogService.State.DISCOVERED_PROJECT).count();
 
       this.categoryCounts.put(this.nodeAll, total);
       this.categoryCounts.put(this.nodeEntity, entityCount);

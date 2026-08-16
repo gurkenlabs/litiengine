@@ -266,7 +266,7 @@
 
     ['java'].forEach(lang => {
       monaco.languages.registerCompletionItemProvider(lang, {
-        triggerCharacters: ['.', '(', ','],
+        triggerCharacters: ['.', '(', ',', '@'],
         async provideCompletionItems(model, position) {
           try {
             const gen = modelGeneration;
@@ -275,11 +275,21 @@
             const word = model.getWordUntilPosition(position);
             const range = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
             return { suggestions: value.items.map(item => {
+              const filterText = (item.label || item.insertText || '').replace(/\(.*\)/, '');
+              const sortPrefix = item.label.startsWith('ScriptProperty') ? '000_'
+                : item.label.startsWith('ScriptInfo') ? '001_'
+                : item.kind === 'SNIPPET' ? '010_'
+                : item.kind === 'PROPERTY' ? '020_'
+                : item.kind === 'FIELD' || item.kind === 'METHOD' ? '030_'
+                : '100_';
               const suggestion = {
                 label: item.label,
                 kind: completionKind(item.kind),
                 detail: item.detail + (item.returnType ? `  ${item.returnType}` : ''),
                 insertText: item.insertText,
+                insertTextRules: item.kind === 'SNIPPET' ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet : undefined,
+                filterText: filterText,
+                sortText: sortPrefix + item.label,
                 range,
                 additionalTextEdits: (item.additionalTextEdits || []).map(edit => ({
                   range: new monaco.Range(edit.startLine + 1, edit.startColumn + 1, edit.endLine + 1, edit.endColumn + 1),
@@ -628,6 +638,11 @@
             monaco.editor.setTheme(payload.dark ? 'utiliti-dark' : 'vs');
           } else if (method === 'focus') {
             try { editor.focus(); } catch (ignored) {}
+          } else if (method === 'blur') {
+            try {
+              const active = document.activeElement;
+              if (active && typeof active.blur === 'function') active.blur();
+            } catch (ignored) {}
           } else if (method === 'revealLine') {
             if (payload.line) {
               try {

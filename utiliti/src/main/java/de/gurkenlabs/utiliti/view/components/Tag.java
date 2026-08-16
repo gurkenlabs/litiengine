@@ -19,8 +19,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Tag extends JPanel {
-  static final int CHIP_HEIGHT = 24;
-  private static final int TAG_ARC = 12;
+  static final int CHIP_HEIGHT = 20;
+  private static final int TAG_ARC = 10;
 
   private final JLabel lblText;
   private final JButton btnDelete;
@@ -31,7 +31,7 @@ public class Tag extends JPanel {
   }
 
   public Tag() {
-    setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 4));
+    setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 2));
     setLayout(new BorderLayout(2, 0));
     setBackground(Style.COLOR_DEFAULT_TAG);
     setOpaque(false);
@@ -58,7 +58,7 @@ public class Tag extends JPanel {
     this.btnDelete.setBorderPainted(false);
     this.btnDelete.setFocusPainted(false);
     this.btnDelete.setBorder(null);
-    this.btnDelete.setPreferredSize(new Dimension(16, 16));
+    this.btnDelete.setPreferredSize(new Dimension(14, 14));
     this.btnDelete.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
     add(this.btnDelete, BorderLayout.EAST);
 

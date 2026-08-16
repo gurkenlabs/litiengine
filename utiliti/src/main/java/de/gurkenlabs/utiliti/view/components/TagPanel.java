@@ -33,10 +33,10 @@ public class TagPanel extends JPanel {
   private static final int PANEL_ARC = Style.CORNER_RADIUS;
 
   public TagPanel() {
-    setBackground(Style.raisedSurface());
+    setBackground(Style.inputBackground());
     setOpaque(false);
-    setBorder(new RoundedBorder(Style.border(), PANEL_ARC, 5));
-    WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 4, 0);
+    setBorder(new RoundedBorder(Style.border(), PANEL_ARC, 2));
+    WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 4, 1);
     this.addContainerListener(
         new ContainerListener() {
 
@@ -140,8 +140,8 @@ public class TagPanel extends JPanel {
   @Override
   public void updateUI() {
     super.updateUI();
-    setBackground(Style.raisedSurface());
-    setBorder(new RoundedBorder(Style.border(), PANEL_ARC, 5));
+    setBackground(Style.inputBackground());
+    setBorder(new RoundedBorder(Style.border(), PANEL_ARC, 2));
     if (this.textFieldInput != null) {
       this.textFieldInput.setForeground(Style.text());
       this.textFieldInput.setCaretColor(Style.accent());
@@ -160,6 +160,20 @@ public class TagPanel extends JPanel {
       g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, PANEL_ARC, PANEL_ARC);
     }
     g2.dispose();
+  }
+
+  @Override
+  public Dimension getPreferredSize() {
+    Dimension d = super.getPreferredSize();
+    d.height = Math.max(PropertyPanel.CONTROL_HEIGHT, d.height);
+    return d;
+  }
+
+  @Override
+  public Dimension getMinimumSize() {
+    Dimension d = super.getMinimumSize();
+    d.height = Math.max(PropertyPanel.CONTROL_HEIGHT, d.height);
+    return d;
   }
 
   @Override

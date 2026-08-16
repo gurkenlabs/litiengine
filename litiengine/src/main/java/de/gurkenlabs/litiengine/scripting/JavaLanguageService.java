@@ -66,10 +66,13 @@ public class JavaLanguageService implements ScriptLanguageService {
     int importInsertLine = importInsertLine(source);
     List<Completion> result = new ArrayList<>();
 
+    boolean annotationContext = prefix.matches("(?s).*@\\s*[A-Za-z0-9_$]*$");
     boolean constructorContext = prefix.matches("(?s).*\\bnew(?:\\s+[\\w.$]*)?$");
 
     if (type != null) {
       addMembers(result, type);
+    } else if (annotationContext) {
+      this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
     } else if (constructorContext) {
       Optional<Class<?>> expectedParamType = this.inferExpectedParameterType(prefix, document.definition(), variables, source);
       expectedParamType.ifPresent(expectedType -> {
@@ -102,6 +105,7 @@ public class JavaLanguageService implements ScriptLanguageService {
         "globals", ScriptGlobals.class.getName(), List.of(), List.of()));
       addScriptScope(result, document.definition(), importedFqns, importInsertLine);
       this.hostType(document.definition()).ifPresent(host -> addMembers(result, new ResolvedType(host, null, false)));
+      this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
 
       KEYWORDS.stream().sorted().forEach(keyword -> result.add(new Completion(
         keyword, CompletionKind.KEYWORD, "Java keyword", "", keyword, null, List.of(), List.of())));
@@ -109,23 +113,18 @@ public class JavaLanguageService implements ScriptLanguageService {
       this.importedTypes(source).values().stream().distinct().sorted(Comparator.comparing(Class::getSimpleName))
         .forEach(imported -> result.add(typeCompletion(imported)));
 
-      String currentWord = wordAt(source, offset);
-      boolean isUpper = !currentWord.isEmpty() && Character.isUpperCase(currentWord.charAt(0));
-
-      if (isUpper || result.size() < 15) {
-        for (Class<?> engineType : EngineTypeCatalog.publicTypes()) {
-          List<TextEdit> edits = importedFqns.contains(engineType.getName()) ? List.of()
-            : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
-              "import " + engineType.getName() + ";\n"));
-          result.add(typeCompletion(engineType, false, edits));
-        }
-        for (Class<?> projectType : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
-          if (importedFqns.contains(projectType.getName())) continue;
-          List<TextEdit> edits = List.of(new TextEdit(
-            new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
-            "import " + projectType.getName() + ";\n"));
-          result.add(typeCompletion(projectType, false, edits));
-        }
+      for (Class<?> engineType : EngineTypeCatalog.publicTypes()) {
+        List<TextEdit> edits = importedFqns.contains(engineType.getName()) ? List.of()
+          : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+            "import " + engineType.getName() + ";\n"));
+        result.add(typeCompletion(engineType, false, edits));
+      }
+      for (Class<?> projectType : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
+        if (importedFqns.contains(projectType.getName())) continue;
+        List<TextEdit> edits = List.of(new TextEdit(
+          new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+          "import " + projectType.getName() + ";\n"));
+        result.add(typeCompletion(projectType, false, edits));
       }
     }
     return result.stream().collect(java.util.stream.Collectors.toMap(
@@ -146,18 +145,32 @@ public class JavaLanguageService implements ScriptLanguageService {
       word = wordAt(source, off);
     }
 
-    Set<String> missingSymbols = new java.util.HashSet<>();
+    Set<String> missingSymbols = new java.util.LinkedHashSet<>();
     if (!word.isBlank() && Character.isJavaIdentifierStart(word.charAt(0))) {
       missingSymbols.add(word);
     }
 
     ParsedDocument parsed = parse(document);
-    for (ScriptDiagnostic diag : parsed.diagnostics()) {
-      if (diag.message() != null && diag.message().contains("cannot find symbol")) {
-        Matcher matcher = Pattern.compile("symbol:\\s*(?:variable|class|type)\\s+([A-Za-z_$][\\w$]*)").matcher(diag.message());
-        if (matcher.find()) {
-          missingSymbols.add(matcher.group(1));
-        }
+    List<ScriptDiagnostic> allDiags = new ArrayList<>(parsed.diagnostics());
+    if (diagnostics != null) allDiags.addAll(diagnostics);
+
+    for (ScriptDiagnostic diag : allDiags) {
+      if (diag.message() == null) continue;
+      Matcher matcher = Pattern.compile("symbol:\\s*(?:variable|class|type|package)\\s+([A-Za-z_$][\\w$]*)").matcher(diag.message());
+      if (matcher.find()) {
+        missingSymbols.add(matcher.group(1));
+      }
+      Matcher resolveMatcher = Pattern.compile("([A-Za-z_$][\\w$]*)\\s+cannot be resolved").matcher(diag.message());
+      if (resolveMatcher.find()) {
+        missingSymbols.add(resolveMatcher.group(1));
+      }
+      Matcher pkgMatcher = Pattern.compile("package\\s+([A-Za-z_$][\\w$]*)\\s+does not exist").matcher(diag.message());
+      if (pkgMatcher.find()) {
+        missingSymbols.add(pkgMatcher.group(1));
+      }
+      Matcher annotMatcher = Pattern.compile("@([A-Za-z_$][\\w$]*)").matcher(diag.message());
+      if (annotMatcher.find()) {
+        missingSymbols.add(annotMatcher.group(1));
       }
     }
 
@@ -166,22 +179,101 @@ public class JavaLanguageService implements ScriptLanguageService {
     Range insertRange = new Range(new Position(insertLine, 0), new Position(insertLine, 0));
 
     List<CodeAction> actions = new ArrayList<>();
+    String[] lines = source.split("\r?\n", -1);
+
     for (String symbol : missingSymbols) {
-      List<Class<?>> candidates = new ArrayList<>();
-      for (Class<?> type : EngineTypeCatalog.publicTypes()) {
-        if (type.getSimpleName().equals(symbol)) candidates.add(type);
-      }
-      for (Class<?> type : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
-        if (type.getSimpleName().equals(symbol) && !candidates.contains(type)) candidates.add(type);
+      // 1. Check if the symbol is used as an annotation (@symbol)
+      boolean isAnnotationUsage = false;
+      Range symbolRange = range;
+      for (int i = 0; i < lines.length; i++) {
+        String lineStr = lines[i];
+        Matcher atMatcher = Pattern.compile("@\\s*(" + Pattern.quote(symbol) + ")\\b").matcher(lineStr);
+        if (atMatcher.find()) {
+          isAnnotationUsage = true;
+          Position startPos = new Position(i, atMatcher.start(1));
+          Position endPos = new Position(i, atMatcher.end(1));
+          symbolRange = new Range(startPos, endPos);
+          break;
+        }
       }
 
-      for (Class<?> candidate : candidates) {
+      if (isAnnotationUsage || symbol.startsWith("Script") || symbol.startsWith("Prop") || symbol.equalsIgnoreCase("Property")) {
+        // Offer @ScriptProperty
+        List<TextEdit> propEdits = new ArrayList<>();
+        propEdits.add(new TextEdit(symbolRange, "ScriptProperty"));
+        if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+          propEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+        }
+        actions.add(new CodeAction("Change to '@ScriptProperty'", "quickfix", propEdits));
+
+        // Offer @ScriptProperty with parameters snippet/template
+        List<TextEdit> propParamEdits = new ArrayList<>();
+        propParamEdits.add(new TextEdit(symbolRange, "ScriptProperty(name = \"" + symbol.toLowerCase(java.util.Locale.ROOT) + "\", description = \"\")"));
+        if (!importedFqns.contains(ScriptProperty.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+          propParamEdits.add(new TextEdit(insertRange, "import " + ScriptProperty.class.getName() + ";\n"));
+        }
+        actions.add(new CodeAction("Change to '@ScriptProperty(name = \"...\", description = \"...\")'", "quickfix", propParamEdits));
+
+        // Offer @ScriptInfo
+        List<TextEdit> infoEdits = new ArrayList<>();
+        infoEdits.add(new TextEdit(symbolRange, "ScriptInfo"));
+        if (!importedFqns.contains(ScriptInfo.class.getName()) && !isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) {
+          infoEdits.add(new TextEdit(insertRange, "import " + ScriptInfo.class.getName() + ";\n"));
+        }
+        actions.add(new CodeAction("Change to '@ScriptInfo'", "quickfix", infoEdits));
+
+        // Offer @Override if symbol is close
+        if ("Override".toLowerCase(java.util.Locale.ROOT).contains(symbol.toLowerCase(java.util.Locale.ROOT)) || symbol.equalsIgnoreCase("Over")) {
+          actions.add(new CodeAction("Change to '@Override'", "quickfix", List.of(new TextEdit(symbolRange, "Override"))));
+        }
+      }
+
+      // 2. Exact match candidates for import
+      List<Class<?>> exactCandidates = new ArrayList<>();
+      for (Class<?> type : EngineTypeCatalog.publicTypes()) {
+        if (type.getSimpleName().equals(symbol)) exactCandidates.add(type);
+      }
+      for (Class<?> type : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
+        if (type.getSimpleName().equals(symbol) && !exactCandidates.contains(type)) exactCandidates.add(type);
+      }
+
+      for (Class<?> candidate : exactCandidates) {
         if (importedFqns.contains(candidate.getName())) continue;
         actions.add(new CodeAction(
           "Import '" + candidate.getName() + "'",
           "quickfix",
           List.of(new TextEdit(insertRange, "import " + candidate.getName() + ";\n"))
         ));
+      }
+
+      // 3. Prefix / fuzzy match candidates for "Change to '...'"
+      if (exactCandidates.isEmpty()) {
+        List<Class<?>> fuzzyCandidates = new ArrayList<>();
+        String lowerSymbol = symbol.toLowerCase(java.util.Locale.ROOT);
+        for (Class<?> type : EngineTypeCatalog.publicTypes()) {
+          String lowerName = type.getSimpleName().toLowerCase(java.util.Locale.ROOT);
+          if (lowerName.startsWith(lowerSymbol) || (lowerSymbol.length() >= 3 && lowerName.contains(lowerSymbol))) {
+            if (!fuzzyCandidates.contains(type)) fuzzyCandidates.add(type);
+          }
+        }
+        for (Class<?> type : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
+          String lowerName = type.getSimpleName().toLowerCase(java.util.Locale.ROOT);
+          if (lowerName.startsWith(lowerSymbol) || (lowerSymbol.length() >= 3 && lowerName.contains(lowerSymbol))) {
+            if (!fuzzyCandidates.contains(type)) fuzzyCandidates.add(type);
+          }
+        }
+        for (Class<?> candidate : fuzzyCandidates.stream().limit(5).toList()) {
+          List<TextEdit> edits = new ArrayList<>();
+          edits.add(new TextEdit(symbolRange, candidate.getSimpleName()));
+          if (!importedFqns.contains(candidate.getName()) && !isPackageWildcardImported(candidate.getPackageName(), source)) {
+            edits.add(new TextEdit(insertRange, "import " + candidate.getName() + ";\n"));
+          }
+          actions.add(new CodeAction(
+            "Change to '" + candidate.getSimpleName() + "' (" + candidate.getPackageName() + ")",
+            "quickfix",
+            edits
+          ));
+        }
       }
     }
     actions.addAll(this.abstractMethodCodeActions(document, parsed));
@@ -950,11 +1042,79 @@ public class JavaLanguageService implements ScriptLanguageService {
     return new Signature(label, method.getGenericReturnType().getTypeName(), parameters);
   }
 
+  private void addAnnotationCompletions(List<Completion> result, String source, Set<String> importedFqns, int importInsertLine) {
+    List<TextEdit> propEdits = (importedFqns.contains(ScriptProperty.class.getName()) || isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) ? List.of()
+      : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+        "import " + ScriptProperty.class.getName() + ";\n"));
+
+    result.add(new Completion("ScriptProperty", CompletionKind.PROPERTY, ScriptProperty.class.getName(),
+      "Exports this field to the utiLITI inspector for live configuration and map persistence.",
+      "ScriptProperty", ScriptProperty.class.getName(), List.of(), propEdits));
+
+    result.add(new Completion("ScriptProperty(...)", CompletionKind.SNIPPET, "@ScriptProperty(name = \"...\", description = \"...\")",
+      "Snippet for @ScriptProperty with configurable metadata attributes.",
+      "ScriptProperty(name = \"${1:name}\", description = \"${2:description}\")", ScriptProperty.class.getName(), List.of(), propEdits));
+
+    List<TextEdit> infoEdits = (importedFqns.contains(ScriptInfo.class.getName()) || isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) ? List.of()
+      : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+        "import " + ScriptInfo.class.getName() + ";\n"));
+
+    result.add(new Completion("ScriptInfo", CompletionKind.CLASS, ScriptInfo.class.getName(),
+      "Declares the script identifier, host type, and target entity class.",
+      "ScriptInfo", ScriptInfo.class.getName(), List.of(), infoEdits));
+
+    result.add(new Completion("ScriptInfo(...)", CompletionKind.SNIPPET, "@ScriptInfo(id = \"...\", host = ...)",
+      "Snippet for @ScriptInfo declaration.",
+      "ScriptInfo(id = \"${1:id}\", host = ScriptHostType.${2|GAME,ENVIRONMENT,ENTITY|})", ScriptInfo.class.getName(), List.of(), infoEdits));
+
+    result.add(new Completion("Override", CompletionKind.CLASS, "java.lang.Override",
+      "Indicates that a method declaration is intended to override a method declaration in a supertype.",
+      "Override", "java.lang.Override", List.of(), List.of()));
+
+    result.add(new Completion("Deprecated", CompletionKind.CLASS, "java.lang.Deprecated",
+      "Marks the annotated element as deprecated.",
+      "Deprecated", "java.lang.Deprecated", List.of(), List.of()));
+
+    result.add(new Completion("SuppressWarnings", CompletionKind.CLASS, "java.lang.SuppressWarnings",
+      "Suppresses compiler warnings in the annotated element.",
+      "SuppressWarnings(\"${1:all}\")", "java.lang.SuppressWarnings", List.of(), List.of()));
+
+    for (Class<?> engineType : EngineTypeCatalog.publicTypes()) {
+      if (engineType.isAnnotation() && !engineType.equals(ScriptProperty.class) && !engineType.equals(ScriptInfo.class)) {
+        List<TextEdit> edits = (importedFqns.contains(engineType.getName()) || engineType.getPackageName().equals("java.lang") || isPackageWildcardImported(engineType.getPackageName(), source)) ? List.of()
+          : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+            "import " + engineType.getName() + ";\n"));
+        result.add(typeCompletion(engineType, false, edits));
+      }
+    }
+
+    for (Class<?> projectType : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
+      if (projectType.isAnnotation() && !importedFqns.contains(projectType.getName())) {
+        List<TextEdit> edits = isPackageWildcardImported(projectType.getPackageName(), source) ? List.of()
+          : List.of(new TextEdit(
+            new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+            "import " + projectType.getName() + ";\n"));
+        result.add(typeCompletion(projectType, false, edits));
+      }
+    }
+  }
+
+  private static boolean isPackageWildcardImported(String pkg, String source) {
+    if (pkg == null || pkg.isBlank() || source == null) return false;
+    Matcher matcher = IMPORT.matcher(source);
+    while (matcher.find()) {
+      String fqn = matcher.group(1);
+      if (fqn != null && fqn.equals(pkg + ".*")) return true;
+    }
+    return false;
+  }
+
   private static int memberRank(Completion completion) {
     return switch (completion.kind()) {
       case METHOD, FIELD, PROPERTY, VARIABLE -> 0;
-      case KEYWORD, SNIPPET -> 1;
-      case CLASS, CONSTRUCTOR -> 2;
+      case SNIPPET -> 1;
+      case KEYWORD -> 2;
+      case CLASS, CONSTRUCTOR -> 3;
     };
   }
 

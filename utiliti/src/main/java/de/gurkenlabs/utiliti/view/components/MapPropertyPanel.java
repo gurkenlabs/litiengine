@@ -65,20 +65,9 @@ public class MapPropertyPanel extends JPanel {
 
     this.textFieldName = ControlBehavior.apply(new JTextField());
     this.textFieldTitle = ControlBehavior.apply(new JTextField());
-    this.textFieldDesc = new JTextArea() {
-      @Override public void updateUI() {
-        super.updateUI();
-        setBackground(Style.raisedSurface());
-        setForeground(Style.text());
-        setCaretColor(Style.text());
-      }
-    };
+    this.textFieldDesc = ControlBehavior.apply(new JTextArea());
     this.textFieldDesc.setLineWrap(true);
     this.textFieldDesc.setWrapStyleWord(true);
-    this.textFieldDesc.setMargin(new java.awt.Insets(4, 4, 4, 4));
-    JScrollPane scrollPaneDesc = new JScrollPane(this.textFieldDesc);
-    scrollPaneDesc.setBorder(new RoundedBorder(Style.border(), Style.CORNER_RADIUS, 1));
-    scrollPaneDesc.getViewport().setBackground(Style.raisedSurface());
 
     this.spinnerGravity = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
     ControlBehavior.apply(this.spinnerGravity);
@@ -130,7 +119,7 @@ public class MapPropertyPanel extends JPanel {
     accordion.setBackground(Style.background());
     accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    this.generalCard = new ExpandableCard(Resources.strings().get("menu_map"), createGeneralPanel(scrollPaneDesc), false);
+    this.generalCard = new ExpandableCard(Resources.strings().get("menu_map"), createGeneralPanel(this.textFieldDesc), false);
     ExpandableCard lightingCard =
         new ExpandableCard(Resources.strings().get("mapProperties_lighting"), createLightingPanel(), false);
     this.scriptsCard =
@@ -213,7 +202,7 @@ public class MapPropertyPanel extends JPanel {
     return commands;
   }
 
-  private JPanel createGeneralPanel(JComponent scrollPaneDesc) {
+  private JPanel createGeneralPanel(JComponent textDesc) {
     return createForm(
         new JLabel[] {
             createLabel(Resources.strings().get("panel_name")),
@@ -224,7 +213,7 @@ public class MapPropertyPanel extends JPanel {
         new JComponent[] {
             this.textFieldName,
             this.textFieldTitle,
-            scrollPaneDesc,
+            textDesc,
             this.spinnerGravity,
         },
         new int[] {

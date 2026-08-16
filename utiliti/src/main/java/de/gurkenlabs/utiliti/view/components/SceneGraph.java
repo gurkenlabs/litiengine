@@ -423,6 +423,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
               List<IMapObject> selectedObjects = getSelectedTreeMapObjects();
               Editor.instance().getMapComponent().setSelection(selectedObjects, true);
               Editor.instance().getMapComponent().setFocus(node.getMapObject(), false);
+              UI.showObjectInspector();
             }
           }
         }

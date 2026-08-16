@@ -265,8 +265,11 @@ public class ViewportToolbar extends JPanel {
     this.btnRedoHistory.setEnabled(false);
     UndoManager.onUndoStackChanged(mgr -> {
       javax.swing.SwingUtilities.invokeLater(() -> {
-          this.btnUndo.setEnabled(UndoManager.instance().canUndo());
-          this.btnRedo.setEnabled(UndoManager.instance().canRedo());
+          if (!mgr.isCurrentMap()) {
+            return;
+          }
+          this.btnUndo.setEnabled(mgr.canUndo());
+          this.btnRedo.setEnabled(mgr.canRedo());
           this.btnUndoHistory.setEnabled(this.btnUndo.isEnabled());
           this.btnRedoHistory.setEnabled(this.btnRedo.isEnabled());
       });

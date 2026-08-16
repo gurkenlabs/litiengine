@@ -91,10 +91,10 @@ final class ScriptOutline {
 
     if (className == null) return null;
     List<Symbol> groups = new ArrayList<>();
-    if (!innerClasses.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Classes", Integer.toString(innerClasses.size()), -1, List.copyOf(innerClasses)));
-    if (!fields.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Fields", Integer.toString(fields.size()), -1, List.copyOf(fields)));
-    if (!methods.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Methods", Integer.toString(methods.size()), -1, List.copyOf(methods)));
-    if (!dependencies.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Dependencies", Integer.toString(dependencies.size()), -1,
+    if (!innerClasses.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Classes", "", -1, List.copyOf(innerClasses)));
+    if (!fields.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Fields", "", -1, List.copyOf(fields)));
+    if (!methods.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Methods", "", -1, List.copyOf(methods)));
+    if (!dependencies.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Dependencies", "", -1,
       List.copyOf(dependencies.values())));
     return new Symbol(Kind.CLASS, className, baseType == null ? "" : baseType, classLine, List.copyOf(groups));
   }

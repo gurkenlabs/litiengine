@@ -8,10 +8,13 @@ import de.gurkenlabs.utiliti.controller.debug.ScriptDebugSnapshot;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.HierarchyEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -80,6 +83,12 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private final JPanel browserContainer = new JPanel(new BorderLayout());
   private final JLabel fallbackLabel = new JLabel("Starting Monaco...", SwingConstants.CENTER);
   private final JButton retryButton = new JButton("Retry Loading Editor");
+  private final PropertyChangeListener focusOwnerListener = event -> {
+    Component owner = event.getNewValue() instanceof Component component ? component : null;
+    if (shouldRelinquishEditorFocus(owner, this.browserContainer)) {
+      this.relinquishEditorFocus();
+    }
+  };
   private int retryCount;
   private MonacoResourceServer resources;
   private Consumer<String> changeListener = ignored -> {};
@@ -112,6 +121,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private List<ScriptDebugSnapshot.Variable> debugVariables = List.of();
   private int pendingRevealLine;
   private int pendingRevealColumn;
+  private boolean focusOwnerListenerRegistered;
 
   MonacoScriptEditor() throws IOException {
     super();
@@ -265,7 +275,20 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   }
 
   void focusEditor() {
+    if (this.browser != null) this.browser.setFocus(true);
     if (this.ready) this.send("focus", Json.createObjectBuilder().build());
+  }
+
+  private void relinquishEditorFocus() {
+    if (this.browser != null) this.browser.setFocus(false);
+    if (this.ready) this.send("blur", Json.createObjectBuilder().build());
+  }
+
+  static boolean shouldRelinquishEditorFocus(Component focusOwner, Component browserHost) {
+    return focusOwner != null
+      && browserHost != null
+      && focusOwner != browserHost
+      && !SwingUtilities.isDescendingFrom(focusOwner, browserHost);
   }
 
   void revealPosition(int line, int column) {
@@ -333,6 +356,11 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.browserContainer.add(browserUI, BorderLayout.CENTER);
     this.browserContainer.revalidate();
     this.browserContainer.repaint();
+    if (!this.focusOwnerListenerRegistered) {
+      KeyboardFocusManager.getCurrentKeyboardFocusManager()
+        .addPropertyChangeListener("permanentFocusOwner", this.focusOwnerListener);
+      this.focusOwnerListenerRegistered = true;
+    }
     this.cards.show(this, EDITOR);
     this.timeoutTimer = new javax.swing.Timer(30000, event -> {
       ((javax.swing.Timer) event.getSource()).stop();
@@ -827,6 +855,11 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   public synchronized void close() {
     this.closed = true;
     this.ready = false;
+    if (this.focusOwnerListenerRegistered) {
+      KeyboardFocusManager.getCurrentKeyboardFocusManager()
+        .removePropertyChangeListener("permanentFocusOwner", this.focusOwnerListener);
+      this.focusOwnerListenerRegistered = false;
+    }
     if (this.timeoutTimer != null) {
       this.timeoutTimer.stop();
       this.timeoutTimer = null;
