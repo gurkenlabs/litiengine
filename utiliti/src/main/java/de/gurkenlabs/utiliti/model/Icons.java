@@ -35,6 +35,7 @@ public final class Icons {
   public static final Icon MAPAREA_8 = IconLoader.get().getUIAwareIcon("maparea.svg", 8, 8);
   public static final Icon MINUS_8 = IconLoader.get().getUIAwareIcon("minus.svg", 8, 8);
   public static final Icon MISC_8 = IconLoader.get().getUIAwareIcon("misc.svg", 8, 8);
+  public static final Icon PACKAGE_8 = IconLoader.get().getUIAwareIcon("package.svg", 8, 8);
   public static final Icon PASTE_8 = IconLoader.get().getUIAwareIcon("paste.svg", 8, 8);
   public static final Icon PAUSE_8 = IconLoader.get().getUIAwareIcon("pause.svg", 8, 8);
   public static final Icon PENCIL_8 = IconLoader.get().getUIAwareIcon("pencil.svg", 8, 8);
@@ -122,6 +123,7 @@ public final class Icons {
   public static final Icon MAP_SYNC_16 = IconLoader.get().getUIAwareIcon("map-sync.svg", 16, 16);
   public static final Icon MINUS_16 = IconLoader.get().getUIAwareIcon("minus.svg", 16, 16);
   public static final Icon MISC_16 = IconLoader.get().getUIAwareIcon("misc.svg", 16, 16);
+  public static final Icon PACKAGE_16 = IconLoader.get().getUIAwareIcon("package.svg", 16, 16);
   public static final Icon PASTE_16 = IconLoader.get().getUIAwareIcon("paste.svg", 16, 16);
   public static final Icon PAUSE_16 = IconLoader.get().getUIAwareIcon("pause.svg", 16, 16);
   public static final Icon PENCIL_16 = IconLoader.get().getUIAwareIcon("pencil.svg", 16, 16);
@@ -339,7 +341,7 @@ public final class Icons {
 
   public static final Icon GREEN_PLAY_16 = new VectorRunIcon(16, true);
   public static final Icon GREEN_DEBUG_16 = debugIcon(new java.awt.Color(53, 208, 115));
-  public static final Icon DISABLED_DEBUG_16 = debugIcon(new java.awt.Color(80, 80, 85));
+  public static final Icon DISABLED_DEBUG_16 = debugIcon(Style.COLOR_DISABLED_TEXT);
   public static final Icon RED_STOP_16 = new VectorRunIcon(16, false);
 
   private static Icon debugIcon(java.awt.Color color) {
@@ -366,7 +368,7 @@ public final class Icons {
       boolean enabled = c == null || c.isEnabled();
 
       if (isPlay) {
-        g2.setColor(enabled ? new java.awt.Color(53, 208, 115) : new java.awt.Color(80, 80, 85));
+        g2.setColor(enabled ? new java.awt.Color(53, 208, 115) : Style.disabledIconColor());
         int padding = Math.max(2, size / 6);
         int w = size - padding * 2;
         int h = size - padding * 2;
@@ -378,7 +380,7 @@ public final class Icons {
         triangle.closePath();
         g2.fill(triangle);
       } else {
-        g2.setColor(enabled ? new java.awt.Color(229, 87, 86) : new java.awt.Color(80, 80, 85));
+        g2.setColor(enabled ? new java.awt.Color(229, 87, 86) : Style.disabledIconColor());
         int padding = Math.max(3, size / 5);
         int sz = size - padding * 2;
         g2.fill(new java.awt.geom.RoundRectangle2D.Double(x + padding, y + padding, sz, sz, 3, 3));

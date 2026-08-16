@@ -277,4 +277,37 @@ class EditorStyleTest {
       tilesetEditor.dispose();
     }
   }
+
+  @Test
+  void disabledButtonsUseGrayVectorIcons() {
+    BufferedImage source = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = source.createGraphics();
+    g.setColor(Color.WHITE);
+    g.fillRect(0, 0, 16, 16);
+    g.dispose();
+
+    JButton button = Style.iconButton(new ImageIcon(source));
+    assertTrue(button.getDisabledIcon() instanceof Style.DisabledVectorIcon);
+
+    button.setEnabled(false);
+    BufferedImage rendered = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    button.getDisabledIcon().paintIcon(button, rendered.getGraphics(), 0, 0);
+
+    assertEquals(Style.disabledIconColor().getRGB(), rendered.getRGB(8, 8));
+  }
+
+  @Test
+  void dynamicIconChangeUpdatesDisabledIcon() {
+    BufferedImage icon1 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage icon2 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    JButton button = Style.iconButton(new ImageIcon(icon1));
+
+    Icon initialDisabled = button.getDisabledIcon();
+    assertTrue(initialDisabled instanceof Style.DisabledVectorIcon);
+
+    button.setIcon(new ImageIcon(icon2));
+    Icon updatedDisabled = button.getDisabledIcon();
+    assertTrue(updatedDisabled instanceof Style.DisabledVectorIcon);
+    assertEquals(icon2, ((ImageIcon) ((Style.DisabledVectorIcon) updatedDisabled).getDelegate()).getImage());
+  }
 }
