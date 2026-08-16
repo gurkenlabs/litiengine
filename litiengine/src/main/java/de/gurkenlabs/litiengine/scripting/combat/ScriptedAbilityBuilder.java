@@ -1,89 +1,93 @@
 package de.gurkenlabs.litiengine.scripting.combat;
 
-import de.gurkenlabs.litiengine.abilities.AbilityExecution;
+import de.gurkenlabs.litiengine.abilities.AbilityBuilder;
 import de.gurkenlabs.litiengine.abilities.CastType;
+import de.gurkenlabs.litiengine.abilities.DynamicAbility;
+import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.entities.Creature;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /** Fluent builder for constructing and registering {@link ScriptedAbility} instances. */
-public final class ScriptedAbilityBuilder {
-  private final Creature executor;
-  private final String name;
-  private String description = "";
-  private int cooldown = 0;
-  private int range = 0;
-  private int impact = 0;
-  private int value = 0;
-  private CastType castType = CastType.INSTANT;
-  private boolean multiTarget = false;
-  private Consumer<AbilityExecution> onCastConsumer;
+public final class ScriptedAbilityBuilder extends AbilityBuilder {
 
   public ScriptedAbilityBuilder(Creature executor, String name) {
-    this.executor = Objects.requireNonNull(executor, "Executor must not be null.");
-    this.name = Objects.requireNonNull(name, "Ability name must not be null.");
+    super(executor, name);
   }
 
+  @Override
   public ScriptedAbilityBuilder description(String description) {
-    this.description = description == null ? "" : description;
+    super.description(description);
     return this;
   }
 
+  @Override
   public ScriptedAbilityBuilder cooldown(int cooldownMs) {
-    this.cooldown = Math.max(0, cooldownMs);
+    super.cooldown(cooldownMs);
     return this;
   }
 
+  @Override
   public ScriptedAbilityBuilder range(int range) {
-    this.range = Math.max(0, range);
+    super.range(range);
     return this;
   }
 
+  @Override
   public ScriptedAbilityBuilder impact(int impact) {
-    this.impact = Math.max(0, impact);
+    super.impact(impact);
     return this;
   }
 
+  @Override
   public ScriptedAbilityBuilder value(int value) {
-    this.value = value;
+    super.value(value);
     return this;
   }
 
+  @Override
   public ScriptedAbilityBuilder castType(CastType castType) {
-    this.castType = Objects.requireNonNull(castType);
+    super.castType(castType);
     return this;
   }
 
+  @Override
   public ScriptedAbilityBuilder multiTarget(boolean multiTarget) {
-    this.multiTarget = multiTarget;
+    super.multiTarget(multiTarget);
     return this;
   }
 
-  public ScriptedAbilityBuilder onCast(Consumer<AbilityExecution> onCast) {
-    this.onCastConsumer = onCast;
+  @Override
+  public ScriptedAbilityBuilder onCast(Consumer<de.gurkenlabs.litiengine.abilities.AbilityExecution> onCast) {
+    super.onCast(onCast);
     return this;
   }
 
+  @Override
   public ScriptedAbilityBuilder onCast(Runnable onCast) {
-    if (onCast == null) {
-      this.onCastConsumer = null;
-    } else {
-      this.onCastConsumer = execution -> onCast.run();
-    }
+    super.onCast(onCast);
     return this;
   }
 
+  @Override
+  public ScriptedAbilityBuilder effect(Effect effect) {
+    super.effect(effect);
+    return this;
+  }
+
+  @Override
   public ScriptedAbility build() {
-    ScriptedAbility ability = new ScriptedAbility(this.executor, this.name);
-    ability.setDescription(this.description);
-    ability.setCastType(this.castType);
-    ability.setMultiTarget(this.multiTarget);
-    ability.getAttributes().cooldown().setValue(this.cooldown);
-    ability.getAttributes().range().setValue(this.range);
-    ability.getAttributes().impact().setValue(this.impact);
-    ability.getAttributes().value().setValue(this.value);
-    if (this.onCastConsumer != null) {
-      ability.setCastConsumer(this.onCastConsumer);
+    DynamicAbility dynamic = super.build();
+    ScriptedAbility ability = new ScriptedAbility((Creature) dynamic.getExecutor(), dynamic.getName());
+    ability.setDescription(dynamic.getDescription());
+    ability.setCastType(dynamic.getCastType());
+    ability.setMultiTarget(dynamic.isMultiTarget());
+    ability.getAttributes().cooldown().setValue(dynamic.getAttributes().cooldown().getModifiedValue());
+    ability.getAttributes().range().setValue(dynamic.getAttributes().range().getModifiedValue());
+    ability.getAttributes().impact().setValue(dynamic.getAttributes().impact().getModifiedValue());
+    ability.getAttributes().value().setValue(dynamic.getAttributes().value().getModifiedValue());
+    ability.setCastConsumer(dynamic.getCastConsumer());
+    for (Effect effect : dynamic.getEffects()) {
+      ability.addEffect(effect);
     }
     return ability;
   }

@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.scripting;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.abilities.AbilityExecution;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.EntityQuery;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -62,6 +63,39 @@ public final class ScriptContext<T> implements AutoCloseable {
   /** Begins building a scripted ability for a specific executor creature. */
   public ScriptedAbilityBuilder createAbility(Creature executor, String name) {
     return new ScriptedAbilityBuilder(executor, name);
+  }
+
+  /** Casts an ability on the current host creature by name. */
+  public AbilityExecution cast(String name) {
+    if (!(this.host instanceof Creature creature)) {
+      throw new IllegalStateException("The script host is not a Creature. Specify the executor explicitly via cast(executor, name).");
+    }
+    return creature.cast(name);
+  }
+
+  /** Casts an ability on a specific executor creature by name. */
+  public AbilityExecution cast(Creature executor, String name) {
+    return executor != null ? executor.cast(name) : null;
+  }
+
+  /** Checks if an ability on the current host creature can currently be cast. */
+  public boolean canCast(String name) {
+    return this.host instanceof Creature creature && creature.canCast(name);
+  }
+
+  /** Checks if an ability on a specific executor creature can currently be cast. */
+  public boolean canCast(Creature executor, String name) {
+    return executor != null && executor.canCast(name);
+  }
+
+  /** Checks if an ability on the current host creature is currently on cooldown. */
+  public boolean isOnCooldown(String name) {
+    return this.host instanceof Creature creature && creature.isOnCooldown(name);
+  }
+
+  /** Checks if an ability on a specific executor creature is currently on cooldown. */
+  public boolean isOnCooldown(Creature executor, String name) {
+    return executor != null && executor.isOnCooldown(name);
   }
 
   /** Begins building and spawning a scripted projectile in the current environment. */

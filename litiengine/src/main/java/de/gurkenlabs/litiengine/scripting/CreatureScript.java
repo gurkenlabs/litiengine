@@ -63,4 +63,29 @@ public abstract class CreatureScript extends EntityScript<Creature> {
     }
     return new ScriptedAbilityBuilder(this.host(), name);
   }
+
+  /** Casts an ability registered on this creature by its name. */
+  public de.gurkenlabs.litiengine.abilities.AbilityExecution cast(String name) {
+    return this.host() != null ? this.host().cast(name) : null;
+  }
+
+  /** Gets an ability registered on this creature by its name. */
+  public java.util.Optional<de.gurkenlabs.litiengine.abilities.Ability> getAbility(String name) {
+    return this.host() != null ? this.host().getAbility(name) : java.util.Optional.empty();
+  }
+
+  /** Checks if this creature has an ability registered with the specified name. */
+  public boolean hasAbility(String name) {
+    return this.host() != null && this.host().hasAbility(name);
+  }
+
+  /** Checks if an ability registered with the specified name can currently be cast. */
+  public boolean canCast(String name) {
+    return this.host() != null && this.host().canCast(name);
+  }
+
+  /** Checks if an ability registered with the specified name is currently on cooldown. */
+  public boolean isOnCooldown(String name) {
+    return this.host() != null && this.host().isOnCooldown(name);
+  }
 }
