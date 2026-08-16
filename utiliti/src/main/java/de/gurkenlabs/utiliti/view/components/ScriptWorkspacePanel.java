@@ -1575,7 +1575,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       setPreferredSize(new Dimension(18, 18));
       setMaximumSize(new Dimension(18, 18));
       setMinimumSize(new Dimension(18, 18));
-      setToolTipText(Resources.strings().get("close"));
+      setToolTipText(Resources.strings().get("close", "Close"));
       addMouseListener(new MouseAdapter() {
         @Override public void mouseEntered(MouseEvent e) { hovered = true; repaint(); }
         @Override public void mouseExited(MouseEvent e) { hovered = false; repaint(); }

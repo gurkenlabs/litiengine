@@ -270,6 +270,16 @@ public final class ScriptBindingService {
 
   /** Executes a previously validated project-wide definition mutation. */
   public MutationResult execute(ScriptMutationPlan plan) {
+    return this.execute(plan, ignored -> {}, null);
+  }
+
+  /**
+   * Executes a definition mutation together with an optional external resource mutation.
+   * The participant is rolled back when project or runtime synchronization fails and is
+   * included in the same undo/redo operation as the serialized project data.
+   */
+  public MutationResult execute(ScriptMutationPlan plan, Consumer<ScriptDefinition> definitionMutation,
+                                MutationParticipant participant) {
     if (plan == null) return new MutationResult(false, "No mutation plan was provided.");
     if (!plan.errors().isEmpty()) return new MutationResult(false, String.join("\n", plan.errors()));
     if (Editor.instance().getGameFile() == null) return new MutationResult(false, "No project is loaded.");
@@ -280,6 +290,7 @@ public final class ScriptBindingService {
     ScriptDefinition definition = findDefinition(plan.scriptId());
     if (definition == null) return new MutationResult(false, "The script definition no longer exists.");
     ProjectSnapshot snapshot = ProjectSnapshot.capture();
+    boolean participantApplied = false;
     try {
       if (plan.kind() == MutationKind.RENAME) {
         replaceReferences(plan.scriptId(), plan.replacementId());
@@ -289,12 +300,26 @@ public final class ScriptBindingService {
         removeReferences(plan.scriptId());
         Editor.instance().getGameFile().getScripts().remove(definition);
       }
+      if (definitionMutation != null) definitionMutation.accept(definition);
+      if (participant != null) {
+        participantApplied = true;
+        participant.apply();
+      }
       this.refreshRuntimeState();
-      this.registerMutationUndo(snapshot, ProjectSnapshot.capture());
+      this.registerMutationUndo(snapshot, ProjectSnapshot.capture(), participant);
       this.fireMutationChanged(validated);
       return new MutationResult(true, null);
     } catch (RuntimeException | LinkageError exception) {
       String message = exception.getMessage() == null ? "Script mutation failed." : exception.getMessage();
+      if (participantApplied) {
+        try {
+          participant.rollback();
+        } catch (RuntimeException rollbackFailure) {
+          exception.addSuppressed(rollbackFailure);
+          message += " The associated source file could not be restored: "
+            + Objects.toString(rollbackFailure.getMessage(), rollbackFailure.getClass().getSimpleName()) + ".";
+        }
+      }
       try {
         snapshot.restore();
         this.refreshRuntimeState();
@@ -471,11 +496,19 @@ public final class ScriptBindingService {
     Game.scripts().setGameBindings(bindings);
   }
 
-  private void registerMutationUndo(ProjectSnapshot before, ProjectSnapshot after) {
+  private void registerMutationUndo(ProjectSnapshot before, ProjectSnapshot after,
+                                    MutationParticipant participant) {
     Environment environment = Game.world().environment();
     if (environment == null || environment.getMap() == null) return;
     UndoManager.forMap(environment.getMap()).resourceChanged(
-      () -> this.restoreSnapshot(before), () -> this.restoreSnapshot(after));
+      () -> {
+        if (participant != null) participant.undo();
+        this.restoreSnapshot(before);
+      },
+      () -> {
+        if (participant != null) participant.redo();
+        this.restoreSnapshot(after);
+      });
   }
 
   private void restoreSnapshot(ProjectSnapshot snapshot) {
@@ -804,6 +837,21 @@ public final class ScriptBindingService {
   }
 
   public record MutationResult(boolean success, String message) {}
+
+  /** External resource operation that participates in a project mutation transaction. */
+  public interface MutationParticipant {
+    void apply();
+
+    void rollback();
+
+    default void undo() {
+      this.rollback();
+    }
+
+    default void redo() {
+      this.apply();
+    }
+  }
 
   public record RegistrationResult(boolean success, String message, ScriptDefinition definition) {}
 
