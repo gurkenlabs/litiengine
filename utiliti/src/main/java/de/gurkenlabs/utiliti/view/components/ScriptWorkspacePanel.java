@@ -512,10 +512,10 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private Map<String, Integer> visibleUsageCounts() {
     if (Editor.instance().getGameFile() == null) return Map.of();
+    Map<String, Integer> usageCounts = ScriptBindingService.instance().usageCounts();
     Map<String, Integer> result = new LinkedHashMap<>();
     for (ScriptDefinition definition : Editor.instance().getGameFile().getScripts()) {
-      int count = ScriptUsagesPanel.displayableUsages(
-        ScriptBindingService.instance().findUsages(definition.getId())).size();
+      int count = usageCounts.getOrDefault(definition.getId(), 0);
       if (count > 0) result.put(definition.getId(), count);
     }
     return Map.copyOf(result);

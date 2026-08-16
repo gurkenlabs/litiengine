@@ -93,14 +93,14 @@ class ScriptWorkspacePanelTest {
   }
 
   @Test
-  void usedByShowsAssignmentsButNotEntityCompatibilityOrDefaults() {
+  void usedByShowsEveryPersistedAssignmentWithoutCompatibilityOnlyNodes() {
     ScriptBindingService.UsageIndex usages = new ScriptBindingService.UsageIndex("test", List.of(
       new ScriptBindingService.ScriptUsage(new ScriptBindingTarget.Game(), "Game", 0),
       new ScriptBindingService.ScriptUsage(new ScriptBindingTarget.Environment("map"), "map", 0),
       new ScriptBindingService.ScriptUsage(new ScriptBindingTarget.EntityType(Creature.class.getName()),
         "Creature", 0)), List.of());
 
-    assertEquals(2, ScriptUsagesPanel.displayableUsages(usages).size());
+    assertEquals(3, ScriptUsagesPanel.displayableUsages(usages).size());
   }
 
   @Test

@@ -152,6 +152,11 @@ final class ScriptUsagesPanel extends JPanel {
         game.getFirst())));
     }
 
+    visible.stream().filter(usage -> usage.target() instanceof ScriptBindingTarget.EntityType)
+      .sorted(Comparator.comparing(ScriptUsagesPanel::entityDefaultLabel, String.CASE_INSENSITIVE_ORDER))
+      .forEach(usage -> this.root.add(new DefaultMutableTreeNode(
+        new UsageNode(entityDefaultLabel(usage), Icons.ENTITY_16, usage))));
+
     Map<String, List<ScriptBindingService.ScriptUsage>> byMap = new LinkedHashMap<>();
     visible.stream().filter(usage -> mapName(usage.target()) != null)
       .sorted(Comparator.comparing(usage -> mapName(usage.target()), String.CASE_INSENSITIVE_ORDER))
@@ -205,9 +210,14 @@ final class ScriptUsagesPanel extends JPanel {
 
   static List<ScriptBindingService.ScriptUsage> displayableUsages(ScriptBindingService.UsageIndex index) {
     if (index == null) return List.of();
-    return index.usages().stream()
-      .filter(usage -> !(usage.target() instanceof ScriptBindingTarget.EntityType))
-      .toList();
+    return index.usages();
+  }
+
+  private static String entityDefaultLabel(ScriptBindingService.ScriptUsage usage) {
+    if (!(usage.target() instanceof ScriptBindingTarget.EntityType entityType)) return usage.label();
+    String type = entityType.type();
+    int separator = type == null ? -1 : type.lastIndexOf('.');
+    return (separator < 0 ? Objects.toString(type, "Entity") : type.substring(separator + 1)) + " defaults";
   }
 
   private static String mapName(ScriptBindingTarget target) {
