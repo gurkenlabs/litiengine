@@ -583,6 +583,12 @@
       }, 50);
     });
 
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Tab,
+      () => query('switchWorkspaceMode', { mode: 'cycle' }).catch(console.error));
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyM,
+      () => query('switchWorkspaceMode', { mode: 'map' }).catch(console.error));
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyS,
+      () => query('switchWorkspaceMode', { mode: 'script' }).catch(console.error));
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => query('save').catch(console.error));
     editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Enter, () => {
       editor.getAction('editor.action.quickFix')?.run();

@@ -907,6 +907,24 @@ public final class UI {
     } catch (Exception ignored) {
     }
 
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(event -> {
+      if (event.getID() == KeyEvent.KEY_PRESSED) {
+        if (matchesShortcut(event, switchWorkspaceModeShortcut)) {
+          cycleWorkspaceMode();
+          return true;
+        }
+        if (matchesShortcut(event, switchMapModeShortcut)) {
+          showMapWorkspace();
+          return true;
+        }
+        if (matchesShortcut(event, switchScriptModeShortcut)) {
+          showScriptWorkspace();
+          return true;
+        }
+      }
+      return false;
+    });
+
     JComponent rootPane = window.getRootPane();
     rootPane.getActionMap().put("switchWorkspaceMode", new AbstractAction() {
       @Override
@@ -1003,6 +1021,19 @@ public final class UI {
     if (inspectorForwardButton != null) {
       inspectorForwardButton.setToolTipText(shortcutTooltip("inspector_forward", inspectorForwardShortcut));
     }
+  }
+
+  private static boolean matchesShortcut(KeyEvent event, KeyStroke shortcut) {
+    if (shortcut == null || event == null) {
+      return false;
+    }
+    if (event.getKeyCode() != shortcut.getKeyCode()) {
+      return false;
+    }
+    int standardMask = InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK | InputEvent.META_DOWN_MASK;
+    int eventModifiers = event.getModifiersEx() & standardMask;
+    int shortcutModifiers = shortcut.getModifiers() & standardMask;
+    return eventModifiers == shortcutModifiers;
   }
 
   private static String shortcutTooltip(String resourceKey, KeyStroke shortcut) {

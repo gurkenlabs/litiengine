@@ -580,6 +580,19 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
         SwingUtilities.invokeLater(() -> this.breakpointListener.accept(List.copyOf(lines)));
         yield success(Json.createObjectBuilder().build());
       }
+      case "switchWorkspaceMode" -> {
+        String mode = payload.getString("mode", "cycle");
+        SwingUtilities.invokeLater(() -> {
+          if ("map".equalsIgnoreCase(mode)) {
+            UI.showMapWorkspace();
+          } else if ("script".equalsIgnoreCase(mode)) {
+            UI.showScriptWorkspace();
+          } else {
+            UI.cycleWorkspaceMode();
+          }
+        });
+        yield success(Json.createObjectBuilder().build());
+      }
       case "debugCommand" -> {
         String command = payload.getString("command", "");
         SwingUtilities.invokeLater(() -> this.debugCommandListener.accept(command));
