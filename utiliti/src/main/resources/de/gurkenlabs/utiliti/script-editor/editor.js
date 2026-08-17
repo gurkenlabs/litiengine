@@ -307,21 +307,41 @@
             const atIndex = lineUntilPos.lastIndexOf('@');
             const isAnnotationContext = atIndex >= 0 && /^@\s*[A-Za-z0-9_$]*$/.test(lineUntilPos.substring(atIndex));
 
-            const wordRange = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
-            const atRange = isAnnotationContext ? new monaco.Range(position.lineNumber, atIndex + 1, position.lineNumber, word.endColumn) : wordRange;
+            const wordRange = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, Math.max(word.endColumn, position.column));
+            const atRange = isAnnotationContext ? new monaco.Range(position.lineNumber, atIndex + 1, position.lineNumber, Math.max(word.endColumn, position.column)) : wordRange;
 
             return {
               suggestions: (value.items || []).map(item => {
-                const label = item.label || '';
-                const insertText = item.insertText || label;
-                const hasAtInInsert = insertText.startsWith('@');
-                const targetRange = hasAtInInsert && isAnnotationContext ? atRange : wordRange;
-                const filterText = (label || insertText).replace(/^@/, '').replace(/\(.*\)/, '');
-                const isProp = label.includes('ScriptProperty') || label === 'prop' || label.startsWith('@ScriptProperty');
-                const isInfo = label.includes('ScriptInfo') || label.startsWith('@ScriptInfo');
+                const rawLabel = item.label || '';
+                const rawInsert = item.insertText || rawLabel;
+                const isSnippet = item.kind === 'SNIPPET';
+
+                let label = rawLabel;
+                let insertText = rawInsert;
+                let filterText = '';
+                let targetRange = wordRange;
+
+                if (isAnnotationContext) {
+                  targetRange = atRange;
+                  if (!insertText.startsWith('@') && !isSnippet) {
+                    insertText = '@' + insertText;
+                  }
+                  if (!label.startsWith('@') && !isSnippet) {
+                    label = '@' + label;
+                  }
+                  filterText = insertText.startsWith('@')
+                    ? insertText.replace(/\(.*\)/, '')
+                    : ('@' + (label || insertText).replace(/\(.*\)/, ''));
+                } else {
+                  targetRange = wordRange;
+                  filterText = (label || insertText).replace(/^@/, '').replace(/\(.*\)/, '');
+                }
+
+                const isProp = label.includes('ScriptProperty') || label === 'prop' || label === 'scriptproperty';
+                const isInfo = label.includes('ScriptInfo');
                 const sortPrefix = isProp ? '000_'
                   : isInfo ? '001_'
-                  : item.kind === 'SNIPPET' ? '010_'
+                  : isSnippet ? '010_'
                   : item.kind === 'PROPERTY' ? '020_'
                   : item.kind === 'FIELD' || item.kind === 'METHOD' ? '030_'
                   : '100_';
@@ -331,7 +351,7 @@
                   kind: completionKind(item.kind),
                   detail: detailStr,
                   insertText: insertText,
-                  insertTextRules: item.kind === 'SNIPPET' ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet : undefined,
+                  insertTextRules: isSnippet ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet : undefined,
                   filterText: filterText,
                   sortText: sortPrefix + label,
                   range: targetRange,

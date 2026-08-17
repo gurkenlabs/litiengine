@@ -44,6 +44,9 @@ public final class ScriptCatalogService {
     for (ScriptDefinition definition : registered) {
       var project = discoveredByImplementation.remove(definition.getImplementation());
       if (project != null) {
+        if (definition.getSource() == null && project.sourcePath() != null) {
+          definition.setSource(normalized(project.sourcePath()).toString());
+        }
         catalog.add(new Entry(key(State.REGISTERED_PROJECT, definition.getImplementation()),
           State.REGISTERED_PROJECT, definition,
           new ScriptImplementation(project.className(), normalized(project.sourcePath()), SourceKind.PROJECT)));
@@ -62,7 +65,7 @@ public final class ScriptCatalogService {
       definition.setId(project.id());
       definition.setName(project.displayName());
       definition.setLanguage(languageFor(project.sourcePath()));
-      definition.setSource(null);
+      definition.setSource(normalized(project.sourcePath()) != null ? normalized(project.sourcePath()).toString() : null);
       definition.setImplementation(project.className());
       definition.setHost(project.host());
       definition.setTargetType(project.targetType());

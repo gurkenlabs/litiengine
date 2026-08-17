@@ -66,8 +66,6 @@ public final class FileMenu extends JMenu {
     this.add(close);
     this.add(recentFiles);
     this.addSeparator();
-    this.add(new RunMenu());
-    this.addSeparator();
     this.add(save);
     this.add(saveAs);
     this.add(revert);

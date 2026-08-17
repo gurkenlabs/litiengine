@@ -526,14 +526,15 @@ public class Editor extends Screen {
       // Replace the current project only after the new resource bundle was parsed successfully.
       this.currentResourceFile = gameFile;
       this.gameFile = loadedGameFile;
-      Game.scripts().setDefinitions(loadedGameFile.getScripts());
-      Game.scripts().setGameBindings(loadedGameFile.getGameScripts());
-      Game.scripts().setEntityBindings(loadedGameFile.getEntityScripts());
       Game.scripts().setProjectRoot(gameFile.getParent());
       this.setProjectPath(gameFile);
       this.loadProjectTilesetTerrains(gameFile.getParent());
       this.projectCodeIntegration.reloadProject(this.projectModel);
       this.applyProjectModel();
+      Game.scripts().clearDiagnostics();
+      Game.scripts().setDefinitions(loadedGameFile.getScripts());
+      Game.scripts().setGameBindings(loadedGameFile.getGameScripts());
+      Game.scripts().setEntityBindings(loadedGameFile.getEntityScripts());
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
@@ -626,15 +627,15 @@ public class Editor extends Screen {
 
         this.currentResourceFile = gameFile;
         this.gameFile = loadedBundle;
-        Game.scripts().setDefinitions(loadedBundle.getScripts());
-        Game.scripts().setGameBindings(loadedBundle.getGameScripts());
-        Game.scripts().setEntityBindings(loadedBundle.getEntityScripts());
         Game.scripts().setProjectRoot(gameFile.getParent());
-
         this.setProjectPath(gameFile);
         this.loadProjectTilesetTerrains(gameFile.getParent());
         this.projectCodeIntegration.reloadProject(this.projectModel);
         this.applyProjectModel();
+        Game.scripts().clearDiagnostics();
+        Game.scripts().setDefinitions(loadedBundle.getScripts());
+        Game.scripts().setGameBindings(loadedBundle.getGameScripts());
+        Game.scripts().setEntityBindings(loadedBundle.getEntityScripts());
 
         this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
 

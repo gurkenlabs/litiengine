@@ -375,6 +375,9 @@ public final class ScriptManager implements IUpdateable {
     ScriptProvider provider = this.providers.get(definition.getLanguage().toLowerCase());
     if (provider == null) throw new ScriptException("No provider is registered for language " + definition.getLanguage() + ".");
     URL source = this.resolveSource(definition.getSource());
+    if (source == null) {
+      source = this.resolveSourceByImplementation(definition);
+    }
     if (!"java".equalsIgnoreCase(definition.getLanguage()) && source == null) {
       throw new ScriptException("Could not resolve script source " + definition.getSource() + ".");
     }
@@ -382,6 +385,68 @@ public final class ScriptManager implements IUpdateable {
     if (parent == null) parent = ScriptManager.class.getClassLoader();
     return provider.compile(definition, source,
       new ScriptCompilationContext(parent, this.projectClasspath, this.projectJavaVersion));
+  }
+
+  private URL resolveSourceByImplementation(ScriptDefinition definition) {
+    if (definition == null) return null;
+    String impl = definition.getImplementation();
+    String id = definition.getId();
+    String lang = definition.getLanguage() != null ? definition.getLanguage().toLowerCase() : "java";
+    String ext = "groovy".equals(lang) ? ".groovy" : ".java";
+
+    List<String> candidateRelPaths = new ArrayList<>();
+    if (impl != null && !impl.isBlank()) {
+      String pathFromFqn = impl.replace('.', '/') + ext;
+      candidateRelPaths.add(pathFromFqn);
+      candidateRelPaths.add("src/main/java/" + pathFromFqn);
+      candidateRelPaths.add("src/main/groovy/" + pathFromFqn);
+      candidateRelPaths.add("src/" + pathFromFqn);
+      candidateRelPaths.add("scripts/" + pathFromFqn);
+      int lastDot = impl.lastIndexOf('.');
+      String simpleName = lastDot >= 0 ? impl.substring(lastDot + 1) : impl;
+      candidateRelPaths.add("scripts/" + simpleName + ext);
+      candidateRelPaths.add("src/main/java/" + simpleName + ext);
+      candidateRelPaths.add("src/main/groovy/" + simpleName + ext);
+      candidateRelPaths.add(simpleName + ext);
+    }
+    if (id != null && !id.isBlank()) {
+      candidateRelPaths.add("scripts/" + id + ext);
+      candidateRelPaths.add("src/main/java/" + id + ext);
+      candidateRelPaths.add("src/main/groovy/" + id + ext);
+      candidateRelPaths.add(id + ext);
+    }
+
+    if (this.projectRoot != null) {
+      for (String rel : candidateRelPaths) {
+        Path p = this.projectRoot.resolve(rel).toAbsolutePath().normalize();
+        if (p.startsWith(this.projectRoot) && Files.isRegularFile(p)) {
+          try {
+            return p.toUri().toURL();
+          } catch (java.net.MalformedURLException ignored) {
+          }
+        }
+      }
+      String searchFileName = (impl != null && !impl.isBlank()
+        ? (impl.substring(Math.max(0, impl.lastIndexOf('.') + 1)) + ext)
+        : (id != null ? (id + ext) : null));
+      if (searchFileName != null) {
+        try (var stream = Files.walk(this.projectRoot, 8)) {
+          var found = stream.filter(Files::isRegularFile)
+            .filter(path -> path.getFileName().toString().equalsIgnoreCase(searchFileName))
+            .findFirst();
+          if (found.isPresent()) {
+            return found.get().toUri().toURL();
+          }
+        } catch (Exception ignored) {
+        }
+      }
+    }
+
+    for (String rel : candidateRelPaths) {
+      URL url = Resources.getLocation(rel);
+      if (url != null) return url;
+    }
+    return null;
   }
 
   private URL resolveSource(String configuredSource) throws ScriptException {
