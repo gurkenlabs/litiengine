@@ -59,6 +59,8 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     left.setLayout(new BoxLayout(left, BoxLayout.X_AXIS));
     left.setOpaque(false);
 
+
+
     this.typeLabel = fixedLabel(18);
     this.nameLabel = new JLabel();
     this.nameLabel.setOpaque(false);

@@ -33,7 +33,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
-public class ScriptAssetTree extends JTree {
+public class ScriptAssetTree extends StyledTree {
   private final AssetPanel assetPanel;
   private final DefaultTreeModel treeModel;
   private final DefaultMutableTreeNode nodeRoot;
@@ -43,15 +43,8 @@ public class ScriptAssetTree extends JTree {
   private final DefaultMutableTreeNode nodeGame;
   private final DefaultMutableTreeNode nodeSources;
   private final Map<DefaultMutableTreeNode, Integer> categoryCounts = new IdentityHashMap<>();
-  private int hoveredRow = -1;
 
   public ScriptAssetTree(AssetPanel assetPanel) {
-    this.setRootVisible(false);
-    this.setShowsRootHandles(true);
-    this.setBackground(Style.assetExplorerBackground());
-    this.setOpaque(true);
-    this.putClientProperty("JTree.lineStyle", "None");
-
     this.assetPanel = assetPanel;
 
     this.nodeRoot = categoryNode("Scripts", Icons.SCRIPT_16, true);
@@ -71,7 +64,6 @@ public class ScriptAssetTree extends JTree {
     this.setModel(this.treeModel);
     this.setCellRenderer(new ScriptCategoryRenderer());
     this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
-    this.setRowHeight((int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale()));
 
     this.refreshCounts();
     for (int i = 0; i < getRowCount(); i++) {
@@ -79,23 +71,7 @@ public class ScriptAssetTree extends JTree {
     }
 
     this.addTreeSelectionListener(e -> loadScriptsOfCurrentSelection(e.getPath()));
-    this.addMouseMotionListener(new MouseMotionAdapter() {
-      @Override
-      public void mouseMoved(MouseEvent e) {
-        int row = getRowForLocation(e.getX(), e.getY());
-        if (row != hoveredRow) {
-          hoveredRow = row;
-          repaint();
-        }
-      }
-    });
     this.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseExited(MouseEvent e) {
-        hoveredRow = -1;
-        repaint();
-      }
-
       @Override
       public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
@@ -108,19 +84,7 @@ public class ScriptAssetTree extends JTree {
     });
   }
 
-  @Override
-  public void updateUI() {
-    super.updateUI();
-    setBackground(Style.assetExplorerBackground());
-    setOpaque(true);
-  }
 
-  @Override
-  protected void paintComponent(Graphics graphics) {
-    graphics.setColor(Style.assetExplorerBackground());
-    graphics.fillRect(0, 0, getWidth(), getHeight());
-    super.paintComponent(graphics);
-  }
 
   public void forceUpdate() {
     refreshCounts();
@@ -248,12 +212,13 @@ public class ScriptAssetTree extends JTree {
   private final class ScriptCategoryRenderer extends JPanel implements TreeCellRenderer {
     private final JLabel name = new JLabel();
     private final JLabel count = new JLabel();
-    private boolean selectedRow;
-    private boolean hovered;
 
     private ScriptCategoryRenderer() {
       super(new BorderLayout(8, 0));
       setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 8));
+      setOpaque(false);
+      this.name.setOpaque(false);
+      this.count.setOpaque(false);
       this.name.setIconTextGap(8);
       this.count.setHorizontalAlignment(JLabel.RIGHT);
       add(this.name, BorderLayout.CENTER);
@@ -278,39 +243,16 @@ public class ScriptAssetTree extends JTree {
       this.count.setText(category.group() ? "" : Resources.strings().get(
           "assettree_category_count", categoryCounts.getOrDefault(node, 0)));
 
-      java.awt.Color foreground = Style.text();
-      this.name.setForeground(foreground);
+      this.name.setForeground(Style.text());
       this.count.setForeground(selected ? Style.text() : Style.mutedText());
-      this.selectedRow = selected;
-      this.hovered = row == hoveredRow;
-      setBackground(Style.assetExplorerBackground());
-      setOpaque(true);
 
       int depthInset = Math.max(0, node.getLevel() - 1) * 20;
       int width = Math.max(120, tree.getWidth() - 34 - depthInset);
       setPreferredSize(new Dimension(width, tree.getRowHeight()));
+      setOpaque(false);
       return this;
     }
-
-    @Override
-    protected void paintComponent(Graphics graphics) {
-      super.paintComponent(graphics);
-      if (this.selectedRow || this.hovered) {
-        Graphics2D g2 = (Graphics2D) graphics.create();
-        try {
-          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-          g2.setColor(this.selectedRow ? Style.raisedSurface() : Style.hover());
-          g2.fillRoundRect(
-              0,
-              1,
-              getWidth(),
-              Math.max(0, getHeight() - 2),
-              Style.CORNER_RADIUS * 2,
-              Style.CORNER_RADIUS * 2);
-        } finally {
-          g2.dispose();
-        }
-      }
-    }
   }
+
 }
+

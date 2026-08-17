@@ -66,30 +66,21 @@ public class AssetList extends JSplitPane implements Controller {
       @Override
       public void updateUI() {
         super.updateUI();
-        setBackground(Style.assetExplorerBackground());
+        setBackground(Style.background());
       }
     };
-    leftPanel.setOpaque(true);
+    leftPanel.setOpaque(false);
+    leftPanel.setBackground(Style.background());
     leftPanel.setBorder(null);
+
     leftPanel.setMinimumSize(new Dimension(RESOURCE_EXPLORER_MIN_WIDTH, 0));
     leftPanel.setPreferredSize(new Dimension(RESOURCE_EXPLORER_DEFAULT_WIDTH, 0));
     leftPanel.setMaximumSize(new Dimension(RESOURCE_EXPLORER_MAX_WIDTH, Integer.MAX_VALUE));
 
-    this.categoryScrollPane = new JScrollPane(
-        assetTree,
-        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    this.categoryScrollPane.setBorder(null);
-    this.categoryScrollPane.getVerticalScrollBar().setUnitIncrement(assetTree.getRowHeight());
-    this.categoryScrollPane.getViewport().setBackground(Style.assetExplorerBackground());
+    this.categoryScrollPane = StyledTree.createScrollPane(assetTree);
+    this.scriptScrollPane = StyledTree.createScrollPane(scriptTree);
 
-    this.scriptScrollPane = new JScrollPane(
-        scriptTree,
-        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    this.scriptScrollPane.setBorder(null);
-    this.scriptScrollPane.getVerticalScrollBar().setUnitIncrement(scriptTree.getRowHeight());
-    this.scriptScrollPane.getViewport().setBackground(Style.assetExplorerBackground());
+
 
     this.leftCardLayout = new CardLayout();
     this.leftCardsPanel = new JPanel(this.leftCardLayout);

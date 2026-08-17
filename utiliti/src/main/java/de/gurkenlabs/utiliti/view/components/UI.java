@@ -1424,8 +1424,10 @@ public final class UI {
     UIManager.put("ComboBox.arc", Style.CORNER_RADIUS);
 
     // Panels - borderless design with subtle contrast
+    UIManager.put("Editor.background", Style.COLOR_BG);
     UIManager.put("Panel.background", Style.COLOR_BG);
     UIManager.put("Panel.foreground", Style.COLOR_TEXT);
+
     UIManager.put("Editor.surface", Style.COLOR_SURFACE);
     UIManager.put("Editor.surfaceRaised", Style.COLOR_SURFACE2);
     UIManager.put("Editor.border", Style.COLOR_BORDER);
@@ -1507,6 +1509,13 @@ public final class UI {
     UIManager.put("Tree.selectionForeground", Style.COLOR_TEXT);
     UIManager.put("Tree.textBackground", Style.COLOR_BG);
     UIManager.put("Tree.textForeground", Style.COLOR_TEXT);
+    UIManager.put("Tree.rendererBackground", Style.COLOR_BG);
+    UIManager.put("Tree.alternateRowBackground", Style.COLOR_BG);
+    UIManager.put("Tree.rowBackground", Style.COLOR_BG);
+    UIManager.put("Tree.alternateRowColor", Boolean.FALSE);
+    UIManager.put("Tree.paintLines", Boolean.FALSE);
+    UIManager.put("Tree.selectionBorderColor", Style.COLOR_TRANSPARENT);
+
 
     // TabbedPane - modern minimal headers
     UIManager.put("TabbedPane.background", Style.COLOR_BG);
@@ -1619,7 +1628,9 @@ public final class UI {
     UIManager.put("Spinner.border", new DarkSpinnerBorder());
     UIManager.put("Table.gridColor", Style.COLOR_LIGHT_GRID);
     Color lightBg = panel != null ? panel : new Color(248, 248, 248);
+    UIManager.put("Editor.background", lightBg);
     UIManager.put("Windows.TitlePane.borderColor", lightBg);
+
     UIManager.put("MenuBar.borderColor", lightBg);
     UIManager.put("MenuBar.border", BorderFactory.createEmptyBorder());
     UIManager.put("ToolBar.borderColor", lightBg);
@@ -1763,62 +1774,68 @@ public final class UI {
    * Creates a JTree initialized with model and Utiliti focus, hover, and selection rendering.
    */
   public static JTree createStyledTree(javax.swing.tree.TreeModel model) {
-    JTree tree = new JTree(model) {
-      private boolean paintingBaseRows;
+    return new StyledTree(model);
+  }
 
-      @Override
-      public boolean isPathSelected(javax.swing.tree.TreePath path) {
-        return !this.paintingBaseRows && super.isPathSelected(path);
-      }
 
-      @Override
-      public boolean isRowSelected(int row) {
-        return !this.paintingBaseRows && super.isRowSelected(row);
-      }
+  public static void paintHierarchyConnectors(JTree tree, Graphics graphics) {
+    if (tree.getRowCount() == 0) return;
+    Graphics2D g2 = (Graphics2D) graphics.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setColor(Style.border());
+      g2.setStroke(new java.awt.BasicStroke(1f));
 
-      @Override
-      public boolean hasFocus() {
-        return !this.paintingBaseRows && super.hasFocus();
-      }
-
-      @Override
-      public int getLeadSelectionRow() {
-        return this.paintingBaseRows ? -1 : super.getLeadSelectionRow();
-      }
-
-      @Override
-      public javax.swing.tree.TreePath getLeadSelectionPath() {
-        return this.paintingBaseRows ? null : super.getLeadSelectionPath();
-      }
-
-      @Override
-      public javax.swing.tree.TreePath getAnchorSelectionPath() {
-        return this.paintingBaseRows ? null : super.getAnchorSelectionPath();
-      }
-
-      @Override
-      protected void paintComponent(Graphics g) {
-        this.paintingBaseRows = true;
-        try {
-          super.paintComponent(g);
-        } finally {
-          this.paintingBaseRows = false;
+      for (int row = 0; row < tree.getRowCount(); row++) {
+        javax.swing.tree.TreePath parentPath = tree.getPathForRow(row);
+        if (parentPath == null || !tree.isExpanded(parentPath)
+            || !(parentPath.getLastPathComponent() instanceof javax.swing.tree.DefaultMutableTreeNode parent)
+            || parent.getChildCount() == 0) {
+          continue;
         }
-        paintTreeRowVisuals(this, g);
+        java.awt.Rectangle parentBounds = tree.getPathBounds(parentPath);
+        if (parentBounds == null) continue;
+
+        java.util.List<java.awt.Rectangle> childBounds = new java.util.ArrayList<>();
+        java.util.List<javax.swing.tree.DefaultMutableTreeNode> visibleChildren = new java.util.ArrayList<>();
+        for (int i = 0; i < parent.getChildCount(); i++) {
+          javax.swing.tree.DefaultMutableTreeNode childNode = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(i);
+          javax.swing.tree.TreePath childPath = parentPath.pathByAddingChild(childNode);
+          java.awt.Rectangle bounds = tree.getPathBounds(childPath);
+          if (bounds != null && tree.isVisible(childPath)) {
+            childBounds.add(bounds);
+            visibleChildren.add(childNode);
+          }
+        }
+        if (childBounds.isEmpty()) continue;
+
+        java.awt.Rectangle firstChild = childBounds.getFirst();
+        int indent = Math.max(12, firstChild.x - parentBounds.x);
+        int trunkX = firstChild.x - indent / 2;
+        int parentY = parentBounds.y + parentBounds.height;
+        int lastY = childBounds.getLast().y + childBounds.getLast().height / 2;
+        g2.drawLine(trunkX, parentY, trunkX, lastY);
+
+        for (int i = 0; i < childBounds.size(); i++) {
+          java.awt.Rectangle child = childBounds.get(i);
+          javax.swing.tree.DefaultMutableTreeNode childNode = visibleChildren.get(i);
+          int childY = child.y + child.height / 2;
+          int endpoint = childNode.isLeaf() ? child.x + 8 : child.x - 3;
+          g2.drawLine(trunkX, childY, endpoint, childY);
+        }
       }
-    };
-    configureTreeVisuals(tree);
-    return tree;
+    } finally {
+      g2.dispose();
+    }
   }
 
   public static void paintTreeRowVisuals(JTree tree, Graphics g) {
+    if (tree.getRowCount() == 0) return;
     Graphics2D g2 = (Graphics2D) g.create();
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       Object hoverVal = tree.getClientProperty("hoverRow");
       int hoverRow = hoverVal instanceof Integer r ? r : -1;
-      int leadRow = tree.getLeadSelectionRow();
-      boolean focused = tree.hasFocus();
 
       for (int row = 0; row < tree.getRowCount(); row++) {
         java.awt.Rectangle bounds = tree.getRowBounds(row);
@@ -1831,12 +1848,6 @@ public final class UI {
         if (tree.isRowSelected(row)) {
           g2.setColor(Style.sceneRowSelected());
           g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
-          if (focused || row == leadRow) {
-            g2.setColor(Style.selectionOutline());
-            g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
-          }
-          g2.setColor(Style.accent());
-          g2.fillRoundRect(x + 1, y + 2, 3, Math.max(4, height - 4), 3, 3);
         } else if (row == hoverRow) {
           g2.setColor(Style.sceneRowHover());
           g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
@@ -1846,6 +1857,7 @@ public final class UI {
       g2.dispose();
     }
   }
+
 
   /**
    * Configures a JList with standard Utiliti focus, hover, and selection visuals.

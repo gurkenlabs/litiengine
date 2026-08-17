@@ -461,8 +461,9 @@ public final class Style {
   }
 
   public static Color background() {
-    return uiColor("Panel.background", COLOR_BG);
+    return uiColor("Editor.background", COLOR_BG);
   }
+
 
   public static Color surface() {
     return uiColor("Editor.surface", COLOR_SURFACE);
@@ -547,6 +548,10 @@ public final class Style {
   public static Color assetExplorerBackground() {
     return background();
   }
+
+
+
+
 
   public static Color mapBacking() {
     return uiColor("Editor.mapBacking", COLOR_MAP_BACKING);

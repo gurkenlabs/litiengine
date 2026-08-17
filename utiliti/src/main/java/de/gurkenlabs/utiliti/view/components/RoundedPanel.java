@@ -32,6 +32,8 @@ final class RoundedPanel extends JPanel {
       g2.setColor(Style.background());
       g2.fill(createShape());
       g2.setColor(Style.border());
+
+
       g2.draw(new RoundRectangle2D.Double(
           0.5, 0.5, Math.max(0, getWidth() - 1.0), Math.max(0, getHeight() - 1.0), this.arc, this.arc));
     } finally {

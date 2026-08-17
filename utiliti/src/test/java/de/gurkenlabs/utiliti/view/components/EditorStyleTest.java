@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
+import javax.swing.ImageIcon;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -20,12 +21,14 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SwingTestSuite.class)
@@ -33,6 +36,7 @@ class EditorStyleTest {
 
   @Test
   void toolbarButtonsUseCompactFocusableContract() {
+
     JButton button = Style.iconButton(new ImageIcon(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)));
 
     assertTrue(button.isFocusable());
@@ -177,11 +181,11 @@ class EditorStyleTest {
     JComponent cell = (JComponent) tree.getCellRenderer().getTreeCellRendererComponent(
         tree, node, true, true, false, 0, true);
 
-    assertTrue(cell.isOpaque());
+    assertFalse(cell.isOpaque());
     assertTrue(cell.getBorder() instanceof EmptyBorder);
     assertEquals("None", tree.getClientProperty("JTree.lineStyle"));
     assertEquals(Style.assetExplorerBackground(), tree.getBackground());
-    assertTrue(tree.isOpaque());
+    assertFalse(tree.isOpaque());
   }
 
   @Test
@@ -310,4 +314,93 @@ class EditorStyleTest {
     assertTrue(updatedDisabled instanceof Style.DisabledVectorIcon);
     assertEquals(icon2, ((ImageIcon) ((Style.DisabledVectorIcon) updatedDisabled).getDelegate()).getImage());
   }
+
+  @Test
+  void dumpDarklafTreeDiagnostics() {
+    UI.setTheme(Style.Theme.DARK);
+
+    System.out.println("=== DARKLAF DIAGNOSTICS DUMP ===");
+    System.out.println("Darklaf version: 3.1.1");
+    System.out.println("Tree.background: " + toHex(UIManager.getColor("Tree.background")));
+    System.out.println("Tree.textBackground: " + toHex(UIManager.getColor("Tree.textBackground")));
+    System.out.println("Tree.selectionBackground: " + toHex(UIManager.getColor("Tree.selectionBackground")));
+    System.out.println("Viewport.background: " + toHex(UIManager.getColor("Viewport.background")));
+    System.out.println("Panel.background: " + toHex(UIManager.getColor("Panel.background")));
+
+    SceneGraph sceneGraph = new SceneGraph();
+    JTree sceneTree = findChildTree(sceneGraph);
+    System.out.println("\nScene Graph:");
+    System.out.println("  component class: " + (sceneTree != null ? sceneTree.getClass().getName() : "null"));
+    System.out.println("  UI delegate: " + (sceneTree != null ? sceneTree.getUI().getClass().getName() : "null"));
+    System.out.println("  opaque: " + (sceneTree != null ? sceneTree.isOpaque() : "null"));
+    System.out.println("  component background: " + (sceneTree != null ? toHex(sceneTree.getBackground()) : "null"));
+
+    ScriptWorkspacePanel scriptWorkspace = new ScriptWorkspacePanel();
+    JTree scriptTree = findChildTree(scriptWorkspace);
+    System.out.println("\nScripts Tree:");
+    System.out.println("  component class: " + (scriptTree != null ? scriptTree.getClass().getName() : "null"));
+    System.out.println("  UI delegate: " + (scriptTree != null ? scriptTree.getUI().getClass().getName() : "null"));
+    System.out.println("  opaque: " + (scriptTree != null ? scriptTree.isOpaque() : "null"));
+    System.out.println("  component background: " + (scriptTree != null ? toHex(scriptTree.getBackground()) : "null"));
+
+    ScriptAssetTree scriptAssetTree = new ScriptAssetTree(new AssetPanel());
+    System.out.println("\nScripts Categories:");
+    System.out.println("  component class: " + scriptAssetTree.getClass().getName());
+    System.out.println("  UI delegate: " + scriptAssetTree.getUI().getClass().getName());
+    System.out.println("  opaque: " + scriptAssetTree.isOpaque());
+    System.out.println("  component background: " + toHex(scriptAssetTree.getBackground()));
+    System.out.println("=================================");
+  }
+
+  @Test
+  void renderedTreePixelsMatchDarkBackground() {
+    UI.setTheme(Style.Theme.DARK);
+
+    SceneGraph sceneGraph = new SceneGraph();
+    sceneGraph.setSize(240, 400);
+    sceneGraph.doLayout();
+    JTree sceneTree = findChildTree(sceneGraph);
+    assertNotNull(sceneTree);
+    sceneTree.setSize(240, 400);
+
+    BufferedImage image = new BufferedImage(240, 400, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = image.createGraphics();
+    g.setColor(Style.background());
+    g.fillRect(0, 0, 240, 400);
+    sceneTree.paint(g);
+    g.dispose();
+
+    // Check pixel at empty space (e.g., x=10, y=300) vs unselected row space (e.g., x=220, y=10)
+    int emptyColor = image.getRGB(10, 350) & 0xFFFFFF;
+    int rowColor = image.getRGB(220, 10) & 0xFFFFFF;
+    int expected = Style.background().getRGB() & 0xFFFFFF;
+
+    assertEquals(Integer.toHexString(expected), Integer.toHexString(emptyColor));
+    assertEquals(Integer.toHexString(expected), Integer.toHexString(rowColor));
+  }
+
+  private static void assertNotNull(Object obj) {
+    org.junit.jupiter.api.Assertions.assertNotNull(obj);
+  }
+
+  private static JTree findChildTree(java.awt.Container container) {
+    for (java.awt.Component comp : container.getComponents()) {
+      if (comp instanceof JTree tree) return tree;
+      if (comp instanceof java.awt.Container childContainer) {
+        JTree tree = findChildTree(childContainer);
+        if (tree != null) return tree;
+      }
+    }
+    return null;
+  }
+
+  private static String toHex(Color color) {
+    if (color == null) return "null";
+    return String.format("#%02X%02X%02X (alpha=%d)", color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+  }
 }
+
+
+
+
+
