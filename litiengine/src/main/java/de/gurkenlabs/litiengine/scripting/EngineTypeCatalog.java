@@ -30,6 +30,7 @@ public final class EngineTypeCatalog {
   }
 
   private static final Map<ClassLoader, Map<String, Class<?>>> NAME_LOOKUP_CACHE = new ConcurrentHashMap<>();
+  private static final Map<ClassLoader, Map<String, List<Class<?>>>> PACKAGE_LOOKUP_CACHE = new ConcurrentHashMap<>();
 
   public static Optional<Class<?>> findType(String name, ClassLoader loader) {
     if (name == null || name.isBlank()) return Optional.empty();
@@ -44,6 +45,23 @@ public final class EngineTypeCatalog {
     });
     return Optional.ofNullable(map.get(name));
   }
+
+  public static List<Class<?>> typesInPackage(String packageName, ClassLoader loader) {
+    if (packageName == null || packageName.isBlank()) return List.of();
+    ClassLoader effectiveLoader = loader == null ? Game.class.getClassLoader() : loader;
+    Map<String, List<Class<?>>> map = PACKAGE_LOOKUP_CACHE.computeIfAbsent(effectiveLoader, l -> {
+      Map<String, List<Class<?>>> lookup = new ConcurrentHashMap<>();
+      for (Class<?> type : projectTypes(l)) {
+        String pkg = type.getPackageName();
+        if (pkg != null && !pkg.isBlank()) {
+          lookup.computeIfAbsent(pkg, k -> new ArrayList<>()).add(type);
+        }
+      }
+      return lookup;
+    });
+    return map.getOrDefault(packageName, List.of());
+  }
+
 
   private static List<Class<?>> loadEngine(ClassLoader loader) {
     List<Class<?>> result = new ArrayList<>();
@@ -148,13 +166,56 @@ public final class EngineTypeCatalog {
   }
 
   private static boolean isRelevantProjectClass(String name) {
-    if (name.contains("$") || name.endsWith("module-info")) return false;
-    if (name.startsWith("org.apache.") || name.startsWith("com.fasterxml.") || name.startsWith("org.codehaus.groovy.")
-      || name.startsWith("me.friwi.") || name.startsWith("org.cef.") || name.startsWith("jakarta.")
-      || name.startsWith("org.eclipse.") || name.startsWith("org.junit.") || name.startsWith("org.hamcrest.")
-      || name.startsWith("com.sun.") || name.startsWith("sun.") || name.startsWith("java.awt.peer.")) return false;
+    if (name == null || name.isBlank() || name.contains("$") || name.endsWith("module-info") || name.endsWith("package-info")) {
+      return false;
+    }
+    if (name.startsWith("tools.")
+        || name.startsWith("com.fasterxml.")
+        || name.startsWith("com.google.")
+        || name.startsWith("com.github.")
+        || name.startsWith("com.formdev.")
+        || name.startsWith("com.jgoodies.")
+        || name.startsWith("com.sun.")
+        || name.startsWith("org.apache.")
+        || name.startsWith("org.codehaus.")
+        || name.startsWith("org.cef.")
+        || name.startsWith("org.eclipse.")
+        || name.startsWith("org.junit.")
+        || name.startsWith("org.hamcrest.")
+        || name.startsWith("org.opentest4j.")
+        || name.startsWith("org.apiguardian.")
+        || name.startsWith("org.slf4j.")
+        || name.startsWith("org.gradle.")
+        || name.startsWith("org.joda.")
+        || name.startsWith("org.jgrapht.")
+        || name.startsWith("org.jetbrains.")
+        || name.startsWith("org.intellij.")
+        || name.startsWith("org.checkerframework.")
+        || name.startsWith("net.java.")
+        || name.startsWith("net.bytebuddy.")
+        || name.startsWith("io.netty.")
+        || name.startsWith("me.friwi.")
+        || name.startsWith("org.glassfish.")
+        || name.startsWith("org.w3c.")
+        || name.startsWith("org.xml.")
+        || name.startsWith("org.ietf.")
+        || name.startsWith("org.omg.")
+        || name.startsWith("com.oracle.")
+        || name.startsWith("javax.xml.")
+        || name.startsWith("javax.crypto.")
+        || name.startsWith("javax.security.")
+        || name.startsWith("javax.transaction.")
+        || name.startsWith("javax.naming.")
+        || name.startsWith("javax.management.")
+        || name.startsWith("sun.")
+        || name.startsWith("jdk.")
+        || name.startsWith("java.awt.peer.")) {
+      return false;
+    }
     return true;
+
   }
+
 
   private static Comparator<Class<?>> typeOrder() {
     return Comparator.comparing((Class<?> type) -> type.getSimpleName(), String.CASE_INSENSITIVE_ORDER)

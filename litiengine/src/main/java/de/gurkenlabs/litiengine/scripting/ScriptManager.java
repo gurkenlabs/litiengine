@@ -207,6 +207,11 @@ public final class ScriptManager implements IUpdateable {
     this.diagnostics.clear();
   }
 
+  public void clearDiagnostics(String scriptId) {
+    if (scriptId == null) return;
+    this.diagnostics.removeIf(d -> Objects.equals(d.scriptId(), scriptId));
+  }
+
   public void clearDiagnostics(Object host) {
     if (host == null) return;
     if (host instanceof IEntity entity) {
@@ -214,6 +219,7 @@ public final class ScriptManager implements IUpdateable {
       this.diagnostics.removeIf(d -> d.message() != null && d.message().contains(marker));
     }
   }
+
 
   public List<ScriptInstance> attachAll(Object host, Collection<ScriptBinding> bindings) {
     return this.attachAll(host, bindings, false);
@@ -287,6 +293,7 @@ public final class ScriptManager implements IUpdateable {
   public boolean reload(String scriptId) {
     ScriptDefinition definition = this.definitions.get(scriptId);
     if (definition == null) return false;
+    this.clearDiagnostics(scriptId);
     final CompiledScript replacement;
     try {
       replacement = this.compile(definition);
@@ -294,6 +301,7 @@ public final class ScriptManager implements IUpdateable {
       this.record(definition, e);
       return false;
     }
+
 
     List<Attachment> affected = this.attachments.stream().filter(a -> a.definition.getId().equals(scriptId)).toList();
     List<HostBinding> bindings = affected.stream().map(a -> new HostBinding(a.host, a.binding, a.controllerManaged)).toList();

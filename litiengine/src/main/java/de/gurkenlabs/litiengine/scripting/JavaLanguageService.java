@@ -41,6 +41,10 @@ public class JavaLanguageService implements ScriptLanguageService {
     "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "var"
   );
 
+  private record CachedMembers(List<Completion> all, List<Completion> staticOnly) {}
+  private static final Map<Class<?>, CachedMembers> MEMBER_CACHE = new ConcurrentHashMap<>();
+  private static final Map<Class<?>, Completion> TYPE_COMPLETION_CACHE = new ConcurrentHashMap<>();
+
   private final Workspace workspace;
   private ParsedDocument lastValid;
 
@@ -52,6 +56,31 @@ public class JavaLanguageService implements ScriptLanguageService {
   public Analysis analyze(Document document) {
     ParsedDocument parsed = parse(document);
     return new Analysis(parsed.diagnostics(), parsed.symbols(), List.of());
+  }
+
+  private static String currentWord(String prefix) {
+    if (prefix == null || prefix.isEmpty()) return "";
+    int i = prefix.length() - 1;
+    while (i >= 0 && (Character.isJavaIdentifierPart(prefix.charAt(i)) || prefix.charAt(i) == '@')) {
+      i--;
+    }
+    return prefix.substring(i + 1);
+  }
+
+  private static boolean matchesPrefix(String label, String prefix) {
+    if (prefix == null || prefix.isEmpty()) return true;
+    if (label.regionMatches(true, 0, prefix, 0, prefix.length())) return true;
+    if (prefix.length() <= 4) {
+      int pIdx = 0;
+      for (int i = 0; i < label.length() && pIdx < prefix.length(); i++) {
+        char c = label.charAt(i);
+        if (Character.isUpperCase(c) && Character.toLowerCase(c) == Character.toLowerCase(prefix.charAt(pIdx))) {
+          pIdx++;
+        }
+      }
+      if (pIdx == prefix.length()) return true;
+    }
+    return label.toLowerCase(java.util.Locale.ROOT).contains(prefix.toLowerCase(java.util.Locale.ROOT));
   }
 
   @Override
@@ -66,20 +95,27 @@ public class JavaLanguageService implements ScriptLanguageService {
     int importInsertLine = importInsertLine(source);
     List<Completion> result = new ArrayList<>();
 
+    Matcher annotParamMatcher = Pattern.compile("(?s)@([A-Za-z0-9_$]+)\\s*\\(([^)]*)$").matcher(prefix);
     boolean annotationContext = prefix.matches("(?s).*@\\s*[A-Za-z0-9_$]*$");
     boolean constructorContext = prefix.matches("(?s).*\\bnew(?:\\s+[\\w.$]*)?$");
 
-    if (type != null) {
+    if (annotParamMatcher.find()) {
+      String annotName = annotParamMatcher.group(1);
+      String paramsContent = annotParamMatcher.group(2);
+      this.addAnnotationAttributeCompletions(result, annotName, paramsContent, source);
+      return result;
+    } else if (type != null) {
       addMembers(result, type);
     } else if (annotationContext) {
       this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
     } else if (constructorContext) {
+
       Optional<Class<?>> expectedParamType = this.inferExpectedParameterType(prefix, document.definition(), variables, source);
       expectedParamType.ifPresent(expectedType -> {
         List<TextEdit> edits = importedFqns.contains(expectedType.getName()) ? List.of()
           : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
             "import " + expectedType.getName() + ";\n"));
-        result.add(typeCompletion(expectedType, true, edits));
+        result.add(typeCompletionWithEdits(expectedType, true, edits));
         if (expectedType.isInterface() || Modifier.isAbstract(expectedType.getModifiers())) {
           result.add(anonymousClassCompletion(expectedType, edits));
         }
@@ -89,16 +125,17 @@ public class JavaLanguageService implements ScriptLanguageService {
         List<TextEdit> edits = importedFqns.contains(engineType.getName()) ? List.of()
           : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
             "import " + engineType.getName() + ";\n"));
-        result.add(typeCompletion(engineType, true, edits));
+        result.add(typeCompletionWithEdits(engineType, true, edits));
       }
       for (Class<?> projectType : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
         if (importedFqns.contains(projectType.getName())) continue;
         List<TextEdit> edits = List.of(new TextEdit(
           new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
           "import " + projectType.getName() + ";\n"));
-        result.add(typeCompletion(projectType, true, edits));
+        result.add(typeCompletionWithEdits(projectType, true, edits));
       }
     } else {
+      String word = currentWord(prefix);
       addScriptDeclaredMembers(result, source);
       result.add(new Completion("globals", CompletionKind.FIELD, "ScriptGlobals",
         "Direct access to global shared game state map (`globals.put(...)`, `globals.get(...)`, `globals.onChanged(...)`).",
@@ -107,24 +144,36 @@ public class JavaLanguageService implements ScriptLanguageService {
       this.hostType(document.definition()).ifPresent(host -> addMembers(result, new ResolvedType(host, null, false)));
       this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
 
-      KEYWORDS.stream().sorted().forEach(keyword -> result.add(new Completion(
-        keyword, CompletionKind.KEYWORD, "Java keyword", "", keyword, null, List.of(), List.of())));
+      KEYWORDS.stream().sorted().forEach(keyword -> {
+        if (word.isEmpty() || matchesPrefix(keyword, word)) {
+          result.add(new Completion(
+            keyword, CompletionKind.KEYWORD, "Java keyword", "", keyword, null, List.of(), List.of()));
+        }
+      });
 
       this.importedTypes(source).values().stream().distinct().sorted(Comparator.comparing(Class::getSimpleName))
-        .forEach(imported -> result.add(typeCompletion(imported)));
+        .forEach(imported -> {
+          if (word.isEmpty() || matchesPrefix(imported.getSimpleName(), word)) {
+            result.add(getCachedTypeCompletion(imported));
+          }
+        });
 
       for (Class<?> engineType : EngineTypeCatalog.publicTypes()) {
-        List<TextEdit> edits = importedFqns.contains(engineType.getName()) ? List.of()
-          : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
-            "import " + engineType.getName() + ";\n"));
-        result.add(typeCompletion(engineType, false, edits));
+        if (word.isEmpty() || matchesPrefix(engineType.getSimpleName(), word)) {
+          List<TextEdit> edits = importedFqns.contains(engineType.getName()) ? List.of()
+            : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+              "import " + engineType.getName() + ";\n"));
+          result.add(typeCompletionWithEdits(engineType, false, edits));
+        }
       }
       for (Class<?> projectType : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
         if (importedFqns.contains(projectType.getName())) continue;
-        List<TextEdit> edits = List.of(new TextEdit(
-          new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
-          "import " + projectType.getName() + ";\n"));
-        result.add(typeCompletion(projectType, false, edits));
+        if (word.isEmpty() || matchesPrefix(projectType.getSimpleName(), word)) {
+          List<TextEdit> edits = List.of(new TextEdit(
+            new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+            "import " + projectType.getName() + ";\n"));
+          result.add(typeCompletionWithEdits(projectType, false, edits));
+        }
       }
     }
     return result.stream().collect(java.util.stream.Collectors.toMap(
@@ -134,6 +183,7 @@ public class JavaLanguageService implements ScriptLanguageService {
         .thenComparing(Comparator.comparing(Completion::label, String.CASE_INSENSITIVE_ORDER)))
       .toList();
   }
+
 
   @Override
   public List<CodeAction> codeActions(Document document, Range range, List<ScriptDiagnostic> diagnostics) {
@@ -145,14 +195,17 @@ public class JavaLanguageService implements ScriptLanguageService {
       word = wordAt(source, off);
     }
 
-    Set<String> missingSymbols = new java.util.LinkedHashSet<>();
-    if (!word.isBlank() && Character.isJavaIdentifierStart(word.charAt(0))) {
-      missingSymbols.add(word);
-    }
-
     ParsedDocument parsed = parse(document);
     List<ScriptDiagnostic> allDiags = new ArrayList<>(parsed.diagnostics());
     if (diagnostics != null) allDiags.addAll(diagnostics);
+
+    int targetLine = range.start().line();
+    boolean lineHasDiagnostic = allDiags.stream().anyMatch(d -> d.line() - 1 == targetLine);
+
+    Set<String> missingSymbols = new java.util.LinkedHashSet<>();
+    if (lineHasDiagnostic && !word.isBlank() && Character.isJavaIdentifierStart(word.charAt(0)) && !KEYWORDS.contains(word)) {
+      missingSymbols.add(word);
+    }
 
     for (ScriptDiagnostic diag : allDiags) {
       if (diag.message() == null) continue;
@@ -174,6 +227,9 @@ public class JavaLanguageService implements ScriptLanguageService {
       }
     }
 
+    missingSymbols.removeIf(s -> s.isBlank() || KEYWORDS.contains(s));
+
+
     Set<String> importedFqns = this.importedTypes(source).values().stream().map(Class::getName).collect(java.util.stream.Collectors.toSet());
     int insertLine = importInsertLine(source);
     Range insertRange = new Range(new Position(insertLine, 0), new Position(insertLine, 0));
@@ -181,9 +237,9 @@ public class JavaLanguageService implements ScriptLanguageService {
     List<CodeAction> actions = new ArrayList<>();
     String[] lines = source.split("\r?\n", -1);
     List<DeclaredScriptField> declaredFields = scanDeclaredFields(source);
-    int targetLine = range.start().line();
 
     DeclaredScriptField targetField = declaredFields.stream()
+
       .filter(f -> f.line() == targetLine || f.annotationLine() == targetLine || (f.line() >= range.start().line() && f.line() <= range.end().line()))
       .findFirst().orElse(null);
 
@@ -893,26 +949,42 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private static void addMembers(List<Completion> result, ResolvedType receiver) {
-    String owner = simpleName(receiver.type().getName());
-    for (Method method : receiver.type().getMethods()) {
-      if (receiver.staticOnly() && !Modifier.isStatic(method.getModifiers())) continue;
+    if (receiver == null || receiver.type() == null) return;
+    CachedMembers cached = MEMBER_CACHE.computeIfAbsent(receiver.type(), JavaLanguageService::buildMembers);
+    result.addAll(receiver.staticOnly() ? cached.staticOnly() : cached.all());
+  }
+
+  private static CachedMembers buildMembers(Class<?> type) {
+    List<Completion> all = new ArrayList<>();
+    List<Completion> statics = new ArrayList<>();
+    String owner = simpleName(type.getName());
+    for (Method method : type.getMethods()) {
       List<Parameter> parameters = Arrays.stream(method.getParameters())
         .map(parameter -> new Parameter(parameter.getName(), parameter.getParameterizedType().getTypeName())).toList();
       String detail = method.getName() + "(" + String.join(", ", parameters.stream()
         .map(parameter -> simpleName(parameter.type()) + " " + parameter.name()).toList()) + ")";
       String docs = "```java\n" + simpleName(method.getGenericReturnType().getTypeName()) + " " + owner + "." + detail + "\n```\n\n"
         + "Declared in `" + method.getDeclaringClass().getName() + "`";
-      result.add(new Completion(method.getName(), CompletionKind.METHOD, detail, docs, method.getName() + "()",
-        method.getGenericReturnType().getTypeName(), parameters, List.of()));
+      Completion completion = new Completion(method.getName(), CompletionKind.METHOD, detail, docs, method.getName() + "()",
+        method.getGenericReturnType().getTypeName(), parameters, List.of());
+      all.add(completion);
+      if (Modifier.isStatic(method.getModifiers())) {
+        statics.add(completion);
+      }
     }
-    for (Field field : receiver.type().getFields()) {
-      if (receiver.staticOnly() && !Modifier.isStatic(field.getModifiers())) continue;
+    for (Field field : type.getFields()) {
       String docs = "```java\n" + simpleName(field.getGenericType().getTypeName()) + " " + owner + "." + field.getName() + "\n```\n\n"
         + "Declared in `" + field.getDeclaringClass().getName() + "`";
-      result.add(new Completion(field.getName(), CompletionKind.FIELD, field.getGenericType().getTypeName(), docs,
-        field.getName(), field.getGenericType().getTypeName(), List.of(), List.of()));
+      Completion completion = new Completion(field.getName(), CompletionKind.FIELD, field.getGenericType().getTypeName(), docs,
+        field.getName(), field.getGenericType().getTypeName(), List.of(), List.of());
+      all.add(completion);
+      if (Modifier.isStatic(field.getModifiers())) {
+        statics.add(completion);
+      }
     }
+    return new CachedMembers(List.copyOf(all), List.copyOf(statics));
   }
+
 
   private record DeclaredScriptField(int line, String indentation, String type, String name, boolean hasScriptProperty, boolean hasAnnotationParams, int annotationLine, Range annotationRange) {}
 
@@ -1075,6 +1147,7 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private Map<String, Class<?>> importedTypes(String source) {
+    if (source == null || source.isBlank()) return Map.of();
     Map<String, Class<?>> imports = new LinkedHashMap<>();
     Matcher matcher = IMPORT.matcher(source);
     ClassLoader loader = this.workspace.classLoader();
@@ -1083,10 +1156,8 @@ public class JavaLanguageService implements ScriptLanguageService {
       String alias = matcher.group(2);
       if (fqn.endsWith(".*")) {
         String pkg = fqn.substring(0, fqn.length() - 2);
-        for (Class<?> type : EngineTypeCatalog.projectTypes(loader)) {
-          if (type.getPackageName().equals(pkg)) {
-            imports.put(type.getSimpleName(), type);
-          }
+        for (Class<?> type : EngineTypeCatalog.typesInPackage(pkg, loader)) {
+          imports.put(type.getSimpleName(), type);
         }
       } else {
         try {
@@ -1157,8 +1228,29 @@ public class JavaLanguageService implements ScriptLanguageService {
       "Creates an inline anonymous implementation of `" + type.getName() + "`.", body.toString(), name, List.of(), edits);
   }
 
+  private static Completion getCachedTypeCompletion(Class<?> type) {
+    return TYPE_COMPLETION_CACHE.computeIfAbsent(type, t -> typeCompletion(t, false, List.of()));
+  }
+
   private static Completion typeCompletion(Class<?> type) {
-    return typeCompletion(type, false, List.of());
+    return getCachedTypeCompletion(type);
+  }
+
+  private static Completion typeCompletionWithEdits(Class<?> type, boolean fullyQualified, List<TextEdit> additionalEdits) {
+    if (!fullyQualified && additionalEdits.isEmpty()) {
+      return getCachedTypeCompletion(type);
+    }
+    Completion base = getCachedTypeCompletion(type);
+    return new Completion(
+      base.label(),
+      base.kind(),
+      base.detail(),
+      base.documentation(),
+      fullyQualified ? type.getName() : base.insertText(),
+      base.returnType(),
+      base.parameters(),
+      additionalEdits
+    );
   }
 
   private static Completion typeCompletion(Class<?> type, boolean fullyQualified, List<TextEdit> additionalEdits) {
@@ -1169,6 +1261,7 @@ public class JavaLanguageService implements ScriptLanguageService {
     return new Completion(type.getSimpleName(), CompletionKind.CLASS, type.getName(), docs,
       fullyQualified ? type.getName() : type.getSimpleName(), type.getName(), List.of(), additionalEdits);
   }
+
 
   private static Completion function(String name, String returnType, String documentation) {
     return new Completion(name, CompletionKind.METHOD, name + "()", documentation, name + "()", returnType, List.of(), List.of());
@@ -1279,6 +1372,67 @@ public class JavaLanguageService implements ScriptLanguageService {
       }
     }
   }
+
+  private void addAnnotationAttributeCompletions(List<Completion> result, String annotName, String paramsContent, String source) {
+    int lastComma = paramsContent.lastIndexOf(',');
+    String clause = lastComma >= 0 ? paramsContent.substring(lastComma + 1).strip() : paramsContent.strip();
+    if (clause.contains("=")) {
+      if (clause.startsWith("required") || clause.contains("required")) {
+        result.add(new Completion("true", CompletionKind.KEYWORD, "boolean", "Required property", "true", "boolean", List.of(), List.of()));
+        result.add(new Completion("false", CompletionKind.KEYWORD, "boolean", "Optional property", "false", "boolean", List.of(), List.of()));
+      }
+      return;
+    }
+    String word = currentWord(clause);
+
+    if (annotName.equals("ScriptProperty") || annotName.endsWith(".ScriptProperty")) {
+      List<Completion> attrs = List.of(
+        new Completion("defaultValue", CompletionKind.PROPERTY, "String - Initial fallback value", "Initial fallback value when not overridden in utiLITI", "defaultValue = \"$1\"", "String", List.of(), List.of()),
+        new Completion("name", CompletionKind.PROPERTY, "String - Inspector label", "Display label shown in the utiLITI inspector", "name = \"$1\"", "String", List.of(), List.of()),
+        new Completion("description", CompletionKind.PROPERTY, "String - Help tooltip", "Help description tooltip shown on hover in utiLITI", "description = \"$1\"", "String", List.of(), List.of()),
+        new Completion("category", CompletionKind.PROPERTY, "String - Inspector category", "Inspector section / grouping header (default: \"Script\")", "category = \"$1\"", "String", List.of(), List.of()),
+        new Completion("min", CompletionKind.PROPERTY, "double - Minimum numeric bound", "Minimum numeric value boundary for sliders/spinners", "min = $1", "double", List.of(), List.of()),
+        new Completion("max", CompletionKind.PROPERTY, "double - Maximum numeric bound", "Maximum numeric value boundary for sliders/spinners", "max = $1", "double", List.of(), List.of()),
+        new Completion("unit", CompletionKind.PROPERTY, "String - Unit label", "Unit label shown next to the input (e.g. \"px\", \"sec\", \"%\")", "unit = \"$1\"", "String", List.of(), List.of()),
+        new Completion("required", CompletionKind.PROPERTY, "boolean - Mandatory flag", "Flags the property as mandatory in the inspector", "required = true", "boolean", List.of(), List.of())
+      );
+      for (Completion attr : attrs) {
+        if (word.isEmpty() || matchesPrefix(attr.label(), word)) {
+          result.add(attr);
+        }
+      }
+      return;
+    }
+
+    if (annotName.equals("ScriptInfo") || annotName.endsWith(".ScriptInfo")) {
+      List<Completion> attrs = List.of(
+        new Completion("name", CompletionKind.PROPERTY, "String - Script name", "Display name of the script", "name = \"$1\"", "String", List.of(), List.of()),
+        new Completion("description", CompletionKind.PROPERTY, "String - Script description", "Summary description of what the script does", "description = \"$1\"", "String", List.of(), List.of()),
+        new Completion("author", CompletionKind.PROPERTY, "String - Author", "Author or creator of the script", "author = \"$1\"", "String", List.of(), List.of()),
+        new Completion("version", CompletionKind.PROPERTY, "String - Version", "Semantic version of the script", "version = \"$1\"", "String", List.of(), List.of()),
+        new Completion("category", CompletionKind.PROPERTY, "String - Category", "Category grouping for the script", "category = \"$1\"", "String", List.of(), List.of())
+      );
+      for (Completion attr : attrs) {
+        if (word.isEmpty() || matchesPrefix(attr.label(), word)) {
+          result.add(attr);
+        }
+      }
+      return;
+    }
+
+    this.resolveType(annotName, source).ifPresent(annotClass -> {
+      if (annotClass.isAnnotation()) {
+        for (Method m : annotClass.getDeclaredMethods()) {
+          if (word.isEmpty() || matchesPrefix(m.getName(), word)) {
+            String insert = m.getReturnType().equals(String.class) ? m.getName() + " = \"$1\"" : m.getName() + " = $1";
+            result.add(new Completion(m.getName(), CompletionKind.PROPERTY, m.getReturnType().getSimpleName(),
+              "Annotation attribute `" + m.getName() + "`", insert, m.getReturnType().getSimpleName(), List.of(), List.of()));
+          }
+        }
+      }
+    });
+  }
+
 
   private static boolean isPackageWildcardImported(String pkg, String source) {
     if (pkg == null || pkg.isBlank() || source == null) return false;

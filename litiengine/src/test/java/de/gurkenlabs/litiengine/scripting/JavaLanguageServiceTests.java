@@ -90,6 +90,60 @@ class JavaLanguageServiceTests {
   }
 
   @Test
+  void testAnnotationParameterCompletionInsideScriptProperty() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class JanitorBehavior extends EntityScript<Object> {
+          @ScriptProperty(name = "mycnt", description = "something weird", default
+          private int speed;
+        }
+        """;
+
+    int line = 4;
+    int col = 74; // right after "default"
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///JanitorBehavior.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.Completion> completions = this.service.complete(doc, new ScriptLanguageService.Position(line, col));
+    assertNotNull(completions);
+    assertFalse(completions.isEmpty());
+
+    List<String> labels = completions.stream().map(ScriptLanguageService.Completion::label).toList();
+    assertTrue(labels.contains("defaultValue"), "Should suggest defaultValue attribute of @ScriptProperty");
+    assertFalse(labels.contains("DefaultAccessorNamingStrategy"), "Should not suggest 3rd-party classes inside annotation params");
+    assertFalse(labels.contains("Default"), "Should not suggest random classes inside annotation params");
+  }
+
+  @Test
+  void testNoThirdPartyClassesInCatalog() {
+    List<Class<?>> publicTypes = EngineTypeCatalog.publicTypes();
+    List<Class<?>> projectTypes = EngineTypeCatalog.projectTypes(Thread.currentThread().getContextClassLoader());
+
+    for (Class<?> type : publicTypes) {
+      String name = type.getName();
+      assertFalse(name.startsWith("tools.jackson."), "Catalog should not contain tools.jackson: " + name);
+      assertFalse(name.startsWith("com.google.gson."), "Catalog should not contain com.google.gson: " + name);
+      assertFalse(name.startsWith("org.apache."), "Catalog should not contain org.apache: " + name);
+      assertFalse(name.startsWith("com.formdev."), "Catalog should not contain com.formdev: " + name);
+    }
+
+    for (Class<?> type : projectTypes) {
+      String name = type.getName();
+      assertFalse(name.startsWith("tools.jackson."), "Project types should not contain tools.jackson: " + name);
+      assertFalse(name.startsWith("com.google.gson."), "Project types should not contain com.google.gson: " + name);
+      assertFalse(name.startsWith("org.apache."), "Project types should not contain org.apache: " + name);
+      assertFalse(name.startsWith("com.formdev."), "Project types should not contain com.formdev: " + name);
+    }
+  }
+
+
+  @Test
   void testCodeActionsOnIncompleteScriptAnnotation() {
     String code = """
         package scripts;
