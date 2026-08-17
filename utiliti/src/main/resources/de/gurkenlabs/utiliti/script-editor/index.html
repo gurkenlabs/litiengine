@@ -1,13 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="background-color: #121214; color: #C8D0F5;">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>utiLITI Script Editor</title>
+  <style>
+    html, body, #editor {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background-color: #121214;
+      color: #C8D0F5;
+    }
+  </style>
   <link rel="stylesheet" href="editor.css">
 </head>
-<body>
-  <div id="editor" aria-label="Script editor"></div>
+<body style="background-color: #121214; color: #C8D0F5;">
+  <div id="editor" aria-label="Script editor" style="background-color: #121214;"></div>
   <script src="bootstrap.js"></script>
   <script src="../monaco/min/vs/loader.js"></script>
   <script src="editor.js"></script>

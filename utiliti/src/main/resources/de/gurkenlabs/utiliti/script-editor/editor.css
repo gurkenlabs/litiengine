@@ -3,8 +3,10 @@ html, body, #editor {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background: transparent;
+  background-color: #121214;
+  color: #C8D0F5;
 }
+
 
 .utiliti-breakpoint {
   background: #f05252;

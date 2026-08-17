@@ -125,12 +125,16 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
 
   MonacoScriptEditor() throws IOException {
     super();
+    this.setBackground(Style.COLOR_BG);
+    this.browserContainer.setOpaque(true);
+    this.browserContainer.setBackground(Style.COLOR_BG);
     this.setLayout(this.cards);
     this.add(this.browserContainer, EDITOR);
 
     JPanel fallbackPanel = new JPanel(new BorderLayout(0, 12));
     fallbackPanel.setOpaque(true);
-    fallbackPanel.setBackground(Style.background());
+    fallbackPanel.setBackground(Style.COLOR_BG);
+
     fallbackPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
     this.fallbackLabel.setFont(Style.getDefaultFont().deriveFont(12f));
@@ -355,6 +359,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     this.client.addLoadHandler(new LoadHandler());
     this.browser = this.client.createBrowser(this.resources.editorUrl(), false, false);
     java.awt.Component browserUI = this.browser.getUIComponent();
+    browserUI.setBackground(Style.COLOR_BG);
     browserUI.setVisible(true);
     this.browserContainer.add(browserUI, BorderLayout.CENTER);
     this.browserContainer.revalidate();
@@ -366,6 +371,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
     }
     this.cards.show(this, EDITOR);
     this.timeoutTimer = new javax.swing.Timer(30000, event -> {
+
       ((javax.swing.Timer) event.getSource()).stop();
       if (!this.ready) {
         String detail = this.startupError;
@@ -465,6 +471,9 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
         builder.setInstallDir(Path.of(System.getProperty("user.home"), ".litiengine", "jcef-146").toFile());
         builder.getCefSettings().windowless_rendering_enabled = false;
         builder.setProgressHandler((progress, percentage) -> {
+
+
+
           switch (progress) {
             case DOWNLOADING -> {
               if (percentage >= 0) {
@@ -625,25 +634,35 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private JsonObject complete(ScriptLanguageService.Position position) {
     JsonArrayBuilder completions = Json.createArrayBuilder();
     if (this.languageService != null) for (ScriptLanguageService.Completion item : this.languageService.complete(this.document(), position)) {
-      JsonArrayBuilder parameters = Json.createArrayBuilder();
-      item.parameters().forEach(parameter -> parameters.add(Json.createObjectBuilder()
-        .add("name", parameter.name()).add("type", parameter.type())));
-      JsonArrayBuilder additionalEdits = Json.createArrayBuilder();
-      item.additionalEdits().forEach(edit -> additionalEdits.add(Json.createObjectBuilder()
-        .add("startLine", edit.range().start().line()).add("startColumn", edit.range().start().column())
-        .add("endLine", edit.range().end().line()).add("endColumn", edit.range().end().column())
-        .add("text", edit.text())));
-      String docs = item.documentation();
-      if (docs == null || docs.isBlank()) docs = item.detail() != null ? item.detail() : "";
-      completions.add(Json.createObjectBuilder().add("label", item.label()).add("kind", item.kind().name())
+      JsonObjectBuilder obj = Json.createObjectBuilder()
+        .add("label", item.label())
+        .add("kind", item.kind().name())
         .add("detail", Objects.requireNonNullElse(item.detail(), ""))
-        .add("documentation", docs)
         .add("insertText", Objects.requireNonNullElse(item.insertText(), item.label()))
-        .add("returnType", Objects.requireNonNullElse(item.returnType(), ""))
-        .add("parameters", parameters).add("additionalTextEdits", additionalEdits));
+        .add("returnType", Objects.requireNonNullElse(item.returnType(), ""));
+      String docs = item.documentation();
+      if (docs != null && !docs.isBlank()) {
+        obj.add("documentation", docs);
+      }
+      if (!item.parameters().isEmpty()) {
+        JsonArrayBuilder parameters = Json.createArrayBuilder();
+        item.parameters().forEach(parameter -> parameters.add(Json.createObjectBuilder()
+          .add("name", parameter.name()).add("type", parameter.type())));
+        obj.add("parameters", parameters);
+      }
+      if (!item.additionalEdits().isEmpty()) {
+        JsonArrayBuilder additionalEdits = Json.createArrayBuilder();
+        item.additionalEdits().forEach(edit -> additionalEdits.add(Json.createObjectBuilder()
+          .add("startLine", edit.range().start().line()).add("startColumn", edit.range().start().column())
+          .add("endLine", edit.range().end().line()).add("endColumn", edit.range().end().column())
+          .add("text", edit.text())));
+        obj.add("additionalTextEdits", additionalEdits);
+      }
+      completions.add(obj);
     }
     return success(Json.createObjectBuilder().add("items", completions).build());
   }
+
 
   private JsonObject hover(ScriptLanguageService.Position position) {
     Optional<ScriptLanguageService.Hover> hover = this.languageService == null

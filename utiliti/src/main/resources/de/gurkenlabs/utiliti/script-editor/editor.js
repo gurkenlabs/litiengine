@@ -310,43 +310,48 @@
             const wordRange = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
             const atRange = isAnnotationContext ? new monaco.Range(position.lineNumber, atIndex + 1, position.lineNumber, word.endColumn) : wordRange;
 
-            return { suggestions: value.items.map(item => {
-              const label = item.label || '';
-              const insertText = item.insertText || label;
-              const hasAtInInsert = insertText.startsWith('@');
-              const targetRange = hasAtInInsert && isAnnotationContext ? atRange : wordRange;
-              const filterText = (label || insertText).replace(/^@/, '').replace(/\(.*\)/, '');
-              const isProp = label.includes('ScriptProperty') || label === 'prop' || label.startsWith('@ScriptProperty');
-              const isInfo = label.includes('ScriptInfo') || label.startsWith('@ScriptInfo');
-              const sortPrefix = isProp ? '000_'
-                : isInfo ? '001_'
-                : item.kind === 'SNIPPET' ? '010_'
-                : item.kind === 'PROPERTY' ? '020_'
-                : item.kind === 'FIELD' || item.kind === 'METHOD' ? '030_'
-                : '100_';
-              const suggestion = {
-                label: label,
-                kind: completionKind(item.kind),
-                detail: item.detail + (item.returnType ? `  ${item.returnType}` : ''),
-                insertText: insertText,
-                insertTextRules: item.kind === 'SNIPPET' ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet : undefined,
-                filterText: filterText,
-                sortText: sortPrefix + label,
-                range: targetRange,
-                additionalTextEdits: (item.additionalTextEdits || []).map(edit => ({
-                  range: new monaco.Range(edit.startLine + 1, edit.startColumn + 1, edit.endLine + 1, edit.endColumn + 1),
-                  text: edit.text
-                }))
-              };
-              if (item.documentation) {
-                suggestion.documentation = { value: item.documentation };
-              }
-              return suggestion;
-            }) };
+            return {
+              suggestions: (value.items || []).map(item => {
+                const label = item.label || '';
+                const insertText = item.insertText || label;
+                const hasAtInInsert = insertText.startsWith('@');
+                const targetRange = hasAtInInsert && isAnnotationContext ? atRange : wordRange;
+                const filterText = (label || insertText).replace(/^@/, '').replace(/\(.*\)/, '');
+                const isProp = label.includes('ScriptProperty') || label === 'prop' || label.startsWith('@ScriptProperty');
+                const isInfo = label.includes('ScriptInfo') || label.startsWith('@ScriptInfo');
+                const sortPrefix = isProp ? '000_'
+                  : isInfo ? '001_'
+                  : item.kind === 'SNIPPET' ? '010_'
+                  : item.kind === 'PROPERTY' ? '020_'
+                  : item.kind === 'FIELD' || item.kind === 'METHOD' ? '030_'
+                  : '100_';
+                const detailStr = item.detail ? (item.detail + (item.returnType ? `  ${item.returnType}` : '')) : (item.returnType || '');
+                const suggestion = {
+                  label: label,
+                  kind: completionKind(item.kind),
+                  detail: detailStr,
+                  insertText: insertText,
+                  insertTextRules: item.kind === 'SNIPPET' ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet : undefined,
+                  filterText: filterText,
+                  sortText: sortPrefix + label,
+                  range: targetRange,
+                  additionalTextEdits: (item.additionalTextEdits || []).map(edit => ({
+                    range: new monaco.Range(edit.startLine + 1, edit.startColumn + 1, edit.endLine + 1, edit.endColumn + 1),
+                    text: edit.text
+                  }))
+                };
+                if (item.documentation) {
+                  suggestion.documentation = { value: item.documentation };
+                }
+                return suggestion;
+              }),
+              incomplete: false
+            };
           } catch (error) {
             console.error(error);
-            return { suggestions: [] };
+            return { suggestions: [], incomplete: false };
           }
+
         }
       });
 
@@ -677,9 +682,21 @@
               models.delete(uri.toString());
             }
           } else if (method === 'theme') {
-            monaco.editor.setTheme(payload.dark ? 'utiliti-dark' : 'utiliti-light');
-            document.body.style.background = payload.dark ? '#121214' : '#FFFFFF';
+            const isDark = Boolean(payload.dark);
+            monaco.editor.setTheme(isDark ? 'utiliti-dark' : 'utiliti-light');
+            const bg = isDark ? '#121214' : '#FFFFFF';
+            const fg = isDark ? '#C8D0F5' : '#1E1E23';
+            document.documentElement.style.backgroundColor = bg;
+            document.documentElement.style.color = fg;
+            document.body.style.backgroundColor = bg;
+            document.body.style.color = fg;
+            const el = document.getElementById('editor');
+            if (el) {
+              el.style.backgroundColor = bg;
+              el.style.color = fg;
+            }
           } else if (method === 'focus') {
+
             try { editor.focus(); } catch (ignored) {}
           } else if (method === 'blur') {
             try {
