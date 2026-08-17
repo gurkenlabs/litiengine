@@ -64,14 +64,20 @@ public final class ScriptOverviewPanel extends JPanel {
     this.setBackground(Style.background());
     this.content.setLayout(new BoxLayout(this.content, BoxLayout.Y_AXIS));
     this.content.setOpaque(false);
-    this.content.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
+    this.content.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+
 
     // --- EXPOSED FIELDS SECTION ---
     JPanel fieldsHeader = createSectionHeader(createSectionTitleLabel("EXPOSED FIELDS"));
     this.fieldsListPanel.setLayout(new BoxLayout(this.fieldsListPanel, BoxLayout.Y_AXIS));
     this.fieldsListPanel.setOpaque(false);
 
-    JPanel fieldsSection = new JPanel(new BorderLayout(0, 2));
+    JPanel fieldsSection = new JPanel(new BorderLayout(0, 2)) {
+      @Override
+      public Dimension getMaximumSize() {
+        return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+      }
+    };
     fieldsSection.setOpaque(false);
     fieldsSection.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
@@ -85,7 +91,12 @@ public final class ScriptOverviewPanel extends JPanel {
     this.methodsListPanel.setLayout(new BoxLayout(this.methodsListPanel, BoxLayout.Y_AXIS));
     this.methodsListPanel.setOpaque(false);
 
-    JPanel methodsSection = new JPanel(new BorderLayout(0, 2));
+    JPanel methodsSection = new JPanel(new BorderLayout(0, 2)) {
+      @Override
+      public Dimension getMaximumSize() {
+        return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+      }
+    };
     methodsSection.setOpaque(false);
     methodsSection.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
@@ -101,7 +112,12 @@ public final class ScriptOverviewPanel extends JPanel {
     this.usagesListPanel.setLayout(new BoxLayout(this.usagesListPanel, BoxLayout.Y_AXIS));
     this.usagesListPanel.setOpaque(false);
 
-    JPanel usagesSection = new JPanel(new BorderLayout(0, 2));
+    JPanel usagesSection = new JPanel(new BorderLayout(0, 2)) {
+      @Override
+      public Dimension getMaximumSize() {
+        return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+      }
+    };
     usagesSection.setOpaque(false);
     usagesSection.setBorder(BorderFactory.createEmptyBorder(6, 0, 8, 0));
     usagesSection.add(usagesHeader, BorderLayout.NORTH);
@@ -109,6 +125,7 @@ public final class ScriptOverviewPanel extends JPanel {
     this.content.add(usagesSection);
 
     this.content.add(Box.createVerticalGlue());
+
 
     JScrollPane scroll = new JScrollPane(this.content);
     scroll.setBorder(BorderFactory.createEmptyBorder());

@@ -14,6 +14,9 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -32,18 +35,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+
 
 /** Reverse-reference view for the assignments of the script currently open in the editor. */
 final class ScriptUsagesPanel extends JPanel {
   private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Used in");
   private final DefaultTreeModel model = new DefaultTreeModel(this.root);
-  private final JTree usages = UI.createStyledTree(this.model);
+  private final StyledTree usages = new StyledTree(this.model);
   private final JLabel count = new JLabel("No uses");
   private final JButton toggle = new JButton(Icons.SCROLL_RIGHT_16);
   private final JPanel header = new JPanel(new BorderLayout(10, 0));
-  private final JScrollPane scroll = new JScrollPane(this.usages);
+  private final JScrollPane scroll = StyledTree.createScrollPane(this.usages);
   private final Consumer<ScriptBindingService.ScriptUsage> navigation;
   private final Consumer<Boolean> expansionListener;
   private ScriptDefinition definition;
@@ -58,24 +62,19 @@ final class ScriptUsagesPanel extends JPanel {
     this.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()));
 
     this.header.setBackground(Style.background());
-    this.header.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
+    this.header.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
     this.header.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    this.header.setToolTipText("Show or hide script usages");
 
-    JPanel title = new JPanel(new BorderLayout(7, 0));
-    title.setOpaque(false);
-    this.toggle.setBorder(BorderFactory.createEmptyBorder());
+    this.toggle.setBorder(null);
     this.toggle.setContentAreaFilled(false);
     this.toggle.setFocusable(false);
-    this.toggle.setPreferredSize(new Dimension(20, 20));
-    this.toggle.setToolTipText("Show or hide script usages");
-    this.toggle.addActionListener(event -> this.setExpanded(!this.expanded));
-    JLabel heading = new JLabel("Used in");
-    heading.setFont(heading.getFont().deriveFont(Font.BOLD, 11f));
-    heading.setForeground(Style.text());
-    title.add(this.toggle, BorderLayout.WEST);
-    title.add(heading, BorderLayout.CENTER);
-    this.header.add(title, BorderLayout.WEST);
+    this.toggle.addActionListener(e -> setExpanded(!expanded));
+    this.header.add(this.toggle, BorderLayout.WEST);
+
+    JLabel title = new JLabel("Used In");
+    title.setFont(Style.getDefaultFont().deriveFont(11.5f));
+    title.setForeground(Style.text());
+    this.header.add(title, BorderLayout.CENTER);
 
     this.count.setFont(this.count.getFont().deriveFont(11f));
     this.count.setForeground(Style.mutedText());
@@ -88,13 +87,6 @@ final class ScriptUsagesPanel extends JPanel {
     });
     this.add(this.header, BorderLayout.NORTH);
 
-    this.usages.setRootVisible(false);
-    this.usages.setShowsRootHandles(true);
-    this.usages.setRowHeight(Style.TREE_ROW_HEIGHT);
-    this.usages.setBackground(Style.background());
-    this.usages.setOpaque(false);
-    this.usages.setBorder(BorderFactory.createEmptyBorder(5, 18, 8, 12));
-    this.usages.putClientProperty("JTree.lineStyle", "None");
     this.usages.setCellRenderer(new UsageRenderer());
     this.usages.addMouseListener(new MouseAdapter() {
       @Override
@@ -105,9 +97,11 @@ final class ScriptUsagesPanel extends JPanel {
     this.usages.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent event) {
+
         if (event.getKeyCode() == KeyEvent.VK_ENTER) navigateSelectedUsage();
       }
     });
+
     this.scroll.setBorder(null);
     this.scroll.getViewport().setBackground(Style.background());
     this.add(this.scroll, BorderLayout.CENTER);
@@ -257,17 +251,61 @@ final class ScriptUsagesPanel extends JPanel {
     }
   }
 
-  private static final class UsageRenderer extends DefaultTreeCellRenderer {
+  private final class UsageRenderer extends JPanel implements TreeCellRenderer {
+    private final JLabel iconLabel = new JLabel();
+    private final JLabel nameLabel = new JLabel();
+
+    UsageRenderer() {
+
+      super(new BorderLayout(6, 0));
+      this.setOpaque(false);
+      this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
+
+      JPanel left = new JPanel();
+      left.setLayout(new javax.swing.BoxLayout(left, javax.swing.BoxLayout.X_AXIS));
+      left.setOpaque(false);
+
+      this.iconLabel.setOpaque(false);
+      this.iconLabel.setHorizontalAlignment(JLabel.CENTER);
+      this.iconLabel.setPreferredSize(new Dimension(18, 18));
+      this.nameLabel.setOpaque(false);
+
+      this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.nameLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.nameLabel.setFont(Style.getDefaultFont().deriveFont(11.5f));
+
+      left.add(this.iconLabel);
+      left.add(javax.swing.Box.createHorizontalStrut(6));
+      left.add(this.nameLabel);
+
+      this.add(left, BorderLayout.CENTER);
+    }
+
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
                                                    boolean leaf, int row, boolean focused) {
-      super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, focused);
-      if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof UsageNode usage) {
-        this.setText(usage.label());
-        this.setIcon(usage.icon());
+      DefaultMutableTreeNode node = value instanceof DefaultMutableTreeNode n ? n : null;
+      Object userObj = node != null ? node.getUserObject() : null;
+
+      if (userObj instanceof UsageNode usage) {
+        this.nameLabel.setText(usage.label());
+        this.iconLabel.setIcon(usage.icon());
+      } else {
+        this.nameLabel.setText(Objects.toString(value, ""));
+        this.iconLabel.setIcon(null);
       }
-      this.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+
+      this.nameLabel.setForeground(Style.text());
+
+      int level = node != null ? Math.max(0, node.getLevel() - 1) : 0;
+      int depthInset = level * 16;
+      int width = Math.max(100, tree.getWidth() - 20 - depthInset);
+      int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : (int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale());
+      this.setPreferredSize(new Dimension(width, rowHeight));
+
       return this;
     }
   }
 }
+
+

@@ -109,12 +109,13 @@ public final class ScriptWorkspacePanel extends JPanel {
   static final String DEFAULT_SCRIPT_NAME = "NewScript";
   private final DefaultMutableTreeNode scriptsRoot = new DefaultMutableTreeNode("Scripts");
   private final DefaultTreeModel scriptsModel = new DefaultTreeModel(this.scriptsRoot);
-  private final JTree scripts = UI.createStyledTree(this.scriptsModel);
+  private final StyledTree scripts = new StyledTree(this.scriptsModel);
   private final JTextField search = createSearchTextField("Search scripts...");
   private final DefaultMutableTreeNode globalsRoot = new DefaultMutableTreeNode("Globals & APIs");
   private final DefaultTreeModel globalsTreeModel = new DefaultTreeModel(this.globalsRoot);
-  private final JTree globalsTree = UI.createStyledTree(this.globalsTreeModel);
+  private final StyledTree globalsTree = new StyledTree(this.globalsTreeModel);
   private final JTextField globalsSearch = createSearchTextField("Search APIs & events...");
+
   private final JTabbedPane tabs = new JTabbedPane() {
     @Override
     public Dimension getPreferredSize() {
@@ -216,6 +217,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     SwingUtilities.invokeLater(this::refreshActiveUsages);
 
   public ScriptWorkspacePanel() {
+
+
     super(new BorderLayout());
     this.setBackground(Style.background());
     this.add(this.createConflictBar(), BorderLayout.NORTH);
@@ -229,16 +232,17 @@ public final class ScriptWorkspacePanel extends JPanel {
     sidebarTabs.putClientProperty("JTabbedPane.noContentBorder", Boolean.TRUE);
     sidebarTabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);
     sidebarTabs.putClientProperty("JTabbedPane.contentInsets", new java.awt.Insets(0, 0, 0, 0));
-    sidebarTabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 0, 0, 0));
+    sidebarTabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 4, 0, 4));
     sidebarTabs.putClientProperty("JTabbedPane.tabType", "underlined");
     sidebarTabs.putClientProperty("JTabbedPane.showTabSeparators", Boolean.TRUE);
     sidebarTabs.putClientProperty("JTabbedPane.tabHeight", 28);
-    sidebarTabs.putClientProperty("JTabbedPane.tabInsets", new java.awt.Insets(2, 10, 2, 10));
+    sidebarTabs.putClientProperty("JTabbedPane.tabInsets", new java.awt.Insets(2, 8, 2, 8));
     sidebarTabs.putClientProperty("JTabbedPane.underlineColor", Style.accent());
     sidebarTabs.putClientProperty("JTabbedPane.underlineHeight", 2);
     sidebarTabs.putClientProperty("JTabbedPane.selectedBackground", Style.surface());
     sidebarTabs.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
     sidebarTabs.setBackground(Style.background());
+
     sidebarTabs.addTab("Current Script", Icons.SYMBOL_GROUP_16, this.overviewPanel);
     sidebarTabs.addTab("Game API", Icons.API_16, this.createGlobalsPanel());
 
@@ -1296,8 +1300,8 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private JPanel createScriptExplorer() {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
-    panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
-    panel.setBackground(Style.background());
+    panel.setOpaque(false);
+    panel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
     RoundedSearchBox searchBox = new RoundedSearchBox(this.search, 0);
     searchBox.getClearButton().addActionListener(e -> {
@@ -1306,12 +1310,6 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
     panel.add(searchBox, BorderLayout.NORTH);
 
-    this.scripts.setRootVisible(false);
-    this.scripts.setShowsRootHandles(true);
-    this.scripts.setRowHeight(Style.TREE_ROW_HEIGHT);
-    this.scripts.setBackground(Style.background());
-    this.scripts.setOpaque(false);
-    this.scripts.putClientProperty("JTree.lineStyle", "None");
     this.scripts.setCellRenderer(new ScriptTreeRenderer());
     this.scripts.addTreeSelectionListener(event -> {
       ScriptDefinition definition = this.selectedDefinition();
@@ -1329,14 +1327,14 @@ public final class ScriptWorkspacePanel extends JPanel {
       JComponent.WHEN_FOCUSED
     );
 
-    panel.add(createBorderlessScrollPane(this.scripts), BorderLayout.CENTER);
+    panel.add(StyledTree.createScrollPane(this.scripts), BorderLayout.CENTER);
     return panel;
   }
 
   private JPanel createGlobalsPanel() {
     JPanel panel = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
-    panel.setBackground(Style.COLOR_BG);
-    panel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
+    panel.setOpaque(false);
+    panel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
     JPanel searchRow = new JPanel(new BorderLayout(4, 0));
     searchRow.setOpaque(false);
@@ -1355,17 +1353,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     panel.add(searchRow, BorderLayout.NORTH);
 
-    JPanel content = new JPanel(new BorderLayout(0, Style.SPACE_SMALL));
-    content.setBackground(Style.COLOR_BG);
-
-    this.globalsTree.setRootVisible(false);
-    this.globalsTree.setShowsRootHandles(true);
-    this.globalsTree.setRowHeight(Style.TREE_ROW_HEIGHT);
-    this.globalsTree.setBackground(Style.background());
-    this.globalsTree.setOpaque(false);
-    this.globalsTree.putClientProperty("JTree.lineStyle", "None");
     this.globalsTree.setCellRenderer(new GlobalApiTreeRenderer());
-
     this.globalsTree.addMouseListener(new java.awt.event.MouseAdapter() {
       @Override public void mouseClicked(java.awt.event.MouseEvent event) {
         if (event.getClickCount() == 2) {
@@ -1387,10 +1375,10 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     this.refreshGlobals();
 
-    content.add(createBorderlessScrollPane(this.globalsTree), BorderLayout.CENTER);
-    panel.add(content, BorderLayout.CENTER);
+    panel.add(StyledTree.createScrollPane(this.globalsTree), BorderLayout.CENTER);
     return panel;
   }
+
 
   private ScriptHostType getActiveHostType() {
     ScriptTab active = this.activeTab();
@@ -1601,10 +1589,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     scroll.setBorder(BorderFactory.createEmptyBorder());
     scroll.setViewportBorder(null);
     scroll.setOpaque(false);
-    scroll.getViewport().setOpaque(false);
+    scroll.getViewport().setOpaque(true);
     scroll.getViewport().setBackground(Style.background());
     return scroll;
   }
+
 
   public void insertTextToActiveScript(String text) {
     if (this.monaco != null && this.monaco.isReady() && text != null && !text.isEmpty()) {
@@ -2084,7 +2073,11 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private void showAnalysis(de.gurkenlabs.litiengine.scripting.ScriptLanguageService.Analysis analysis) {
     if (this.monacoTab != null && this.monacoTab.definition != null) {
-      this.projectDiagnostics.put(this.monacoTab.definition.getId(), new ArrayList<>(analysis.diagnostics()));
+      String scriptId = this.monacoTab.definition.getId();
+      this.projectDiagnostics.put(scriptId, new ArrayList<>(analysis.diagnostics()));
+      if (analysis.diagnostics().isEmpty()) {
+        Game.scripts().clearDiagnostics(scriptId);
+      }
     }
     refreshProblemsTable();
   }
@@ -2113,6 +2106,12 @@ public final class ScriptWorkspacePanel extends JPanel {
         }
       }
       if (diag.scriptId() != null) {
+        if (this.projectDiagnostics.containsKey(diag.scriptId())) {
+          List<ScriptDiagnostic> currentList = this.projectDiagnostics.get(diag.scriptId());
+          if (currentList != null && currentList.isEmpty() && diag.line() <= 0) {
+            continue;
+          }
+        }
         List<ScriptDiagnostic> list = allDiagnostics.computeIfAbsent(diag.scriptId(), k -> new ArrayList<>());
         boolean exists = list.stream().anyMatch(d -> Objects.equals(d.message(), diag.message()) && d.line() == diag.line());
         if (!exists) {
@@ -2120,6 +2119,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         }
       }
     }
+
 
     int totalCount = 0;
     int errorCount = 0;
@@ -3061,68 +3061,94 @@ public final class ScriptWorkspacePanel extends JPanel {
     @Override public String toString() { return this.label; }
   }
 
-  private final class ScriptTreeRenderer implements TreeCellRenderer {
-    private final JPanel panel = new JPanel();
+  private final class ScriptTreeRenderer extends JPanel implements TreeCellRenderer {
     private final JLabel iconLabel = new JLabel();
-    private final JLabel textLabel = new JLabel();
+    private final JLabel nameLabel = new JLabel();
     private final JLabel usageLabel = new UsageBadge();
+    ScriptTreeRenderer() {
+      super(new BorderLayout(6, 0));
+      this.setOpaque(false);
+      this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
 
-    ScriptTreeRenderer() {
-      this.panel.setLayout(new javax.swing.BoxLayout(this.panel, javax.swing.BoxLayout.X_AXIS));
-      this.panel.setOpaque(false);
+      JPanel left = new JPanel();
+      left.setLayout(new javax.swing.BoxLayout(left, javax.swing.BoxLayout.X_AXIS));
+      left.setOpaque(false);
+
       this.iconLabel.setOpaque(false);
-      this.textLabel.setOpaque(false);
+      this.iconLabel.setHorizontalAlignment(JLabel.CENTER);
+      this.iconLabel.setPreferredSize(new Dimension(18, 18));
+      this.nameLabel.setOpaque(false);
+      this.usageLabel.setOpaque(false);
+
       this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-      this.textLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      this.nameLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.usageLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-      this.textLabel.setFont(Style.getDefaultFont());
-      this.panel.add(this.iconLabel);
-      this.panel.add(javax.swing.Box.createHorizontalStrut(4));
-      this.panel.add(this.textLabel);
-      this.panel.add(javax.swing.Box.createHorizontalStrut(6));
-      this.panel.add(this.usageLabel);
+
+      this.nameLabel.setFont(Style.getDefaultFont());
+
+      left.add(this.iconLabel);
+      left.add(javax.swing.Box.createHorizontalStrut(6));
+      left.add(this.nameLabel);
+      left.add(javax.swing.Box.createHorizontalStrut(6));
+      left.add(this.usageLabel);
+
+      this.add(left, BorderLayout.CENTER);
     }
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
                                                    boolean leaf, int row, boolean focused) {
-      if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
-        this.textLabel.setText(item.label());
+      DefaultMutableTreeNode node = value instanceof DefaultMutableTreeNode n ? n : null;
+      Object userObj = node != null ? node.getUserObject() : null;
+
+      if (userObj instanceof ScriptTreeItem item) {
+        this.nameLabel.setText(item.label());
         javax.swing.Icon icon;
         if (item.definition() != null) {
           icon = Icons.SCRIPT_16;
           int usages = scriptUsageCounts.getOrDefault(item.definition().getId(), 0);
           this.usageLabel.setText(usages == 1 ? "1 use" : usages + " uses");
           this.usageLabel.setVisible(usages > 0);
-          this.panel.setToolTipText(usages > 0
+          this.setToolTipText(usages > 0
             ? usages + (usages == 1 ? " script use" : " script uses") : null);
+          this.nameLabel.setFont(tree.getFont().deriveFont(Font.PLAIN));
         } else if ("Project Sources".equals(item.label())) {
-          icon = Icons.FOLDER_OPEN_16;
+          icon = expanded ? Icons.FOLDER_OPEN_16 : Icons.GROUP_16;
           this.usageLabel.setVisible(false);
-          this.panel.setToolTipText(null);
+          this.setToolTipText(null);
+          this.nameLabel.setFont(tree.getFont().deriveFont(Font.BOLD));
         } else {
           icon = Icons.PACKAGE_16;
           this.usageLabel.setVisible(false);
-          this.panel.setToolTipText(null);
+          this.setToolTipText(null);
+          this.nameLabel.setFont(tree.getFont().deriveFont(Font.PLAIN));
         }
+
         this.iconLabel.setIcon(icon);
-        this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
       } else {
-        this.textLabel.setText(Objects.toString(value, ""));
+        this.nameLabel.setText(Objects.toString(value, ""));
         this.iconLabel.setIcon(null);
         this.usageLabel.setVisible(false);
-        this.panel.setToolTipText(null);
-        this.textLabel.setForeground(selected ? Color.WHITE : Style.text());
+        this.setToolTipText(null);
+        this.nameLabel.setFont(tree.getFont().deriveFont(Font.PLAIN));
       }
-      this.usageLabel.setForeground(selected ? Color.WHITE : Style.text());
-      this.panel.setOpaque(false);
-      return this.panel;
+
+      this.nameLabel.setForeground(Style.text());
+
+      int level = node != null ? Math.max(0, node.getLevel() - 1) : 0;
+      int depthInset = level * 16;
+      int width = Math.max(100, tree.getWidth() - 20 - depthInset);
+      int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : (int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale());
+      this.setOpaque(false);
+      return this;
     }
   }
 
   private static final class UsageBadge extends JLabel {
     private UsageBadge() {
       this.setOpaque(false);
+      this.setForeground(Style.mutedText());
+      this.setFont(Style.getDefaultFont().deriveFont(10.5f));
       this.setBorder(BorderFactory.createEmptyBorder(1, 6, 1, 6));
     }
 
@@ -3131,7 +3157,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       Graphics2D g = (Graphics2D) graphics.create();
       try {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setColor(Style.selection());
+        g.setColor(Style.surface());
         g.fillRoundRect(0, 2, this.getWidth(), Math.max(0, this.getHeight() - 4), 10, 10);
       } finally {
         g.dispose();
@@ -3140,74 +3166,95 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
   }
 
-  private static final class GlobalApiTreeRenderer implements TreeCellRenderer {
-    private final JPanel panel = new JPanel();
+  private final class GlobalApiTreeRenderer extends JPanel implements TreeCellRenderer {
     private final JLabel iconLabel = new JLabel();
     private final JLabel nameLabel = new JLabel();
     private final JLabel detailLabel = new JLabel();
 
     GlobalApiTreeRenderer() {
-      this.panel.setLayout(new javax.swing.BoxLayout(this.panel, javax.swing.BoxLayout.X_AXIS));
-      this.panel.setOpaque(false);
+      super(new BorderLayout(6, 0));
+      this.setOpaque(false);
+      this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
+
+      JPanel left = new JPanel();
+      left.setLayout(new javax.swing.BoxLayout(left, javax.swing.BoxLayout.X_AXIS));
+      left.setOpaque(false);
+
+
       this.iconLabel.setOpaque(false);
+      this.iconLabel.setHorizontalAlignment(JLabel.CENTER);
+      this.iconLabel.setPreferredSize(new Dimension(18, 18));
       this.nameLabel.setOpaque(false);
       this.detailLabel.setOpaque(false);
+
       this.iconLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.nameLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       this.detailLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-      this.panel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 4));
-      this.panel.add(this.iconLabel);
-      this.panel.add(javax.swing.Box.createHorizontalStrut(5));
-      this.panel.add(this.nameLabel);
-      this.panel.add(javax.swing.Box.createHorizontalStrut(6));
-      this.panel.add(this.detailLabel);
+
+      left.add(this.iconLabel);
+      left.add(javax.swing.Box.createHorizontalStrut(6));
+      left.add(this.nameLabel);
+      left.add(javax.swing.Box.createHorizontalStrut(6));
+      left.add(this.detailLabel);
+
+      this.add(left, BorderLayout.CENTER);
     }
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
                                                    boolean leaf, int row, boolean focused) {
-      if (value instanceof DefaultMutableTreeNode node) {
-        Object userObj = node.getUserObject();
-        if (userObj instanceof GlobalApiItem item) {
-          this.iconLabel.setIcon(switch (item.badge()) {
-            case "h" -> Icons.SYMBOL_CLASS_16;
-            case "e" -> Icons.SYMBOL_DEPENDENCY_16;
-            case "c", "g" -> Icons.SYMBOL_FIELD_16;
-            case "m", "hook", "a", "p" -> Icons.SYMBOL_METHOD_16;
-            case "q" -> Icons.SEARCH_16;
-            case "u" -> Icons.DOCUMENTATION_16;
-            case "creature" -> Icons.CREATURE_16;
-            case "prop" -> Icons.PROP_16;
-            case "trigger" -> Icons.TRIGGER_16;
-            case "emitter" -> Icons.EMITTER_16;
-            default -> Icons.API_16;
-          });
+      DefaultMutableTreeNode node = value instanceof DefaultMutableTreeNode n ? n : null;
+      Object userObj = node != null ? node.getUserObject() : null;
 
-          this.nameLabel.setText(item.label());
-          this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.PLAIN, 11.5f));
-          this.nameLabel.setForeground(selected ? Color.WHITE : Style.COLOR_TEXT);
+      if (userObj instanceof GlobalApiItem item) {
+        this.iconLabel.setIcon(switch (item.badge()) {
+          case "h" -> Icons.SYMBOL_CLASS_16;
+          case "e" -> Icons.SYMBOL_DEPENDENCY_16;
+          case "c", "g" -> Icons.SYMBOL_FIELD_16;
+          case "m", "hook", "a", "p" -> Icons.SYMBOL_METHOD_16;
+          case "q" -> Icons.SEARCH_16;
+          case "u" -> Icons.DOCUMENTATION_16;
+          case "creature" -> Icons.CREATURE_16;
+          case "prop" -> Icons.PROP_16;
+          case "trigger" -> Icons.TRIGGER_16;
+          case "emitter" -> Icons.EMITTER_16;
+          default -> Icons.API_16;
+        });
 
-          this.detailLabel.setText(item.description());
-          this.detailLabel.setFont(Style.getDefaultFont().deriveFont(10.5f));
-          this.detailLabel.setForeground(selected ? new Color(200, 210, 240) : Style.COLOR_SUBTEXT);
-          this.detailLabel.setVisible(true);
+        this.nameLabel.setText(item.label());
+        this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.PLAIN, 11.5f));
+        this.nameLabel.setForeground(Style.text());
 
-          this.panel.setToolTipText("<html><b>" + item.label() + "</b>: " + item.description() + "<br><code>" + item.snippet().replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>") + "</code><br><i>Double-click to insert</i></html>");
-        } else {
-          // Group Category Node
-          this.iconLabel.setIcon(expanded ? Icons.FOLDER_OPEN_16 : Icons.GROUP_16);
-          this.nameLabel.setText(Objects.toString(userObj, ""));
-          this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
-          this.nameLabel.setForeground(selected ? Color.WHITE : Style.COLOR_SUBTEXT);
-          this.detailLabel.setText("");
-          this.detailLabel.setVisible(false);
-          this.panel.setToolTipText(null);
-        }
+        this.detailLabel.setText(item.description());
+        this.detailLabel.setFont(Style.getDefaultFont().deriveFont(10.5f));
+        this.detailLabel.setForeground(Style.mutedText());
+        this.detailLabel.setVisible(true);
+
+        this.setToolTipText("<html><b>" + item.label() + "</b>: " + item.description() + "<br><code>" + item.snippet().replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>") + "</code><br><i>Double-click to insert</i></html>");
+      } else {
+        this.iconLabel.setIcon(expanded ? Icons.FOLDER_OPEN_16 : Icons.GROUP_16);
+        this.nameLabel.setText(Objects.toString(userObj, ""));
+
+        this.nameLabel.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
+        this.nameLabel.setForeground(Style.mutedText());
+        this.detailLabel.setText("");
+        this.detailLabel.setVisible(false);
+        this.setToolTipText(null);
       }
-      this.panel.setOpaque(false);
-      return this.panel;
+
+      int level = node != null ? Math.max(0, node.getLevel() - 1) : 0;
+      int depthInset = level * 16;
+      int width = Math.max(100, tree.getWidth() - 20 - depthInset);
+      int rowHeight = tree.getRowHeight() > 0 ? tree.getRowHeight() : (int) (Style.TREE_ROW_HEIGHT * Editor.preferences().getUiScale());
+      this.setPreferredSize(new Dimension(width, rowHeight));
+      this.setOpaque(false);
+
+      return this;
     }
   }
+
+
+
 
   private static final class ProblemSeverityRenderer extends javax.swing.table.DefaultTableCellRenderer {
     @Override
