@@ -17,6 +17,13 @@ public final class ControlBehavior {
   private ControlBehavior() {}
 
   public static <T extends Component> T apply(T component) {
+    if (component instanceof javax.swing.AbstractButton button && (button instanceof javax.swing.JCheckBox || button instanceof javax.swing.JRadioButton)) {
+      button.setMargin(new java.awt.Insets(0, 0, 0, 0));
+      button.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+      button.setOpaque(false);
+      return component;
+    }
+
     if (component instanceof javax.swing.text.JTextComponent jText) {
       applyRoundedControlShape(jText);
       jText.setCaretColor(Style.accent());

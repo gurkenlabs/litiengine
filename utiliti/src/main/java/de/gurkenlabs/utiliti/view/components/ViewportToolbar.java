@@ -108,13 +108,12 @@ public class ViewportToolbar extends JPanel {
     super(new BorderLayout());
     setOpaque(true);
     setBackground(Style.background());
-    setBorder(BorderFactory.createEmptyBorder(0, 0, TOOLBAR_VERTICAL_PADDING, 0));
+    setBorder(BorderFactory.createEmptyBorder(Style.SPACE_SMALL, 0, Style.SPACE_SMALL, 0));
 
     JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
     left.setOpaque(false);
 
-    JPanel right = new JPanel();
-    right.setLayout(new BoxLayout(right, BoxLayout.X_AXIS));
+    JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, Style.SPACE_MEDIUM, 0));
     right.setOpaque(false);
 
     mapSelector.setPreferredSize(new Dimension(232, Style.CONTROL_HEIGHT));
@@ -315,9 +314,7 @@ public class ViewportToolbar extends JPanel {
         Resources.strings().get("toolbar_fit"));
     this.zoomControls.setZoomText(formatZoom());
     right.add(viewControls);
-    right.add(Box.createRigidArea(new Dimension(Style.SPACE_MEDIUM, 0)));
     right.add(this.zoomControls);
-    right.add(Box.createRigidArea(new Dimension(Style.SPACE_MEDIUM, 0)));
     this.rightControlsContainer = right;
 
     add(left, BorderLayout.WEST);

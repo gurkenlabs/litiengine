@@ -22,7 +22,7 @@ final class TilesetTabsPanel extends JPanel {
   private List<ITileset> boundTilesets = List.of();
 
   TilesetTabsPanel() {
-    super(new BorderLayout(0, 6));
+    super(new BorderLayout(0, 0));
     setOpaque(true);
     setBackground(Style.background());
     setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));

@@ -46,6 +46,18 @@ public class ExpandableCard extends JPanel {
 
     this.headerPanel = new JPanel(new BorderLayout()) {
       @Override
+      public Dimension getPreferredSize() {
+        Dimension pref = super.getPreferredSize();
+        return new Dimension(pref.width, Math.max(pref.height, 36));
+      }
+
+      @Override
+      public Dimension getMinimumSize() {
+        Dimension min = super.getMinimumSize();
+        return new Dimension(min.width, Math.max(min.height, 36));
+      }
+
+      @Override
       protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -65,7 +77,7 @@ public class ExpandableCard extends JPanel {
       }
     };
     headerPanel.setOpaque(false);
-    headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+    headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
     headerPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     headerPanel.setFocusable(true);
     headerPanel.getAccessibleContext().setAccessibleName(title);
@@ -185,7 +197,7 @@ public class ExpandableCard extends JPanel {
   }
 
   public void setInspectorContentInsets() {
-    setContentInsets(Style.SPACE_MEDIUM, 0, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM);
+    setContentInsets(4, Style.SPACE_MEDIUM, 4, Style.SPACE_MEDIUM);
   }
 
   public void setTitle(String title) {

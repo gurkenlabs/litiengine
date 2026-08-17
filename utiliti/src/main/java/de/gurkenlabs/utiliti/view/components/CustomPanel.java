@@ -7,16 +7,18 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Style;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -34,6 +36,10 @@ public class CustomPanel extends PropertyPanel {
     super("panel_customProperties");
 
     this.scrollPane = new JScrollPane();
+    this.scrollPane.setPreferredSize(new Dimension(0, 96));
+    this.scrollPane.setBorder(BorderFactory.createLineBorder(Style.border()));
+    this.scrollPane.getViewport().setBackground(Style.surface());
+    this.scrollPane.getVerticalScrollBar().setUnitIncrement(24);
 
     JButton buttonAdd = Style.textButton("+");
     buttonAdd.addActionListener(
@@ -61,32 +67,10 @@ public class CustomPanel extends PropertyPanel {
           tableCustomProperties.revalidate();
         });
 
-    GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-        groupLayout
-            .createSequentialGroup()
-            .addGap(PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH)
-            .addGroup(
-                groupLayout
-                    .createParallelGroup(Alignment.LEADING)
-                    .addComponent(scrollPane, PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Integer.MAX_VALUE)
-                    .addGroup(
-                        groupLayout
-                            .createSequentialGroup()
-                            .addComponent(buttonAdd)
-                            .addGap(6)
-                            .addComponent(buttonRemove))));
-    groupLayout.setVerticalGroup(
-        groupLayout
-            .createSequentialGroup()
-            .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
-            .addGap(6)
-            .addGroup(
-                groupLayout
-                    .createParallelGroup(Alignment.CENTER)
-                    .addComponent(buttonAdd)
-                    .addComponent(buttonRemove))
-            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+    JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+    buttonRow.setOpaque(false);
+    buttonRow.add(buttonAdd);
+    buttonRow.add(buttonRemove);
 
     this.tableCustomProperties = new JTable() {
       private static final String EMPTY_TEXT = Resources.strings().get("panel_noPropertiesDefined");
@@ -107,7 +91,7 @@ public class CustomPanel extends PropertyPanel {
     this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.tableCustomProperties.setShowHorizontalLines(true);
     this.tableCustomProperties.setShowVerticalLines(false);
-    this.tableCustomProperties.setGridColor(Style.COLOR_BORDER);
+    this.tableCustomProperties.setGridColor(Style.border());
     this.tableCustomProperties.setIntercellSpacing(new Dimension(0, 1));
     this.scrollPane.setViewportView(tableCustomProperties);
     this.tableCustomProperties.setModel(
@@ -134,7 +118,11 @@ public class CustomPanel extends PropertyPanel {
         (int) (this.tableCustomProperties.getRowHeight() * Editor.preferences().getUiScale()));
 
     this.model = (DefaultTableModel) this.tableCustomProperties.getModel();
-    setLayout(groupLayout);
+
+    setLayout(new BorderLayout(0, 4));
+    setOpaque(false);
+    add(this.scrollPane, BorderLayout.CENTER);
+    add(buttonRow, BorderLayout.SOUTH);
 
     this.setupChangedListeners();
   }

@@ -611,7 +611,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
     JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
     commands.setOpaque(true);
     commands.setBackground(Style.surface());
-    commands.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+    commands.setBorder(BorderFactory.createEmptyBorder(4, 4, 7, 4));
     commands.add(createAddLayerControl());
     commands.add(this.btnRaiseLayer);
     commands.add(this.btnLowerLayer);

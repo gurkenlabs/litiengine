@@ -103,10 +103,10 @@ public class TilesetEditorPanel extends JPanel {
   private boolean binding;
 
   public TilesetEditorPanel() {
-    super(new BorderLayout(0, 8));
+    super(new BorderLayout(0, 4));
     setOpaque(true);
     setBackground(Style.background());
-    setBorder(BorderFactory.createEmptyBorder(8, 8, 10, 8));
+    setBorder(BorderFactory.createEmptyBorder(4, 6, 6, 6));
 
     JPanel info = new JPanel();
     info.setOpaque(false);

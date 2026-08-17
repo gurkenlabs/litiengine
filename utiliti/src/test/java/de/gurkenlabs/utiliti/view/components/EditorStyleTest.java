@@ -150,7 +150,7 @@ class EditorStyleTest {
 
     card.setInspectorContentInsets();
 
-    assertEquals(0, content.getInsets().left);
+    assertEquals(Style.SPACE_MEDIUM, content.getInsets().left);
     assertEquals(Style.SPACE_MEDIUM, content.getInsets().right);
 
     card.setSize(160, 80);

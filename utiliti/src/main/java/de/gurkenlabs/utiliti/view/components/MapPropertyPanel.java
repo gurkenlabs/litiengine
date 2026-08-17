@@ -145,6 +145,7 @@ public class MapPropertyPanel extends JPanel {
     JScrollPane hostScrollPane = new JScrollPane(accordion);
     hostScrollPane.setBorder(null);
     hostScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    hostScrollPane.getVerticalScrollBar().setUnitIncrement(24);
     hostScrollPane.getViewport().setBackground(Style.background());
     add(hostScrollPane, BorderLayout.CENTER);
 
@@ -156,7 +157,7 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private JPanel createTilesetCommands() {
-    JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+    JPanel commands = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
     commands.setOpaque(false);
     this.tilesetTabs = new JTabbedPane();
     this.tilesetTabs.setTransferHandler(new TransferHandler() {
@@ -239,20 +240,19 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private JPanel createPropertiesPanel(JButton buttonAdd, JButton buttonRemove) {
-    int inset = PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH - 6;
-    JPanel panel = new JPanel();
+    JPanel panel = new JPanel(new BorderLayout(0, 4));
     panel.setOpaque(false);
-    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    panel.add(createAlignedControl(this.scrollPane, 150, inset));
-    panel.add(Box.createVerticalStrut(6));
+    this.scrollPane.setPreferredSize(new Dimension(0, 96));
+    this.scrollPane.setBorder(BorderFactory.createLineBorder(Style.border()));
+    this.scrollPane.getViewport().setBackground(Style.surface());
+    this.scrollPane.getVerticalScrollBar().setUnitIncrement(24);
+    panel.add(this.scrollPane, BorderLayout.CENTER);
+
     JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
     buttonRow.setOpaque(false);
     buttonRow.add(buttonAdd);
     buttonRow.add(buttonRemove);
-    JPanel buttonWrapper = new JPanel(new BorderLayout());
-    buttonWrapper.setOpaque(false);
-    buttonWrapper.add(buttonRow, BorderLayout.WEST);
-    panel.add(createAlignedControl(buttonWrapper, buttonRow.getPreferredSize().height, inset));
+    panel.add(buttonRow, BorderLayout.SOUTH);
     return panel;
   }
 

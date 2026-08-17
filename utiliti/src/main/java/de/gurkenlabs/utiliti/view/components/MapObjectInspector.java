@@ -228,6 +228,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JScrollPane scrollPane = new JScrollPane(accordion);
     scrollPane.setBorder(null);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.getVerticalScrollBar().setUnitIncrement(24);
     scrollPane.getViewport().setBackground(Style.background());
     add(scrollPane, BorderLayout.CENTER);
 

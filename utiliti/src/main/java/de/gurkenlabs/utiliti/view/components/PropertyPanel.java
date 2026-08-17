@@ -395,6 +395,7 @@ public abstract class PropertyPanel extends JPanel {
     if (property == null || property.isEmpty()) {
       return;
     }
+    ControlBehavior.apply(checkbox);
     checkbox.addActionListener(
       new MapObjectPropertyActionListener(m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
         m -> m.setValue(property, checkbox.isSelected())));

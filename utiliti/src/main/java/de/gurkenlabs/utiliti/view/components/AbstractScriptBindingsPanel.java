@@ -119,7 +119,7 @@ public abstract class AbstractScriptBindingsPanel<T> extends JPanel {
   private void initUI() {
     this.setLayout(new BorderLayout(0, Style.SPACE_SMALL));
     this.setOpaque(false);
-    this.setBorder(BorderFactory.createEmptyBorder(0, Style.SPACE_MEDIUM, 0, 0));
+    this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
     this.availableScripts.setRenderer((list, value, index, selected, focused) -> {
       JLabel label = new JLabel();
