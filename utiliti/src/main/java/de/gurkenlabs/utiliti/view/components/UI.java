@@ -1027,13 +1027,25 @@ public final class UI {
     if (shortcut == null || event == null) {
       return false;
     }
-    if (event.getKeyCode() != shortcut.getKeyCode()) {
+    if (event.getKeyCode() != shortcut.getKeyCode() && event.getExtendedKeyCode() != shortcut.getKeyCode()) {
       return false;
     }
-    int standardMask = InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK | InputEvent.META_DOWN_MASK;
-    int eventModifiers = event.getModifiersEx() & standardMask;
-    int shortcutModifiers = shortcut.getModifiers() & standardMask;
-    return eventModifiers == shortcutModifiers;
+    int shortcutMods = shortcut.getModifiers();
+    boolean shortcutCtrl = (shortcutMods & (InputEvent.CTRL_DOWN_MASK | InputEvent.CTRL_MASK)) != 0;
+    boolean shortcutAlt = (shortcutMods & (InputEvent.ALT_DOWN_MASK | InputEvent.ALT_MASK)) != 0;
+    boolean shortcutShift = (shortcutMods & (InputEvent.SHIFT_DOWN_MASK | InputEvent.SHIFT_MASK)) != 0;
+    boolean shortcutMeta = (shortcutMods & (InputEvent.META_DOWN_MASK | InputEvent.META_MASK)) != 0;
+
+    int eventMods = event.getModifiersEx();
+    boolean eventCtrl = (eventMods & InputEvent.CTRL_DOWN_MASK) != 0;
+    boolean eventAlt = (eventMods & InputEvent.ALT_DOWN_MASK) != 0;
+    boolean eventShift = (eventMods & InputEvent.SHIFT_DOWN_MASK) != 0;
+    boolean eventMeta = (eventMods & InputEvent.META_DOWN_MASK) != 0;
+
+    return shortcutCtrl == eventCtrl
+        && shortcutAlt == eventAlt
+        && shortcutShift == eventShift
+        && shortcutMeta == eventMeta;
   }
 
   private static String shortcutTooltip(String resourceKey, KeyStroke shortcut) {

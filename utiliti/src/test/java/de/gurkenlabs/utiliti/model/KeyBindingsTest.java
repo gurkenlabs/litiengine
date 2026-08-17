@@ -93,11 +93,12 @@ class KeyBindingsTest {
   void includesWorkspaceSwitchingDefaults() {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
 
-    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK),
+    int ctrlOrCmd = KeyBindings.platformModifiers(InputEvent.CTRL_DOWN_MASK, System.getProperty("os.name", ""));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, ctrlOrCmd),
         bindings.get(Command.SWITCH_WORKSPACE_MODE));
-    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_M, ctrlOrCmd | InputEvent.SHIFT_DOWN_MASK),
         bindings.get(Command.SWITCH_MAP_MODE));
-    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_S, ctrlOrCmd | InputEvent.SHIFT_DOWN_MASK),
         bindings.get(Command.SWITCH_SCRIPT_MODE));
   }
 }
