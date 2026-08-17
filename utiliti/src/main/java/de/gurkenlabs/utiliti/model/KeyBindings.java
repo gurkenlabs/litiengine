@@ -57,7 +57,10 @@ public final class KeyBindings {
     SCRIPT_RELOAD("menu_script_reload", KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK),
     RUN_PROJECT("menu_run_project", KeyEvent.VK_F10, InputEvent.SHIFT_DOWN_MASK),
     DEBUG_PROJECT("menu_debug_project", KeyEvent.VK_F9, InputEvent.SHIFT_DOWN_MASK),
-    STOP_PROJECT("menu_stop_project", KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK);
+    STOP_PROJECT("menu_stop_project", KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK),
+    SWITCH_WORKSPACE_MODE("keymap_switch_workspace_mode", KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK),
+    SWITCH_MAP_MODE("keymap_switch_map_mode", KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+    SWITCH_SCRIPT_MODE("keymap_switch_script_mode", KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
 
     private final String resourceKey;
     private final KeyStroke defaultKeyStroke;
@@ -69,11 +72,15 @@ public final class KeyBindings {
     }
 
     public enum CommandGroup {
+      GLOBAL,
       MAP,
       SCRIPT
     }
 
     public CommandGroup group() {
+      if (this == SWITCH_WORKSPACE_MODE || this == SWITCH_MAP_MODE || this == SWITCH_SCRIPT_MODE) {
+        return CommandGroup.GLOBAL;
+      }
       if (this.name().startsWith("SCRIPT_")) {
         return CommandGroup.SCRIPT;
       }

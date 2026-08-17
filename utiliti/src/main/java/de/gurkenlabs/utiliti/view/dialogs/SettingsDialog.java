@@ -1276,11 +1276,26 @@ public final class SettingsDialog extends JDialog {
         if (keyStroke == null) {
           continue;
         }
-        Map<KeyStroke, Command> used = groupUsed.get(command.group());
-        Command existing = used.putIfAbsent(keyStroke, command);
-        if (existing != null) {
-          return KeyBindings.format(keyStroke) + " (" + text(existing.resourceKey()) + ", "
-              + text(command.resourceKey()) + ")";
+        if (command.group() == KeyBindings.Command.CommandGroup.GLOBAL) {
+          for (KeyBindings.Command.CommandGroup group : KeyBindings.Command.CommandGroup.values()) {
+            Command existing = groupUsed.get(group).putIfAbsent(keyStroke, command);
+            if (existing != null && existing != command) {
+              return KeyBindings.format(keyStroke) + " (" + text(existing.resourceKey()) + ", "
+                  + text(command.resourceKey()) + ")";
+            }
+          }
+        } else {
+          Command existingGlobal = groupUsed.get(KeyBindings.Command.CommandGroup.GLOBAL).get(keyStroke);
+          if (existingGlobal != null && existingGlobal != command) {
+            return KeyBindings.format(keyStroke) + " (" + text(existingGlobal.resourceKey()) + ", "
+                + text(command.resourceKey()) + ")";
+          }
+          Map<KeyStroke, Command> used = groupUsed.get(command.group());
+          Command existing = used.putIfAbsent(keyStroke, command);
+          if (existing != null && existing != command) {
+            return KeyBindings.format(keyStroke) + " (" + text(existing.resourceKey()) + ", "
+                + text(command.resourceKey()) + ")";
+          }
         }
       }
       return null;

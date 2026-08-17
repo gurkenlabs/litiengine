@@ -149,6 +149,9 @@ public final class UI {
   private static JToggleButton workspaceScriptButton;
   private static KeyStroke inspectorBackShortcut;
   private static KeyStroke inspectorForwardShortcut;
+  private static KeyStroke switchWorkspaceModeShortcut;
+  private static KeyStroke switchMapModeShortcut;
+  private static KeyStroke switchScriptModeShortcut;
 
   private static boolean initialized;
 
@@ -490,6 +493,15 @@ public final class UI {
     return workspaceScriptButton != null && workspaceScriptButton.isSelected();
   }
 
+  /** Cycles between map editing and script workspace modes. */
+  public static void cycleWorkspaceMode() {
+    if (isScriptWorkspaceActive()) {
+      showMapWorkspace();
+    } else {
+      showScriptWorkspace();
+    }
+  }
+
   /** Switches the central area back to map editing. */
   public static void showMapWorkspace() {
     if (workspaceCards == null || workspaceHost == null) return;
@@ -677,6 +689,7 @@ public final class UI {
     tileLayerTilesetEditorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     ExpandableCard tileLayerTilesets = tileLayerPropertyPanel.addSection(
         Resources.strings().get("assettree_tilesets"), tileLayerTilesetEditorPanel, true);
+    tileLayerTilesets.setContentInsets(0, 0, 4, 0);
     tileLayerTilesets.setFillsAvailableHeight(true);
     tileLayerTilesets.setHeaderTrailing(tileLayerTilesetEditorPanel.getCommands());
     spriteEditorPanel = new SpriteEditorPanel();
@@ -689,6 +702,7 @@ public final class UI {
     javax.swing.JScrollPane tilesetInspectorScroll = new javax.swing.JScrollPane(tilesetEditorPanel);
     tilesetInspectorScroll.setBorder(null);
     tilesetInspectorScroll.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    tilesetInspectorScroll.getVerticalScrollBar().setUnitIncrement(24);
     tilesetInspectorScroll.getViewport().setBackground(Style.COLOR_BG);
     inspectorHost.add(tilesetInspectorScroll, "tilesets");
     inspectorHost.add(tileLayerPropertyPanel, "tileLayers");
@@ -794,10 +808,10 @@ public final class UI {
     rail.setBackground(Style.background());
     rail.setBorder(BorderFactory.createEmptyBorder(0, Style.SPACE_MEDIUM, 0, 0));
     workspaceMapButton = createWorkspaceModeButton(Icons.MAP_16);
-    workspaceMapButton.setToolTipText("Map editor");
+    workspaceMapButton.setToolTipText(shortcutTooltip("workspace_map", KeyBindings.get(KeyBindings.Command.SWITCH_MAP_MODE)));
     workspaceMapButton.addActionListener(event -> showMapWorkspace());
     workspaceScriptButton = createWorkspaceModeButton(Icons.SCRIPT_16);
-    workspaceScriptButton.setToolTipText("Script editor");
+    workspaceScriptButton.setToolTipText(shortcutTooltip("workspace_scripts", KeyBindings.get(KeyBindings.Command.SWITCH_SCRIPT_MODE)));
     workspaceScriptButton.addActionListener(event -> showScriptWorkspace());
     ButtonGroup modes = new ButtonGroup();
     modes.add(workspaceMapButton);
@@ -810,7 +824,63 @@ public final class UI {
   }
 
   private static JToggleButton createWorkspaceModeButton(Icon icon) {
-    JToggleButton button = Style.iconToggleButton(icon, false);
+    JToggleButton button = new JToggleButton(icon) {
+      @Override
+      protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          boolean selected = isSelected();
+          boolean rollover = getModel().isRollover();
+          boolean pressed = getModel().isPressed();
+          int w = getWidth();
+          int h = getHeight();
+          int arc = Style.CORNER_RADIUS * 2;
+
+          Color bg;
+          if (selected) {
+            bg = new Color(Style.accent().getRed(), Style.accent().getGreen(), Style.accent().getBlue(), 36);
+          } else if (pressed) {
+            bg = Style.selection();
+          } else if (rollover) {
+            bg = Style.hover();
+          } else {
+            bg = Style.surface();
+          }
+          g2.setColor(bg);
+          g2.fillRoundRect(0, 0, w, h, arc, arc);
+
+          g2.setColor(selected ? Style.accent() : Style.border());
+          g2.setStroke(new java.awt.BasicStroke(selected ? 1.5f : 1f));
+          g2.drawRoundRect(0, 0, w - 1, h - 1, arc, arc);
+
+          if (selected) {
+            g2.setColor(Style.accent());
+            int pillWidth = 3;
+            int pillHeight = h - 16;
+            int pillX = 3;
+            int pillY = (h - pillHeight) / 2;
+            g2.fillRoundRect(pillX, pillY, pillWidth, pillHeight, 2, 2);
+          }
+
+          Icon currentIcon = getIcon();
+          if (currentIcon != null) {
+            int iconX = (w - currentIcon.getIconWidth()) / 2;
+            int iconY = (h - currentIcon.getIconHeight()) / 2;
+            currentIcon.paintIcon(this, g2, iconX, iconY);
+          }
+        } finally {
+          g2.dispose();
+        }
+      }
+    };
+    button.setFocusable(false);
+    button.setOpaque(false);
+    button.setContentAreaFilled(false);
+    button.setBorderPainted(false);
+    button.setFocusPainted(false);
+    button.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+    button.putClientProperty("Editor.buttonVariant", Style.ButtonVariant.TOOLBAR);
     Dimension size = new Dimension(43, 42);
     button.setPreferredSize(size);
     button.setMinimumSize(size);
@@ -820,7 +890,42 @@ public final class UI {
   }
 
   private static void installInspectorNavigationShortcuts(JFrame window) {
+    // Unbind Ctrl+Tab from Focus Traversal Keys so it can be used for editor mode cycling
+    try {
+      java.awt.KeyboardFocusManager focusManager = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager();
+      java.util.Set<java.awt.AWTKeyStroke> forwardKeys = new java.util.HashSet<>(
+          focusManager.getDefaultFocusTraversalKeys(java.awt.KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+      forwardKeys.remove(java.awt.AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+      focusManager.setDefaultFocusTraversalKeys(
+          java.awt.KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, java.util.Collections.unmodifiableSet(forwardKeys));
+
+      java.util.Set<java.awt.AWTKeyStroke> backwardKeys = new java.util.HashSet<>(
+          focusManager.getDefaultFocusTraversalKeys(java.awt.KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+      backwardKeys.remove(java.awt.AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.SHIFT_DOWN_MASK));
+      focusManager.setDefaultFocusTraversalKeys(
+          java.awt.KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, java.util.Collections.unmodifiableSet(backwardKeys));
+    } catch (Exception ignored) {
+    }
+
     JComponent rootPane = window.getRootPane();
+    rootPane.getActionMap().put("switchWorkspaceMode", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent event) {
+        cycleWorkspaceMode();
+      }
+    });
+    rootPane.getActionMap().put("switchMapMode", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent event) {
+        showMapWorkspace();
+      }
+    });
+    rootPane.getActionMap().put("switchScriptMode", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent event) {
+        showScriptWorkspace();
+      }
+    });
     rootPane.getActionMap().put("inspectorBack", new AbstractAction() {
       @Override
       public void actionPerformed(java.awt.event.ActionEvent event) {
@@ -850,19 +955,47 @@ public final class UI {
 
   private static void refreshInspectorNavigationShortcuts(JFrame window) {
     javax.swing.InputMap inputMap = window.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    if (switchWorkspaceModeShortcut != null) {
+      inputMap.remove(switchWorkspaceModeShortcut);
+    }
+    if (switchMapModeShortcut != null) {
+      inputMap.remove(switchMapModeShortcut);
+    }
+    if (switchScriptModeShortcut != null) {
+      inputMap.remove(switchScriptModeShortcut);
+    }
     if (inspectorBackShortcut != null) {
       inputMap.remove(inspectorBackShortcut);
     }
     if (inspectorForwardShortcut != null) {
       inputMap.remove(inspectorForwardShortcut);
     }
+    switchWorkspaceModeShortcut = KeyBindings.get(KeyBindings.Command.SWITCH_WORKSPACE_MODE);
+    switchMapModeShortcut = KeyBindings.get(KeyBindings.Command.SWITCH_MAP_MODE);
+    switchScriptModeShortcut = KeyBindings.get(KeyBindings.Command.SWITCH_SCRIPT_MODE);
     inspectorBackShortcut = KeyBindings.get(KeyBindings.Command.INSPECTOR_BACK);
     inspectorForwardShortcut = KeyBindings.get(KeyBindings.Command.INSPECTOR_FORWARD);
+
+    if (switchWorkspaceModeShortcut != null) {
+      inputMap.put(switchWorkspaceModeShortcut, "switchWorkspaceMode");
+    }
+    if (switchMapModeShortcut != null) {
+      inputMap.put(switchMapModeShortcut, "switchMapMode");
+    }
+    if (switchScriptModeShortcut != null) {
+      inputMap.put(switchScriptModeShortcut, "switchScriptMode");
+    }
     if (inspectorBackShortcut != null) {
       inputMap.put(inspectorBackShortcut, "inspectorBack");
     }
     if (inspectorForwardShortcut != null) {
       inputMap.put(inspectorForwardShortcut, "inspectorForward");
+    }
+    if (workspaceMapButton != null) {
+      workspaceMapButton.setToolTipText(shortcutTooltip("workspace_map", switchMapModeShortcut));
+    }
+    if (workspaceScriptButton != null) {
+      workspaceScriptButton.setToolTipText(shortcutTooltip("workspace_scripts", switchScriptModeShortcut));
     }
     if (inspectorBackButton != null) {
       inspectorBackButton.setToolTipText(shortcutTooltip("inspector_back", inspectorBackShortcut));
@@ -1535,8 +1668,12 @@ public final class UI {
     UIManager.put("ToggleButton.select", Style.COLOR_SELECT);
     UIManager.put("CheckBox.background", Style.COLOR_BG);
     UIManager.put("CheckBox.foreground", Style.COLOR_TEXT);
+    UIManager.put("CheckBox.margin", new java.awt.Insets(0, 0, 0, 0));
+    UIManager.put("CheckBox.border", BorderFactory.createEmptyBorder(0, 0, 0, 0));
     UIManager.put("RadioButton.background", Style.COLOR_BG);
     UIManager.put("RadioButton.foreground", Style.COLOR_TEXT);
+    UIManager.put("RadioButton.margin", new java.awt.Insets(0, 0, 0, 0));
+    UIManager.put("RadioButton.border", BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
     // Menus
     applyMenuOverrides(

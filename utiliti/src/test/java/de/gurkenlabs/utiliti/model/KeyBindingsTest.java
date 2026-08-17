@@ -88,4 +88,16 @@ class KeyBindingsTest {
         InputEvent.CTRL_DOWN_MASK,
         KeyBindings.platformModifiers(InputEvent.CTRL_DOWN_MASK, "Linux"));
   }
+
+  @Test
+  void includesWorkspaceSwitchingDefaults() {
+    EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
+
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK),
+        bindings.get(Command.SWITCH_WORKSPACE_MODE));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.SWITCH_MAP_MODE));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.SWITCH_SCRIPT_MODE));
+  }
 }
