@@ -92,17 +92,16 @@ jobs:
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Test
-        run: ./gradlew test -PskipSpotless --stacktrace --console=plain
+        run: ./gradlew test -PskipSpotless --stacktrace --info --console=plain
 
       - name: Package application image
         if: always()
         run: ./gradlew :utiliti:jpackage -PskipSpotless --stacktrace --console=plain
 
       - name: Dump failed tests
-        if: failure()
+        if: always()
         run: |
-          find . -path "*/build/test-results/test/*.xml" \
-            -exec grep -H -E '<failure|<error' {} \; || true
+          find . -name "TEST-*.xml" -exec grep -Hn -E '<failure|<error' {} + || true
 
       - name: Publish Test Results
         if: always()
