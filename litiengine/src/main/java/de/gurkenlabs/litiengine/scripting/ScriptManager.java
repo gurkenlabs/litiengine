@@ -61,7 +61,6 @@ public final class ScriptManager implements IUpdateable {
   private boolean attachedToLoop;
 
   public ScriptManager() {
-    this.registerProvider(new ClasspathScriptProvider());
     this.registerProvider(new JavaScriptProvider());
     ServiceLoader.load(ScriptProvider.class).forEach(this::registerProvider);
     Game.addGameListener(new GameListener() {
@@ -308,8 +307,11 @@ public final class ScriptManager implements IUpdateable {
     affected.forEach(this::detachAttachment);
     CompiledScript previous = this.compiled.put(scriptId, replacement);
     close(previous);
-    bindings.forEach(binding -> this.attach(binding.host, binding.binding, binding.controllerManaged));
-    return true;
+    boolean success = true;
+    for (HostBinding binding : bindings) {
+      success &= this.attach(binding.host, binding.binding, binding.controllerManaged) != null;
+    }
+    return success;
   }
 
   public void detach(Object host) {
@@ -837,8 +839,8 @@ public final class ScriptManager implements IUpdateable {
   }
 
   private void detachUpdateLoop() {
-    if (!this.attachedToLoop || Game.loop() == null) return;
-    Game.loop().detach(this);
+    if (!this.attachedToLoop) return;
+    if (Game.loop() != null) Game.loop().detach(this);
     this.attachedToLoop = false;
   }
 

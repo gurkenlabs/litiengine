@@ -148,7 +148,8 @@ public class JavaScriptProvider implements ScriptProvider {
     JavaSourceFileObject sourceFile = new JavaSourceFileObject(filename, sourceCode);
 
     DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-    MemoryFileManager fileManager = new MemoryFileManager(compiler.getStandardFileManager(diagnostics, null, StandardCharsets.UTF_8));
+    try (MemoryFileManager fileManager = new MemoryFileManager(
+        compiler.getStandardFileManager(diagnostics, null, StandardCharsets.UTF_8))) {
 
     List<String> options = new ArrayList<>();
     options.add("-g");
@@ -234,6 +235,9 @@ public class JavaScriptProvider implements ScriptProvider {
     } catch (Exception | LinkageError e) {
       String expected = className == null || className.isBlank() ? definition.getImplementation() : className;
       throw new ScriptException("Could not load compiled Java script class " + expected + ".", e);
+    }
+    } catch (IOException e) {
+      throw new ScriptException("Could not close Java compiler resources.", e);
     }
   }
 

@@ -321,6 +321,7 @@ class ScriptBindingServiceTest {
       .filter(entry -> entry.state() == ScriptCatalogService.State.UNRESOLVED).findFirst().orElseThrow();
 
     assertSame(registered, registeredEntry.definition());
+    assertEquals(null, registered.getSource());
     assertEquals("com.game.Registered", registeredEntry.implementation().qualifiedClassName());
     assertEquals(registeredSource.toAbsolutePath().normalize(), registeredEntry.implementation().sourcePath());
     assertEquals("com.game.Discovered", discoveredEntry.definition().getImplementation());

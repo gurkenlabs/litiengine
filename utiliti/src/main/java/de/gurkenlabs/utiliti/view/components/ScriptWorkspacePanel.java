@@ -698,9 +698,6 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static String languageFor(Path source) {
-    String name = source == null ? "" : source.getFileName().toString().toLowerCase(Locale.ROOT);
-    if (name.endsWith(".groovy")) return "groovy";
-    if (name.endsWith(".kt")) return "kotlin";
     return "java";
   }
 

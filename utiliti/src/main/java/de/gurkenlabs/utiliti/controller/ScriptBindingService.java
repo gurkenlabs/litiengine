@@ -799,9 +799,6 @@ public final class ScriptBindingService {
   }
 
   private static String languageFor(java.nio.file.Path source) {
-    String name = source == null ? "" : source.getFileName().toString().toLowerCase(java.util.Locale.ROOT);
-    if (name.endsWith(".groovy")) return "groovy";
-    if (name.endsWith(".kt")) return "kotlin";
     return "java";
   }
 

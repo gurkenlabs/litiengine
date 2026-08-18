@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -20,6 +21,10 @@ import java.util.stream.Stream;
 /** Standalone launcher to bootstrap and run LITIengine games and script-based projects without custom Java entry points. */
 public final class GameLauncher {
   private static final Logger log = Logger.getLogger(GameLauncher.class.getName());
+  private static final java.util.regex.Pattern PACKAGE_DECLARATION = java.util.regex.Pattern.compile(
+    "(?m)^\\s*package\\s+([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*;");
+  private static final java.util.regex.Pattern SCRIPT_ID = java.util.regex.Pattern.compile(
+    "@ScriptInfo\\s*\\(.*?\\bid\\s*=\\s*\\\"([^\\\"]+)\\\"", java.util.regex.Pattern.DOTALL);
 
   private GameLauncher() {}
 
@@ -136,12 +141,12 @@ public final class GameLauncher {
         stream.filter(Files::isRegularFile).forEach(file -> {
           String filename = file.getFileName().toString();
           if (filename.endsWith(".java")) {
-            String scriptId = filename.substring(0, filename.length() - ".java".length());
-            if (discovered.stream().noneMatch(d -> d.getId().equalsIgnoreCase(scriptId))) {
-              String relativeSource = root.relativize(file.toAbsolutePath()).toString().replace('\\', '/');
-              ScriptHostType host = inferHostType(file, scriptId);
-              discovered.add(new ScriptDefinition(scriptId, "java", relativeSource, scriptId, host));
-            }
+            discoverProjectScript(root, file).ifPresent(candidate -> {
+              if (discovered.stream().noneMatch(d -> d.getId().equalsIgnoreCase(candidate.id()))) {
+                discovered.add(new ScriptDefinition(candidate.id(), "java", candidate.source(),
+                  candidate.implementation(), candidate.host()));
+              }
+            });
           }
         });
       } catch (IOException e) {
@@ -151,18 +156,31 @@ public final class GameLauncher {
     Game.scripts().setDefinitions(discovered);
   }
 
-  private static ScriptHostType inferHostType(Path javaFile, String scriptId) {
+  private static Optional<ScriptCandidate> discoverProjectScript(Path root, Path javaFile) {
     try {
       String content = Files.readString(javaFile);
-      if (content.contains("extends GameScript")) return ScriptHostType.GAME;
-      if (content.contains("extends EnvironmentScript")) return ScriptHostType.ENVIRONMENT;
-      if (content.contains("extends EntityScript") || content.contains("extends CreatureScript")) return ScriptHostType.ENTITY;
+      Optional<ScriptHostType> host = inferHostType(content);
+      if (host.isEmpty()) return Optional.empty();
+      String simpleName = javaFile.getFileName().toString().replaceFirst("\\.java$", "");
+      var packageMatcher = PACKAGE_DECLARATION.matcher(content);
+      String implementation = packageMatcher.find() ? packageMatcher.group(1) + "." + simpleName : simpleName;
+      var idMatcher = SCRIPT_ID.matcher(content);
+      String id = idMatcher.find() ? idMatcher.group(1) : implementation;
+      String source = root.relativize(javaFile.toAbsolutePath()).toString().replace('\\', '/');
+      return Optional.of(new ScriptCandidate(id, source, implementation, host.get()));
     } catch (Exception ignored) {
+      return Optional.empty();
     }
-    if (scriptId.toLowerCase().contains("game")) return ScriptHostType.GAME;
-    if (scriptId.toLowerCase().contains("env") || scriptId.toLowerCase().contains("map")) return ScriptHostType.ENVIRONMENT;
-    return ScriptHostType.ENTITY;
   }
+
+  private static Optional<ScriptHostType> inferHostType(String content) {
+    if (content.matches("(?s).*\\bextends\\s+(?:[\\w$]+\\.)*GameScript\\b.*")) return Optional.of(ScriptHostType.GAME);
+    if (content.matches("(?s).*\\bextends\\s+(?:[\\w$]+\\.)*EnvironmentScript\\b.*")) return Optional.of(ScriptHostType.ENVIRONMENT);
+    if (content.matches("(?s).*\\bextends\\s+(?:[\\w$]+\\.)*(?:EntityScript|CreatureScript)\\b.*")) return Optional.of(ScriptHostType.ENTITY);
+    return Optional.empty();
+  }
+
+  private record ScriptCandidate(String id, String source, String implementation, ScriptHostType host) {}
 
   private static LaunchOptions parseArgs(Path explicitProjectRoot, String[] args) {
     LaunchOptions options = new LaunchOptions();
