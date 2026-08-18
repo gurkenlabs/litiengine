@@ -36,7 +36,7 @@ public class GameTest {
     terminateGame();
     Game.scripts().setGameBindings(List.of());
     Game.scripts().setDefinitions(List.of());
-    LifecycleGameScript.updates = 0;
+    LifecycleGameScript.stops = 0;
   }
 
   private static class Status {
@@ -92,7 +92,8 @@ public class GameTest {
     configureLifecycleScript();
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     Game.start();
-    Game.scripts().update();
+
+    assertEquals(0, LifecycleGameScript.stops);
 
     GameListener veto = new GameListener() {
       @Override public boolean terminating() { return false; }
@@ -100,8 +101,7 @@ public class GameTest {
     Game.addGameListener(veto);
     try {
       assertFalse(Game.terminating());
-      Game.scripts().update();
-      assertEquals(2, LifecycleGameScript.updates);
+      assertEquals(0, LifecycleGameScript.stops);
     } finally {
       Game.removeGameListener(veto);
     }
@@ -110,32 +110,39 @@ public class GameTest {
   @Test
   void terminationDetachesScriptsBeforeTheNextGameLoopStarts() {
     Game.terminate();
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    int initializedUpdatables = Game.loop().getUpdatableCount();
+    Game.start();
+    int startRegistrations = Game.loop().getUpdatableCount() - initializedUpdatables;
+    Game.terminate();
+
     configureLifecycleScript();
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    int initialUpdatables = Game.loop().getUpdatableCount();
     Game.start();
-    Game.scripts().update();
-    assertEquals(1, LifecycleGameScript.updates);
+    assertEquals(initialUpdatables + startRegistrations + 1, Game.loop().getUpdatableCount());
 
     Game.terminate();
+    assertEquals(1, LifecycleGameScript.stops);
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    int restartedUpdatables = Game.loop().getUpdatableCount();
     Game.start();
-    Game.scripts().update();
-    assertEquals(2, LifecycleGameScript.updates);
+    assertEquals(restartedUpdatables + startRegistrations + 1, Game.loop().getUpdatableCount());
   }
 
   private static void configureLifecycleScript() {
-    LifecycleGameScript.updates = 0;
+    LifecycleGameScript.stops = 0;
     Game.scripts().setDefinitions(List.of(new ScriptDefinition("lifecycle", "java", null,
       LifecycleGameScript.class.getName(), ScriptHostType.GAME)));
     Game.scripts().setGameBindings(List.of(new ScriptBinding("lifecycle")));
   }
 
   public static final class LifecycleGameScript extends GameScript {
-    private static int updates;
+    private static int stops;
 
     @Override
-    public void update() {
-      updates++;
+    protected void onStopped() {
+      stops++;
     }
   }
 
