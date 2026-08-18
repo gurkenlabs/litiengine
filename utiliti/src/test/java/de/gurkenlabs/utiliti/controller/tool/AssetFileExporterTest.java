@@ -39,7 +39,7 @@ class AssetFileExporterTest {
     assertEquals(3, exported.getWidth());
     assertEquals(2, exported.getHeight());
     assertEquals(Color.CYAN.getRGB(), exported.getRGB(2, 1));
-    assertTrue(files.getFirst().startsWith(this.tempDir));
+    assertTrue(files.getFirst().startsWith(this.tempDir.toRealPath()));
   }
 
   @Test
@@ -87,9 +87,10 @@ class AssetFileExporterTest {
 
     List<Path> files = AssetFileExporter.export(animation, this.tempDir);
 
-    assertEquals(List.of(this.tempDir.resolve("walk.json"), this.tempDir.resolve("sheet.png")), files);
+    Path exportDir = this.tempDir.toRealPath();
+    assertEquals(List.of(exportDir.resolve("walk.json"), exportDir.resolve("sheet.png")), files);
     assertTrue(files.stream().allMatch(java.nio.file.Files::isRegularFile));
-    assertTrue(files.stream().allMatch(path -> path.normalize().startsWith(this.tempDir.normalize())));
+    assertTrue(files.stream().allMatch(path -> path.normalize().startsWith(exportDir.normalize())));
   }
 
   @Test

@@ -10,6 +10,8 @@ import java.util.EventListener;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@code GamepadManager} provides access to all gamepad input devices.
@@ -22,6 +24,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @see #get(int)
  */
 public final class GamepadManager extends GamepadEvents {
+  private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
+
   private final Collection<GamepadAddedListener> gamepadAddedConsumer;
   private final Collection<GamepadRemovedListener> gamepadRemovedConsumer;
   private final InputDevicePlugin devicePlugin;
@@ -36,32 +40,38 @@ public final class GamepadManager extends GamepadEvents {
     this.gamePads = new CopyOnWriteArrayList<>();
     this.devicePlugin = InputDevices.init();
 
-    // initially add all gamepads before subscribing the events
-    this.devicePlugin.getAll().forEach(this::addNewGamepad);
+    if (this.devicePlugin != null) {
+      try {
+        // initially add all gamepads before subscribing the events
+        this.devicePlugin.getAll().forEach(this::addNewGamepad);
 
-    // add new gamepads as they are connected
-    this.devicePlugin.onDeviceConnected(device ->
-    {
-      final var gamepad = this.getById(device.getID());
-      if (gamepad != null) {
-        // already added
-        return;
+        // add new gamepads as they are connected
+        this.devicePlugin.onDeviceConnected(device ->
+        {
+          final var gamepad = this.getById(device.getID());
+          if (gamepad != null) {
+            // already added
+            return;
+          }
+
+          this.addNewGamepad(device);
+        });
+
+        // remove gamepads as they are disconnected
+        this.devicePlugin.onDeviceDisconnected(device ->
+        {
+          final var gamepad = this.getById(device.getID());
+          if (gamepad == null) {
+            // gamepad was not added before, nothing to do
+            return;
+          }
+
+          this.removeGamepad(gamepad);
+        });
+      } catch (IllegalStateException e) {
+        log.log(Level.FINE, "InputDevicePlugin could not be initialized: {0}", e.getMessage());
       }
-
-      this.addNewGamepad(device);
-    });
-
-    // remove gamepads as they are disconnected
-    this.devicePlugin.onDeviceDisconnected(device ->
-    {
-      final var gamepad = this.getById(device.getID());
-      if (gamepad == null) {
-        // gamepad was not added before, nothing to do
-        return;
-      }
-
-      this.removeGamepad(gamepad);
-    });
+    }
   }
 
   private void addNewGamepad(InputDevice device) {
