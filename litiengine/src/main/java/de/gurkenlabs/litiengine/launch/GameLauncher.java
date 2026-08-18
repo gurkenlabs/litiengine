@@ -48,11 +48,11 @@ public final class GameLauncher {
   public static void prepare(Path explicitProjectRoot, String... args) {
     LaunchOptions options = parseArgs(explicitProjectRoot, args);
 
-    Game.init(args);
-
     if (options.title != null && !options.title.isBlank()) {
       Game.info().setName(options.title);
     }
+
+    Game.init(args);
     if (options.renderScale > 0) {
       Game.graphics().setBaseRenderScale(options.renderScale);
     }
@@ -127,18 +127,12 @@ public final class GameLauncher {
   }
 
   private static void discoverProjectScripts(Path root, LaunchOptions options) {
-    List<Path> scriptDirs = new ArrayList<>();
-    Path scriptsFolder = root.resolve("scripts");
-    if (Files.isDirectory(scriptsFolder)) {
-      scriptDirs.add(scriptsFolder);
-    }
-    if (Files.isDirectory(root)) {
-      scriptDirs.add(root);
-    }
+    List<Path> scriptDirs = List.of(root.resolve("scripts"), root.resolve("src/main/java"));
 
     List<ScriptDefinition> discovered = new ArrayList<>(Game.scripts().getDefinitions());
     for (Path dir : scriptDirs) {
-      try (Stream<Path> stream = Files.walk(dir, 3)) {
+      if (!Files.isDirectory(dir)) continue;
+      try (Stream<Path> stream = Files.walk(dir)) {
         stream.filter(Files::isRegularFile).forEach(file -> {
           String filename = file.getFileName().toString();
           if (filename.endsWith(".java")) {

@@ -51,9 +51,10 @@ public final class ScriptInput {
         onPress.run();
       }
     };
-    if (Input.keyboard() != null) {
-      Input.keyboard().onKeyPressed(keyCode, listener);
-      return this.context.manage(() -> Input.keyboard().removeKeyPressedListener(keyCode, listener));
+    IKeyboard keyboard = Input.keyboard();
+    if (keyboard != null) {
+      keyboard.onKeyPressed(keyCode, listener);
+      return this.context.manage(() -> keyboard.removeKeyPressedListener(keyCode, listener));
     }
     return () -> {};
   }
@@ -62,14 +63,15 @@ public final class ScriptInput {
   public Subscription bindKey(int keyCode, Runnable onPress, Runnable onRelease) {
     Subscription pressSub = onPress != null ? bindKey(keyCode, onPress) : () -> {};
     Subscription releaseSub = () -> {};
-    if (onRelease != null && Input.keyboard() != null) {
+    IKeyboard keyboard = Input.keyboard();
+    if (onRelease != null && keyboard != null) {
       IKeyboard.KeyReleasedListener listener = e -> {
         if (e.getKeyCode() == keyCode) {
           onRelease.run();
         }
       };
-      Input.keyboard().onKeyReleased(keyCode, listener);
-      releaseSub = this.context.manage(() -> Input.keyboard().removeKeyReleasedListener(keyCode, listener));
+      keyboard.onKeyReleased(keyCode, listener);
+      releaseSub = this.context.manage(() -> keyboard.removeKeyReleasedListener(keyCode, listener));
     }
     Subscription finalReleaseSub = releaseSub;
     return () -> {
@@ -82,9 +84,22 @@ public final class ScriptInput {
   public Subscription bindKey(int keyCode, Consumer<KeyEvent> onPress) {
     Objects.requireNonNull(onPress, "onPress must not be null.");
     IKeyboard.KeyPressedListener listener = onPress::accept;
-    if (Input.keyboard() != null) {
-      Input.keyboard().onKeyPressed(keyCode, listener);
-      return this.context.manage(() -> Input.keyboard().removeKeyPressedListener(keyCode, listener));
+    IKeyboard keyboard = Input.keyboard();
+    if (keyboard != null) {
+      keyboard.onKeyPressed(keyCode, listener);
+      return this.context.manage(() -> keyboard.removeKeyPressedListener(keyCode, listener));
+    }
+    return () -> {};
+  }
+
+  /** Binds a consumer to receive key typed events for the specified key code. */
+  public Subscription bindKeyTyped(int keyCode, Consumer<KeyEvent> onTyped) {
+    Objects.requireNonNull(onTyped, "onTyped must not be null.");
+    IKeyboard.KeyTypedListener listener = onTyped::accept;
+    IKeyboard keyboard = Input.keyboard();
+    if (keyboard != null) {
+      keyboard.onKeyTyped(keyCode, listener);
+      return this.context.manage(() -> keyboard.removeKeyTypedListener(keyCode, listener));
     }
     return () -> {};
   }
@@ -127,9 +142,10 @@ public final class ScriptInput {
         onPress.run();
       }
     };
-    if (Input.mouse() != null) {
-      Input.mouse().onPressed(listener);
-      return this.context.manage(() -> Input.mouse().removeMousePressedListener(listener));
+    IMouse mouse = Input.mouse();
+    if (mouse != null) {
+      mouse.onPressed(listener);
+      return this.context.manage(() -> mouse.removeMousePressedListener(listener));
     }
     return () -> {};
   }
@@ -138,14 +154,15 @@ public final class ScriptInput {
   public Subscription bindMouse(int button, Runnable onPress, Runnable onRelease) {
     Subscription pressSub = onPress != null ? bindMouse(button, onPress) : () -> {};
     Subscription releaseSub = () -> {};
-    if (onRelease != null && Input.mouse() != null) {
+    IMouse mouse = Input.mouse();
+    if (onRelease != null && mouse != null) {
       IMouse.MouseReleasedListener listener = e -> {
         if (e.getButton() == button) {
           onRelease.run();
         }
       };
-      Input.mouse().onReleased(listener);
-      releaseSub = this.context.manage(() -> Input.mouse().removeMouseReleasedListener(listener));
+      mouse.onReleased(listener);
+      releaseSub = this.context.manage(() -> mouse.removeMouseReleasedListener(listener));
     }
     Subscription finalReleaseSub = releaseSub;
     return () -> {

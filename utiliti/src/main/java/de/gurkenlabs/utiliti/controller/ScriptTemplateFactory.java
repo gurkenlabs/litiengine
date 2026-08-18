@@ -29,7 +29,6 @@ public final class ScriptTemplateFactory {
       String base = "GameScript".equals(className) ? "de.gurkenlabs.litiengine.scripting.GameScript" : "GameScript";
       return packageHeader
           + "import de.gurkenlabs.litiengine.*;\n"
-          + "import de.gurkenlabs.litiengine.input.Input;\n"
           + "import de.gurkenlabs.litiengine.resources.*;\n"
           + "import de.gurkenlabs.litiengine.scripting.*;\n"
           + "import java.awt.event.KeyEvent;\n\n"
@@ -57,8 +56,8 @@ public final class ScriptTemplateFactory {
           + "    if (Game.world().environment() == null) {\n"
           + "      // loadMap(\"level1\");\n"
           + "    }\n\n"
-          + "    // 4. Global input shortcuts (e.g. Pause on ESC)\n"
-          + "    Input.keyboard().onKeyTyped(KeyEvent.VK_ESCAPE, event -> {\n"
+          + "    // 4. Global input shortcuts are cleaned up on script reload\n"
+          + "    input().bindKeyTyped(KeyEvent.VK_ESCAPE, event -> {\n"
           + "      // Toggle pause or open menu\n"
           + "    });\n"
           + "  }\n\n"

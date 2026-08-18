@@ -17,6 +17,8 @@ class ScriptTemplateFactoryTest {
     assertTrue(source.contains("public class MainGame extends GameScript"));
     assertTrue(source.contains("@ScriptInfo(id = \"MainGame\", host = ScriptHostType.GAME)"));
     assertTrue(source.contains("void onStarted()"));
+    assertTrue(source.contains("input().bindKeyTyped(KeyEvent.VK_ESCAPE"));
+    assertFalse(source.contains("Input.keyboard()"));
     assertTrue(source.contains("void update()"));
   }
 

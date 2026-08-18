@@ -1,15 +1,21 @@
 package de.gurkenlabs.litiengine;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.test.GameTestSuite;
+import de.gurkenlabs.litiengine.scripting.GameScript;
+import de.gurkenlabs.litiengine.scripting.ScriptBinding;
+import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
+import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import java.awt.AWTError;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,8 +33,10 @@ public class GameTest {
 
     Files.deleteIfExists(configFile);
 
-
     terminateGame();
+    Game.scripts().setGameBindings(List.of());
+    Game.scripts().setDefinitions(List.of());
+    LifecycleGameScript.updates = 0;
   }
 
   private static class Status {
@@ -76,6 +84,59 @@ public class GameTest {
 
     Game.start();
     assertTrue(started.wasCalled);
+  }
+
+  @Test
+  void vetoedExitPreparationDoesNotDetachRunningGameScripts() {
+    Game.terminate();
+    configureLifecycleScript();
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    Game.start();
+    Game.scripts().update();
+
+    GameListener veto = new GameListener() {
+      @Override public boolean terminating() { return false; }
+    };
+    Game.addGameListener(veto);
+    try {
+      assertFalse(Game.terminating());
+      Game.scripts().update();
+      assertEquals(2, LifecycleGameScript.updates);
+    } finally {
+      Game.removeGameListener(veto);
+    }
+  }
+
+  @Test
+  void terminationDetachesScriptsBeforeTheNextGameLoopStarts() {
+    Game.terminate();
+    configureLifecycleScript();
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    Game.start();
+    Game.scripts().update();
+    assertEquals(1, LifecycleGameScript.updates);
+
+    Game.terminate();
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    Game.start();
+    Game.scripts().update();
+    assertEquals(2, LifecycleGameScript.updates);
+  }
+
+  private static void configureLifecycleScript() {
+    LifecycleGameScript.updates = 0;
+    Game.scripts().setDefinitions(List.of(new ScriptDefinition("lifecycle", "java", null,
+      LifecycleGameScript.class.getName(), ScriptHostType.GAME)));
+    Game.scripts().setGameBindings(List.of(new ScriptBinding("lifecycle")));
+  }
+
+  public static final class LifecycleGameScript extends GameScript {
+    private static int updates;
+
+    @Override
+    public void update() {
+      updates++;
+    }
   }
 
   @Test

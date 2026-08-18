@@ -66,7 +66,7 @@ public final class ScriptManager implements IUpdateable {
     ServiceLoader.load(ScriptProvider.class).forEach(this::registerProvider);
     Game.addGameListener(new GameListener() {
       @Override public void started() { attachAll(gameHost, gameBindings); }
-      @Override public boolean terminating() { detachAll(); return true; }
+      @Override public void terminated() { detachAll(); }
     });
     Game.world().onLoaded(this::environmentLoaded);
     Game.world().onUnloaded(this::detach);
@@ -621,7 +621,8 @@ public final class ScriptManager implements IUpdateable {
   }
 
   private void registerInputLifecycle(Attachment attachment, AbstractScript<?> script) {
-    if (Input.keyboard() != null) {
+    IKeyboard keyboard = Input.keyboard();
+    if (keyboard != null) {
       IKeyboard.KeyPressedListener keyPressed = event -> {
         if (attachment.faulted) return;
         try {
@@ -652,19 +653,18 @@ public final class ScriptManager implements IUpdateable {
           this.detachAttachment(attachment);
         }
       };
-      Input.keyboard().onKeyPressed(keyPressed);
-      Input.keyboard().onKeyReleased(keyReleased);
-      Input.keyboard().onKeyTyped(keyTyped);
+      keyboard.onKeyPressed(keyPressed);
+      keyboard.onKeyReleased(keyReleased);
+      keyboard.onKeyTyped(keyTyped);
       attachment.context.manage(() -> {
-        if (Input.keyboard() != null) {
-          Input.keyboard().removeKeyPressedListener(keyPressed);
-          Input.keyboard().removeKeyReleasedListener(keyReleased);
-          Input.keyboard().removeKeyTypedListener(keyTyped);
-        }
+        keyboard.removeKeyPressedListener(keyPressed);
+        keyboard.removeKeyReleasedListener(keyReleased);
+        keyboard.removeKeyTypedListener(keyTyped);
       });
     }
 
-    if (Input.mouse() != null) {
+    IMouse mouse = Input.mouse();
+    if (mouse != null) {
       IMouse.MouseClickedListener mouseClicked = event -> {
         if (attachment.faulted) return;
         try {
@@ -715,19 +715,17 @@ public final class ScriptManager implements IUpdateable {
           this.detachAttachment(attachment);
         }
       };
-      Input.mouse().onClicked(mouseClicked);
-      Input.mouse().onPressed(mousePressed);
-      Input.mouse().onReleased(mouseReleased);
-      Input.mouse().onMoved(mouseMoved);
-      Input.mouse().onWheelMoved(mouseWheel);
+      mouse.onClicked(mouseClicked);
+      mouse.onPressed(mousePressed);
+      mouse.onReleased(mouseReleased);
+      mouse.onMoved(mouseMoved);
+      mouse.onWheelMoved(mouseWheel);
       attachment.context.manage(() -> {
-        if (Input.mouse() != null) {
-          Input.mouse().removeMouseClickedListener(mouseClicked);
-          Input.mouse().removeMousePressedListener(mousePressed);
-          Input.mouse().removeMouseReleasedListener(mouseReleased);
-          Input.mouse().removeMouseMovedListener(mouseMoved);
-          Input.mouse().removeMouseWheelListener(mouseWheel);
-        }
+        mouse.removeMouseClickedListener(mouseClicked);
+        mouse.removeMousePressedListener(mousePressed);
+        mouse.removeMouseReleasedListener(mouseReleased);
+        mouse.removeMouseMovedListener(mouseMoved);
+        mouse.removeMouseWheelListener(mouseWheel);
       });
     }
   }

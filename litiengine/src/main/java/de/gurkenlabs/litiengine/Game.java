@@ -573,7 +573,7 @@ public final class Game {
   public static void init(boolean initInSwingThread, String... args) {
     if (initInSwingThread) {
       try {
-        SwingUtilities.invokeAndWait(initImpl());
+        SwingUtilities.invokeAndWait(initImpl(args));
       } catch (InvocationTargetException | InterruptedException e) {
         throw new Error(e);
       }
