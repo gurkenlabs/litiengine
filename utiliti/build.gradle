@@ -58,6 +58,10 @@ dependencies {
   testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
+tasks.named("test") {
+  jvmArgs += jcefJvmArgs
+}
+
 runtime {
   options.set(["--strip-debug", "--no-header-files", "--no-man-pages"])
   modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.naming", "java.xml",

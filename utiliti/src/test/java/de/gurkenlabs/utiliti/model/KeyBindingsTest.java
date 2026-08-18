@@ -48,8 +48,10 @@ class KeyBindingsTest {
   void includesInspectorNavigationDefaults() {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
 
-    assertEquals(Command.INSPECTOR_BACK.defaultKeyStroke(), bindings.get(Command.INSPECTOR_BACK));
-    assertEquals(Command.INSPECTOR_FORWARD.defaultKeyStroke(), bindings.get(Command.INSPECTOR_FORWARD));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.ALT_DOWN_MASK),
+        bindings.get(Command.INSPECTOR_BACK));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.ALT_DOWN_MASK),
+        bindings.get(Command.INSPECTOR_FORWARD));
   }
 
   @Test
@@ -63,16 +65,25 @@ class KeyBindingsTest {
   void includesQuickSearchDefault() {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
 
-    assertEquals(Command.QUICK_SEARCH.defaultKeyStroke(), bindings.get(Command.QUICK_SEARCH));
+    int ctrlOrCmd = KeyBindings.platformModifiers(
+        InputEvent.CTRL_DOWN_MASK, System.getProperty("os.name", ""));
+    assertEquals(
+        KeyStroke.getKeyStroke(KeyEvent.VK_P, ctrlOrCmd),
+        bindings.get(Command.QUICK_SEARCH));
   }
 
   @Test
   void includesProjectLifecycleDefaults() {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
 
-    assertEquals(Command.RUN_PROJECT.defaultKeyStroke(), bindings.get(Command.RUN_PROJECT));
-    assertEquals(Command.DEBUG_PROJECT.defaultKeyStroke(), bindings.get(Command.DEBUG_PROJECT));
-    assertEquals(Command.STOP_PROJECT.defaultKeyStroke(), bindings.get(Command.STOP_PROJECT));
+    int ctrlOrCmd = KeyBindings.platformModifiers(
+        InputEvent.CTRL_DOWN_MASK, System.getProperty("os.name", ""));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.RUN_PROJECT));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.DEBUG_PROJECT));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F2, ctrlOrCmd),
+        bindings.get(Command.STOP_PROJECT));
   }
 
   @Test
@@ -90,8 +101,18 @@ class KeyBindingsTest {
   void includesWorkspaceSwitchingDefaults() {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
 
-    assertEquals(Command.SWITCH_WORKSPACE_MODE.defaultKeyStroke(), bindings.get(Command.SWITCH_WORKSPACE_MODE));
-    assertEquals(Command.SWITCH_MAP_MODE.defaultKeyStroke(), bindings.get(Command.SWITCH_MAP_MODE));
-    assertEquals(Command.SWITCH_SCRIPT_MODE.defaultKeyStroke(), bindings.get(Command.SWITCH_SCRIPT_MODE));
+    int ctrlOrCmd = KeyBindings.platformModifiers(
+        InputEvent.CTRL_DOWN_MASK, System.getProperty("os.name", ""));
+    assertEquals(
+        KeyStroke.getKeyStroke(
+            KeyEvent.VK_M, ctrlOrCmd | InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.SWITCH_MAP_MODE));
+    assertEquals(
+        KeyStroke.getKeyStroke(
+            KeyEvent.VK_S, ctrlOrCmd | InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.SWITCH_SCRIPT_MODE));
+    assertEquals(
+        KeyStroke.getKeyStroke(KeyEvent.VK_TAB, ctrlOrCmd),
+        bindings.get(Command.SWITCH_WORKSPACE_MODE));
   }
 }
