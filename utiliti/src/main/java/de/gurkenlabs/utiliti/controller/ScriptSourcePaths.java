@@ -115,7 +115,7 @@ public final class ScriptSourcePaths {
       var sourceFiles = stream.filter(p -> {
         if (!Files.isRegularFile(p)) return false;
         String name = p.getFileName().toString().toLowerCase(Locale.ROOT);
-        return name.endsWith(".java") || name.endsWith(".groovy") || name.endsWith(".kt");
+        return name.endsWith(".java");
       }).limit(25).toList();
 
       for (Path file : sourceFiles) {
@@ -206,7 +206,7 @@ public final class ScriptSourcePaths {
     return directory + className + suffix;
   }
 
-  /** Extracts simple class name from Java/Groovy source text. */
+  /** Extracts simple class name from Java source text. */
   public static String extractClassName(String source) {
     if (source == null || source.isBlank()) return null;
     var matcher = Pattern.compile("(?m)^\\s*(?:public\\s+)?(?:class|interface|enum|record)\\s+([A-Za-z_$][\\w$]*)").matcher(source);
@@ -251,7 +251,7 @@ public final class ScriptSourcePaths {
   }
 
   private static String extension(String language) {
-    return "." + ("groovy".equals(language) ? "groovy" : "java");
+    return ".java";
   }
 }
 

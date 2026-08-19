@@ -15,7 +15,7 @@ class ScriptSourcePathsTest {
   @Test
   void createsRuntimeScriptsOutsideBuildSourceSetsWhenNoProjectModel() {
     assertEquals("scripts/java/CreatureScript.java", ScriptSourcePaths.create("java", "CreatureScript"));
-    assertEquals("scripts/groovy/GameScript.groovy", ScriptSourcePaths.create("groovy", "GameScript"));
+    assertEquals("scripts/java/GameScript.java", ScriptSourcePaths.create("java", "GameScript"));
   }
 
   @Test

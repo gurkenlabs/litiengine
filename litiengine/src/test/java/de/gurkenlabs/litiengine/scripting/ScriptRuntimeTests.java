@@ -194,6 +194,75 @@ class ScriptRuntimeTests {
     assertEquals(1, JavaEntityScript.updates);
   }
 
+  public static class Gen1WorkingScript extends EntityScript<TestEntity> {
+    static int loadedCount = 0;
+    static int updates = 0;
+
+    @Override
+    protected void onLoaded() {
+      loadedCount++;
+    }
+
+    @Override
+    public void update() {
+      updates++;
+    }
+  }
+
+  public static class Gen2FailingScript extends EntityScript<TestEntity> {
+    @Override
+    protected void onLoaded() {
+      throw new RuntimeException("oops");
+    }
+  }
+
+  @Test
+  void reloadRestoresLastWorkingGenerationWhenReplacementAttachmentFails() {
+    Gen1WorkingScript.loadedCount = 0;
+    Gen1WorkingScript.updates = 0;
+    java.util.concurrent.atomic.AtomicInteger compileCount = new java.util.concurrent.atomic.AtomicInteger();
+
+    ScriptProvider provider = new ScriptProvider() {
+      @Override
+      public String language() {
+        return "rollback-test";
+      }
+
+      @Override
+      public CompiledScript compile(ScriptDefinition definition, URL source, ClassLoader parent) {
+        int gen = compileCount.incrementAndGet();
+        return new CompiledScript() {
+          @Override
+          public ScriptInstance create() {
+            return gen == 2 ? new Gen2FailingScript() : new Gen1WorkingScript();
+          }
+
+          @Override
+          public Class<? extends ScriptInstance> implementationType() {
+            return gen == 2 ? Gen2FailingScript.class : Gen1WorkingScript.class;
+          }
+        };
+      }
+    };
+
+    Game.scripts().registerProvider(provider);
+    ScriptDefinition definition = new ScriptDefinition("rollback-script", provider.language(), null, "RollbackScript", ScriptHostType.ENTITY);
+    Game.scripts().setDefinitions(List.of(definition));
+    this.host = new TestEntity();
+    ScriptInstance initial = Game.scripts().attach(this.host, new ScriptBinding("rollback-script"));
+    assertNotNull(initial);
+    assertEquals(1, Gen1WorkingScript.loadedCount);
+    Game.scripts().update();
+    assertEquals(1, Gen1WorkingScript.updates);
+
+    boolean reloaded = Game.scripts().reload("rollback-script");
+    assertFalse(reloaded);
+
+    assertEquals(2, Gen1WorkingScript.loadedCount);
+    Game.scripts().update();
+    assertEquals(2, Gen1WorkingScript.updates);
+  }
+
   @Test
   void changingDefinitionConfigurationInvalidatesTheCompiledGeneration() {
     CountingProvider provider = new CountingProvider();

@@ -69,7 +69,7 @@ public class JavaScriptProvider implements ScriptProvider {
 
     if (type == null && definition.getSource() != null) {
       String derived = definition.getSource().replace('\\', '/')
-          .replaceFirst("^(?:.*?/)?(?:src/main/java|src/main/groovy|src/main|src|scripts)/(?:java|groovy)?/?", "")
+          .replaceFirst("^(?:.*?/)?(?:src/main/java|src/main|src|scripts)/(?:java)?/?", "")
           .replaceFirst("\\.[^.]+$", "")
           .replace('/', '.');
       if (!derived.isBlank() && !derived.equals(impl)) {

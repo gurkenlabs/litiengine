@@ -306,11 +306,22 @@ public final class ScriptManager implements IUpdateable {
     List<HostBinding> bindings = affected.stream().map(a -> new HostBinding(a.host, a.binding, a.controllerManaged)).toList();
     affected.forEach(this::detachAttachment);
     CompiledScript previous = this.compiled.put(scriptId, replacement);
-    close(previous);
     boolean success = true;
     for (HostBinding binding : bindings) {
       success &= this.attach(binding.host, binding.binding, binding.controllerManaged) != null;
     }
+    if (!success) {
+      this.attachments.stream().filter(a -> a.definition.getId().equals(scriptId)).toList()
+        .forEach(this::detachAttachment);
+      if (previous == null) this.compiled.remove(scriptId);
+      else this.compiled.put(scriptId, previous);
+      for (HostBinding binding : bindings) {
+        this.attach(binding.host, binding.binding, binding.controllerManaged);
+      }
+      close(replacement);
+      return false;
+    }
+    close(previous);
     return success;
   }
 
@@ -393,28 +404,24 @@ public final class ScriptManager implements IUpdateable {
     if (definition == null) return null;
     String impl = definition.getImplementation();
     String id = definition.getId();
-    String lang = definition.getLanguage() != null ? definition.getLanguage().toLowerCase() : "java";
-    String ext = "groovy".equals(lang) ? ".groovy" : ".java";
+    String ext = ".java";
 
     List<String> candidateRelPaths = new ArrayList<>();
     if (impl != null && !impl.isBlank()) {
       String pathFromFqn = impl.replace('.', '/') + ext;
       candidateRelPaths.add(pathFromFqn);
       candidateRelPaths.add("src/main/java/" + pathFromFqn);
-      candidateRelPaths.add("src/main/groovy/" + pathFromFqn);
       candidateRelPaths.add("src/" + pathFromFqn);
       candidateRelPaths.add("scripts/" + pathFromFqn);
       int lastDot = impl.lastIndexOf('.');
       String simpleName = lastDot >= 0 ? impl.substring(lastDot + 1) : impl;
       candidateRelPaths.add("scripts/" + simpleName + ext);
       candidateRelPaths.add("src/main/java/" + simpleName + ext);
-      candidateRelPaths.add("src/main/groovy/" + simpleName + ext);
       candidateRelPaths.add(simpleName + ext);
     }
     if (id != null && !id.isBlank()) {
       candidateRelPaths.add("scripts/" + id + ext);
       candidateRelPaths.add("src/main/java/" + id + ext);
-      candidateRelPaths.add("src/main/groovy/" + id + ext);
       candidateRelPaths.add(id + ext);
     }
 

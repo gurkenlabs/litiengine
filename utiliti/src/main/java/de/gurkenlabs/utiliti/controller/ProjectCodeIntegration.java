@@ -52,7 +52,7 @@ public final class ProjectCodeIntegration implements AutoCloseable {
     return definitions;
   }
 
-  /** Returns compiled Java and Groovy script implementations visible to utiLITI. */
+  /** Returns compiled Java script implementations visible to utiLITI. */
   public List<ScriptClassDefinition> getScriptDefinitions() {
     return this.scriptDefinitions;
   }
@@ -210,7 +210,7 @@ public final class ProjectCodeIntegration implements AutoCloseable {
 
   private static boolean isJvmSource(Path path) {
     String name = path.getFileName().toString().toLowerCase(java.util.Locale.ROOT);
-    return name.endsWith(".java") || name.endsWith(".groovy") || name.endsWith(".kt");
+    return name.endsWith(".java");
   }
 
   static String sourceClassName(Path sourceRoot, Path sourceFile) {

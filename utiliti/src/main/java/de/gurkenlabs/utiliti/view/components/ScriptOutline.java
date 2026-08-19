@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Builds a stable editor outline from incomplete Java or Groovy script source. */
+/** Builds a stable editor outline from incomplete Java script source. */
 final class ScriptOutline {
   private static final Pattern CLASS = Pattern.compile(
     "^(?:@[\\w.]+(?:\\([^)]*\\))?\\s*)*(?:(?:public|protected|private|static|final|abstract|sealed|non-sealed)\\s+)*"

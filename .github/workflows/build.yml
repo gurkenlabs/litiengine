@@ -10,7 +10,7 @@ on:
       - "**.xml"
       - ".github/workflows/*.yml"
     branches:
-      - "**"
+      - main
   pull_request:
     branches:
       - main
@@ -95,7 +95,6 @@ jobs:
         run: ./gradlew test -PskipSpotless --stacktrace --info --console=plain
 
       - name: Package application image
-        if: always()
         run: ./gradlew :utiliti:jpackage -PskipSpotless --stacktrace --console=plain
 
       - name: Dump failed tests
@@ -131,4 +130,3 @@ jobs:
           name: JUnit test results (macOS ${{ matrix.arch }})
           reporter: java-junit
           path: '**/test-results/**/*.xml'
-

@@ -23,8 +23,14 @@ public final class GameLauncher {
   private static final Logger log = Logger.getLogger(GameLauncher.class.getName());
   private static final java.util.regex.Pattern PACKAGE_DECLARATION = java.util.regex.Pattern.compile(
     "(?m)^\\s*package\\s+([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*;");
-  private static final java.util.regex.Pattern SCRIPT_ID = java.util.regex.Pattern.compile(
-    "@ScriptInfo\\s*\\(.*?\\bid\\s*=\\s*\\\"([^\\\"]+)\\\"", java.util.regex.Pattern.DOTALL);
+  private static final java.util.regex.Pattern SCRIPT_INFO = java.util.regex.Pattern.compile(
+    "@ScriptInfo\\s*\\((.*?)\\)", java.util.regex.Pattern.DOTALL);
+  private static final java.util.regex.Pattern SCRIPT_HOST = java.util.regex.Pattern.compile(
+    "\\bhost\\s*=\\s*ScriptHostType\\.(GAME|ENVIRONMENT|ENTITY)");
+  private static final java.util.regex.Pattern SCRIPT_TARGET = java.util.regex.Pattern.compile(
+    "\\btarget\\s*=\\s*([A-Za-z_$][\\w$.]*)\\s*\\.class");
+  private static final java.util.regex.Pattern IMPORT = java.util.regex.Pattern.compile(
+    "(?m)^\\s*import\\s+([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*;");
 
   private GameLauncher() {}
 
@@ -120,6 +126,10 @@ public final class GameLauncher {
     System.out.println("  -v, --version                Display engine version");
   }
 
+  private static void printVersion() {
+    System.out.println("LITIengine " + Game.info().getVersion());
+  }
+
   private static void loadProjectResources(Path root, LaunchOptions options) {
     if (options.litidataPath != null && Files.isRegularFile(options.litidataPath)) {
       Resources.load(options.litidataPath.toString());
@@ -143,8 +153,10 @@ public final class GameLauncher {
           if (filename.endsWith(".java")) {
             discoverProjectScript(root, file).ifPresent(candidate -> {
               if (discovered.stream().noneMatch(d -> d.getId().equalsIgnoreCase(candidate.id()))) {
-                discovered.add(new ScriptDefinition(candidate.id(), "java", candidate.source(),
-                  candidate.implementation(), candidate.host()));
+                ScriptDefinition definition = new ScriptDefinition(candidate.id(), "java", candidate.source(),
+                  candidate.implementation(), candidate.host());
+                definition.setTargetType(candidate.targetType());
+                discovered.add(definition);
               }
             });
           }
@@ -159,32 +171,76 @@ public final class GameLauncher {
   private static Optional<ScriptCandidate> discoverProjectScript(Path root, Path javaFile) {
     try {
       String content = Files.readString(javaFile);
-      Optional<ScriptHostType> host = inferHostType(content);
+      String cleanContent = stripComments(content);
+      Optional<ScriptMetadata> metadata = scriptMetadata(cleanContent);
+      Optional<ScriptHostType> host = metadata.map(ScriptMetadata::host).or(() -> inferHostType(cleanContent));
       if (host.isEmpty()) return Optional.empty();
       String simpleName = javaFile.getFileName().toString().replaceFirst("\\.java$", "");
-      var packageMatcher = PACKAGE_DECLARATION.matcher(content);
+      var packageMatcher = PACKAGE_DECLARATION.matcher(cleanContent);
       String implementation = packageMatcher.find() ? packageMatcher.group(1) + "." + simpleName : simpleName;
-      var idMatcher = SCRIPT_ID.matcher(content);
-      String id = idMatcher.find() ? idMatcher.group(1) : implementation;
+      String id = metadata.map(ScriptMetadata::id).orElse(implementation);
       String source = root.relativize(javaFile.toAbsolutePath()).toString().replace('\\', '/');
-      return Optional.of(new ScriptCandidate(id, source, implementation, host.get()));
+      return Optional.of(new ScriptCandidate(id, source, implementation, host.get(),
+        metadata.map(ScriptMetadata::targetType).orElse(null)));
     } catch (Exception ignored) {
       return Optional.empty();
     }
   }
 
+  private static String stripComments(String content) {
+    return content.replaceAll("//.*|/\\*.*?\\*/", "");
+  }
+
   private static Optional<ScriptHostType> inferHostType(String content) {
-    if (content.matches("(?s).*\\bextends\\s+(?:[\\w$]+\\.)*GameScript\\b.*")) return Optional.of(ScriptHostType.GAME);
-    if (content.matches("(?s).*\\bextends\\s+(?:[\\w$]+\\.)*EnvironmentScript\\b.*")) return Optional.of(ScriptHostType.ENVIRONMENT);
-    if (content.matches("(?s).*\\bextends\\s+(?:[\\w$]+\\.)*(?:EntityScript|CreatureScript)\\b.*")) return Optional.of(ScriptHostType.ENTITY);
+    var matcher = java.util.regex.Pattern.compile(
+      "\\bclass\\s+[A-Za-z_$][\\w$]*(?:\\s*<[^>]+>)?\\s+extends\\s+([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)")
+      .matcher(content);
+    if (matcher.find()) {
+      String superclass = matcher.group(1);
+      if (superclass.endsWith("GameScript")) return Optional.of(ScriptHostType.GAME);
+      if (superclass.endsWith("EnvironmentScript")) return Optional.of(ScriptHostType.ENVIRONMENT);
+      if (superclass.endsWith("EntityScript") || superclass.endsWith("CreatureScript")) return Optional.of(ScriptHostType.ENTITY);
+    }
     return Optional.empty();
   }
 
-  private record ScriptCandidate(String id, String source, String implementation, ScriptHostType host) {}
+  private static Optional<ScriptMetadata> scriptMetadata(String content) {
+    var annotation = SCRIPT_INFO.matcher(content);
+    if (!annotation.find()) return Optional.empty();
+    String values = annotation.group(1);
+    var id = java.util.regex.Pattern.compile("\\bid\\s*=\\s*\\\"([^\\\"]+)\\\"").matcher(values);
+    var host = SCRIPT_HOST.matcher(values);
+    if (!id.find()) return Optional.empty();
+    String targetType = null;
+    var target = SCRIPT_TARGET.matcher(values);
+    if (target.find()) targetType = resolveTypeName(content, target.group(1));
+    return Optional.of(new ScriptMetadata(id.group(1),
+      host.find() ? ScriptHostType.valueOf(host.group(1)) : ScriptHostType.ENTITY, targetType));
+  }
+
+  private static String resolveTypeName(String content, String typeName) {
+    if ("Object".equals(typeName) || "java.lang.Object".equals(typeName)) return null;
+    if (typeName.contains(".")) return typeName;
+    var imports = IMPORT.matcher(content);
+    while (imports.find()) {
+      String imported = imports.group(1);
+      if (imported.endsWith("." + typeName)) return imported;
+    }
+    try {
+      Class<?> loaded = Class.forName("de.gurkenlabs.litiengine.entities." + typeName);
+      return loaded.getName();
+    } catch (ClassNotFoundException ignored) {
+    }
+    var packageMatcher = PACKAGE_DECLARATION.matcher(content);
+    return packageMatcher.find() ? packageMatcher.group(1) + "." + typeName : typeName;
+  }
+
+  private record ScriptCandidate(String id, String source, String implementation, ScriptHostType host, String targetType) {}
+  private record ScriptMetadata(String id, ScriptHostType host, String targetType) {}
 
   private static LaunchOptions parseArgs(Path explicitProjectRoot, String[] args) {
     LaunchOptions options = new LaunchOptions();
-    options.projectRoot = explicitProjectRoot;
+    options.projectRoot = explicitProjectRoot == null ? null : explicitProjectRoot.toAbsolutePath().normalize();
     if (args == null) return options;
 
     for (int i = 0; i < args.length; i++) {
