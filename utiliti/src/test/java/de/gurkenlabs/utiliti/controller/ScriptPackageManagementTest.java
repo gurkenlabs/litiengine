@@ -286,4 +286,48 @@ class ScriptPackageManagementTest {
     assertEquals("com.example.game.HostileBehavior", definition.getImplementation());
     assertEquals("src/main/java/com/example/game/HostileBehavior.java", definition.getSource());
   }
+
+  @Test
+  void testRenameClassWhenNewClassNameMatchesExistingCustomId(@TempDir Path tempDir) throws IOException {
+    Path srcMainJava = tempDir.resolve("src/main/java");
+    Path pkgDir = srcMainJava.resolve("com/example/game");
+    Files.createDirectories(pkgDir);
+
+    Path scriptFile = pkgDir.resolve("EnemyBehavior.java");
+    String originalSource = "package com.example.game;\n\n"
+        + "import de.gurkenlabs.litiengine.scripting.*;\n\n"
+        + "@ScriptInfo(id = \"EnemyAI\", name = \"Enemy AI\")\n"
+        + "public class EnemyBehavior extends EntityScript<de.gurkenlabs.litiengine.entities.Creature> {\n"
+        + "}\n";
+    Files.writeString(scriptFile, originalSource);
+
+    ProjectModel model = new ProjectModel(
+        tempDir, null, ":run", "com.example.game.MyGame", 21,
+        List.of(srcMainJava), List.of(), List.of(), List.of());
+
+    Path projectFile = tempDir.resolve("game.litidata");
+    Editor.instance().setProjectPath(projectFile);
+    Editor.instance().setProjectModel(model);
+
+    ScriptDefinition definition = new ScriptDefinition(
+        "EnemyAI", "java", "src/main/java/com/example/game/EnemyBehavior.java",
+        "com.example.game.EnemyBehavior", ScriptHostType.ENTITY);
+    definition.setName("Enemy AI");
+    Editor.instance().getGameFile().getScripts().add(definition);
+
+    ScriptWorkspacePanel panel = new ScriptWorkspacePanel();
+    // Renaming class from EnemyBehavior to EnemyAI (which matches definition.getId())
+    boolean renamed = panel.renameScript(definition, "EnemyAI");
+    assertTrue(renamed, "Rename should succeed even when newClassName matches custom script id");
+
+    assertFalse(Files.exists(scriptFile));
+    Path newFile = pkgDir.resolve("EnemyAI.java");
+    assertTrue(Files.exists(newFile), "Class file must be renamed to EnemyAI.java");
+
+    String updatedSource = Files.readString(newFile);
+    assertTrue(updatedSource.contains("class EnemyAI"), "Class declaration must be EnemyAI");
+    assertEquals("com.example.game.EnemyAI", definition.getImplementation());
+    assertEquals("src/main/java/com/example/game/EnemyAI.java", definition.getSource());
+    assertEquals("EnemyAI", definition.getId());
+  }
 }

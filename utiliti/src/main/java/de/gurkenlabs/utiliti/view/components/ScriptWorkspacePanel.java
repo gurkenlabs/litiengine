@@ -3121,23 +3121,25 @@ public final class ScriptWorkspacePanel extends JPanel {
       if (choice != JOptionPane.YES_OPTION) return false;
     }
 
+    try {
+      try (Stream<Path> stream = Files.walk(dir)) {
+        List<Path> pathsToDelete = stream.sorted(Comparator.reverseOrder()).toList();
+        for (Path p : pathsToDelete) {
+          Files.delete(p);
+        }
+      }
+      deleteEmptyDirectoriesUpTo(dir.getParent(), ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel()));
+    } catch (IOException e) {
+      setStatus("Could not delete package directory: " + e.getMessage(), true);
+      return false;
+    }
+
     matching.forEach(this::closeTab);
 
     if (Editor.instance().getGameFile() != null) {
       Editor.instance().getGameFile().getScripts().removeAll(matching);
       Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
     }
-
-    try {
-      try (Stream<Path> stream = Files.walk(dir)) {
-        stream.sorted(Comparator.reverseOrder()).forEach(p -> {
-          try {
-            Files.deleteIfExists(p);
-          } catch (IOException ignored) {}
-        });
-      }
-    } catch (IOException ignored) {}
-    deleteEmptyDirectoriesUpTo(dir.getParent(), ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel()));
 
     this.customCreatedPackages.removeIf(p -> p.equals(packageName) || p.startsWith(packageName + "."));
     if (Editor.instance().getProjectCodeIntegration() != null) {
@@ -3299,8 +3301,6 @@ public final class ScriptWorkspacePanel extends JPanel {
   private boolean renameScript(ScriptDefinition definition, String newClassName, String sourceText,
                                boolean saveProject) {
     if (definition == null || newClassName == null || newClassName.isBlank()) return false;
-    String oldId = definition.getId();
-    if (Objects.equals(oldId, newClassName)) return true;
     if (!newClassName.matches("[A-Za-z_$][\\w$]*")) {
       setStatus("Invalid Java identifier name: " + newClassName, true);
       return false;
@@ -3324,16 +3324,6 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.setStatus("The script source file could not be resolved.", true);
       return false;
     }
-    if (!oldPath.equals(newPath) && Files.exists(newPath)) {
-      this.setStatus("A source file named '" + newPath.getFileName() + "' already exists.", true);
-      return false;
-    }
-
-    ScriptBindingService.ScriptMutationPlan plan = ScriptBindingService.instance().planRename(oldId, newClassName);
-    if (!plan.valid() && Editor.instance().getGameFile().getScripts().stream().anyMatch(d -> d != null && oldId.equals(d.getId()))) {
-      this.setStatus(String.join(" ", plan.errors()), true);
-      return false;
-    }
 
     ScriptTab tab = this.openTabs.get(this.documentKey(definition));
     String currentText = sourceText;
@@ -3347,6 +3337,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     }
 
+    String oldId = definition.getId();
     String oldClassName = extractClassName(currentText);
     if (oldClassName == null) {
       if (definition.getImplementation() != null) {
@@ -3357,7 +3348,22 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     }
 
+    if (Objects.equals(oldClassName, newClassName)) return true;
+
+    if (!oldPath.equals(newPath) && Files.exists(newPath)) {
+      this.setStatus("A source file named '" + newPath.getFileName() + "' already exists.", true);
+      return false;
+    }
+
     boolean idMatchesClassName = Objects.equals(oldId, oldClassName);
+    ScriptBindingService.ScriptMutationPlan plan = idMatchesClassName
+        ? ScriptBindingService.instance().planRename(oldId, newClassName)
+        : null;
+    if (plan != null && !plan.valid() && Editor.instance().getGameFile().getScripts().stream().anyMatch(d -> d != null && oldId.equals(d.getId()))) {
+      this.setStatus(String.join(" ", plan.errors()), true);
+      return false;
+    }
+
     String updatedText = currentText
         .replaceAll("\\b" + Pattern.quote(oldClassName) + "\\b", java.util.regex.Matcher.quoteReplacement(newClassName));
     if (idMatchesClassName) {
