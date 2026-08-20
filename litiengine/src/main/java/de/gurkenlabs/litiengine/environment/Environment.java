@@ -2337,7 +2337,7 @@ public final class Environment implements IRenderable {
     loadUpdatableOrEmitterEntity(entity);
 
     // 3. if a gravity is defined, add a gravity force to the entity
-    if (entity instanceof IMobileEntity iMobileEntity && this.getGravity() != 0) {
+    if (entity instanceof IMobileEntity iMobileEntity && this.getGravity() != 0 && Game.scripts().isEnabled()) {
       this.addGravityForce(iMobileEntity);
     }
 

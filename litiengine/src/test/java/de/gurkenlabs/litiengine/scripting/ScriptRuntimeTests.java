@@ -286,6 +286,60 @@ class ScriptRuntimeTests {
   }
 
   @Test
+  void setDefinitionsWithChangedConfigThenFailedReloadPreservesWorkingGeneration() {
+    Gen1WorkingScript.loadedCount = 0;
+    Gen1WorkingScript.updates = 0;
+    java.util.concurrent.atomic.AtomicInteger compileCount = new java.util.concurrent.atomic.AtomicInteger();
+
+    ScriptProvider provider = new ScriptProvider() {
+      @Override
+      public String language() {
+        return "setdef-rollback-test";
+      }
+
+      @Override
+      public CompiledScript compile(ScriptDefinition definition, java.net.URL source, ClassLoader parent) {
+        int gen = compileCount.incrementAndGet();
+        return new CompiledScript() {
+          @Override
+          public ScriptInstance create() {
+            return gen == 2 ? new Gen2FailingScript() : new Gen1WorkingScript();
+          }
+
+          @Override
+          public Class<? extends ScriptInstance> implementationType() {
+            return gen == 2 ? Gen2FailingScript.class : Gen1WorkingScript.class;
+          }
+        };
+      }
+    };
+
+    Game.scripts().registerProvider(provider);
+    ScriptDefinition definition = new ScriptDefinition(
+      "setdef-rollback", provider.language(), null, "SetdefRollbackScript", ScriptHostType.ENTITY);
+    Game.scripts().setDefinitions(List.of(definition));
+    this.host = new TestEntity();
+    ScriptInstance initial = Game.scripts().attach(this.host, new ScriptBinding("setdef-rollback"));
+    assertNotNull(initial);
+    assertEquals(1, Gen1WorkingScript.loadedCount);
+    Game.scripts().update();
+    assertEquals(1, Gen1WorkingScript.updates);
+
+    // Change the definition config while attachments are still active
+    definition.setTargetType(TestEntity.class.getName());
+    Game.scripts().setDefinitions(List.of(definition));
+
+    // Reload should fail (Gen2 throws in onLoaded) and roll back to Gen1
+    boolean reloaded = Game.scripts().reload("setdef-rollback");
+    assertFalse(reloaded);
+
+    // Gen1 must still be attached and functional
+    assertEquals(2, Gen1WorkingScript.loadedCount);
+    Game.scripts().update();
+    assertEquals(2, Gen1WorkingScript.updates);
+  }
+
+  @Test
   void scriptGlobalsStoresAndFiresChangeListeners() {
     ScriptGlobals globals = Game.scripts().globals();
     globals.clear();
@@ -737,6 +791,34 @@ class ScriptRuntimeTests {
     List<ScriptLanguageService.Completion> hostCompletions = service.complete(hostDoc, new ScriptLanguageService.Position(7, 11));
     assertTrue(hostCompletions.stream().anyMatch(c -> c.label().equals("getMaterial")),
         "Should offer Prop-specific method getMaterial directly on host().");
+  }
+
+  @Test
+  void doesNotAttachOrUpdateWhenScriptsDisabled() {
+    try {
+      Game.scripts().setEnabled(false);
+      assertFalse(Game.scripts().isEnabled());
+
+      ScriptDefinition definition = new ScriptDefinition("java-disabled", "java", null, JavaEntityScript.class.getName(), ScriptHostType.ENTITY);
+      definition.setTargetType(TestEntity.class.getName());
+      Game.scripts().setDefinitions(List.of(definition));
+      ScriptBinding binding = new ScriptBinding("java-disabled");
+      this.host = new TestEntity();
+
+      ScriptInstance instance = Game.scripts().attach(this.host, binding);
+      assertEquals(null, instance);
+      assertEquals(0, JavaEntityScript.loaded);
+
+      EntityScriptController<TestEntity> controller = new EntityScriptController<>(this.host, List.of(binding));
+      this.host.addController(controller);
+      controller.attach();
+      assertFalse(controller.isAttached());
+
+      Game.scripts().update();
+      assertEquals(0, JavaEntityScript.updates);
+    } finally {
+      Game.scripts().setEnabled(true);
+    }
   }
 }
 

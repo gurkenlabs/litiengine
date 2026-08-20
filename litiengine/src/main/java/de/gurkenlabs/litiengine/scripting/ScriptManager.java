@@ -59,6 +59,7 @@ public final class ScriptManager implements IUpdateable {
   private List<Path> projectClasspath = List.of();
   private int projectJavaVersion = Runtime.version().feature();
   private boolean attachedToLoop;
+  private boolean enabled = true;
 
   public ScriptManager() {
     this.registerProvider(new JavaScriptProvider());
@@ -69,6 +70,17 @@ public final class ScriptManager implements IUpdateable {
     });
     Game.world().onLoaded(this::environmentLoaded);
     Game.world().onUnloaded(this::detach);
+  }
+
+  public boolean isEnabled() {
+    return this.enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    if (!enabled) {
+      this.detachAll();
+    }
   }
 
   public ScriptGlobals globals() {
@@ -108,7 +120,16 @@ public final class ScriptManager implements IUpdateable {
     }
 
     this.definitions.forEach((id, previous) -> {
-      if (!previous.hasSameConfiguration(replacements.get(id))) close(this.compiled.remove(id));
+      if (!previous.hasSameConfiguration(replacements.get(id))) {
+        // Only close the compiled generation if no attachments still depend on it.
+        // When attachments are active, keep the generation alive so that reload() can
+        // find it as 'previous' and roll back if the replacement fails to attach.
+        boolean hasActiveAttachment = this.attachments.stream()
+          .anyMatch(a -> a.definition.getId().equals(id));
+        if (!hasActiveAttachment) {
+          close(this.compiled.remove(id));
+        }
+      }
     });
     this.definitions.clear();
     this.definitions.putAll(replacements);
@@ -165,6 +186,7 @@ public final class ScriptManager implements IUpdateable {
   /** Adds or refreshes the script controller that owns the default bindings for an entity type. */
   public void configure(IEntity entity) {
     Objects.requireNonNull(entity);
+    if (!this.enabled) return;
     List<ScriptBinding> defaults = this.resolveEntityBindings(entity);
     EntityScriptController<?> controller = entity.scripts();
     if (controller == null) {
@@ -225,7 +247,7 @@ public final class ScriptManager implements IUpdateable {
   }
 
   List<ScriptInstance> attachAll(Object host, Collection<ScriptBinding> bindings, boolean controllerManaged) {
-    if (bindings == null) return List.of();
+    if (!this.enabled || bindings == null) return List.of();
     this.clearDiagnostics(host);
     List<ScriptInstance> instances = new ArrayList<>();
     bindings.stream().filter(ScriptBinding::isEnabled).sorted(Comparator.comparingInt(ScriptBinding::getOrder)).forEach(binding -> {
@@ -242,6 +264,7 @@ public final class ScriptManager implements IUpdateable {
   private ScriptInstance attach(Object host, ScriptBinding binding, boolean controllerManaged) {
     Objects.requireNonNull(host);
     Objects.requireNonNull(binding);
+    if (!this.enabled) return null;
     ScriptDefinition definition = this.definitions.get(binding.getScript());
     if (definition == null) {
       String hostInfo = "";
@@ -360,6 +383,7 @@ public final class ScriptManager implements IUpdateable {
   }
 
   private void updateAttachments(Object host, boolean controllerManaged) {
+    if (!this.enabled) return;
     for (Attachment attachment : this.attachments) {
       if (attachment.controllerManaged != controllerManaged || host != null && attachment.host != host) continue;
       if (attachment.faulted) continue;
@@ -374,6 +398,7 @@ public final class ScriptManager implements IUpdateable {
   }
 
   private void environmentLoaded(Environment environment) {
+    if (!this.enabled) return;
     if (environment.getMap() instanceof ICustomPropertyProvider properties) {
       String encoded = properties.getStringValue(BINDINGS_PROPERTY, null);
       try {

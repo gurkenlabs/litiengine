@@ -36,7 +36,7 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
     this.lifecycleListener = new EntityListener() {
       @Override
       public void loaded(IEntity loaded, Environment environment) {
-        if (controllerAttached) attachScripts();
+        if (controllerAttached && Game.scripts().isEnabled()) attachScripts();
       }
 
       @Override
@@ -51,7 +51,7 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
   public void attach() {
     if (this.controllerAttached) return;
     this.controllerAttached = true;
-    if (this.entity.isLoaded()) this.attachScripts();
+    if (this.entity.isLoaded() && Game.scripts().isEnabled()) this.attachScripts();
   }
 
   @Override
@@ -63,7 +63,9 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
 
   @Override
   public void update() {
-    Game.scripts().update(this.entity);
+    if (Game.scripts().isEnabled()) {
+      Game.scripts().update(this.entity);
+    }
   }
 
   @Override
@@ -91,7 +93,7 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
     if (restart) this.detachScripts();
     this.explicitBindings = copyBindings(bindings);
     this.rebuildBindings();
-    if (restart && this.controllerAttached && this.entity.isLoaded()) this.attachScripts();
+    if (restart && this.controllerAttached && this.entity.isLoaded() && Game.scripts().isEnabled()) this.attachScripts();
   }
 
   /** Replaces inherited type-level bindings while retaining per-entity overrides. */
@@ -100,7 +102,7 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
     if (restart) this.detachScripts();
     this.defaultBindings = copyBindings(bindings);
     this.rebuildBindings();
-    if (restart && this.controllerAttached && this.entity.isLoaded()) this.attachScripts();
+    if (restart && this.controllerAttached && this.entity.isLoaded() && Game.scripts().isEnabled()) this.attachScripts();
   }
 
   public boolean isAttached() {
@@ -108,7 +110,7 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
   }
 
   private void attachScripts() {
-    if (this.scriptsAttached) return;
+    if (this.scriptsAttached || !Game.scripts().isEnabled()) return;
     this.scriptsAttached = true;
     Game.scripts().attachAll(this.entity, this.bindings, true);
     if (Game.loop() != null) Game.loop().attach(this);

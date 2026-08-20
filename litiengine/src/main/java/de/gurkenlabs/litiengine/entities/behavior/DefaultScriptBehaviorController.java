@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.entities.behavior;
 
+import de.gurkenlabs.litiengine.Game;
+
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.scripting.EntityScriptController;
 import de.gurkenlabs.litiengine.scripting.ScriptBinding;
@@ -71,7 +73,7 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
    * @param binding the script binding to load
    */
   public void loadScript(final ScriptBinding binding) {
-    if (binding == null || binding.getScript() == null) return;
+    if (binding == null || binding.getScript() == null || !Game.scripts().isEnabled()) return;
     this.loadedBindings.removeIf(b -> binding.getScript().equals(b.getScript()));
     this.loadedBindings.add(new ScriptBinding(binding));
     this.scriptController.setBindings(this.loadedBindings);
@@ -83,7 +85,7 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
    * @param bindings the script bindings to load
    */
   public void loadScripts(final Collection<ScriptBinding> bindings) {
-    if (bindings == null) return;
+    if (bindings == null || !Game.scripts().isEnabled()) return;
     for (ScriptBinding binding : bindings) {
       if (binding != null && binding.getScript() != null) {
         this.loadedBindings.removeIf(b -> binding.getScript().equals(b.getScript()));
@@ -124,7 +126,9 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
 
   @Override
   public void attach() {
-    this.scriptController.attach();
+    if (Game.scripts().isEnabled()) {
+      this.scriptController.attach();
+    }
   }
 
   @Override
@@ -134,6 +138,7 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
 
   @Override
   public void update() {
+    if (!Game.scripts().isEnabled()) return;
     this.scriptController.update();
     try {
       this.updateBehavior();

@@ -104,6 +104,7 @@ public class Editor extends Screen {
 
   private Editor() {
     super("Editor");
+    Game.scripts().setEnabled(false);
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
     this.mapComponent = new MapComponent();
     this.mapComponent.onMapLoaded(map -> this.windowMetadataDirty.set(true));
@@ -211,6 +212,11 @@ public class Editor extends Screen {
 
   public ProjectModel getProjectModel() {
     return this.projectModel;
+  }
+
+  public void setProjectModel(ProjectModel model) {
+    this.projectModel = model;
+    this.applyProjectModel();
   }
 
   private volatile ProjectLaunchRequest.Mode projectLaunchMode = ProjectLaunchRequest.Mode.RUN;
@@ -355,6 +361,7 @@ public class Editor extends Screen {
 
   public void setProjectPath(Path projectPath) {
     this.projectPath = projectPath;
+    this.currentResourceFile = projectPath;
     this.projectModel = projectPath == null ? null : this.projectBuildService.resolve(projectPath);
     if (projectPath == null) {
       Game.scripts().setProjectClassLoader(null);
@@ -1262,7 +1269,7 @@ public class Editor extends Screen {
 
   public synchronized void setCurrentStatus(String currentStatus) {
     this.currentStatus = currentStatus;
-    this.statusTick = Game.time().now();
+    this.statusTick = Game.loop() != null ? Game.time().now() : System.currentTimeMillis();
   }
 
   public void updateGameFileMaps() {

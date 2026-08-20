@@ -27,7 +27,9 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   @Override
   public void attach() {
-    Game.loop().attach(this);
+    if (Game.scripts().isEnabled() && Game.loop() != null) {
+      Game.loop().attach(this);
+    }
   }
 
   @Override

@@ -157,6 +157,7 @@ public class MapComponent extends GuiComponent {
 
   public MapComponent() {
     super(0, 0);
+    Game.scripts().setEnabled(false);
     this.transformModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.inspectorNavigationChangedConsumer = new CopyOnWriteArrayList<>();

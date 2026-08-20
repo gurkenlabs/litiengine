@@ -52,6 +52,7 @@ class ScriptBindingServiceTest {
     Game.scripts().registerProvider(new JavaScriptProvider());
     UndoManager.clearAll();
     Editor.instance().load(null, false);
+    Game.scripts().setEnabled(true);
     Editor.instance().getGameFile().getMaps().clear();
     Editor.instance().getGameFile().getScripts().clear();
     Editor.instance().getGameFile().getGameScripts().clear();
@@ -68,6 +69,7 @@ class ScriptBindingServiceTest {
   @AfterEach
   void tearDown() {
     Game.world().unloadEnvironment();
+    Game.scripts().setEnabled(false);
     UndoManager.clearAll();
   }
 

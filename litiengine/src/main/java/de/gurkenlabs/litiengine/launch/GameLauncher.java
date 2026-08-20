@@ -64,6 +64,7 @@ public final class GameLauncher {
     }
 
     Game.init(args);
+    Game.scripts().setEnabled(true);
     if (options.renderScale > 0) {
       Game.graphics().setBaseRenderScale(options.renderScale);
     }
@@ -126,10 +127,6 @@ public final class GameLauncher {
     System.out.println("  -v, --version                Display engine version");
   }
 
-  private static void printVersion() {
-    System.out.println("LITIengine " + Game.info().getVersion());
-  }
-
   private static void loadProjectResources(Path root, LaunchOptions options) {
     if (options.litidataPath != null && Files.isRegularFile(options.litidataPath)) {
       Resources.load(options.litidataPath.toString());
@@ -152,7 +149,11 @@ public final class GameLauncher {
           String filename = file.getFileName().toString();
           if (filename.endsWith(".java")) {
             discoverProjectScript(root, file).ifPresent(candidate -> {
-              if (discovered.stream().noneMatch(d -> d.getId().equalsIgnoreCase(candidate.id()))) {
+              var existing = discovered.stream().filter(d -> d.getId().equalsIgnoreCase(candidate.id())).findFirst();
+              if (existing.isPresent()) {
+                log.warning("Duplicate script id '" + candidate.id() + "' discovered in "
+                  + candidate.source() + " (already registered from " + existing.get().getSource() + "). Keeping first.");
+              } else {
                 ScriptDefinition definition = new ScriptDefinition(candidate.id(), "java", candidate.source(),
                   candidate.implementation(), candidate.host());
                 definition.setTargetType(candidate.targetType());
@@ -187,8 +188,55 @@ public final class GameLauncher {
     }
   }
 
-  private static String stripComments(String content) {
-    return content.replaceAll("//.*|/\\*.*?\\*/", "");
+  /**
+   * Strips comments from Java source while preserving string and character literal contents.
+   * Uses a simple lexical state machine rather than regexes so that:
+   * <ul>
+   *   <li>Multi-line block comments ({@code /* ... * /}) are removed even across newlines</li>
+   *   <li>Comment-like sequences inside string literals ({@code "https://..."}) are preserved</li>
+   *   <li>Character literals ({@code '/'}) do not trigger comment detection</li>
+   * </ul>
+   */
+  static String stripComments(String content) {
+    StringBuilder out = new StringBuilder(content.length());
+    int i = 0;
+    int len = content.length();
+    // States: 0 = code, 1 = line comment, 2 = block comment, 3 = string literal, 4 = char literal
+    int state = 0;
+    while (i < len) {
+      char c = content.charAt(i);
+      char next = i + 1 < len ? content.charAt(i + 1) : 0;
+      switch (state) {
+        case 0 -> { // CODE
+          if (c == '/' && next == '/') { state = 1; i += 2; }
+          else if (c == '/' && next == '*') { state = 2; i += 2; }
+          else if (c == '"') { state = 3; out.append(c); i++; }
+          else if (c == '\'') { state = 4; out.append(c); i++; }
+          else { out.append(c); i++; }
+        }
+        case 1 -> { // LINE_COMMENT — skip until newline, preserve the newline
+          if (c == '\n') { out.append(c); state = 0; }
+          i++;
+        }
+        case 2 -> { // BLOCK_COMMENT — skip until */
+          if (c == '*' && next == '/') { state = 0; i += 2; }
+          else { i++; }
+        }
+        case 3 -> { // STRING_LITERAL — copy verbatim, handle escapes
+          out.append(c);
+          if (c == '\\') { if (i + 1 < len) { out.append(content.charAt(i + 1)); i++; } }
+          else if (c == '"') { state = 0; }
+          i++;
+        }
+        case 4 -> { // CHAR_LITERAL — copy verbatim, handle escapes
+          out.append(c);
+          if (c == '\\') { if (i + 1 < len) { out.append(content.charAt(i + 1)); i++; } }
+          else if (c == '\'') { state = 0; }
+          i++;
+        }
+      }
+    }
+    return out.toString();
   }
 
   private static Optional<ScriptHostType> inferHostType(String content) {
@@ -218,9 +266,33 @@ public final class GameLauncher {
       host.find() ? ScriptHostType.valueOf(host.group(1)) : ScriptHostType.ENTITY, targetType));
   }
 
+  /**
+   * Resolves a simple type name from {@code @ScriptInfo(target = Foo.class)} to a fully qualified
+   * class name using only source-level heuristics.
+   *
+   * <p>Supported resolution paths:
+   * <ul>
+   *   <li>Fully qualified names ({@code com.example.Player.class}) — returned as-is</li>
+   *   <li>Explicit single-type imports ({@code import com.example.Player;})</li>
+   *   <li>Engine entity types ({@code Prop}, {@code Creature}, etc. from {@code de.gurkenlabs.litiengine.entities})</li>
+   *   <li>Same-package types (inferred from the source file's {@code package} declaration)</li>
+   * </ul>
+   *
+   * <p><strong>Not supported</strong> (use a fully qualified name instead):
+   * <ul>
+   *   <li>Wildcard imports ({@code import foo.bar.*;})</li>
+   *   <li>Nested/inner types ({@code Types.Player.class})</li>
+   *   <li>Static imports</li>
+   * </ul>
+   */
   private static String resolveTypeName(String content, String typeName) {
     if ("Object".equals(typeName) || "java.lang.Object".equals(typeName)) return null;
-    if (typeName.contains(".")) return typeName;
+    if (typeName.contains(".")) {
+      log.warning("@ScriptInfo target '" + typeName
+        + "' looks like a nested type or partial qualifier, which is not supported by source discovery. "
+        + "Use a fully qualified name (e.g. com.example." + typeName.replace('.', '$') + ".class) instead.");
+      return typeName;
+    }
     var imports = IMPORT.matcher(content);
     while (imports.find()) {
       String imported = imports.group(1);
