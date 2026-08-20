@@ -114,5 +114,49 @@ class ScriptSourcePathsTest {
         "scripts/groovy/Startup.groovy",
         ScriptSourcePaths.rename("scripts\\groovy\\GameScript.groovy", "groovy", "Startup"));
   }
+
+  @Test
+  void createsScriptInSpecificPackage(@TempDir Path tempDir) throws IOException {
+    Path srcMainJava = tempDir.resolve("src/main/java");
+    Files.createDirectories(srcMainJava);
+    ProjectModel model = new ProjectModel(
+        tempDir, null, ":run", "com.example.game.MyGame", 21,
+        List.of(srcMainJava), List.of(), List.of(), List.of());
+
+    String path = ScriptSourcePaths.create(model, "java", "com.example.game.combat", "BossScript");
+    assertEquals("src/main/java/com/example/game/combat/BossScript.java", path);
+    assertEquals("com.example.game.combat", ScriptSourcePaths.derivePackageName(model, path));
+  }
+
+  @Test
+  void resolvesAndListsPackageDirectories(@TempDir Path tempDir) throws IOException {
+    Path srcMainJava = tempDir.resolve("src/main/java");
+    Path entityPkg = srcMainJava.resolve("com/example/game/entity");
+    Path uiPkg = srcMainJava.resolve("com/example/game/ui");
+    Files.createDirectories(entityPkg);
+    Files.createDirectories(uiPkg);
+
+    ProjectModel model = new ProjectModel(
+        tempDir, null, ":run", "com.example.game.MyGame", 21,
+        List.of(srcMainJava), List.of(), List.of(), List.of());
+
+    Path resolvedEntity = ScriptSourcePaths.resolvePackageDirectory(model, "com.example.game.entity");
+    assertEquals(entityPkg.toAbsolutePath().normalize(), resolvedEntity);
+
+    List<String> discovered = ScriptSourcePaths.listPackageDirectories(model);
+    org.junit.jupiter.api.Assertions.assertTrue(discovered.contains("com.example.game.entity"));
+    org.junit.jupiter.api.Assertions.assertTrue(discovered.contains("com.example.game.ui"));
+  }
+
+  @Test
+  void validatesPackageNames() {
+    org.junit.jupiter.api.Assertions.assertTrue(ScriptSourcePaths.isValidPackage("com.example.game.scripts"));
+    org.junit.jupiter.api.Assertions.assertTrue(ScriptSourcePaths.isValidPackage("scripts"));
+    org.junit.jupiter.api.Assertions.assertTrue(ScriptSourcePaths.isValidPackage("a.b.c"));
+    org.junit.jupiter.api.Assertions.assertFalse(ScriptSourcePaths.isValidPackage(""));
+    org.junit.jupiter.api.Assertions.assertFalse(ScriptSourcePaths.isValidPackage("com.example..scripts"));
+    org.junit.jupiter.api.Assertions.assertFalse(ScriptSourcePaths.isValidPackage("123.bad"));
+    org.junit.jupiter.api.Assertions.assertFalse(ScriptSourcePaths.isValidPackage("class.default"));
+  }
 }
 

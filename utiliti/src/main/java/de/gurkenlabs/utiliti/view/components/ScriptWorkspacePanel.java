@@ -65,6 +65,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.SourceVersion;
@@ -187,6 +188,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final Map<String, ScriptTab> openTabs = new LinkedHashMap<>();
   private final Map<ScriptDefinition, Path> projectSourcePaths = new IdentityHashMap<>();
   private final Map<String, ScriptDefinition> projectSourceDefinitions = new LinkedHashMap<>();
+  private final Set<String> customCreatedPackages = new java.util.LinkedHashSet<>();
   private Map<String, Integer> scriptUsageCounts = Map.of();
   private final Map<String, ScriptDefinition> navigatedProjectDefinitions = new LinkedHashMap<>();
   private final Map<String, Path> navigatedProjectSources = new LinkedHashMap<>();
@@ -505,13 +507,20 @@ public final class ScriptWorkspacePanel extends JPanel {
           .map(d -> Objects.toString(d.getImplementation(), ""))
           .collect(java.util.stream.Collectors.toSet());
 
+      if (query.isEmpty()) {
+        List<String> diskPackages = ScriptSourcePaths.listPackageDirectories(Editor.instance().getProjectModel());
+        Set<String> allPackages = new java.util.LinkedHashSet<>(diskPackages);
+        allPackages.addAll(this.customCreatedPackages);
+        allPackages.stream().sorted().forEach(this::insertPackageNode);
+      }
+
       Editor.instance().getGameFile().getScripts().stream()
         .filter(definition -> query.isEmpty() || displayName(definition).toLowerCase(Locale.ROOT).contains(query)
           || Objects.toString(definition.getSource(), "").toLowerCase(Locale.ROOT).contains(query)
           || Objects.toString(definition.getImplementation(), "").toLowerCase(Locale.ROOT).contains(query))
         .sorted(Comparator.comparing(ScriptWorkspacePanel::displayName, String.CASE_INSENSITIVE_ORDER))
         .forEach(definition -> {
-          if (this.isProjectSource(definition)) this.insertProjectSourceNode(definition);
+          if (this.isProjectSource(definition) || (definition.getImplementation() != null && definition.getImplementation().contains("."))) this.insertProjectSourceNode(definition);
           else this.insertScriptNode(definition);
         });
       this.projectSourceDefinitions.values().stream()
@@ -733,7 +742,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     definition.setTargetType(host == ScriptHostType.ENTITY ? targetType : null);
     tab.synchronizeDeclaration();
     Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
-    UndoManager.instance().recordChanges();
+    recordUndoChanges();
     this.refreshScripts();
     this.selectTreeNode(definition.getId());
     this.selectionListener.accept(definition);
@@ -1307,6 +1316,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
     panel.add(searchBox, BorderLayout.NORTH);
 
+    this.scripts.getSelectionModel().setSelectionMode(javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION);
     this.scripts.setCellRenderer(new ScriptTreeRenderer());
     this.scripts.addTreeSelectionListener(event -> {
       ScriptDefinition definition = this.selectedDefinition();
@@ -1319,8 +1329,32 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
 
     this.scripts.registerKeyboardAction(
-      evt -> renameScript(selectedDefinition()),
+      evt -> {
+        Object selected = this.scripts.getLastSelectedPathComponent();
+        if (selected instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
+          if (item.isPackage()) {
+            renamePackage(item.packageName());
+          } else if (item.definition() != null) {
+            renameScript(item.definition());
+          }
+        }
+      },
       KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F2, 0),
+      JComponent.WHEN_FOCUSED
+    );
+
+    this.scripts.registerKeyboardAction(
+      evt -> {
+        Object selected = this.scripts.getLastSelectedPathComponent();
+        if (selected instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
+          if (item.isPackage()) {
+            deletePackage(item.packageName());
+          } else if (item.definition() != null) {
+            deleteScript(item.definition());
+          }
+        }
+      },
+      KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DELETE, 0),
       JComponent.WHEN_FOCUSED
     );
 
@@ -2216,18 +2250,34 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private record LevelAndMessage(Level level, String message) {}
 
+  private void insertPackageNode(String packageName) {
+    if (packageName == null || packageName.isBlank()) return;
+    DefaultMutableTreeNode parent = this.scriptsRoot;
+    String[] parts = packageName.split("\\.");
+    String currentPkg = "";
+    for (String part : parts) {
+      if (part.isBlank()) continue;
+      currentPkg = currentPkg.isEmpty() ? part : currentPkg + "." + part;
+      parent = childFolder(parent, part, currentPkg);
+    }
+  }
+
   private void insertScriptNode(ScriptDefinition definition) {
-    this.scriptsRoot.add(new DefaultMutableTreeNode(new ScriptTreeItem(displayName(definition), definition)));
+    this.scriptsRoot.add(new DefaultMutableTreeNode(new ScriptTreeItem(displayName(definition), definition, null)));
   }
 
   private void insertProjectSourceNode(ScriptDefinition definition) {
     DefaultMutableTreeNode parent = this.scriptsRoot;
     String implementation = Objects.toString(definition.getImplementation(), definition.getId());
     String[] parts = implementation.split("\\.");
+    String currentPkg = "";
     for (int i = 0; i < Math.max(0, parts.length - 1); i++) {
-      if (!parts[i].isBlank()) parent = childFolder(parent, parts[i]);
+      if (!parts[i].isBlank()) {
+        currentPkg = currentPkg.isEmpty() ? parts[i] : currentPkg + "." + parts[i];
+        parent = childFolder(parent, parts[i], currentPkg);
+      }
     }
-    parent.add(new DefaultMutableTreeNode(new ScriptTreeItem(displayName(definition), definition)));
+    parent.add(new DefaultMutableTreeNode(new ScriptTreeItem(displayName(definition), definition, null)));
   }
 
   private static void compactEmptyFolders(DefaultMutableTreeNode node) {
@@ -2236,12 +2286,12 @@ public final class ScriptWorkspacePanel extends JPanel {
       DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
       compactEmptyFolders(child);
     }
-    if (node.getUserObject() instanceof ScriptTreeItem item && item.definition() == null) {
+    if (node.getUserObject() instanceof ScriptTreeItem item && item.isPackage()) {
       while (node.getChildCount() == 1) {
         DefaultMutableTreeNode onlyChild = (DefaultMutableTreeNode) node.getChildAt(0);
-        if (onlyChild.getUserObject() instanceof ScriptTreeItem childItem && childItem.definition() == null) {
+        if (onlyChild.getUserObject() instanceof ScriptTreeItem childItem && childItem.isPackage()) {
           String merged = item.label() + "." + childItem.label();
-          item = new ScriptTreeItem(merged, null);
+          item = new ScriptTreeItem(merged, null, childItem.packageName());
           node.setUserObject(item);
           node.removeAllChildren();
           List<DefaultMutableTreeNode> grandChildren = new ArrayList<>();
@@ -2258,15 +2308,42 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
   }
 
-  private static DefaultMutableTreeNode childFolder(DefaultMutableTreeNode parent, String name) {
+  private static DefaultMutableTreeNode childFolder(DefaultMutableTreeNode parent, String name, String fullPackage) {
     Enumeration<?> children = parent.children();
     while (children.hasMoreElements()) {
       DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
-      if (child.getUserObject() instanceof ScriptTreeItem item && item.definition() == null && item.label().equals(name)) return child;
+      if (child.getUserObject() instanceof ScriptTreeItem item && item.isPackage() && item.label().equals(name)) return child;
     }
-    DefaultMutableTreeNode child = new DefaultMutableTreeNode(new ScriptTreeItem(name, null));
+    DefaultMutableTreeNode child = new DefaultMutableTreeNode(new ScriptTreeItem(name, null, fullPackage));
     parent.add(child);
     return child;
+  }
+
+  public String selectedPackage() {
+    Object selected = this.scripts.getLastSelectedPathComponent();
+    if (selected instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof ScriptTreeItem item) {
+      if (item.isPackage()) return item.packageName();
+      if (item.definition() != null && item.definition().getImplementation() != null) {
+        int dot = item.definition().getImplementation().lastIndexOf('.');
+        return dot > 0 ? item.definition().getImplementation().substring(0, dot) : null;
+      }
+    }
+    return null;
+  }
+
+  public void selectPackageNode(String packageName) {
+    if (packageName == null || packageName.isBlank()) return;
+    Enumeration<?> nodes = this.scriptsRoot.depthFirstEnumeration();
+    while (nodes.hasMoreElements()) {
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) nodes.nextElement();
+      if (node.getUserObject() instanceof ScriptTreeItem item && item.isPackage()
+          && (Objects.equals(packageName, item.packageName()) || Objects.equals(packageName, item.label()))) {
+        TreePath path = new TreePath(node.getPath());
+        this.scripts.setSelectionPath(path);
+        this.scripts.scrollPathToVisible(path);
+        return;
+      }
+    }
   }
 
   private ScriptDefinition selectedDefinition() {
@@ -2317,10 +2394,14 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   public ScriptDefinition createScript(ScriptKind kind) {
-    return createScript(kind, kind == ScriptKind.ENTITY ? Creature.class : null);
+    return createScript(kind, kind == ScriptKind.ENTITY ? Creature.class : null, selectedPackage());
   }
 
   public ScriptDefinition createScript(ScriptKind kind, Class<?> targetClass) {
+    return createScript(kind, targetClass, selectedPackage());
+  }
+
+  public ScriptDefinition createScript(ScriptKind kind, Class<?> targetClass, String targetPackage) {
     if (Editor.instance().getGameFile() == null || Editor.instance().getProjectPath() == null) return null;
     String targetType = targetClass != null ? targetClass.getName() : (kind == ScriptKind.ENTITY ? Creature.class.getName() : null);
     ScriptHostType hostType = switch (kind) {
@@ -2332,12 +2413,15 @@ public final class ScriptWorkspacePanel extends JPanel {
     String className = this.promptForNewScriptName(this.nextAvailableScriptName());
     if (className == null) return null;
     String id = className;
-    String relPath = ScriptSourcePaths.create(Editor.instance().getProjectModel(), "java", className);
+    String relPath = ScriptSourcePaths.create(Editor.instance().getProjectModel(), "java", targetPackage, className);
     Path source = resolveSource(relPath);
     if (source == null) return null;
 
     String packageName = ScriptSourcePaths.derivePackageName(
         Editor.instance().getProjectModel(), relPath);
+    if (packageName == null || packageName.isBlank()) {
+      packageName = targetPackage;
+    }
     String implementation = (packageName != null && !packageName.isBlank())
         ? packageName + "." + className
         : className;
@@ -2353,7 +2437,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       Files.writeString(source, defaultSource(definition, className, kind));
       Editor.instance().getGameFile().getScripts().add(definition);
       Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
-      UndoManager.instance().recordChanges();
+      recordUndoChanges();
       UI.getAssetController().refresh();
       this.refreshScripts();
       this.open(definition);
@@ -2605,7 +2689,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
       Editor.instance().getGameFile().getScripts().add(dup);
       Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
-      UndoManager.instance().recordChanges();
+      recordUndoChanges();
       UI.getAssetController().refresh();
       refreshScripts();
       open(dup);
@@ -2617,14 +2701,15 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private JPopupMenu createAddScriptPopupMenu() {
     JPopupMenu menu = new JPopupMenu();
+    String targetPkg = selectedPackage();
     JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.SCRIPT_16);
-    entityScript.addActionListener(e -> createScript(ScriptKind.ENTITY));
+    entityScript.addActionListener(e -> createScript(ScriptKind.ENTITY, null, targetPkg));
 
     JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_16);
-    gameScript.addActionListener(e -> createScript(ScriptKind.GAME));
+    gameScript.addActionListener(e -> createScript(ScriptKind.GAME, null, targetPkg));
 
     JMenuItem envScript = new JMenuItem("Environment Script...", Icons.SCRIPT_16);
-    envScript.addActionListener(e -> createScript(ScriptKind.ENVIRONMENT));
+    envScript.addActionListener(e -> createScript(ScriptKind.ENVIRONMENT, null, targetPkg));
 
     menu.add(entityScript);
     menu.add(gameScript);
@@ -2636,43 +2721,382 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (!e.isPopupTrigger()) return;
     int row = this.scripts.getClosestRowForLocation(e.getX(), e.getY());
     if (row >= 0) this.scripts.setSelectionRow(row);
-    ScriptDefinition selected = selectedDefinition();
+    Object selectedComponent = this.scripts.getLastSelectedPathComponent();
+    ScriptTreeItem item = (selectedComponent instanceof DefaultMutableTreeNode node
+        && node.getUserObject() instanceof ScriptTreeItem treeItem) ? treeItem : null;
 
     JPopupMenu menu = new JPopupMenu();
+    String targetPkg = item != null && item.isPackage() ? item.packageName() : selectedPackage();
+
     JMenu newSub = new JMenu("New Script");
     newSub.setIcon(Icons.ADD_16);
     JMenuItem entityScript = new JMenuItem("Entity Script...");
-    entityScript.addActionListener(evt -> createScript(ScriptKind.ENTITY));
+    entityScript.addActionListener(evt -> createScript(ScriptKind.ENTITY, null, targetPkg));
     JMenuItem gameScript = new JMenuItem("Game Script...");
-    gameScript.addActionListener(evt -> createScript(ScriptKind.GAME));
+    gameScript.addActionListener(evt -> createScript(ScriptKind.GAME, null, targetPkg));
     JMenuItem envScript = new JMenuItem("Environment Script...");
-    envScript.addActionListener(evt -> createScript(ScriptKind.ENVIRONMENT));
+    envScript.addActionListener(evt -> createScript(ScriptKind.ENVIRONMENT, null, targetPkg));
     newSub.add(entityScript);
     newSub.add(gameScript);
     newSub.add(envScript);
     menu.add(newSub);
 
-    if (selected != null) {
-      menu.addSeparator();
-      JMenuItem dupItem = new JMenuItem("Duplicate Script", Icons.COPY_16);
-      dupItem.addActionListener(evt -> duplicateScript(selected));
-      menu.add(dupItem);
+    JMenuItem newPkgItem = new JMenuItem(item != null && item.isPackage() ? "New Subpackage..." : "New Package...", Icons.PACKAGE_16);
+    newPkgItem.addActionListener(evt -> createPackage(targetPkg));
+    menu.add(newPkgItem);
 
-      JMenuItem renameItem = new JMenuItem("Rename Class...", Icons.RENAME_16);
-      renameItem.addActionListener(evt -> renameScript(selected));
-      menu.add(renameItem);
+    if (item != null) {
+      if (item.isPackage()) {
+        menu.addSeparator();
+        JMenuItem renamePkg = new JMenuItem("Rename Package...", Icons.RENAME_16);
+        renamePkg.addActionListener(evt -> renamePackage(item.packageName()));
+        menu.add(renamePkg);
 
-      JMenuItem deleteItem = new JMenuItem("Delete Script", Icons.DELETE_16);
-      deleteItem.addActionListener(evt -> deleteScript(selected));
-      menu.add(deleteItem);
+        JMenuItem deletePkg = new JMenuItem("Delete Package", Icons.DELETE_16);
+        deletePkg.addActionListener(evt -> deletePackage(item.packageName()));
+        menu.add(deletePkg);
+      } else if (item.definition() != null) {
+        ScriptDefinition selected = item.definition();
+        menu.addSeparator();
+        JMenuItem dupItem = new JMenuItem("Duplicate Script", Icons.COPY_16);
+        dupItem.addActionListener(evt -> duplicateScript(selected));
+        menu.add(dupItem);
 
-      if (showsUsagesFor(selected)) {
-        JMenuItem usagesItem = new JMenuItem("Find Usages", Icons.SEARCH_16);
-        usagesItem.addActionListener(evt -> open(selected));
-        menu.add(usagesItem);
+        JMenuItem renameItem = new JMenuItem("Rename Class...", Icons.RENAME_16);
+        renameItem.addActionListener(evt -> renameScript(selected));
+        menu.add(renameItem);
+
+        JMenuItem movePkgItem = new JMenuItem("Move to Package...", Icons.PACKAGE_16);
+        movePkgItem.addActionListener(evt -> moveScriptToPackage(selected));
+        menu.add(movePkgItem);
+
+        JMenuItem deleteItem = new JMenuItem("Delete Script", Icons.DELETE_16);
+        deleteItem.addActionListener(evt -> deleteScript(selected));
+        menu.add(deleteItem);
+
+        if (showsUsagesFor(selected)) {
+          JMenuItem usagesItem = new JMenuItem("Find Usages", Icons.SEARCH_16);
+          usagesItem.addActionListener(evt -> open(selected));
+          menu.add(usagesItem);
+        }
       }
     }
     menu.show(e.getComponent(), e.getX(), e.getY());
+  }
+
+  public void createPackage(String parentPackage) {
+    if (Editor.instance().getGameFile() == null || Editor.instance().getProjectPath() == null) return;
+    String suggestion = parentPackage != null && !parentPackage.isBlank() ? parentPackage + "." : "";
+    String input = (String) JOptionPane.showInputDialog(
+        this,
+        "Enter package name (e.g. 'com.example.game.combat' or 'combat'):",
+        "New Package",
+        JOptionPane.QUESTION_MESSAGE,
+        Icons.PACKAGE_16,
+        null,
+        suggestion);
+    if (input == null || input.isBlank()) return;
+    String pkgName = input.trim();
+    if (!pkgName.contains(".") && parentPackage != null && !parentPackage.isBlank()) {
+      pkgName = parentPackage + "." + pkgName;
+    }
+    if (!ScriptSourcePaths.isValidPackage(pkgName)) {
+      JOptionPane.showMessageDialog(this, "Invalid package name: " + pkgName, "Create Package Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    Path dir = ScriptSourcePaths.resolvePackageDirectory(Editor.instance().getProjectModel(), pkgName);
+    if (dir == null) {
+      this.setStatus("Could not resolve package directory for " + pkgName, true);
+      return;
+    }
+    try {
+      Files.createDirectories(dir);
+      this.customCreatedPackages.add(pkgName);
+      this.refreshScripts();
+      this.selectPackageNode(pkgName);
+      this.setStatus("Created package " + pkgName, false);
+    } catch (IOException e) {
+      this.setStatus("Could not create package directory: " + e.getMessage(), true);
+    }
+  }
+
+  public void renamePackage(String oldPackage) {
+    if (oldPackage == null || oldPackage.isBlank() || Editor.instance().getProjectPath() == null) return;
+    String input = (String) JOptionPane.showInputDialog(
+        this,
+        "Enter new package name:",
+        "Rename Package",
+        JOptionPane.QUESTION_MESSAGE,
+        Icons.RENAME_16,
+        null,
+        oldPackage);
+    if (input == null || input.isBlank() || input.trim().equals(oldPackage)) return;
+    String newPackage = input.trim();
+    if (!ScriptSourcePaths.isValidPackage(newPackage)) {
+      JOptionPane.showMessageDialog(this, "Invalid package name: " + newPackage, "Rename Package Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    executeRenamePackage(oldPackage, newPackage);
+  }
+
+  public void executeRenamePackage(String oldPackage, String newPackage) {
+    if (oldPackage == null || newPackage == null || oldPackage.equals(newPackage)) return;
+    Path oldDir = ScriptSourcePaths.resolvePackageDirectory(Editor.instance().getProjectModel(), oldPackage);
+    Path newDir = ScriptSourcePaths.resolvePackageDirectory(Editor.instance().getProjectModel(), newPackage);
+
+    if (oldDir != null && Files.isDirectory(oldDir)) {
+      try {
+        Files.createDirectories(newDir);
+        List<Path> javaFiles;
+        try (Stream<Path> stream = Files.walk(oldDir)) {
+          javaFiles = stream.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(".java")).toList();
+        }
+        for (Path file : javaFiles) {
+          String content = Files.readString(file);
+          Path relPath = oldDir.relativize(file);
+          Path targetFile = newDir.resolve(relPath);
+          Files.createDirectories(targetFile.getParent());
+
+          String targetPkg;
+          if (relPath.getParent() != null) {
+            String sub = relPath.getParent().toString().replace('\\', '.').replace('/', '.');
+            targetPkg = newPackage + "." + sub;
+          } else {
+            targetPkg = newPackage;
+          }
+          String updated = content.replaceFirst("(?m)^\\s*package\\s+[a-zA-Z0-9_.]+\\s*;", "package " + targetPkg + ";");
+          Files.writeString(targetFile, updated);
+        }
+
+        for (Path file : javaFiles) {
+          Files.deleteIfExists(file);
+        }
+        deleteEmptyDirectoriesUpTo(oldDir, ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel()));
+      } catch (IOException error) {
+        this.setStatus("Could not rename package on disk: " + error.getMessage(), true);
+        return;
+      }
+    }
+
+    Path sourceRoot = ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel());
+    if (sourceRoot != null && Files.isDirectory(sourceRoot)) {
+      try (Stream<Path> stream = Files.walk(sourceRoot)) {
+        var files = stream.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(".java")).toList();
+        for (Path file : files) {
+          try {
+            String text = Files.readString(file);
+            String updated = text
+                .replaceAll("(?m)^\\s*import\\s+" + Pattern.quote(oldPackage) + "\\.", "import " + newPackage + ".")
+                .replaceAll("(?m)^\\s*import\\s+static\\s+" + Pattern.quote(oldPackage) + "\\.", "import static " + newPackage + ".");
+            if (!updated.equals(text)) {
+              Files.writeString(file, updated);
+            }
+          } catch (IOException ignored) {}
+        }
+      } catch (IOException ignored) {}
+    }
+
+    if (Editor.instance().getGameFile() != null) {
+      String oldSlash = oldPackage.replace('.', '/');
+      String newSlash = newPackage.replace('.', '/');
+      for (ScriptDefinition def : Editor.instance().getGameFile().getScripts()) {
+        if (def == null) continue;
+        String impl = def.getImplementation();
+        if (impl != null) {
+          if (impl.equals(oldPackage)) {
+            def.setImplementation(newPackage);
+          } else if (impl.startsWith(oldPackage + ".")) {
+            def.setImplementation(newPackage + impl.substring(oldPackage.length()));
+          }
+        }
+        String src = def.getSource();
+        if (src != null && src.contains(oldSlash)) {
+          def.setSource(src.replace(oldSlash, newSlash));
+        }
+      }
+      Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
+    }
+
+    Set<String> updatedCustom = new java.util.LinkedHashSet<>();
+    for (String pkg : this.customCreatedPackages) {
+      if (pkg.equals(oldPackage)) {
+        updatedCustom.add(newPackage);
+      } else if (pkg.startsWith(oldPackage + ".")) {
+        updatedCustom.add(newPackage + pkg.substring(oldPackage.length()));
+      } else {
+        updatedCustom.add(pkg);
+      }
+    }
+    this.customCreatedPackages.clear();
+    this.customCreatedPackages.addAll(updatedCustom);
+
+    if (oldDir != null && newDir != null) {
+      for (ScriptTab tab : List.copyOf(this.openTabs.values())) {
+        if (tab.path != null && tab.path.startsWith(oldDir)) {
+          Path rel = oldDir.relativize(tab.path);
+          Path next = newDir.resolve(rel);
+          this.openTabs.remove(tab.key);
+          tab.path = next;
+          tab.key = this.documentKey(tab.definition);
+          this.openTabs.put(tab.key, tab);
+          tab.loadPreservingCaret();
+        }
+      }
+    }
+
+    if (Editor.instance().getProjectCodeIntegration() != null) {
+      Editor.instance().getProjectCodeIntegration().reloadProject(Editor.instance().getProjectModel());
+    }
+    recordUndoChanges();
+    Editor.instance().save(false);
+    refreshScripts();
+    selectPackageNode(newPackage);
+    setStatus("Renamed package " + oldPackage + " to " + newPackage, false);
+  }
+
+  private static void deleteEmptyDirectoriesUpTo(Path start, Path boundary) {
+    if (start == null) return;
+    Path curr = start;
+    while (curr != null && !curr.equals(boundary)) {
+      try {
+        if (Files.isDirectory(curr)) {
+          try (var s = Files.list(curr)) {
+            if (s.findAny().isPresent()) break;
+          }
+          Files.deleteIfExists(curr);
+        }
+      } catch (IOException ignored) {
+        break;
+      }
+      curr = curr.getParent();
+    }
+  }
+
+  public void deletePackage(String packageName) {
+    if (packageName == null || packageName.isBlank() || Editor.instance().getProjectPath() == null) return;
+    List<ScriptDefinition> matching = new ArrayList<>();
+    if (Editor.instance().getGameFile() != null) {
+      for (ScriptDefinition def : Editor.instance().getGameFile().getScripts()) {
+        if (def == null) continue;
+        String impl = def.getImplementation();
+        if (impl != null && (impl.equals(packageName) || impl.startsWith(packageName + "."))) {
+          matching.add(def);
+        }
+      }
+    }
+    int scriptCount = matching.size();
+    int choice = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to delete package '" + packageName + "'"
+            + (scriptCount > 0 ? " and all " + scriptCount + " script(s) inside it" : "") + "?\n"
+            + "This will delete the directory from disk.",
+        "Delete Package",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE);
+    if (choice != JOptionPane.YES_OPTION) return;
+
+    matching.forEach(this::closeTab);
+
+    if (Editor.instance().getGameFile() != null) {
+      Editor.instance().getGameFile().getScripts().removeAll(matching);
+      Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
+    }
+
+    Path dir = ScriptSourcePaths.resolvePackageDirectory(Editor.instance().getProjectModel(), packageName);
+    if (dir != null && Files.isDirectory(dir)) {
+      try {
+        try (Stream<Path> stream = Files.walk(dir)) {
+          stream.sorted(Comparator.reverseOrder()).forEach(p -> {
+            try {
+              Files.deleteIfExists(p);
+            } catch (IOException ignored) {}
+          });
+        }
+      } catch (IOException ignored) {}
+      deleteEmptyDirectoriesUpTo(dir.getParent(), ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel()));
+    }
+
+    this.customCreatedPackages.removeIf(p -> p.equals(packageName) || p.startsWith(packageName + "."));
+    if (Editor.instance().getProjectCodeIntegration() != null) {
+      Editor.instance().getProjectCodeIntegration().reloadProject(Editor.instance().getProjectModel());
+    }
+    recordUndoChanges();
+    Editor.instance().save(false);
+    refreshScripts();
+    setStatus("Deleted package " + packageName, false);
+  }
+
+  public void moveScriptToPackage(ScriptDefinition definition) {
+    if (definition == null || Editor.instance().getProjectPath() == null) return;
+    String currentPkg = "";
+    if (definition.getImplementation() != null) {
+      int dot = definition.getImplementation().lastIndexOf('.');
+      if (dot > 0) currentPkg = definition.getImplementation().substring(0, dot);
+    }
+    String input = (String) JOptionPane.showInputDialog(
+        this,
+        "Enter destination package for '" + displayName(definition) + "':",
+        "Move to Package",
+        JOptionPane.QUESTION_MESSAGE,
+        Icons.PACKAGE_16,
+        null,
+        currentPkg);
+    if (input == null || input.isBlank() || input.trim().equals(currentPkg)) return;
+    String targetPackage = input.trim();
+    if (!ScriptSourcePaths.isValidPackage(targetPackage)) {
+      JOptionPane.showMessageDialog(this, "Invalid package name: " + targetPackage, "Move Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+
+    String className = displayName(definition);
+    String newSourceRel = ScriptSourcePaths.create(Editor.instance().getProjectModel(), definition.getLanguage(), targetPackage, className);
+    Path oldPath = this.projectSourcePaths.get(definition);
+    if (oldPath == null) oldPath = resolveSource(definition.getSource());
+    Path newPath = resolveSource(newSourceRel);
+
+    if (oldPath == null || !Files.isRegularFile(oldPath) || newPath == null) {
+      setStatus("Could not resolve source paths for move.", true);
+      return;
+    }
+
+    try {
+      String content = Files.readString(oldPath);
+      String updated = content.replaceFirst("(?m)^\\s*package\\s+[a-zA-Z0-9_.]+\\s*;", "package " + targetPackage + ";");
+      if (!updated.contains("package " + targetPackage + ";")) {
+        updated = "package " + targetPackage + ";\n\n" + updated;
+      }
+      Files.createDirectories(newPath.getParent());
+      Files.writeString(newPath, updated);
+      if (!oldPath.equals(newPath)) {
+        Files.deleteIfExists(oldPath);
+        deleteEmptyDirectoriesUpTo(oldPath.getParent(), ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel()));
+      }
+
+      definition.setSource(newSourceRel);
+      definition.setImplementation(targetPackage + "." + className);
+      Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
+
+      ScriptTab tab = this.openTabs.get(this.documentKey(definition));
+      if (tab != null) {
+        this.openTabs.remove(tab.key);
+        tab.path = newPath;
+        tab.key = this.documentKey(definition);
+        this.openTabs.put(tab.key, tab);
+        tab.setText(updated);
+        tab.dirty = false;
+      }
+
+      if (Editor.instance().getProjectCodeIntegration() != null) {
+        Editor.instance().getProjectCodeIntegration().reloadProject(Editor.instance().getProjectModel());
+      }
+      recordUndoChanges();
+      Editor.instance().save(false);
+      refreshScripts();
+      open(definition);
+      setStatus("Moved script to package " + targetPackage, false);
+    } catch (IOException e) {
+      setStatus("Could not move script: " + e.getMessage(), true);
+    }
   }
 
   public void renameScript(ScriptDefinition definition) {
@@ -2828,6 +3252,12 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   static String synchronizeDeclaration(String source, ScriptDefinition definition) {
     return ScriptTemplateFactory.synchronizeDeclaration(source, definition);
+  }
+
+  private static void recordUndoChanges() {
+    if (Game.world() != null && Game.world().environment() != null && Game.world().environment().getMap() != null) {
+      UndoManager.instance().recordChanges();
+    }
   }
 
   private static String displayName(ScriptDefinition definition) {
@@ -3020,7 +3450,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.loadedTime = Files.getLastModifiedTime(this.path);
         this.dirty = false;
         this.updateTabTitle();
-        if (!this.projectSource) UndoManager.instance().recordChanges();
+        if (!this.projectSource) recordUndoChanges();
         return true;
       } catch (IOException e) {
         setStatus("Could not save source: " + e.getMessage(), true);
@@ -3054,7 +3484,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
   }
 
-  private record ScriptTreeItem(String label, ScriptDefinition definition) {
+  private record ScriptTreeItem(String label, ScriptDefinition definition, String packageName) {
+    ScriptTreeItem(String label, ScriptDefinition definition) {
+      this(label, definition, null);
+    }
+    public boolean isPackage() { return this.definition == null; }
     @Override public String toString() { return this.label; }
   }
 
@@ -3062,7 +3496,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     private final JLabel iconLabel = new JLabel();
     private final JLabel nameLabel = new JLabel();
     private final JLabel usageLabel = new UsageBadge();
-    ScriptTreeRenderer() {
+
+    ScriptTreeRenderer() {
       super(new BorderLayout(6, 0));
       this.setOpaque(false);
       this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
@@ -3117,7 +3552,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         } else {
           icon = Icons.PACKAGE_16;
           this.usageLabel.setVisible(false);
-          this.setToolTipText(null);
+          this.setToolTipText(item.packageName() != null ? "Package: " + item.packageName() : null);
           this.nameLabel.setFont(tree.getFont().deriveFont(Font.PLAIN));
         }
 

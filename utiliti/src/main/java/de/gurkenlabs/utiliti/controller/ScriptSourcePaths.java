@@ -20,17 +20,26 @@ public final class ScriptSourcePaths {
   }
 
   public static String create(ProjectModel model, String language, String className) {
+    return create(model, language, null, className);
+  }
+
+  public static String create(ProjectModel model, String language, String packageName, String className) {
     String normalizedLanguage = normalizeLanguage(language);
     String ext = extension(normalizedLanguage);
 
     if (model == null || model.projectRoot() == null) {
+      if (packageName != null && !packageName.isBlank()) {
+        return SCRIPT_ROOT + normalizedLanguage + "/" + packageName.replace('.', '/') + "/" + className + ext;
+      }
       return SCRIPT_ROOT + normalizedLanguage + "/" + className + ext;
     }
 
     Path projectRoot = model.projectRoot();
     Path chosenSourceRoot = selectSourceRoot(model);
 
-    String scriptPackage = detectScriptPackage(model, chosenSourceRoot);
+    String scriptPackage = (packageName != null && !packageName.isBlank())
+        ? packageName
+        : detectScriptPackage(model, chosenSourceRoot);
 
     if (chosenSourceRoot != null && scriptPackage != null && !scriptPackage.isBlank()) {
       String relSourceRoot = projectRoot.relativize(chosenSourceRoot).toString().replace('\\', '/');
@@ -43,19 +52,28 @@ public final class ScriptSourcePaths {
     }
 
     if (Files.isDirectory(projectRoot.resolve("scripts"))) {
+      if (packageName != null && !packageName.isBlank()) {
+        return SCRIPT_ROOT + normalizedLanguage + "/" + packageName.replace('.', '/') + "/" + className + ext;
+      }
       return SCRIPT_ROOT + normalizedLanguage + "/" + className + ext;
     }
 
     if (chosenSourceRoot != null) {
       String relSourceRoot = projectRoot.relativize(chosenSourceRoot).toString().replace('\\', '/');
       String prefix = relSourceRoot.isEmpty() ? "" : relSourceRoot + "/";
+      if (packageName != null && !packageName.isBlank()) {
+        return prefix + packageName.replace('.', '/') + "/" + className + ext;
+      }
       return prefix + className + ext;
     }
 
+    if (packageName != null && !packageName.isBlank()) {
+      return SCRIPT_ROOT + normalizedLanguage + "/" + packageName.replace('.', '/') + "/" + className + ext;
+    }
     return SCRIPT_ROOT + normalizedLanguage + "/" + className + ext;
   }
 
-  private static Path selectSourceRoot(ProjectModel model) {
+  public static Path selectSourceRoot(ProjectModel model) {
     if (model == null || model.sourceRoots() == null || model.sourceRoots().isEmpty()) {
       return null;
     }
@@ -163,7 +181,7 @@ public final class ScriptSourcePaths {
     return sb.toString();
   }
 
-  static boolean isValidPackage(String packageName) {
+  public static boolean isValidPackage(String packageName) {
     if (packageName == null || packageName.isBlank()) return false;
     String[] parts = packageName.split("\\.");
     for (String part : parts) {
@@ -172,6 +190,33 @@ public final class ScriptSourcePaths {
       }
     }
     return true;
+  }
+
+  public static Path resolvePackageDirectory(ProjectModel model, String packageName) {
+    if (model == null || model.projectRoot() == null) return null;
+    Path sourceRoot = selectSourceRoot(model);
+    if (sourceRoot == null) return null;
+    if (packageName == null || packageName.isBlank()) return sourceRoot;
+    return sourceRoot.resolve(packageName.replace('.', '/')).normalize();
+  }
+
+  public static java.util.List<String> listPackageDirectories(ProjectModel model) {
+    if (model == null || model.projectRoot() == null) return java.util.List.of();
+    Path sourceRoot = selectSourceRoot(model);
+    if (sourceRoot == null || !Files.isDirectory(sourceRoot)) return java.util.List.of();
+    java.util.List<String> packages = new java.util.ArrayList<>();
+    try (Stream<Path> stream = Files.walk(sourceRoot, 10)) {
+      stream.filter(Files::isDirectory)
+          .filter(p -> !p.equals(sourceRoot))
+          .forEach(dir -> {
+            Path rel = sourceRoot.relativize(dir);
+            String pkg = rel.toString().replace('\\', '/').replace('/', '.');
+            if (isValidPackage(pkg)) {
+              packages.add(pkg);
+            }
+          });
+    } catch (IOException ignored) {}
+    return packages;
   }
 
   public static String derivePackageName(ProjectModel model, String relativeSource) {
