@@ -77,9 +77,12 @@ public final class ScriptManager implements IUpdateable {
   }
 
   public void setEnabled(boolean enabled) {
+    if (this.enabled == enabled) return;
     this.enabled = enabled;
     if (!enabled) {
       this.detachAll();
+    } else if (Game.world().environment() != null) {
+      this.environmentLoaded(Game.world().environment());
     }
   }
 

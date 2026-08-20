@@ -65,6 +65,7 @@ public final class GameLauncher {
 
     Game.init(args);
     Game.scripts().setEnabled(true);
+    Game.physics().setEnabled(true);
     if (options.renderScale > 0) {
       Game.graphics().setBaseRenderScale(options.renderScale);
     }

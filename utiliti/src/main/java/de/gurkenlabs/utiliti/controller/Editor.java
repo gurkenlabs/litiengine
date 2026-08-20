@@ -105,6 +105,7 @@ public class Editor extends Screen {
   private Editor() {
     super("Editor");
     Game.scripts().setEnabled(false);
+    Game.physics().setEnabled(false);
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
     this.mapComponent = new MapComponent();
     this.mapComponent.onMapLoaded(map -> this.windowMetadataDirty.set(true));

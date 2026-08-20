@@ -37,6 +37,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -54,8 +55,10 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -2841,61 +2844,140 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   public void executeRenamePackage(String oldPackage, String newPackage) {
     if (oldPackage == null || newPackage == null || oldPackage.equals(newPackage)) return;
+    if (!ScriptSourcePaths.isValidPackage(newPackage)) {
+      setStatus("Invalid package name: " + newPackage, true);
+      return;
+    }
+
+    Path sourceRoot = ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel());
     Path oldDir = ScriptSourcePaths.resolvePackageDirectory(Editor.instance().getProjectModel(), oldPackage);
     Path newDir = ScriptSourcePaths.resolvePackageDirectory(Editor.instance().getProjectModel(), newPackage);
 
-    if (oldDir != null && Files.isDirectory(oldDir)) {
+    if (oldDir == null || !Files.isDirectory(oldDir)) {
+      setStatus("Source package directory does not exist: " + oldPackage, true);
+      return;
+    }
+
+    // Step 1: Preflight analysis & collision checking
+    List<Path> sourceJavaFiles;
+    try (Stream<Path> stream = Files.walk(oldDir)) {
+      sourceJavaFiles = stream.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(".java")).toList();
+    } catch (IOException e) {
+      setStatus("Could not scan package files: " + e.getMessage(), true);
+      return;
+    }
+
+    Map<Path, Path> moveMap = new LinkedHashMap<>();
+    Map<Path, String> newContents = new LinkedHashMap<>();
+
+    for (Path file : sourceJavaFiles) {
+      Path relPath = oldDir.relativize(file);
+      Path targetFile = newDir.resolve(relPath);
+      moveMap.put(file, targetFile);
+
+      if (!file.equals(targetFile) && Files.exists(targetFile) && !sourceJavaFiles.contains(targetFile)) {
+        setStatus("Cannot rename package: Destination file '" + targetFile.getFileName() + "' already exists.", true);
+        return;
+      }
+
       try {
-        Files.createDirectories(newDir);
-        List<Path> javaFiles;
-        try (Stream<Path> stream = Files.walk(oldDir)) {
-          javaFiles = stream.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(".java")).toList();
+        String fileContent = Files.readString(file);
+        String targetPkg;
+        if (relPath.getParent() != null) {
+          String sub = relPath.getParent().toString().replace('\\', '.').replace('/', '.');
+          targetPkg = newPackage + "." + sub;
+        } else {
+          targetPkg = newPackage;
         }
-        for (Path file : javaFiles) {
-          String content = Files.readString(file);
-          Path relPath = oldDir.relativize(file);
-          Path targetFile = newDir.resolve(relPath);
-          Files.createDirectories(targetFile.getParent());
-
-          String targetPkg;
-          if (relPath.getParent() != null) {
-            String sub = relPath.getParent().toString().replace('\\', '.').replace('/', '.');
-            targetPkg = newPackage + "." + sub;
-          } else {
-            targetPkg = newPackage;
-          }
-          String updated = content.replaceFirst("(?m)^\\s*package\\s+[a-zA-Z0-9_.]+\\s*;", "package " + targetPkg + ";");
-          Files.writeString(targetFile, updated);
-        }
-
-        for (Path file : javaFiles) {
-          Files.deleteIfExists(file);
-        }
-        deleteEmptyDirectoriesUpTo(oldDir, ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel()));
-      } catch (IOException error) {
-        this.setStatus("Could not rename package on disk: " + error.getMessage(), true);
+        String updated = fileContent.replaceFirst("(?m)^\\s*package\\s+[a-zA-Z0-9_.]+\\s*;", "package " + targetPkg + ";");
+        newContents.put(file, updated);
+      } catch (IOException e) {
+        setStatus("Could not read file during preflight: " + file, true);
         return;
       }
     }
 
-    Path sourceRoot = ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel());
+    // Analyze import rewrites in all source files under sourceRoot
+    Map<Path, String> importRewrites = new LinkedHashMap<>();
     if (sourceRoot != null && Files.isDirectory(sourceRoot)) {
       try (Stream<Path> stream = Files.walk(sourceRoot)) {
-        var files = stream.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(".java")).toList();
-        for (Path file : files) {
+        var allJava = stream.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(".java")).toList();
+        for (Path file : allJava) {
+          if (sourceJavaFiles.contains(file)) continue;
           try {
             String text = Files.readString(file);
             String updated = text
                 .replaceAll("(?m)^\\s*import\\s+" + Pattern.quote(oldPackage) + "\\.", "import " + newPackage + ".")
                 .replaceAll("(?m)^\\s*import\\s+static\\s+" + Pattern.quote(oldPackage) + "\\.", "import static " + newPackage + ".");
             if (!updated.equals(text)) {
-              Files.writeString(file, updated);
+              importRewrites.put(file, updated);
             }
-          } catch (IOException ignored) {}
+          } catch (IOException e) {
+            setStatus("Could not analyze file for imports: " + file.getFileName(), true);
+            return;
+          }
         }
-      } catch (IOException ignored) {}
+      } catch (IOException e) {
+        setStatus("Could not scan source files: " + e.getMessage(), true);
+        return;
+      }
     }
 
+    // Step 2: In-memory snapshot for transactional rollback
+    Map<Path, byte[]> originalSnapshots = new LinkedHashMap<>();
+    Set<Path> createdTargetFiles = new LinkedHashSet<>();
+    try {
+      for (Path file : sourceJavaFiles) {
+        originalSnapshots.put(file, Files.readAllBytes(file));
+      }
+      for (Path file : importRewrites.keySet()) {
+        originalSnapshots.put(file, Files.readAllBytes(file));
+      }
+    } catch (IOException e) {
+      setStatus("Could not create rollback snapshot: " + e.getMessage(), true);
+      return;
+    }
+
+    // Step 3: Apply mutation transactionally
+    try {
+      Files.createDirectories(newDir);
+      for (Map.Entry<Path, Path> entry : moveMap.entrySet()) {
+        Path src = entry.getKey();
+        Path dst = entry.getValue();
+        String updatedText = newContents.get(src);
+        Files.createDirectories(dst.getParent());
+        Files.writeString(dst, updatedText);
+        createdTargetFiles.add(dst);
+      }
+
+      for (Path src : sourceJavaFiles) {
+        if (!moveMap.containsValue(src)) {
+          Files.deleteIfExists(src);
+        }
+      }
+      deleteEmptyDirectoriesUpTo(oldDir, sourceRoot);
+
+      for (Map.Entry<Path, String> entry : importRewrites.entrySet()) {
+        Files.writeString(entry.getKey(), entry.getValue());
+      }
+    } catch (Exception error) {
+      // Rollback all file changes
+      for (Path created : createdTargetFiles) {
+        try {
+          Files.deleteIfExists(created);
+        } catch (IOException ignored) {}
+      }
+      for (Map.Entry<Path, byte[]> snapshot : originalSnapshots.entrySet()) {
+        try {
+          Files.createDirectories(snapshot.getKey().getParent());
+          Files.write(snapshot.getKey(), snapshot.getValue());
+        } catch (IOException ignored) {}
+      }
+      setStatus("Could not rename package on disk, changes rolled back: " + error.getMessage(), true);
+      return;
+    }
+
+    // Step 4: Update metadata
     if (Editor.instance().getGameFile() != null) {
       String oldSlash = oldPackage.replace('.', '/');
       String newSlash = newPackage.replace('.', '/');
@@ -2973,27 +3055,71 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   public void deletePackage(String packageName) {
-    if (packageName == null || packageName.isBlank() || Editor.instance().getProjectPath() == null) return;
+    this.deletePackage(packageName, false);
+  }
+
+  public boolean deletePackage(String packageName, boolean skipConfirmation) {
+    if (packageName == null || packageName.isBlank() || Editor.instance().getProjectPath() == null) return false;
+    Path dir = ScriptSourcePaths.resolvePackageDirectory(Editor.instance().getProjectModel(), packageName);
+    if (dir == null || !Files.isDirectory(dir)) return false;
+
     List<ScriptDefinition> matching = new ArrayList<>();
+    Set<Path> scriptPaths = new HashSet<>();
     if (Editor.instance().getGameFile() != null) {
       for (ScriptDefinition def : Editor.instance().getGameFile().getScripts()) {
         if (def == null) continue;
         String impl = def.getImplementation();
         if (impl != null && (impl.equals(packageName) || impl.startsWith(packageName + "."))) {
           matching.add(def);
+          Path sp = this.projectSourcePaths.get(def);
+          if (sp == null) sp = resolveSource(def.getSource());
+          if (sp != null) scriptPaths.add(sp.toAbsolutePath().normalize());
         }
       }
     }
-    int scriptCount = matching.size();
-    int choice = JOptionPane.showConfirmDialog(
-        this,
-        "Are you sure you want to delete package '" + packageName + "'"
-            + (scriptCount > 0 ? " and all " + scriptCount + " script(s) inside it" : "") + "?\n"
-            + "This will delete the directory from disk.",
-        "Delete Package",
-        JOptionPane.YES_NO_OPTION,
-        JOptionPane.WARNING_MESSAGE);
-    if (choice != JOptionPane.YES_OPTION) return;
+
+    List<Path> nonScriptFiles = new ArrayList<>();
+    try (Stream<Path> stream = Files.walk(dir)) {
+      nonScriptFiles = stream.filter(Files::isRegularFile)
+          .map(p -> p.toAbsolutePath().normalize())
+          .filter(p -> !scriptPaths.contains(p))
+          .toList();
+    } catch (IOException e) {
+      setStatus("Could not inspect package directory: " + e.getMessage(), true);
+      return false;
+    }
+
+    if (!nonScriptFiles.isEmpty()) {
+      String sample = nonScriptFiles.stream()
+          .limit(3)
+          .map(p -> p.getFileName().toString())
+          .collect(java.util.stream.Collectors.joining(", "));
+      if (nonScriptFiles.size() > 3) sample += ", ...";
+      if (!skipConfirmation && !GraphicsEnvironment.isHeadless()) {
+        JOptionPane.showMessageDialog(
+            this,
+            "Cannot delete package '" + packageName + "': The directory contains " + nonScriptFiles.size()
+                + " non-script file(s) (" + sample + ").\n"
+                + "To prevent accidental deletion of unrelated project code, only empty packages or packages containing exclusively scripts can be deleted from the Script Explorer.",
+            "Delete Package Denied",
+            JOptionPane.ERROR_MESSAGE);
+      }
+      setStatus("Cannot delete package '" + packageName + "': contains non-script files (" + sample + ").", true);
+      return false;
+    }
+
+    if (!skipConfirmation && !GraphicsEnvironment.isHeadless()) {
+      int scriptCount = matching.size();
+      int choice = JOptionPane.showConfirmDialog(
+          this,
+          "Are you sure you want to delete package '" + packageName + "'"
+              + (scriptCount > 0 ? " and all " + scriptCount + " script(s) inside it" : "") + "?\n"
+              + "This will delete the directory from disk.",
+          "Delete Package",
+          JOptionPane.YES_NO_OPTION,
+          JOptionPane.WARNING_MESSAGE);
+      if (choice != JOptionPane.YES_OPTION) return false;
+    }
 
     matching.forEach(this::closeTab);
 
@@ -3002,19 +3128,16 @@ public final class ScriptWorkspacePanel extends JPanel {
       Game.scripts().setDefinitions(Editor.instance().getGameFile().getScripts());
     }
 
-    Path dir = ScriptSourcePaths.resolvePackageDirectory(Editor.instance().getProjectModel(), packageName);
-    if (dir != null && Files.isDirectory(dir)) {
-      try {
-        try (Stream<Path> stream = Files.walk(dir)) {
-          stream.sorted(Comparator.reverseOrder()).forEach(p -> {
-            try {
-              Files.deleteIfExists(p);
-            } catch (IOException ignored) {}
-          });
-        }
-      } catch (IOException ignored) {}
-      deleteEmptyDirectoriesUpTo(dir.getParent(), ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel()));
-    }
+    try {
+      try (Stream<Path> stream = Files.walk(dir)) {
+        stream.sorted(Comparator.reverseOrder()).forEach(p -> {
+          try {
+            Files.deleteIfExists(p);
+          } catch (IOException ignored) {}
+        });
+      }
+    } catch (IOException ignored) {}
+    deleteEmptyDirectoriesUpTo(dir.getParent(), ScriptSourcePaths.selectSourceRoot(Editor.instance().getProjectModel()));
 
     this.customCreatedPackages.removeIf(p -> p.equals(packageName) || p.startsWith(packageName + "."));
     if (Editor.instance().getProjectCodeIntegration() != null) {
@@ -3024,6 +3147,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     Editor.instance().save(false);
     refreshScripts();
     setStatus("Deleted package " + packageName, false);
+    return true;
   }
 
   public void moveScriptToPackage(ScriptDefinition definition) {
@@ -3044,24 +3168,59 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (input == null || input.isBlank() || input.trim().equals(currentPkg)) return;
     String targetPackage = input.trim();
     if (!ScriptSourcePaths.isValidPackage(targetPackage)) {
-      JOptionPane.showMessageDialog(this, "Invalid package name: " + targetPackage, "Move Error", JOptionPane.ERROR_MESSAGE);
+      if (!GraphicsEnvironment.isHeadless()) {
+        JOptionPane.showMessageDialog(this, "Invalid package name: " + targetPackage, "Move Error", JOptionPane.ERROR_MESSAGE);
+      }
       return;
     }
+    executeMoveScriptToPackage(definition, targetPackage);
+  }
 
-    String className = displayName(definition);
-    String newSourceRel = ScriptSourcePaths.create(Editor.instance().getProjectModel(), definition.getLanguage(), targetPackage, className);
+  public boolean executeMoveScriptToPackage(ScriptDefinition definition, String targetPackage) {
+    if (definition == null || targetPackage == null || Editor.instance().getProjectPath() == null) return false;
+    if (!ScriptSourcePaths.isValidPackage(targetPackage)) {
+      setStatus("Invalid package name: " + targetPackage, true);
+      return false;
+    }
+
     Path oldPath = this.projectSourcePaths.get(definition);
     if (oldPath == null) oldPath = resolveSource(definition.getSource());
+
+    String className = null;
+    if (oldPath != null && Files.isRegularFile(oldPath)) {
+      try {
+        className = extractClassName(Files.readString(oldPath));
+      } catch (IOException ignored) {}
+    }
+    if (className == null && definition.getImplementation() != null) {
+      int dot = definition.getImplementation().lastIndexOf('.');
+      className = dot >= 0 ? definition.getImplementation().substring(dot + 1) : definition.getImplementation();
+    }
+    if (className == null && definition.getSource() != null) {
+      String fn = Path.of(definition.getSource()).getFileName().toString();
+      int ext = fn.lastIndexOf('.');
+      className = ext > 0 ? fn.substring(0, ext) : fn;
+    }
+    if (className == null || className.isBlank()) {
+      className = definition.getId();
+    }
+
+    String newSourceRel = ScriptSourcePaths.create(Editor.instance().getProjectModel(), definition.getLanguage(), targetPackage, className);
     Path newPath = resolveSource(newSourceRel);
 
     if (oldPath == null || !Files.isRegularFile(oldPath) || newPath == null) {
       setStatus("Could not resolve source paths for move.", true);
-      return;
+      return false;
+    }
+
+    if (!oldPath.equals(newPath) && Files.exists(newPath)) {
+      setStatus("Cannot move script: Destination file '" + newPath.getFileName() + "' already exists in package '" + targetPackage + "'.", true);
+      return false;
     }
 
     try {
-      String content = Files.readString(oldPath);
-      String updated = content.replaceFirst("(?m)^\\s*package\\s+[a-zA-Z0-9_.]+\\s*;", "package " + targetPackage + ";");
+      String fileContent = Files.readString(oldPath);
+      String updated = fileContent.replaceFirst("(?m)^\\s*package\\s+[a-zA-Z0-9_.]+\\s*;", "package " + targetPackage + ";");
       if (!updated.contains("package " + targetPackage + ";")) {
         updated = "package " + targetPackage + ";\n\n" + updated;
       }
@@ -3092,30 +3251,49 @@ public final class ScriptWorkspacePanel extends JPanel {
       recordUndoChanges();
       Editor.instance().save(false);
       refreshScripts();
-      open(definition);
+      if (tab != null) {
+        open(definition);
+      }
       setStatus("Moved script to package " + targetPackage, false);
+      return true;
     } catch (IOException e) {
       setStatus("Could not move script: " + e.getMessage(), true);
+      return false;
     }
   }
 
   public void renameScript(ScriptDefinition definition) {
     if (definition == null) return;
-    String currentName = displayName(definition);
+    String currentClassName = null;
+    Path currentPath = this.projectSourcePaths.get(definition);
+    if (currentPath == null) currentPath = resolveSource(definition.getSource());
+    if (currentPath != null && Files.isRegularFile(currentPath)) {
+      try {
+        currentClassName = extractClassName(Files.readString(currentPath));
+      } catch (IOException ignored) {}
+    }
+    if (currentClassName == null && definition.getImplementation() != null) {
+      int dot = definition.getImplementation().lastIndexOf('.');
+      currentClassName = dot >= 0 ? definition.getImplementation().substring(dot + 1) : definition.getImplementation();
+    }
+    if (currentClassName == null) {
+      currentClassName = definition.getId();
+    }
+
     String input = (String) JOptionPane.showInputDialog(
         this,
-        "Enter new class name:",
-        "Rename Script",
+        "Enter new class name for '" + displayName(definition) + "':",
+        "Rename Class",
         JOptionPane.QUESTION_MESSAGE,
         Icons.RENAME_16,
         null,
-        currentName);
-    if (input == null || input.isBlank() || input.trim().equals(currentName)) return;
+        currentClassName);
+    if (input == null || input.isBlank() || input.trim().equals(currentClassName)) return;
     renameScript(definition, input.trim());
   }
 
-  public void renameScript(ScriptDefinition definition, String newClassName) {
-    this.renameScript(definition, newClassName, null, true);
+  public boolean renameScript(ScriptDefinition definition, String newClassName) {
+    return this.renameScript(definition, newClassName, null, true);
   }
 
   private boolean renameScript(ScriptDefinition definition, String newClassName, String sourceText,
@@ -3124,7 +3302,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     String oldId = definition.getId();
     if (Objects.equals(oldId, newClassName)) return true;
     if (!newClassName.matches("[A-Za-z_$][\\w$]*")) {
-      JOptionPane.showMessageDialog(this, "Invalid Java identifier name.", "Rename Error", JOptionPane.ERROR_MESSAGE);
+      setStatus("Invalid Java identifier name: " + newClassName, true);
       return false;
     }
 
@@ -3169,10 +3347,23 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
     }
 
-    String oldClassName = Objects.requireNonNullElse(extractClassName(currentText), displayName(definition));
+    String oldClassName = extractClassName(currentText);
+    if (oldClassName == null) {
+      if (definition.getImplementation() != null) {
+        int dot = definition.getImplementation().lastIndexOf('.');
+        oldClassName = dot >= 0 ? definition.getImplementation().substring(dot + 1) : definition.getImplementation();
+      } else {
+        oldClassName = definition.getId();
+      }
+    }
+
+    boolean idMatchesClassName = Objects.equals(oldId, oldClassName);
     String updatedText = currentText
-        .replaceAll("\\b" + Pattern.quote(oldClassName) + "\\b", java.util.regex.Matcher.quoteReplacement(newClassName))
-        .replace("id = \"" + oldId + "\"", "id = \"" + newClassName + "\"");
+        .replaceAll("\\b" + Pattern.quote(oldClassName) + "\\b", java.util.regex.Matcher.quoteReplacement(newClassName));
+    if (idMatchesClassName) {
+      updatedText = updatedText.replace("id = \"" + oldId + "\"", "id = \"" + newClassName + "\"");
+    }
+
     String implementation = extractFullyQualifiedClassName(updatedText);
     if (implementation == null || implementation.isBlank()) {
       String oldImplementation = Objects.toString(definition.getImplementation(), "");
@@ -3190,9 +3381,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
 
     String renamedImplementation = implementation;
-    if (plan.valid()) {
+    boolean preserveCustomName = definition.getName() != null && !definition.getName().equals(oldClassName) && !definition.getName().equals(oldId);
+
+    if (idMatchesClassName && plan.valid()) {
       ScriptBindingService.MutationResult result = ScriptBindingService.instance().execute(plan, renamed -> {
-        renamed.setName(newClassName);
+        if (!preserveCustomName) renamed.setName(newClassName);
         renamed.setImplementation(renamedImplementation);
         renamed.setSource(newSource);
       }, sourceMutation);
@@ -3207,7 +3400,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.setStatus("Could not rename source file: " + error.getMessage(), true);
         return false;
       }
-      definition.setName(newClassName);
+      if (!preserveCustomName) definition.setName(newClassName);
       definition.setImplementation(renamedImplementation);
       definition.setSource(newSource);
     }

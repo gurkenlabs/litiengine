@@ -43,6 +43,7 @@ public class Program {
         UI.init();
         forceBasicEditorConfiguration();
         Game.scripts().setEnabled(false);
+        Game.physics().setEnabled(false);
         Game.world().camera().onZoom(event -> Editor.preferences().setZoom((float) event.getZoom()));
 
 

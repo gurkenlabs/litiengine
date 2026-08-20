@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 public final class PhysicsEngine implements IUpdateable {
 
   private Rectangle2D environmentBounds;
+  private boolean enabled = true;
 
   private final Map<Collision, List<ICollisionEntity>> collisionEntities = new ConcurrentHashMap<>();
   private final Map<Collision, List<Rectangle2D>> collisionBoxes = new ConcurrentHashMap<>();
@@ -680,12 +681,23 @@ public final class PhysicsEngine implements IUpdateable {
     return move(entity, newLocation);
   }
 
+  public boolean isEnabled() {
+    return this.enabled;
+  }
+
+  public void setEnabled(final boolean enabled) {
+    this.enabled = enabled;
+  }
+
   /**
    * Clears all collision boxes registered on the {@code PhysicsEngine} once per tick and re-adds
    * them with their updated positions.
    */
   @Override
   public void update() {
+    if (!this.enabled) {
+      return;
+    }
     // retrieve all collision box rectangles once per update
     for (Collision type : Collision.values()) {
       if (type == Collision.NONE || type == Collision.ANY) {
