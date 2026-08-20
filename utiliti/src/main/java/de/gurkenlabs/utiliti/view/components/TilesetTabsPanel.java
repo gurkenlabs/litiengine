@@ -26,8 +26,9 @@ final class TilesetTabsPanel extends JPanel {
     setOpaque(true);
     setBackground(Style.background());
     setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-    this.commands = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+    this.commands = new JPanel();
     this.commands.setOpaque(false);
+    this.commands.setLayout(new javax.swing.BoxLayout(this.commands, javax.swing.BoxLayout.X_AXIS));
     JButton add = Style.iconButton(Icons.ADD_16);
     add.setToolTipText(Resources.strings().get("mapTilesets_add"));
     add.addActionListener(e -> UI.showMapTilesetMenu(add));
@@ -42,8 +43,11 @@ final class TilesetTabsPanel extends JPanel {
     remove.setToolTipText(Resources.strings().get("mapTilesets_remove"));
     remove.addActionListener(e -> UI.removeSelectedMapTileset(this));
     this.commands.add(add);
+    this.commands.add(javax.swing.Box.createHorizontalStrut(Style.SPACE_SMALL));
     this.commands.add(addAll);
+    this.commands.add(javax.swing.Box.createHorizontalStrut(Style.SPACE_SMALL));
     this.commands.add(create);
+    this.commands.add(javax.swing.Box.createHorizontalStrut(Style.SPACE_SMALL));
     this.commands.add(remove);
     this.tabs.putClientProperty("JTabbedPane.noContentBorder", Boolean.TRUE);
     this.tabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);

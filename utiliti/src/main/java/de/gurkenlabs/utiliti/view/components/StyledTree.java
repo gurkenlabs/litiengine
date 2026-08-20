@@ -89,7 +89,19 @@ public class StyledTree extends JTree {
 
   @Override
   public int getLeadSelectionRow() {
-    return this.paintingBaseRows ? -1 : super.getLeadSelectionRow();
+    if (this.paintingBaseRows) return -1;
+    TreePath leadPath = super.getLeadSelectionPath();
+    if (leadPath != null) {
+      int row = this.getRowForPath(leadPath);
+      if (row >= 0) return row;
+    }
+    TreePath selPath = super.getSelectionPath();
+    if (selPath != null) {
+      int row = this.getRowForPath(selPath);
+      if (row >= 0) return row;
+    }
+    int lead = super.getLeadSelectionRow();
+    return lead >= 0 && lead < this.getRowCount() ? lead : -1;
   }
 
   @Override
@@ -130,6 +142,44 @@ public class StyledTree extends JTree {
         boolean selected) {
       // Suppress Darklaf's default row rectangle painting.
       // StyledTree paints hover and selection highlights with custom rounded shapes.
+    }
+
+    @Override
+    protected void paintVerticalLegs(
+        Graphics g,
+        Rectangle clipBounds,
+        Rectangle rowBounds,
+        java.awt.Insets insets,
+        TreePath path) {
+      // Suppress Darklaf's default vertical legs.
+    }
+
+    @Override
+    protected void paintVerticalPartOfLeg(
+        Graphics g,
+        Rectangle clipBounds,
+        java.awt.Insets insets,
+        TreePath path) {
+      // Suppress Darklaf's vertical part of leg.
+    }
+
+    @Override
+    protected void paintHorizontalPartOfLeg(
+        Graphics g,
+        Rectangle clipBounds,
+        java.awt.Insets insets,
+        Rectangle bounds,
+        TreePath path,
+        int row,
+        boolean isExpanded,
+        boolean hasBeenExpanded,
+        boolean isLeaf) {
+      // Suppress Darklaf's horizontal legs.
+    }
+
+    @Override
+    protected boolean shouldPaintLines() {
+      return false;
     }
   }
 
@@ -239,20 +289,23 @@ public class StyledTree extends JTree {
     Graphics2D g2 = (Graphics2D) graphics.create();
     try {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      Rectangle visible = this.getVisibleRect();
       int leadRow = this.getLeadSelectionRow();
-      for (int row = 0; row < this.getRowCount(); row++) {
-        if (!this.isRowSelected(row)) {
-          continue;
+      int[] selectionRows = this.getSelectionRows();
+      if (selectionRows != null) {
+        for (int row : selectionRows) {
+          if (row < 0 || row >= this.getRowCount()) continue;
+          Rectangle bounds = this.getRowBounds(row);
+          if (bounds == null || bounds.width <= 0) continue;
+          int x = bounds.x;
+          int y = bounds.y + 2;
+          int height = Math.max(1, bounds.height - 4);
+          boolean isLead = (row == leadRow) || (selectionRows.length == 1);
+          g2.setColor(isLead ? Style.accent() : Style.border());
+          int barWidth = isLead ? 3 : 2;
+          int barHeight = Math.max(4, height - 4);
+          int barY = y + (height - barHeight) / 2;
+          g2.fillRoundRect(x + 1, barY, barWidth, barHeight, 2, 2);
         }
-        Rectangle bounds = this.getRowBounds(row);
-        if (bounds == null) {
-          continue;
-        }
-        g2.setColor(row == leadRow ? Style.accent() : Style.border());
-        g2.fillRoundRect(
-            visible.x + 4, bounds.y + 5, row == leadRow ? 3 : 2,
-            Math.max(4, bounds.height - 10), 3, 3);
       }
       if (this.hasFocus() && leadRow >= 0 && this.isRowSelected(leadRow)) {
         Rectangle bounds = this.getRowBounds(leadRow);

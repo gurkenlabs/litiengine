@@ -77,7 +77,7 @@ public class ExpandableCard extends JPanel {
       }
     };
     headerPanel.setOpaque(false);
-    headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
+    headerPanel.setBorder(BorderFactory.createEmptyBorder(0, Style.SPACE_MEDIUM, 0, Style.SPACE_MEDIUM));
     headerPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     headerPanel.setFocusable(true);
     headerPanel.getAccessibleContext().setAccessibleName(title);
