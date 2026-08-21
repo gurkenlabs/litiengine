@@ -30,7 +30,7 @@ import javax.swing.border.EmptyBorder;
 public class AssetPanel extends JPanel {
 
   public enum AssetType {
-    SPRITESHEET, TILESET, EMITTER, BLUEPRINT, SOUND, ANIMATION
+    SPRITESHEET, TILESET, EMITTER, BLUEPRINT, SOUND, ANIMATION, SCRIPT
   }
 
   private AssetType currentType;
@@ -180,6 +180,7 @@ public class AssetPanel extends JPanel {
       case BLUEPRINT -> Resources.strings().get("assettree_blueprints");
       case SOUND -> Resources.strings().get("assettree_sounds");
       case ANIMATION -> Resources.strings().get("assettree_animations");
+      case SCRIPT -> "Scripts";
     };
   }
 
@@ -267,6 +268,15 @@ public class AssetPanel extends JPanel {
           icon = new ImageIcon(sheet.getPreview(64));
         }
         allItems.add(createItem(icon, animation.getName(), animation));
+      }
+    });
+  }
+
+  public void loadScripts(List<de.gurkenlabs.litiengine.scripting.ScriptDefinition> scripts) {
+    this.currentType = AssetType.SCRIPT;
+    loadItems(() -> {
+      for (de.gurkenlabs.litiengine.scripting.ScriptDefinition script : scripts) {
+        allItems.add(createItem(Icons.SCRIPT_16, script.getName() == null || script.getName().isBlank() ? script.getId() : script.getName(), script));
       }
     });
   }

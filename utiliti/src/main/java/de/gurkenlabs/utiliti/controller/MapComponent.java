@@ -157,6 +157,8 @@ public class MapComponent extends GuiComponent {
 
   public MapComponent() {
     super(0, 0);
+    Game.scripts().setEnabled(false);
+    Game.physics().setEnabled(false);
     this.transformModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.inspectorNavigationChangedConsumer = new CopyOnWriteArrayList<>();
@@ -244,11 +246,15 @@ public class MapComponent extends GuiComponent {
     if (maps == null) {
       return;
     }
-    UI.getInspector().bind(null);
+    if (UI.getInspector() != null) {
+      UI.getInspector().bind(null);
+    }
     this.setFocus(null, true);
     getMaps().clear();
     getMaps().addAll(sortedMaps(maps));
-    UI.getMapController().bind(getMaps(), clearSelection);
+    if (UI.getMapController() != null) {
+      UI.getMapController().bind(getMaps(), clearSelection);
+    }
   }
 
   static List<TmxMap> sortedMaps(List<TmxMap> maps) {
@@ -1131,7 +1137,9 @@ public class MapComponent extends GuiComponent {
 
     // TODO: remove all tile sets from the game file that are no longer needed
     // by any other map.
-    UI.getMapController().bind(getMaps());
+    if (UI.getMapController() != null) {
+      UI.getMapController().bind(getMaps());
+    }
     if (!this.maps.isEmpty()) {
       this.loadEnvironment(this.maps.getFirst());
     } else {
@@ -1213,7 +1221,9 @@ public class MapComponent extends GuiComponent {
         Objects.requireNonNull(Renderers.get(GridRenderer.class)).clearCache();
         this.environments.remove(map);
 
-        UI.getMapController().bind(getMaps(), true);
+        if (UI.getMapController() != null) {
+          UI.getMapController().bind(getMaps(), true);
+        }
         this.loadEnvironment(map);
         log.log(Level.INFO, "imported map {0}", new Object[] {map.getName()});
       },
@@ -1793,11 +1803,11 @@ public class MapComponent extends GuiComponent {
   }
 
   static boolean shouldHandleArrowTransform(int modifiers) {
-    return (modifiers & InputEvent.ALT_DOWN_MASK) == 0;
+    return !de.gurkenlabs.utiliti.view.components.UI.isScriptWorkspaceActive() && (modifiers & InputEvent.ALT_DOWN_MASK) == 0;
   }
 
   private void handleKeyboardTransform(int x, int y) {
-    if (!Game.window().getRenderComponent().hasFocus()) {
+    if (de.gurkenlabs.utiliti.view.components.UI.isScriptWorkspaceActive() || !Game.window().getRenderComponent().hasFocus()) {
       return;
     }
 

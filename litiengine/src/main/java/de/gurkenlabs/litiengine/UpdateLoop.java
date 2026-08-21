@@ -1,7 +1,8 @@
 package de.gurkenlabs.litiengine;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -18,7 +19,7 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
  */
 public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   private static final Logger log = Logger.getLogger(UpdateLoop.class.getName());
-  private final Set<IUpdateable> updatables = ConcurrentHashMap.newKeySet();
+  private final Set<IUpdateable> updatables = new LinkedHashSet<>();
   private final Lock lock = new ReentrantLock();
 
   private int tickRate;
@@ -31,6 +32,7 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
 
   protected UpdateLoop(String name, int tickRate) {
     super(name);
+    this.setDaemon(true);
     this.tickRate = tickRate;
   }
 
@@ -87,19 +89,42 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
       return;
     }
 
-    if (!this.updatables.add(updatable)) {
-      log.log(Level.FINE, "Updatable {0} already registered for update!", new Object[] {updatable});
+    this.lock.lock();
+    try {
+      if (!this.updatables.add(updatable)) {
+        log.log(Level.FINE, "Updatable {0} already registered for update!", new Object[] {updatable});
+        return;
+      }
+
+      // LinkedHashSet plus the stable stream sort retains registration order for equal priorities.
+      var ordered = this.updatables.stream()
+        .sorted(java.util.Comparator.comparingInt(IUpdateable::getUpdatePriority))
+        .toList();
+      this.updatables.clear();
+      this.updatables.addAll(ordered);
+    } finally {
+      this.lock.unlock();
     }
   }
 
   @Override
   public void detach(final IUpdateable updatable) {
-    this.updatables.remove(updatable);
+    this.lock.lock();
+    try {
+      this.updatables.remove(updatable);
+    } finally {
+      this.lock.unlock();
+    }
   }
 
   @Override
   public int getUpdatableCount() {
-    return this.updatables.size();
+    this.lock.lock();
+    try {
+      return this.updatables.size();
+    } finally {
+      this.lock.unlock();
+    }
   }
 
   @Override
@@ -148,7 +173,8 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
    * @see IUpdateable#update()
    */
   protected void update() {
-    for (IUpdateable updatable : this.getUpdatables()) {
+    // Update a snapshot so an updateable can safely attach or detach objects for the next tick.
+    for (IUpdateable updatable : List.copyOf(this.getUpdatables())) {
       try {
         if (updatable != null) {
           updatable.update();

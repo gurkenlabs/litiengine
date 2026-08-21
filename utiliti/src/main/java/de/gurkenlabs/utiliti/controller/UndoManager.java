@@ -484,7 +484,8 @@ public class UndoManager {
     return true;
   }
 
-  private boolean isCurrentMap() {
+  /** Returns whether this manager belongs to the environment currently displayed by the editor. */
+  public boolean isCurrentMap() {
     return Game.world().environment() != null && Game.world().environment().getMap() == this.map;
   }
 
@@ -526,6 +527,7 @@ public class UndoManager {
         mapObject,
         this.changing.remove(this.changing.indexOf(trackedMapObject.get())),
         new MapObject((MapObject) mapObject, true),
+        this.map.getMapObjectLayer(mapObject),
         operationType,
         this.operation);
     fireUndoStackChangedEvent(this);
@@ -546,7 +548,7 @@ public class UndoManager {
     this.clearRedoSteps();
 
     this.undoStack[this.currentIndex] =
-      new UndoState(mapObject, OperationType.DELETE, this.operation);
+      new UndoState(mapObject, this.map.getMapObjectLayer(mapObject), OperationType.DELETE, this.operation);
     fireUndoStackChangedEvent(this);
     fireUndoManagerEvent(mapObjectRemoved, this);
   }
@@ -565,7 +567,8 @@ public class UndoManager {
     this.currentIndex++;
     this.clearRedoSteps();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.ADD, this.operation);
+    this.undoStack[this.currentIndex] =
+      new UndoState(mapObject, this.map.getMapObjectLayer(mapObject), OperationType.ADD, this.operation);
     fireUndoStackChangedEvent(this);
     fireUndoManagerEvent(mapObjectAdded, this);
   }
@@ -979,7 +982,11 @@ public class UndoManager {
   private static void fireUndoManagerEvent(
     List<Consumer<UndoManager>> consumers, UndoManager undoManager) {
     for (Consumer<UndoManager> cons : consumers) {
-      cons.accept(undoManager);
+      try {
+        cons.accept(undoManager);
+      } catch (RuntimeException exception) {
+        log.log(Level.WARNING, "Undo manager listener failed", exception);
+      }
     }
   }
 
@@ -1123,10 +1130,11 @@ public class UndoManager {
      * @param operationType The type of operation (ADD, CHANGE, DELETE).
      * @param operation     The operation identifier.
      */
-    public UndoState(IMapObject target, OperationType operationType, int operation) {
+    public UndoState(
+      IMapObject target, IMapObjectLayer layer, OperationType operationType, int operation) {
       this.operation = operation;
       this.target = target;
-      this.layer = Game.world().environment().getMap().getMapObjectLayer(target);
+      this.layer = layer;
       this.oldMapObject = null;
       this.newMapObject = null;
       this.operationType = operationType;
@@ -1149,6 +1157,7 @@ public class UndoManager {
       IMapObject target,
       IMapObject oldMapObject,
       IMapObject newMapObject,
+      IMapObjectLayer layer,
       OperationType operationType,
       int operation) {
       this.operation = operation;
@@ -1156,7 +1165,7 @@ public class UndoManager {
       this.oldMapObject = operationType != OperationType.ADD ? oldMapObject : null;
       this.newMapObject = operationType != OperationType.DELETE ? newMapObject : null;
       this.operationType = operationType;
-      this.layer = Game.world().environment().getMap().getMapObjectLayer(target);
+      this.layer = layer;
       this.targetLayer = null;
       this.targetMap = null;
       this.oldLayerProperties = null;

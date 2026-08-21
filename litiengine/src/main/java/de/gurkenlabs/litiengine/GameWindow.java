@@ -428,6 +428,9 @@ public final class GameWindow {
   private static void initializeWindowEventListeners(Window window) {
 
     window.addWindowStateListener(e -> {
+      if (Game.loop() == null) {
+        return;
+      }
       if (e.getNewState() == Frame.ICONIFIED) {
         Game.loop().setTickRate(ICONIFIED_MAX_FPS);
       } else {
@@ -438,14 +441,16 @@ public final class GameWindow {
     window.addWindowFocusListener(new WindowFocusListener() {
       @Override
       public void windowLostFocus(WindowEvent e) {
-        if (Game.config().graphics().reduceFramesWhenNotFocused()) {
+        if (Game.loop() != null && Game.config().graphics().reduceFramesWhenNotFocused()) {
           Game.loop().setTickRate(NONE_FOCUS_MAX_FPS);
         }
       }
 
       @Override
       public void windowGainedFocus(WindowEvent e) {
-        Game.loop().setTickRate(Game.config().client().getMaxFps());
+        if (Game.loop() != null) {
+          Game.loop().setTickRate(Game.config().client().getMaxFps());
+        }
       }
     });
 

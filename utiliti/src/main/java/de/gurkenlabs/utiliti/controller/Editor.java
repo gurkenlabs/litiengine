@@ -54,6 +54,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -82,8 +83,15 @@ public class Editor extends Screen {
 
   private final MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
-  private Path projectPath;
+  private volatile Path projectPath;
   private final ProjectCodeIntegration projectCodeIntegration = new ProjectCodeIntegration();
+  private final ProjectBuildService projectBuildService = new GradleProjectBuildService();
+  private volatile ProjectModel projectModel;
+  private volatile ProjectSession projectSession;
+  private final java.util.concurrent.atomic.AtomicBoolean projectLaunchInProgress =
+      new java.util.concurrent.atomic.AtomicBoolean();
+  private final java.util.concurrent.atomic.AtomicBoolean projectLaunchCancelled =
+      new java.util.concurrent.atomic.AtomicBoolean();
   private Path currentResourceFile;
 
   private long statusTick;
@@ -96,6 +104,8 @@ public class Editor extends Screen {
 
   private Editor() {
     super("Editor");
+    Game.scripts().setEnabled(false);
+    Game.physics().setEnabled(false);
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
     this.mapComponent = new MapComponent();
     this.mapComponent.onMapLoaded(map -> this.windowMetadataDirty.set(true));
@@ -201,9 +211,196 @@ public class Editor extends Screen {
     return projectCodeIntegration;
   }
 
+  public ProjectModel getProjectModel() {
+    return this.projectModel;
+  }
+
+  public void setProjectModel(ProjectModel model) {
+    this.projectModel = model;
+    this.applyProjectModel();
+  }
+
+  private volatile ProjectLaunchRequest.Mode projectLaunchMode = ProjectLaunchRequest.Mode.RUN;
+  private int projectDebugPort = 5005;
+  private long projectModelConfigurationStamp = Long.MIN_VALUE;
+
+  public ProjectSession getProjectSession() {
+    return this.projectSession;
+  }
+
+  /** Gets the mode used for the current or most recently launched project session. */
+  public ProjectLaunchRequest.Mode getProjectLaunchMode() {
+    return this.projectLaunchMode;
+  }
+
+  public int getProjectDebugPort() {
+    return this.projectDebugPort;
+  }
+
+  public boolean isProjectLaunchCancellationRequested() {
+    return this.projectLaunchCancelled.get();
+  }
+
+  /** Starts a new launch attempt before any asynchronous save or model-resolution work begins. */
+  public void prepareProjectLaunch() {
+    this.projectLaunchCancelled.set(false);
+  }
+
+  /** Reloads compiled project classes for script completion and precompiled Java script generations. */
+  public void reloadProjectCode() {
+    if (this.projectPath == null) return;
+    this.projectModel = this.projectBuildService.refresh(this.projectPath);
+    this.projectCodeIntegration.reloadProject(this.projectModel);
+    this.applyProjectModel();
+  }
+
+  /** Builds the opened project's ordinary source set without launching the game. */
+  public ProjectSession buildProjectClasses() throws IOException {
+    Path buildPath = this.projectPath;
+    if (buildPath == null) throw new IOException("Open a project before building its scripts.");
+    ProjectModel model = this.projectBuildService.refresh(buildPath);
+    if (model == null || !model.canRun()) {
+      throw new IOException("The opened project has no usable Gradle wrapper.");
+    }
+    this.projectModel = model;
+    String classesTask = classesTaskFor(model.runTask());
+    ProjectModel buildModel = new ProjectModel(
+        model.projectRoot(), model.wrapper(), classesTask, model.mainClass(), model.javaVersion(),
+        model.sourceRoots(), model.outputDirectories(), model.compileClasspath(), model.runtimeClasspath());
+    return this.projectBuildService.launch(ProjectLaunchRequest.run(buildModel));
+  }
+
+  static String classesTaskFor(String runTask) {
+    String task = runTask == null || runTask.isBlank() ? ":run" : runTask.strip();
+    int separator = task.lastIndexOf(':');
+    return separator < 0 ? "classes" : task.substring(0, separator + 1) + "classes";
+  }
+
+  private void applyProjectModel() {
+    Game.scripts().setProjectClassLoader(this.projectCodeIntegration.getClassLoader());
+    if (this.projectModel == null) return;
+    Game.scripts().setProjectClasspath(this.projectModel.scriptCompilationClasspath());
+    Game.scripts().setProjectJavaVersion(this.projectModel.javaVersion());
+  }
+
+  /** Launches the opened project through its Gradle application run task. */
+  public ProjectSession runProject() throws IOException {
+    return this.runProject(ProjectLaunchRequest.Mode.RUN);
+  }
+
+  /** Launches the opened project, optionally with a JVM debugger available to attach. */
+  public ProjectSession runProject(ProjectLaunchRequest.Mode mode) throws IOException {
+    if (!this.projectLaunchInProgress.compareAndSet(false, true)) {
+      throw new IOException("The project is already starting.");
+    }
+    try {
+      Path launchPath = this.projectPath;
+      if (launchPath == null) throw new IOException("Open a project before running it.");
+      ProjectSession active = this.projectSession;
+      if (active != null && active.isActive()) throw new IOException("The project is already running.");
+
+      ProjectModel model = this.projectModel;
+      long configurationStamp = buildConfigurationStamp(
+          model == null ? launchPath : model.projectRoot());
+      if (model == null || configurationStamp != this.projectModelConfigurationStamp) {
+        this.checkProjectLaunchCancelled();
+        model = this.projectBuildService.refresh(launchPath);
+        this.checkProjectLaunchCancelled();
+        this.projectModel = model;
+        this.projectModelConfigurationStamp = buildConfigurationStamp(model.projectRoot());
+      }
+      this.checkProjectLaunchCancelled();
+      this.applyProjectModel();
+      this.projectLaunchMode = mode == null ? ProjectLaunchRequest.Mode.RUN : mode;
+      Map<String, String> environment = Map.of();
+      if (this.projectLaunchMode == ProjectLaunchRequest.Mode.DEBUG) {
+        try (java.net.ServerSocket socket = new java.net.ServerSocket(
+            0, 1, java.net.InetAddress.getLoopbackAddress())) {
+          this.projectDebugPort = socket.getLocalPort();
+        }
+        environment = Map.of("UTILITI_DEBUG_PORT", Integer.toString(this.projectDebugPort));
+      }
+      this.checkProjectLaunchCancelled();
+      List<String> buildArguments;
+      try {
+        buildArguments = ProjectLaunchRequest.parseBuildArguments(
+            preferences().getGradleLaunchArguments());
+      } catch (IllegalArgumentException error) {
+        throw new IOException(error.getMessage(), error);
+      }
+      ProjectSession launched = this.projectBuildService.launch(new ProjectLaunchRequest(
+          model, this.projectLaunchMode, List.of(), buildArguments, environment));
+      if (this.projectLaunchCancelled.get()) {
+        launched.stop();
+        throw new ProjectLaunchCancelledException();
+      }
+      this.projectSession = launched;
+      return launched;
+    } finally {
+      this.projectLaunchInProgress.set(false);
+    }
+  }
+
+  private void checkProjectLaunchCancelled() throws ProjectLaunchCancelledException {
+    if (this.projectLaunchCancelled.get()) throw new ProjectLaunchCancelledException();
+  }
+
+  public void stopProject() {
+    this.projectLaunchCancelled.set(true);
+    this.projectBuildService.cancelCurrentBuild();
+    ProjectSession session = this.projectSession;
+    if (session != null) session.stop();
+  }
+
+  /** Stops external project processes before the editor JVM exits. */
+  public void shutdown() {
+    this.projectLaunchCancelled.set(true);
+    this.projectBuildService.close();
+    this.projectSession = null;
+    this.projectCodeIntegration.close();
+  }
+
   public void setProjectPath(Path projectPath) {
     this.projectPath = projectPath;
+    this.currentResourceFile = projectPath;
+    this.projectModel = projectPath == null ? null : this.projectBuildService.resolve(projectPath);
+    if (projectPath == null) {
+      Game.scripts().setProjectClassLoader(null);
+      Game.scripts().setProjectClasspath(List.of());
+      Game.scripts().setProjectJavaVersion(Runtime.version().feature());
+    }
     this.windowMetadataDirty.set(true);
+    de.gurkenlabs.utiliti.view.components.UI.updateRunControlStates();
+  }
+
+  static long buildConfigurationStamp(Path projectRoot) {
+    if (projectRoot == null) return 0;
+    List<Path> candidates = new ArrayList<>();
+    for (String name : List.of("settings.gradle", "settings.gradle.kts", "build.gradle", "build.gradle.kts",
+        "gradle.properties", "gradlew", "gradlew.bat")) {
+      candidates.add(projectRoot.resolve(name));
+    }
+    candidates.add(projectRoot.resolve("gradle/libs.versions.toml"));
+    candidates.add(projectRoot.resolve("gradle/wrapper/gradle-wrapper.properties"));
+    try (var children = java.nio.file.Files.list(projectRoot)) {
+      children.filter(java.nio.file.Files::isDirectory).forEach(child -> {
+        candidates.add(child.resolve("build.gradle"));
+        candidates.add(child.resolve("build.gradle.kts"));
+        candidates.add(child.resolve("gradle.properties"));
+      });
+    } catch (IOException ignored) {
+    }
+    long stamp = 1;
+    for (Path candidate : candidates.stream().sorted().toList()) {
+      try {
+        if (!java.nio.file.Files.isRegularFile(candidate)) continue;
+        stamp = 31 * stamp + candidate.toAbsolutePath().normalize().toString().hashCode();
+        stamp = 31 * stamp + java.nio.file.Files.getLastModifiedTime(candidate).toMillis();
+        stamp = 31 * stamp + java.nio.file.Files.size(candidate);
+      } catch (IOException ignored) {
+      }
+    }
+    return stamp;
   }
 
   public void create() {
@@ -220,6 +417,8 @@ public class Editor extends Screen {
         Game.world().unloadEnvironment();
       }
 
+      UI.clearConsole();
+
       // set up project settings
       this.setProjectPath(chooser.getSelectedFile().toPath());
 
@@ -233,7 +432,9 @@ public class Editor extends Screen {
         this.loadSpriteSheets(map);
       }
 
+    if (UI.getAssetController() != null) {
       UI.getAssetController().refresh();
+    }
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
@@ -276,12 +477,15 @@ public class Editor extends Screen {
     getMapComponent().clearAll();
     UI.clearInspector();
     this.currentResourceFile = null;
+    this.stopProject();
     this.projectCodeIntegration.close();
     this.setProjectPath(null);
     this.mapComponent.loadMaps(List.of(), true);
     Resources.clearAll();
     this.gameFile = null;
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
   }
 
@@ -309,6 +513,7 @@ public class Editor extends Screen {
       return;
     }
 
+    final boolean isDifferentProject = !Objects.equals(this.currentResourceFile, gameFile);
     final long currentTime = System.nanoTime();
     Cursors.apply(Cursors.LOAD);
 
@@ -322,12 +527,22 @@ public class Editor extends Screen {
         throw new IllegalArgumentException("The game file " + gameFile + " could not be loaded!");
       }
 
+      if (isDifferentProject) {
+        UI.clearConsole();
+      }
+
       // Replace the current project only after the new resource bundle was parsed successfully.
       this.currentResourceFile = gameFile;
       this.gameFile = loadedGameFile;
+      Game.scripts().setProjectRoot(gameFile.getParent());
       this.setProjectPath(gameFile);
       this.loadProjectTilesetTerrains(gameFile.getParent());
-      this.projectCodeIntegration.reload(gameFile);
+      this.projectCodeIntegration.reloadProject(this.projectModel);
+      this.applyProjectModel();
+      Game.scripts().clearDiagnostics();
+      Game.scripts().setDefinitions(loadedGameFile.getScripts());
+      Game.scripts().setGameBindings(loadedGameFile.getGameScripts());
+      Game.scripts().setEntityBindings(loadedGameFile.getEntityScripts());
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
@@ -355,7 +570,9 @@ public class Editor extends Screen {
 
       // load custom emitter files
       loadCustomEmitters(this.getGameFile().getEmitters());
+    if (UI.getAssetController() != null) {
       UI.getAssetController().refresh();
+    }
 
       // display first available map after loading all stuff
       // also switch to map component
@@ -396,6 +613,7 @@ public class Editor extends Screen {
       return;
     }
 
+    final boolean isDifferentProject = !Objects.equals(this.currentResourceFile, gameFile);
     final long currentTime = System.nanoTime();
     Cursors.apply(Cursors.LOAD);
     this.loading = true;
@@ -411,12 +629,21 @@ public class Editor extends Screen {
         UndoManager.clearAll();
         ToolManager.instance().clearSelections();
 
+        if (isDifferentProject) {
+          UI.clearConsole();
+        }
+
         this.currentResourceFile = gameFile;
         this.gameFile = loadedBundle;
-
+        Game.scripts().setProjectRoot(gameFile.getParent());
         this.setProjectPath(gameFile);
         this.loadProjectTilesetTerrains(gameFile.getParent());
-        this.projectCodeIntegration.reload(gameFile);
+        this.projectCodeIntegration.reloadProject(this.projectModel);
+        this.applyProjectModel();
+        Game.scripts().clearDiagnostics();
+        Game.scripts().setDefinitions(loadedBundle.getScripts());
+        Game.scripts().setGameBindings(loadedBundle.getGameScripts());
+        Game.scripts().setEntityBindings(loadedBundle.getEntityScripts());
 
         this.mapComponent.loadMaps(this.getGameFile().getMaps(), true);
 
@@ -438,7 +665,9 @@ public class Editor extends Screen {
         }
 
         loadCustomEmitters(this.getGameFile().getEmitters());
-        UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
 
         if (!this.mapComponent.getMaps().isEmpty()) {
           this.mapComponent.loadEnvironment(this.mapComponent.getMaps().getFirst());
@@ -540,7 +769,9 @@ public class Editor extends Screen {
         log.log(Level.SEVERE, "could not import animation from " + file + ": " + e.getMessage(), e);
       }
     }
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   public void exportSpriteFile() {
@@ -606,7 +837,9 @@ public class Editor extends Screen {
       }
     }
 
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   public void importSpriteSheets(TextureAtlas atlas) {
@@ -774,7 +1007,9 @@ public class Editor extends Screen {
 
   public void importEmitters(Path... files) {
     Stream.of(files).forEach(this::importEmitter);
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   private void importEmitter(Path file) {
@@ -806,7 +1041,9 @@ public class Editor extends Screen {
 
   public void importBlueprints(Path... files) {
     Stream.of(files).forEach(this::importBlueprint);
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   private void importBlueprint(Path file) {
@@ -841,7 +1078,9 @@ public class Editor extends Screen {
 
   public void importTilesets(Path... files) {
     Stream.of(files).forEach(this::importTileset);
-    UI.getAssetController().refresh();
+    if (UI.getAssetController() != null) {
+      UI.getAssetController().refresh();
+    }
   }
 
   private void importTileset(Path file) {
@@ -947,7 +1186,7 @@ public class Editor extends Screen {
   }
 
   public void loadTileset(ITileset tileset, boolean embedded) {
-    if (tileset == null) {
+    if (tileset == null || tileset.getImage() == null) {
       return;
     }
     Spritesheet sprite = Resources.spritesheets().get(tileset.getImage().getSource());
@@ -1031,7 +1270,7 @@ public class Editor extends Screen {
 
   public synchronized void setCurrentStatus(String currentStatus) {
     this.currentStatus = currentStatus;
-    this.statusTick = Game.time().now();
+    this.statusTick = Game.loop() != null ? Game.time().now() : System.currentTimeMillis();
   }
 
   public void updateGameFileMaps() {
@@ -1052,6 +1291,15 @@ public class Editor extends Screen {
   private void saveGameFile(Path target) {
     try {
       Files.deleteIfExists(target);
+
+      if (Game.scripts() != null) {
+        getGameFile().getScripts().clear();
+        getGameFile().getScripts().addAll(Game.scripts().getDefinitions());
+        getGameFile().getGameScripts().clear();
+        getGameFile().getGameScripts().addAll(Game.scripts().getGameBindings());
+        getGameFile().getEntityScripts().clear();
+        getGameFile().getEntityScripts().addAll(Game.scripts().getEntityBindings());
+      }
 
       getGameFile().save(target.toString(), preferences().compressFile());
       AutoSaveManager.deleteBackup(target);
@@ -1082,15 +1330,32 @@ public class Editor extends Screen {
     getChangedMaps().forEach(m -> {
       UndoManager.save(m);
       String fileName = String.format("%s.%s", m.getName(), TmxMap.FILE_EXTENSION);
-      if (preferences().syncMaps()) {
+      if (preferences().syncMaps() && getProjectPath() != null && getProjectPath().getParent() != null) {
         Path searchRoot = getProjectPath().getParent();
-        try (Stream<Path> paths = Files.walk(searchRoot)) {
-          paths.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().equals(fileName)).forEach(p -> {
-            Path newFile = XmlUtilities.save(m, p);
-            log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
-          });
-        } catch (IOException e) {
-          log.log(Level.SEVERE, "Error walking file tree for map sync", e);
+        if (Files.exists(searchRoot)) {
+          try {
+            Files.walkFileTree(searchRoot, new java.nio.file.SimpleFileVisitor<Path>() {
+              @Override
+              public java.nio.file.FileVisitResult preVisitDirectory(Path dir, java.nio.file.attribute.BasicFileAttributes attrs) {
+                String name = dir.getFileName() != null ? dir.getFileName().toString() : "";
+                if (name.startsWith(".") || name.equalsIgnoreCase("build") || name.equalsIgnoreCase("target") || name.equalsIgnoreCase("bin") || name.equalsIgnoreCase("out") || name.equalsIgnoreCase("node_modules")) {
+                  return java.nio.file.FileVisitResult.SKIP_SUBTREE;
+                }
+                return java.nio.file.FileVisitResult.CONTINUE;
+              }
+
+              @Override
+              public java.nio.file.FileVisitResult visitFile(Path file, java.nio.file.attribute.BasicFileAttributes attrs) {
+                if (file.getFileName() != null && file.getFileName().toString().equals(fileName)) {
+                  Path newFile = XmlUtilities.save(m, file);
+                  log.log(Level.INFO, "synchronized map {0}", new Object[] {newFile});
+                }
+                return java.nio.file.FileVisitResult.CONTINUE;
+              }
+            });
+          } catch (IOException e) {
+            log.log(Level.SEVERE, "Error walking file tree for map sync", e);
+          }
         }
       }
     });

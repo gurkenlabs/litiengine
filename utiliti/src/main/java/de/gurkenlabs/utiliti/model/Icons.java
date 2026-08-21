@@ -35,6 +35,7 @@ public final class Icons {
   public static final Icon MAPAREA_8 = IconLoader.get().getUIAwareIcon("maparea.svg", 8, 8);
   public static final Icon MINUS_8 = IconLoader.get().getUIAwareIcon("minus.svg", 8, 8);
   public static final Icon MISC_8 = IconLoader.get().getUIAwareIcon("misc.svg", 8, 8);
+  public static final Icon PACKAGE_8 = IconLoader.get().getUIAwareIcon("package.svg", 8, 8);
   public static final Icon PASTE_8 = IconLoader.get().getUIAwareIcon("paste.svg", 8, 8);
   public static final Icon PAUSE_8 = IconLoader.get().getUIAwareIcon("pause.svg", 8, 8);
   public static final Icon PENCIL_8 = IconLoader.get().getUIAwareIcon("pencil.svg", 8, 8);
@@ -59,6 +60,16 @@ public final class Icons {
   public static final Icon ABOUT_16 = IconLoader.get().getUIAwareIcon("about.svg", 16, 16);
   public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("animation.svg", 16, 16);
   public static final Icon API_16 = IconLoader.get().getUIAwareIcon("api.svg", 16, 16);
+  public static final Icon SCRIPT_16 = IconLoader.get().getUIAwareIcon("script.svg", 16, 16);
+  public static final Icon ERROR_16 = IconLoader.get().getUIAwareIcon("error.svg", 16, 16);
+  public static final Icon FORMAT_CODE_16 = IconLoader.get().getUIAwareIcon("format-code.svg", 16, 16);
+  public static final Icon COMPILE_16 = IconLoader.get().getUIAwareIcon("compile.svg", 16, 16);
+  public static final Icon RELOAD_16 = IconLoader.get().getUIAwareIcon("reload.svg", 16, 16);
+  public static final Icon SYMBOL_CLASS_16 = IconLoader.get().getUIAwareIcon("symbol_class.svg", 16, 16);
+  public static final Icon SYMBOL_METHOD_16 = IconLoader.get().getUIAwareIcon("symbol_method.svg", 16, 16);
+  public static final Icon SYMBOL_FIELD_16 = IconLoader.get().getUIAwareIcon("symbol_field.svg", 16, 16);
+  public static final Icon SYMBOL_GROUP_16 = IconLoader.get().getUIAwareIcon("symbol_group.svg", 16, 16);
+  public static final Icon SYMBOL_DEPENDENCY_16 = IconLoader.get().getUIAwareIcon("symbol_dependency.svg", 16, 16);
   public static final Icon ASSET_16 = IconLoader.get().getUIAwareIcon("asset.svg", 16, 16);
   public static final Icon ASSET_BLUEPRINT_16 = IconLoader.get().getUIAwareIcon("asset_blueprint.svg", 16, 16);
   public static final Icon ASSET_EMITTER_16 = IconLoader.get().getUIAwareIcon("asset_emitter.svg", 16, 16);
@@ -112,6 +123,7 @@ public final class Icons {
   public static final Icon MAP_SYNC_16 = IconLoader.get().getUIAwareIcon("map-sync.svg", 16, 16);
   public static final Icon MINUS_16 = IconLoader.get().getUIAwareIcon("minus.svg", 16, 16);
   public static final Icon MISC_16 = IconLoader.get().getUIAwareIcon("misc.svg", 16, 16);
+  public static final Icon PACKAGE_16 = IconLoader.get().getUIAwareIcon("package.svg", 16, 16);
   public static final Icon PASTE_16 = IconLoader.get().getUIAwareIcon("paste.svg", 16, 16);
   public static final Icon PAUSE_16 = IconLoader.get().getUIAwareIcon("pause.svg", 16, 16);
   public static final Icon PENCIL_16 = IconLoader.get().getUIAwareIcon("pencil.svg", 16, 16);
@@ -123,6 +135,7 @@ public final class Icons {
   public static final Icon REDO_16 = IconLoader.get().getUIAwareIcon("redo.svg", 16, 16);
   public static final Icon REWIND_16 = IconLoader.get().getUIAwareIcon("rewind.svg", 16, 16);
   public static final Icon SCROLL_DOWN_16 = IconLoader.get().getUIAwareIcon("scroll_down.svg", 16, 16);
+  public static final Icon SCROLL_RIGHT_16 = IconLoader.get().getUIAwareIcon("scroll_right.svg", 16, 16);
   public static final Icon SAVE_16 = IconLoader.get().getUIAwareIcon("save.svg", 16, 16);
   public static final Icon SEARCH_16 = IconLoader.get().getUIAwareIcon("search.svg", 16, 16);
   public static final Icon SHADOWBOX_16 = IconLoader.get().getUIAwareIcon("shadowbox.svg", 16, 16);
@@ -288,5 +301,95 @@ public final class Icons {
       case TRIGGER -> TRIGGER_16;
       default -> ENTITY_16;
     };
+  }
+
+  public static final class VectorScriptIcon implements Icon {
+    private final int width;
+    private final int height;
+    private final java.awt.Color color;
+
+    public VectorScriptIcon(int width, int height, java.awt.Color color) {
+      this.width = width;
+      this.height = height;
+      this.color = color;
+    }
+
+    @Override public int getIconWidth() { return width; }
+    @Override public int getIconHeight() { return height; }
+
+    @Override
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_STROKE_CONTROL, java.awt.RenderingHints.VALUE_STROKE_PURE);
+        g2.setColor(color != null ? color : (c != null ? c.getForeground() : java.awt.Color.WHITE));
+
+        g2.setStroke(new java.awt.BasicStroke(1.5f, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
+        // <
+        g2.drawLine(x + 3, y + 8, x + 5, y + 5);
+        g2.drawLine(x + 3, y + 8, x + 5, y + 11);
+        // /
+        g2.drawLine(x + 7, y + 12, x + 9, y + 4);
+        // >
+        g2.drawLine(x + 13, y + 8, x + 11, y + 5);
+        g2.drawLine(x + 13, y + 8, x + 11, y + 11);
+      } finally {
+        g2.dispose();
+      }
+    }
+  }
+
+  public static final Icon GREEN_PLAY_16 = new VectorRunIcon(16, true);
+  public static final Icon GREEN_DEBUG_16 = debugIcon(new java.awt.Color(53, 208, 115));
+  public static final Icon DISABLED_DEBUG_16 = debugIcon(Style.COLOR_DISABLED_TEXT);
+  public static final Icon RED_STOP_16 = new VectorRunIcon(16, false);
+
+  private static Icon debugIcon(java.awt.Color color) {
+    var loader = IconLoader.get();
+    var colors = java.util.Map.<Object, Object>of("debugColor", color);
+    return loader.createUIAwareIcon(
+        () -> loader.loadSVGIcon("light/debug.svg", 16, 16, true, colors),
+        () -> loader.loadSVGIcon("dark/debug.svg", 16, 16, true, colors));
+  }
+
+  public static class VectorRunIcon implements Icon {
+    private final int size;
+    private final boolean isPlay;
+
+    public VectorRunIcon(int size, boolean isPlay) {
+      this.size = size;
+      this.isPlay = isPlay;
+    }
+
+    @Override
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+      g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+      boolean enabled = c == null || c.isEnabled();
+
+      if (isPlay) {
+        g2.setColor(enabled ? new java.awt.Color(53, 208, 115) : Style.disabledIconColor());
+        int padding = Math.max(2, size / 6);
+        int w = size - padding * 2;
+        int h = size - padding * 2;
+
+        java.awt.geom.Path2D triangle = new java.awt.geom.Path2D.Double();
+        triangle.moveTo(x + padding + 1, y + padding);
+        triangle.lineTo(x + padding + w, y + padding + h / 2.0);
+        triangle.lineTo(x + padding + 1, y + padding + h);
+        triangle.closePath();
+        g2.fill(triangle);
+      } else {
+        g2.setColor(enabled ? new java.awt.Color(229, 87, 86) : Style.disabledIconColor());
+        int padding = Math.max(3, size / 5);
+        int sz = size - padding * 2;
+        g2.fill(new java.awt.geom.RoundRectangle2D.Double(x + padding, y + padding, sz, sz, 3, 3));
+      }
+      g2.dispose();
+    }
+
+    @Override public int getIconWidth() { return size; }
+    @Override public int getIconHeight() { return size; }
   }
 }

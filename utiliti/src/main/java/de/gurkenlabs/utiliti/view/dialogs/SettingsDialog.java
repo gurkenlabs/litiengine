@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.UriUtilities;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ProjectLaunchRequest;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.KeyBindings;
 import de.gurkenlabs.utiliti.model.KeyBindings.Command;
@@ -106,6 +107,7 @@ public final class SettingsDialog extends JDialog {
   private JPanel uiPreview;
   private final JCheckBox reopenLastProject;
   private final JSpinner editorFpsCap;
+  private final JTextField gradleLaunchArguments;
   private final JComboBox<LogLevelOption> logLevel;
   private final JCheckBox mcpEnabled;
   private final JTextField mcpPort;
@@ -189,6 +191,13 @@ public final class SettingsDialog extends JDialog {
         UserPreferences.EDITOR_FPS_CAP_MIN,
         UserPreferences.EDITOR_FPS_CAP_MAX, 1));
     ControlBehavior.apply(this.editorFpsCap);
+    this.gradleLaunchArguments = new JTextField(this.preferences.getGradleLaunchArguments());
+    this.gradleLaunchArguments.setColumns(34);
+    this.gradleLaunchArguments.setToolTipText(text("settings_gradle_launch_arguments_description"));
+    this.gradleLaunchArguments.getAccessibleContext().setAccessibleName(
+        text("settings_gradle_launch_arguments"));
+    this.gradleLaunchArguments.getAccessibleContext().setAccessibleDescription(
+        text("settings_gradle_launch_arguments_description"));
     this.logLevel = new JComboBox<>(LogLevelOption.values());
     try {
       this.logLevel.setSelectedItem(LogLevelOption.valueOf(this.preferences.getLogLevel().toUpperCase(Locale.ROOT)));
@@ -468,6 +477,12 @@ public final class SettingsDialog extends JDialog {
         this.editorFpsCap));
     body.add(rowSeparator());
     body.add(settingRow(
+        Icons.GREEN_PLAY_16,
+        text("settings_gradle_launch_arguments"),
+        text("settings_gradle_launch_arguments_description"),
+        this.gradleLaunchArguments));
+    body.add(rowSeparator());
+    body.add(settingRow(
         Icons.CONSOLE_16,
         "Logging Verbosity",
         "Configure application log detail (INFO: clean user logs, FINE: detailed diagnostics)",
@@ -641,6 +656,14 @@ public final class SettingsDialog extends JDialog {
           text("settings_keymap_conflict_title"), JOptionPane.WARNING_MESSAGE);
       return false;
     }
+    try {
+      ProjectLaunchRequest.parseBuildArguments(this.gradleLaunchArguments.getText());
+    } catch (IllegalArgumentException error) {
+      JOptionPane.showMessageDialog(this, error.getMessage(),
+          text("settings_gradle_launch_arguments"), JOptionPane.WARNING_MESSAGE);
+      this.gradleLaunchArguments.requestFocusInWindow();
+      return false;
+    }
 
     LocaleOption locale = (LocaleOption) this.language.getSelectedItem();
     boolean restartRequired = locale != null
@@ -663,6 +686,7 @@ public final class SettingsDialog extends JDialog {
     this.preferences.setReopenLastProject(this.reopenLastProject.isSelected());
     int fpsCap = ((Number) this.editorFpsCap.getValue()).intValue();
     this.preferences.setEditorFpsCap(fpsCap);
+    this.preferences.setGradleLaunchArguments(this.gradleLaunchArguments.getText());
     Game.config().client().setMaxFps(fpsCap);
     Game.loop().setTickRate(fpsCap);
     this.preferences.setGridLineWidth(((Number) this.gridLineWidth.getValue()).floatValue());
@@ -759,6 +783,7 @@ public final class SettingsDialog extends JDialog {
     this.editorFontSize.setValue(defaults.getEditorFontSize());
     this.reopenLastProject.setSelected(defaults.reopenLastProject());
     this.editorFpsCap.setValue(defaults.getEditorFpsCap());
+    this.gradleLaunchArguments.setText(defaults.getGradleLaunchArguments());
     this.mcpEnabled.setSelected(defaults.isMcpEnabled());
     this.mcpPort.setText(String.valueOf(defaults.getMcpPort()));
     this.gridLineWidth.setValue((double) defaults.getGridLineWidth());
@@ -1076,7 +1101,9 @@ public final class SettingsDialog extends JDialog {
             .append(' ').append(text("settings_ui_scale_description"));
         case GENERAL -> value
             .append(' ').append(text("settings_reopen_last_project"))
-            .append(' ').append(text("settings_reopen_last_project_description"));
+            .append(' ').append(text("settings_reopen_last_project_description"))
+            .append(' ').append(text("settings_gradle_launch_arguments"))
+            .append(' ').append(text("settings_gradle_launch_arguments_description"));
         case GRID -> value
             .append(' ').append(text("menu_view_gridStroke"))
             .append(' ').append(text("settings_grid_stroke_description"))
@@ -1239,16 +1266,36 @@ public final class SettingsDialog extends JDialog {
     }
 
     private String findConflict() {
-      Map<KeyStroke, Command> used = new HashMap<>();
+      Map<KeyBindings.Command.CommandGroup, Map<KeyStroke, Command>> groupUsed = new EnumMap<>(KeyBindings.Command.CommandGroup.class);
+      for (KeyBindings.Command.CommandGroup group : KeyBindings.Command.CommandGroup.values()) {
+        groupUsed.put(group, new HashMap<>());
+      }
+
       for (Command command : this.commands) {
         KeyStroke keyStroke = this.bindings.get(command);
         if (keyStroke == null) {
           continue;
         }
-        Command existing = used.putIfAbsent(keyStroke, command);
-        if (existing != null) {
-          return KeyBindings.format(keyStroke) + " (" + text(existing.resourceKey()) + ", "
-              + text(command.resourceKey()) + ")";
+        if (command.group() == KeyBindings.Command.CommandGroup.GLOBAL) {
+          for (KeyBindings.Command.CommandGroup group : KeyBindings.Command.CommandGroup.values()) {
+            Command existing = groupUsed.get(group).putIfAbsent(keyStroke, command);
+            if (existing != null && existing != command) {
+              return KeyBindings.format(keyStroke) + " (" + text(existing.resourceKey()) + ", "
+                  + text(command.resourceKey()) + ")";
+            }
+          }
+        } else {
+          Command existingGlobal = groupUsed.get(KeyBindings.Command.CommandGroup.GLOBAL).get(keyStroke);
+          if (existingGlobal != null && existingGlobal != command) {
+            return KeyBindings.format(keyStroke) + " (" + text(existingGlobal.resourceKey()) + ", "
+                + text(command.resourceKey()) + ")";
+          }
+          Map<KeyStroke, Command> used = groupUsed.get(command.group());
+          Command existing = used.putIfAbsent(keyStroke, command);
+          if (existing != null && existing != command) {
+            return KeyBindings.format(keyStroke) + " (" + text(existing.resourceKey()) + ", "
+                + text(command.resourceKey()) + ")";
+          }
         }
       }
       return null;

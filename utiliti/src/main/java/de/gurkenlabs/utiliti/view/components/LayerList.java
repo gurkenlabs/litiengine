@@ -11,6 +11,7 @@ import de.gurkenlabs.utiliti.controller.LayerController;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -319,8 +320,7 @@ public final class LayerList extends JPanel implements LayerController {
 
   private JButton createButton(Icon icon, String tooltip, BiConsumer<IMap, IMapObjectLayer> consumer,
       boolean requireLayer) {
-    JButton button = new JButton();
-    button.setIcon(icon);
+    JButton button = Style.iconButton(icon);
     button.setToolTipText(tooltip);
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setPreferredSize(BUTTON_SIZE);

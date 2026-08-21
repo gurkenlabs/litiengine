@@ -57,10 +57,12 @@ public class UserPreferences extends ConfigurationGroup {
   private String preferredLanguage;
   private String preferredCountry;
   private String keyBindings;
+  private String scriptBreakpoints;
   private boolean reopenLastProject;
   private String editorFontFamily;
   private int editorFontSize;
   private int editorFpsCap;
+  private String gradleLaunchArguments;
   private int settingsDialogX;
   private int settingsDialogY;
   private int mcpPort;
@@ -89,10 +91,12 @@ public class UserPreferences extends ConfigurationGroup {
     this.compactMode = false;
     this.assetCardSize = 118;
     this.keyBindings = "";
+    this.scriptBreakpoints = "";
     this.reopenLastProject = true;
     this.editorFontFamily = "Roboto";
     this.editorFontSize = 12;
     this.editorFpsCap = 60;
+    this.gradleLaunchArguments = "";
     this.settingsDialogX = Integer.MIN_VALUE;
     this.settingsDialogY = Integer.MIN_VALUE;
     this.mcpPort = 8080;
@@ -156,6 +160,14 @@ public class UserPreferences extends ConfigurationGroup {
     this.keyBindings = keyBindings;
   }
 
+  public String getScriptBreakpoints() {
+    return this.scriptBreakpoints;
+  }
+
+  public void setScriptBreakpoints(String scriptBreakpoints) {
+    this.scriptBreakpoints = scriptBreakpoints == null ? "" : scriptBreakpoints;
+  }
+
   public boolean reopenLastProject() {
     return this.reopenLastProject;
   }
@@ -188,6 +200,14 @@ public class UserPreferences extends ConfigurationGroup {
 
   public void setEditorFpsCap(int editorFpsCap) {
     this.editorFpsCap = Math.clamp(editorFpsCap, EDITOR_FPS_CAP_MIN, EDITOR_FPS_CAP_MAX);
+  }
+
+  public String getGradleLaunchArguments() {
+    return this.gradleLaunchArguments == null ? "" : this.gradleLaunchArguments;
+  }
+
+  public void setGradleLaunchArguments(String gradleLaunchArguments) {
+    this.gradleLaunchArguments = gradleLaunchArguments == null ? "" : gradleLaunchArguments.strip();
   }
 
   public int getSettingsDialogX() {

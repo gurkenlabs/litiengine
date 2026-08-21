@@ -7,6 +7,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
+import de.gurkenlabs.litiengine.scripting.EntityScriptController;
+import de.gurkenlabs.litiengine.scripting.ScriptBindingCodec;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -86,7 +88,16 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   public void afterLoad(Collection<IEntity> entities, IMapObject mapObject) {
     for (IEntity entity : entities) {
       callAfterTmxUnmarshal(entity, mapObject);
+      configureScriptController(entity, mapObject);
     }
+  }
+
+  private static void configureScriptController(IEntity entity, IMapObject mapObject) {
+    String encoded = mapObject.getStringValue(MapObjectProperty.SCRIPT_BINDINGS, null);
+    if (encoded == null || encoded.isBlank()) return;
+    final var bindings = ScriptBindingCodec.decode(encoded);
+    if (bindings.isEmpty()) return;
+    entity.setController(EntityScriptController.class, new EntityScriptController<>(entity, bindings));
   }
 
   protected boolean isMatchingType(IMapObject mapObject) {

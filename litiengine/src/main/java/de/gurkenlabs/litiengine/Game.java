@@ -41,6 +41,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundPlayback;
+import de.gurkenlabs.litiengine.scripting.ScriptManager;
 import de.gurkenlabs.litiengine.tweening.TweenEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -95,6 +96,7 @@ public final class Game {
   private static GameWindow gameWindow;
 
   private static final GameWorld world = new GameWorld();
+  private static final ScriptManager scriptManager = new ScriptManager();
 
   private static boolean debug = true;
   private static boolean noGUIMode = false;
@@ -206,6 +208,15 @@ public final class Game {
    */
   public static GameInfo info() {
     return gameInfo;
+  }
+
+  /**
+   * Gets the manager for Java and runtime scripting integrations.
+   *
+   * @return The global script manager.
+   */
+  public static ScriptManager scripts() {
+    return scriptManager;
   }
 
   /**
@@ -451,13 +462,15 @@ public final class Game {
       if (SwingUtilities.isEventDispatchThread()) {
         throw new AWTError("Cannot call init(Runnable, Runnable, String...) from the event dispatcher thread!");
       }
-      log().log(Level.INFO, "PreInitialization started");
+      log().log(Level.FINE, "PreInitialization started");
       SwingUtilities.invokeAndWait(preInitialization);
-      log().log(Level.INFO, "PreInitialization complete");
+      log().log(Level.FINE, "PreInitialization complete");
       init(true, args);
-      log().log(Level.INFO, "PostInitialization started");
+      log().log(Level.FINE, "PostInitialization started");
       SwingUtilities.invokeAndWait(postInitialization);
-      log().log(Level.INFO, "PostInitialization complete.");
+      String name = Game.info().getName() != null && !Game.info().getName().isBlank() ? Game.info().getName() : "LITIengine";
+      String version = Game.info().getVersion() != null && !Game.info().getVersion().isBlank() ? " v" + Game.info().getVersion() : "";
+      log().log(Level.INFO, "{0}{1} loaded successfully and is ready.", new Object[] {name, version});
     } catch (InvocationTargetException | InterruptedException e) {
       throw new Error(e);
     }
@@ -544,7 +557,7 @@ public final class Game {
       Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
 
       initialized = true;
-      log().log(Level.INFO, "Initialization complete");
+      log().log(Level.FINE, "Initialization complete");
     };
   }
 
@@ -560,7 +573,7 @@ public final class Game {
   public static void init(boolean initInSwingThread, String... args) {
     if (initInSwingThread) {
       try {
-        SwingUtilities.invokeAndWait(initImpl());
+        SwingUtilities.invokeAndWait(initImpl(args));
       } catch (InvocationTargetException | InterruptedException e) {
         throw new Error(e);
       }
@@ -630,6 +643,7 @@ public final class Game {
 
   public static void exit() {
     if (terminating()) {
+      terminate();
       System.exit(Game.EXIT_GAME_CLOSED);
     }
   }
@@ -691,7 +705,10 @@ public final class Game {
     return true;
   }
 
-  static void terminate() {
+  /**
+   * Terminates the game, releases all engine resources, saves configuration, and notifies listeners.
+   */
+  public static void terminate() {
     if (!initialized) {
       return;
     }

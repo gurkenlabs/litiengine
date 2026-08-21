@@ -6,61 +6,30 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapImage;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.scripting.ScriptManager;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
-import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
-import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Icons;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
+import de.gurkenlabs.utiliti.model.Style;
+
 import javax.imageio.ImageIO;
-import java.io.File;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
+import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JTabbedPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JMenuItem;
-import javax.swing.TransferHandler;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JColorChooser;
-import javax.swing.JOptionPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.*;
+import java.util.List;
 
 public class MapPropertyPanel extends JPanel {
   private static final int CONTENT_WIDTH =
@@ -69,6 +38,8 @@ public class MapPropertyPanel extends JPanel {
   private final AmbientLightPreviewPanel ambientlightPreview;
   private final JScrollPane scrollPane;
   private final ExpandableCard generalCard;
+  private final ExpandableCard scriptsCard;
+  private final EnvironmentScriptInspectorPanel scriptsPanel;
   private final JSpinner spinnerGravity;
   private final ColorComponent ambientColorComponent;
   private final JTextArea textFieldDesc;
@@ -90,23 +61,13 @@ public class MapPropertyPanel extends JPanel {
     setOpaque(true);
     setBackground(Style.background());
     this.tilesetPanel = new TilesetTabsPanel();
+    this.scriptsPanel = new EnvironmentScriptInspectorPanel();
 
     this.textFieldName = ControlBehavior.apply(new JTextField());
     this.textFieldTitle = ControlBehavior.apply(new JTextField());
-    this.textFieldDesc = new JTextArea() {
-      @Override public void updateUI() {
-        super.updateUI();
-        setBackground(Style.raisedSurface());
-        setForeground(Style.text());
-        setCaretColor(Style.text());
-      }
-    };
+    this.textFieldDesc = ControlBehavior.apply(new JTextArea());
     this.textFieldDesc.setLineWrap(true);
     this.textFieldDesc.setWrapStyleWord(true);
-    this.textFieldDesc.setMargin(new java.awt.Insets(4, 4, 4, 4));
-    JScrollPane scrollPaneDesc = new JScrollPane(this.textFieldDesc);
-    scrollPaneDesc.setBorder(new RoundedBorder(Style.border(), Style.CORNER_RADIUS, 1));
-    scrollPaneDesc.getViewport().setBackground(Style.raisedSurface());
 
     this.spinnerGravity = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
     ControlBehavior.apply(this.spinnerGravity);
@@ -158,28 +119,33 @@ public class MapPropertyPanel extends JPanel {
     accordion.setBackground(Style.background());
     accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    this.generalCard = new ExpandableCard(Resources.strings().get("menu_map"), createGeneralPanel(scrollPaneDesc), false);
+    this.generalCard = new ExpandableCard(Resources.strings().get("menu_map"), createGeneralPanel(this.textFieldDesc), false);
     ExpandableCard lightingCard =
         new ExpandableCard(Resources.strings().get("mapProperties_lighting"), createLightingPanel(), false);
+    this.scriptsCard =
+        new ExpandableCard(Resources.strings().get("panel_scriptBindings"), this.scriptsPanel, false);
     ExpandableCard propertiesCard =
         new ExpandableCard(Resources.strings().get("panel_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), false);
 
-    this.generalCard.setContentInsets(8, 0, 8, 0);
-    lightingCard.setContentInsets(8, 0, 8, 0);
-    propertiesCard.setContentInsets(8, 0, 8, 0);
+    this.generalCard.setInspectorContentInsets();
+    lightingCard.setInspectorContentInsets();
+    this.scriptsCard.setInspectorContentInsets();
+    propertiesCard.setInspectorContentInsets();
     ExpandableCard tilesetsCard = new ExpandableCard(Resources.strings().get("assettree_tilesets"), createTilesetsPanel(), true);
-    tilesetsCard.setContentInsets(8, 0, 8, 0);
+    tilesetsCard.setInspectorContentInsets();
     tilesetsCard.setFillsAvailableHeight(true);
     tilesetsCard.setHeaderTrailing(this.tilesetPanel.getCommands());
 
     accordion.add(this.generalCard);
     accordion.add(lightingCard);
+    accordion.add(this.scriptsCard);
     accordion.add(propertiesCard);
     accordion.add(tilesetsCard);
 
     JScrollPane hostScrollPane = new JScrollPane(accordion);
     hostScrollPane.setBorder(null);
     hostScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    hostScrollPane.getVerticalScrollBar().setUnitIncrement(24);
     hostScrollPane.getViewport().setBackground(Style.background());
     add(hostScrollPane, BorderLayout.CENTER);
 
@@ -191,7 +157,7 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private JPanel createTilesetCommands() {
-    JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+    JPanel commands = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
     commands.setOpaque(false);
     this.tilesetTabs = new JTabbedPane();
     this.tilesetTabs.setTransferHandler(new TransferHandler() {
@@ -237,7 +203,7 @@ public class MapPropertyPanel extends JPanel {
     return commands;
   }
 
-  private JPanel createGeneralPanel(JComponent scrollPaneDesc) {
+  private JPanel createGeneralPanel(JComponent textDesc) {
     return createForm(
         new JLabel[] {
             createLabel(Resources.strings().get("panel_name")),
@@ -248,7 +214,7 @@ public class MapPropertyPanel extends JPanel {
         new JComponent[] {
             this.textFieldName,
             this.textFieldTitle,
-            scrollPaneDesc,
+            textDesc,
             this.spinnerGravity,
         },
         new int[] {
@@ -274,20 +240,19 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private JPanel createPropertiesPanel(JButton buttonAdd, JButton buttonRemove) {
-    int inset = PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH - 6;
-    JPanel panel = new JPanel();
+    JPanel panel = new JPanel(new BorderLayout(0, 4));
     panel.setOpaque(false);
-    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    panel.add(createAlignedControl(this.scrollPane, 150, inset));
-    panel.add(Box.createVerticalStrut(6));
+    this.scrollPane.setPreferredSize(new Dimension(0, 96));
+    this.scrollPane.setBorder(BorderFactory.createLineBorder(Style.border()));
+    this.scrollPane.getViewport().setBackground(Style.surface());
+    this.scrollPane.getVerticalScrollBar().setUnitIncrement(24);
+    panel.add(this.scrollPane, BorderLayout.CENTER);
+
     JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
     buttonRow.setOpaque(false);
     buttonRow.add(buttonAdd);
     buttonRow.add(buttonRemove);
-    JPanel buttonWrapper = new JPanel(new BorderLayout());
-    buttonWrapper.setOpaque(false);
-    buttonWrapper.add(buttonRow, BorderLayout.WEST);
-    panel.add(createAlignedControl(buttonWrapper, buttonRow.getPreferredSize().height, inset));
+    panel.add(buttonRow, BorderLayout.SOUTH);
     return panel;
   }
 
@@ -423,6 +388,7 @@ public class MapPropertyPanel extends JPanel {
       return;
     }
 
+    this.scriptsPanel.bind(map);
     this.setControlValues(map);
     String mapName = map.getName() != null && !map.getName().isBlank()
       ? map.getName() : Resources.strings().get("mapProperties_unnamedMap");
@@ -444,6 +410,7 @@ public class MapPropertyPanel extends JPanel {
       this.ambientlightPreview.setAmbientColor(AmbientLight.DEFAULT_COLOR);
       this.ambientlightPreview.setStaticShadowColor(StaticShadow.DEFAULT_COLOR);
       this.model.setRowCount(0);
+      this.scriptsPanel.bind(null);
       this.tilesetPanel.bind(null);
     } finally {
       this.binding = false;
@@ -454,42 +421,30 @@ public class MapPropertyPanel extends JPanel {
     this.tilesetPanel.bind(this.dataSource);
   }
 
+  public void refreshScripts() {
+    if (this.scriptsPanel != null) {
+      this.scriptsPanel.refreshAvailableScripts();
+    }
+  }
+
   void refreshTilesets(IMap map) {
     if (this.dataSource == map) {
       refreshTilesets();
     }
   }
 
-  void onTilesetsChanged(java.util.function.Consumer<IMap> listener) {
-    this.tilesetsChanged = listener != null ? listener : _ -> {};
-  }
-
-  void showAddTilesetMenu(JButton owner) {
-    if (Editor.instance().getGameFile() == null) {
-      return;
-    }
-    JPopupMenu menu = new JPopupMenu();
-    for (Tileset tileset : availableTilesets()) {
-      if (this.dataSource != null && this.dataSource.getTilesets().stream()
-          .anyMatch(existing -> java.util.Objects.equals(existing.getName(), tileset.getName()))) {
-        continue;
-      }
-      JMenuItem item = new JMenuItem(tileset.getName());
-      item.addActionListener(e -> addTileset(tileset));
-      menu.add(item);
-    }
-    if (menu.getComponentCount() == 0) {
-      JMenuItem empty = new JMenuItem(Resources.strings().get("mapTilesets_allAssigned"));
-      empty.setEnabled(false);
-      menu.add(empty);
-    }
-    menu.show(owner, 0, owner.getHeight());
+  public void onTilesetsChanged(java.util.function.Consumer<IMap> listener) {
+    this.tilesetsChanged = listener;
   }
 
   boolean addTileset(Tileset tileset) {
-    if (this.dataSource == null || this.dataSource.getTilesets().stream()
-        .anyMatch(existing -> java.util.Objects.equals(existing.getName(), tileset.getName()))) {
+    if (this.dataSource == null || tileset == null) {
       return false;
+    }
+    for (ITileset existing : this.dataSource.getTilesets()) {
+      if (existing != null && Objects.equals(existing.getName(), tileset.getName())) {
+        return false;
+      }
     }
     UndoManager.instance().mapChanging(this.dataSource);
     this.dataSource.getTilesets().add(tileset);
@@ -499,12 +454,37 @@ public class MapPropertyPanel extends JPanel {
   }
 
   void addAllTilesets() {
-    for (Tileset tileset : availableTilesets()) {
-      addTileset(tileset);
+    if (this.dataSource == null || Editor.instance().getGameFile() == null) {
+      return;
+    }
+    boolean added = false;
+    for (Tileset tileset : getAvailableTilesets()) {
+      added |= addTileset(tileset);
+    }
+    if (added) {
+      this.tilesetsChanged.accept(this.dataSource);
     }
   }
 
-  private List<Tileset> availableTilesets() {
+  void showAddTilesetMenu(JComponent invoker) {
+    if (this.dataSource == null) {
+      return;
+    }
+    JPopupMenu menu = new JPopupMenu();
+    for (Tileset tileset : getAvailableTilesets()) {
+      JMenuItem item = new JMenuItem(tileset.getName());
+      item.addActionListener(e -> addTileset(tileset));
+      menu.add(item);
+    }
+    if (menu.getComponentCount() == 0) {
+      JMenuItem empty = new JMenuItem(Resources.strings().get("mapTilesets_noTilesetsAvailable"));
+      empty.setEnabled(false);
+      menu.add(empty);
+    }
+    menu.show(invoker, 0, invoker.getHeight());
+  }
+
+  private List<Tileset> getAvailableTilesets() {
     if (Editor.instance().getGameFile() == null) {
       return List.of();
     }
@@ -697,13 +677,15 @@ public class MapPropertyPanel extends JPanel {
               : StaticShadow.DEFAULT_COLOR);
 
       this.spinnerGravity.setValue(map.getIntValue(MapProperty.GRAVITY, 0));
+      this.scriptsPanel.bind(map);
 
       for (Map.Entry<String, ICustomProperty> prop : map.getProperties().entrySet()) {
         if (prop.getKey().equals(MapProperty.AMBIENTCOLOR)
             || prop.getKey().equals(MapProperty.GRAVITY)
             || prop.getKey().equals(MapProperty.MAP_DESCRIPTION)
             || prop.getKey().equals(MapProperty.MAP_TITLE)
-            || prop.getKey().equals(MapProperty.SHADOWCOLOR)) {
+            || prop.getKey().equals(MapProperty.SHADOWCOLOR)
+            || prop.getKey().equals(ScriptManager.BINDINGS_PROPERTY)) {
           continue;
         }
         this.model.addRow(new Object[] {prop.getKey(), prop.getValue().getAsString()});

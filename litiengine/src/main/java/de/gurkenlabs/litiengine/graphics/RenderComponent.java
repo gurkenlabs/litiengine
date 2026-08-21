@@ -105,8 +105,15 @@ public class RenderComponent extends Canvas {
    * Initializes the {@code RenderComponent}, setting up the buffer strategy for rendering.
    */
   public void init() {
-    createBufferStrategy(2);
-    this.currentBufferStrategy = getBufferStrategy();
+    if (!isDisplayable()) {
+      return;
+    }
+    try {
+      createBufferStrategy(2);
+      this.currentBufferStrategy = getBufferStrategy();
+    } catch (IllegalStateException | NullPointerException ignored) {
+      // Peer not ready yet
+    }
   }
 
   /**
@@ -161,9 +168,29 @@ public class RenderComponent extends Canvas {
   }
 
   /**
+   * Unregisters a consumer from being notified after the component has been rendered.
+   *
+   * @param renderedConsumer The consumer to remove.
+   */
+  public void removeRenderedConsumer(final Consumer<Graphics2D> renderedConsumer) {
+    this.renderedConsumer.remove(renderedConsumer);
+  }
+
+  /**
    * Renders the game screen, including handling fade effects, cursor rendering, and screenshot capture.
    */
   public void render() {
+    if (!isDisplayable() || getWidth() <= 0 || getHeight() <= 0) {
+      return;
+    }
+
+    if (currentBufferStrategy == null) {
+      init();
+      if (currentBufferStrategy == null) {
+        return;
+      }
+    }
+
     if (System.currentTimeMillis() - lastFpsTime >= 1000) {
       lastFpsTime = System.currentTimeMillis();
       fpsChangedConsumer.forEach(consumer -> consumer.accept(frameCount));
@@ -171,18 +198,28 @@ public class RenderComponent extends Canvas {
     }
 
     handleFade();
-    do {
-      Graphics2D g = (Graphics2D) currentBufferStrategy.getDrawGraphics();
-      try {
-        renderGraphics(g);
-      } finally {
-        g.dispose();
-      }
-      currentBufferStrategy.show();
-    } while (currentBufferStrategy.contentsLost());
 
-    Toolkit.getDefaultToolkit().sync();
-    frameCount++;
+    try {
+      do {
+        Graphics2D g = (Graphics2D) currentBufferStrategy.getDrawGraphics();
+        try {
+          renderGraphics(g);
+        } finally {
+          g.dispose();
+        }
+        currentBufferStrategy.show();
+      } while (currentBufferStrategy.contentsLost());
+
+      Toolkit.getDefaultToolkit().sync();
+      frameCount++;
+    } catch (IllegalStateException | NullPointerException e) {
+      // Buffers were destroyed or invalidated (e.g. window resize, minimize, display mode change, DPI scaling).
+      try {
+        init();
+      } catch (Exception ignored) {
+        // Native peer may not be ready yet; will retry on the next render cycle
+      }
+    }
   }
 
   /**

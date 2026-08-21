@@ -45,7 +45,7 @@ public final class StatusBar extends JPanel {
   static final Color FPS_WARNING_COLOR = new Color(220, 180, 70);
 
   private final JLabel stateLabel = new JLabel();
-  private final JLabel mcpLabel = new JLabel(new McpStatusIcon());
+  private final JLabel mcpLabel = createMcpBadge();
   private final JLabel toolLabel = new JLabel();
   private final JLabel positionLabel = new JLabel();
   private final JLabel tileLabel = new JLabel();
@@ -82,20 +82,6 @@ public final class StatusBar extends JPanel {
         this.gridLabel, this.snapLabel, this.fpsLabel}) {
       label.setFont(font);
     }
-    Dimension mcpIndicatorSize = new Dimension(62, 16);
-    this.mcpLabel.setPreferredSize(mcpIndicatorSize);
-    this.mcpLabel.setMinimumSize(new Dimension(44, 16));
-    this.mcpLabel.setMaximumSize(new Dimension(64, 16));
-    this.mcpLabel.getAccessibleContext().setAccessibleName("MCP server status");
-    this.mcpLabel.getAccessibleContext().setAccessibleDescription(
-        "Shows MCP activity and connected clients");
-    this.mcpLabel.addMouseListener(new MouseAdapter() {
-      @Override public void mouseClicked(MouseEvent event) {
-        if (SwingUtilities.isLeftMouseButton(event) && McpServer.instance().isRunning()) {
-          showMcpPanel();
-        }
-      }
-    });
 
     add(this.stateLabel);
     add(separator());
@@ -253,7 +239,36 @@ public final class StatusBar extends JPanel {
     };
   }
 
-  private void showMcpPanel() {
+  public static JLabel createMcpBadge() {
+    JLabel label = new JLabel(new McpStatusIcon());
+    Dimension mcpIndicatorSize = new Dimension(62, 16);
+    label.setPreferredSize(mcpIndicatorSize);
+    label.setMinimumSize(new Dimension(44, 16));
+    label.setMaximumSize(new Dimension(64, 16));
+    label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    label.getAccessibleContext().setAccessibleName("MCP server status");
+    label.getAccessibleContext().setAccessibleDescription("Shows MCP activity and connected clients");
+    label.addMouseListener(new MouseAdapter() {
+      @Override public void mouseClicked(MouseEvent event) {
+        if (SwingUtilities.isLeftMouseButton(event) && McpServer.instance().isRunning()) {
+          showMcpPanel(label);
+        }
+      }
+    });
+    Timer timer = new Timer(50, event -> {
+      McpServer server = McpServer.instance();
+      boolean running = server.isRunning();
+      ActionStatus action = server.getActionStatus();
+      label.setToolTipText(mcpTooltip(server.getPort(), action));
+      if (running && action.state() == ActionState.RUNNING) {
+        label.repaint();
+      }
+    });
+    timer.start();
+    return label;
+  }
+
+  public static void showMcpPanel(Component invoker) {
     McpServer server = McpServer.instance();
     if (!server.isRunning()) {
       return;
@@ -344,7 +359,7 @@ public final class StatusBar extends JPanel {
     refreshBtn.addMouseListener(new MouseAdapter() {
       @Override public void mouseClicked(MouseEvent e) {
         menu.setVisible(false);
-        SwingUtilities.invokeLater(() -> showMcpPanel());
+        SwingUtilities.invokeLater(() -> showMcpPanel(invoker));
       }
     });
     clientsHeader.add(refreshBtn);
@@ -368,10 +383,10 @@ public final class StatusBar extends JPanel {
       }
     }
 
-    menu.show(this.mcpLabel, 0, this.mcpLabel.getHeight());
+    menu.show(invoker, 0, invoker.getHeight());
   }
 
-  private JPanel clientEntry(ConnectedClient client) {
+  private static JPanel clientEntry(ConnectedClient client) {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setOpaque(false);
@@ -443,7 +458,7 @@ public final class StatusBar extends JPanel {
     };
   }
 
-  private JPanel separator() {
+  public static JPanel separator() {
     JPanel wrapper = new JPanel();
     wrapper.setOpaque(false);
     wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
@@ -453,7 +468,6 @@ public final class StatusBar extends JPanel {
     line.setPreferredSize(new Dimension(1, 12));
     line.setMaximumSize(new Dimension(1, 12));
     line.setBackground(Style.border());
-    this.separatorLines.add(line);
     wrapper.add(line);
     return wrapper;
   }

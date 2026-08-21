@@ -143,15 +143,16 @@ class AbilityExecutionTests {
         .thenCallRealMethod(); // otherwise Game.time() returns null because of the mock
       gameMockedStatic.when(Game::loop).thenReturn(loopSpy);
 
+      int initialCount = Game.loop().getUpdatableCount();
       AbilityExecution abilityExecution = new AbilityExecution(ability);
-      assertEquals(3, Game.loop().getUpdatableCount());
+      assertEquals(initialCount + 1, Game.loop().getUpdatableCount());
       assertTrue(abilityExecution.getAppliedEffects().isEmpty());
 
       // act
       abilityExecution.update();
 
       // assert
-      assertEquals(2, Game.loop().getUpdatableCount());
+      assertEquals(initialCount, Game.loop().getUpdatableCount());
       verify(loopSpy, times(1)).detach(abilityExecution);
     }
   }
@@ -169,11 +170,12 @@ class AbilityExecutionTests {
       TestEffect otherEffectSpy = spy(new TestEffect());
       ability.addEffect(otherEffectSpy);
 
+      int initialCount = Game.loop().getUpdatableCount();
       AbilityExecution testAbilityExecution = new AbilityExecution(ability);
       testAbilityExecution.getAppliedEffects().add(effectSpy);
       testAbilityExecution.getAppliedEffects().add(otherEffectSpy);
 
-      assertEquals(3, Game.loop().getUpdatableCount());
+      assertEquals(initialCount + 1, Game.loop().getUpdatableCount());
       assertTrue(testAbilityExecution.getAppliedEffects().contains(effectSpy));
       assertTrue(testAbilityExecution.getAppliedEffects().contains(otherEffectSpy));
 
@@ -181,7 +183,7 @@ class AbilityExecutionTests {
       testAbilityExecution.update();
 
       // assert
-      assertEquals(2, Game.loop().getUpdatableCount());
+      assertEquals(initialCount, Game.loop().getUpdatableCount());
       verify(loopSpy, times(1)).detach(testAbilityExecution);
     }
   }

@@ -11,6 +11,16 @@ plugins {
   id "testing-defaults"
 }
 
+def nativeOs = DefaultNativePlatform.currentOperatingSystem
+def jcefJvmArgs = ["--enable-native-access=ALL-UNNAMED"]
+if (nativeOs.isMacOsX()) {
+  jcefJvmArgs.addAll([
+    "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+    "--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED",
+    "--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED"
+  ])
+}
+
 sourceSets {
   main {
     resources {
@@ -23,7 +33,7 @@ application {
   mainClass = "de.gurkenlabs.utiliti.Program"
   applicationName = utiLITI_name
   description = utiLITI_description
-  applicationDefaultJvmArgs = ["--enable-native-access=ALL-UNNAMED"]
+  applicationDefaultJvmArgs = jcefJvmArgs
   applicationDistribution.into(executableDir) {
     from("src/dist")
   }
@@ -36,15 +46,26 @@ dependencies {
   implementation platform(libs.mcp.bom)
   implementation libs.mcp.sdk
   implementation libs.tomcat.embed.core
+  implementation libs.jcef
+  implementation libs.monaco
+  def nativeArch = System.getProperty("os.arch").toLowerCase(Locale.ROOT)
+  def jcefPlatform = nativeOs.isWindows() ? "windows" : nativeOs.isMacOsX() ? "macosx" : "linux"
+  jcefPlatform += nativeArch.contains("aarch64") || nativeArch.contains("arm64") ? "-arm64" : "-amd64"
+  runtimeOnly "me.friwi:jcef-natives-${jcefPlatform}:${libs.versions.jcefNatives.get()}"
   runtimeOnly libs.slf4j.jdk14
   testImplementation project(":shared")
   testImplementation libs.junit.jupiter
   testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
+tasks.named("test") {
+  jvmArgs += jcefJvmArgs
+}
+
 runtime {
   options.set(["--strip-debug", "--no-header-files", "--no-man-pages"])
-  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.naming", "java.xml", "jdk.unsupported.desktop"])
+  modules.set(["java.desktop", "java.logging", "java.datatransfer", "java.management", "java.naming", "java.xml",
+               "java.sql", "java.security.jgss", "java.instrument", "jdk.httpserver", "jdk.jdi", "jdk.unsupported.desktop"])
 
   launcher {
     noConsole = false
@@ -53,10 +74,10 @@ runtime {
   jpackage {
     appVersion = project.version.toString().tokenize("-")[0]
     skipInstaller = true
-    var currentOs = DefaultNativePlatform.currentOperatingSystem
+    var currentOs = nativeOs
     var iconFileType = currentOs.isWindows() ? "ico" : currentOs.isMacOsX() ? "icns" : "png"
 
-    imageOptions.addAll([
+    def runtimeImageOptions = [
       "--icon", "${project.file("src/dist/pixel-icon-utiliti.$iconFileType").path}",
       "--description", description,
       "--copyright", copyright,
@@ -64,7 +85,11 @@ runtime {
       "--java-options", "-Xms256m",
       "--java-options", "-Xmx2048m",
       "--java-options", "--add-exports java.desktop/sun.awt=ALL-UNNAMED"
-    ] as Collection<? extends String>)
+    ]
+    jcefJvmArgs.each { jvmArg ->
+      runtimeImageOptions.addAll(["--java-options", jvmArg])
+    }
+    imageOptions.addAll(runtimeImageOptions as Collection<? extends String>)
 
     if (currentOs.isMacOsX()) {
 //      TODO: Once we are above version 1.0.0, we should be able to use the project version directly for Mac builds.

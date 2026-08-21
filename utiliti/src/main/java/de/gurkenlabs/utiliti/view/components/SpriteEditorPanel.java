@@ -216,7 +216,7 @@ public class SpriteEditorPanel extends JPanel {
         ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
         ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scroll.setBorder(null);
-    scroll.getVerticalScrollBar().setUnitIncrement(16);
+    scroll.getVerticalScrollBar().setUnitIncrement(24);
     scroll.getViewport().setBackground(Style.background());
     JPanel header = createHeader();
     header.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
