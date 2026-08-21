@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.gui.screens;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 
 /**
@@ -10,29 +11,43 @@ import de.gurkenlabs.litiengine.gui.GuiComponent;
  * rendered to the currently active screen.
  */
 public abstract class Screen extends GuiComponent {
+  private int screenLayer = 0;
+
   protected Screen(final String screenName) {
     super(0, 0);
     this.setName(screenName);
   }
+
   /**
-   * Overrides the setX method from GuiComponent to prevent changing the x-coordinate.
-   * This method does nothing because screens always start at the coordinates (0, 0).
+   * Creates a new {@code Screen} with the specified name and screen layer.
    *
-   * @param x The new x-coordinate, which will be ignored.
+   * @param screenName  The name of the screen.
+   * @param screenLayer The rendering layer of this screen (lower values are rendered first).
    */
-  @Override
-  public void setX(final double x) {
-    // do nothing because screens always start at 0/0
+  protected Screen(final String screenName, int screenLayer) {
+    super(0, 0);
+    this.setName(screenName);
+    this.screenLayer = screenLayer;
   }
 
   /**
-   * Overrides the setY method from GuiComponent to prevent changing the y-coordinate.
-   * This method does nothing because screens always start at the coordinates (0, 0).
+   * Gets the screen layer used for ordering when multiple screens are active.
    *
-   * @param y The new y-coordinate, which will be ignored.
+   * @return The screen layer value (lower values are rendered first).
    */
-  @Override
-  public void setY(final double y) {
-    // do nothing because screens always start at 0/0
+  public int getScreenLayer() {
+    return this.screenLayer;
+  }
+
+  /**
+   * Sets the screen layer used for ordering when multiple screens are active.
+   *
+   * @param screenLayer The screen layer value (lower values are rendered first).
+   */
+  public void setScreenLayer(int screenLayer) {
+    this.screenLayer = screenLayer;
+    if (Game.screens() != null) {
+      Game.screens().sortActiveScreens();
+    }
   }
 }

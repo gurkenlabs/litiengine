@@ -194,8 +194,8 @@ public class RenderComponent extends Canvas {
     clearBackground(g);
     applyRenderingHints(g);
 
-    Screen currentScreen = Game.screens().current();
-    if (currentScreen != null) {
+    List<Screen> activeScreens = Game.screens().getActiveScreens();
+    for (Screen currentScreen : activeScreens) {
       renderScreen(g, currentScreen);
     }
 
@@ -203,8 +203,8 @@ public class RenderComponent extends Canvas {
     renderedConsumer.forEach(consumer -> consumer.accept(g));
     applyFadeOverlay(g);
 
-    if (takeScreenShot && currentScreen != null) {
-      takeAndSaveScreenshot(currentScreen);
+    if (takeScreenShot && !activeScreens.isEmpty()) {
+      takeAndSaveScreenshot(activeScreens);
     }
   }
 
@@ -243,7 +243,18 @@ public class RenderComponent extends Canvas {
    */
   private void renderScreen(Graphics2D g, Screen screen) {
     long renderStart = System.nanoTime();
-    screen.render(g);
+    Graphics2D screenGraphics = (Graphics2D) g.create();
+    try {
+      screenGraphics.clip(
+        new Rectangle(
+          (int) Math.round(screen.getX()),
+          (int) Math.round(screen.getY()),
+          (int) Math.round(screen.getWidth()),
+          (int) Math.round(screen.getHeight())));
+      screen.render(screenGraphics);
+    } finally {
+      screenGraphics.dispose();
+    }
 
     if (Game.config().debug().trackRenderTimes()) {
       double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
@@ -265,14 +276,16 @@ public class RenderComponent extends Canvas {
   }
 
   /**
-   * Captures and saves a screenshot of the current screen.
+   * Captures and saves a screenshot of the current active screens.
    *
-   * @param screen The current {@link Screen} to capture.
+   * @param screens The currently active {@link Screen} instances to capture.
    */
-  private void takeAndSaveScreenshot(Screen screen) {
+  private void takeAndSaveScreenshot(List<Screen> screens) {
     BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics2D imgGraphics = img.createGraphics();
-    screen.render(imgGraphics);
+    for (Screen screen : screens) {
+      renderScreen(imgGraphics, screen);
+    }
     imgGraphics.dispose();
     saveScreenshot(img);
   }

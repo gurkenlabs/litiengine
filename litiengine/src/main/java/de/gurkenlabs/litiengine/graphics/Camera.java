@@ -202,10 +202,6 @@ public class Camera implements ICamera, Tweenable {
 
   @Override
   public void update() {
-    if (Game.world().camera() != null && !Game.world().camera().equals(this)) {
-      return;
-    }
-
     if (this.targetZoom > 0) {
       if (Game.time().since(this.zoomTick) >= this.zoomDelay) {
         this.zoom = this.targetZoom;
