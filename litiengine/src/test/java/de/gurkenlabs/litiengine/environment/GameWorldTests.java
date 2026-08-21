@@ -1,11 +1,14 @@
 package de.gurkenlabs.litiengine.environment;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameTest;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 
@@ -165,6 +168,74 @@ class GameWorldTests {
 
     // assert
     assertTrue(mapUnloaded.wasCalled);
+  }
+
+  @Test
+  void testCameraListOperations() {
+    Game.world().clearCameras();
+    Camera camera0 = new Camera();
+    Camera camera1 = new Camera();
+    Camera camera2 = new Camera();
+
+    assertEquals(0, Game.world().addCamera(camera0));
+    assertEquals(1, Game.world().addCamera(camera1));
+    assertEquals(2, Game.world().addCamera(camera2));
+
+    assertEquals(3, Game.world().cameras().size());
+    assertEquals(camera0, Game.world().camera(0));
+    assertEquals(camera1, Game.world().camera(1));
+    assertEquals(camera2, Game.world().camera(2));
+
+    Camera replacement = new Camera();
+    Game.world().setCamera(1, replacement);
+    assertEquals(replacement, Game.world().camera(1));
+
+    Game.world().setCurrentCameraIndex(1);
+    Game.world().setCamera(0, null);
+    assertEquals(0, Game.world().currentCameraIndex());
+    assertEquals(replacement, Game.world().camera());
+
+    Game.world().setCurrentCameraIndex(1);
+    Game.world().setCamera(1, null);
+    assertEquals(0, Game.world().currentCameraIndex());
+    assertEquals(replacement, Game.world().camera());
+
+    Game.world().clearCameras();
+    assertTrue(Game.world().cameras().isEmpty());
+    assertNull(Game.world().camera());
+  }
+
+  @Test
+  void testSetCameraRejectsInvalidIndices() {
+    Game.world().clearCameras();
+    Camera camera0 = new Camera();
+    Camera camera1 = new Camera();
+    Game.world().addCamera(camera0);
+
+    Game.world().setCamera(10, camera1);
+    assertEquals(1, Game.world().cameras().size());
+    assertNull(Game.world().camera(10));
+
+    Game.world().setCamera(1, camera1);
+    assertEquals(2, Game.world().cameras().size());
+    assertEquals(camera1, Game.world().camera(1));
+  }
+
+  @Test
+  void testRemoveCameraAdjustsCurrentIndex() {
+    Game.world().clearCameras();
+    Camera camera0 = new Camera();
+    Camera camera1 = new Camera();
+    Camera camera2 = new Camera();
+    Game.world().addCamera(camera0);
+    Game.world().addCamera(camera1);
+    Game.world().addCamera(camera2);
+
+    Game.world().setCurrentCameraIndex(1);
+    Game.world().removeCamera(camera0);
+
+    assertEquals(0, Game.world().currentCameraIndex());
+    assertEquals(camera1, Game.world().camera());
   }
 
   private class Status {

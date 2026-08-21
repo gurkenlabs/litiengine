@@ -553,6 +553,10 @@ public final class GameWorld implements IUpdateable {
    * @param cam   The new camera to be set. If {@code null}, the slot is removed.
    */
   public void setCamera(int index, final ICamera cam) {
+    if (index < 0 || index > this.cameras.size()) {
+      return;
+    }
+
     // detach old camera at index if present
     if (index >= 0 && index < this.cameras.size()) {
       ICamera old = this.cameras.get(index);
@@ -561,14 +565,14 @@ public final class GameWorld implements IUpdateable {
       }
       if (cam == null) {
         this.cameras.remove(index);
-        if (this.currentCameraIndex >= this.cameras.size()) {
-          this.currentCameraIndex = Math.max(0, this.cameras.size() - 1);
-        }
+        this.adjustCurrentCameraIndexAfterRemoval(index);
         return;
       }
       this.cameras.set(index, cam);
-    } else if (cam != null) {
+    } else if (index == this.cameras.size() && cam != null) {
       this.cameras.add(cam);
+    } else {
+      return;
     }
 
     if (cam != null && !Game.isInNoGUIMode()) {
@@ -609,9 +613,7 @@ public final class GameWorld implements IUpdateable {
     if (index >= 0) {
       Game.loop().detach(cam);
       this.cameras.remove(index);
-      if (this.currentCameraIndex >= this.cameras.size()) {
-        this.currentCameraIndex = Math.max(0, this.cameras.size() - 1);
-      }
+      this.adjustCurrentCameraIndexAfterRemoval(index);
     }
   }
 
@@ -690,6 +692,17 @@ public final class GameWorld implements IUpdateable {
 
     for (EnvironmentListener listener : this.listeners) {
       env.addListener(listener);
+    }
+  }
+
+  private void adjustCurrentCameraIndexAfterRemoval(int removedIndex) {
+    if (removedIndex < this.currentCameraIndex) {
+      this.currentCameraIndex--;
+      return;
+    }
+
+    if (this.currentCameraIndex >= this.cameras.size()) {
+      this.currentCameraIndex = Math.max(0, this.cameras.size() - 1);
     }
   }
 }

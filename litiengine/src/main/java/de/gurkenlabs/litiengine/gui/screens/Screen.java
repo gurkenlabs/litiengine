@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.gui.screens;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 
 /**
@@ -45,5 +46,8 @@ public abstract class Screen extends GuiComponent {
    */
   public void setScreenLayer(int screenLayer) {
     this.screenLayer = screenLayer;
+    if (Game.screens() != null) {
+      Game.screens().sortActiveScreens();
+    }
   }
 }

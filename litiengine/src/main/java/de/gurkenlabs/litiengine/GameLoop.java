@@ -88,7 +88,9 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
       this.executeTimedActions();
     }
 
-    Game.world().camera().updateFocus();
+    for (var camera : Game.world().cameras()) {
+      camera.updateFocus();
+    }
     if (!Game.isInNoGUIMode()) {
       Game.window().getRenderComponent().render();
     }

@@ -18,7 +18,7 @@ public class ScreenChangedEvent extends EventObject {
    * @param previous the previous screen that was displayed
    */
   public ScreenChangedEvent(Screen changed, Screen previous) {
-    super(changed);
+    super(changed != null ? changed : previous != null ? previous : ScreenChangedEvent.class);
     this.previous = previous;
     this.changed = changed;
   }

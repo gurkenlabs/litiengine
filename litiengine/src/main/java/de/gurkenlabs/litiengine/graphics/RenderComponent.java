@@ -243,7 +243,18 @@ public class RenderComponent extends Canvas {
    */
   private void renderScreen(Graphics2D g, Screen screen) {
     long renderStart = System.nanoTime();
-    screen.render(g);
+    Graphics2D screenGraphics =
+      (Graphics2D)
+        g.create(
+          (int) Math.round(screen.getX()),
+          (int) Math.round(screen.getY()),
+          (int) Math.round(screen.getWidth()),
+          (int) Math.round(screen.getHeight()));
+    try {
+      screen.render(screenGraphics);
+    } finally {
+      screenGraphics.dispose();
+    }
 
     if (Game.config().debug().trackRenderTimes()) {
       double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
@@ -273,7 +284,7 @@ public class RenderComponent extends Canvas {
     BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics2D imgGraphics = img.createGraphics();
     for (Screen screen : screens) {
-      screen.render(imgGraphics);
+      renderScreen(imgGraphics, screen);
     }
     imgGraphics.dispose();
     saveScreenshot(img);

@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameWindow;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -105,11 +106,12 @@ public final class ScreenManager {
    *          The screen to remove.
    */
   public void remove(Screen screen) {
+    final boolean wasCurrent = this.current() == screen;
     this.screens.remove(screen);
     if (this.activeScreens.contains(screen)) {
       this.removeScreen(screen);
     }
-    if (this.current() == screen) {
+    if (wasCurrent && this.activeScreens.isEmpty()) {
       if (!this.screens.isEmpty()) {
         this.display(this.screens.get(0));
       } else {
@@ -125,8 +127,37 @@ public final class ScreenManager {
    *          The screen to be displayed.
    */
   public void display(final Screen screen) {
+    if (Game.hasStarted() && Game.time().since(this.lastScreenChange) < this.getChangeCooldown()) {
+      log.log(
+          Level.INFO,
+          "Skipping displaying of screen {0} because screen changing is currently on cooldown.",
+          screen != null ? screen.getName() : "");
+      return;
+    }
+
     final Screen previous = this.current();
-    this.replaceDisplay(previous, screen);
+    for (Screen activeScreen : new ArrayList<>(this.activeScreens)) {
+      this.removeScreen(activeScreen);
+    }
+
+    if (screen != null) {
+      if (!this.screens.contains(screen)) {
+        this.screens.add(screen);
+      }
+
+      this.activeScreens.add(screen);
+      this.sortActiveScreens();
+
+      if (!Game.isInNoGUIMode()) {
+        screen.prepare();
+      }
+    }
+
+    this.lastScreenChange = Game.loop().getTicks();
+    final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
+    for (final ScreenChangedListener listener : this.screenChangedListeners) {
+      listener.changed(event);
+    }
   }
 
   /**
@@ -136,7 +167,9 @@ public final class ScreenManager {
    *          The name of the screen to be displayed.
    */
   public void display(final String screenName) {
-    if (this.current() != null && this.current().getName().equalsIgnoreCase(screenName)) {
+    if (this.current() != null
+        && this.current().getName().equalsIgnoreCase(screenName)
+        && this.activeScreens.size() == 1) {
       log.log(
           Level.INFO,
           "Skipping displaying of screen {0} because it is already the current screen.",
@@ -198,7 +231,7 @@ public final class ScreenManager {
     }
 
     this.activeScreens.add(newScreen);
-    this.activeScreens.sort(Comparator.comparingInt(Screen::getScreenLayer));
+    this.sortActiveScreens();
 
     if (!Game.isInNoGUIMode()) {
       newScreen.prepare();
@@ -226,6 +259,7 @@ public final class ScreenManager {
       log.log(Level.WARNING,
           "Could not display the screen {0} because there is no screen with the specified name.",
           newScreenName);
+      return;
     }
 
     this.replaceDisplay(oldScreen, newScreen);
@@ -354,5 +388,9 @@ public final class ScreenManager {
     for (Screen screen : this.screens) {
       screen.onResolutionChanged(newResolution);
     }
+  }
+
+  void sortActiveScreens() {
+    this.activeScreens.sort(Comparator.comparingInt(Screen::getScreenLayer));
   }
 }

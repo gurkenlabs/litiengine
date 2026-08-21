@@ -27,7 +27,7 @@ public class GameScreen extends Screen {
    * @param name        The name of the screen.
    * @param cameraIndex The index of the camera to use for rendering this screen.
    */
-  protected GameScreen(String name, int cameraIndex) {
+  public GameScreen(String name, int cameraIndex) {
     super(name);
     this.setCameraIndex(cameraIndex);
   }
@@ -42,12 +42,12 @@ public class GameScreen extends Screen {
   }
 
   /**
-   * Sets the camera index for this screen. If the index is out of bounds for the current cameras list, it defaults to 0.
+   * Sets the camera index for this screen. Negative indices default to 0.
    *
    * @param cameraIndex The camera index to set.
    */
   public void setCameraIndex(int cameraIndex) {
-    if (cameraIndex < 0 || (!Game.world().cameras().isEmpty() && cameraIndex >= Game.world().cameras().size())) {
+    if (cameraIndex < 0) {
       this.cameraIndex = 0;
     } else {
       this.cameraIndex = cameraIndex;
@@ -66,10 +66,20 @@ public class GameScreen extends Screen {
 
   @Override
   public void render(final Graphics2D g) {
-    if (Game.world().environment() != null) {
-      Game.world().environment().render(g);
+    int previousCameraIndex = Game.world().currentCameraIndex();
+    boolean switchedCamera = Game.world().camera(this.cameraIndex) != null;
+    try {
+      if (switchedCamera) {
+        Game.world().setCurrentCameraIndex(this.cameraIndex);
+      }
+      if (Game.world().environment() != null) {
+        Game.world().environment().render(g);
+      }
+      super.render(g);
+    } finally {
+      if (switchedCamera) {
+        Game.world().setCurrentCameraIndex(previousCameraIndex);
+      }
     }
-
-    super.render(g);
   }
 }
