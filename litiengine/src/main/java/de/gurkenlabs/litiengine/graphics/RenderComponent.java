@@ -243,14 +243,14 @@ public class RenderComponent extends Canvas {
    */
   private void renderScreen(Graphics2D g, Screen screen) {
     long renderStart = System.nanoTime();
-    Graphics2D screenGraphics =
-      (Graphics2D)
-        g.create(
+    Graphics2D screenGraphics = (Graphics2D) g.create();
+    try {
+      screenGraphics.clip(
+        new Rectangle(
           (int) Math.round(screen.getX()),
           (int) Math.round(screen.getY()),
           (int) Math.round(screen.getWidth()),
-          (int) Math.round(screen.getHeight()));
-    try {
+          (int) Math.round(screen.getHeight())));
       screen.render(screenGraphics);
     } finally {
       screenGraphics.dispose();

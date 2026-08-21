@@ -212,6 +212,10 @@ class GameWorldTests {
     Camera camera1 = new Camera();
     Game.world().addCamera(camera0);
 
+    Game.world().setCamera(-1, camera1);
+    assertEquals(1, Game.world().cameras().size());
+    assertNull(Game.world().camera(-1));
+
     Game.world().setCamera(10, camera1);
     assertEquals(1, Game.world().cameras().size());
     assertNull(Game.world().camera(10));
@@ -233,6 +237,12 @@ class GameWorldTests {
 
     Game.world().setCurrentCameraIndex(1);
     Game.world().removeCamera(camera0);
+
+    assertEquals(0, Game.world().currentCameraIndex());
+    assertEquals(camera1, Game.world().camera());
+
+    Game.world().setCurrentCameraIndex(1);
+    Game.world().removeCamera(camera2);
 
     assertEquals(0, Game.world().currentCameraIndex());
     assertEquals(camera1, Game.world().camera());

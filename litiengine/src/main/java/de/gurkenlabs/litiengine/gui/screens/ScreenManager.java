@@ -85,14 +85,7 @@ public final class ScreenManager {
    *          The screen to add.
    */
   public void add(final Screen screen) {
-    screen.setWidth(Game.window().getWidth());
-    screen.setHeight(Game.window().getHeight());
-    this.screens.add(screen);
-
-    if (!this.resolutionListenerRegistered && !Game.isInNoGUIMode()) {
-      Game.window().onResolutionChanged(this::onWindowResolutionChanged);
-      this.resolutionListenerRegistered = true;
-    }
+    this.ensureRegistered(screen);
 
     if (this.current() == null) {
       this.display(screen);
@@ -141,10 +134,7 @@ public final class ScreenManager {
     }
 
     if (screen != null) {
-      if (!this.screens.contains(screen)) {
-        this.screens.add(screen);
-      }
-
+      this.ensureRegistered(screen);
       this.activeScreens.add(screen);
       this.sortActiveScreens();
 
@@ -211,7 +201,7 @@ public final class ScreenManager {
 
     final Screen previous = this.current();
 
-    this.removeScreen(oldScreen);
+    final boolean removedOldScreen = this.removeActiveScreen(oldScreen);
 
     if (newScreen == null) {
       this.lastScreenChange = Game.loop().getTicks();
@@ -223,13 +213,19 @@ public final class ScreenManager {
     }
 
     if (this.activeScreens.contains(newScreen)) {
+      if (!removedOldScreen) {
+        return;
+      }
+
+      this.lastScreenChange = Game.loop().getTicks();
+      final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
+      for (final ScreenChangedListener listener : this.screenChangedListeners) {
+        listener.changed(event);
+      }
       return;
     }
 
-    if (!this.screens.contains(newScreen)) {
-      this.screens.add(newScreen);
-    }
-
+    this.ensureRegistered(newScreen);
     this.activeScreens.add(newScreen);
     this.sortActiveScreens();
 
@@ -289,11 +285,7 @@ public final class ScreenManager {
    * @param screen The screen to remove from the active screens (may be {@code null}).
    */
   public void removeScreen(final Screen screen) {
-    if (screen == null || !this.activeScreens.contains(screen)) {
-      return;
-    }
-    screen.suspend();
-    this.activeScreens.remove(screen);
+    this.removeActiveScreen(screen);
   }
 
   /**
@@ -388,6 +380,31 @@ public final class ScreenManager {
     for (Screen screen : this.screens) {
       screen.onResolutionChanged(newResolution);
     }
+  }
+
+  private void ensureRegistered(Screen screen) {
+    if (screen == null || this.screens.contains(screen)) {
+      return;
+    }
+
+    screen.setWidth(Game.window().getWidth());
+    screen.setHeight(Game.window().getHeight());
+    this.screens.add(screen);
+
+    if (!this.resolutionListenerRegistered && !Game.isInNoGUIMode()) {
+      Game.window().onResolutionChanged(this::onWindowResolutionChanged);
+      this.resolutionListenerRegistered = true;
+    }
+  }
+
+  private boolean removeActiveScreen(Screen screen) {
+    if (screen == null || !this.activeScreens.contains(screen)) {
+      return false;
+    }
+
+    screen.suspend();
+    this.activeScreens.remove(screen);
+    return true;
   }
 
   void sortActiveScreens() {

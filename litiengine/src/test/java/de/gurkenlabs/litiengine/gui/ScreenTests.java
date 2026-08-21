@@ -2,12 +2,15 @@ package de.gurkenlabs.litiengine.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
+import de.gurkenlabs.litiengine.gui.screens.ScreenChangedEvent;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import java.awt.Dimension;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -192,6 +195,50 @@ class ScreenTests {
     TestComponent component = new TestComponent(0, 0, 100, 100);
     component.setAutoScaling(false);
     assertFalse(component.isAutoScaling());
+  }
+
+  @Test
+  void displayRegistersNewScreensWithWindowDimensions() {
+    TestScreen screen = new TestScreen("displayed");
+
+    Game.screens().display(screen);
+
+    assertTrue(Game.screens().getAll().contains(screen));
+    assertEquals(Game.window().getWidth(), screen.getWidth(), 0.001);
+    assertEquals(Game.window().getHeight(), screen.getHeight(), 0.001);
+  }
+
+  @Test
+  void addDisplayRegistersNewScreensWithWindowDimensions() {
+    TestScreen baseScreen = new TestScreen("base");
+    TestScreen additionalScreen = new TestScreen("additional");
+
+    Game.screens().add(baseScreen);
+    Game.screens().addDisplay(additionalScreen);
+
+    assertTrue(Game.screens().getAll().contains(additionalScreen));
+    assertTrue(Game.screens().getActiveScreens().contains(additionalScreen));
+    assertEquals(Game.window().getWidth(), additionalScreen.getWidth(), 0.001);
+    assertEquals(Game.window().getHeight(), additionalScreen.getHeight(), 0.001);
+  }
+
+  @Test
+  void replaceDisplayFiresChangeEventWhenRemovingOldActiveScreen() {
+    TestScreen screenA = new TestScreen("A");
+    TestScreen screenB = new TestScreen("B");
+    AtomicReference<ScreenChangedEvent> changedEvent = new AtomicReference<>();
+    Game.screens().addScreenChangedListener(changedEvent::set);
+
+    Game.screens().add(screenA);
+    Game.screens().add(screenB);
+    Game.screens().addDisplay(screenB);
+
+    changedEvent.set(null);
+    Game.screens().replaceDisplay(screenA, screenB);
+
+    assertSame(screenB, Game.screens().current());
+    assertSame(screenA, changedEvent.get().getPrevious());
+    assertSame(screenB, changedEvent.get().getChanged());
   }
 
   private static class TestComponent extends GuiComponent {

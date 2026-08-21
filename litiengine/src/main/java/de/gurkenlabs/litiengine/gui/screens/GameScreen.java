@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * A default screen implementation that renders the game's current environment.
@@ -60,26 +61,41 @@ public class GameScreen extends Screen {
    * @return The camera for this screen, or the default camera if the index is out of bounds.
    */
   public ICamera getCamera() {
-    ICamera cam = Game.world().camera(this.cameraIndex);
-    return cam != null ? cam : Game.world().camera();
+    int resolvedCameraIndex = this.getResolvedCameraIndex();
+    return resolvedCameraIndex >= 0 ? Game.world().camera(resolvedCameraIndex) : null;
   }
 
   @Override
   public void render(final Graphics2D g) {
     int previousCameraIndex = Game.world().currentCameraIndex();
-    boolean switchedCamera = Game.world().camera(this.cameraIndex) != null;
+    int renderCameraIndex = this.getResolvedCameraIndex();
     try {
-      if (switchedCamera) {
-        Game.world().setCurrentCameraIndex(this.cameraIndex);
+      if (renderCameraIndex >= 0) {
+        Game.world().setCurrentCameraIndex(renderCameraIndex);
       }
       if (Game.world().environment() != null) {
-        Game.world().environment().render(g);
+        Graphics2D environmentGraphics = (Graphics2D) g.create();
+        try {
+          environmentGraphics.translate(this.getX(), this.getY());
+          environmentGraphics.clip(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
+          Game.world().environment().render(environmentGraphics);
+        } finally {
+          environmentGraphics.dispose();
+        }
       }
       super.render(g);
     } finally {
-      if (switchedCamera) {
+      if (renderCameraIndex >= 0) {
         Game.world().setCurrentCameraIndex(previousCameraIndex);
       }
     }
+  }
+
+  private int getResolvedCameraIndex() {
+    if (Game.world().camera(this.cameraIndex) != null) {
+      return this.cameraIndex;
+    }
+
+    return Game.world().camera(0) != null ? 0 : -1;
   }
 }
