@@ -130,7 +130,7 @@ public final class ScriptEventExplorerDialog extends JDialog {
         JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         if (value instanceof ScriptEventItem item) {
           label.setText(item.name() + " (" + item.category() + ")");
-          label.setIcon(Icons.SYMBOL_METHOD_16);
+          label.setIcon(getEventItemIcon(item));
         }
         return label;
       }
@@ -151,7 +151,7 @@ public final class ScriptEventExplorerDialog extends JDialog {
 
     JPanel headerPanel = new JPanel(new BorderLayout(8, 0));
     this.titleLabel.setFont(this.titleLabel.getFont().deriveFont(Font.BOLD, 15f));
-    this.hostBadge.setForeground(Color.GRAY);
+    this.hostBadge.setFont(this.hostBadge.getFont().deriveFont(Font.BOLD, 11f));
     headerPanel.add(this.titleLabel, BorderLayout.WEST);
     headerPanel.add(this.hostBadge, BorderLayout.EAST);
     detailsPanel.add(headerPanel, BorderLayout.NORTH);
@@ -208,7 +208,7 @@ public final class ScriptEventExplorerDialog extends JDialog {
   private JPanel createGuidePanel() {
     JPanel panel = new JPanel(new BorderLayout(0, 8));
     panel.setBackground(Style.COLOR_BG);
-    panel.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
+    panel.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
 
     JEditorPane guidePane = new JEditorPane();
     guidePane.setContentType("text/html");
@@ -217,42 +217,44 @@ public final class ScriptEventExplorerDialog extends JDialog {
     guidePane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
     guidePane.setFont(Style.getDefaultFont());
 
-    String guideHtml = "<html><body style='font-family: sans-serif; font-size: 11pt; color: #c8d0f5; background-color: #121214; padding: 4px;'>"
-        + "<h2 style='color: #ffffff; margin-top: 0px; margin-bottom: 6px; font-size: 15pt;'>Scripting Architecture Guide</h2>"
-        + "<p style='color: #969eb9; margin-top: 0px; margin-bottom: 14px;'>In LITIengine, you can build full games using pure modular scripts. Scripts operate across three distinct tiers:</p>"
+    String guideHtml = "<html><body style='font-family: sans-serif; font-size: 10.5pt; color: #CBD5E1; background-color: #121214; margin: 0; padding: 6px 12px;'>"
+        + "<div style='margin-bottom: 12px;'>"
+        + "<h2 style='color: #FFFFFF; margin: 0 0 4px 0; font-size: 14pt; font-weight: bold;'>Scripting Architecture Guide</h2>"
+        + "<div style='color: #94A3B8; font-size: 10pt;'>In LITIengine, you can build full games using modular scripts organized across three distinct tiers:</div>"
+        + "</div>"
 
         // Card 1: GameScript
-        + "<div style='background-color: #1e1e23; border: 1px solid #373740; padding: 10px 14px; margin-bottom: 12px; border-radius: 6px;'>"
-        + "<div style='margin-bottom: 6px;'><span style='background-color: #24355a; color: #7aa2f7; font-size: 9pt; font-weight: bold; padding: 2px 8px; border-radius: 3px;'>TIER 1 &bull; GAME SCRIPT (GameScript)</span>"
-        + " <b style='color: #ffffff; margin-left: 6px; font-size: 11pt;'>Global Game Entry Point</b></div>"
-        + "<div style='color: #969eb9; margin-bottom: 6px;'><b>Role:</b> The root orchestrator (equivalent to <code>main()</code>). Boots on startup and runs continuously across all maps.</div>"
-        + "<ul style='margin-top: 4px; margin-bottom: 4px; padding-left: 20px; color: #c8d0f5;'>"
-        + "<li><b>Load Initial Map:</b> Call <code>loadMap(\"level1\")</code> on startup or when entering portals.</li>"
-        + "<li><b>Manage Global State:</b> Store persistent progression across maps via <code>globals.put(\"score\", score)</code> or <code>globals.put(\"lives\", 3)</code>.</li>"
-        + "<li><b>Background Soundtracks:</b> Play music with <code>playMusic(\"main_theme\")</code> and <code>stopMusic()</code>.</li>"
-        + "<li><b>Global Hotkeys:</b> Register pause or restart inputs via <code>Input.keyboard().onKeyTyped(KeyEvent.VK_ESCAPE, ...)</code>.</li>"
+        + "<div style='background-color: #18191E; border: 1px solid #2E313D; border-left: 4px solid #FBBF24; padding: 10px 14px; margin-bottom: 12px; border-radius: 6px;'>"
+        + "<div style='margin-bottom: 6px;'><span style='background-color: #2D2311; border: 1px solid #784E10; color: #FBBF24; font-size: 8.5pt; font-weight: bold; padding: 2px 7px; border-radius: 3px;'>&#9889; TIER 1 &bull; GAME SCRIPT (GameScript)</span>"
+        + " <b style='color: #FFFFFF; margin-left: 6px; font-size: 10.5pt;'>Global Game Entry Point</b></div>"
+        + "<div style='color: #94A3B8; margin-bottom: 6px; font-size: 9.5pt;'><b style='color: #E2E8F0;'>Role:</b> The root orchestrator (equivalent to <code>main()</code>). Boots on startup and runs continuously across all maps.</div>"
+        + "<ul style='margin: 0; padding-left: 18px; color: #E2E8F0; font-size: 9.5pt;'>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #FBBF24;'>Load Initial Map:</b> Call <code>loadMap(\"level1\")</code> on startup or when entering portals.</li>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #FBBF24;'>Manage Global State:</b> Store persistent progression across maps via <code>globals.put(\"score\", score)</code>.</li>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #FBBF24;'>Background Soundtracks:</b> Play music with <code>playMusic(\"main_theme\")</code> and <code>stopMusic()</code>.</li>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #FBBF24;'>Global Hotkeys:</b> Register pause/restart inputs via <code>Input.keyboard().onKeyTyped(KeyEvent.VK_ESCAPE, ...)</code>.</li>"
         + "</ul></div>"
 
         // Card 2: EnvironmentScript
-        + "<div style='background-color: #1e1e23; border: 1px solid #373740; padding: 10px 14px; margin-bottom: 12px; border-radius: 6px;'>"
-        + "<div style='margin-bottom: 6px;'><span style='background-color: #1c3d2e; color: #9ece6a; font-size: 9pt; font-weight: bold; padding: 2px 8px; border-radius: 3px;'>TIER 2 &bull; ENVIRONMENT SCRIPT (EnvironmentScript)</span>"
-        + " <b style='color: #ffffff; margin-left: 6px; font-size: 11pt;'>Map / Level Controller</b></div>"
-        + "<div style='color: #969eb9; margin-bottom: 6px;'><b>Role:</b> Attached to a specific map. Active while that map is loaded; coordinates level objectives and cinematics.</div>"
-        + "<ul style='margin-top: 4px; margin-bottom: 4px; padding-left: 20px; color: #c8d0f5;'>"
-        + "<li><b>Level Start:</b> Show level titles via <code>context().ui().showBanner(\"STAGE 1\", \"Fight!\", 3000)</code>.</li>"
-        + "<li><b>Objective Tracking:</b> Detect enemy defeats with <code>onEntityRemoved(entity)</code> to trigger victory transitions or unlock doors.</li>"
-        + "<li><b>Camera Sequences:</b> Pan camera smoothly using <code>context().sequence().cameraPanTo(...)</code>.</li>"
+        + "<div style='background-color: #18191E; border: 1px solid #2E313D; border-left: 4px solid #4ADE80; padding: 10px 14px; margin-bottom: 12px; border-radius: 6px;'>"
+        + "<div style='margin-bottom: 6px;'><span style='background-color: #112A1B; border: 1px solid #1A6038; color: #4ADE80; font-size: 8.5pt; font-weight: bold; padding: 2px 7px; border-radius: 3px;'>&#128506; TIER 2 &bull; MAP SCRIPT (EnvironmentScript)</span>"
+        + " <b style='color: #FFFFFF; margin-left: 6px; font-size: 10.5pt;'>Map / Level Controller</b></div>"
+        + "<div style='color: #94A3B8; margin-bottom: 6px; font-size: 9.5pt;'><b style='color: #E2E8F0;'>Role:</b> Attached to a specific map. Active while that map is loaded; coordinates level objectives and cinematics.</div>"
+        + "<ul style='margin: 0; padding-left: 18px; color: #E2E8F0; font-size: 9.5pt;'>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #4ADE80;'>Level Start:</b> Show level titles via <code>context().ui().showBanner(\"STAGE 1\", \"Fight!\", 3000)</code>.</li>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #4ADE80;'>Objective Tracking:</b> Detect enemy defeats with <code>onEntityRemoved(entity)</code> to trigger victory transitions or unlock doors.</li>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #4ADE80;'>Camera Sequences:</b> Pan camera smoothly using <code>context().sequence().cameraPanTo(...)</code>.</li>"
         + "</ul></div>"
 
         // Card 3: CreatureScript
-        + "<div style='background-color: #1e1e23; border: 1px solid #373740; padding: 10px 14px; margin-bottom: 4px; border-radius: 6px;'>"
-        + "<div style='margin-bottom: 6px;'><span style='background-color: #42301c; color: #e0af68; font-size: 9pt; font-weight: bold; padding: 2px 8px; border-radius: 3px;'>TIER 3 &bull; CREATURE SCRIPT (CreatureScript)</span>"
-        + " <b style='color: #ffffff; margin-left: 6px; font-size: 11pt;'>Entity Behaviors & AI</b></div>"
-        + "<div style='color: #969eb9; margin-bottom: 6px;'><b>Role:</b> Attached to individual creatures, enemies, NPCs, or players to govern movement, combat, and interactions.</div>"
-        + "<ul style='margin-top: 4px; margin-bottom: 4px; padding-left: 20px; color: #c8d0f5;'>"
-        + "<li><b>AI Movement:</b> Move towards targets with <code>moveTowards(target)</code> or patrol with <code>moveInDirection(dir)</code>.</li>"
-        + "<li><b>Combat & Abilities:</b> Build abilities via <code>createAbility(\"Spell\").cast()</code> or fire projectiles with <code>spawnProjectile()</code>.</li>"
-        + "<li><b>Reactions:</b> Spawn floating damage numbers in <code>onHit(event)</code> and despawn in <code>onDeath(entity, hitEvent)</code>.</li>"
+        + "<div style='background-color: #18191E; border: 1px solid #2E313D; border-left: 4px solid #38BDF8; padding: 10px 14px; margin-bottom: 6px; border-radius: 6px;'>"
+        + "<div style='margin-bottom: 6px;'><span style='background-color: #0E2638; border: 1px solid #134E70; color: #38BDF8; font-size: 8.5pt; font-weight: bold; padding: 2px 7px; border-radius: 3px;'>&#9889; TIER 3 &bull; ENTITY SCRIPT (CreatureScript)</span>"
+        + " <b style='color: #FFFFFF; margin-left: 6px; font-size: 10.5pt;'>Entity Behaviors & AI</b></div>"
+        + "<div style='color: #94A3B8; margin-bottom: 6px; font-size: 9.5pt;'><b style='color: #E2E8F0;'>Role:</b> Attached to individual creatures, enemies, NPCs, or props to govern movement, combat, and interactions.</div>"
+        + "<ul style='margin: 0; padding-left: 18px; color: #E2E8F0; font-size: 9.5pt;'>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #38BDF8;'>AI Movement:</b> Move towards targets with <code>moveTowards(target)</code> or patrol with <code>moveInDirection(dir)</code>.</li>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #38BDF8;'>Combat & Abilities:</b> Build abilities via <code>createAbility(\"Spell\").cast()</code> or fire projectiles with <code>spawnProjectile()</code>.</li>"
+        + "<li style='margin-bottom: 3px;'><b style='color: #38BDF8;'>Reactions:</b> Spawn floating damage numbers in <code>onHit(event)</code> and despawn in <code>onDeath(entity, hitEvent)</code>.</li>"
         + "</ul></div>"
         + "</body></html>";
 
@@ -279,21 +281,21 @@ public final class ScriptEventExplorerDialog extends JDialog {
     JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
     buttonsPanel.setOpaque(false);
 
-    JButton createGameScriptBtn = new JButton("Game Script", Icons.ADD_16);
+    JButton createGameScriptBtn = new JButton("Game Script", Icons.SCRIPT_GAME_16);
     createGameScriptBtn.setToolTipText("Create a new global GameScript entry point");
     createGameScriptBtn.addActionListener(e -> {
       this.dispose();
       UI.getScriptWorkspacePanel().createScript(ScriptKind.GAME);
     });
 
-    JButton createEnvScriptBtn = new JButton("Map Script", Icons.ADD_16);
+    JButton createEnvScriptBtn = new JButton("Map Script", Icons.SCRIPT_ENVIRONMENT_16);
     createEnvScriptBtn.setToolTipText("Create a new map-level EnvironmentScript");
     createEnvScriptBtn.addActionListener(e -> {
       this.dispose();
       UI.getScriptWorkspacePanel().createScript(ScriptKind.ENVIRONMENT);
     });
 
-    JButton createCreatureScriptBtn = new JButton("Creature Script", Icons.ADD_16);
+    JButton createCreatureScriptBtn = new JButton("Creature Script", Icons.SCRIPT_ENTITY_16);
     createCreatureScriptBtn.setToolTipText("Create a new CreatureScript behavior");
     createCreatureScriptBtn.addActionListener(e -> {
       this.dispose();
@@ -316,6 +318,28 @@ public final class ScriptEventExplorerDialog extends JDialog {
     panel.add(quickActions, BorderLayout.SOUTH);
 
     return panel;
+  }
+
+  static javax.swing.Icon getEventItemIcon(ScriptEventItem item) {
+    if (item == null) return Icons.API_16;
+    String host = item.hostType() != null ? item.hostType().toLowerCase(Locale.ROOT) : "";
+    String cat = item.category() != null ? item.category().toLowerCase(Locale.ROOT) : "";
+    if (host.contains("game") || cat.contains("game")) return Icons.SCRIPT_GAME_16;
+    if (host.contains("environment") || cat.contains("environment")) return Icons.SCRIPT_ENVIRONMENT_16;
+    if (host.contains("creature") || host.contains("entity") || cat.contains("entity") || cat.contains("combat") || cat.contains("movement"))
+      return Icons.SCRIPT_ENTITY_16;
+    return Icons.API_16;
+  }
+
+  static Color getEventItemColor(ScriptEventItem item) {
+    if (item == null) return Style.accent();
+    String host = item.hostType() != null ? item.hostType().toLowerCase(Locale.ROOT) : "";
+    String cat = item.category() != null ? item.category().toLowerCase(Locale.ROOT) : "";
+    if (host.contains("game") || cat.contains("game")) return new Color(251, 191, 36);
+    if (host.contains("environment") || cat.contains("environment")) return new Color(74, 222, 128);
+    if (host.contains("creature") || host.contains("entity") || cat.contains("entity") || cat.contains("combat") || cat.contains("movement"))
+      return new Color(56, 189, 248);
+    return Style.accent();
   }
 
   private void filterList() {
@@ -344,6 +368,7 @@ public final class ScriptEventExplorerDialog extends JDialog {
   private void displayItem(ScriptEventItem item) {
     if (item == null) {
       this.titleLabel.setText("No selection");
+      this.titleLabel.setIcon(null);
       this.hostBadge.setText("");
       this.descriptionArea.setText("");
       this.codeArea.setCode("");
@@ -352,7 +377,9 @@ public final class ScriptEventExplorerDialog extends JDialog {
       return;
     }
     this.titleLabel.setText(item.name());
+    this.titleLabel.setIcon(getEventItemIcon(item));
     this.hostBadge.setText(item.hostType());
+    this.hostBadge.setForeground(getEventItemColor(item));
     this.descriptionArea.setText(item.description());
     this.codeArea.setCode(item.codeSnippet());
     this.insertButton.setEnabled(true);
