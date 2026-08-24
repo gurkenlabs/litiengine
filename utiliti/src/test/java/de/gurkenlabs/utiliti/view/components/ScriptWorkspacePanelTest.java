@@ -115,6 +115,13 @@ class ScriptWorkspacePanelTest {
 
     entity.setHost(ScriptHostType.GAME);
     assertEquals("Game Script", ScriptWorkspacePanel.scriptContext(entity));
+    assertEquals(new java.awt.Color(251, 191, 36), ScriptWorkspacePanel.scriptBadgeColor(entity));
+
+    entity.setHost(ScriptHostType.ENVIRONMENT);
+    assertEquals(new java.awt.Color(74, 222, 128), ScriptWorkspacePanel.scriptBadgeColor(entity));
+
+    entity.setHost(ScriptHostType.ENTITY);
+    assertEquals(new java.awt.Color(56, 189, 248), ScriptWorkspacePanel.scriptBadgeColor(entity));
 
     assertNotNull(ScriptWorkspacePanel.scriptContextIcon(entity));
     assertEquals(Icons.CREATURE_16, ScriptWorkspacePanel.entityTypeIcon("Creature"));

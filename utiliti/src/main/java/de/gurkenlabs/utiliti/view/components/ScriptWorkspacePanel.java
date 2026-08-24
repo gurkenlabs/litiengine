@@ -214,7 +214,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private boolean restartRequested;
   private Consumer<ScriptDefinition> selectionListener = ignored -> {};
   private final JPanel editorHost = new JPanel(new BorderLayout());
-  private final JLabel scriptContext = new ScriptTypeBadge();
+  private final ScriptTypeBadge scriptContext = new ScriptTypeBadge();
   private final ScriptOverviewPanel overviewPanel;
   private final Consumer<ScriptBindingTarget> scriptBindingChangeListener = ignored ->
     SwingUtilities.invokeLater(this::scriptBindingsChanged);
@@ -1818,6 +1818,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     ScriptDefinition definition = active == null ? null : active.definition;
     this.scriptContext.setText(scriptContext(definition));
     this.scriptContext.setIcon(scriptContextIcon(definition));
+    this.scriptContext.setBadgeColor(scriptBadgeColor(definition));
     this.scriptContext.setVisible(definition != null);
     this.refreshActiveUsages();
     this.selectionListener.accept(definition);
@@ -1891,6 +1892,8 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static final class ScriptTypeBadge extends JLabel {
+    private Color badgeColor;
+
     ScriptTypeBadge() {
       setOpaque(false);
       setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
@@ -1898,9 +1901,14 @@ public final class ScriptWorkspacePanel extends JPanel {
       setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
     }
 
+    void setBadgeColor(Color color) {
+      this.badgeColor = color;
+      repaint();
+    }
+
     @Override
     public Color getForeground() {
-      return Style.accent();
+      return this.badgeColor != null ? this.badgeColor : Style.accent();
     }
 
     @Override
@@ -1908,8 +1916,8 @@ public final class ScriptWorkspacePanel extends JPanel {
       Graphics2D g2 = (Graphics2D) g.create();
       try {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        Color accent = Style.accent();
-        Color bg = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 48);
+        Color accent = getForeground();
+        Color bg = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 38);
         Color border = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 110);
         int arc = Style.CORNER_RADIUS * 2;
         g2.setColor(bg);
@@ -1921,6 +1929,15 @@ public final class ScriptWorkspacePanel extends JPanel {
       }
       super.paintComponent(g);
     }
+  }
+
+  static Color scriptBadgeColor(ScriptDefinition definition) {
+    if (definition == null || definition.getHost() == null) return Style.accent();
+    return switch (definition.getHost()) {
+      case ENTITY -> new Color(56, 189, 248); // Electric Cyan
+      case ENVIRONMENT -> new Color(74, 222, 128); // Emerald Green (Map Script)
+      case GAME -> new Color(251, 191, 36); // Amber Gold (Game Script)
+    };
   }
 
   static javax.swing.Icon scriptContextIcon(ScriptDefinition definition) {
