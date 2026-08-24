@@ -63,8 +63,33 @@ public final class EngineTypeCatalog {
   }
 
 
+  private static final List<Class<?>> STANDARD_JDK_TYPES = List.of(
+    java.awt.Color.class,
+    java.awt.Font.class,
+    java.awt.Graphics2D.class,
+    java.awt.geom.Point2D.class,
+    java.awt.geom.Rectangle2D.class,
+    java.awt.geom.Ellipse2D.class,
+    java.awt.geom.Line2D.class,
+    java.awt.geom.AffineTransform.class,
+    java.awt.image.BufferedImage.class,
+    java.util.List.class,
+    java.util.Map.class,
+    java.util.Set.class,
+    java.util.Optional.class,
+    java.util.Random.class,
+    java.util.ArrayList.class,
+    java.util.HashMap.class,
+    java.util.HashSet.class,
+    java.util.concurrent.ConcurrentHashMap.class,
+    java.util.function.Consumer.class,
+    java.util.function.Predicate.class,
+    java.util.function.Function.class,
+    java.util.function.Supplier.class
+  );
+
   private static List<Class<?>> loadEngine(ClassLoader loader) {
-    List<Class<?>> result = new ArrayList<>();
+    List<Class<?>> result = new ArrayList<>(STANDARD_JDK_TYPES);
     Class<?>[] sentinelClasses = {
       Game.class,
       de.gurkenlabs.litiengine.entities.Entity.class,

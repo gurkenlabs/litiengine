@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.scripting.Subscription;
 import java.awt.Color;
@@ -103,9 +104,12 @@ public final class ScriptUiOverlay implements IUpdateable, Subscription {
   }
 
   public void render(Graphics2D g) {
-    if (this.closed) return;
+    if (this.closed || g == null) return;
 
     // Render world-space floating texts
+    ICamera camera = Game.world() != null ? Game.world().camera() : null;
+    double renderScale = camera != null ? camera.getRenderScale() : 1.0;
+
     for (FloatingText text : this.floatingTexts) {
       float progress = text.getProgress();
       int alpha = Math.clamp((int) ((1f - progress) * text.getColor().getAlpha()), 0, 255);
@@ -117,9 +121,14 @@ public final class ScriptUiOverlay implements IUpdateable, Subscription {
         g.setFont(text.getFont());
       }
 
-      Point2D screenLoc = Game.world().camera().getViewportLocation(text.getLocation().getX(), text.getLocation().getY());
+      Point2D screenLoc = camera != null
+          ? camera.getViewportLocation(text.getLocation().getX(), text.getLocation().getY())
+          : text.getLocation();
+      double renderX = screenLoc.getX() * renderScale;
+      double renderY = screenLoc.getY() * renderScale;
+
       g.setColor(renderColor);
-      TextRenderer.renderWithOutline(g, text.getText(), screenLoc.getX(), screenLoc.getY(), outlineColor);
+      TextRenderer.renderWithOutline(g, text.getText(), renderX, renderY, outlineColor);
       g.setFont(prevFont);
     }
 
@@ -135,7 +144,7 @@ public final class ScriptUiOverlay implements IUpdateable, Subscription {
     }
 
     // Render screen banner if active
-    if (this.announcement != null && !Game.isInNoGUIMode()) {
+    if (this.announcement != null && !Game.isInNoGUIMode() && Game.window() != null && Game.window().getResolution() != null) {
       float progress = (float) this.announcement.elapsed / (float) this.announcement.duration;
       int alpha = 255;
       if (progress > 0.8f) {

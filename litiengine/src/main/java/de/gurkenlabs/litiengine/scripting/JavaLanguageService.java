@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.scripting;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.scripting.ui.ScriptUiOverlay;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -98,6 +99,7 @@ public class JavaLanguageService implements ScriptLanguageService {
     Matcher annotParamMatcher = Pattern.compile("(?s)@([A-Za-z0-9_$]+)\\s*\\(([^)]*)$").matcher(prefix);
     boolean annotationContext = prefix.matches("(?s).*@\\s*[A-Za-z0-9_$]*$");
     boolean constructorContext = prefix.matches("(?s).*\\bnew(?:\\s+[\\w.$]*)?$");
+    boolean insideMethodArgs = findUnclosedParen(prefix) >= 0;
 
     if (annotParamMatcher.find()) {
       String annotName = annotParamMatcher.group(1);
@@ -136,13 +138,18 @@ public class JavaLanguageService implements ScriptLanguageService {
       }
     } else {
       String word = currentWord(prefix);
+      if (insideMethodArgs) {
+        this.addParameterCompletions(result, prefix, document.definition(), variables, source, importedFqns, importInsertLine);
+      }
       addScriptDeclaredMembers(result, source);
       result.add(new Completion("globals", CompletionKind.FIELD, "ScriptGlobals",
         "Direct access to global shared game state map (`globals.put(...)`, `globals.get(...)`, `globals.onChanged(...)`).",
         "globals", ScriptGlobals.class.getName(), List.of(), List.of()));
       addScriptScope(result, document.definition(), importedFqns, importInsertLine);
       this.hostType(document.definition()).ifPresent(host -> addMembers(result, new ResolvedType(host, null, false)));
-      this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
+      if (!insideMethodArgs && (word.startsWith("@") || word.startsWith("Script") || word.startsWith("Prop"))) {
+        this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
+      }
 
       KEYWORDS.stream().sorted().forEach(keyword -> {
         if (word.isEmpty() || matchesPrefix(keyword, word)) {
@@ -682,27 +689,60 @@ public class JavaLanguageService implements ScriptLanguageService {
       return Optional.of(new Hover(docs, null));
     }
 
+    List<Method> candidateMethods = new ArrayList<>();
+    String declaringClass = null;
+
     String prefix = text.substring(0, off);
     String receiver = receiverExpression(prefix);
     if (receiver != null) {
       Map<String, Class<?>> variables = this.variables(document, text);
       ResolvedType receiverType = this.resolveExpression(receiver, document.definition(), variables, text);
       if (receiverType != null) {
-        Method method = Arrays.stream(receiverType.type().getMethods())
-          .filter(m -> m.getName().equals(word)).findFirst().orElse(null);
-        if (method != null) {
-          String sig = simpleName(method.getGenericReturnType().getTypeName()) + " " + word + "("
-            + Arrays.stream(method.getParameters())
-              .map(p -> simpleName(p.getParameterizedType().getTypeName()) + " " + p.getName())
-              .reduce((a, b) -> a + ", " + b).orElse("") + ")";
-          String docs = "```java\n" + sig + "\n```\n\nDeclared in `" + method.getDeclaringClass().getName() + "`";
-          String methodDoc = ScriptDocumentation.getMethodDoc(word);
-          if (!methodDoc.isBlank()) {
-            docs += "\n\n" + methodDoc;
+        candidateMethods = Arrays.stream(receiverType.type().getMethods())
+          .filter(m -> m.getName().equals(word))
+          .sorted(Comparator.comparingInt(Method::getParameterCount))
+          .toList();
+        if (!candidateMethods.isEmpty()) {
+          declaringClass = candidateMethods.get(0).getDeclaringClass().getName();
+        } else {
+          Field field = Arrays.stream(receiverType.type().getFields())
+            .filter(f -> f.getName().equals(word)).findFirst().orElse(null);
+          if (field != null) {
+            String docs = "```java\n" + simpleName(field.getGenericType().getTypeName()) + " " + field.getName() + "\n```\n\nDeclared in `" + field.getDeclaringClass().getName() + "`";
+            String attrDoc = ScriptDocumentation.getAttributeDoc(word);
+            if (!attrDoc.isBlank()) {
+              docs += "\n\n" + attrDoc;
+            }
+            return Optional.of(new Hover(docs, null));
           }
-          return Optional.of(new Hover(docs, null));
         }
       }
+    }
+
+    if (candidateMethods.isEmpty()) {
+      ResolvedType scriptType = this.scriptType(document.definition());
+      if (scriptType != null) {
+        candidateMethods = Arrays.stream(scriptType.type().getMethods())
+          .filter(m -> m.getName().equals(word))
+          .sorted(Comparator.comparingInt(Method::getParameterCount))
+          .toList();
+        if (!candidateMethods.isEmpty()) {
+          declaringClass = candidateMethods.get(0).getDeclaringClass().getName();
+        }
+      }
+    }
+
+    if (!candidateMethods.isEmpty()) {
+      StringBuilder sigs = new StringBuilder("```java\n");
+      for (Method m : candidateMethods) {
+        sigs.append(formatMethodSignature(m)).append("\n");
+      }
+      sigs.append("```\n\nDeclared in `").append(declaringClass != null ? declaringClass : candidateMethods.get(0).getDeclaringClass().getName()).append("`");
+      String methodDoc = ScriptDocumentation.getMethodDoc(word);
+      if (!methodDoc.isBlank()) {
+        sigs.append("\n\n").append(methodDoc);
+      }
+      return Optional.of(new Hover(sigs.toString(), null));
     }
 
     String methodDoc = ScriptDocumentation.getMethodDoc(word);
@@ -940,6 +980,8 @@ public class JavaLanguageService implements ScriptLanguageService {
     result.add(function("context", ScriptContext.class.getSimpleName(), "The current script attachment context."));
     result.add(function("environment", Environment.class.getSimpleName(), "The host's current environment."));
     result.add(function("globals", ScriptGlobals.class.getSimpleName(), "Direct access to the global shared state store."));
+    result.add(function("ui", ScriptUiOverlay.class.getSimpleName(), "Returns the ScriptUiOverlay service for floating text and banners."));
+    result.add(function("camera", "ICamera", "Returns the active camera controller for panning, zooming, and shaking."));
 
     List<TextEdit> gameEdits = importedFqns != null && importedFqns.contains("de.gurkenlabs.litiengine.Game") ? List.of()
       : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
@@ -959,13 +1001,31 @@ public class JavaLanguageService implements ScriptLanguageService {
     List<Completion> statics = new ArrayList<>();
     String owner = simpleName(type.getName());
     for (Method method : type.getMethods()) {
-      List<Parameter> parameters = Arrays.stream(method.getParameters())
-        .map(parameter -> new Parameter(parameter.getName(), parameter.getParameterizedType().getTypeName())).toList();
+      java.lang.reflect.Parameter[] rawParams = method.getParameters();
+      List<Parameter> parameters = new ArrayList<>();
+      for (int i = 0; i < rawParams.length; i++) {
+        String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
+        parameters.add(new Parameter(pName, rawParams[i].getParameterizedType().getTypeName()));
+      }
       String detail = method.getName() + "(" + String.join(", ", parameters.stream()
         .map(parameter -> simpleName(parameter.type()) + " " + parameter.name()).toList()) + ")";
       String docs = "```java\n" + simpleName(method.getGenericReturnType().getTypeName()) + " " + owner + "." + detail + "\n```\n\n"
         + "Declared in `" + method.getDeclaringClass().getName() + "`";
-      Completion completion = new Completion(method.getName(), CompletionKind.METHOD, detail, docs, method.getName() + "()",
+      String methodDoc = ScriptDocumentation.getMethodDoc(method.getName());
+      if (!methodDoc.isBlank()) {
+        docs += "\n\n" + methodDoc;
+      }
+      String insertText;
+      if (parameters.isEmpty()) {
+        insertText = method.getName() + "()";
+      } else {
+        List<String> placeholders = new ArrayList<>();
+        for (int i = 0; i < parameters.size(); i++) {
+          placeholders.add("${" + (i + 1) + ":" + parameters.get(i).name() + "}");
+        }
+        insertText = method.getName() + "(" + String.join(", ", placeholders) + ")";
+      }
+      Completion completion = new Completion(method.getName(), CompletionKind.METHOD, detail, docs, insertText,
         method.getGenericReturnType().getTypeName(), parameters, List.of());
       all.add(completion);
       if (Modifier.isStatic(method.getModifiers())) {
@@ -1186,14 +1246,121 @@ public class JavaLanguageService implements ScriptLanguageService {
     return URI.create("class:///" + fqn.replace('.', '/') + ".java");
   }
 
+  private static int findUnclosedParen(String text) {
+    int depth = 0;
+    for (int i = text.length() - 1; i >= 0; i--) {
+      char c = text.charAt(i);
+      if (c == ')') depth++;
+      else if (c == '(') {
+        if (depth == 0) return i;
+        depth--;
+      }
+    }
+    return -1;
+  }
+
+  private static int countTopLevelCommas(String argList) {
+    int depth = 0;
+    int count = 0;
+    for (int i = 0; i < argList.length(); i++) {
+      char c = argList.charAt(i);
+      if (c == '(' || c == '[' || c == '{') depth++;
+      else if (c == ')' || c == ']' || c == '}') depth--;
+      else if (c == ',' && depth == 0) count++;
+    }
+    return count;
+  }
+
+  private void addParameterCompletions(List<Completion> result, String prefix, ScriptDefinition definition, Map<String, Class<?>> variables, String source, Set<String> importedFqns, int importInsertLine) {
+    int openParen = findUnclosedParen(prefix);
+    if (openParen < 0) return;
+    String callPrefix = prefix.substring(0, openParen).trim();
+    Matcher matcher = Pattern.compile("([A-Za-z_$][\\w$]*)$").matcher(callPrefix);
+    if (!matcher.find()) return;
+    String methodName = matcher.group(1);
+    String argList = prefix.substring(openParen + 1);
+    int argIndex = countTopLevelCommas(argList);
+    String currentArgPrefix = argList.contains(",") ? argList.substring(argList.lastIndexOf(',') + 1).trim() : argList.trim();
+    String receiverPrefix = callPrefix.substring(0, matcher.start(1));
+    String receiverExpr = receiverExpression(receiverPrefix);
+    ResolvedType receiverType = receiverExpr == null ? this.scriptType(definition)
+      : this.resolveExpression(receiverExpr, definition, variables, source);
+    if (receiverType == null || receiverType.type() == null) return;
+
+    List<Method> matchingMethods = Arrays.stream(receiverType.type().getMethods())
+      .filter(m -> m.getName().equals(methodName))
+      .sorted(Comparator.comparingInt(Method::getParameterCount))
+      .toList();
+
+    // 1. If at start of argument list (argIndex == 0 and currentArgPrefix is empty):
+    // Offer full parameter placeholder snippets for each overload
+    if (argIndex == 0 && currentArgPrefix.isEmpty()) {
+      for (Method m : matchingMethods) {
+        if (m.getParameterCount() > 0) {
+          java.lang.reflect.Parameter[] rawParams = m.getParameters();
+          List<String> placeholders = new ArrayList<>();
+          List<String> labels = new ArrayList<>();
+          for (int i = 0; i < rawParams.length; i++) {
+            String pName = formatParamName(rawParams[i], i, rawParams.length, methodName);
+            labels.add(pName);
+            placeholders.add("${" + (i + 1) + ":" + pName + "}");
+          }
+          String label = String.join(", ", labels);
+          String snippet = String.join(", ", placeholders);
+          String detail = methodName + "(" + label + ") parameters";
+          result.add(new Completion(label, CompletionKind.SNIPPET, detail,
+            "Inserts parameter placeholders for `" + formatMethodSignature(m) + "`",
+            snippet, simpleName(m.getGenericReturnType().getTypeName()), List.of(), List.of()));
+        }
+      }
+    }
+
+    // 2. Context-aware value suggestions for the active argument at argIndex:
+    for (Method m : matchingMethods) {
+      if (m.getParameterCount() > argIndex) {
+        Class<?> paramType = m.getParameterTypes()[argIndex];
+
+        if (paramType == java.awt.Color.class) {
+          List<TextEdit> colorEdits = importedFqns.contains("java.awt.Color") ? List.of()
+            : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)), "import java.awt.Color;\n"));
+          for (String cName : List.of("RED", "GREEN", "BLUE", "YELLOW", "WHITE", "BLACK", "ORANGE", "CYAN", "MAGENTA", "GRAY", "DARK_GRAY", "LIGHT_GRAY", "PINK")) {
+            result.add(new Completion("Color." + cName, CompletionKind.FIELD, "Color", "Standard Color constant", "Color." + cName, "Color", List.of(), colorEdits));
+          }
+          result.add(new Completion("new Color(r, g, b)", CompletionKind.SNIPPET, "Custom Color", "Creates a custom RGB color", "new Color(${1:255}, ${2:0}, ${3:0})", "Color", List.of(), colorEdits));
+        } else if (paramType == de.gurkenlabs.litiengine.Direction.class) {
+          for (String dName : List.of("UP", "DOWN", "LEFT", "RIGHT", "UNDEFINED")) {
+            result.add(new Completion("Direction." + dName, CompletionKind.FIELD, "Direction", "Cardinal direction constant", "Direction." + dName, "Direction", List.of(), List.of()));
+          }
+        } else if (paramType == java.awt.geom.Point2D.class) {
+          result.add(new Completion("host().getCenter()", CompletionKind.METHOD, "Point2D", "Center coordinate of host entity", "host().getCenter()", "Point2D", List.of(), List.of()));
+          result.add(new Completion("host().getLocation()", CompletionKind.METHOD, "Point2D", "Location of host entity", "host().getLocation()", "Point2D", List.of(), List.of()));
+          result.add(new Completion("new Point2D.Double(x, y)", CompletionKind.SNIPPET, "Point2D", "Creates a new Point2D coordinate", "new Point2D.Double(${1:0}, ${2:0})", "Point2D", List.of(), List.of()));
+        } else if (de.gurkenlabs.litiengine.entities.IEntity.class.isAssignableFrom(paramType)) {
+          result.add(new Completion("host()", CompletionKind.METHOD, simpleName(paramType.getName()), "The current host entity", "host()", simpleName(paramType.getName()), List.of(), List.of()));
+        } else if (paramType == java.awt.Font.class) {
+          result.add(new Completion("new Font(name, style, size)", CompletionKind.SNIPPET, "Font", "Creates a custom Font", "new Font(${1:\"Arial\"}, Font.PLAIN, ${2:12})", "Font", List.of(), List.of()));
+        }
+
+        for (var entry : variables.entrySet()) {
+          if (paramType.isAssignableFrom(entry.getValue())) {
+            result.add(new Completion(entry.getKey(), CompletionKind.VARIABLE, entry.getValue().getSimpleName(), "Local variable", entry.getKey(), entry.getValue().getSimpleName(), List.of(), List.of()));
+          }
+        }
+      }
+    }
+  }
+
   private Optional<Class<?>> inferExpectedParameterType(String prefix, ScriptDefinition definition, Map<String, Class<?>> variables, String source) {
-    Matcher matcher = Pattern.compile("(?s)([A-Za-z_$][\\w$]*)\\s*\\(([^()]*)$").matcher(prefix);
+    int openParen = findUnclosedParen(prefix);
+    if (openParen < 0) return Optional.empty();
+    String callPrefix = prefix.substring(0, openParen).trim();
+    Matcher matcher = Pattern.compile("([A-Za-z_$][\\w$]*)$").matcher(callPrefix);
     if (!matcher.find()) return Optional.empty();
     String methodName = matcher.group(1);
-    String argList = matcher.group(2);
-    int argIndex = (int) argList.chars().filter(c -> c == ',').count();
-    String callPrefix = prefix.substring(0, matcher.start(1));
-    String receiverExpr = receiverExpression(callPrefix);
+    String argList = prefix.substring(openParen + 1);
+    int argIndex = countTopLevelCommas(argList);
+    String receiverPrefix = callPrefix.substring(0, matcher.start(1));
+    String receiverExpr = receiverExpression(receiverPrefix);
     ResolvedType receiverType = receiverExpr == null ? this.scriptType(definition)
       : this.resolveExpression(receiverExpr, definition, variables, source);
     if (receiverType == null || receiverType.type() == null) return Optional.empty();
@@ -1280,10 +1447,73 @@ public class JavaLanguageService implements ScriptLanguageService {
     return 0;
   }
 
+  private static String formatParamName(java.lang.reflect.Parameter param, int index, int total, String methodName) {
+    String rawName = param.getName();
+    if (rawName != null && !rawName.startsWith("arg") && !rawName.isBlank()) {
+      return rawName;
+    }
+    String typeName = simpleName(param.getParameterizedType().getTypeName());
+    return switch (typeName) {
+      case "String" -> {
+        if (methodName.contains("Text") || methodName.contains("Message") || methodName.contains("Banner")) yield index == 0 ? "text" : "subtitle";
+        if (methodName.contains("Sound") || methodName.contains("Audio")) yield "soundName";
+        if (methodName.contains("Prop") || methodName.contains("Sprite")) yield "spriteSheet";
+        yield "name";
+      }
+      case "Point2D" -> methodName.contains("Pan") || methodName.contains("Move") ? "target" : "location";
+      case "Color" -> "color";
+      case "Font" -> "font";
+      case "IEntity", "Entity" -> "entity";
+      case "Creature" -> "creature";
+      case "Environment" -> "environment";
+      case "Direction" -> "direction";
+      case "Sound" -> "sound";
+      case "Graphics2D" -> "g";
+      case "int" -> {
+        if (methodName.contains("Pan") || methodName.contains("Shake") || methodName.contains("Duration")) yield "durationTicks";
+        if (methodName.contains("Zoom") || methodName.contains("Delay") || methodName.contains("Time") || methodName.contains("Text") || methodName.contains("Banner")) yield "durationMs";
+        if (index == 0 && total >= 2) yield "x";
+        if (index == 1 && total >= 2) yield "y";
+        yield "value";
+      }
+      case "double", "float" -> {
+        if (methodName.contains("Zoom")) yield "targetZoom";
+        if (methodName.contains("Shake")) yield "intensity";
+        if (methodName.contains("Velocity") || methodName.contains("Speed")) yield "velocity";
+        if (methodName.contains("Angle")) yield "angleDegrees";
+        if (index == 0 && total >= 2) yield "x";
+        if (index == 1 && total >= 2) yield "y";
+        yield "value";
+      }
+      case "boolean" -> "enabled";
+      default -> {
+        if (!typeName.isEmpty() && Character.isUpperCase(typeName.charAt(0))) {
+          yield Character.toLowerCase(typeName.charAt(0)) + typeName.substring(1);
+        }
+        yield "arg" + index;
+      }
+    };
+  }
+
+  private static String formatMethodSignature(Method method) {
+    java.lang.reflect.Parameter[] rawParams = method.getParameters();
+    List<String> paramStrings = new ArrayList<>();
+    for (int i = 0; i < rawParams.length; i++) {
+      String pType = simpleName(rawParams[i].getParameterizedType().getTypeName());
+      String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
+      paramStrings.add(pType + " " + pName);
+    }
+    return simpleName(method.getGenericReturnType().getTypeName()) + " " + method.getName() + "(" + String.join(", ", paramStrings) + ")";
+  }
+
   private static Signature signature(Method method) {
-    List<Parameter> parameters = Arrays.stream(method.getParameters())
-      .map(parameter -> new Parameter(parameter.getName(), parameter.getParameterizedType().getTypeName())).toList();
-    String label = method.getName() + "(" + String.join(", ", parameters.stream()
+    java.lang.reflect.Parameter[] rawParams = method.getParameters();
+    List<Parameter> parameters = new ArrayList<>();
+    for (int i = 0; i < rawParams.length; i++) {
+      String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
+      parameters.add(new Parameter(pName, rawParams[i].getParameterizedType().getTypeName()));
+    }
+    String label = simpleName(method.getGenericReturnType().getTypeName()) + " " + method.getName() + "(" + String.join(", ", parameters.stream()
       .map(parameter -> simpleName(parameter.type()) + " " + parameter.name()).toList()) + ")";
     return new Signature(label, method.getGenericReturnType().getTypeName(), parameters);
   }
@@ -1445,8 +1675,11 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private static int memberRank(Completion completion) {
-    if (completion.label().contains("ScriptProperty") || completion.label().equals("prop")) return -2;
-    if (completion.label().contains("ScriptInfo")) return -1;
+    if (completion.kind() == CompletionKind.SNIPPET && completion.detail() != null && completion.detail().contains("parameters")) return -5;
+    if (completion.label().startsWith("Color.") || completion.label().startsWith("Direction.")) return -4;
+    if (completion.label().equals("host()")) return -3;
+    if (completion.label().startsWith("@ScriptProperty") || completion.label().equals("prop")) return 10;
+    if (completion.label().startsWith("@ScriptInfo")) return 11;
     return switch (completion.kind()) {
       case METHOD, FIELD, PROPERTY, VARIABLE -> 0;
       case SNIPPET -> 1;

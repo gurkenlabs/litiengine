@@ -679,6 +679,144 @@ class ScriptRuntimeTests {
   }
 
   @Test
+  void javaLanguageServiceSuggestsImportForCommonJdkTypesLikeColor() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("ColorTest", "java", null, "ColorTest", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class ColorTest extends CreatureScript {
+        @Override
+        public void update() {
+          context().ui().floatText("test", host(), Color.RED);
+        }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    List<ScriptDiagnostic> diags = List.of(new ScriptDiagnostic(ScriptDiagnostic.Severity.ERROR, "ColorTest", null, 5, 45, "cannot find symbol: class Color"));
+    List<ScriptLanguageService.CodeAction> actions = service.codeActions(doc, new ScriptLanguageService.Range(new ScriptLanguageService.Position(4, 44), new ScriptLanguageService.Position(4, 49)), diags);
+
+    assertTrue(actions.stream().anyMatch(a -> a.title().equals("Import 'java.awt.Color'")),
+        "Should offer exact match quickfix to import java.awt.Color instead of fuzzy renaming to ColorAdapter/ColorLayer.");
+  }
+
+  @Test
+  void javaLanguageServiceDisplaysAllOverloadsAndDocumentationOnHover() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("HoverTest", "java", null, "HoverTest", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class HoverTest extends CreatureScript {
+        @Override
+        public void update() {
+          context().ui().floatText("bulb", host(), java.awt.Color.RED);
+        }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    // Position on floatText (line 4, col 20)
+    var hover = service.hover(doc, new ScriptLanguageService.Position(4, 20));
+
+    assertTrue(hover.isPresent(), "Hover should be present for floatText");
+    String md = hover.get().markdown();
+    assertTrue(md.contains("floatText(String"), "Hover markdown should include floatText signature: " + md);
+    assertTrue(md.contains("Point2D"), "Hover markdown should include Point2D overload: " + md);
+    assertTrue(md.contains("IEntity"), "Hover markdown should include IEntity overload: " + md);
+    assertTrue(md.contains("Font"), "Hover markdown should include full 6-argument overload: " + md);
+    assertTrue(md.contains("ScriptUiOverlay"), "Hover markdown should mention declaring class: " + md);
+    assertTrue(md.contains("floating combat text"), "Hover markdown should include rich method documentation: " + md);
+  }
+
+  @Test
+  void javaLanguageServiceSuggestsParametersInsideMethodCall() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("ShakeTest", "java", null, "ShakeTest", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class ShakeTest extends CreatureScript {
+        @Override
+        public void update() {
+          context().camera().shake(
+        }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    // Position inside shake( (line 4, col 31)
+    var completions = service.complete(doc, new ScriptLanguageService.Position(4, 31));
+
+    assertFalse(completions.isEmpty(), "Completions should not be empty inside shake(");
+    // Should suggest parameter placeholders
+    assertTrue(completions.stream().anyMatch(c -> c.label().contains("intensity") && c.label().contains("delay") && c.label().contains("duration")),
+        "Should suggest parameter placeholders for shake(intensity, delay, duration)");
+    // Should NOT suggest @ScriptProperty inside method arguments
+    assertFalse(completions.stream().anyMatch(c -> c.label().startsWith("@ScriptProperty")),
+        "Should not suggest @ScriptProperty inside method arguments");
+  }
+
+  @Test
+  void javaLanguageServiceSuggestsColorConstantsInsideColorParameter() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("ColorParamTest", "java", null, "ColorParamTest", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class ColorParamTest extends CreatureScript {
+        @Override
+        public void update() {
+          context().ui().floatText("bulb", host(), 
+        }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    // Position inside floatText("bulb", host(),  (line 4, col 47)
+    var completions = service.complete(doc, new ScriptLanguageService.Position(4, 47));
+
+    assertTrue(completions.stream().anyMatch(c -> c.label().equals("Color.RED")),
+        "Should suggest Color.RED for floatText color parameter");
+  }
+
+  @Test
+  void javaLanguageServiceMethodCompletionInsertsParameterSnippets() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("SnippetTest", "java", null, "SnippetTest", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class SnippetTest extends CreatureScript {
+        @Override
+        public void update() {
+          context().camera().sh
+        }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+    // Position at context().camera().sh (line 4, col 27)
+    var completions = service.complete(doc, new ScriptLanguageService.Position(4, 27));
+
+    var shakeCompletion = completions.stream().filter(c -> c.label().equals("shake")).findFirst();
+    assertTrue(shakeCompletion.isPresent(), "shake completion should be present");
+    assertTrue(shakeCompletion.get().insertText().contains("${1:intensity}"),
+        "shake completion insertText should be a snippet with tab-stops: " + shakeCompletion.get().insertText());
+  }
+
+  @Test
   void javaLanguageServiceFixesCyclicInheritance() {
     ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
     JavaLanguageService service = new JavaLanguageService(workspace);

@@ -168,7 +168,7 @@ public final class ScriptDocumentation {
       ### AbstractScript
       Base abstract class for all LITIENGINE script instances.
 
-      Provides access to `host()`, `environment()`, `context()`, and `globals`.
+      Provides convenient access to `host()`, `environment()`, `context()`, `globals`, `input()`, `ui()`, `camera()`, and `spawner()`.
       """);
 
     CLASS_DOCS.put("de.gurkenlabs.litiengine.scripting.ScriptGlobals", """
@@ -185,6 +185,14 @@ public final class ScriptDocumentation {
     CLASS_DOCS.put("de.gurkenlabs.litiengine.scripting.ScriptContext", """
       ### ScriptContext
       Represents the execution and parameter binding context for script attachments.
+
+      **Key Services:**
+      - `ui()` — Access `ScriptUiOverlay` for floating combat text, screen HUD, and banners.
+      - `camera()` — Access active `ICamera` controller.
+      - `input()` — Access `ScriptInput` for key and mouse tracking.
+      - `spawner()` — Fluent entity spawner for runtime spawning.
+      - `sequence()` — Cancellable ordered sequences and cinematic transitions.
+      - `entities(type)` — Fluent entity query engine.
       """);
 
     CLASS_DOCS.put("de.gurkenlabs.litiengine.scripting.ScriptHostType", """
@@ -341,6 +349,46 @@ public final class ScriptDocumentation {
     METHOD_DOCS.put("loadMap", "Loads and transitions to the specified map environment.");
     METHOD_DOCS.put("playMusic", "Plays the specified background soundtrack.");
     METHOD_DOCS.put("playSound", "Plays a sound effect by audio asset name.");
+    METHOD_DOCS.put("ui", "Returns the ScriptUiOverlay service for displaying floating combat text, screen HUD elements, and announcement banners.");
+    METHOD_DOCS.put("camera", "Returns the active camera controller for panning, zooming, shaking, and viewport queries.");
+    METHOD_DOCS.put("floatText", "Spawns animated floating combat text in world space that moves upward and fades out over time.");
+    METHOD_DOCS.put("drawScreenText", "Draws persistent or timed screen-space text at fixed pixel coordinates.");
+    METHOD_DOCS.put("showBanner", "Displays a prominent centered announcement banner with a title and optional subtitle.");
+    METHOD_DOCS.put("cameraPanTo", "Smoothly pans the camera to focus on a target point or entity over a specified tick duration.");
+    METHOD_DOCS.put("cameraZoom", "Smoothly zooms the camera to a target zoom level over a specified duration in milliseconds.");
+    METHOD_DOCS.put("screenShake", "Applies a screen shake effect with specified intensity and duration.");
+    METHOD_DOCS.put("moveTowards", "Moves the creature towards a target map position or entity using its current velocity.");
+    METHOD_DOCS.put("moveInDirection", "Moves the creature in a specific compass direction (UP, DOWN, LEFT, RIGHT).");
+    METHOD_DOCS.put("moveInAngle", "Moves the creature along a specific angle in degrees (0 = North, 90 = East, 180 = South, 270 = West).");
+    METHOD_DOCS.put("enableTopDownMovement", "Configures 8-directional top-down keyboard movement (WASD or custom keys).");
+    METHOD_DOCS.put("enablePlatformingMovement", "Configures 2D side-scrolling platformer physics movement and jumping.");
+    METHOD_DOCS.put("disableMovementController", "Disables and detaches active keyboard/movement controllers.");
+    METHOD_DOCS.put("createAbility", "Begins building a custom scripted combat ability with range, cooldown, and cast logic.");
+    METHOD_DOCS.put("cast", "Executes a registered combat ability by name on the host creature.");
+    METHOD_DOCS.put("canCast", "Checks if a combat ability is available and ready to be cast.");
+    METHOD_DOCS.put("isOnCooldown", "Checks if a combat ability is currently cooling down.");
+    METHOD_DOCS.put("spawnProjectile", "Begins building and launching a scripted projectile entity.");
+    METHOD_DOCS.put("spawner", "Returns a fluent entity spawner for creating creatures, props, and custom entities.");
+    METHOD_DOCS.put("spawnCreature", "Spawns a creature with the given sprite prefix at the specified coordinates.");
+    METHOD_DOCS.put("spawnProp", "Spawns a prop entity with the given spritesheet name at the specified coordinates.");
+    METHOD_DOCS.put("spawn", "Spawns an entity instance or entity class type in the active environment.");
+    METHOD_DOCS.put("entities", "Begins a fluent spatial query for map entities of a given type in the active environment.");
+    METHOD_DOCS.put("input", "Returns the managed ScriptInput helper for key/mouse event tracking and queries.");
+    METHOD_DOCS.put("sequence", "Creates a cancellable ordered sequence of delayed actions and cinematic camera movements.");
+    METHOD_DOCS.put("schedule", "Schedules a cancellable action to be performed after a frame delay.");
+    METHOD_DOCS.put("manage", "Registers a resource, listener, or subscription to be automatically closed/cleaned up when the script is unloaded.");
+    METHOD_DOCS.put("listen", "Registers an event listener that is automatically unregistered upon script unloading.");
+    METHOD_DOCS.put("getVelocity", "Gets the movement velocity vector and speed of this mobile entity.");
+    METHOD_DOCS.put("setVelocity", "Sets the movement speed and velocity of this entity in pixels/second.");
+    METHOD_DOCS.put("getHitPoints", "Gets the current and maximum hit points of this combat entity.");
+    METHOD_DOCS.put("setHitPoints", "Sets the current hit points of this combat entity.");
+    METHOD_DOCS.put("isDead", "Checks if the combat entity is currently dead.");
+    METHOD_DOCS.put("die", "Inflicts lethal damage and kills the combat entity.");
+    METHOD_DOCS.put("resurrect", "Revives the combat entity with its initial hit points.");
+    METHOD_DOCS.put("getCenter", "Returns the geometric center coordinate of this entity in map pixels.");
+    METHOD_DOCS.put("getLocation", "Returns the top-left coordinate of this entity in map pixels.");
+    METHOD_DOCS.put("setLocation", "Sets the position of this entity in map pixels.");
+    METHOD_DOCS.put("sendMessage", "Dispatches a custom string message to entity message listeners.");
   }
 
   private ScriptDocumentation() {}

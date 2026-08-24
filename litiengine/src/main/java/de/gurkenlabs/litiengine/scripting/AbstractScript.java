@@ -5,6 +5,8 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.graphics.ICamera;
+import de.gurkenlabs.litiengine.scripting.ui.ScriptUiOverlay;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -88,6 +90,16 @@ public abstract class AbstractScript<T> implements ScriptInstance {
   /** Returns the managed input helper for key/mouse bindings and state queries. */
   protected final ScriptInput input() {
     return this.context().input();
+  }
+
+  /** Returns the scripted UI overlay service owned by this context. */
+  protected final ScriptUiOverlay ui() {
+    return this.context().ui();
+  }
+
+  /** Returns the active camera from the game world. */
+  protected final ICamera camera() {
+    return this.context().camera();
   }
 
   /** Returns a fluent spawner for creating entities in the current environment. */

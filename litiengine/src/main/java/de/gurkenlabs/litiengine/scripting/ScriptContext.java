@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.EntityQuery;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.scripting.combat.ScriptedAbilityBuilder;
 import de.gurkenlabs.litiengine.scripting.combat.ScriptedProjectileBuilder;
 import de.gurkenlabs.litiengine.scripting.ui.ScriptUiOverlay;
@@ -23,7 +24,7 @@ public final class ScriptContext<T> implements AutoCloseable {
   private final Logger logger;
   private ScriptUiOverlay uiOverlay;
 
-  ScriptContext(ScriptDefinition definition, ScriptBinding binding, T host) {
+  public ScriptContext(ScriptDefinition definition, ScriptBinding binding, T host) {
     this.definition = Objects.requireNonNull(definition);
     this.binding = Objects.requireNonNull(binding);
     this.host = Objects.requireNonNull(host);
@@ -110,6 +111,11 @@ public final class ScriptContext<T> implements AutoCloseable {
       this.manage(this.uiOverlay);
     }
     return this.uiOverlay;
+  }
+
+  /** Returns the active camera from the game world. */
+  public ICamera camera() {
+    return Game.world().camera();
   }
 
   private ScriptInput scriptInput;
