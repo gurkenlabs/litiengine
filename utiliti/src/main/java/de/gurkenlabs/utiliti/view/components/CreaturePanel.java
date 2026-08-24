@@ -7,16 +7,18 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.view.renderers.LabelListCellRenderer;
 import java.awt.LayoutManager;
-import java.util.Map;
+import java.awt.image.BufferedImage;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import javax.swing.DefaultComboBoxModel;
@@ -34,6 +36,7 @@ public class CreaturePanel extends PropertyPanel {
   private final JCheckBox checkBoxStartDead;
   private final SpriteAnimationPreview animationPreview;
   private boolean creaturesLoaded; // mirrors PropPanel.propsLoaded behavior
+  private boolean refreshingAnimationChoices;
 
   public CreaturePanel() {
     this(UI::showSpriteInspector);
@@ -46,7 +49,6 @@ public class CreaturePanel extends PropertyPanel {
     this.comboBoxAnimations = new JComboBox<>();
     this.comboBoxAnimations.setRenderer(new LabelListCellRenderer());
     this.animationPreview = new SpriteAnimationPreview(editAction);
-
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
     this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
@@ -56,9 +58,26 @@ public class CreaturePanel extends PropertyPanel {
     setLayout(this.createLayout());
     setupChangedListeners();
     this.comboBoxSpriteSheets.addActionListener(e -> refreshAnimationChoices());
-    this.comboBoxAnimations.addActionListener(e -> updateSpritePreview());
-    this.comboBoxDirection.addActionListener(
-        e -> SwingUtilities.invokeLater(this::refreshAnimationChoices));
+    this.comboBoxAnimations.addActionListener(e -> {
+      if (this.isBinding() || this.refreshingAnimationChoices) {
+        return;
+      }
+      JLabel selectedAnim = (JLabel) this.comboBoxAnimations.getSelectedItem();
+      if (selectedAnim != null) {
+        String source = selectedAnim.getName() != null ? selectedAnim.getName() : selectedAnim.getText();
+        Direction dir = getDirectionFromAnimationName(source);
+        if (dir != null && dir != this.comboBoxDirection.getSelectedItem()) {
+          this.comboBoxDirection.setSelectedItem(dir);
+        }
+        boolean isDead = isDeathAnimation(source);
+        if (this.checkBoxStartDead.isSelected() != isDead) {
+          this.checkBoxStartDead.setSelected(isDead);
+          this.applyChanges(m -> applyStartDead(m, isDead));
+        }
+      }
+      updateSpritePreview();
+    });
+    this.comboBoxDirection.addActionListener(e -> refreshAnimationChoices());
     this.checkBoxStartDead.addActionListener(e -> refreshAnimationChoices());
 
     // if images are cleared (e.g. resource reload), repopulate on next bind
@@ -189,6 +208,10 @@ public class CreaturePanel extends PropertyPanel {
     return this.checkBoxStartDead.isSelected();
   }
 
+  JComboBox<JLabel> getComboBoxAnimationsForTest() {
+    return this.comboBoxAnimations;
+  }
+
   void doubleClickPreviewForTest() {
     this.animationPreview.doubleClickForTest();
   }
@@ -215,19 +238,27 @@ public class CreaturePanel extends PropertyPanel {
     if (source == null) {
       source = selectPreviewSpriteName(name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll());
     }
-    Spritesheet spritesheet = source != null ? Resources.spritesheets().get(source) : null;
+    Spritesheet spritesheet = getOrLoadSpritesheet(source);
     SpritesheetResource resource = resolveOriginalResource(source);
     this.animationPreview.setSpritesheet(spritesheet, resource);
   }
 
   private void refreshAnimationChoices() {
-    String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
-    Map<String, String> animations = getAnimationSpriteNames(name, Resources.spritesheets().getAll());
-    Map<String, String> display = toDisplayNames(name, animations);
-    populateComboBoxWithSpritesAndNames(this.comboBoxAnimations, display);
-    Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
-    selectAnimationBySpriteName(selectPreviewSpriteName(name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll()));
-    updateSpritePreview();
+    if (this.refreshingAnimationChoices) {
+      return;
+    }
+    this.refreshingAnimationChoices = true;
+    try {
+      String name = SearchableSpriteComboBox.selectedText(this.comboBoxSpriteSheets);
+      Map<String, String> animations = getAnimationSpriteNames(name, Resources.spritesheets().getAll());
+      Map<String, String> display = toDisplayNames(name, animations);
+      populateComboBoxWithSpritesAndNames(this.comboBoxAnimations, display);
+      Direction direction = (Direction) this.comboBoxDirection.getSelectedItem();
+      selectAnimationBySpriteName(selectPreviewSpriteName(name, direction, this.checkBoxStartDead.isSelected(), Resources.spritesheets().getAll()));
+      updateSpritePreview();
+    } finally {
+      this.refreshingAnimationChoices = false;
+    }
   }
 
   static Map<String, String> getAnimationSpriteNames(String base, java.util.Collection<Spritesheet> spritesheets) {
@@ -238,6 +269,20 @@ public class CreaturePanel extends PropertyPanel {
     for (Spritesheet spritesheet : spritesheets) {
       if (base.equalsIgnoreCase(getCreatureSpriteName(spritesheet.getName()))) {
         animations.put(spritesheet.getName(), spritesheet.getName());
+      }
+    }
+    if (Editor.instance().getGameFile() != null) {
+      for (SpritesheetResource res : Editor.instance().getGameFile().getSpriteSheets()) {
+        if (res != null && res.getName() != null && base.equalsIgnoreCase(getCreatureSpriteName(res.getName()))) {
+          animations.put(res.getName(), res.getName());
+        }
+      }
+    }
+    java.util.List<String> currentKeys = new java.util.ArrayList<>(animations.keySet());
+    for (String key : currentKeys) {
+      String opp = oppositeHorizontalDirection(key);
+      if (opp != null && !animations.containsKey(opp)) {
+        animations.put(opp, opp);
       }
     }
     return animations;
@@ -266,6 +311,15 @@ public class CreaturePanel extends PropertyPanel {
     return display;
   }
 
+  static boolean isMirrored(String spriteName) {
+    if (spriteName == null || Editor.instance().getGameFile() == null) {
+      return false;
+    }
+    return findResource(spriteName) == null
+        && oppositeHorizontalDirection(spriteName) != null
+        && findResource(oppositeHorizontalDirection(spriteName)) != null;
+  }
+
   /**
    * Populates the animation combo box with display names, storing the actual sprite name
    * in each JLabel's {@code name} property for later resolution.
@@ -274,11 +328,15 @@ public class CreaturePanel extends PropertyPanel {
       JComboBox<JLabel> comboBox, Map<String, String> display) {
     comboBox.removeAllItems();
     display.forEach((displayName, spriteName) -> {
-      JLabel label = new JLabel(displayName);
+      String labelText = displayName;
+      if (isMirrored(spriteName)) {
+        labelText = displayName + " (" + Resources.strings().get("spriteEditor_mirrored") + ")";
+      }
+      JLabel label = new JLabel(labelText);
       label.setName(spriteName); // store full sprite name for resolution
-      Spritesheet spritesheet = Resources.spritesheets().get(spriteName);
+      Spritesheet spritesheet = getOrLoadSpritesheet(spriteName);
       if (spritesheet != null && spritesheet.getTotalNumberOfSprites() > 0) {
-        java.awt.image.BufferedImage preview = spritesheet.getPreview(24);
+        BufferedImage preview = spritesheet.getPreview(24);
         if (preview != null) {
           label.setIcon(new javax.swing.ImageIcon(preview));
         }
@@ -322,6 +380,34 @@ public class CreaturePanel extends PropertyPanel {
     }
   }
 
+  static Spritesheet getOrLoadSpritesheet(String spriteName) {
+    if (spriteName == null) {
+      return null;
+    }
+    Spritesheet spritesheet = Resources.spritesheets().get(spriteName);
+    if (spritesheet != null) {
+      return spritesheet;
+    }
+    if (Editor.instance().getGameFile() != null) {
+      for (SpritesheetResource res : Editor.instance().getGameFile().getSpriteSheets()) {
+        if (res != null && spriteName.equalsIgnoreCase(res.getName())) {
+          return Resources.spritesheets().load(res);
+        }
+      }
+    }
+    String opposite = oppositeHorizontalDirection(spriteName);
+    if (opposite != null) {
+      Spritesheet oppSheet = getOrLoadSpritesheet(opposite);
+      if (oppSheet != null) {
+        BufferedImage flipped = Imaging.flipSpritesHorizontally(oppSheet);
+        if (flipped != null) {
+          return Resources.spritesheets().load(flipped, spriteName, oppSheet.getSpriteWidth(), oppSheet.getSpriteHeight());
+        }
+      }
+    }
+    return null;
+  }
+
   private static SpritesheetResource resolveOriginalResource(String source) {
     if (source == null || Editor.instance().getGameFile() == null) {
       return null;
@@ -331,7 +417,13 @@ public class CreaturePanel extends PropertyPanel {
       return resource;
     }
     String opposite = oppositeHorizontalDirection(source);
-    return opposite != null ? findResource(opposite) : null;
+    if (opposite != null) {
+      SpritesheetResource oppRes = findResource(opposite);
+      if (oppRes != null) {
+        return SpriteEditorPanel.createMirroredResource(oppRes, source);
+      }
+    }
+    return null;
   }
 
   private static SpritesheetResource findResource(String name) {
@@ -341,7 +433,7 @@ public class CreaturePanel extends PropertyPanel {
         .orElse(null);
   }
 
-  private static String oppositeHorizontalDirection(String name) {
+  public static String oppositeHorizontalDirection(String name) {
     String lowerName = name.toLowerCase(java.util.Locale.ROOT);
     if (lowerName.endsWith("-left")) {
       return name.substring(0, name.length() - "left".length()) + "right";
@@ -352,15 +444,40 @@ public class CreaturePanel extends PropertyPanel {
     return null;
   }
 
+  public static Direction getDirectionFromAnimationName(String animName) {
+    if (animName == null) {
+      return null;
+    }
+    String lower = animName.toLowerCase(Locale.ROOT);
+    if (lower.endsWith("-left") || lower.equals("left")) {
+      return Direction.LEFT;
+    }
+    if (lower.endsWith("-right") || lower.equals("right")) {
+      return Direction.RIGHT;
+    }
+    if (lower.endsWith("-down") || lower.equals("down")) {
+      return Direction.DOWN;
+    }
+    if (lower.endsWith("-up") || lower.equals("up")) {
+      return Direction.UP;
+    }
+    return null;
+  }
+
+  public static boolean isDeathAnimation(String animName) {
+    if (animName == null) {
+      return false;
+    }
+    String lower = animName.toLowerCase(Locale.ROOT);
+    return lower.equals("dead") || lower.startsWith("dead-") || lower.endsWith("-dead") || lower.contains("-dead-");
+  }
+
   static String selectPreviewSpriteName(
       String base, Direction direction, boolean startDead, java.util.Collection<Spritesheet> spritesheets) {
     if (base == null) {
       return null;
     }
-    Map<String, String> available = new java.util.HashMap<>();
-    for (Spritesheet spritesheet : spritesheets) {
-      available.put(spritesheet.getName().toLowerCase(Locale.ROOT), spritesheet.getName());
-    }
+    Map<String, String> available = getAnimationSpriteNames(base, spritesheets);
     String directionToken = direction != null && direction != Direction.UNDEFINED
         ? "-" + direction.name().toLowerCase(Locale.ROOT)
         : "";
@@ -379,7 +496,7 @@ public class CreaturePanel extends PropertyPanel {
       candidates.add(base + "-" + WALK_SPRITE_TOKEN);
     }
     for (String candidate : candidates) {
-      String source = available.get(candidate.toLowerCase(Locale.ROOT));
+      String source = available.get(candidate);
       if (source != null) {
         return source;
       }
