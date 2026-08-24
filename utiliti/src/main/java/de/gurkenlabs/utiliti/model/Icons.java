@@ -120,7 +120,7 @@ public final class Icons {
   public static final Icon LOOP_16 = IconLoader.get().getUIAwareIcon("loop.svg", 16, 16);
   public static final Icon LOWER_16 = IconLoader.get().getUIAwareIcon("lower.svg", 16, 16);
   public static final Icon MAPAREA_16 = IconLoader.get().getUIAwareIcon("maparea.svg", 16, 16);
-  public static final Icon MAP_16 = IconLoader.get().getUIAwareIcon("map.svg", 16, 16);
+  public static final Icon MAP_16 = new VectorBadgeMapIcon(16, new java.awt.Color(74, 222, 128));
   public static final Icon MAP_EXPORT_16 = IconLoader.get().getUIAwareIcon("map-export.svg", 16, 16);
   public static final Icon MAP_IDS_16 = IconLoader.get().getUIAwareIcon("map-ids.svg", 16, 16);
   public static final Icon MAP_IMPORT_16 = IconLoader.get().getUIAwareIcon("map-import.svg", 16, 16);
@@ -391,6 +391,89 @@ public final class Icons {
   public static Icon getScriptIcon(ScriptDefinition definition, boolean inherited) {
     if (inherited) return SCRIPT_INHERITED_16;
     return getScriptIcon(definition);
+  }
+
+  public static final class VectorBadgeMapIcon implements Icon {
+    private final int size;
+    private final java.awt.Color accentColor;
+
+    public VectorBadgeMapIcon(int size, java.awt.Color accentColor) {
+      this.size = size;
+      this.accentColor = accentColor;
+    }
+
+    @Override public int getIconWidth() { return size; }
+    @Override public int getIconHeight() { return size; }
+
+    @Override
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_STROKE_CONTROL, java.awt.RenderingHints.VALUE_STROKE_PURE);
+
+        java.awt.Color base = accentColor != null ? accentColor : new java.awt.Color(74, 222, 128);
+        boolean enabled = c == null || c.isEnabled();
+        if (!enabled) {
+          base = new java.awt.Color(128, 128, 128);
+        }
+
+        // 1. Soft glowing background badge (matches script badge)
+        int pad = Math.max(1, size / 16);
+        int badgeSize = size - pad * 2;
+        java.awt.Color bgFill = new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 38);
+        java.awt.Color bgBorder = new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 90);
+        g2.setColor(bgFill);
+        g2.fillRoundRect(x + pad, y + pad, badgeSize, badgeSize, 4, 4);
+        g2.setColor(bgBorder);
+        g2.setStroke(new java.awt.BasicStroke(1.0f));
+        g2.drawRoundRect(x + pad, y + pad, badgeSize, badgeSize, 4, 4);
+
+        // 2. Crisp Folded Map Geometry
+        double scale = size / 16.0;
+
+        // Left Panel
+        java.awt.geom.Path2D leftPanel = new java.awt.geom.Path2D.Double();
+        leftPanel.moveTo(x + 3.6 * scale, y + 5.0 * scale);
+        leftPanel.lineTo(x + 6.8 * scale, y + 3.6 * scale);
+        leftPanel.lineTo(x + 6.8 * scale, y + 11.2 * scale);
+        leftPanel.lineTo(x + 3.6 * scale, y + 12.6 * scale);
+        leftPanel.closePath();
+
+        // Center Panel
+        java.awt.geom.Path2D centerPanel = new java.awt.geom.Path2D.Double();
+        centerPanel.moveTo(x + 6.8 * scale, y + 3.6 * scale);
+        centerPanel.lineTo(x + 10.0 * scale, y + 5.0 * scale);
+        centerPanel.lineTo(x + 10.0 * scale, y + 12.6 * scale);
+        centerPanel.lineTo(x + 6.8 * scale, y + 11.2 * scale);
+        centerPanel.closePath();
+
+        // Right Panel
+        java.awt.geom.Path2D rightPanel = new java.awt.geom.Path2D.Double();
+        rightPanel.moveTo(x + 10.0 * scale, y + 5.0 * scale);
+        rightPanel.lineTo(x + 13.2 * scale, y + 3.6 * scale);
+        rightPanel.lineTo(x + 13.2 * scale, y + 11.2 * scale);
+        rightPanel.lineTo(x + 10.0 * scale, y + 12.6 * scale);
+        rightPanel.closePath();
+
+        // Fill with subtle shading for 3D folded map look
+        g2.setColor(base);
+        g2.fill(leftPanel);
+        g2.setColor(new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 190));
+        g2.fill(centerPanel);
+        g2.setColor(base);
+        g2.fill(rightPanel);
+
+        // Subtle crisp outline
+        g2.setColor(new java.awt.Color(255, 255, 255, 160));
+        g2.setStroke(new java.awt.BasicStroke(0.9f * (float) scale, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
+        g2.draw(leftPanel);
+        g2.draw(centerPanel);
+        g2.draw(rightPanel);
+      } finally {
+        g2.dispose();
+      }
+    }
   }
 
   public static final class VectorScriptIcon implements Icon {

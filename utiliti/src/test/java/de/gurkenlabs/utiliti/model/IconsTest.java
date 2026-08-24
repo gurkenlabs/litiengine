@@ -64,5 +64,10 @@ class IconsTest {
     assertNotNull(Icons.getScriptIcon(de.gurkenlabs.litiengine.scripting.ScriptHostType.GAME));
     assertNotNull(Icons.getScriptIcon((de.gurkenlabs.litiengine.scripting.ScriptHostType) null));
     assertNotNull(Icons.getScriptIcon((de.gurkenlabs.litiengine.scripting.ScriptDefinition) null));
+
+    assertNotNull(Icons.MAP_16);
+    assertEquals(16, Icons.MAP_16.getIconWidth());
+    assertEquals(16, Icons.MAP_16.getIconHeight());
+    Icons.MAP_16.paintIcon(new JLabel(), graphics, 0, 0);
   }
 }
