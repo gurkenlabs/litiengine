@@ -129,7 +129,8 @@ public abstract class AbstractScriptBindingsPanel<T> extends JPanel {
         label.setIcon(Icons.API_16);
       } else {
         label.setText(this.formatAvailableScriptLabel(value));
-        label.setIcon(Icons.SYMBOL_METHOD_16);
+        label.setIcon(Icons.getScriptIcon(value));
+        label.setToolTipText(getScriptHostTooltip(value, false));
       }
       label.setOpaque(true);
       label.setBackground(selected ? list.getSelectionBackground() : list.getBackground());
@@ -200,12 +201,14 @@ public abstract class AbstractScriptBindingsPanel<T> extends JPanel {
     this.bindings.setCellRenderer((list, value, index, selected, focused) -> {
       ScriptDefinition definition = definition(value == null ? null : value.getScript());
       boolean duplicate = value != null && countBindings(value.getScript()) > 1;
+      boolean isInherited = value != null && this.isInherited(value.getScript());
       String prefix = duplicate ? "⚠ Duplicate · " : "";
-      if (value != null && this.isInherited(value.getScript())) prefix += "Override · ";
+      if (isInherited) prefix += "Override · ";
       if (value != null && !value.isEnabled()) prefix += "Disabled · ";
       JLabel label = new JLabel(prefix
           + (definition == null ? (value == null ? "" : value.getScript()) : displayName(definition)));
-      label.setIcon(Icons.SYMBOL_METHOD_16);
+      label.setIcon(Icons.getScriptIcon(definition, isInherited));
+      label.setToolTipText(getScriptHostTooltip(definition, isInherited));
       label.setOpaque(true);
       label.setBackground(selected ? list.getSelectionBackground() : list.getBackground());
       label.setForeground(selected ? list.getSelectionForeground()
@@ -229,7 +232,8 @@ public abstract class AbstractScriptBindingsPanel<T> extends JPanel {
       boolean overridden = value != null && this.containsBinding(value.getScript());
       JLabel label = new JLabel((overridden ? "Overridden · " : "Inherited · ")
         + (definition == null ? (value == null ? "" : value.getScript()) : displayName(definition)));
-      label.setIcon(Icons.SYMBOL_DEPENDENCY_16);
+      label.setIcon(Icons.getScriptIcon(definition, true));
+      label.setToolTipText(getScriptHostTooltip(definition, true));
       label.setOpaque(true);
       label.setBackground(selected ? list.getSelectionBackground() : list.getBackground());
       label.setForeground(selected ? list.getSelectionForeground() : Style.mutedText());
@@ -868,5 +872,18 @@ public abstract class AbstractScriptBindingsPanel<T> extends JPanel {
       }
       return this.spinner;
     }
+  }
+
+  private static String getScriptHostTooltip(ScriptDefinition definition, boolean inherited) {
+    if (definition == null) return inherited ? "Inherited script binding" : "Script behavior";
+    String hostName = definition.getHost() != null ? switch (definition.getHost()) {
+      case ENTITY -> "Entity Script (Creature/Entity lifecycle & events)";
+      case ENVIRONMENT -> "Environment Script (Map & world events)";
+      case GAME -> "Game Script (Global game loops & systems)";
+    } : "Script behavior";
+    if (inherited) {
+      return "Inherited " + hostName + " (from template/blueprint)";
+    }
+    return hostName;
   }
 }

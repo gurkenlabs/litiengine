@@ -599,7 +599,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     ScriptTab tab = this.openTabs.computeIfAbsent(key, ignored -> {
       Path projectSource = this.projectSourcePaths.get(definition);
       ScriptTab created = new ScriptTab(definition, projectSource, projectSource != null);
-      this.tabs.addTab(displayName(definition), Icons.SCRIPT_16, created, definition.getSource());
+      this.tabs.addTab(displayName(definition), Icons.getScriptIcon(definition), created, definition.getSource());
       this.tabs.setTabComponentAt(this.tabs.indexOfComponent(created), this.createTabHeader(created));
       return created;
     });
@@ -1693,7 +1693,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     header.setOpaque(false);
     header.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
 
-    JLabel label = new JLabel(displayName(tab.definition), Icons.SCRIPT_16, SwingConstants.LEADING);
+    JLabel label = new JLabel(displayName(tab.definition), Icons.getScriptIcon(tab.definition), SwingConstants.LEADING);
     label.setFont(Style.getDefaultFont().deriveFont(12f));
     label.setForeground(tab == activeTab() ? Style.text() : Style.mutedText());
     tab.title = label;
@@ -2705,13 +2705,13 @@ public final class ScriptWorkspacePanel extends JPanel {
   private JPopupMenu createAddScriptPopupMenu() {
     JPopupMenu menu = new JPopupMenu();
     String targetPkg = selectedPackage();
-    JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.SCRIPT_16);
+    JMenuItem entityScript = new JMenuItem("Entity Script...", Icons.SCRIPT_ENTITY_16);
     entityScript.addActionListener(e -> createScript(ScriptKind.ENTITY, null, targetPkg));
 
-    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_16);
+    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_GAME_16);
     gameScript.addActionListener(e -> createScript(ScriptKind.GAME, null, targetPkg));
 
-    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.SCRIPT_16);
+    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.SCRIPT_ENVIRONMENT_16);
     envScript.addActionListener(e -> createScript(ScriptKind.ENVIRONMENT, null, targetPkg));
 
     menu.add(entityScript);
@@ -3736,7 +3736,7 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.nameLabel.setText(item.label());
         javax.swing.Icon icon;
         if (item.definition() != null) {
-          icon = Icons.SCRIPT_16;
+          icon = Icons.getScriptIcon(item.definition());
           int usages = scriptUsageCounts.getOrDefault(item.definition().getId(), 0);
           this.usageLabel.setText(usages == 1 ? "1 use" : usages + " uses");
           this.usageLabel.setVisible(usages > 0);

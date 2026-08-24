@@ -2,6 +2,8 @@ package de.gurkenlabs.utiliti.model;
 
 import com.github.weisj.darklaf.properties.icons.IconLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
+import de.gurkenlabs.litiengine.scripting.ScriptHostType;
 import javax.swing.Icon;
 
 public final class Icons {
@@ -60,7 +62,11 @@ public final class Icons {
   public static final Icon ABOUT_16 = IconLoader.get().getUIAwareIcon("about.svg", 16, 16);
   public static final Icon ANIMATION_16 = IconLoader.get().getUIAwareIcon("animation.svg", 16, 16);
   public static final Icon API_16 = IconLoader.get().getUIAwareIcon("api.svg", 16, 16);
-  public static final Icon SCRIPT_16 = IconLoader.get().getUIAwareIcon("script.svg", 16, 16);
+  public static final Icon SCRIPT_16 = new VectorLightningScriptIcon(16, new java.awt.Color(56, 189, 248), false);
+  public static final Icon SCRIPT_ENTITY_16 = new VectorLightningScriptIcon(16, new java.awt.Color(56, 189, 248), false);
+  public static final Icon SCRIPT_ENVIRONMENT_16 = new VectorLightningScriptIcon(16, new java.awt.Color(74, 222, 128), false);
+  public static final Icon SCRIPT_GAME_16 = new VectorLightningScriptIcon(16, new java.awt.Color(251, 191, 36), false);
+  public static final Icon SCRIPT_INHERITED_16 = new VectorLightningScriptIcon(16, new java.awt.Color(148, 163, 184), true);
   public static final Icon ERROR_16 = IconLoader.get().getUIAwareIcon("error.svg", 16, 16);
   public static final Icon FORMAT_CODE_16 = IconLoader.get().getUIAwareIcon("format-code.svg", 16, 16);
   public static final Icon COMPILE_16 = IconLoader.get().getUIAwareIcon("compile.svg", 16, 16);
@@ -301,6 +307,90 @@ public final class Icons {
       case TRIGGER -> TRIGGER_16;
       default -> ENTITY_16;
     };
+  }
+
+  public static final class VectorLightningScriptIcon implements Icon {
+    private final int size;
+    private final java.awt.Color accentColor;
+    private final boolean inherited;
+
+    public VectorLightningScriptIcon(int size, java.awt.Color accentColor, boolean inherited) {
+      this.size = size;
+      this.accentColor = accentColor;
+      this.inherited = inherited;
+    }
+
+    @Override public int getIconWidth() { return size; }
+    @Override public int getIconHeight() { return size; }
+
+    @Override
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_STROKE_CONTROL, java.awt.RenderingHints.VALUE_STROKE_PURE);
+
+        java.awt.Color base = accentColor != null ? accentColor : new java.awt.Color(56, 189, 248);
+        boolean enabled = c == null || c.isEnabled();
+        if (!enabled) {
+          base = new java.awt.Color(128, 128, 128);
+        }
+
+        // 1. Soft glowing background badge
+        int pad = Math.max(1, size / 16);
+        int badgeSize = size - pad * 2;
+        java.awt.Color bgFill = new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 38);
+        java.awt.Color bgBorder = new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 90);
+        g2.setColor(bgFill);
+        g2.fillRoundRect(x + pad, y + pad, badgeSize, badgeSize, 4, 4);
+        g2.setColor(bgBorder);
+        g2.setStroke(new java.awt.BasicStroke(1.0f));
+        g2.drawRoundRect(x + pad, y + pad, badgeSize, badgeSize, 4, 4);
+
+        // 2. Crisp Event Lightning Spark
+        double scale = size / 16.0;
+        java.awt.geom.Path2D bolt = new java.awt.geom.Path2D.Double();
+        bolt.moveTo(x + 9.2 * scale, y + 2.5 * scale);
+        bolt.lineTo(x + 4.8 * scale, y + 8.6 * scale);
+        bolt.lineTo(x + 8.2 * scale, y + 8.6 * scale);
+        bolt.lineTo(x + 6.8 * scale, y + 13.5 * scale);
+        bolt.lineTo(x + 12.0 * scale, y + 7.4 * scale);
+        bolt.lineTo(x + 8.6 * scale, y + 7.4 * scale);
+        bolt.closePath();
+
+        g2.setColor(base);
+        g2.fill(bolt);
+
+        // 3. Inherited badge link indicator (if inherited)
+        if (inherited) {
+          g2.setColor(new java.awt.Color(255, 255, 255, 220));
+          g2.setStroke(new java.awt.BasicStroke(1.2f, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
+          int lx = x + (int) (10 * scale);
+          int ly = y + (int) (10 * scale);
+          g2.drawOval(lx, ly, (int) (4 * scale), (int) (4 * scale));
+        }
+      } finally {
+        g2.dispose();
+      }
+    }
+  }
+
+  public static Icon getScriptIcon(ScriptHostType hostType) {
+    if (hostType == null) return SCRIPT_16;
+    return switch (hostType) {
+      case ENTITY -> SCRIPT_ENTITY_16;
+      case ENVIRONMENT -> SCRIPT_ENVIRONMENT_16;
+      case GAME -> SCRIPT_GAME_16;
+    };
+  }
+
+  public static Icon getScriptIcon(ScriptDefinition definition) {
+    return getScriptIcon(definition != null ? definition.getHost() : null);
+  }
+
+  public static Icon getScriptIcon(ScriptDefinition definition, boolean inherited) {
+    if (inherited) return SCRIPT_INHERITED_16;
+    return getScriptIcon(definition);
   }
 
   public static final class VectorScriptIcon implements Icon {

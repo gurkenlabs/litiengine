@@ -383,45 +383,45 @@ public class ViewportToolbar extends JPanel {
     JPopupMenu menu = new JPopupMenu();
 
     JMenu entitySub = new JMenu("Entity Script");
-    entitySub.setIcon(Icons.SCRIPT_16);
+    entitySub.setIcon(Icons.SCRIPT_ENTITY_16);
 
-    JMenuItem creatureScript = new JMenuItem("Creature Script...", Icons.SCRIPT_16);
+    JMenuItem creatureScript = new JMenuItem("Creature Script...", Icons.SCRIPT_ENTITY_16);
     creatureScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null)
         UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Creature.class);
     });
 
-    JMenuItem propScript = new JMenuItem("Prop Script...", Icons.SCRIPT_16);
+    JMenuItem propScript = new JMenuItem("Prop Script...", Icons.SCRIPT_ENTITY_16);
     propScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null)
         UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Prop.class);
     });
 
-    JMenuItem triggerScript = new JMenuItem("Trigger Script...", Icons.SCRIPT_16);
+    JMenuItem triggerScript = new JMenuItem("Trigger Script...", Icons.SCRIPT_ENTITY_16);
     triggerScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null)
         UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Trigger.class);
     });
 
-    JMenuItem emitterScript = new JMenuItem("Emitter Script...", Icons.SCRIPT_16);
+    JMenuItem emitterScript = new JMenuItem("Emitter Script...", Icons.SCRIPT_ENTITY_16);
     emitterScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null)
         UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.graphics.emitters.Emitter.class);
     });
 
-    JMenuItem collisionBoxScript = new JMenuItem("CollisionBox Script...", Icons.SCRIPT_16);
+    JMenuItem collisionBoxScript = new JMenuItem("CollisionBox Script...", Icons.SCRIPT_ENTITY_16);
     collisionBoxScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null)
         UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.CollisionBox.class);
     });
 
-    JMenuItem lightSourceScript = new JMenuItem("LightSource Script...", Icons.SCRIPT_16);
+    JMenuItem lightSourceScript = new JMenuItem("LightSource Script...", Icons.SCRIPT_ENTITY_16);
     lightSourceScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null)
         UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.LightSource.class);
     });
 
-    JMenuItem genericEntityScript = new JMenuItem("Generic Entity Script...", Icons.SCRIPT_16);
+    JMenuItem genericEntityScript = new JMenuItem("Generic Entity Script...", Icons.SCRIPT_ENTITY_16);
     genericEntityScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null)
         UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.IEntity.class);
@@ -435,12 +435,12 @@ public class ViewportToolbar extends JPanel {
     entitySub.add(lightSourceScript);
     entitySub.add(genericEntityScript);
 
-    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_16);
+    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_GAME_16);
     gameScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.GAME);
     });
 
-    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.SCRIPT_16);
+    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.SCRIPT_ENVIRONMENT_16);
     envScript.addActionListener(e -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENVIRONMENT);
     });

@@ -276,7 +276,7 @@ public class AssetPanel extends JPanel {
     this.currentType = AssetType.SCRIPT;
     loadItems(() -> {
       for (de.gurkenlabs.litiengine.scripting.ScriptDefinition script : scripts) {
-        allItems.add(createItem(Icons.SCRIPT_16, script.getName() == null || script.getName().isBlank() ? script.getId() : script.getName(), script));
+        allItems.add(createItem(Icons.getScriptIcon(script), script.getName() == null || script.getName().isBlank() ? script.getId() : script.getName(), script));
       }
     });
   }
