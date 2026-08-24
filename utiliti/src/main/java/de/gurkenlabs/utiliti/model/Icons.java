@@ -120,7 +120,7 @@ public final class Icons {
   public static final Icon LOOP_16 = IconLoader.get().getUIAwareIcon("loop.svg", 16, 16);
   public static final Icon LOWER_16 = IconLoader.get().getUIAwareIcon("lower.svg", 16, 16);
   public static final Icon MAPAREA_16 = IconLoader.get().getUIAwareIcon("maparea.svg", 16, 16);
-  public static final Icon MAP_16 = new VectorBadgeMapIcon(16, new java.awt.Color(74, 222, 128));
+  public static final Icon MAP_16 = new VectorBadgeMapIcon(16, null);
   public static final Icon MAP_EXPORT_16 = IconLoader.get().getUIAwareIcon("map-export.svg", 16, 16);
   public static final Icon MAP_IDS_16 = IconLoader.get().getUIAwareIcon("map-ids.svg", 16, 16);
   public static final Icon MAP_IMPORT_16 = IconLoader.get().getUIAwareIcon("map-import.svg", 16, 16);
@@ -412,7 +412,7 @@ public final class Icons {
         } else if (accentColor != null) {
           base = accentColor;
         } else {
-          base = c != null && c.getForeground() != null ? c.getForeground() : new java.awt.Color(74, 222, 128);
+          base = c != null && c.getForeground() != null ? c.getForeground() : new java.awt.Color(226, 232, 240);
         }
 
         // Crisp Minimalist Folded Map Origami Silhouette
