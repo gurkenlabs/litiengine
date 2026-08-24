@@ -1041,12 +1041,7 @@ public class JavaLanguageService implements ScriptLanguageService {
         String sigKey = method.getName() + Arrays.toString(method.getParameterTypes());
         if (!seenMethods.add(sigKey)) continue;
 
-        java.lang.reflect.Parameter[] rawParams = method.getParameters();
-        List<Parameter> parameters = new ArrayList<>();
-        for (int i = 0; i < rawParams.length; i++) {
-          String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
-          parameters.add(new Parameter(pName, rawParams[i].getParameterizedType().getTypeName()));
-        }
+        List<Parameter> parameters = extractParameters(method);
         String detail = method.getName() + "(" + String.join(", ", parameters.stream()
           .map(parameter -> simpleName(parameter.type()) + " " + parameter.name()).toList()) + ")";
         String docs = "```java\n" + simpleName(method.getGenericReturnType().getTypeName()) + " " + owner + "." + detail + "\n```\n\n"
@@ -1367,43 +1362,50 @@ public class JavaLanguageService implements ScriptLanguageService {
     return count;
   }
 
-  private void addParameterCompletions(List<Completion> result, String prefix, ScriptDefinition definition, Map<String, Class<?>> variables, String source, Set<String> importedFqns, int importInsertLine) {
+  private record CallContext(String methodName, int argIndex, String currentArgPrefix, ResolvedType receiverType) {}
+
+  private Optional<CallContext> extractCallContext(String prefix, ScriptDefinition definition, Map<String, Class<?>> variables, String source) {
     int openParen = findUnclosedParen(prefix);
-    if (openParen < 0) return;
+    if (openParen < 0) return Optional.empty();
     String callPrefix = prefix.substring(0, openParen).trim();
     Matcher matcher = Pattern.compile("([A-Za-z_$][\\w$]*)$").matcher(callPrefix);
-    if (!matcher.find()) return;
+    if (!matcher.find()) return Optional.empty();
     String methodName = matcher.group(1);
     String argList = prefix.substring(openParen + 1);
     int argIndex = countTopLevelCommas(argList);
     String currentArgPrefix = argList.contains(",") ? argList.substring(argList.lastIndexOf(',') + 1).trim() : argList.trim();
     String receiverPrefix = callPrefix.substring(0, matcher.start(1));
     String receiverExpr = receiverExpression(receiverPrefix);
-    ResolvedType receiverType = receiverExpr == null ? this.scriptType(definition)
+    ResolvedType receiverType = receiverExpr == null ? this.scriptType(definition, source)
       : this.resolveExpression(receiverExpr, definition, variables, source);
-    if (receiverType == null || receiverType.type() == null) return;
+    if (receiverType == null || receiverType.type() == null) return Optional.empty();
+    return Optional.of(new CallContext(methodName, argIndex, currentArgPrefix, receiverType));
+  }
 
-    List<Method> matchingMethods = Arrays.stream(receiverType.type().getMethods())
-      .filter(m -> m.getName().equals(methodName))
+  private void addParameterCompletions(List<Completion> result, String prefix, ScriptDefinition definition, Map<String, Class<?>> variables, String source, Set<String> importedFqns, int importInsertLine) {
+    Optional<CallContext> callCtxOpt = extractCallContext(prefix, definition, variables, source);
+    if (callCtxOpt.isEmpty()) return;
+    CallContext ctx = callCtxOpt.get();
+
+    List<Method> matchingMethods = Arrays.stream(ctx.receiverType().type().getMethods())
+      .filter(m -> m.getName().equals(ctx.methodName()))
       .sorted(Comparator.comparingInt(Method::getParameterCount))
       .toList();
 
-    // 1. If at start of argument list (argIndex == 0 and currentArgPrefix is empty):
-    // Offer full parameter placeholder snippets for each overload
-    if (argIndex == 0 && currentArgPrefix.isEmpty()) {
+    // 1. If at start of argument list: offer full parameter placeholder snippets for each overload
+    if (ctx.argIndex() == 0 && ctx.currentArgPrefix().isEmpty()) {
       for (Method m : matchingMethods) {
         if (m.getParameterCount() > 0) {
-          java.lang.reflect.Parameter[] rawParams = m.getParameters();
+          List<Parameter> params = extractParameters(m);
           List<String> placeholders = new ArrayList<>();
           List<String> labels = new ArrayList<>();
-          for (int i = 0; i < rawParams.length; i++) {
-            String pName = formatParamName(rawParams[i], i, rawParams.length, methodName);
-            labels.add(pName);
-            placeholders.add("${" + (i + 1) + ":" + pName + "}");
+          for (int i = 0; i < params.size(); i++) {
+            labels.add(params.get(i).name());
+            placeholders.add("${" + (i + 1) + ":" + params.get(i).name() + "}");
           }
           String label = String.join(", ", labels);
           String snippet = String.join(", ", placeholders);
-          String detail = methodName + "(" + label + ") parameters";
+          String detail = ctx.methodName() + "(" + label + ") parameters";
           result.add(new Completion(label, CompletionKind.SNIPPET, detail,
             "Inserts parameter placeholders for `" + formatMethodSignature(m) + "`",
             snippet, simpleName(m.getGenericReturnType().getTypeName()), List.of(), List.of()));
@@ -1413,8 +1415,8 @@ public class JavaLanguageService implements ScriptLanguageService {
 
     // 2. Context-aware value suggestions for the active argument at argIndex:
     for (Method m : matchingMethods) {
-      if (m.getParameterCount() > argIndex) {
-        Class<?> paramType = m.getParameterTypes()[argIndex];
+      if (m.getParameterCount() > ctx.argIndex()) {
+        Class<?> paramType = m.getParameterTypes()[ctx.argIndex()];
 
         if (paramType == java.awt.Color.class) {
           List<TextEdit> colorEdits = importedFqns.contains("java.awt.Color") ? List.of()
@@ -1447,25 +1449,11 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private Optional<Class<?>> inferExpectedParameterType(String prefix, ScriptDefinition definition, Map<String, Class<?>> variables, String source) {
-    int openParen = findUnclosedParen(prefix);
-    if (openParen < 0) return Optional.empty();
-    String callPrefix = prefix.substring(0, openParen).trim();
-    Matcher matcher = Pattern.compile("([A-Za-z_$][\\w$]*)$").matcher(callPrefix);
-    if (!matcher.find()) return Optional.empty();
-    String methodName = matcher.group(1);
-    String argList = prefix.substring(openParen + 1);
-    int argIndex = countTopLevelCommas(argList);
-    String receiverPrefix = callPrefix.substring(0, matcher.start(1));
-    String receiverExpr = receiverExpression(receiverPrefix);
-    ResolvedType receiverType = receiverExpr == null ? this.scriptType(definition)
-      : this.resolveExpression(receiverExpr, definition, variables, source);
-    if (receiverType == null || receiverType.type() == null) return Optional.empty();
-    for (Method method : receiverType.type().getMethods()) {
-      if (method.getName().equals(methodName) && method.getParameterCount() > argIndex) {
-        return Optional.of(method.getParameterTypes()[argIndex]);
-      }
-    }
-    return Optional.empty();
+    return extractCallContext(prefix, definition, variables, source)
+      .flatMap(ctx -> Arrays.stream(ctx.receiverType().type().getMethods())
+        .filter(m -> m.getName().equals(ctx.methodName()) && m.getParameterCount() > ctx.argIndex())
+        .map(m -> m.getParameterTypes()[ctx.argIndex()])
+        .findFirst());
   }
 
   private static Completion anonymousClassCompletion(Class<?> type, List<TextEdit> edits) {
@@ -1591,27 +1579,25 @@ public class JavaLanguageService implements ScriptLanguageService {
     };
   }
 
-  private static String formatMethodSignature(Method method) {
-    java.lang.reflect.Parameter[] rawParams = method.getParameters();
-    List<String> paramStrings = new ArrayList<>();
-    for (int i = 0; i < rawParams.length; i++) {
-      String pType = simpleName(rawParams[i].getParameterizedType().getTypeName());
-      String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
-      paramStrings.add(pType + " " + pName);
-    }
-    return simpleName(method.getGenericReturnType().getTypeName()) + " " + method.getName() + "(" + String.join(", ", paramStrings) + ")";
-  }
-
-  private static Signature signature(Method method) {
+  private static List<Parameter> extractParameters(Method method) {
     java.lang.reflect.Parameter[] rawParams = method.getParameters();
     List<Parameter> parameters = new ArrayList<>();
     for (int i = 0; i < rawParams.length; i++) {
       String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
       parameters.add(new Parameter(pName, rawParams[i].getParameterizedType().getTypeName()));
     }
+    return parameters;
+  }
+
+  private static Signature signature(Method method) {
+    List<Parameter> parameters = extractParameters(method);
     String label = simpleName(method.getGenericReturnType().getTypeName()) + " " + method.getName() + "(" + String.join(", ", parameters.stream()
       .map(parameter -> simpleName(parameter.type()) + " " + parameter.name()).toList()) + ")";
     return new Signature(label, method.getGenericReturnType().getTypeName(), parameters);
+  }
+
+  private static String formatMethodSignature(Method method) {
+    return signature(method).label();
   }
 
   private void addAnnotationCompletions(List<Completion> result, String source, Set<String> importedFqns, int importInsertLine) {
