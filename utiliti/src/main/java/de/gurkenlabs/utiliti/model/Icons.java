@@ -340,19 +340,23 @@ public final class Icons {
           base = c != null && c.getForeground() != null ? c.getForeground() : new java.awt.Color(56, 189, 248);
         }
 
-        // Crisp Minimalist Event Lightning Spark
+        // Crisp Minimalist Event Lightning Spark with line-style stroke and subtle translucent fill
         double scale = size / 16.0;
         java.awt.geom.Path2D bolt = new java.awt.geom.Path2D.Double();
-        bolt.moveTo(x + 9.6 * scale, y + 1.8 * scale);
-        bolt.lineTo(x + 3.8 * scale, y + 8.6 * scale);
-        bolt.lineTo(x + 8.0 * scale, y + 8.6 * scale);
-        bolt.lineTo(x + 6.4 * scale, y + 14.2 * scale);
-        bolt.lineTo(x + 12.8 * scale, y + 7.4 * scale);
-        bolt.lineTo(x + 8.8 * scale, y + 7.4 * scale);
+        bolt.moveTo(x + 9.5 * scale, y + 1.8 * scale);
+        bolt.lineTo(x + 3.8 * scale, y + 8.5 * scale);
+        bolt.lineTo(x + 8.0 * scale, y + 8.5 * scale);
+        bolt.lineTo(x + 6.5 * scale, y + 14.2 * scale);
+        bolt.lineTo(x + 12.8 * scale, y + 7.5 * scale);
+        bolt.lineTo(x + 8.6 * scale, y + 7.5 * scale);
         bolt.closePath();
 
-        g2.setColor(base);
+        // Subtle translucent fill + crisp line-style stroke
+        g2.setColor(new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 65));
         g2.fill(bolt);
+        g2.setColor(base);
+        g2.setStroke(new java.awt.BasicStroke(1.25f * (float) scale, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
+        g2.draw(bolt);
 
         // Inherited badge link indicator (if inherited)
         if (inherited) {
@@ -415,7 +419,7 @@ public final class Icons {
           base = c != null && c.getForeground() != null ? c.getForeground() : new java.awt.Color(226, 232, 240);
         }
 
-        // Crisp Minimalist Folded Map Origami Silhouette
+        // Crisp Folded Map Origami with line-style stroke and subtle translucent panels
         double scale = size / 16.0;
 
         // Left Panel
@@ -442,19 +446,20 @@ public final class Icons {
         rightPanel.lineTo(x + 10.4 * scale, y + 13.6 * scale);
         rightPanel.closePath();
 
-        // Shaded folding for clear 2D silhouette
-        g2.setColor(base);
+        // Subtle translucent panel fills for gentle depth
+        g2.setColor(new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 35));
         g2.fill(leftPanel);
-        g2.setColor(new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 180));
+        g2.setColor(new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 75));
         g2.fill(centerPanel);
-        g2.setColor(base);
+        g2.setColor(new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 35));
         g2.fill(rightPanel);
 
-        // Subtle fold separation line
-        g2.setColor(new java.awt.Color(0, 0, 0, 45));
-        g2.setStroke(new java.awt.BasicStroke(0.9f * (float) scale, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
-        g2.drawLine((int) (x + 6.6 * scale), (int) (y + 2.4 * scale), (int) (x + 6.6 * scale), (int) (y + 11.8 * scale));
-        g2.drawLine((int) (x + 10.4 * scale), (int) (y + 4.2 * scale), (int) (x + 10.4 * scale), (int) (y + 13.6 * scale));
+        // Crisp line-style stroke (matches other toolbar icons)
+        g2.setColor(base);
+        g2.setStroke(new java.awt.BasicStroke(1.25f * (float) scale, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
+        g2.draw(leftPanel);
+        g2.draw(centerPanel);
+        g2.draw(rightPanel);
       } finally {
         g2.dispose();
       }
