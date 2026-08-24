@@ -106,12 +106,12 @@ public class JavaLanguageService implements ScriptLanguageService {
     if (annotParamMatcher.find()) {
       String annotName = annotParamMatcher.group(1);
       String paramsContent = annotParamMatcher.group(2);
-      this.addAnnotationAttributeCompletions(result, annotName, paramsContent, source);
+      ScriptAnnotationProvider.addAnnotationAttributeCompletions(result, annotName, paramsContent);
       return result;
     } else if (type != null) {
       addMembers(result, type);
     } else if (annotationContext) {
-      this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
+      ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
     } else if (constructorContext) {
 
       Optional<Class<?>> expectedParamType = this.inferExpectedParameterType(prefix, document.definition(), variables, source);
@@ -147,14 +147,14 @@ public class JavaLanguageService implements ScriptLanguageService {
       result.add(new Completion("globals", CompletionKind.FIELD, "ScriptGlobals",
         "Direct access to global shared game state map (`globals.put(...)`, `globals.get(...)`, `globals.onChanged(...)`).",
         "globals", ScriptGlobals.class.getName(), List.of(), List.of()));
-      addScriptScope(result, document.definition(), importedFqns, importInsertLine);
+      ScriptScope.addScriptScope(result, document.definition(), importedFqns, importInsertLine);
       ResolvedType scriptType = this.scriptType(document.definition(), source);
       if (scriptType != null) {
         addMembers(result, scriptType);
       }
       this.hostType(document.definition(), source).ifPresent(host -> addMembers(result, new ResolvedType(host, null, false)));
       if (!insideMethodArgs && (word.startsWith("@") || word.startsWith("Script") || word.startsWith("Prop"))) {
-        this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
+        ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
       }
 
       KEYWORDS.stream().sorted().forEach(keyword -> {
@@ -953,11 +953,11 @@ public class JavaLanguageService implements ScriptLanguageService {
     if (root.endsWith("()")) {
       String methodName = root.substring(0, root.length() - 2);
       if (methodName.equals("host")) return this.hostType(definition, source).map(t -> new ResolvedType(t, null, false)).orElse(null);
-      if (methodName.equals("context")) return new ResolvedType(ScriptContext.class, null, false);
-      if (methodName.equals("environment")) return new ResolvedType(Environment.class, null, false);
-      if (methodName.equals("globals")) return new ResolvedType(ScriptGlobals.class, null, false);
-      if (methodName.equals("ui")) return new ResolvedType(ScriptUiOverlay.class, null, false);
-      if (methodName.equals("camera")) return new ResolvedType(ICamera.class, null, false);
+      for (ScriptScope.RootFunction fn : ScriptScope.ROOT_FUNCTIONS) {
+        if (fn.name().equals(methodName)) {
+          return new ResolvedType(fn.returnType(), null, false);
+        }
+      }
 
       ResolvedType scriptType = this.scriptType(definition, source);
       if (scriptType != null && scriptType.type() != null) {
@@ -985,11 +985,10 @@ public class JavaLanguageService implements ScriptLanguageService {
       if (memberName.equals("host")) {
         return this.hostType(definition, source).map(t -> new ResolvedType(t, null, false)).orElse(new ResolvedType(Object.class, null, false));
       }
-      if (memberName.equals("ui")) {
-        return new ResolvedType(ScriptUiOverlay.class, null, false);
-      }
-      if (memberName.equals("camera")) {
-        return new ResolvedType(ICamera.class, null, false);
+      for (ScriptScope.RootFunction fn : ScriptScope.ROOT_FUNCTIONS) {
+        if (fn.name().equals(memberName)) {
+          return new ResolvedType(fn.returnType(), null, false);
+        }
       }
     }
     for (Method m : type.getMethods()) {
@@ -1002,22 +1001,6 @@ public class JavaLanguageService implements ScriptLanguageService {
       return new ResolvedType(f.getType(), f.getGenericType(), false);
     } catch (NoSuchFieldException ignored) {}
     return null;
-  }
-
-  private static void addScriptScope(List<Completion> result, ScriptDefinition definition, Set<String> importedFqns, int importInsertLine) {
-    String host = definition == null || definition.getTargetType() == null ? "Object" : simpleName(definition.getTargetType());
-    result.add(function("host", host, "The typed object controlled by this script."));
-    result.add(function("context", ScriptContext.class.getSimpleName(), "The current script attachment context."));
-    result.add(function("environment", Environment.class.getSimpleName(), "The host's current environment."));
-    result.add(function("globals", ScriptGlobals.class.getSimpleName(), "Direct access to the global shared state store."));
-    result.add(function("ui", ScriptUiOverlay.class.getSimpleName(), "Returns the ScriptUiOverlay service for floating text and banners."));
-    result.add(function("camera", "ICamera", "Returns the active camera controller for panning, zooming, and shaking."));
-
-    List<TextEdit> gameEdits = importedFqns != null && importedFqns.contains("de.gurkenlabs.litiengine.Game") ? List.of()
-      : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
-        "import de.gurkenlabs.litiengine.Game;\n"));
-    result.add(new Completion("Game", CompletionKind.CLASS, "de.gurkenlabs.litiengine.Game",
-      "The central LITIENGINE static entry point for game systems.", "Game", "Game", List.of(), gameEdits));
   }
 
   private static void addMembers(List<Completion> result, ResolvedType receiver) {
@@ -1176,74 +1159,11 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private Optional<Class<?>> hostType(ScriptDefinition definition, String source) {
-    if (source != null && !source.isBlank()) {
-      Matcher genericMatcher = Pattern.compile("(?m)\\bextends\\s+(?:EntityScript|CreatureScript|AbstractScript|PropScript)\\s*<\\s*([A-Za-z0-9_$]+)\\s*>").matcher(source);
-      if (genericMatcher.find()) {
-        Optional<Class<?>> fromExtends = this.resolveType(genericMatcher.group(1), source);
-        if (fromExtends.isPresent()) return fromExtends;
-      }
-      if (Pattern.compile("(?m)\\bextends\\s+CreatureScript\\b").matcher(source).find()) {
-        return Optional.of(de.gurkenlabs.litiengine.entities.Creature.class);
-      }
-      if (Pattern.compile("(?m)\\bextends\\s+EnvironmentScript\\b").matcher(source).find()) {
-        return Optional.of(de.gurkenlabs.litiengine.environment.Environment.class);
-      }
-      if (Pattern.compile("(?m)\\bextends\\s+GameScript\\b").matcher(source).find()) {
-        return Optional.of(de.gurkenlabs.litiengine.Game.class);
-      }
-      if (Pattern.compile("(?m)\\bextends\\s+EntityScript\\b").matcher(source).find()) {
-        return Optional.of(de.gurkenlabs.litiengine.entities.Entity.class);
-      }
-      Matcher targetMatcher = Pattern.compile("(?m)@ScriptInfo\\s*\\([^)]*target\\s*=\\s*([A-Za-z0-9_$]+)\\.class").matcher(source);
-      if (targetMatcher.find()) {
-        Optional<Class<?>> fromAnnotation = this.resolveType(targetMatcher.group(1), source);
-        if (fromAnnotation.isPresent()) return fromAnnotation;
-      }
-    }
-    if (definition != null && definition.getTargetType() != null && !definition.getTargetType().isBlank()) {
-      try {
-        return Optional.of(Class.forName(definition.getTargetType(), false, this.workspace.classLoader()));
-      } catch (ClassNotFoundException | LinkageError ignored) {
-        Optional<Class<?>> resolved = this.resolveType(definition.getTargetType(), "");
-        if (resolved.isPresent()) return resolved;
-      }
-    }
-    if (definition != null && definition.getHost() != null) {
-      return switch (definition.getHost()) {
-        case ENTITY -> Optional.of(de.gurkenlabs.litiengine.entities.Creature.class);
-        case ENVIRONMENT -> Optional.of(de.gurkenlabs.litiengine.environment.Environment.class);
-        case GAME -> Optional.of(de.gurkenlabs.litiengine.Game.class);
-      };
-    }
-    return Optional.empty();
+    return ScriptScope.inferHostType(definition, source, this.workspace.classLoader());
   }
 
   private ResolvedType scriptType(ScriptDefinition definition, String source) {
-    if (source != null && !source.isBlank()) {
-      if (Pattern.compile("(?m)\\bextends\\s+CreatureScript\\b").matcher(source).find()) {
-        return new ResolvedType(CreatureScript.class, null, false);
-      }
-      if (Pattern.compile("(?m)\\bextends\\s+EnvironmentScript\\b").matcher(source).find()) {
-        return new ResolvedType(EnvironmentScript.class, null, false);
-      }
-      if (Pattern.compile("(?m)\\bextends\\s+EntityScript\\b").matcher(source).find()) {
-        return new ResolvedType(EntityScript.class, null, false);
-      }
-      if (Pattern.compile("(?m)\\bextends\\s+GameScript\\b").matcher(source).find()) {
-        return new ResolvedType(GameScript.class, null, false);
-      }
-      if (Pattern.compile("(?m)\\bextends\\s+AbstractScript\\b").matcher(source).find()) {
-        return new ResolvedType(AbstractScript.class, null, false);
-      }
-    }
-    if (definition != null && definition.getHost() != null) {
-      return switch (definition.getHost()) {
-        case ENTITY -> new ResolvedType(CreatureScript.class, null, false);
-        case ENVIRONMENT -> new ResolvedType(EnvironmentScript.class, null, false);
-        case GAME -> new ResolvedType(GameScript.class, null, false);
-      };
-    }
-    return new ResolvedType(AbstractScript.class, null, false);
+    return new ResolvedType(ScriptScope.inferScriptType(definition, source), null, false);
   }
 
   private ResolvedType scriptType(ScriptDefinition definition) {
@@ -1417,33 +1337,7 @@ public class JavaLanguageService implements ScriptLanguageService {
     for (Method m : matchingMethods) {
       if (m.getParameterCount() > ctx.argIndex()) {
         Class<?> paramType = m.getParameterTypes()[ctx.argIndex()];
-
-        if (paramType == java.awt.Color.class) {
-          List<TextEdit> colorEdits = importedFqns.contains("java.awt.Color") ? List.of()
-            : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)), "import java.awt.Color;\n"));
-          for (String cName : List.of("RED", "GREEN", "BLUE", "YELLOW", "WHITE", "BLACK", "ORANGE", "CYAN", "MAGENTA", "GRAY", "DARK_GRAY", "LIGHT_GRAY", "PINK")) {
-            result.add(new Completion("Color." + cName, CompletionKind.FIELD, "Color", "Standard Color constant", "Color." + cName, "Color", List.of(), colorEdits));
-          }
-          result.add(new Completion("new Color(r, g, b)", CompletionKind.SNIPPET, "Custom Color", "Creates a custom RGB color", "new Color(${1:255}, ${2:0}, ${3:0})", "Color", List.of(), colorEdits));
-        } else if (paramType == de.gurkenlabs.litiengine.Direction.class) {
-          for (String dName : List.of("UP", "DOWN", "LEFT", "RIGHT", "UNDEFINED")) {
-            result.add(new Completion("Direction." + dName, CompletionKind.FIELD, "Direction", "Cardinal direction constant", "Direction." + dName, "Direction", List.of(), List.of()));
-          }
-        } else if (paramType == java.awt.geom.Point2D.class) {
-          result.add(new Completion("host().getCenter()", CompletionKind.METHOD, "Point2D", "Center coordinate of host entity", "host().getCenter()", "Point2D", List.of(), List.of()));
-          result.add(new Completion("host().getLocation()", CompletionKind.METHOD, "Point2D", "Location of host entity", "host().getLocation()", "Point2D", List.of(), List.of()));
-          result.add(new Completion("new Point2D.Double(x, y)", CompletionKind.SNIPPET, "Point2D", "Creates a new Point2D coordinate", "new Point2D.Double(${1:0}, ${2:0})", "Point2D", List.of(), List.of()));
-        } else if (de.gurkenlabs.litiengine.entities.IEntity.class.isAssignableFrom(paramType)) {
-          result.add(new Completion("host()", CompletionKind.METHOD, simpleName(paramType.getName()), "The current host entity", "host()", simpleName(paramType.getName()), List.of(), List.of()));
-        } else if (paramType == java.awt.Font.class) {
-          result.add(new Completion("new Font(name, style, size)", CompletionKind.SNIPPET, "Font", "Creates a custom Font", "new Font(${1:\"Arial\"}, Font.PLAIN, ${2:12})", "Font", List.of(), List.of()));
-        }
-
-        for (var entry : variables.entrySet()) {
-          if (paramType.isAssignableFrom(entry.getValue())) {
-            result.add(new Completion(entry.getKey(), CompletionKind.VARIABLE, entry.getValue().getSimpleName(), "Local variable", entry.getKey(), entry.getValue().getSimpleName(), List.of(), List.of()));
-          }
-        }
+        result.addAll(ScriptParameterSuggestionProvider.suggestForType(paramType, variables, importedFqns, importInsertLine));
       }
     }
   }
@@ -1531,62 +1425,8 @@ public class JavaLanguageService implements ScriptLanguageService {
     return 0;
   }
 
-  private static String formatParamName(java.lang.reflect.Parameter param, int index, int total, String methodName) {
-    String rawName = param.getName();
-    if (rawName != null && !rawName.startsWith("arg") && !rawName.isBlank()) {
-      return rawName;
-    }
-    String typeName = simpleName(param.getParameterizedType().getTypeName());
-    return switch (typeName) {
-      case "String" -> {
-        if (methodName.contains("Text") || methodName.contains("Message") || methodName.contains("Banner")) yield index == 0 ? "text" : "subtitle";
-        if (methodName.contains("Sound") || methodName.contains("Audio")) yield "soundName";
-        if (methodName.contains("Prop") || methodName.contains("Sprite")) yield "spriteSheet";
-        yield "name";
-      }
-      case "Point2D" -> methodName.contains("Pan") || methodName.contains("Move") ? "target" : "location";
-      case "Color" -> "color";
-      case "Font" -> "font";
-      case "IEntity", "Entity" -> "entity";
-      case "Creature" -> "creature";
-      case "Environment" -> "environment";
-      case "Direction" -> "direction";
-      case "Sound" -> "sound";
-      case "Graphics2D" -> "g";
-      case "int" -> {
-        if (methodName.contains("Pan") || methodName.contains("Shake") || methodName.contains("Duration")) yield "durationTicks";
-        if (methodName.contains("Zoom") || methodName.contains("Delay") || methodName.contains("Time") || methodName.contains("Text") || methodName.contains("Banner")) yield "durationMs";
-        if (index == 0 && total >= 2) yield "x";
-        if (index == 1 && total >= 2) yield "y";
-        yield "value";
-      }
-      case "double", "float" -> {
-        if (methodName.contains("Zoom")) yield "targetZoom";
-        if (methodName.contains("Shake")) yield "intensity";
-        if (methodName.contains("Velocity") || methodName.contains("Speed")) yield "velocity";
-        if (methodName.contains("Angle")) yield "angleDegrees";
-        if (index == 0 && total >= 2) yield "x";
-        if (index == 1 && total >= 2) yield "y";
-        yield "value";
-      }
-      case "boolean" -> "enabled";
-      default -> {
-        if (!typeName.isEmpty() && Character.isUpperCase(typeName.charAt(0))) {
-          yield Character.toLowerCase(typeName.charAt(0)) + typeName.substring(1);
-        }
-        yield "arg" + index;
-      }
-    };
-  }
-
   private static List<Parameter> extractParameters(Method method) {
-    java.lang.reflect.Parameter[] rawParams = method.getParameters();
-    List<Parameter> parameters = new ArrayList<>();
-    for (int i = 0; i < rawParams.length; i++) {
-      String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
-      parameters.add(new Parameter(pName, rawParams[i].getParameterizedType().getTypeName()));
-    }
-    return parameters;
+    return ScriptParameterNamer.extractParameters(method);
   }
 
   private static Signature signature(Method method) {
@@ -1601,53 +1441,7 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private void addAnnotationCompletions(List<Completion> result, String source, Set<String> importedFqns, int importInsertLine) {
-    List<TextEdit> propEdits = (importedFqns.contains(ScriptProperty.class.getName()) || isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) ? List.of()
-      : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
-        "import " + ScriptProperty.class.getName() + ";\n"));
-
-    result.add(new Completion("ScriptProperty", CompletionKind.PROPERTY, ScriptProperty.class.getName(),
-      "Exports this field to the utiLITI inspector for live configuration and map persistence.",
-      "ScriptProperty", ScriptProperty.class.getName(), List.of(), propEdits));
-
-    result.add(new Completion("@ScriptProperty", CompletionKind.PROPERTY, ScriptProperty.class.getName(),
-      "Exports this field to the utiLITI inspector for live configuration and map persistence.",
-      "@ScriptProperty", ScriptProperty.class.getName(), List.of(), propEdits));
-
-    result.add(new Completion("ScriptProperty(...)", CompletionKind.SNIPPET, "@ScriptProperty(name = \"...\", description = \"...\")",
-      "Snippet for @ScriptProperty with configurable metadata attributes.",
-      "ScriptProperty(name = \"${1:name}\", description = \"${2:description}\")", ScriptProperty.class.getName(), List.of(), propEdits));
-
-    result.add(new Completion("@ScriptProperty(...)", CompletionKind.SNIPPET, "@ScriptProperty(name = \"...\", description = \"...\")",
-      "Snippet for @ScriptProperty with configurable metadata attributes.",
-      "@ScriptProperty(name = \"${1:name}\", description = \"${2:description}\")", ScriptProperty.class.getName(), List.of(), propEdits));
-
-    result.add(new Completion("scriptproperty", CompletionKind.SNIPPET, "Property field template",
-      "Generates an annotated @ScriptProperty field.",
-      "@ScriptProperty\nprivate ${1:int} ${2:propertyName};\n", ScriptProperty.class.getName(), List.of(), propEdits));
-
-    result.add(new Completion("prop", CompletionKind.SNIPPET, "Property field template",
-      "Generates an annotated @ScriptProperty field.",
-      "@ScriptProperty\nprivate ${1:int} ${2:propertyName};\n", ScriptProperty.class.getName(), List.of(), propEdits));
-
-    List<TextEdit> infoEdits = (importedFqns.contains(ScriptInfo.class.getName()) || isPackageWildcardImported("de.gurkenlabs.litiengine.scripting", source)) ? List.of()
-      : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
-        "import " + ScriptInfo.class.getName() + ";\n"));
-
-    result.add(new Completion("ScriptInfo", CompletionKind.CLASS, ScriptInfo.class.getName(),
-      "Declares the script identifier, host type, and target entity class.",
-      "ScriptInfo", ScriptInfo.class.getName(), List.of(), infoEdits));
-
-    result.add(new Completion("@ScriptInfo", CompletionKind.CLASS, ScriptInfo.class.getName(),
-      "Declares the script identifier, host type, and target entity class.",
-      "@ScriptInfo", ScriptInfo.class.getName(), List.of(), infoEdits));
-
-    result.add(new Completion("ScriptInfo(...)", CompletionKind.SNIPPET, "@ScriptInfo(id = \"...\", host = ...)",
-      "Snippet for @ScriptInfo declaration.",
-      "ScriptInfo(id = \"${1:id}\", host = ScriptHostType.${2|GAME,ENVIRONMENT,ENTITY|})", ScriptInfo.class.getName(), List.of(), infoEdits));
-
-    result.add(new Completion("@ScriptInfo(...)", CompletionKind.SNIPPET, "@ScriptInfo(id = \"...\", host = ...)",
-      "Snippet for @ScriptInfo declaration.",
-      "@ScriptInfo(id = \"${1:id}\", host = ScriptHostType.${2|GAME,ENVIRONMENT,ENTITY|})", ScriptInfo.class.getName(), List.of(), infoEdits));
+    ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
 
     result.add(new Completion("Override", CompletionKind.CLASS, "java.lang.Override",
       "Indicates that a method declaration is intended to override a method declaration in a supertype.",
@@ -1686,60 +1480,14 @@ public class JavaLanguageService implements ScriptLanguageService {
   }
 
   private void addAnnotationAttributeCompletions(List<Completion> result, String annotName, String paramsContent, String source) {
-    int lastComma = paramsContent.lastIndexOf(',');
-    String clause = lastComma >= 0 ? paramsContent.substring(lastComma + 1).strip() : paramsContent.strip();
-    if (clause.contains("=")) {
-      if (clause.startsWith("required") || clause.contains("required")) {
-        result.add(new Completion("true", CompletionKind.KEYWORD, "boolean", "Required property", "true", "boolean", List.of(), List.of()));
-        result.add(new Completion("false", CompletionKind.KEYWORD, "boolean", "Optional property", "false", "boolean", List.of(), List.of()));
-      }
-      return;
-    }
-    String word = currentWord(clause);
-
-    if (annotName.equals("ScriptProperty") || annotName.endsWith(".ScriptProperty")) {
-      List<Completion> attrs = List.of(
-        new Completion("defaultValue", CompletionKind.PROPERTY, "String - Initial fallback value", "Initial fallback value when not overridden in utiLITI", "defaultValue = \"$1\"", "String", List.of(), List.of()),
-        new Completion("name", CompletionKind.PROPERTY, "String - Inspector label", "Display label shown in the utiLITI inspector", "name = \"$1\"", "String", List.of(), List.of()),
-        new Completion("description", CompletionKind.PROPERTY, "String - Help tooltip", "Help description tooltip shown on hover in utiLITI", "description = \"$1\"", "String", List.of(), List.of()),
-        new Completion("category", CompletionKind.PROPERTY, "String - Inspector category", "Inspector section / grouping header (default: \"Script\")", "category = \"$1\"", "String", List.of(), List.of()),
-        new Completion("min", CompletionKind.PROPERTY, "double - Minimum numeric bound", "Minimum numeric value boundary for sliders/spinners", "min = $1", "double", List.of(), List.of()),
-        new Completion("max", CompletionKind.PROPERTY, "double - Maximum numeric bound", "Maximum numeric value boundary for sliders/spinners", "max = $1", "double", List.of(), List.of()),
-        new Completion("unit", CompletionKind.PROPERTY, "String - Unit label", "Unit label shown next to the input (e.g. \"px\", \"sec\", \"%\")", "unit = \"$1\"", "String", List.of(), List.of()),
-        new Completion("required", CompletionKind.PROPERTY, "boolean - Mandatory flag", "Flags the property as mandatory in the inspector", "required = true", "boolean", List.of(), List.of())
-      );
-      for (Completion attr : attrs) {
-        if (word.isEmpty() || matchesPrefix(attr.label(), word)) {
-          result.add(attr);
-        }
-      }
-      return;
-    }
-
-    if (annotName.equals("ScriptInfo") || annotName.endsWith(".ScriptInfo")) {
-      List<Completion> attrs = List.of(
-        new Completion("name", CompletionKind.PROPERTY, "String - Script name", "Display name of the script", "name = \"$1\"", "String", List.of(), List.of()),
-        new Completion("description", CompletionKind.PROPERTY, "String - Script description", "Summary description of what the script does", "description = \"$1\"", "String", List.of(), List.of()),
-        new Completion("author", CompletionKind.PROPERTY, "String - Author", "Author or creator of the script", "author = \"$1\"", "String", List.of(), List.of()),
-        new Completion("version", CompletionKind.PROPERTY, "String - Version", "Semantic version of the script", "version = \"$1\"", "String", List.of(), List.of()),
-        new Completion("category", CompletionKind.PROPERTY, "String - Category", "Category grouping for the script", "category = \"$1\"", "String", List.of(), List.of())
-      );
-      for (Completion attr : attrs) {
-        if (word.isEmpty() || matchesPrefix(attr.label(), word)) {
-          result.add(attr);
-        }
-      }
-      return;
-    }
+    ScriptAnnotationProvider.addAnnotationAttributeCompletions(result, annotName, paramsContent);
 
     this.resolveType(annotName, source).ifPresent(annotClass -> {
-      if (annotClass.isAnnotation()) {
+      if (annotClass.isAnnotation() && !annotClass.equals(ScriptProperty.class) && !annotClass.equals(ScriptInfo.class)) {
         for (Method m : annotClass.getDeclaredMethods()) {
-          if (word.isEmpty() || matchesPrefix(m.getName(), word)) {
-            String insert = m.getReturnType().equals(String.class) ? m.getName() + " = \"$1\"" : m.getName() + " = $1";
-            result.add(new Completion(m.getName(), CompletionKind.PROPERTY, m.getReturnType().getSimpleName(),
-              "Annotation attribute `" + m.getName() + "`", insert, m.getReturnType().getSimpleName(), List.of(), List.of()));
-          }
+          String insert = m.getReturnType().equals(String.class) ? m.getName() + " = \"$1\"" : m.getName() + " = $1";
+          result.add(new Completion(m.getName(), CompletionKind.PROPERTY, m.getReturnType().getSimpleName(),
+            "Annotation attribute `" + m.getName() + "`", insert, m.getReturnType().getSimpleName(), List.of(), List.of()));
         }
       }
     });
