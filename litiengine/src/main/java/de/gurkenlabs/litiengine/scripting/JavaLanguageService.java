@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.scripting;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.scripting.ui.ScriptUiOverlay;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,7 +148,11 @@ public class JavaLanguageService implements ScriptLanguageService {
         "Direct access to global shared game state map (`globals.put(...)`, `globals.get(...)`, `globals.onChanged(...)`).",
         "globals", ScriptGlobals.class.getName(), List.of(), List.of()));
       addScriptScope(result, document.definition(), importedFqns, importInsertLine);
-      this.hostType(document.definition()).ifPresent(host -> addMembers(result, new ResolvedType(host, null, false)));
+      ResolvedType scriptType = this.scriptType(document.definition(), source);
+      if (scriptType != null) {
+        addMembers(result, scriptType);
+      }
+      this.hostType(document.definition(), source).ifPresent(host -> addMembers(result, new ResolvedType(host, null, false)));
       if (!insideMethodArgs && (word.startsWith("@") || word.startsWith("Script") || word.startsWith("Prop"))) {
         this.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
       }
@@ -921,7 +927,7 @@ public class JavaLanguageService implements ScriptLanguageService {
     ResolvedType current = resolveRoot(root, definition, variables, source);
     if (current == null) return null;
     for (int index = 1; index < chain.size(); index++) {
-      current = resolveMember(current, chain.get(index), source, this.workspace.classLoader());
+      current = resolveMember(current, chain.get(index), source, this.workspace.classLoader(), definition);
       if (current == null) return null;
     }
     return current;
@@ -950,8 +956,21 @@ public class JavaLanguageService implements ScriptLanguageService {
       if (methodName.equals("context")) return new ResolvedType(ScriptContext.class, null, false);
       if (methodName.equals("environment")) return new ResolvedType(Environment.class, null, false);
       if (methodName.equals("globals")) return new ResolvedType(ScriptGlobals.class, null, false);
+      if (methodName.equals("ui")) return new ResolvedType(ScriptUiOverlay.class, null, false);
+      if (methodName.equals("camera")) return new ResolvedType(ICamera.class, null, false);
+
+      ResolvedType scriptType = this.scriptType(definition, source);
+      if (scriptType != null && scriptType.type() != null) {
+        for (Method m : scriptType.type().getMethods()) {
+          if (m.getName().equals(methodName)) {
+            return new ResolvedType(m.getReturnType(), m.getGenericReturnType(), false);
+          }
+        }
+      }
     }
     if (root.equals("this") || root.equals("super")) {
+      ResolvedType scriptType = this.scriptType(definition, source);
+      if (scriptType != null) return scriptType;
       return this.hostType(definition, source).map(t -> new ResolvedType(t, null, false)).orElse(null);
     }
     Class<?> varType = variables.get(root);
@@ -959,9 +978,20 @@ public class JavaLanguageService implements ScriptLanguageService {
     return this.resolveType(root, source).map(t -> new ResolvedType(t, null, true)).orElse(null);
   }
 
-  private ResolvedType resolveMember(ResolvedType receiver, String memberCall, String source, ClassLoader loader) {
+  private ResolvedType resolveMember(ResolvedType receiver, String memberCall, String source, ClassLoader loader, ScriptDefinition definition) {
     String memberName = memberCall.endsWith("()") ? memberCall.substring(0, memberCall.length() - 2) : memberCall;
     Class<?> type = receiver.type();
+    if (ScriptContext.class.isAssignableFrom(type) || AbstractScript.class.isAssignableFrom(type)) {
+      if (memberName.equals("host")) {
+        return this.hostType(definition, source).map(t -> new ResolvedType(t, null, false)).orElse(new ResolvedType(Object.class, null, false));
+      }
+      if (memberName.equals("ui")) {
+        return new ResolvedType(ScriptUiOverlay.class, null, false);
+      }
+      if (memberName.equals("camera")) {
+        return new ResolvedType(ICamera.class, null, false);
+      }
+    }
     for (Method m : type.getMethods()) {
       if (m.getName().equals(memberName)) {
         return new ResolvedType(m.getReturnType(), m.getGenericReturnType(), false);
@@ -1000,46 +1030,62 @@ public class JavaLanguageService implements ScriptLanguageService {
     List<Completion> all = new ArrayList<>();
     List<Completion> statics = new ArrayList<>();
     String owner = simpleName(type.getName());
-    for (Method method : type.getMethods()) {
-      java.lang.reflect.Parameter[] rawParams = method.getParameters();
-      List<Parameter> parameters = new ArrayList<>();
-      for (int i = 0; i < rawParams.length; i++) {
-        String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
-        parameters.add(new Parameter(pName, rawParams[i].getParameterizedType().getTypeName()));
-      }
-      String detail = method.getName() + "(" + String.join(", ", parameters.stream()
-        .map(parameter -> simpleName(parameter.type()) + " " + parameter.name()).toList()) + ")";
-      String docs = "```java\n" + simpleName(method.getGenericReturnType().getTypeName()) + " " + owner + "." + detail + "\n```\n\n"
-        + "Declared in `" + method.getDeclaringClass().getName() + "`";
-      String methodDoc = ScriptDocumentation.getMethodDoc(method.getName());
-      if (!methodDoc.isBlank()) {
-        docs += "\n\n" + methodDoc;
-      }
-      String insertText;
-      if (parameters.isEmpty()) {
-        insertText = method.getName() + "()";
-      } else {
-        List<String> placeholders = new ArrayList<>();
-        for (int i = 0; i < parameters.size(); i++) {
-          placeholders.add("${" + (i + 1) + ":" + parameters.get(i).name() + "}");
+
+    Set<String> seenMethods = new HashSet<>();
+    Set<String> seenFields = new HashSet<>();
+
+    for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
+      for (Method method : c.getDeclaredMethods()) {
+        int mod = method.getModifiers();
+        if (Modifier.isPrivate(mod) || method.isSynthetic()) continue;
+        String sigKey = method.getName() + Arrays.toString(method.getParameterTypes());
+        if (!seenMethods.add(sigKey)) continue;
+
+        java.lang.reflect.Parameter[] rawParams = method.getParameters();
+        List<Parameter> parameters = new ArrayList<>();
+        for (int i = 0; i < rawParams.length; i++) {
+          String pName = formatParamName(rawParams[i], i, rawParams.length, method.getName());
+          parameters.add(new Parameter(pName, rawParams[i].getParameterizedType().getTypeName()));
         }
-        insertText = method.getName() + "(" + String.join(", ", placeholders) + ")";
+        String detail = method.getName() + "(" + String.join(", ", parameters.stream()
+          .map(parameter -> simpleName(parameter.type()) + " " + parameter.name()).toList()) + ")";
+        String docs = "```java\n" + simpleName(method.getGenericReturnType().getTypeName()) + " " + owner + "." + detail + "\n```\n\n"
+          + "Declared in `" + method.getDeclaringClass().getName() + "`";
+        String methodDoc = ScriptDocumentation.getMethodDoc(method.getName());
+        if (!methodDoc.isBlank()) {
+          docs += "\n\n" + methodDoc;
+        }
+        String insertText;
+        if (parameters.isEmpty()) {
+          insertText = method.getName() + "()";
+        } else {
+          List<String> placeholders = new ArrayList<>();
+          for (int i = 0; i < parameters.size(); i++) {
+            placeholders.add("${" + (i + 1) + ":" + parameters.get(i).name() + "}");
+          }
+          insertText = method.getName() + "(" + String.join(", ", placeholders) + ")";
+        }
+        Completion completion = new Completion(method.getName(), CompletionKind.METHOD, detail, docs, insertText,
+          method.getGenericReturnType().getTypeName(), parameters, List.of());
+        all.add(completion);
+        if (Modifier.isStatic(method.getModifiers())) {
+          statics.add(completion);
+        }
       }
-      Completion completion = new Completion(method.getName(), CompletionKind.METHOD, detail, docs, insertText,
-        method.getGenericReturnType().getTypeName(), parameters, List.of());
-      all.add(completion);
-      if (Modifier.isStatic(method.getModifiers())) {
-        statics.add(completion);
-      }
-    }
-    for (Field field : type.getFields()) {
-      String docs = "```java\n" + simpleName(field.getGenericType().getTypeName()) + " " + owner + "." + field.getName() + "\n```\n\n"
-        + "Declared in `" + field.getDeclaringClass().getName() + "`";
-      Completion completion = new Completion(field.getName(), CompletionKind.FIELD, field.getGenericType().getTypeName(), docs,
-        field.getName(), field.getGenericType().getTypeName(), List.of(), List.of());
-      all.add(completion);
-      if (Modifier.isStatic(field.getModifiers())) {
-        statics.add(completion);
+
+      for (Field field : c.getDeclaredFields()) {
+        int mod = field.getModifiers();
+        if (Modifier.isPrivate(mod) || field.isSynthetic()) continue;
+        if (!seenFields.add(field.getName())) continue;
+
+        String docs = "```java\n" + simpleName(field.getGenericType().getTypeName()) + " " + owner + "." + field.getName() + "\n```\n\n"
+          + "Declared in `" + field.getDeclaringClass().getName() + "`";
+        Completion completion = new Completion(field.getName(), CompletionKind.FIELD, field.getGenericType().getTypeName(), docs,
+          field.getName(), field.getGenericType().getTypeName(), List.of(), List.of());
+        all.add(completion);
+        if (Modifier.isStatic(field.getModifiers())) {
+          statics.add(completion);
+        }
       }
     }
     return new CachedMembers(List.copyOf(all), List.copyOf(statics));
@@ -1136,10 +1182,22 @@ public class JavaLanguageService implements ScriptLanguageService {
 
   private Optional<Class<?>> hostType(ScriptDefinition definition, String source) {
     if (source != null && !source.isBlank()) {
-      Matcher extendsMatcher = Pattern.compile("(?m)\\bextends\\s+(?:EntityScript|CreatureScript|AbstractScript)\\s*<\\s*([A-Za-z0-9_$]+)\\s*>").matcher(source);
-      if (extendsMatcher.find()) {
-        Optional<Class<?>> fromExtends = this.resolveType(extendsMatcher.group(1), source);
+      Matcher genericMatcher = Pattern.compile("(?m)\\bextends\\s+(?:EntityScript|CreatureScript|AbstractScript|PropScript)\\s*<\\s*([A-Za-z0-9_$]+)\\s*>").matcher(source);
+      if (genericMatcher.find()) {
+        Optional<Class<?>> fromExtends = this.resolveType(genericMatcher.group(1), source);
         if (fromExtends.isPresent()) return fromExtends;
+      }
+      if (Pattern.compile("(?m)\\bextends\\s+CreatureScript\\b").matcher(source).find()) {
+        return Optional.of(de.gurkenlabs.litiengine.entities.Creature.class);
+      }
+      if (Pattern.compile("(?m)\\bextends\\s+EnvironmentScript\\b").matcher(source).find()) {
+        return Optional.of(de.gurkenlabs.litiengine.environment.Environment.class);
+      }
+      if (Pattern.compile("(?m)\\bextends\\s+GameScript\\b").matcher(source).find()) {
+        return Optional.of(de.gurkenlabs.litiengine.Game.class);
+      }
+      if (Pattern.compile("(?m)\\bextends\\s+EntityScript\\b").matcher(source).find()) {
+        return Optional.of(de.gurkenlabs.litiengine.entities.Entity.class);
       }
       Matcher targetMatcher = Pattern.compile("(?m)@ScriptInfo\\s*\\([^)]*target\\s*=\\s*([A-Za-z0-9_$]+)\\.class").matcher(source);
       if (targetMatcher.find()) {
@@ -1147,16 +1205,54 @@ public class JavaLanguageService implements ScriptLanguageService {
         if (fromAnnotation.isPresent()) return fromAnnotation;
       }
     }
-    if (definition == null || definition.getTargetType() == null || definition.getTargetType().isBlank()) return Optional.empty();
-    try {
-      return Optional.of(Class.forName(definition.getTargetType(), false, this.workspace.classLoader()));
-    } catch (ClassNotFoundException | LinkageError ignored) {
-      return this.resolveType(definition.getTargetType(), "");
+    if (definition != null && definition.getTargetType() != null && !definition.getTargetType().isBlank()) {
+      try {
+        return Optional.of(Class.forName(definition.getTargetType(), false, this.workspace.classLoader()));
+      } catch (ClassNotFoundException | LinkageError ignored) {
+        Optional<Class<?>> resolved = this.resolveType(definition.getTargetType(), "");
+        if (resolved.isPresent()) return resolved;
+      }
     }
+    if (definition != null && definition.getHost() != null) {
+      return switch (definition.getHost()) {
+        case ENTITY -> Optional.of(de.gurkenlabs.litiengine.entities.Creature.class);
+        case ENVIRONMENT -> Optional.of(de.gurkenlabs.litiengine.environment.Environment.class);
+        case GAME -> Optional.of(de.gurkenlabs.litiengine.Game.class);
+      };
+    }
+    return Optional.empty();
+  }
+
+  private ResolvedType scriptType(ScriptDefinition definition, String source) {
+    if (source != null && !source.isBlank()) {
+      if (Pattern.compile("(?m)\\bextends\\s+CreatureScript\\b").matcher(source).find()) {
+        return new ResolvedType(CreatureScript.class, null, false);
+      }
+      if (Pattern.compile("(?m)\\bextends\\s+EnvironmentScript\\b").matcher(source).find()) {
+        return new ResolvedType(EnvironmentScript.class, null, false);
+      }
+      if (Pattern.compile("(?m)\\bextends\\s+EntityScript\\b").matcher(source).find()) {
+        return new ResolvedType(EntityScript.class, null, false);
+      }
+      if (Pattern.compile("(?m)\\bextends\\s+GameScript\\b").matcher(source).find()) {
+        return new ResolvedType(GameScript.class, null, false);
+      }
+      if (Pattern.compile("(?m)\\bextends\\s+AbstractScript\\b").matcher(source).find()) {
+        return new ResolvedType(AbstractScript.class, null, false);
+      }
+    }
+    if (definition != null && definition.getHost() != null) {
+      return switch (definition.getHost()) {
+        case ENTITY -> new ResolvedType(CreatureScript.class, null, false);
+        case ENVIRONMENT -> new ResolvedType(EnvironmentScript.class, null, false);
+        case GAME -> new ResolvedType(GameScript.class, null, false);
+      };
+    }
+    return new ResolvedType(AbstractScript.class, null, false);
   }
 
   private ResolvedType scriptType(ScriptDefinition definition) {
-    return this.hostType(definition).map(type -> new ResolvedType(type, null, false)).orElse(null);
+    return this.scriptType(definition, null);
   }
 
   private List<String> buildCompilerClasspath() {

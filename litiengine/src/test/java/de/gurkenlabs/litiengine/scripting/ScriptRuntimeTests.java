@@ -817,6 +817,82 @@ class ScriptRuntimeTests {
   }
 
   @Test
+  void javaLanguageServiceAutocompletesHelperMethodsAndContextChains() {
+    ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
+    JavaLanguageService service = new JavaLanguageService(workspace);
+
+    ScriptDefinition definition = new ScriptDefinition("HelperMethodsTest", "java", null, "HelperMethodsTest", ScriptHostType.ENTITY);
+
+    String code = """
+      import de.gurkenlabs.litiengine.scripting.*;
+      public class HelperMethodsTest extends CreatureScript {
+        @Override
+        public void update() {
+          // Test direct helper method calls
+          ui().
+          camera().
+          host().
+          context().
+          context().ui().
+          context().camera().
+          context().host().
+          this.
+          this.ui().
+          this.camera().
+        }
+      }
+      """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
+
+    // 1. ui().
+    var uiCompletions = service.complete(doc, new ScriptLanguageService.Position(5, 9));
+    assertTrue(uiCompletions.stream().anyMatch(c -> c.label().equals("floatText")), "ui(). should autocomplete floatText");
+    assertTrue(uiCompletions.stream().anyMatch(c -> c.label().equals("showBanner")), "ui(). should autocomplete showBanner");
+
+    // 2. camera().
+    var cameraCompletions = service.complete(doc, new ScriptLanguageService.Position(6, 13));
+    assertTrue(cameraCompletions.stream().anyMatch(c -> c.label().equals("shake")), "camera(). should autocomplete shake");
+    assertTrue(cameraCompletions.stream().anyMatch(c -> c.label().equals("pan")), "camera(). should autocomplete pan");
+
+    // 3. host().
+    var hostCompletions = service.complete(doc, new ScriptLanguageService.Position(7, 11));
+    assertTrue(hostCompletions.stream().anyMatch(c -> c.label().equals("setAngle")), "host(). should autocomplete Creature methods like setAngle");
+    assertTrue(hostCompletions.stream().anyMatch(c -> c.label().equals("getHitPoints")), "host(). should autocomplete Creature methods like getHitPoints");
+
+    // 4. context().
+    var contextCompletions = service.complete(doc, new ScriptLanguageService.Position(8, 14));
+    assertTrue(contextCompletions.stream().anyMatch(c -> c.label().equals("ui")), "context(). should autocomplete ui");
+    assertTrue(contextCompletions.stream().anyMatch(c -> c.label().equals("camera")), "context(). should autocomplete camera");
+    assertTrue(contextCompletions.stream().anyMatch(c -> c.label().equals("host")), "context(). should autocomplete host");
+
+    // 5. context().ui().
+    var contextUiCompletions = service.complete(doc, new ScriptLanguageService.Position(9, 19));
+    assertTrue(contextUiCompletions.stream().anyMatch(c -> c.label().equals("floatText")), "context().ui(). should autocomplete floatText");
+
+    // 6. context().camera().
+    var contextCameraCompletions = service.complete(doc, new ScriptLanguageService.Position(10, 23));
+    assertTrue(contextCameraCompletions.stream().anyMatch(c -> c.label().equals("shake")), "context().camera(). should autocomplete shake");
+
+    // 7. context().host().
+    var contextHostCompletions = service.complete(doc, new ScriptLanguageService.Position(11, 21));
+    assertTrue(contextHostCompletions.stream().anyMatch(c -> c.label().equals("setAngle")), "context().host(). should autocomplete Creature methods");
+
+    // 8. this.
+    var thisCompletions = service.complete(doc, new ScriptLanguageService.Position(12, 9));
+    assertTrue(thisCompletions.stream().anyMatch(c -> c.label().equals("ui")), "this. should autocomplete ui");
+    assertTrue(thisCompletions.stream().anyMatch(c -> c.label().equals("camera")), "this. should autocomplete camera");
+    assertTrue(thisCompletions.stream().anyMatch(c -> c.label().equals("host")), "this. should autocomplete host");
+    assertTrue(thisCompletions.stream().anyMatch(c -> c.label().equals("context")), "this. should autocomplete context");
+
+    // 9. this.ui(). and this.camera().
+    var thisUiCompletions = service.complete(doc, new ScriptLanguageService.Position(13, 14));
+    assertTrue(thisUiCompletions.stream().anyMatch(c -> c.label().equals("floatText")), "this.ui(). should autocomplete floatText");
+    var thisCameraCompletions = service.complete(doc, new ScriptLanguageService.Position(14, 18));
+    assertTrue(thisCameraCompletions.stream().anyMatch(c -> c.label().equals("shake")), "this.camera(). should autocomplete shake");
+  }
+
+  @Test
   void javaLanguageServiceFixesCyclicInheritance() {
     ScriptLanguageService.Workspace workspace = new ScriptLanguageService.Workspace(null, getClass().getClassLoader(), java.util.Map.of());
     JavaLanguageService service = new JavaLanguageService(workspace);
