@@ -459,7 +459,9 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    this.loadEnvironment((TmxMap) Game.world().environment().getMap());
+    TmxMap map = (TmxMap) Game.world().environment().getMap();
+    this.environments.remove(map);
+    this.loadEnvironment(map);
   }
 
   public void add(IMapObject mapObject) {
@@ -1100,7 +1102,9 @@ public class MapComponent extends GuiComponent {
   }
 
   public void refreshInspector() {
-    UI.getInspector().bindAll(inspectorSelection(getFocusedMapObject()));
+    if (UI.getInspector() != null) {
+      UI.getInspector().bindAll(inspectorSelection(getFocusedMapObject()));
+    }
   }
 
   private List<IMapObject> inspectorSelection(IMapObject focused) {
