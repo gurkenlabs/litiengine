@@ -251,6 +251,12 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     if (hasAnimation(animName)) {
       return animName;
     }
+    if (state.getOpposite() == CreatureAnimationState.MOVE) {
+      animName = getWalkSpriteName(dir);
+      if (hasAnimation(animName)) {
+        return animName;
+      }
+    }
 
     // search for any animation for the specified state with dir information
     for (Direction d : Direction.values()) {

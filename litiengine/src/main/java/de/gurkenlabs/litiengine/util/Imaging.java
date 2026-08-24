@@ -391,6 +391,10 @@ public final class Imaging {
       return null;
     }
 
+    if (GraphicsEnvironment.isHeadless()) {
+      return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    }
+
     if (graphicsConfig == null) {
       final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
       final GraphicsDevice device = env.getDefaultScreenDevice();
@@ -404,21 +408,25 @@ public final class Imaging {
    * Gets a two dimensional grid that contains parts of the specified image. Splits up the specified image into a grid with the defined number of rows
    * and columns.
    *
-   * @param image   The base image that will be split up.
-   * @param rows    The number of rows.
-   * @param columns The number or columns.
-   * @return A two dimensional array with all the sub-images.
+   * @param image the image
+   * @param rows  the rows
+   * @param cols  the cols
+   * @return the two dimensional array containing the sub-images
    */
   public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
-    final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
-    final int smallWidth = image.getWidth() / columns;
-    final int smallHeight = image.getHeight() / rows;
+    if (image == null || rows <= 0 || columns <= 0) {
+      return new BufferedImage[0][0];
+    }
 
+    final int chunkWidth = image.getWidth() / columns;
+    final int chunkHeight = image.getHeight() / rows;
+
+    final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
     for (int y = 0; y < rows; y++) {
       for (int x = 0; x < columns; x++) {
-        final int cellX = x * smallWidth;
-        final int cellY = y * smallHeight;
-        smallImages[y][x] = image.getSubimage(cellX, cellY, smallWidth, smallHeight);
+        final int cellX = x * chunkWidth;
+        final int cellY = y * chunkHeight;
+        smallImages[y][x] = image.getSubimage(cellX, cellY, chunkWidth, chunkHeight);
       }
     }
 
@@ -432,6 +440,9 @@ public final class Imaging {
    * @return The horizontally flipped image.
    */
   public static BufferedImage horizontalFlip(final BufferedImage img) {
+    if (img == null) {
+      return null;
+    }
     final int w = img.getWidth();
     final int h = img.getHeight();
     if (w == 0 || h == 0) {
@@ -452,6 +463,9 @@ public final class Imaging {
    * @return The vertically flipped image.
    */
   public static BufferedImage verticalFlip(final BufferedImage img) {
+    if (img == null) {
+      return null;
+    }
     final int w = img.getWidth();
     final int h = img.getHeight();
     if (w == 0 || h == 0) {
@@ -806,7 +820,13 @@ public final class Imaging {
     int index = 0;
     for (int column = 0; column < sprite.getColumns(); column++) {
       for (int row = 0; row < sprite.getRows(); row++) {
-        g.drawImage(flipFunction.apply(sprite.getSprite(index)), column * sprite.getSpriteWidth(), row * sprite.getSpriteHeight(), null);
+        BufferedImage s = sprite.getSprite(index);
+        if (s != null) {
+          BufferedImage flipped = flipFunction.apply(s);
+          if (flipped != null) {
+            g.drawImage(flipped, column * sprite.getSpriteWidth(), row * sprite.getSpriteHeight(), null);
+          }
+        }
         index++;
       }
     }
