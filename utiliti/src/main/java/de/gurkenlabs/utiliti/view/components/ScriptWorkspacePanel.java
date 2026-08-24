@@ -202,6 +202,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final ScriptDebuggerPanel debuggerPanel = new ScriptDebuggerPanel();
   private final List<ScriptBreakpoint> breakpoints = new java.util.concurrent.CopyOnWriteArrayList<>();
   private final Timer breakpointSyncTimer = new Timer(300, e -> this.syncBreakpoints());
+  private final Timer problemsRefreshDebounce = new Timer(200, e -> this.refreshProblemsTableNow());
   private final java.util.concurrent.ExecutorService breakpointSyncExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
   private final java.util.concurrent.atomic.AtomicBoolean projectSourceBuildInProgress =
     new java.util.concurrent.atomic.AtomicBoolean();
@@ -225,6 +226,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
 
     super(new BorderLayout());
+    this.problemsRefreshDebounce.setRepeats(false);
     this.setBackground(Style.background());
     this.add(this.createConflictBar(), BorderLayout.NORTH);
 
@@ -438,6 +440,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     UndoManager.removeUndoStackChanged(this.undoStackChangeListener);
     if (this.externalChangeTimer != null) {
       this.externalChangeTimer.stop();
+    }
+    if (this.problemsRefreshDebounce != null) {
+      this.problemsRefreshDebounce.stop();
     }
     for (ScriptTab tab : new ArrayList<>(this.openTabs.values())) {
       if (tab != null) {
@@ -1891,19 +1896,35 @@ public final class ScriptWorkspacePanel extends JPanel {
     };
   }
 
+  private static final Color BADGE_ENTITY = new Color(56, 189, 248); // Electric Cyan
+  private static final Color BADGE_ENV = new Color(74, 222, 128); // Emerald Green (Map Script)
+  private static final Color BADGE_GAME = new Color(251, 191, 36); // Amber Gold (Game Script)
+
   private static final class ScriptTypeBadge extends JLabel {
     private Color badgeColor;
+    private Color bgColor;
+    private Color borderColor;
 
     ScriptTypeBadge() {
       setOpaque(false);
       setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
       setIconTextGap(5);
       setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+      this.updateColors();
     }
 
     void setBadgeColor(Color color) {
-      this.badgeColor = color;
-      repaint();
+      if (!Objects.equals(this.badgeColor, color)) {
+        this.badgeColor = color;
+        this.updateColors();
+        repaint();
+      }
+    }
+
+    private void updateColors() {
+      Color accent = this.badgeColor != null ? this.badgeColor : Style.accent();
+      this.bgColor = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 38);
+      this.borderColor = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 110);
     }
 
     @Override
@@ -1916,13 +1937,10 @@ public final class ScriptWorkspacePanel extends JPanel {
       Graphics2D g2 = (Graphics2D) g.create();
       try {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        Color accent = getForeground();
-        Color bg = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 38);
-        Color border = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 110);
         int arc = Style.CORNER_RADIUS * 2;
-        g2.setColor(bg);
+        g2.setColor(this.bgColor);
         g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, arc, arc);
-        g2.setColor(border);
+        g2.setColor(this.borderColor);
         g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, arc, arc);
       } finally {
         g2.dispose();
@@ -1934,9 +1952,9 @@ public final class ScriptWorkspacePanel extends JPanel {
   static Color scriptBadgeColor(ScriptDefinition definition) {
     if (definition == null || definition.getHost() == null) return Style.accent();
     return switch (definition.getHost()) {
-      case ENTITY -> new Color(56, 189, 248); // Electric Cyan
-      case ENVIRONMENT -> new Color(74, 222, 128); // Emerald Green (Map Script)
-      case GAME -> new Color(251, 191, 36); // Amber Gold (Game Script)
+      case ENTITY -> BADGE_ENTITY;
+      case ENVIRONMENT -> BADGE_ENV;
+      case GAME -> BADGE_GAME;
     };
   }
 
@@ -2130,10 +2148,15 @@ public final class ScriptWorkspacePanel extends JPanel {
         Game.scripts().clearDiagnostics(scriptId);
       }
     }
-    refreshProblemsTable();
+    this.problemsRefreshDebounce.restart();
   }
 
   public void refreshProblemsTable() {
+    this.problemsRefreshDebounce.stop();
+    this.refreshProblemsTableNow();
+  }
+
+  private void refreshProblemsTableNow() {
     this.problemsModel.setRowCount(0);
     this.scriptErrorStates.clear();
 

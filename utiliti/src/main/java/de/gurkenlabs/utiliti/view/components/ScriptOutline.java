@@ -27,10 +27,25 @@ final class ScriptOutline {
     "List", "Set", "Map", "Collection", "Optional", "Class", "Creature", "Entity", "IEntity", "Environment",
     "ScriptContext", "ScriptHostType", "ScriptInfo", "Override");
 
+  private static final int MAX_OUTLINE_CACHE = 16;
+  private static final Map<Integer, Symbol> PARSE_CACHE = java.util.Collections.synchronizedMap(
+      new LinkedHashMap<>(MAX_OUTLINE_CACHE, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Integer, Symbol> eldest) {
+          return this.size() > MAX_OUTLINE_CACHE;
+        }
+      });
+
   private ScriptOutline() {}
 
   static Symbol parse(String source) {
     if (source == null || source.isBlank()) return null;
+    int hash = source.hashCode();
+    Symbol cached = PARSE_CACHE.get(hash);
+    if (cached != null) {
+      return cached;
+    }
+
     String[] lines = source.split("\\R", -1);
     String className = null;
     String baseType = null;
@@ -96,7 +111,9 @@ final class ScriptOutline {
     if (!methods.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Methods", "", -1, List.copyOf(methods)));
     if (!dependencies.isEmpty()) groups.add(new Symbol(Kind.GROUP, "Dependencies", "", -1,
       List.copyOf(dependencies.values())));
-    return new Symbol(Kind.CLASS, className, baseType == null ? "" : baseType, classLine, List.copyOf(groups));
+    Symbol result = new Symbol(Kind.CLASS, className, baseType == null ? "" : baseType, classLine, List.copyOf(groups));
+    PARSE_CACHE.put(hash, result);
+    return result;
   }
 
   private static void addParameterDependencies(Map<String, Symbol> dependencies, String parameters, int line,
