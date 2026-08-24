@@ -330,38 +330,31 @@ public final class Icons {
         g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(java.awt.RenderingHints.KEY_STROKE_CONTROL, java.awt.RenderingHints.VALUE_STROKE_PURE);
 
-        java.awt.Color base = accentColor != null ? accentColor : new java.awt.Color(56, 189, 248);
         boolean enabled = c == null || c.isEnabled();
+        java.awt.Color base;
         if (!enabled) {
-          base = new java.awt.Color(128, 128, 128);
+          base = Style.COLOR_DISABLED_TEXT;
+        } else if (accentColor != null) {
+          base = accentColor;
+        } else {
+          base = c != null && c.getForeground() != null ? c.getForeground() : new java.awt.Color(56, 189, 248);
         }
 
-        // 1. Soft glowing background badge
-        int pad = Math.max(1, size / 16);
-        int badgeSize = size - pad * 2;
-        java.awt.Color bgFill = new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 38);
-        java.awt.Color bgBorder = new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 90);
-        g2.setColor(bgFill);
-        g2.fillRoundRect(x + pad, y + pad, badgeSize, badgeSize, 4, 4);
-        g2.setColor(bgBorder);
-        g2.setStroke(new java.awt.BasicStroke(1.0f));
-        g2.drawRoundRect(x + pad, y + pad, badgeSize, badgeSize, 4, 4);
-
-        // 2. Crisp Event Lightning Spark
+        // Crisp Minimalist Event Lightning Spark
         double scale = size / 16.0;
         java.awt.geom.Path2D bolt = new java.awt.geom.Path2D.Double();
-        bolt.moveTo(x + 9.2 * scale, y + 2.5 * scale);
-        bolt.lineTo(x + 4.8 * scale, y + 8.6 * scale);
-        bolt.lineTo(x + 8.2 * scale, y + 8.6 * scale);
-        bolt.lineTo(x + 6.8 * scale, y + 13.5 * scale);
-        bolt.lineTo(x + 12.0 * scale, y + 7.4 * scale);
-        bolt.lineTo(x + 8.6 * scale, y + 7.4 * scale);
+        bolt.moveTo(x + 9.6 * scale, y + 1.8 * scale);
+        bolt.lineTo(x + 3.8 * scale, y + 8.6 * scale);
+        bolt.lineTo(x + 8.0 * scale, y + 8.6 * scale);
+        bolt.lineTo(x + 6.4 * scale, y + 14.2 * scale);
+        bolt.lineTo(x + 12.8 * scale, y + 7.4 * scale);
+        bolt.lineTo(x + 8.8 * scale, y + 7.4 * scale);
         bolt.closePath();
 
         g2.setColor(base);
         g2.fill(bolt);
 
-        // 3. Inherited badge link indicator (if inherited)
+        // Inherited badge link indicator (if inherited)
         if (inherited) {
           g2.setColor(new java.awt.Color(255, 255, 255, 220));
           g2.setStroke(new java.awt.BasicStroke(1.2f, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
@@ -412,64 +405,56 @@ public final class Icons {
         g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(java.awt.RenderingHints.KEY_STROKE_CONTROL, java.awt.RenderingHints.VALUE_STROKE_PURE);
 
-        java.awt.Color base = accentColor != null ? accentColor : new java.awt.Color(74, 222, 128);
         boolean enabled = c == null || c.isEnabled();
+        java.awt.Color base;
         if (!enabled) {
-          base = new java.awt.Color(128, 128, 128);
+          base = Style.COLOR_DISABLED_TEXT;
+        } else if (accentColor != null) {
+          base = accentColor;
+        } else {
+          base = c != null && c.getForeground() != null ? c.getForeground() : new java.awt.Color(74, 222, 128);
         }
 
-        // 1. Soft glowing background badge (matches script badge)
-        int pad = Math.max(1, size / 16);
-        int badgeSize = size - pad * 2;
-        java.awt.Color bgFill = new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 38);
-        java.awt.Color bgBorder = new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 90);
-        g2.setColor(bgFill);
-        g2.fillRoundRect(x + pad, y + pad, badgeSize, badgeSize, 4, 4);
-        g2.setColor(bgBorder);
-        g2.setStroke(new java.awt.BasicStroke(1.0f));
-        g2.drawRoundRect(x + pad, y + pad, badgeSize, badgeSize, 4, 4);
-
-        // 2. Crisp Folded Map Geometry
+        // Crisp Minimalist Folded Map Origami Silhouette
         double scale = size / 16.0;
 
         // Left Panel
         java.awt.geom.Path2D leftPanel = new java.awt.geom.Path2D.Double();
-        leftPanel.moveTo(x + 3.6 * scale, y + 5.0 * scale);
-        leftPanel.lineTo(x + 6.8 * scale, y + 3.6 * scale);
-        leftPanel.lineTo(x + 6.8 * scale, y + 11.2 * scale);
-        leftPanel.lineTo(x + 3.6 * scale, y + 12.6 * scale);
+        leftPanel.moveTo(x + 2.5 * scale, y + 4.2 * scale);
+        leftPanel.lineTo(x + 6.6 * scale, y + 2.4 * scale);
+        leftPanel.lineTo(x + 6.6 * scale, y + 11.8 * scale);
+        leftPanel.lineTo(x + 2.5 * scale, y + 13.6 * scale);
         leftPanel.closePath();
 
         // Center Panel
         java.awt.geom.Path2D centerPanel = new java.awt.geom.Path2D.Double();
-        centerPanel.moveTo(x + 6.8 * scale, y + 3.6 * scale);
-        centerPanel.lineTo(x + 10.0 * scale, y + 5.0 * scale);
-        centerPanel.lineTo(x + 10.0 * scale, y + 12.6 * scale);
-        centerPanel.lineTo(x + 6.8 * scale, y + 11.2 * scale);
+        centerPanel.moveTo(x + 6.6 * scale, y + 2.4 * scale);
+        centerPanel.lineTo(x + 10.4 * scale, y + 4.2 * scale);
+        centerPanel.lineTo(x + 10.4 * scale, y + 13.6 * scale);
+        centerPanel.lineTo(x + 6.6 * scale, y + 11.8 * scale);
         centerPanel.closePath();
 
         // Right Panel
         java.awt.geom.Path2D rightPanel = new java.awt.geom.Path2D.Double();
-        rightPanel.moveTo(x + 10.0 * scale, y + 5.0 * scale);
-        rightPanel.lineTo(x + 13.2 * scale, y + 3.6 * scale);
-        rightPanel.lineTo(x + 13.2 * scale, y + 11.2 * scale);
-        rightPanel.lineTo(x + 10.0 * scale, y + 12.6 * scale);
+        rightPanel.moveTo(x + 10.4 * scale, y + 4.2 * scale);
+        rightPanel.lineTo(x + 14.5 * scale, y + 2.4 * scale);
+        rightPanel.lineTo(x + 14.5 * scale, y + 11.8 * scale);
+        rightPanel.lineTo(x + 10.4 * scale, y + 13.6 * scale);
         rightPanel.closePath();
 
-        // Fill with subtle shading for 3D folded map look
+        // Shaded folding for clear 2D silhouette
         g2.setColor(base);
         g2.fill(leftPanel);
-        g2.setColor(new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 190));
+        g2.setColor(new java.awt.Color(base.getRed(), base.getGreen(), base.getBlue(), 180));
         g2.fill(centerPanel);
         g2.setColor(base);
         g2.fill(rightPanel);
 
-        // Subtle crisp outline
-        g2.setColor(new java.awt.Color(255, 255, 255, 160));
+        // Subtle fold separation line
+        g2.setColor(new java.awt.Color(0, 0, 0, 45));
         g2.setStroke(new java.awt.BasicStroke(0.9f * (float) scale, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
-        g2.draw(leftPanel);
-        g2.draw(centerPanel);
-        g2.draw(rightPanel);
+        g2.drawLine((int) (x + 6.6 * scale), (int) (y + 2.4 * scale), (int) (x + 6.6 * scale), (int) (y + 11.8 * scale));
+        g2.drawLine((int) (x + 10.4 * scale), (int) (y + 4.2 * scale), (int) (x + 10.4 * scale), (int) (y + 13.6 * scale));
       } finally {
         g2.dispose();
       }
