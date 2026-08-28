@@ -555,4 +555,63 @@ public final class Icons {
     @Override public int getIconWidth() { return size; }
     @Override public int getIconHeight() { return size; }
   }
+
+  public static final Icon STEP_FORWARD_16 = new VectorStepIcon(16, true);
+  public static final Icon STEP_BACK_16 = new VectorStepIcon(16, false);
+
+  public static class VectorStepIcon implements Icon {
+    private final int size;
+    private final boolean forward;
+
+    public VectorStepIcon(int size, boolean forward) {
+      this.size = size;
+      this.forward = forward;
+    }
+
+    @Override
+    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+      java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+      try {
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_STROKE_CONTROL, java.awt.RenderingHints.VALUE_STROKE_PURE);
+        boolean enabled = c == null || c.isEnabled();
+        g2.setColor(enabled ? (c != null ? c.getForeground() : Style.text()) : Style.disabledIconColor());
+
+        int pad = 3;
+        int h = size - pad * 2;
+        double barWidth = 1.75;
+
+        if (forward) {
+          double triangleRight = x + size - pad - barWidth - 2.0;
+          double triangleLeft = x + pad + 0.5;
+          java.awt.geom.Path2D triangle = new java.awt.geom.Path2D.Double();
+          triangle.moveTo(triangleLeft, y + pad);
+          triangle.lineTo(triangleRight, y + pad + h / 2.0);
+          triangle.lineTo(triangleLeft, y + pad + h);
+          triangle.closePath();
+          g2.fill(triangle);
+
+          double barX = x + size - pad - barWidth;
+          g2.fill(new java.awt.geom.RoundRectangle2D.Double(barX, y + pad, barWidth, h, 1, 1));
+        } else {
+          double barX = x + pad;
+          g2.fill(new java.awt.geom.RoundRectangle2D.Double(barX, y + pad, barWidth, h, 1, 1));
+
+          double triangleLeft = x + pad + barWidth + 2.0;
+          double triangleRight = x + size - pad - 0.5;
+          java.awt.geom.Path2D triangle = new java.awt.geom.Path2D.Double();
+          triangle.moveTo(triangleRight, y + pad);
+          triangle.lineTo(triangleLeft, y + pad + h / 2.0);
+          triangle.lineTo(triangleRight, y + pad + h);
+          triangle.closePath();
+          g2.fill(triangle);
+        }
+      } finally {
+        g2.dispose();
+      }
+    }
+
+    @Override public int getIconWidth() { return size; }
+    @Override public int getIconHeight() { return size; }
+  }
 }

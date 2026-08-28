@@ -307,10 +307,10 @@ public class SpriteEditorPanel extends JPanel {
     toolbar.setOpaque(false);
     JPanel playback = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
     playback.setOpaque(false);
-    JButton previous = Style.iconButton(Icons.REWIND_16);
+    JButton previous = Style.iconButton(Icons.STEP_BACK_16);
     configureButton(previous, "spriteEditor_previousFrame");
     previous.addActionListener(_ -> stepFrame(-1));
-    JButton next = Style.iconButton(Icons.PLAY_16);
+    JButton next = Style.iconButton(Icons.STEP_FORWARD_16);
     configureButton(next, "spriteEditor_nextFrame");
     next.addActionListener(_ -> stepFrame(1));
     playback.add(previous);
