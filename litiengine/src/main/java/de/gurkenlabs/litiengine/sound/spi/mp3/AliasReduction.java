@@ -3,29 +3,28 @@ package de.gurkenlabs.litiengine.sound.spi.mp3;
 public class AliasReduction {
 
   static final double[] CS = {
-      -0.0000000000f, -0.0004423847f, -0.0000152588f,  0.0036921507f,  0.0000152588f, -0.0179748535f,
-      -0.0000152588f,  0.0649604797f,  0.0000152588f, -0.1261685944f, -0.0000152588f,  0.1829223633f,
-       0.0000152588f, -0.2253379821f, -0.0000152588f,  0.2544477404f,  0.0000152588f, -0.2483820915f,
-      -0.0000152588f,  0.1923301220f,  0.0000152588f, -0.1280487634f, -0.0000152588f,  0.0676026349f,
-      0.0000152588f, -0.0277600288f, -0.0000152588f
+      0.857492925712, 0.881741997318, 0.949628649103, 0.983314592492,
+      0.995517816065, 0.999160558175, 0.999899195243, 0.999993155067
   };
 
   static final double[] CA = {
-       0.0000000000f,  0.0004424781f, -0.0000152588f, -0.0036909434f,  0.0000152588f,  0.0179748535f,
-      -0.0000152588f, -0.0649604797f,  0.0000152588f,  0.1261685944f, -0.0000152588f, -0.1829223633f,
-       0.0000152588f,  0.2253379821f, -0.0000152588f, -0.2544477404f,  0.0000152588f,  0.2483820915f,
-      -0.0000152588f, -0.1923301220f,  0.0000152588f,  0.1280487634f, -0.0000152588f, -0.0676026349f,
-       0.0000152588f,  0.0277600288f, -0.0000152588f
+      -0.514495755427, -0.471731968565, -0.313377454204, -0.181913199611,
+      -0.0945741925262, -0.0409655828852, -0.0141985685725, -0.00369997467375
   };
 
   public static float[] process(float[] input, int blockType) {
-    if (blockType == MpegFrame.SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS) {
+    return process(input, blockType, false);
+  }
+
+  public static float[] process(float[] input, int blockType, boolean mixedBlock) {
+    if (blockType == MpegFrame.SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS && !mixedBlock) {
       return input.clone();
     }
 
     float[] output = input.clone();
 
-    for (int sb = 0; sb < 32 - 1; sb++) {
+    int boundaries = blockType == MpegFrame.SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS ? 1 : 31;
+    for (int sb = 0; sb < boundaries; sb++) {
       int k = sb * 18;
 
       for (int i = 0; i < 8; i++) {

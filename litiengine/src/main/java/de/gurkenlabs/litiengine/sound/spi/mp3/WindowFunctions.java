@@ -1,105 +1,46 @@
 package de.gurkenlabs.litiengine.sound.spi.mp3;
 
-public class WindowFunctions {
+final class WindowFunctions {
+  private static final float[][] WINDOWS = createWindows();
 
-  private static final float[] LONG_WINDOW;
-  private static final float[] SHORT_WINDOW;
-  private static final float[] START_WINDOW;
-  private static final float[] END_WINDOW;
+  private WindowFunctions() {}
 
-  static {
-    LONG_WINDOW = createLongWindow();
-    SHORT_WINDOW = createShortWindow();
-    START_WINDOW = createStartWindow();
-    END_WINDOW = createEndWindow();
+  private static float[][] createWindows() {
+    float[][] windows = new float[4][36];
+    for (int i = 0; i < 36; i++) windows[0][i] = (float) Math.sin(Math.PI / 36 * (i + 0.5));
+
+    System.arraycopy(windows[0], 0, windows[1], 0, 18);
+    for (int i = 18; i < 24; i++) windows[1][i] = 1;
+    for (int i = 24; i < 30; i++) windows[1][i] = (float) Math.sin(Math.PI / 12 * (i - 18 + 0.5));
+
+    for (int i = 6; i < 12; i++) windows[3][i] = (float) Math.sin(Math.PI / 12 * (i - 6 + 0.5));
+    for (int i = 12; i < 18; i++) windows[3][i] = 1;
+    System.arraycopy(windows[0], 18, windows[3], 18, 18);
+    return windows;
   }
 
-  private static float[] createLongWindow() {
-    float[] window = new float[36];
-    for (int i = 0; i < 36; i++) {
-      window[i] = (float) Math.sin(Math.PI / 36 * (i + 0.5));
-    }
-    return window;
+  static float[] getWindow(int blockType) {
+    if (blockType == 2) return getShortWindow();
+    if (blockType < 0 || blockType >= WINDOWS.length) return getLongWindow();
+    return WINDOWS[blockType].clone();
   }
 
-  private static float[] createShortWindow() {
+  static float[] getLongWindow() { return WINDOWS[0].clone(); }
+
+  static float[] getStartWindow() { return WINDOWS[1].clone(); }
+
+  static float[] getEndWindow() { return WINDOWS[3].clone(); }
+
+  static float[] getShortWindow() {
     float[] window = new float[12];
-    for (int i = 0; i < 12; i++) {
-      window[i] = (float) Math.sin(Math.PI / 12 * (i + 0.5));
-    }
+    for (int i = 0; i < window.length; i++) window[i] = (float) Math.sin(Math.PI / 12 * (i + 0.5));
     return window;
   }
 
-  private static float[] createStartWindow() {
-    float[] window = new float[36];
-    for (int i = 0; i < 36; i++) {
-      if (i < 18) {
-        window[i] = (float) Math.sin(Math.PI / 36 * (i + 0.5));
-      } else {
-        window[i] = 1.0f;
-      }
-    }
-    return window;
-  }
-
-  private static float[] createEndWindow() {
-    float[] window = new float[36];
-    for (int i = 0; i < 36; i++) {
-      if (i < 18) {
-        window[i] = 1.0f;
-      } else {
-        window[i] = (float) Math.sin(Math.PI / 36 * (i - 18 + 0.5));
-      }
-    }
-    return window;
-  }
-
-  public static float[] getLongWindow() {
-    return LONG_WINDOW.clone();
-  }
-
-  public static float[] getShortWindow() {
-    return SHORT_WINDOW.clone();
-  }
-
-  public static float[] getStartWindow() {
-    return START_WINDOW.clone();
-  }
-
-  public static float[] getEndWindow() {
-    return END_WINDOW.clone();
-  }
-
-  public static float[] getWindow(int blockType) {
-    return switch (blockType) {
-      case 0 -> getLongWindow();
-      case 1 -> getStartWindow();
-      case 2 -> getShortWindow();
-      case 3 -> getEndWindow();
-      default -> getLongWindow();
-    };
-  }
-
-  public static float[] applyWindow(float[] data, int blockType) {
+  static float[] applyWindow(float[] data, int blockType) {
+    float[] result = data.clone();
     float[] window = getWindow(blockType);
-    float[] result = new float[data.length];
-
-    if (blockType == 2) { // SHORT block
-      // data has 36 samples (3 windows of 12 samples each)
-      // window has 12 samples
-      for (int w = 0; w < 3; w++) {
-        int offset = w * 12;
-        for (int i = 0; i < 12; i++) {
-          result[offset + i] = data[offset + i] * window[i];
-        }
-      }
-    } else { // LONG block
-      int len = Math.min(data.length, window.length);
-      for (int i = 0; i < len; i++) {
-        result[i] = data[i] * window[i];
-      }
-    }
-
+    for (int i = 0; i < Math.min(result.length, window.length); i++) result[i] *= window[i];
     return result;
   }
 }

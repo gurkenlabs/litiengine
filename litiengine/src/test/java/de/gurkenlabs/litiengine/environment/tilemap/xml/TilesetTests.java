@@ -253,8 +253,8 @@ class TilesetTests {
   void externalWrapperResolvesToResourceTilesetWithTerrains() throws Exception {
     URL tsx = TilesetTests.class.getResource("/de/gurkenlabs/litiengine/environment/tilemap/xml/naughtytiles.tsx");
     Tileset resource = XmlUtilities.read(Tileset.class, tsx);
-    assertFalse("the loaded .tsx resource must carry wang terrains",
-      resource.getTerrainSets() == null || resource.getTerrainSets().isEmpty());
+    assertFalse(resource.getTerrainSets() == null || resource.getTerrainSets().isEmpty(),
+      "the loaded .tsx resource must carry wang terrains");
 
     Tileset wrapper = new Tileset();
     set(wrapper, "firstgid", 513);

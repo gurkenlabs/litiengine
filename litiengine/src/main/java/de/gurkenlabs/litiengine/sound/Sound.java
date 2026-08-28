@@ -4,7 +4,9 @@ import de.gurkenlabs.litiengine.util.io.StreamUtilities;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * This class implements all required functionality to load sounds from the file system and provide a stream that can
@@ -42,17 +44,12 @@ public final class Sound {
 
     this.data = StreamUtilities.getBytes(is);
 
-// Create AudioInputStream from the data we just read
-    ByteArrayInputStream dataStream = new ByteArrayInputStream(this.data);
-    AudioInputStream in = AudioSystem.getAudioInputStream(dataStream);
-
-    if (!AudioSystem.isLineSupported(new DataLine.Info(SourceDataLine.class, in.getFormat()))) {
-      // we need to convert because the default MixerProviders of Java (e.g. DirectAudioMixerProvider) don't support all formats
-      in = AudioSystem.getAudioInputStream(targetAudioFormat(in.getFormat()), in);
+    try (var dataStream = new ByteArrayInputStream(this.data);
+      var encodedStream = AudioSystem.getAudioInputStream(dataStream);
+      var decodedStream = AudioSystem.getAudioInputStream(getOutFormat(encodedStream.getFormat()), encodedStream)) {
+      this.streamData = StreamUtilities.getBytes(decodedStream);
+      this.format = decodedStream.getFormat();
     }
-
-    this.streamData = StreamUtilities.getBytes(in);
-    this.format = in.getFormat();
   }
 
   /**
@@ -85,7 +82,7 @@ public final class Sound {
     return this.data;
   }
 
-  public byte[] getStreamData() {
+  byte[] getStreamData() {
     if (this.streamData == null) {
       return new byte[0];
     }
@@ -93,8 +90,10 @@ public final class Sound {
     return this.streamData.clone();
   }
 
-  private static AudioFormat targetAudioFormat(final AudioFormat sourceFormat) {
-    return new AudioFormat(sourceFormat.getSampleRate(), 16, sourceFormat.getChannels(), true, sourceFormat.isBigEndian());
+  private static AudioFormat getOutFormat(final AudioFormat inFormat) {
+    final int channels = inFormat.getChannels();
+    final float rate = inFormat.getSampleRate();
+    return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, rate, 16, channels, channels * 2, rate, false);
   }
 
   @Override

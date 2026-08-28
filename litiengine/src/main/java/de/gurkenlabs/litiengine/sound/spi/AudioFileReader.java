@@ -4,9 +4,14 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
+/** Common stream and resource handling for LITIENGINE Java Sound file readers. */
 public abstract class AudioFileReader extends javax.sound.sampled.spi.AudioFileReader {
   private final int markLimit;
 
@@ -34,8 +39,12 @@ public abstract class AudioFileReader extends javax.sound.sampled.spi.AudioFileR
 
   @Override
   public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException {
-    try (var inputStream = new FileInputStream(file)) {
+    var inputStream = new FileInputStream(file);
+    try {
       return getAudioInputStream(inputStream, file.length());
+    } catch (UnsupportedAudioFileException | IOException | RuntimeException exception) {
+      inputStream.close();
+      throw exception;
     }
   }
 
@@ -45,15 +54,21 @@ public abstract class AudioFileReader extends javax.sound.sampled.spi.AudioFileR
   }
 
   @Override
-  @Deprecated
-  public AudioFileFormat getAudioFileFormat(URL url) {
-    throw new UnsupportedOperationException("URL is not supported");
+  public AudioFileFormat getAudioFileFormat(URL url) throws UnsupportedAudioFileException, IOException {
+    try (var inputStream = url.openStream()) {
+      return getAudioFileFormat(inputStream, AudioSystem.NOT_SPECIFIED);
+    }
   }
 
   @Override
-  @Deprecated
-  public AudioInputStream getAudioInputStream(URL url) {
-    throw new UnsupportedOperationException("URL is not supported");
+  public AudioInputStream getAudioInputStream(URL url) throws UnsupportedAudioFileException, IOException {
+    var inputStream = url.openStream();
+    try {
+      return getAudioInputStream(inputStream, AudioSystem.NOT_SPECIFIED);
+    } catch (UnsupportedAudioFileException | IOException | RuntimeException exception) {
+      inputStream.close();
+      throw exception;
+    }
   }
 
   protected abstract AudioFileFormat getAudioFileFormat(InputStream stream, long fileLength)

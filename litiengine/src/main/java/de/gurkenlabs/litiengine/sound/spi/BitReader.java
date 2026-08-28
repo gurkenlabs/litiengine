@@ -27,14 +27,19 @@ public class BitReader {
   }
 
   public int get(int bits) {
+    if (bits < 0 || bits > Integer.SIZE) {
+      throw new IllegalArgumentException("bits must be between 0 and 32");
+    }
+
+    if (this.current + bits > this.data.limit() * BITS_PER_BYTE) {
+      return END_OF_DATA;
+    }
+
     int result = 0;
     for (int i = this.current; i < this.current + bits; i++) {
       int byteIndex = i / BITS_PER_BYTE;
       int bitIndex = (BITS_PER_BYTE - 1) - (i % BITS_PER_BYTE);
 
-      if(byteIndex > this.data.limit() -1){
-        return END_OF_DATA;
-      }
       int bitValue = (this.data.get(byteIndex) >> bitIndex) & 1;
       result = (result << 1) | bitValue;
     }
@@ -66,7 +71,18 @@ public class BitReader {
    * @param bits number of bits to skip
    */
   public void skip(int bits) {
-    this.current += bits;
+    setPosition(getPosition() + bits);
+  }
+
+  public void setPosition(int position) {
+    if (position < 0 || this.startByteIndex * BITS_PER_BYTE + position > this.data.limit() * BITS_PER_BYTE) {
+      throw new IllegalArgumentException("Bit position is outside the input");
+    }
+    this.current = this.startByteIndex * BITS_PER_BYTE + position;
+  }
+
+  public int remaining() {
+    return this.data.limit() * BITS_PER_BYTE - this.current;
   }
 
   public void reset() {

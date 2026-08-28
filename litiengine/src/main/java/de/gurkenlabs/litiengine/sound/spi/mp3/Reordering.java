@@ -1,69 +1,37 @@
 package de.gurkenlabs.litiengine.sound.spi.mp3;
 
-public class Reordering {
+final class Reordering {
+  private Reordering() {}
 
-  private static final int[] SCALE_FACTOR_BANDS_SHORT = {0, 4, 8, 12, 16, 22, 30, 40, 52, 66, 84, 106, 136, 192, 576};
-
-  public static float[] reorder(float[] input, int blockType, boolean mixedBlockFlag) {
-    if (blockType != MpegFrame.SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS) {
-      return input.clone();
-    }
-
-    if (mixedBlockFlag) {
-      return reorderMixed(input);
-    } else {
-      return reorderShort(input);
-    }
+  static float[] reorder(float[] input, int blockType, boolean mixedBlock) {
+    return reorder(input, blockType, mixedBlock, 44100);
   }
 
-  private static float[] reorderShort(float[] input) {
+  static float[] reorder(float[] input, int blockType, boolean mixedBlock, int sampleRate) {
+    if (blockType != MpegFrame.SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS) return input.clone();
+
+    int[] bands = MpegFrame.MainData.shortBands(sampleRate);
     float[] output = new float[576];
+    int cursor = 0;
+    int firstBand = 0;
+    if (mixedBlock) {
+      System.arraycopy(input, 0, output, 0, 36);
+      cursor = 36;
+      firstBand = 3;
+    }
 
-    int outIndex = 0;
-
-    for (int sfb = 0; sfb < 13; sfb++) {
-      int bandStart = SCALE_FACTOR_BANDS_SHORT[sfb];
-      int bandEnd = Math.min(SCALE_FACTOR_BANDS_SHORT[sfb + 1], 576);
-
+    for (int sfb = firstBand; sfb < bands.length - 1; sfb++) {
+      int width = bands[sfb + 1] - bands[sfb];
       for (int window = 0; window < 3; window++) {
-        for (int freq = bandStart; freq < bandEnd; freq++) {
-          int inIndex = window * 192 + sfb * (bandEnd - bandStart) + (freq - bandStart);
-          if (inIndex < input.length && outIndex < output.length) {
-            output[outIndex++] = input[inIndex];
-          }
+        for (int line = 0; line < width && cursor < input.length; line++) {
+          output[3 * (bands[sfb] + line) + window] = input[cursor++];
         }
       }
     }
-
     return output;
   }
 
-  private static float[] reorderMixed(float[] input) {
-    float[] output = new float[576];
-
-    for (int i = 0; i < 36 && i < input.length; i++) {
-      output[i] = input[i];
-    }
-
-    int outIndex = 36;
-    for (int sfb = 3; sfb < 13; sfb++) {
-      int bandStart = SCALE_FACTOR_BANDS_SHORT[sfb];
-      int bandEnd = Math.min(SCALE_FACTOR_BANDS_SHORT[sfb + 1], 576);
-
-      for (int window = 0; window < 3; window++) {
-        for (int freq = bandStart; freq < bandEnd; freq++) {
-          int inIndex = 36 + window * 192 + (sfb - 3) * (bandEnd - bandStart) + (freq - bandStart);
-          if (inIndex < input.length && outIndex < output.length) {
-            output[outIndex++] = input[inIndex];
-          }
-        }
-      }
-    }
-
-    return output;
-  }
-
-  public static boolean needsReordering(int blockType) {
+  static boolean needsReordering(int blockType) {
     return blockType == MpegFrame.SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS;
   }
 }

@@ -6,81 +6,73 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 
-public class Mp3FileReader extends AudioFileReader {
+/** Reads MPEG-1 Layer III stream metadata for the Java Sound service provider. */
+public final class Mp3FileReader extends AudioFileReader {
+  /** The Java Sound file type for MP3 resources. */
   public static final AudioFileFormat.Type MP3 = new AudioFileFormat.Type("MP3", "mp3");
 
-  private static final int MINIMUM_BUFFER_LENGTH = 40;
-  private static final int FILE_HEADER_LENGTH = 12;
+  private static final int HEADER_LENGTH = 10;
+  private static final int MAX_FRAME_SEARCH = 64 * 1024;
 
+  /** Creates an MP3 file reader. */
   public Mp3FileReader() {
-    super(128000 * 32 + 1);
+    super(16 * 1024 * 1024);
   }
 
   @Override
-  protected AudioFileFormat getAudioFileFormat(InputStream stream, long fileLength) throws UnsupportedAudioFileException, IOException {
-    var byteBuffer = ByteBuffer.wrap(stream.readAllBytes());
-    if (byteBuffer.limit() < FILE_HEADER_LENGTH) {
-      throw new UnsupportedAudioFileException("Invalid audio stream");
+  protected AudioFileFormat getAudioFileFormat(InputStream stream, long fileLength)
+    throws UnsupportedAudioFileException, IOException {
+    byte[] header = stream.readNBytes(HEADER_LENGTH);
+    if (header.length < Integer.BYTES) {
+      throw new UnsupportedAudioFileException("Invalid MP3 stream");
     }
 
-    var fileHeader = new byte[FILE_HEADER_LENGTH];
-    byteBuffer.get(fileHeader);
-    byteBuffer.clear();
-
-    // The AudioSystem calls this and expects an UnsupportedAudioFileException if a FileReader cannot handle a file
-    if (!canHandleAudioFormat(fileHeader)) {
-      throw new UnsupportedAudioFileException("No mpeg audio format found");
+    var frames = new ByteArrayOutputStream();
+    if (hasId3Tag(header)) {
+      stream.skipNBytes(id3DataSize(header));
+    } else {
+      frames.write(header);
     }
+    frames.write(stream.readNBytes(MAX_FRAME_SEARCH + Integer.BYTES));
 
-    var offset = Mpeg.getDataOffset(byteBuffer);
-    return getFormatFromMpegFrames(byteBuffer, offset);
+    var frame = findFirstFrame(frames.toByteArray());
+    var format = new AudioFormat(frame.getEncoding(), frame.getSampleRate(), AudioSystem.NOT_SPECIFIED,
+      frame.getChannels(), AudioSystem.NOT_SPECIFIED, AudioSystem.NOT_SPECIFIED, false);
+    return new AudioFileFormat(MP3, format, AudioSystem.NOT_SPECIFIED);
   }
 
-  private AudioFileFormat getFormatFromMpegFrames(ByteBuffer byteBuffer, int offset) throws UnsupportedAudioFileException {
-    var frames = new ArrayList<MpegFrame>();
-    while (offset < byteBuffer.limit() - MINIMUM_BUFFER_LENGTH) {
-      if (!Mpeg.isStart(byteBuffer.get(offset), byteBuffer.get(offset + 1))) {
-        offset++;
-        continue;
-      }
+  private static boolean hasId3Tag(byte[] header) {
+    return Mpeg.ID3V2_TAG.equals(new String(header, 0, 3, StandardCharsets.ISO_8859_1));
+  }
 
-      var frame = new MpegFrame(byteBuffer, offset);
-      if (offset + frame.getLengthInBytes() > byteBuffer.limit()) {
-        throw new UnsupportedAudioFileException("Frame length exceeds end of file");
+  private static int id3DataSize(byte[] header) throws UnsupportedAudioFileException {
+    for (int i = 6; i < HEADER_LENGTH; i++) {
+      if ((header[i] & 0x80) != 0) {
+        throw new UnsupportedAudioFileException("Invalid ID3 tag size");
       }
+    }
+    return ((header[6] & 0x7f) << 21) | ((header[7] & 0x7f) << 14)
+      | ((header[8] & 0x7f) << 7) | (header[9] & 0x7f);
+  }
 
-      // ensure frame consistency
-      if (!frames.isEmpty()) {
-        var firstFrame = frames.getFirst();
-        if (firstFrame.getSampleRate() != frame.getSampleRate()
-          || !firstFrame.getLayer().equals(frame.getLayer())
-          || !firstFrame.getVersion().equals(frame.getVersion())) {
-          throw new UnsupportedAudioFileException("Inconsistent frame header");
+  private static MpegFrame findFirstFrame(byte[] data) throws UnsupportedAudioFileException {
+    var buffer = ByteBuffer.wrap(data);
+    int limit = Math.min(data.length - Integer.BYTES, MAX_FRAME_SEARCH);
+    for (int offset = 0; offset <= limit; offset++) {
+      if (Mpeg.isStart(data[offset], data[offset + 1])) {
+        try {
+          return new MpegFrame(buffer, offset);
+        } catch (UnsupportedAudioFileException exception) {
+          // A sync-like byte sequence can occur in metadata; continue searching.
         }
       }
-
-      frames.add(frame);
-      offset += frame.getLengthInBytes();
     }
-
-    // This could be fetched by the XING header if available or the VBRI header (only used by the Fraunhofer Encoder)
-    // https://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header#XINGHeader
-    var bitRate = (int) frames.stream().mapToDouble(MpegFrame::getBitRate).average().orElse(0);
-
-    final var frame = frames.getFirst();
-    // For compressed formats, use NOT_SPECIFIED for sampleSizeInBits since it's not applicable
-    var audioFormat = new AudioFormat(frame.getEncoding(), frame.getSampleRate(), AudioSystem.NOT_SPECIFIED, frame.getChannels(), frame.getLengthInBytes(), frame.getFrameRate(), true);
-
-    return new AudioFileFormat(MP3, audioFormat, frames.size());
-  }
-
-  private boolean canHandleAudioFormat(byte[] fileHeader) {
-    var audioHeader = new String(fileHeader).toUpperCase();
-    return audioHeader.startsWith(Mpeg.ID3V2_TAG);
+    throw new UnsupportedAudioFileException("No MPEG-1 Layer III frame found");
   }
 }

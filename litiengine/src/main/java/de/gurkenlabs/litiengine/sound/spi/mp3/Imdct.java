@@ -1,154 +1,62 @@
 package de.gurkenlabs.litiengine.sound.spi.mp3;
 
-import de.gurkenlabs.litiengine.sound.spi.mp3.MpegFrame.SideInfo;
+/** Hybrid synthesis transform used by MPEG-1 Layer III. */
+final class Imdct {
+  private Imdct() {}
 
-public class Imdct {
-
-  private static final int LONG_BLOCK_SIZE = 36;
-  private static final int SHORT_BLOCK_SIZE = 12;
-  private static final int FREQUENCY_LINES_LONG = 18;
-  private static final int FREQUENCY_LINES_SHORT = 6;
-
-  private static final double PI = Math.PI;
-
-  public static float[] process(float[] frequencyData, int blockType, boolean mixedBlockFlag) {
-    if (blockType == SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS) {
-      return processShortBlock(frequencyData);
-    } else {
-      return processLongBlock(frequencyData);
+  static float[] process(float[] frequencyData, int blockType, boolean mixedBlock) {
+    if (blockType == MpegFrame.SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS && !mixedBlock) {
+      return shortTransform(frequencyData);
     }
+    return longTransform(frequencyData, blockType);
   }
 
-  public static float[] processLongBlock(float[] frequencyData) {
-    float[] output = new float[LONG_BLOCK_SIZE];
-    
-    // Check if all input frequency data is zero
-    boolean hasNonZero = false;
-    for (int k = 0; k < Math.min(FREQUENCY_LINES_LONG, frequencyData.length); k++) {
-      if (frequencyData[k] != 0) {
-        hasNonZero = true;
-        break;
-      }
-    }
-    if (!hasNonZero) {
-      // All input frequency data is zero, skip processing
-      return output;
-    }
+  static float[] processLongBlock(float[] frequencyData) {
+    return longTransform(frequencyData, 0);
+  }
 
-    // IMDCT for 18 frequency lines to 36 time-domain samples
-    // Formula: x[n] = (2/N) * sum_{k=0}^{N/2-1} X[k] * cos(pi/(2N) * (2n + 1 + N) * (2k + 1))
-    // For N=18: x[n] = (2/18) * sum_{k=0}^{17} X[k] * cos(pi/36 * (2n + 19) * (2k + 1))
-    // Note: The (2/N) = 1/9 scaling factor is important!
-    for (int n = 0; n < LONG_BLOCK_SIZE; n++) {
-      double sum = 0;
-      for (int k = 0; k < FREQUENCY_LINES_LONG; k++) {
-        if (k >= frequencyData.length) break;
-        // Correct formula: pi/36 * (2n + 19) * (2k + 1)
-        double cos = Math.cos(PI / 36.0 * (2.0 * n + 19.0) * (2.0 * k + 1.0));
-        sum += frequencyData[k] * cos;
-      }
-      output[n] = (float) (sum * 2.0 / 18.0);  // Apply scaling factor 2/N = 2/18 = 1/9
-    }
+  static float[] processShortBlock(float[] frequencyData) {
+    return shortTransform(frequencyData);
+  }
 
+  private static float[] longTransform(float[] input, int blockType) {
+    float[] output = new float[36];
+    float[] window = WindowFunctions.getWindow(blockType);
+    for (int n = 0; n < output.length; n++) {
+      double value = 0;
+      for (int k = 0; k < 18; k++) {
+        value += input[k] * Math.cos(Math.PI / 72.0 * (2 * n + 19) * (2 * k + 1));
+      }
+      output[n] = (float) (value * window[n]);
+    }
     return output;
   }
 
-  public static float[] processShortBlock(float[] frequencyData) {
-    float[] output = new float[LONG_BLOCK_SIZE];
-
-    for (int w = 0; w < 3; w++) {
-      float[] shortPart = new float[FREQUENCY_LINES_SHORT];
-      int offset = w * FREQUENCY_LINES_SHORT;
-      if (offset + FREQUENCY_LINES_SHORT <= frequencyData.length) {
-        System.arraycopy(frequencyData, offset, shortPart, 0, FREQUENCY_LINES_SHORT);
-      }
-      float[] shortResult = processShortBlockSingle(shortPart);
-
-      int outOffset = w * SHORT_BLOCK_SIZE;
-      for (int i = 0; i < SHORT_BLOCK_SIZE && outOffset + i < LONG_BLOCK_SIZE; i++) {
-        output[outOffset + i] = shortResult[i];
-      }
-    }
-
-    return output;
-  }
-
-  private static float[] processShortBlockSingle(float[] frequencyData) {
-    float[] output = new float[SHORT_BLOCK_SIZE];
-
-    // Check if all input frequency data is zero
-    boolean hasNonZero = false;
-    for (int k = 0; k < Math.min(FREQUENCY_LINES_SHORT, frequencyData.length); k++) {
-      if (frequencyData[k] != 0) {
-        hasNonZero = true;
-        break;
-      }
-    }
-    if (!hasNonZero) {
-      // All input frequency data is zero, skip processing
-      return output;
-    }
-
-    // IMDCT for 6 frequency lines to 12 time-domain samples
-    // Formula: x[n] = (2/N) * sum_{k=0}^{N/2-1} X[k] * cos(pi/(2N) * (2n + 1 + N) * (2k + 1))
-    // For N=12: x[n] = (2/12) * sum_{k=0}^{5} X[k] * cos(pi/24 * (2n + 13) * (2k + 1))
-    // Apply scaling factor 2/N = 2/12 = 1/6
-    for (int n = 0; n < SHORT_BLOCK_SIZE; n++) {
-      double sum = 0;
-      for (int k = 0; k < FREQUENCY_LINES_SHORT; k++) {
-        double cos = Math.cos(PI / 24.0 * (2.0 * n + 13.0) * (2.0 * k + 1.0));
-        sum += frequencyData[k] * cos;
-      }
-      output[n] = (float) (sum * 2.0 / 12.0);  // Apply scaling factor
-    }
-
-    return output;
-  }
-
-  public static float[] getWindow(int blockType) {
-    return switch (blockType) {
-      case 0, 1, 3 -> WindowFunctions.getLongWindow();
-      case 2 -> WindowFunctions.getShortWindow();
-      default -> WindowFunctions.getLongWindow();
-    };
-  }
-
-  public static float[] getWindowShort(int windowIndex) {
-    return WindowFunctions.getShortWindow();
-  }
-
-  public static float[] applyWindow(float[] data, int blockType) {
-    float[] window = getWindow(blockType);
-    float[] result = new float[data.length];
-
-    if (blockType == SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS) {
-      // For short blocks, data has 36 samples (3 windows of 12 samples each)
-      // window has 12 samples, apply to each window
-      for (int w = 0; w < 3; w++) {
-        int offset = w * 12;
-        for (int i = 0; i < 12; i++) {
-          result[offset + i] = data[offset + i] * window[i];
+  private static float[] shortTransform(float[] input) {
+    float[] output = new float[36];
+    float[] window = WindowFunctions.getShortWindow();
+    for (int windowIndex = 0; windowIndex < 3; windowIndex++) {
+      for (int n = 0; n < 12; n++) {
+        double value = 0;
+        for (int k = 0; k < 6; k++) {
+          value += input[3 * k + windowIndex]
+            * Math.cos(Math.PI / 24.0 * (2 * n + 7) * (2 * k + 1));
         }
-      }
-    } else {
-      // For long blocks, apply window to entire data
-      int len = Math.min(data.length, window.length);
-      for (int i = 0; i < len; i++) {
-        result[i] = data[i] * window[i];
+        output[6 + 6 * windowIndex + n] += (float) (value * window[n]);
       }
     }
-
-    return result;
+    return output;
   }
 
-  public static float[] applyWindowShort(float[] data, int windowIndex) {
-    float[] window = getWindowShort(windowIndex);
-    float[] result = new float[data.length];
+  /** Kept for source compatibility; transforms are already windowed. */
+  static float[] applyWindow(float[] data, int blockType) {
+    return data.clone();
+  }
 
-    for (int i = 0; i < Math.min(data.length, window.length); i++) {
-      result[i] = data[i] * window[i];
-    }
-
+  static float[] applyWindowShort(float[] data, int windowIndex) {
+    float[] result = data.clone();
+    float[] window = WindowFunctions.getShortWindow();
+    for (int i = 0; i < Math.min(result.length, window.length); i++) result[i] *= window[i];
     return result;
   }
 }

@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.sound.spi.mp3;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.nio.ByteBuffer;
 
 final class Mpeg {
   public static final String VERSION_1_0 = "1.0";
@@ -36,10 +35,6 @@ final class Mpeg {
 
   static final String ID3V2_TAG = "ID3";
 
-  private static final int ID3V2_TAG_HEADER_LENGTH = 10;
-
-  static final int ID3V2_TAG_DATA_OFFSET_OFFSET = 6;
-
   private Mpeg() {
   }
 
@@ -66,7 +61,7 @@ final class Mpeg {
   }
 
   static int getBitRate(int bitRateRaw) throws UnsupportedAudioFileException {
-    if (bitRateRaw < 0 || bitRateRaw > BITRATES_VERSION_1_0_LAYER_3.length) {
+    if (bitRateRaw < 1 || bitRateRaw > BITRATES_VERSION_1_0_LAYER_3.length) {
       throw new UnsupportedAudioFileException("Invalid bitrate in frame header");
     }
 
@@ -111,23 +106,12 @@ final class Mpeg {
   }
 
   static String getEmphasis(int emphasisRaw) throws UnsupportedAudioFileException {
-    if (emphasisRaw < 0 || emphasisRaw > EMPHASIS.length - 1) {
-      throw new UnsupportedAudioFileException("Invalid emphasis in frame header");
-    }
-
-    return EMPHASIS[emphasisRaw];
-  }
-
-
-  static int getDataOffset(ByteBuffer byteBuffer) {
-    // ID3v2 tag size is stored as a synchsafe integer (7 bits per byte)
-    byte b6 = byteBuffer.get(ID3V2_TAG_DATA_OFFSET_OFFSET);
-    byte b7 = byteBuffer.get(ID3V2_TAG_DATA_OFFSET_OFFSET + 1);
-    byte b8 = byteBuffer.get(ID3V2_TAG_DATA_OFFSET_OFFSET + 2);
-    byte b9 = byteBuffer.get(ID3V2_TAG_DATA_OFFSET_OFFSET + 3);
-    int id3DataSize = ((b6 & 0x7f) << 21) | ((b7 & 0x7f) << 14) | ((b8 & 0x7f) << 7) | (b9 & 0x7f);
-    int offset = ID3V2_TAG_HEADER_LENGTH + id3DataSize;
-    return offset;
+    return switch (emphasisRaw) {
+      case 0 -> EMPHASIS_NONE;
+      case 1 -> EMPHASIS__50_15_MS;
+      case 3 -> EMPHASIS_CCITT_J_17;
+      default -> throw new UnsupportedAudioFileException("Invalid emphasis in frame header");
+    };
   }
 
   static boolean isStart(byte b1, byte b2) {

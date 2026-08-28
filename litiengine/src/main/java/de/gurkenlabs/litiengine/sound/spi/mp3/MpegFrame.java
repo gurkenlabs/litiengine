@@ -152,7 +152,7 @@ class MpegFrame {
    *                                             sampling_frequency     mode_extension
    * </pre>
    * <p>
-   * If error_protection flag is set to 1, header is followed by a two byte CRC.
+   * If the protection bit is zero, the header is followed by a two byte CRC.
    */
   static class Header {
     private static final int FRAME_SYNC = 0b11111111111;
@@ -183,7 +183,7 @@ class MpegFrame {
         throw new UnsupportedAudioFileException("This mpeg decoder only support MPEG version 1.0 layer III (MP3) audio files.");
       }
 
-      this.isProtected = bits.getBoolean();
+      this.isProtected = !bits.getBoolean();
       this.bitRate = Mpeg.getBitRate(bits.get(4));
       this.sampleRate = Mpeg.getSampleRate(bits.get(2));
       this.padding = bits.getBoolean();
@@ -404,10 +404,16 @@ class MpegFrame {
     private final MpegFrame frame;
     private final ScaleFactors[][] scaleFactors; // [channel][granule] - needed for dequantization
 
-    // Scale factor band boundaries for different block types (index 0-6 for different block types)
-    // These are for 44.1kHz - other sample rates scale differently
-    private static final int[] SCALE_FACTOR_BANDS_LONG = {0, 4, 8, 12, 16, 20, 24, 30, 36, 44, 52, 60, 70, 80, 90, 102, 116, 132, 150, 172, 198, 228, 260, 296, 338, 384, 436, 496, 566, 576};
-    private static final int[] SCALE_FACTOR_BANDS_SHORT = {0, 4, 8, 12, 16, 22, 30, 40, 52, 66, 84, 106, 136, 192, 576};
+    private static final int[][] SCALE_FACTOR_BANDS_LONG = {
+      {0, 4, 8, 12, 16, 20, 24, 30, 36, 44, 52, 62, 74, 90, 110, 134, 162, 196, 238, 288, 342, 418, 576},
+      {0, 4, 8, 12, 16, 20, 24, 30, 36, 42, 50, 60, 72, 88, 106, 128, 156, 190, 230, 276, 330, 384, 576},
+      {0, 4, 8, 12, 16, 20, 24, 30, 36, 44, 54, 66, 82, 102, 126, 156, 194, 240, 296, 364, 448, 550, 576}
+    };
+    private static final int[][] SCALE_FACTOR_BANDS_SHORT = {
+      {0, 4, 8, 12, 16, 22, 30, 40, 52, 66, 84, 106, 136, 192},
+      {0, 4, 8, 12, 16, 22, 28, 38, 50, 64, 80, 100, 126, 192},
+      {0, 4, 8, 12, 16, 22, 30, 42, 58, 78, 104, 138, 180, 192}
+    };
 
     // Pretab values per scale factor band for long blocks (ISO 11172-3 Table B.6).
     // Used when preflag is set by the encoder to amplify high-frequency bands.
@@ -416,10 +422,13 @@ class MpegFrame {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3, 2, 0
     };
 
-    // Number of lines per scale factor band for long blocks (44.1kHz)
-    private static final int[] SCALE_FACTOR_BAND_WIDTHS_LONG = {
-        4, 4, 4, 4, 4, 4, 6, 6, 8, 8, 10, 10, 12, 14, 16, 18, 20, 24, 26, 30, 32, 36, 38, 42, 48, 52, 60, 70, 10
-    };
+    static int[] longBands(int sampleRate) {
+      return SCALE_FACTOR_BANDS_LONG[sampleRate == 48000 ? 1 : sampleRate == 32000 ? 2 : 0];
+    }
+
+    static int[] shortBands(int sampleRate) {
+      return SCALE_FACTOR_BANDS_SHORT[sampleRate == 48000 ? 1 : sampleRate == 32000 ? 2 : 0];
+    }
 
   MainData(ByteBuffer byteBuffer, int frameOffset, MpegFrame frame) {
     this.frame = frame;
@@ -479,7 +488,7 @@ class MpegFrame {
         decodeScaleFactors(bits, this.scaleFactors, gr, ch, frame.getSideInfo());
 
         // 2. decode huffman data
-        decodeHuffmanBits(bits, gr, ch);
+        decodeHuffmanBits(bits, gr, ch, granuleBitStart + frame.getSideInfo().channels[ch].granules[gr].part2_3_length);
 
         // 3. advance BitReader to the exact end of this granule's data per part2_3_length.
         // This correctly handles the count1 region and any remaining bits, ensuring the
@@ -487,9 +496,8 @@ class MpegFrame {
         int part2_3_length = frame.getSideInfo().channels[ch].granules[gr].part2_3_length;
         int bitsConsumed = bits.getPosition() - granuleBitStart;
         int bitsRemaining = part2_3_length - bitsConsumed;
-        if (bitsRemaining > 0) {
-          bits.skip(bitsRemaining);
-        }
+        if (bitsRemaining > 0) bits.skip(bitsRemaining);
+        else if (bitsRemaining < 0) bits.setPosition(granuleBitStart + part2_3_length);
 
         // 4. dequantize sample
         dequantize(gr, ch);
@@ -518,21 +526,20 @@ class MpegFrame {
         int granuleBitStart = bits.getPosition();
 
         decodeScaleFactors(bits, this.scaleFactors, gr, ch, frame.getSideInfo());
-        decodeHuffmanBits(bits, gr, ch);
+        decodeHuffmanBits(bits, gr, ch, granuleBitStart + frame.getSideInfo().channels[ch].granules[gr].part2_3_length);
 
         int part2_3_length = frame.getSideInfo().channels[ch].granules[gr].part2_3_length;
         int bitsConsumed = bits.getPosition() - granuleBitStart;
         int bitsRemaining = part2_3_length - bitsConsumed;
-        if (bitsRemaining > 0) {
-          bits.skip(bitsRemaining);
-        }
+        if (bitsRemaining > 0) bits.skip(bitsRemaining);
+        else if (bitsRemaining < 0) bits.setPosition(granuleBitStart + part2_3_length);
 
         dequantize(gr, ch);
       }
     }
   }
 
-    private void decodeHuffmanBits(BitReader bits, int gr, int ch) {
+    private void decodeHuffmanBits(BitReader bits, int gr, int ch, int endBit) {
       var sideInfo = this.frame.getSideInfo();
       var granule = sideInfo.channels[ch].granules[gr];
 
@@ -542,65 +549,48 @@ class MpegFrame {
       // Region 0 ends at sfb band (region0_count + 1).
       // Region 1 ends at sfb band (region0_count + region1_count + 2).
       int region0Start = 0;
-      int region1Start = getRegionStart(granule, 0);
-      int region2Start = getRegionStart(granule, 1);
+      int region1Start = granule.window_switching_flag ? 36 : getRegionStart(granule, 0);
+      int region2Start = granule.window_switching_flag ? 576 : getRegionStart(granule, 1);
       int bigValuesEnd = Math.min(granule.big_values * 2, 576);
 
       // Decode big_values region with up to 3 different Huffman tables
       // Region 0
       if (granule.table_select[0] != 0 && region0Start < region1Start) {
         decodeBigValuesRegion(bits, xr, region0Start, Math.min(region1Start, bigValuesEnd),
-            HuffmanCode.getTable(granule.table_select[0]));
+            HuffmanCode.getTable(granule.table_select[0]), endBit);
       }
 
       // Region 1
       if (granule.table_select[1] != 0 && region1Start < region2Start && region1Start < bigValuesEnd) {
         decodeBigValuesRegion(bits, xr, region1Start, Math.min(region2Start, bigValuesEnd),
-            HuffmanCode.getTable(granule.table_select[1]));
+            HuffmanCode.getTable(granule.table_select[1]), endBit);
       }
 
       // Region 2
       if (granule.table_select[2] != 0 && region2Start < bigValuesEnd) {
         decodeBigValuesRegion(bits, xr, region2Start, bigValuesEnd,
-            HuffmanCode.getTable(granule.table_select[2]));
+            HuffmanCode.getTable(granule.table_select[2]), endBit);
       }
 
-      // Decode count1 (quadruples) region using count1table_select.
-      // Table B (select=1): each of v,w,x,y is a single binary flag; simple 4-bit decode.
-      // Table A (select=0): variable-length Huffman codes (ISO 11172-3 Table B.7); bits are
-      // advanced correctly by the granule bit-budget in the caller, so we skip here.
-      if (granule.count1table_select) {
-        int pos = bigValuesEnd;
-        while (pos < 572) {
-          // Read (v, w, x, y) each as 1 bit; a '0' bit signals no more quads
-          int v = bits.getNextBit();
-          if (v == BitReader.END_OF_DATA) {
-            break;
+      int pos = bigValuesEnd;
+      while (pos <= 572 && bits.getPosition() < endBit) {
+        int mark = bits.getPosition();
+        int quad = HuffmanCode.decodeQuad(granule.count1table_select, bits);
+        if (quad < 0 || bits.getPosition() > endBit) {
+          bits.setPosition(mark);
+          break;
+        }
+        for (int shift = 3; shift >= 0; shift--) {
+          int value = (quad >> shift) & 1;
+          if (value != 0) {
+            if (bits.getPosition() >= endBit) {
+              bits.setPosition(mark);
+              pos = 576;
+              break;
+            }
+            value = bits.getBoolean() ? -1 : 1;
           }
-          int w = bits.getNextBit();
-          int x = bits.getNextBit();
-          int y = bits.getNextBit();
-          if (w == BitReader.END_OF_DATA || x == BitReader.END_OF_DATA || y == BitReader.END_OF_DATA) {
-            break;
-          }
-          // Apply sign bits for each non-zero value
-          if (v != 0) {
-            v = bits.getBoolean() ? -1 : 1;
-          }
-          if (w != 0) {
-            w = bits.getBoolean() ? -1 : 1;
-          }
-          if (x != 0) {
-            x = bits.getBoolean() ? -1 : 1;
-          }
-          if (y != 0) {
-            y = bits.getBoolean() ? -1 : 1;
-          }
-          xr[pos] = v;
-          xr[pos + 1] = w;
-          xr[pos + 2] = x;
-          xr[pos + 3] = y;
-          pos += 4;
+          xr[pos++] = value;
         }
       }
 
@@ -620,32 +610,25 @@ class MpegFrame {
       }
 
       // Convert scale factor band index to frequency line
-      int[] bands = getScaleFactorBands(granule.block_type);
+      int[] bands = longBands(this.frame.getSampleRate());
       if (bandIndex >= bands.length) {
         return 576;
       }
       return bands[bandIndex];
     }
 
-    private int[] getScaleFactorBands(int blockType) {
-      // Block types 0, 1, 3 use long bands; types 2 use short bands
-      // Mixed type (type 2 with mixed_block_flag) uses long for first 8 bands
-      if (blockType == 2) {
-        return SCALE_FACTOR_BANDS_SHORT;
-      }
-      return SCALE_FACTOR_BANDS_LONG;
-    }
-
-    private void decodeBigValuesRegion(BitReader bits, int[] xr, int start, int end, HuffmanCode.CodeTable table) {
+    private void decodeBigValuesRegion(BitReader bits, int[] xr, int start, int end, HuffmanCode.CodeTable table, int endBit) {
       if (table == null || start >= end) {
         return;
       }
 
       int i = start;
-      while (i < end) {
+      while (i < end && bits.getPosition() < endBit) {
+        int mark = bits.getPosition();
         HuffmanCode.Node node = HuffmanCode.decode(table, bits);
 
-        if (node == null) {
+        if (node == null || bits.getPosition() > endBit) {
+          bits.setPosition(mark);
           break;
         }
 
@@ -653,21 +636,18 @@ class MpegFrame {
         int y = node.y();
 
         // Handle escape sequences (ESC): if x or y == 15, read extra linbits
-        if (table.linbits() > 0) {
-          if (x == 15) {
-            x += bits.get(table.linbits());
-          }
-          if (y == 15) {
-            y += bits.get(table.linbits());
-          }
-        }
-
-        // Sign bits: read 1 sign bit for each non-zero value (1 = negative)
+        if (table.linbits() > 0 && x == 15) x += bits.get(table.linbits());
         if (x != 0) {
           x = bits.getBoolean() ? -x : x;
         }
+        if (table.linbits() > 0 && y == 15) y += bits.get(table.linbits());
         if (y != 0) {
           y = bits.getBoolean() ? -y : y;
+        }
+
+        if (bits.getPosition() > endBit) {
+          bits.setPosition(mark);
+          break;
         }
 
         xr[i++] = x;
@@ -692,76 +672,50 @@ class MpegFrame {
       boolean isShortBlock = blockType == SideInfo.Granule.BLOCK_TYPE_3_SHORT_WINDOWS;
       boolean isMixedBlock = granule.mixed_block_flag;
 
-      double globalGainFactor = Math.pow(2, 0.25 * (granule.global_gain - 210));
+      double gain = Math.pow(2, 0.25 * (granule.global_gain - 210));
+      double scaleMultiplier = granule.scalefac_scale ? 1.0 : 0.5;
+      int cursor = 0;
 
-      for (int i = 0; i < 576; i++) {
-        float is = this.samples[ch][gr][i];
-        if (is == 0) {
-          continue;
+      if (isShortBlock && isMixedBlock) {
+        int[] longBands = longBands(this.frame.getSampleRate());
+        for (int sfb = 0; sfb < 8; sfb++) {
+          double scale = Math.pow(2, -scaleMultiplier * this.scaleFactors[ch][gr].l[sfb]);
+          while (cursor < longBands[sfb + 1]) requantize(ch, gr, cursor++, gain * scale);
         }
+      }
 
-        double xr = Math.pow(Math.abs(is), 4.0 / 3.0) * globalGainFactor;
-
-        int sfb;
-        int window = 0;
-        if (isShortBlock) {
-          sfb = getScaleFactorBandShort(i);
-          if (isMixedBlock && i < 36) {
-            sfb = getScaleFactorBandLong(i);
-          }
-          window = getWindowForShortBlock(i);
-        } else {
-          sfb = getScaleFactorBandLong(i);
-        }
-
-        int scalefactor;
-        if (isShortBlock) {
-          scalefactor = this.scaleFactors[ch][gr].s[window][Math.min(sfb, 12)];
-          scalefactor += granule.subblock_gain[window] * 8;
-        } else {
-          scalefactor = this.scaleFactors[ch][gr].l[Math.min(sfb, 22)];
-          if (granule.preflag) {
-            scalefactor += PREFACTORS[Math.min(sfb, 21)];
+      if (isShortBlock) {
+        int[] bands = shortBands(this.frame.getSampleRate());
+        int firstBand = isMixedBlock ? 3 : 0;
+        for (int sfb = firstBand; sfb < 12; sfb++) {
+          int width = bands[sfb + 1] - bands[sfb];
+          for (int window = 0; window < 3; window++) {
+            double exponent = -scaleMultiplier * this.scaleFactors[ch][gr].s[window][sfb]
+              - 2.0 * granule.subblock_gain[window];
+            double scale = gain * Math.pow(2, exponent);
+            for (int line = 0; line < width && cursor < 576; line++) requantize(ch, gr, cursor++, scale);
           }
         }
-
-        if (granule.scalefac_scale) {
-          scalefactor *= 2;
+      } else {
+        int[] bands = longBands(this.frame.getSampleRate());
+        for (int sfb = 0; sfb < 22; sfb++) {
+          int pre = granule.preflag ? PREFACTORS[sfb] : 0;
+          double scale = gain * Math.pow(2, -scaleMultiplier * (this.scaleFactors[ch][gr].l[sfb] + pre));
+          while (cursor < bands[sfb + 1]) requantize(ch, gr, cursor++, scale);
         }
-
-        xr *= Math.pow(2, -0.25 * scalefactor);
-        this.samples[ch][gr][i] = (is < 0) ? (float) -xr : (float) xr;
       }
     }
 
-    private int getScaleFactorBandLong(int frequencyLine) {
-      for (int i = 0; i < SCALE_FACTOR_BANDS_LONG.length - 1; i++) {
-        if (frequencyLine < SCALE_FACTOR_BANDS_LONG[i + 1]) {
-          return Math.min(i, 21); // Clamp to valid range (0-21 for l[])
-        }
-      }
-      return 21;
-    }
-
-    private int getScaleFactorBandShort(int frequencyLine) {
-      for (int i = 0; i < SCALE_FACTOR_BANDS_SHORT.length - 1; i++) {
-        if (frequencyLine < SCALE_FACTOR_BANDS_SHORT[i + 1]) {
-          return Math.min(i, 12); // Clamp to valid range (0-12 for s[][])
-        }
-      }
-      return 12;
-    }
-
-    private int getWindowForShortBlock(int frequencyLine) {
-      // Short blocks have 3 windows, each with 12 scale factor bands
-      // Each window covers 1/3 of the frequency lines
-      int windowSize = 576 / 3;
-      return Math.min(frequencyLine / windowSize, 2);
+    private void requantize(int ch, int gr, int index, double scale) {
+      float value = this.samples[ch][gr][index];
+      if (value == 0) return;
+      double magnitude = Math.pow(Math.abs(value), 4.0 / 3.0) * scale;
+      this.samples[ch][gr][index] = (float) Math.copySign(magnitude, value);
     }
 
     private void decodeScaleFactors(BitReader bits, ScaleFactors[][] scaleFactors, int gr, int ch, SideInfo sideInfo) {
       final int SHORT_SWITCH_POINT = 6;
-      final int LONG_SWITCH_POINT = 12;
+      final int LONG_SWITCH_POINT = 11;
       final var granule = sideInfo.channels[ch].granules[gr];
       final var slen1 = granule.slen1(); // slen1 is for bands 3-5
       final var slen2 = granule.slen2(); // slen2 is for bands 6-11
@@ -785,7 +739,7 @@ class MpegFrame {
           }
         }
       } else {  // LONG types 0,1,3
-        for (var sfb = 0; sfb < 20; sfb++) {
+        for (var sfb = 0; sfb < 21; sfb++) {
           final var bitsToRead = sfb < LONG_SWITCH_POINT ? slen1 : slen2;
           var scaleFactor = sideInfo.reuseScaleFactor(gr, ch, sfb) ? scaleFactors[ch][0].l[sfb] : bits.get(bitsToRead);
           scaleFactors[ch][gr].l[sfb] = scaleFactor;

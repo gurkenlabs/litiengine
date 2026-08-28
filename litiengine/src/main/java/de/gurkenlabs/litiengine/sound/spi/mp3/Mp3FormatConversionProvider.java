@@ -2,25 +2,12 @@ package de.gurkenlabs.litiengine.sound.spi.mp3;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.spi.FormatConversionProvider;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED;
 
-public class Mp3FormatConversionProvider extends FormatConversionProvider {
-
-  private static final AudioFormat[] OUTPUT_FORMATS =
-    {
-      // mono, 16 bit signed
-      new AudioFormat(PCM_SIGNED, AudioSystem.NOT_SPECIFIED, 16, 1, 2, AudioSystem.NOT_SPECIFIED, false),
-      new AudioFormat(PCM_SIGNED, AudioSystem.NOT_SPECIFIED, 16, 1, 2, AudioSystem.NOT_SPECIFIED, true),
-      // stereo, 16 bit signed
-      new AudioFormat(PCM_SIGNED, AudioSystem.NOT_SPECIFIED, 16, 2, 4, AudioSystem.NOT_SPECIFIED, false),
-      new AudioFormat(PCM_SIGNED, AudioSystem.NOT_SPECIFIED, 16, 2, 4, AudioSystem.NOT_SPECIFIED, true),
-    };
+/** Converts LITIENGINE MPEG-1 Layer III streams to signed 16-bit PCM. */
+public final class Mp3FormatConversionProvider extends FormatConversionProvider {
 
   @Override
   public AudioFormat.Encoding[] getSourceEncodings() {
@@ -43,27 +30,46 @@ public class Mp3FormatConversionProvider extends FormatConversionProvider {
   @Override
   public AudioFormat[] getTargetFormats(AudioFormat.Encoding targetEncoding, AudioFormat sourceFormat) {
     if (targetEncoding.equals(PCM_SIGNED) && isMpegFormat(sourceFormat)) {
-      return OUTPUT_FORMATS;
+      int channels = sourceFormat.getChannels();
+      float sampleRate = sourceFormat.getSampleRate();
+      return new AudioFormat[]{
+        new AudioFormat(PCM_SIGNED, sampleRate, 16, channels, channels * 2, sampleRate, false),
+        new AudioFormat(PCM_SIGNED, sampleRate, 16, channels, channels * 2, sampleRate, true)
+      };
     }
     return new AudioFormat[0];
   }
 
   @Override
   public AudioInputStream getAudioInputStream(AudioFormat.Encoding targetEncoding, AudioInputStream sourceStream) {
-    if (targetEncoding.equals(PCM_SIGNED)) {
-      return new Mp3AudioInputStream(sourceStream, OUTPUT_FORMATS[0]); // Default to first format
+    if (!targetEncoding.equals(PCM_SIGNED) || !isMpegFormat(sourceStream.getFormat())) {
+      throw new IllegalArgumentException("Unsupported MP3 conversion");
     }
-    return null;
+
+    var sourceFormat = sourceStream.getFormat();
+    var targetFormat = new AudioFormat(PCM_SIGNED, sourceFormat.getSampleRate(), 16,
+      sourceFormat.getChannels(), sourceFormat.getChannels() * 2, sourceFormat.getSampleRate(), false);
+    return new Mp3AudioInputStream(sourceStream, targetFormat);
   }
 
   @Override
   public AudioInputStream getAudioInputStream(AudioFormat targetFormat, AudioInputStream sourceStream) {
-    if (targetFormat.getEncoding().equals(PCM_SIGNED) && isMpegFormat(sourceStream.getFormat())) {
-      return new Mp3AudioInputStream(sourceStream, targetFormat);
+    var sourceFormat = sourceStream.getFormat();
+    if (!isSupportedTarget(targetFormat, sourceFormat)) {
+      throw new IllegalArgumentException("Unsupported MP3 conversion");
     }
-    return null;
+    return new Mp3AudioInputStream(sourceStream, targetFormat);
   }
-  
+
+  private boolean isSupportedTarget(AudioFormat targetFormat, AudioFormat sourceFormat) {
+    return isMpegFormat(sourceFormat)
+      && targetFormat.getEncoding().equals(PCM_SIGNED)
+      && targetFormat.getSampleSizeInBits() == 16
+      && targetFormat.getChannels() == sourceFormat.getChannels()
+      && targetFormat.getFrameSize() == sourceFormat.getChannels() * 2
+      && targetFormat.getSampleRate() == sourceFormat.getSampleRate();
+  }
+
   private boolean isMpegFormat(AudioFormat format) {
     return format.getEncoding().equals(Mpeg.getEncoding(Mpeg.VERSION_1_0, Mpeg.LAYER_3));
   }

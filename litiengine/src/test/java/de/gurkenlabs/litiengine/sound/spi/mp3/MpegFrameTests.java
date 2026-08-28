@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MpegFrameTests {
 
-  private static final byte[] EXAMPLE_HEADER = new byte[]{(byte) 0b11111111, (byte) 0b11111011, (byte) 0b00111000, (byte) 0b11000100};
+  private static final byte[] EXAMPLE_HEADER = new byte[]{(byte) 0b11111111, (byte) 0b11111010, (byte) 0b00111000, (byte) 0b11000100};
 
   private static final byte[] EXAMPLE_SIDE_INFO = new byte[]{-52, -123, 71, 78, 13, 36, 81, 1, -127, 36, -87, -127, -84, 12, 112, -92, -57};
 
@@ -34,7 +34,7 @@ class MpegFrameTests {
     assertEquals(0b11111111111, syncRoot);
     assertEquals(0b11, version);
     assertEquals(0b01, layer);
-    assertEquals(0b1, protection);
+    assertEquals(0b0, protection);
     assertEquals(0b0011, bitRate);
     assertEquals(0b10, sampleRate);
     assertEquals(0b0, padding);

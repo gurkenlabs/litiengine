@@ -9,7 +9,7 @@ class OverlapAddTests {
   @Test
   void testOverlapAddOutputLength() {
     OverlapAdd overlapAdd = new OverlapAdd();
-    
+
     float[] currentBlock = new float[36];
     for (int i = 0; i < 36; i++) {
       currentBlock[i] = 1.0f;
@@ -24,7 +24,7 @@ class OverlapAddTests {
   @Test
   void testOverlapAddFirstBlock() {
     OverlapAdd overlapAdd = new OverlapAdd();
-    
+
     float[] currentBlock = new float[36];
     for (int i = 0; i < 36; i++) {
       currentBlock[i] = 1.0f;
@@ -40,7 +40,7 @@ class OverlapAddTests {
   @Test
   void testOverlapAddSecondBlock() {
     OverlapAdd overlapAdd = new OverlapAdd();
-    
+
     float[] firstBlock = new float[36];
     for (int i = 0; i < 36; i++) {
       firstBlock[i] = 1.0f;
@@ -62,13 +62,13 @@ class OverlapAddTests {
   @Test
   void testOverlapAddReset() {
     OverlapAdd overlapAdd = new OverlapAdd();
-    
+
     float[] firstBlock = new float[36];
     for (int i = 0; i < 36; i++) {
       firstBlock[i] = 1.0f;
     }
     overlapAdd.process(firstBlock);
-    
+
     overlapAdd.reset();
 
     float[] secondBlock = new float[36];
