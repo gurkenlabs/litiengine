@@ -111,7 +111,7 @@ public class JavaLanguageService implements ScriptLanguageService {
     } else if (type != null) {
       addMembers(result, type);
     } else if (annotationContext) {
-      ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
+      ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine, document.definition());
     } else if (constructorContext) {
 
       Optional<Class<?>> expectedParamType = this.inferExpectedParameterType(prefix, document.definition(), variables, source);
@@ -153,8 +153,9 @@ public class JavaLanguageService implements ScriptLanguageService {
         addMembers(result, scriptType);
       }
       this.hostType(document.definition(), source).ifPresent(host -> addMembers(result, new ResolvedType(host, null, false)));
-      if (!insideMethodArgs && (word.startsWith("@") || word.startsWith("Script") || word.startsWith("Prop"))) {
-        ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine);
+      if (!insideMethodArgs && (word.startsWith("@") || word.startsWith("Script") || word.startsWith("Prop") || word.startsWith("Over") || word.startsWith("on") || word.equals("update") || word.equals("render"))) {
+        ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine, document.definition());
+        ScriptAnnotationProvider.addMethodOverrideCompletions(result, source, importedFqns, importInsertLine, document.definition(), word);
       }
 
       KEYWORDS.stream().sorted().forEach(keyword -> {

@@ -321,6 +321,11 @@
                 let filterText = '';
                 let targetRange = wordRange;
 
+                const isOverrideMethod = label.startsWith('@Override ') || label.includes(' [Override]');
+                const isOverride = label === '@Override' || label === 'Override' || isOverrideMethod;
+                const isProp = label.includes('ScriptProperty') || label === 'prop' || label === 'scriptproperty';
+                const isInfo = label.includes('ScriptInfo');
+
                 if (isAnnotationContext) {
                   targetRange = atRange;
                   if (!insertText.startsWith('@') && !isSnippet) {
@@ -329,18 +334,18 @@
                   if (!label.startsWith('@') && !isSnippet) {
                     label = '@' + label;
                   }
-                  filterText = insertText.startsWith('@')
-                    ? insertText.replace(/\(.*\)/, '')
-                    : ('@' + (label || insertText).replace(/\(.*\)/, ''));
+                  const baseFilter = (label || insertText).replace(/\(.*\)/, '').replace(/\[.*\]/, '').split('\n')[0].trim();
+                  filterText = baseFilter.startsWith('@') ? baseFilter : ('@' + baseFilter);
                 } else {
                   targetRange = wordRange;
-                  filterText = (label || insertText).replace(/^@/, '').replace(/\(.*\)/, '');
+                  const baseFilter = (label || insertText).replace(/^@/, '').replace(/\(.*\)/, '').replace(/\[.*\]/, '').split('\n')[0].trim();
+                  filterText = baseFilter;
                 }
 
-                const isProp = label.includes('ScriptProperty') || label === 'prop' || label === 'scriptproperty';
-                const isInfo = label.includes('ScriptInfo');
-                const sortPrefix = isProp ? '000_'
-                  : isInfo ? '001_'
+                const sortPrefix = isOverrideMethod ? '000_'
+                  : isOverride ? '001_'
+                  : isProp ? '002_'
+                  : isInfo ? '003_'
                   : isSnippet ? '010_'
                   : item.kind === 'PROPERTY' ? '020_'
                   : item.kind === 'FIELD' || item.kind === 'METHOD' ? '030_'

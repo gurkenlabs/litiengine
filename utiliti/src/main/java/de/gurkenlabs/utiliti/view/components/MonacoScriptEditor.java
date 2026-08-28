@@ -184,7 +184,7 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
   private void start() {
     if (this.started) return;
     this.started = true;
-    if (GraphicsEnvironment.isHeadless() || Boolean.getBoolean("utiliti.monaco.disabled")) {
+    if (GraphicsEnvironment.isHeadless() || Boolean.getBoolean("utiliti.monaco.disabled") || Game.isInNoGUIMode()) {
       this.unavailable("Monaco is disabled for this runtime.");
       return;
     }
@@ -470,12 +470,18 @@ final class MonacoScriptEditor extends JPanel implements AutoCloseable {
         CefAppBuilder builder = new CefAppBuilder();
         builder.setInstallDir(Path.of(System.getProperty("user.home"), ".litiengine", "jcef-146").toFile());
         builder.getCefSettings().windowless_rendering_enabled = false;
+        builder.getCefSettings().log_severity = org.cef.CefSettings.LogSeverity.LOGSEVERITY_DISABLE;
         builder.addJcefArgs(
             "--disable-extensions",
             "--disable-background-networking",
             "--disable-sync",
             "--disable-default-apps",
-            "--disable-component-update"
+            "--disable-component-update",
+            "--disable-features=MediaRouter,CastMediaRouteProvider,WebUSB,DeviceDiscoveryNotifications",
+            "--disable-media-router",
+            "--disable-device-discovery-notifications",
+            "--disable-usb-keyboard-detect",
+            "--log-severity=disable"
         );
         builder.setProgressHandler((progress, percentage) -> {
 

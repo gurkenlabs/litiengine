@@ -60,6 +60,7 @@ dependencies {
 
 tasks.named("test") {
   jvmArgs += jcefJvmArgs
+  systemProperty "utiliti.monaco.disabled", "true"
 }
 
 runtime {

@@ -287,5 +287,66 @@ class JavaLanguageServiceTests {
     assertTrue(attrHover.isPresent(), "Hover on attribute 'name' should return attribute documentation");
     assertTrue(attrHover.get().markdown().contains("**name**"), "Attribute hover should contain **name**");
   }
+
+  @Test
+  void testOverrideEventCompletionsForEnvironmentScript() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class MapController extends EnvironmentScript {
+          @Override
+          
+        }
+        """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///MapController.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.Completion> completions = this.service.complete(doc, new ScriptLanguageService.Position(4, 11));
+    assertNotNull(completions);
+    assertFalse(completions.isEmpty());
+
+    List<String> labels = completions.stream().map(ScriptLanguageService.Completion::label).toList();
+    assertTrue(labels.contains("@Override public void onLoaded()"), "Should suggest onLoaded for EnvironmentScript");
+    assertTrue(labels.contains("@Override protected void onEntityRemoved(IEntity entity)"), "Should suggest onEntityRemoved for EnvironmentScript");
+    assertTrue(labels.contains("@Override public void update()"), "Should suggest update for EnvironmentScript");
+
+    // Check that missing import (IEntity) is provided via TextEdit
+    ScriptLanguageService.Completion entityRemoved = completions.stream()
+      .filter(c -> c.label().contains("onEntityRemoved"))
+      .findFirst().orElseThrow();
+    assertNotNull(entityRemoved.additionalEdits());
+    assertTrue(entityRemoved.additionalEdits().stream().anyMatch(e -> e.text().contains("IEntity")), "Should include auto-import for IEntity");
+  }
+
+  @Test
+  void testOverrideEventCompletionsForEntityScript() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class MonsterBehavior extends EntityScript<Object> {
+          @
+        }
+        """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///MonsterBehavior.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.Completion> completions = this.service.complete(doc, new ScriptLanguageService.Position(4, 3));
+    assertNotNull(completions);
+    List<String> labels = completions.stream().map(ScriptLanguageService.Completion::label).toList();
+    assertTrue(labels.contains("@Override protected void onHit(EntityHitEvent event)"), "Should suggest onHit for EntityScript");
+    assertTrue(labels.contains("@Override protected void onDeath(ICombatEntity entity, EntityHitEvent hitEvent)"), "Should suggest onDeath for EntityScript");
+  }
 }
 
