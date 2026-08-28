@@ -144,6 +144,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       @Override public boolean isCellEditable(int row, int column) { return false; }
     };
   private final JTable problems = new JTable(this.problemsModel);
+  private final JScrollPane problemsScrollPane;
   private final Map<String, Boolean> scriptErrorStates = new ConcurrentHashMap<>();
   private final Map<String, List<ScriptDiagnostic>> projectDiagnostics = new ConcurrentHashMap<>();
   private final JLabel status = new JLabel(" ");
@@ -267,38 +268,44 @@ public final class ScriptWorkspacePanel extends JPanel {
     explorer.setPreferredSize(new Dimension(265, 0));
 
     this.problems.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-    this.problems.setRowHeight(Style.TREE_ROW_HEIGHT);
+    this.problems.setRowHeight(22);
     this.problems.setShowGrid(false);
     this.problems.setIntercellSpacing(new Dimension(0, 0));
-    this.problems.setBackground(Style.surface());
+    this.problems.setBackground(Style.background());
     this.problems.setForeground(Style.text());
     this.problems.setSelectionBackground(Style.sceneRowSelected());
     this.problems.setSelectionForeground(Color.WHITE);
-    this.problems.setFont(Style.getDefaultFont());
-    this.problems.setOpaque(false);
+    this.problems.setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11));
+    this.problems.setOpaque(true);
 
     if (this.problems.getTableHeader() != null) {
-      this.problems.getTableHeader().setBackground(Style.surface());
-      this.problems.getTableHeader().setForeground(Style.mutedText());
-      this.problems.getTableHeader().setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 11f));
+      this.problems.getTableHeader().setBackground(Style.background());
+      this.problems.getTableHeader().setForeground(new Color(130, 140, 160));
+      this.problems.getTableHeader().setFont(new Font(Style.FONTNAME_CONSOLE, Font.BOLD, 11));
       this.problems.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
-      javax.swing.table.TableCellRenderer defaultHeaderRenderer = this.problems.getTableHeader().getDefaultRenderer();
       this.problems.getTableHeader().setDefaultRenderer((table, value, isSelected, hasFocus, row, column) -> {
-        Component c = defaultHeaderRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        if (c instanceof JLabel label) {
-          label.setHorizontalAlignment(SwingConstants.LEADING);
-        }
-        return c;
+        JLabel label = new JLabel(Objects.toString(value, ""));
+        label.setOpaque(true);
+        label.setBackground(Style.background());
+        label.setForeground(new Color(130, 140, 160));
+        label.setFont(new Font(Style.FONTNAME_CONSOLE, Font.BOLD, 11));
+        label.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
+            BorderFactory.createEmptyBorder(3, 8, 3, 8)
+        ));
+        return label;
       });
     }
 
-    this.problems.getColumnModel().getColumn(0).setPreferredWidth(85);
+    this.problems.getColumnModel().getColumn(0).setPreferredWidth(62);
+    this.problems.getColumnModel().getColumn(0).setMaxWidth(75);
     this.problems.getColumnModel().getColumn(0).setCellRenderer(new ProblemSeverityRenderer());
 
-    this.problems.getColumnModel().getColumn(1).setPreferredWidth(160);
+    this.problems.getColumnModel().getColumn(1).setPreferredWidth(170);
     this.problems.getColumnModel().getColumn(1).setCellRenderer(new ProblemFileRenderer());
 
     this.problems.getColumnModel().getColumn(2).setPreferredWidth(65);
+    this.problems.getColumnModel().getColumn(2).setMaxWidth(80);
     this.problems.getColumnModel().getColumn(2).setCellRenderer(new ProblemLineRenderer());
 
     this.problems.getColumnModel().getColumn(3).setCellRenderer(new ProblemMessageRenderer());
@@ -306,6 +313,13 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (this.problems.getColumnModel().getColumnCount() > 4) {
       this.problems.getColumnModel().removeColumn(this.problems.getColumnModel().getColumn(4));
     }
+
+    this.problemsScrollPane = new JScrollPane(this.problems);
+    this.problemsScrollPane.setBorder(BorderFactory.createEmptyBorder());
+    this.problemsScrollPane.setBackground(Style.background());
+    this.problemsScrollPane.getViewport().setBackground(Style.background());
+    this.problemsScrollPane.getViewport().setOpaque(true);
+    this.problemsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
     this.problems.getSelectionModel().addListSelectionListener(e -> {
       if (!e.getValueIsAdjusting() && this.problems.getSelectedRow() >= 0) {
@@ -440,7 +454,7 @@ public final class ScriptWorkspacePanel extends JPanel {
 
 
   public JComponent getProblemsComponent() {
-    return new JScrollPane(this.problems);
+    return this.problemsScrollPane;
   }
 
   public JComponent getDebuggerComponent() {
@@ -1260,12 +1274,15 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.setBackground(Style.background());
     this.scripts.setBackground(Style.background());
     this.scripts.setForeground(Style.text());
-    this.problems.setBackground(Style.surface());
+    this.problems.setBackground(Style.background());
     this.problems.setForeground(Style.text());
-    this.problems.setGridColor(Style.border());
+    if (this.problemsScrollPane != null) {
+      this.problemsScrollPane.setBackground(Style.background());
+      this.problemsScrollPane.getViewport().setBackground(Style.background());
+    }
     if (this.problems.getTableHeader() != null) {
-      this.problems.getTableHeader().setBackground(Style.surface());
-      this.problems.getTableHeader().setForeground(Style.text());
+      this.problems.getTableHeader().setBackground(Style.background());
+      this.problems.getTableHeader().setForeground(new Color(130, 140, 160));
       this.problems.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
     }
     if (this.overviewPanel != null) {
@@ -3958,24 +3975,22 @@ public final class ScriptWorkspacePanel extends JPanel {
 
 
   private static final class ProblemSeverityRenderer extends javax.swing.table.DefaultTableCellRenderer {
+    private static final javax.swing.Icon ERROR_BADGE = new LevelBadgeIcon(Level.SEVERE);
+    private static final javax.swing.Icon WARN_BADGE = new LevelBadgeIcon(Level.WARNING);
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       super.getTableCellRendererComponent(table, "", isSelected, hasFocus, row, column);
+      setOpaque(true);
+      setBackground(isSelected ? table.getSelectionBackground() : Style.background());
       if (value instanceof ScriptDiagnostic.Severity severity) {
-        if (severity == ScriptDiagnostic.Severity.ERROR) {
-          setIcon(Icons.ERROR_16);
-          setText("Error");
-          setForeground(isSelected ? Color.WHITE : new Color(255, 110, 110));
-        } else {
-          setIcon(Icons.BULB_16);
-          setText("Warning");
-          setForeground(isSelected ? Color.WHITE : new Color(240, 200, 80));
-        }
+        setIcon(severity == ScriptDiagnostic.Severity.ERROR ? ERROR_BADGE : WARN_BADGE);
       } else {
         setIcon(null);
-        setText(Objects.toString(value, ""));
       }
-      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+      setText("");
+      setHorizontalAlignment(SwingConstants.CENTER);
+      setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
       return this;
     }
   }
@@ -3984,10 +3999,12 @@ public final class ScriptWorkspacePanel extends JPanel {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       super.getTableCellRendererComponent(table, Objects.toString(value, ""), isSelected, hasFocus, row, column);
-      setIcon(Icons.SCRIPT_16);
-      setFont(Style.getDefaultFont());
-      setForeground(isSelected ? Color.WHITE : Style.text());
-      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+      setOpaque(true);
+      setBackground(isSelected ? table.getSelectionBackground() : Style.background());
+      setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11));
+      setForeground(isSelected ? Color.WHITE : new Color(80, 170, 255));
+      setIcon(null);
+      setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
       return this;
     }
   }
@@ -3995,13 +4012,14 @@ public final class ScriptWorkspacePanel extends JPanel {
   private static final class ProblemLineRenderer extends javax.swing.table.DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-      String lineText = value instanceof Integer line ? "Ln " + line : Objects.toString(value, "");
+      String lineText = value instanceof Integer line && line > 0 ? "Ln " + line : Objects.toString(value, "");
       super.getTableCellRendererComponent(table, lineText, isSelected, hasFocus, row, column);
-      setIcon(null);
-      setFont(Style.getDefaultFont().deriveFont(11f));
-      setForeground(isSelected ? Color.WHITE : Style.mutedText());
-      setHorizontalAlignment(SwingConstants.RIGHT);
-      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+      setOpaque(true);
+      setBackground(isSelected ? table.getSelectionBackground() : Style.background());
+      setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11));
+      setForeground(isSelected ? Color.WHITE : new Color(130, 140, 160));
+      setHorizontalAlignment(SwingConstants.LEADING);
+      setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
       return this;
     }
   }
@@ -4010,10 +4028,12 @@ public final class ScriptWorkspacePanel extends JPanel {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       super.getTableCellRendererComponent(table, Objects.toString(value, ""), isSelected, hasFocus, row, column);
-      setIcon(null);
-      setFont(Style.getDefaultFont());
+      setOpaque(true);
+      setBackground(isSelected ? table.getSelectionBackground() : Style.background());
+      setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11));
       setForeground(isSelected ? Color.WHITE : Style.text());
-      setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+      setIcon(null);
+      setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
       return this;
     }
   }
