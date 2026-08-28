@@ -32,6 +32,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -40,11 +41,13 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -301,7 +304,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.problems.getColumnModel().getColumn(0).setMaxWidth(75);
     this.problems.getColumnModel().getColumn(0).setCellRenderer(new ProblemSeverityRenderer());
 
-    this.problems.getColumnModel().getColumn(1).setPreferredWidth(170);
+    this.problems.getColumnModel().getColumn(1).setPreferredWidth(240);
+    this.problems.getColumnModel().getColumn(1).setMinWidth(160);
     this.problems.getColumnModel().getColumn(1).setCellRenderer(new ProblemFileRenderer());
 
     this.problems.getColumnModel().getColumn(2).setPreferredWidth(65);
@@ -333,6 +337,19 @@ public final class ScriptWorkspacePanel extends JPanel {
         int row = problems.getSelectedRow();
         if (row >= 0) {
           jumpToProblemRow(row);
+        }
+      }
+    });
+
+    this.problems.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        int row = problems.rowAtPoint(e.getPoint());
+        int col = problems.columnAtPoint(e.getPoint());
+        if (row >= 0 && col >= 0) {
+          problems.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        } else {
+          problems.setCursor(Cursor.getDefaultCursor());
         }
       }
     });
@@ -3996,14 +4013,24 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   private static final class ProblemFileRenderer extends javax.swing.table.DefaultTableCellRenderer {
+    private static final Font FILE_LINK_FONT;
+    static {
+      Font base = new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11);
+      java.util.Map<TextAttribute, Object> attrs = new java.util.HashMap<>(base.getAttributes());
+      attrs.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+      FILE_LINK_FONT = base.deriveFont(attrs);
+    }
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-      super.getTableCellRendererComponent(table, Objects.toString(value, ""), isSelected, hasFocus, row, column);
+      String fileName = Objects.toString(value, "");
+      super.getTableCellRendererComponent(table, fileName, isSelected, hasFocus, row, column);
       setOpaque(true);
       setBackground(isSelected ? table.getSelectionBackground() : Style.background());
-      setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11));
+      setFont(FILE_LINK_FONT);
       setForeground(isSelected ? Color.WHITE : new Color(80, 170, 255));
       setIcon(null);
+      setToolTipText("Click to open " + fileName);
       setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
       return this;
     }
@@ -4019,6 +4046,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11));
       setForeground(isSelected ? Color.WHITE : new Color(130, 140, 160));
       setHorizontalAlignment(SwingConstants.LEADING);
+      setToolTipText("Click to navigate to line");
       setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
       return this;
     }
@@ -4033,6 +4061,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       setFont(new Font(Style.FONTNAME_CONSOLE, Font.PLAIN, 11));
       setForeground(isSelected ? Color.WHITE : Style.text());
       setIcon(null);
+      setToolTipText("Click to navigate to source");
       setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
       return this;
     }
