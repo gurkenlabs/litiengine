@@ -73,6 +73,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.SourceVersion;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -146,6 +148,8 @@ public final class ScriptWorkspacePanel extends JPanel {
   private final Map<String, List<ScriptDiagnostic>> projectDiagnostics = new ConcurrentHashMap<>();
   private final JLabel status = new JLabel(" ");
   private final JLabel caretStatus = new JLabel(" ");
+  private final JLabel languageStatus = new JLabel(" ");
+  private final JPanel languageSeparator = StatusBar.separator();
   private final JLabel scriptUsageStatusLabel = new JLabel(" ");
   private final JLabel scriptHealthIconLabel = new JLabel();
   private static final javax.swing.Icon CHECK_ICON = new javax.swing.Icon() {
@@ -155,10 +159,11 @@ public final class ScriptWorkspacePanel extends JPanel {
       try {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(new Color(110, 195, 120));
-        g2.drawOval(x + 1, y + 1, 13, 13);
+        int drawY = y + Math.max(0, (c.getHeight() - 16) / 2);
+        g2.drawOval(x + 1, drawY + 1, 13, 13);
         g2.setStroke(new java.awt.BasicStroke(1.5f, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
-        g2.drawLine(x + 4, y + 8, x + 7, y + 11);
-        g2.drawLine(x + 7, y + 11, x + 11, y + 5);
+        g2.drawLine(x + 4, drawY + 8, x + 7, drawY + 11);
+        g2.drawLine(x + 7, drawY + 11, x + 11, drawY + 5);
       } finally {
         g2.dispose();
       }
@@ -174,10 +179,11 @@ public final class ScriptWorkspacePanel extends JPanel {
       try {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(new Color(235, 90, 90));
-        g2.drawOval(x + 1, y + 1, 13, 13);
+        int drawY = y + Math.max(0, (c.getHeight() - 16) / 2);
+        g2.drawOval(x + 1, drawY + 1, 13, 13);
         g2.setStroke(new java.awt.BasicStroke(1.5f, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
-        g2.drawLine(x + 5, y + 5, x + 10, y + 10);
-        g2.drawLine(x + 10, y + 5, x + 5, y + 10);
+        g2.drawLine(x + 5, drawY + 5, x + 10, drawY + 10);
+        g2.drawLine(x + 10, drawY + 5, x + 5, drawY + 10);
       } finally {
         g2.dispose();
       }
@@ -350,7 +356,9 @@ public final class ScriptWorkspacePanel extends JPanel {
 
     this.statusBar = new JPanel(new BorderLayout());
     statusBar.setBackground(Style.background());
-    statusBar.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
+    statusBar.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()),
+        BorderFactory.createEmptyBorder(3, Style.SPACE_SMALL, 0, Style.SPACE_SMALL)));
     Font statusBarFont = new Font(
         Style.FONTNAME_CONSOLE,
         Font.PLAIN,
@@ -359,22 +367,30 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.status.setForeground(Style.mutedText());
     this.caretStatus.setFont(statusBarFont);
     this.caretStatus.setForeground(Style.mutedText());
+    this.languageStatus.setFont(statusBarFont);
+    this.languageStatus.setForeground(Style.mutedText());
     this.scriptUsageStatusLabel.setFont(statusBarFont);
     this.scriptUsageStatusLabel.setForeground(Style.mutedText());
     this.scriptHealthIconLabel.setIcon(CHECK_ICON);
 
     JLabel mcpBadge = StatusBar.createMcpBadge();
 
-    JPanel leftStatus = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+    JPanel leftStatus = new JPanel();
+    leftStatus.setLayout(new BoxLayout(leftStatus, BoxLayout.X_AXIS));
     leftStatus.setOpaque(false);
     leftStatus.add(mcpBadge);
     leftStatus.add(StatusBar.separator());
     leftStatus.add(this.caretStatus);
+    leftStatus.add(this.languageSeparator);
+    leftStatus.add(this.languageStatus);
 
-    JPanel rightStatus = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+    JPanel rightStatus = new JPanel();
+    rightStatus.setLayout(new BoxLayout(rightStatus, BoxLayout.X_AXIS));
     rightStatus.setOpaque(false);
     rightStatus.add(this.status);
+    rightStatus.add(Box.createHorizontalStrut(Style.SPACE_SMALL));
     rightStatus.add(this.scriptUsageStatusLabel);
+    rightStatus.add(Box.createHorizontalStrut(Style.SPACE_SMALL));
     rightStatus.add(this.scriptHealthIconLabel);
 
     statusBar.add(leftStatus, BorderLayout.WEST);
@@ -1269,7 +1285,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     }
     if (this.statusBar != null) {
       this.statusBar.setBackground(Style.background());
-      this.statusBar.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
+      this.statusBar.setBorder(BorderFactory.createCompoundBorder(
+          BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()),
+          BorderFactory.createEmptyBorder(3, Style.SPACE_SMALL, 0, Style.SPACE_SMALL)));
     }
     if (this.tabs != null) {
       this.tabs.setBackground(Style.background());
@@ -1279,6 +1297,7 @@ public final class ScriptWorkspacePanel extends JPanel {
       this.monaco.setTheme(Editor.preferences().getTheme() == Style.Theme.DARK);
     }
     this.caretStatus.setForeground(Style.mutedText());
+    this.languageStatus.setForeground(Style.mutedText());
     this.status.setForeground(Style.mutedText());
     this.scriptUsageStatusLabel.setForeground(Style.mutedText());
     this.globalsTree.setBackground(Style.background());
@@ -2226,15 +2245,26 @@ public final class ScriptWorkspacePanel extends JPanel {
 
   private void updateCaretStatus(ScriptTab tab) {
     if (tab == null) {
-      this.caretStatus.setText(" ");
+      this.caretStatus.setText("");
+      this.caretStatus.setVisible(false);
+      this.languageStatus.setText("");
+      this.languageStatus.setVisible(false);
+      this.languageSeparator.setVisible(false);
       return;
     }
     if (this.monacoTab == tab && this.monaco != null && this.monaco.isReady()) {
-      this.caretStatus.setText("Ln " + tab.caretLine + ", Col " + tab.caretColumn + "    "
-        + tab.definition.getLanguage().toUpperCase(Locale.ROOT));
+      this.caretStatus.setText("Ln " + tab.caretLine + ", Col " + tab.caretColumn);
+      this.caretStatus.setVisible(true);
+      this.languageStatus.setText(tab.definition.getLanguage().toUpperCase(Locale.ROOT));
+      this.languageStatus.setVisible(true);
+      this.languageSeparator.setVisible(true);
       return;
     }
-    this.caretStatus.setText(tab.definition.getLanguage().toUpperCase(Locale.ROOT));
+    this.caretStatus.setText("");
+    this.caretStatus.setVisible(false);
+    this.languageStatus.setText(tab.definition.getLanguage().toUpperCase(Locale.ROOT));
+    this.languageStatus.setVisible(true);
+    this.languageSeparator.setVisible(false);
   }
 
   private void setStatus(String message, boolean error) {

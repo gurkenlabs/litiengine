@@ -49,6 +49,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -120,6 +121,7 @@ public final class UI {
   private static AssetList assetComponent;
   private static ConsoleComponent consoleComponent;
   private static JPanel bottomContentPanel;
+  private static JPanel bottomConsoleToolbar;
   private static JToggleButton bottomConsoleTab;
   private static JToggleButton bottomProblemsTab;
   private static JToggleButton bottomResourcesTab;
@@ -577,6 +579,9 @@ public final class UI {
       if (assetComponent != null && assetComponent.getToolbar() != null) {
         assetComponent.getToolbar().setVisible(false);
       }
+      if (bottomConsoleToolbar != null) {
+        bottomConsoleToolbar.setVisible(true);
+      }
     }
   }
 
@@ -589,6 +594,9 @@ public final class UI {
       ((CardLayout) bottomContentPanel.getLayout()).show(bottomContentPanel, "problems");
       if (assetComponent != null && assetComponent.getToolbar() != null) {
         assetComponent.getToolbar().setVisible(false);
+      }
+      if (bottomConsoleToolbar != null) {
+        bottomConsoleToolbar.setVisible(false);
       }
     }
   }
@@ -603,6 +611,9 @@ public final class UI {
       if (assetComponent != null && assetComponent.getToolbar() != null) {
         assetComponent.getToolbar().setVisible(false);
       }
+      if (bottomConsoleToolbar != null) {
+        bottomConsoleToolbar.setVisible(false);
+      }
     }
   }
 
@@ -615,6 +626,7 @@ public final class UI {
             warnings > 0 || errors > 0
                 ? (errors + " errors" + (warnings > 0 ? ", " + warnings + " warnings" : ""))
                 : null);
+        bottomProblemsTab.revalidate();
         bottomProblemsTab.repaint();
       };
       if (SwingUtilities.isEventDispatchThread()) {
@@ -1302,6 +1314,7 @@ public final class UI {
                     warnings > 0 || errors > 0
                         ? Resources.strings().get("console_status", warnings, errors)
                         : null);
+                consoleTab.revalidate();
                 consoleTab.repaint();
               };
           if (SwingUtilities.isEventDispatchThread()) {
@@ -1338,7 +1351,9 @@ public final class UI {
     };
     header.setOpaque(true);
     Dimension headerSize = new Dimension(0, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
-    JPanel consoleToolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+    header.setPreferredSize(headerSize);
+    header.setMinimumSize(headerSize);
+    JPanel consoleToolbar = new JPanel(new FlowLayout(FlowLayout.TRAILING, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM));
     consoleToolbar.setOpaque(false);
 
     JButton clearBtn = Style.iconButton(Icons.CLEAR_CONSOLE_16);
@@ -1358,6 +1373,7 @@ public final class UI {
     header.add(consoleToolbar, BorderLayout.EAST);
 
     bottomContentPanel = content;
+    bottomConsoleToolbar = consoleToolbar;
     bottomResourcesTab = resourcesTab;
     bottomConsoleTab = consoleTab;
     bottomProblemsTab = problemsTab;
@@ -1395,6 +1411,31 @@ public final class UI {
   private static JToggleButton createBottomTab(String text, boolean selected, boolean showIndicators) {
     JToggleButton tab = new JToggleButton(text, selected) {
       @Override
+      public Dimension getPreferredSize() {
+        FontMetrics metrics = getFontMetrics(getFont());
+        int textWidth = metrics.stringWidth(getText());
+        int warnings = showIndicators ? consoleCount(getClientProperty("consoleWarnings")) : 0;
+        int errors = showIndicators ? consoleCount(getClientProperty("consoleErrors")) : 0;
+        int badgeCount = (warnings > 0 ? 1 : 0) + (errors > 0 ? 1 : 0);
+        int indicatorWidth =
+            badgeCount > 0
+                ? Style.SPACE_SMALL + badgeCount * 18 + (badgeCount - 1) * 3
+                : 0;
+        int width = textWidth + indicatorWidth + Style.SPACE_LARGE * 2;
+        return new Dimension(width, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
+      }
+
+      @Override
+      public Dimension getMinimumSize() {
+        return getPreferredSize();
+      }
+
+      @Override
+      public Dimension getMaximumSize() {
+        return new Dimension(Integer.MAX_VALUE, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
+      }
+
+      @Override
       protected void paintComponent(Graphics graphics) {
         Graphics2D g2 = (Graphics2D) graphics.create();
         try {
@@ -1406,19 +1447,19 @@ public final class UI {
           }
           g2.setColor(isSelected() ? Style.text() : Style.mutedText());
           g2.setFont(getFont());
-          java.awt.FontMetrics metrics = g2.getFontMetrics();
+          FontMetrics metrics = g2.getFontMetrics();
           int warnings = showIndicators ? consoleCount(getClientProperty("consoleWarnings")) : 0;
           int errors = showIndicators ? consoleCount(getClientProperty("consoleErrors")) : 0;
           int badgeCount = (warnings > 0 ? 1 : 0) + (errors > 0 ? 1 : 0);
           int indicatorWidth =
               badgeCount > 0
-                  ? Style.SPACE_MEDIUM + badgeCount * 18 + (badgeCount - 1) * 3
+                  ? Style.SPACE_SMALL + badgeCount * 18 + (badgeCount - 1) * 3
                   : 0;
           int contentWidth = metrics.stringWidth(getText()) + indicatorWidth;
           int textX = Math.max(0, (getWidth() - contentWidth) / 2);
-          int textY = (getHeight() - metrics.getHeight()) / 2 + metrics.getAscent();
+          int textY = (getHeight() + metrics.getAscent() - metrics.getDescent()) / 2;
           g2.drawString(getText(), textX, textY);
-          int indicatorX = textX + metrics.stringWidth(getText()) + Style.SPACE_MEDIUM;
+          int indicatorX = textX + metrics.stringWidth(getText()) + Style.SPACE_SMALL;
           if (warnings > 0) {
             paintConsoleBadge(
                 g2, indicatorX, (getHeight() - 16) / 2, warnings, Style.COLOR_ORANGE);
@@ -1437,7 +1478,7 @@ public final class UI {
       }
     };
     tab.setFont(Style.getHeaderFont());
-    int horizontalPadding = Style.SPACE_MEDIUM;
+    int horizontalPadding = Style.SPACE_LARGE;
     tab.setMargin(new java.awt.Insets(0, horizontalPadding, 0, horizontalPadding));
     tab.setBorder(BorderFactory.createEmptyBorder());
     tab.setOpaque(false);
@@ -1445,12 +1486,6 @@ public final class UI {
     tab.setBorderPainted(false);
     tab.setFocusPainted(false);
     tab.setRolloverEnabled(true);
-    int textWidth = tab.getFontMetrics(tab.getFont()).stringWidth(text);
-    int width = textWidth + horizontalPadding * 2 + (showIndicators ? 42 : 0);
-    Dimension size = new Dimension(width, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
-    tab.setPreferredSize(size);
-    tab.setMinimumSize(size);
-    tab.setMaximumSize(size);
     return tab;
   }
 
@@ -1460,11 +1495,11 @@ public final class UI {
     graphics.setColor(Color.WHITE);
     graphics.setFont(Style.getHeaderFont().deriveFont(Font.BOLD, 10f));
     String text = count > 9 ? "9+" : Integer.toString(count);
-    java.awt.FontMetrics metrics = graphics.getFontMetrics();
+    FontMetrics metrics = graphics.getFontMetrics();
     graphics.drawString(
         text,
         x + (18 - metrics.stringWidth(text)) / 2,
-        y + (16 - metrics.getHeight()) / 2 + metrics.getAscent());
+        y + (16 + metrics.getAscent() - metrics.getDescent()) / 2);
   }
 
   private static int consoleCount(Object value) {

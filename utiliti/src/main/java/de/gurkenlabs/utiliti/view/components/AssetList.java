@@ -16,6 +16,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,6 +26,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -141,9 +143,11 @@ public class AssetList extends JSplitPane implements Controller {
     this.summaryLabel.setForeground(Style.mutedText());
     this.summaryLabel.setFont(this.summaryLabel.getFont().deriveFont(
       Math.max(10f, this.summaryLabel.getFont().getSize2D() - 1f)));
+    this.summaryLabel.setVerticalAlignment(SwingConstants.CENTER);
 
     this.zoomSlider = new JSlider(96, 150, Editor.preferences().getAssetCardSize());
     this.zoomSlider.setPreferredSize(new Dimension(100, Style.CONTROL_HEIGHT));
+    this.zoomSlider.setBorder(BorderFactory.createEmptyBorder());
     this.zoomSlider.setOpaque(false);
     this.zoomSlider.setToolTipText(Resources.strings().get("assetlist_card_size"));
     this.zoomSlider.getAccessibleContext().setAccessibleName(

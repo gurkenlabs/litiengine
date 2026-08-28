@@ -50,4 +50,11 @@ class AssetListTest {
     assets.setScriptMode(false);
     assertFalse(assets.isScriptMode());
   }
+
+  @Test
+  void testToolbarLayout() {
+    AssetList assets = new AssetList();
+    assertNotNull(assets.getToolbar());
+    assertEquals(4, assets.getToolbar().getComponentCount());
+  }
 }

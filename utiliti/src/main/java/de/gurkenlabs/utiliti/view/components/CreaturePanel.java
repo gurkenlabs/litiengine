@@ -380,7 +380,7 @@ public class CreaturePanel extends PropertyPanel {
     }
   }
 
-  static Spritesheet getOrLoadSpritesheet(String spriteName) {
+  public static Spritesheet getOrLoadSpritesheet(String spriteName) {
     if (spriteName == null) {
       return null;
     }
@@ -472,7 +472,7 @@ public class CreaturePanel extends PropertyPanel {
     return lower.equals("dead") || lower.startsWith("dead-") || lower.endsWith("-dead") || lower.contains("-dead-");
   }
 
-  static String selectPreviewSpriteName(
+  public static String selectPreviewSpriteName(
       String base, Direction direction, boolean startDead, java.util.Collection<Spritesheet> spritesheets) {
     if (base == null) {
       return null;

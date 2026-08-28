@@ -49,6 +49,31 @@ class SpriteVariantSelectorTest {
     assertEquals("prop-chest-open", map.get("chest"));
   }
 
+  @Test
+  void selectCreatureSpriteNameMatchesDirectionAndState() {
+    List<Spritesheet> sheets = List.of(
+      sheet("zombie9-idle-down"),
+      sheet("zombie9-walk-left"),
+      sheet("zombie9-walk-right"),
+      sheet("zombie9-dead"));
+
+    assertEquals("zombie9-walk-left", SpriteVariantSelector.selectCreatureSpriteName("zombie9", de.gurkenlabs.litiengine.Direction.LEFT, false, sheets));
+    assertEquals("zombie9-walk-right", SpriteVariantSelector.selectCreatureSpriteName("zombie9", de.gurkenlabs.litiengine.Direction.RIGHT, false, sheets));
+    assertEquals("zombie9-dead", SpriteVariantSelector.selectCreatureSpriteName("zombie9", de.gurkenlabs.litiengine.Direction.LEFT, true, sheets));
+  }
+
+  @Test
+  void selectPropSpriteNameMatchesState() {
+    List<Spritesheet> sheets = List.of(
+      sheet("prop-barrel1-intact"),
+      sheet("prop-barrel1-damaged"),
+      sheet("prop-barrel1-destroyed"));
+
+    assertEquals("prop-barrel1-intact", SpriteVariantSelector.selectPropSpriteName("barrel1", de.gurkenlabs.litiengine.entities.PropState.INTACT, sheets));
+    assertEquals("prop-barrel1-damaged", SpriteVariantSelector.selectPropSpriteName("barrel1", de.gurkenlabs.litiengine.entities.PropState.DAMAGED, sheets));
+    assertEquals("prop-barrel1-destroyed", SpriteVariantSelector.selectPropSpriteName("barrel1", de.gurkenlabs.litiengine.entities.PropState.DESTROYED, sheets));
+  }
+
   private static Spritesheet sheet(String name) {
     return new Spritesheet(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), name + ".png", 1, 1);
   }

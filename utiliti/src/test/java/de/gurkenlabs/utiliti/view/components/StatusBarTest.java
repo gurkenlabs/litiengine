@@ -50,4 +50,20 @@ class StatusBarTest {
     assertEquals(Style.COLOR_RED, StatusBar.mcpColor(
         true, new ActionStatus(ActionState.FAILED, "set-tile")));
   }
+
+  @Test
+  void mcpBadgeSizesToIconWithoutExcessivePadding() {
+    javax.swing.JLabel badge = StatusBar.createMcpBadge();
+    assertEquals(badge.getPreferredSize().width, badge.getMaximumSize().width);
+    org.junit.jupiter.api.Assertions.assertTrue(badge.getPreferredSize().width <= 54);
+    org.junit.jupiter.api.Assertions.assertEquals(16, badge.getPreferredSize().height);
+  }
+
+  @Test
+  void separatorRespectsGlobalSmallSpacing() {
+    javax.swing.JPanel sep = StatusBar.separator();
+    java.awt.Insets insets = sep.getInsets();
+    assertEquals(Style.SPACE_SMALL, insets.left);
+    assertEquals(Style.SPACE_SMALL, insets.right);
+  }
 }

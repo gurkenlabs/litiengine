@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
+import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.view.components.SceneGraph;
@@ -192,18 +193,10 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
   }
 
   private static Icon getEntityIcon(SceneGraph.SceneNode node) {
-    if (node.getEntity() == null) {
+    if (node == null) {
       return null;
     }
-
-    if (node.getEntity() instanceof Prop prop) {
-      return getIcon(prop);
-    } else if (node.getEntity() instanceof Creature creature) {
-      return getIcon(creature);
-    } else if (node.getEntity() instanceof LightSource lightSource) {
-      return getIcon(lightSource);
-    }
-    return null;
+    return SpriteVariantSelector.getEntityIcon(node.getEntity(), node.getMapObject(), 16);
   }
 
   private static Icon getDefaultEntityIcon(SceneGraph.SceneNode node) {
@@ -213,71 +206,6 @@ public class SceneGraphRenderer extends JPanel implements TreeCellRenderer {
     de.gurkenlabs.litiengine.environment.tilemap.MapObjectType type =
         de.gurkenlabs.litiengine.environment.tilemap.MapObjectType.get(node.getMapObject().getType());
     return Icons.forMapObjectType(type);
-  }
-
-  private static Icon getIcon(Prop prop) {
-    if (prop == null || prop.getSpritesheetName() == null
-        || Game.world() == null || Game.world().environment() == null
-        || Game.world().environment().getMap() == null) {
-      return null;
-    }
-    String cacheKey = Game.world().environment().getMap().getName()
-        + "-" + prop.getSpritesheetName().toLowerCase(Locale.ROOT) + "-scene";
-    BufferedImage img = Resources.images().get(cacheKey, () -> {
-      String fallbackName = PropAnimationController.getSpriteName(prop, false);
-      Spritesheet sprite = Resources.spritesheets()
-          .get(PropAnimationController.getSpriteName(prop, PropState.INTACT, true));
-      if (sprite == null && Resources.spritesheets().contains(fallbackName)) {
-        sprite = Resources.spritesheets().get(fallbackName);
-      }
-      if (sprite == null || sprite.getSprite(0) == null) {
-        return null;
-      }
-      return Imaging.scale(sprite.getSprite(0), 16, 16, true);
-    });
-    return img != null ? new ImageIcon(img) : null;
-  }
-
-  private static Icon getIcon(Creature creature) {
-    if (Game.world() == null || Game.world().environment() == null
-        || Game.world().environment().getMap() == null) {
-      return null;
-    }
-    String cacheKey = Game.world().environment().getMap().getName()
-        + "-" + creature.getSpritesheetName() + "-" + creature.getMapId() + "-scene";
-    BufferedImage img = Resources.images().get(cacheKey, () -> {
-      Collection<Spritesheet> sprites = Resources.spritesheets().get(
-          s -> s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.IDLE))
-              || s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.MOVE))
-              || s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.DEAD))
-              || s.getName().startsWith(creature.getSpritesheetName() + "-"));
-      if (sprites.isEmpty()) {
-        return null;
-      }
-      return Imaging.scale(sprites.iterator().next().getSprite(0), 16, 16, true);
-    });
-    return img != null ? new ImageIcon(img) : null;
-  }
-
-  private static Icon getIcon(LightSource lightSource) {
-    Color lightColor = lightSource.getColor();
-    if (lightColor == null || Game.world() == null || Game.world().environment() == null
-        || Game.world().environment().getMap() == null) {
-      return null;
-    }
-    String cacheKey = Game.world().environment().getMap().getName()
-        + "-" + Integer.toHexString(lightSource.getColor().getRGB());
-    BufferedImage img = Resources.images().get(cacheKey, () -> {
-      BufferedImage newImg = Imaging.getCompatibleImage(10, 10);
-      Graphics2D g = (Graphics2D) Objects.requireNonNull(newImg).getGraphics();
-      g.setColor(lightColor);
-      g.fillRect(0, 0, 9, 9);
-      g.setColor(Style.border());
-      g.drawRect(0, 0, 9, 9);
-      g.dispose();
-      return newImg;
-    });
-    return img != null ? new ImageIcon(img) : null;
   }
 
   private static final class BadgeLabel extends JLabel {

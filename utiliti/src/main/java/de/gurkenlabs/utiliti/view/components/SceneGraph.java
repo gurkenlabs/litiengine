@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.EntityController;
 import de.gurkenlabs.utiliti.controller.LayerController;
+import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.controller.Transform;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
@@ -1074,24 +1075,7 @@ public final class SceneGraph extends JPanel implements EntityController, LayerC
   }
 
   private static Spritesheet getPreviewSpritesheet(IEntity entity) {
-    if (entity instanceof Prop prop) {
-      Spritesheet spritesheet = Resources.spritesheets().get(PropAnimationController.getSpriteName(prop, PropState.INTACT, true));
-      if (spritesheet == null) {
-        spritesheet = Resources.spritesheets().get(PropAnimationController.getSpriteName(prop, false));
-      }
-      if (spritesheet != null) {
-        return spritesheet;
-      }
-      return Resources.spritesheets().get(s -> s.getName().startsWith(prop.getSpritesheetName() + "-")).stream().findFirst().orElse(null);
-    }
-    if (entity instanceof Creature creature) {
-      Spritesheet spritesheet = Resources.spritesheets().get(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.IDLE));
-      if (spritesheet != null) {
-        return spritesheet;
-      }
-      return Resources.spritesheets().get(s -> s.getName().startsWith(creature.getSpritesheetName() + "-")).stream().findFirst().orElse(null);
-    }
-    return null;
+    return SpriteVariantSelector.getPreviewSpritesheet(entity, null);
   }
 
   @Override
