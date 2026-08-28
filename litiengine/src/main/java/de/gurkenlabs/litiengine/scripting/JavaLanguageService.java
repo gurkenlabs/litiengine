@@ -100,8 +100,11 @@ public class JavaLanguageService implements ScriptLanguageService {
 
     Matcher annotParamMatcher = Pattern.compile("(?s)@([A-Za-z0-9_$]+)\\s*\\(([^)]*)$").matcher(prefix);
     boolean annotationContext = prefix.matches("(?s).*@\\s*[A-Za-z0-9_$]*$");
+    boolean afterOverride = prefix.matches("(?s).*@Override\\s+[A-Za-z0-9_$]*$");
     boolean constructorContext = prefix.matches("(?s).*\\bnew(?:\\s+[\\w.$]*)?$");
     boolean insideMethodArgs = findUnclosedParen(prefix) >= 0;
+    int depth = braceDepth(prefix);
+    boolean isClassBody = depth == 1;
 
     if (annotParamMatcher.find()) {
       String annotName = annotParamMatcher.group(1);
@@ -112,6 +115,14 @@ public class JavaLanguageService implements ScriptLanguageService {
       addMembers(result, type);
     } else if (annotationContext) {
       ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine, document.definition());
+    } else if (afterOverride) {
+      String word = currentWord(prefix);
+      ScriptAnnotationProvider.addMethodOverrideCompletions(result, source, importedFqns, importInsertLine, document.definition(), word, false);
+      for (String kw : List.of("public", "protected", "private", "void", "int", "boolean", "double", "float", "String")) {
+        if (word.isEmpty() || matchesPrefix(kw, word)) {
+          result.add(new Completion(kw, CompletionKind.KEYWORD, "Java keyword", "", kw, null, List.of(), List.of()));
+        }
+      }
     } else if (constructorContext) {
 
       Optional<Class<?>> expectedParamType = this.inferExpectedParameterType(prefix, document.definition(), variables, source);
@@ -138,6 +149,43 @@ public class JavaLanguageService implements ScriptLanguageService {
           "import " + projectType.getName() + ";\n"));
         result.add(typeCompletionWithEdits(projectType, true, edits));
       }
+    } else if (isClassBody) {
+      String word = currentWord(prefix);
+      addScriptDeclaredMembers(result, source);
+      ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine, document.definition());
+      ScriptAnnotationProvider.addMethodOverrideCompletions(result, source, importedFqns, importInsertLine, document.definition(), word, true);
+
+      KEYWORDS.stream().sorted().forEach(keyword -> {
+        if (word.isEmpty() || matchesPrefix(keyword, word)) {
+          result.add(new Completion(
+            keyword, CompletionKind.KEYWORD, "Java keyword", "", keyword, null, List.of(), List.of()));
+        }
+      });
+
+      this.importedTypes(source).values().stream().distinct().sorted(Comparator.comparing(Class::getSimpleName))
+        .forEach(imported -> {
+          if (word.isEmpty() || matchesPrefix(imported.getSimpleName(), word)) {
+            result.add(getCachedTypeCompletion(imported));
+          }
+        });
+
+      for (Class<?> engineType : EngineTypeCatalog.publicTypes()) {
+        if (word.isEmpty() || matchesPrefix(engineType.getSimpleName(), word)) {
+          List<TextEdit> edits = importedFqns.contains(engineType.getName()) ? List.of()
+            : List.of(new TextEdit(new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+              "import " + engineType.getName() + ";\n"));
+          result.add(typeCompletionWithEdits(engineType, false, edits));
+        }
+      }
+      for (Class<?> projectType : EngineTypeCatalog.projectTypes(this.workspace.classLoader())) {
+        if (importedFqns.contains(projectType.getName())) continue;
+        if (word.isEmpty() || matchesPrefix(projectType.getSimpleName(), word)) {
+          List<TextEdit> edits = List.of(new TextEdit(
+            new Range(new Position(importInsertLine, 0), new Position(importInsertLine, 0)),
+            "import " + projectType.getName() + ";\n"));
+          result.add(typeCompletionWithEdits(projectType, false, edits));
+        }
+      }
     } else {
       String word = currentWord(prefix);
       if (insideMethodArgs) {
@@ -153,10 +201,6 @@ public class JavaLanguageService implements ScriptLanguageService {
         addMembers(result, scriptType);
       }
       this.hostType(document.definition(), source).ifPresent(host -> addMembers(result, new ResolvedType(host, null, false)));
-      if (!insideMethodArgs && (word.startsWith("@") || word.startsWith("Script") || word.startsWith("Prop") || word.startsWith("Over") || word.startsWith("on") || word.equals("update") || word.equals("render"))) {
-        ScriptAnnotationProvider.addAnnotationCompletions(result, source, importedFqns, importInsertLine, document.definition());
-        ScriptAnnotationProvider.addMethodOverrideCompletions(result, source, importedFqns, importInsertLine, document.definition(), word);
-      }
 
       KEYWORDS.stream().sorted().forEach(keyword -> {
         if (word.isEmpty() || matchesPrefix(keyword, word)) {
@@ -1517,6 +1561,49 @@ public class JavaLanguageService implements ScriptLanguageService {
       case KEYWORD -> 2;
       case CLASS, CONSTRUCTOR -> 3;
     };
+  }
+
+  private static int braceDepth(String source) {
+    int depth = 0;
+    boolean inString = false;
+    boolean inChar = false;
+    boolean inLineComment = false;
+    boolean inBlockComment = false;
+    for (int i = 0; i < source.length(); i++) {
+      char c = source.charAt(i);
+      char next = (i + 1 < source.length()) ? source.charAt(i + 1) : '\0';
+      if (inLineComment) {
+        if (c == '\n') inLineComment = false;
+      } else if (inBlockComment) {
+        if (c == '*' && next == '/') {
+          inBlockComment = false;
+          i++;
+        }
+      } else if (inString) {
+        if (c == '\\') i++;
+        else if (c == '"') inString = false;
+      } else if (inChar) {
+        if (c == '\\') i++;
+        else if (c == '\'') inChar = false;
+      } else {
+        if (c == '/' && next == '/') {
+          inLineComment = true;
+          i++;
+        } else if (c == '/' && next == '*') {
+          inBlockComment = true;
+          i++;
+        } else if (c == '"') {
+          inString = true;
+        } else if (c == '\'') {
+          inChar = true;
+        } else if (c == '{') {
+          depth++;
+        } else if (c == '}') {
+          depth--;
+        }
+      }
+    }
+    return depth;
   }
 
   private static int offset(String text, Position position) {

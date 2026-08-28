@@ -358,6 +358,17 @@ final class ScriptAnnotationProvider {
       int importInsertLine,
       ScriptDefinition definition,
       String word) {
+    addMethodOverrideCompletions(result, source, importedFqns, importInsertLine, definition, word, true);
+  }
+
+  static void addMethodOverrideCompletions(
+      List<Completion> result,
+      String source,
+      Set<String> importedFqns,
+      int importInsertLine,
+      ScriptDefinition definition,
+      String word,
+      boolean includeOverrideAnnotation) {
 
     ScriptHostType detectedHost = detectHostType(source, definition);
     for (EventOverride hook : EVENT_OVERRIDES) {
@@ -365,12 +376,13 @@ final class ScriptAnnotationProvider {
         String query = word.toLowerCase(java.util.Locale.ROOT);
         if (query.isEmpty() || hook.methodName().toLowerCase(java.util.Locale.ROOT).startsWith(query) || hook.signature().toLowerCase(java.util.Locale.ROOT).contains(query)) {
           List<TextEdit> edits = createImportEdits(source, importedFqns, importInsertLine, hook.requiredImports());
+          String template = includeOverrideAnnotation ? hook.template() : (hook.signature() + " {\n  ${0}\n}");
           result.add(new Completion(
-              hook.signature() + " [Override]",
+              hook.signature() + (includeOverrideAnnotation ? " [Override]" : ""),
               CompletionKind.SNIPPET,
               hook.detail(),
               hook.doc(),
-              hook.template(),
+              template,
               "void",
               List.of(),
               edits

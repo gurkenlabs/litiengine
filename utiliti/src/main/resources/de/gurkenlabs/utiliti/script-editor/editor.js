@@ -314,7 +314,7 @@
               suggestions: (value.items || []).map(item => {
                 const rawLabel = item.label || '';
                 const rawInsert = item.insertText || rawLabel;
-                const isSnippet = item.kind === 'SNIPPET';
+                const isSnippet = item.kind === 'SNIPPET' || (typeof rawInsert === 'string' && rawInsert.includes('${'));
 
                 let label = rawLabel;
                 let insertText = rawInsert;

@@ -348,5 +348,38 @@ class JavaLanguageServiceTests {
     assertTrue(labels.contains("@Override protected void onHit(EntityHitEvent event)"), "Should suggest onHit for EntityScript");
     assertTrue(labels.contains("@Override protected void onDeath(ICombatEntity entity, EntityHitEvent hitEvent)"), "Should suggest onDeath for EntityScript");
   }
+
+  @Test
+  void testOverrideAfterExistingAnnotationOnPreviousLine() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class MonsterBehavior extends EntityScript<Object> {
+          @Override
+          onD
+        }
+        """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///MonsterBehavior.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.Completion> completions = this.service.complete(doc, new ScriptLanguageService.Position(5, 5));
+    assertNotNull(completions);
+    List<String> labels = completions.stream().map(ScriptLanguageService.Completion::label).toList();
+    assertTrue(labels.contains("protected void onDeath(ICombatEntity entity, EntityHitEvent hitEvent)"),
+      "Should suggest method declaration without duplicate @Override when @Override is on line above");
+
+    ScriptLanguageService.Completion onDeath = completions.stream()
+      .filter(c -> c.label().startsWith("protected void onDeath"))
+      .findFirst().orElseThrow();
+    assertTrue(onDeath.insertText().startsWith("protected void onDeath"), "Insert text should start with protected void onDeath");
+    assertTrue(onDeath.insertText().contains("{\n  ${0}\n}"), "Insert text should contain method body template");
+    assertFalse(onDeath.insertText().contains("${1:entity}"), "Insert text should not be a raw call with ${1:entity}");
+  }
 }
 
