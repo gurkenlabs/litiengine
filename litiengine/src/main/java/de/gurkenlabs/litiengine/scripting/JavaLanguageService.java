@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -35,7 +37,11 @@ import javax.tools.ToolProvider;
 
 /** Language service providing Monaco intellisense (completion, hover, diagnostics, definition) for Java scripts. */
 public class JavaLanguageService implements ScriptLanguageService {
+  private static final Logger log = Logger.getLogger(JavaLanguageService.class.getName());
   private static final Pattern IMPORT = Pattern.compile("(?m)^\\s*import\\s+(?:static\\s+)?([\\w.$]+(?:\\.\\*)?)(?:\\s+as\\s+([A-Za-z_$][\\w$]*))?\\s*;?\\s*$");
+  private static final Set<String> PRIMITIVES = Set.of(
+    "boolean", "byte", "short", "int", "long", "float", "double", "char"
+  );
   private static final Set<String> KEYWORDS = Set.of(
     "abstract", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue",
     "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto",
@@ -548,10 +554,13 @@ public class JavaLanguageService implements ScriptLanguageService {
         Position endOfLine = new Position(diagLine - 1, lineLen);
         Range endRange = new Range(endOfLine, endOfLine);
 
+        String returnType = findEnclosingMethodReturnType(source, diagLine - 1);
+        String defaultReturn = defaultReturnValue(returnType);
+
         actions.add(new CodeAction(
-          "Add 'return null;'",
+          "Add 'return " + defaultReturn + ";'",
           "quickfix",
-          List.of(new TextEdit(endRange, "\n    return null;"))
+          List.of(new TextEdit(endRange, "\n    return " + defaultReturn + ";"))
         ));
       } else if (diag.message().contains("cyclic") || diag.message().contains("inheritance") || diag.message().contains("Vererbung")) {
         String cls = null;
@@ -634,8 +643,7 @@ public class JavaLanguageService implements ScriptLanguageService {
         List<Method> missingMethods = new ArrayList<>();
         for (Method m : contractClass.getMethods()) {
           if (Modifier.isAbstract(m.getModifiers()) || contractClass.isInterface()) {
-            Pattern mPattern = Pattern.compile("\\b" + Pattern.quote(m.getName()) + "\\s*\\(");
-            if (!mPattern.matcher(source).find()) {
+            if (!hasMethodDeclaration(source, m)) {
               missingMethods.add(m);
             }
           }
@@ -657,7 +665,7 @@ public class JavaLanguageService implements ScriptLanguageService {
               sb.append(simpleName(params[i].getParameterizedType().getTypeName())).append(" ")
                 .append(params[i].isNamePresent() ? params[i].getName() : "arg" + i);
             }
-            sb.append(") {\n    // TODO: implement\n  }\n\n");
+            sb.append(") {\n    throw new UnsupportedOperationException(\"Not implemented yet\");\n  }\n\n");
           }
 
           actions.add(new CodeAction(
@@ -1686,35 +1694,249 @@ public class JavaLanguageService implements ScriptLanguageService {
   @Override
   public List<TextEdit> rename(Document document, Position position, String newName) {
     if (document == null || document.text() == null || newName == null || newName.isBlank()) return List.of();
-    String source = document.text();
-    int off = offset(source, position);
-    String targetWord = wordAt(source, off);
-    if (targetWord.isBlank() || !targetWord.matches("[A-Za-z_$][\\w$]*") || KEYWORDS.contains(targetWord)) {
-      return List.of();
-    }
-
     String replacement = newName.trim();
     if (!replacement.matches("[A-Za-z_$][\\w$]*") || KEYWORDS.contains(replacement)) {
       return List.of();
     }
 
-    List<TextEdit> edits = new ArrayList<>();
-    String[] lines = source.split("\\R", -1);
-    Pattern pattern = Pattern.compile("\\b" + Pattern.quote(targetWord) + "\\b");
+    String source = document.text();
+    int targetOffset = offset(source, position);
+    String targetWord = wordAt(source, targetOffset);
+    if (targetWord.isBlank() || !targetWord.matches("[A-Za-z_$][\\w$]*") || KEYWORDS.contains(targetWord)) {
+      return List.of();
+    }
 
-    for (int l = 0; l < lines.length; l++) {
-      String line = lines[l];
-      Matcher matcher = pattern.matcher(line);
-      while (matcher.find()) {
-        int startCol = matcher.start();
-        int endCol = matcher.end();
-        edits.add(new TextEdit(
-          new Range(new Position(l, startCol), new Position(l, endCol)),
-          replacement
-        ));
+    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    if (compiler == null) return List.of();
+
+    String filename = resolveFileName(document);
+    SimpleJavaFileObject file = new SimpleJavaFileObject(URI.create("string:///" + filename), JavaFileObject.Kind.SOURCE) {
+      @Override public CharSequence getCharContent(boolean ignoreEncodingErrors) { return source; }
+    };
+
+    List<String> options = new ArrayList<>();
+    List<String> classpathEntries = this.buildCompilerClasspath();
+    if (!classpathEntries.isEmpty()) {
+      options.add("-classpath");
+      options.add(String.join(java.io.File.pathSeparator, classpathEntries));
+    }
+
+    DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
+    JavaCompiler.CompilationTask task = compiler.getTask(null, null, collector, options, null, List.of(file));
+    if (!(task instanceof com.sun.source.util.JavacTask javacTask)) {
+      return List.of();
+    }
+
+    try {
+      Iterable<? extends com.sun.source.tree.CompilationUnitTree> units = javacTask.parse();
+      javacTask.analyze();
+      com.sun.source.util.Trees trees = com.sun.source.util.Trees.instance(javacTask);
+      com.sun.source.util.SourcePositions positions = trees.getSourcePositions();
+
+      for (com.sun.source.tree.CompilationUnitTree unit : units) {
+        com.sun.source.util.TreePath targetPath = findTreePathAt(trees, unit, targetOffset);
+        if (targetPath == null) continue;
+        javax.lang.model.element.Element targetElement = trees.getElement(targetPath);
+        if (targetElement == null && targetPath.getParentPath() != null) {
+          targetElement = trees.getElement(targetPath.getParentPath());
+        }
+        if (targetElement == null) continue;
+
+        final javax.lang.model.element.Element finalTargetElement = targetElement;
+        String symbolSimpleName = finalTargetElement.getSimpleName().toString();
+        if (finalTargetElement instanceof javax.lang.model.element.ExecutableElement exec && exec.getSimpleName().contentEquals("<init>")) {
+          symbolSimpleName = exec.getEnclosingElement().getSimpleName().toString();
+        }
+
+        final String finalSymbolName = symbolSimpleName;
+        List<int[]> ranges = new ArrayList<>();
+
+        new com.sun.source.util.TreePathScanner<Void, Void>() {
+          @Override
+          public Void visitIdentifier(com.sun.source.tree.IdentifierTree node, Void p) {
+            checkMatch(getCurrentPath(), node);
+            return super.visitIdentifier(node, p);
+          }
+
+          @Override
+          public Void visitMemberSelect(com.sun.source.tree.MemberSelectTree node, Void p) {
+            checkMatch(getCurrentPath(), node);
+            return super.visitMemberSelect(node, p);
+          }
+
+          @Override
+          public Void visitVariable(com.sun.source.tree.VariableTree node, Void p) {
+            checkMatch(getCurrentPath(), node);
+            return super.visitVariable(node, p);
+          }
+
+          @Override
+          public Void visitMethod(com.sun.source.tree.MethodTree node, Void p) {
+            checkMatch(getCurrentPath(), node);
+            return super.visitMethod(node, p);
+          }
+
+          @Override
+          public Void visitClass(com.sun.source.tree.ClassTree node, Void p) {
+            checkMatch(getCurrentPath(), node);
+            return super.visitClass(node, p);
+          }
+
+          private void checkMatch(com.sun.source.util.TreePath path, com.sun.source.tree.Tree node) {
+            javax.lang.model.element.Element element = trees.getElement(path);
+            if (element != null && (element.equals(finalTargetElement) || isConstructorOfTarget(finalTargetElement, element))) {
+              int start = (int) positions.getStartPosition(unit, node);
+              int end = (int) positions.getEndPosition(unit, node);
+              if (start >= 0 && end > start && end <= source.length()) {
+                int idStart = findIdentifierInSpan(source, start, end, finalSymbolName);
+                if (idStart >= 0) {
+                  int idEnd = idStart + finalSymbolName.length();
+                  ranges.add(new int[]{idStart, idEnd});
+                }
+              }
+            }
+          }
+        }.scan(unit, null);
+
+        if (!ranges.isEmpty()) {
+          List<TextEdit> edits = new ArrayList<>();
+          ranges.sort(Comparator.comparingInt(r -> r[0]));
+          int lastEnd = -1;
+          for (int[] r : ranges) {
+            if (r[0] < lastEnd) continue;
+            lastEnd = r[1];
+            Position startPos = positionAtOffset(source, r[0]);
+            Position endPos = positionAtOffset(source, r[1]);
+            edits.add(new TextEdit(new Range(startPos, endPos), replacement));
+          }
+          return edits;
+        }
+      }
+    } catch (Exception e) {
+      log.log(Level.FINE, "Semantic rename failed", e);
+    }
+    return List.of();
+  }
+
+  private static boolean isConstructorOfTarget(javax.lang.model.element.Element target, javax.lang.model.element.Element candidate) {
+    if (target instanceof javax.lang.model.element.TypeElement && candidate instanceof javax.lang.model.element.ExecutableElement exec) {
+      return exec.getSimpleName().contentEquals("<init>") && exec.getEnclosingElement().equals(target);
+    }
+    return false;
+  }
+
+  private static com.sun.source.util.TreePath findTreePathAt(com.sun.source.util.Trees trees, com.sun.source.tree.CompilationUnitTree unit, int targetOffset) {
+    com.sun.source.util.SourcePositions positions = trees.getSourcePositions();
+    class PathFinder extends com.sun.source.util.TreePathScanner<Void, Void> {
+      private com.sun.source.util.TreePath bestPath;
+      private long bestSpan = Long.MAX_VALUE;
+
+      private void check(com.sun.source.tree.Tree node) {
+        if (node == null) return;
+        int start = (int) positions.getStartPosition(unit, node);
+        int end = (int) positions.getEndPosition(unit, node);
+        if (start <= targetOffset && targetOffset <= end) {
+          long span = (long) end - start;
+          if (span <= bestSpan) {
+            bestSpan = span;
+            bestPath = getCurrentPath();
+          }
+        }
+      }
+
+      @Override public Void visitIdentifier(com.sun.source.tree.IdentifierTree node, Void p) { check(node); return super.visitIdentifier(node, p); }
+      @Override public Void visitVariable(com.sun.source.tree.VariableTree node, Void p) { check(node); return super.visitVariable(node, p); }
+      @Override public Void visitMethod(com.sun.source.tree.MethodTree node, Void p) { check(node); return super.visitMethod(node, p); }
+      @Override public Void visitClass(com.sun.source.tree.ClassTree node, Void p) { check(node); return super.visitClass(node, p); }
+      @Override public Void visitMemberSelect(com.sun.source.tree.MemberSelectTree node, Void p) { check(node); return super.visitMemberSelect(node, p); }
+    }
+    PathFinder finder = new PathFinder();
+    finder.scan(unit, null);
+    return finder.bestPath;
+  }
+
+  private static int findIdentifierInSpan(String source, int start, int end, String identifierName) {
+    Pattern p = Pattern.compile("\\b" + Pattern.quote(identifierName) + "\\b");
+    Matcher m = p.matcher(source.substring(start, end));
+    if (m.find()) {
+      return start + m.start();
+    }
+    return -1;
+  }
+
+  private static Position positionAtOffset(String source, int offset) {
+    int line = 0;
+    int col = 0;
+    for (int i = 0; i < offset && i < source.length(); i++) {
+      if (source.charAt(i) == '\n') {
+        line++;
+        col = 0;
+      } else if (source.charAt(i) != '\r') {
+        col++;
       }
     }
-    return edits;
+    return new Position(line, col);
+  }
+
+  private static String resolveFileName(Document document) {
+    if (document.uri() != null && document.uri().isAbsolute() && !"string".equalsIgnoreCase(document.uri().getScheme())
+        && !"inmemory".equalsIgnoreCase(document.uri().getScheme())) {
+      try {
+        return Path.of(document.uri()).getFileName().toString();
+      } catch (Exception ignored) {
+        // fallback
+      }
+    }
+    String className = document.definition() != null && document.definition().getImplementation() != null && !document.definition().getImplementation().isBlank()
+        ? document.definition().getImplementation() : extractClassName(document.text());
+    return className + ".java";
+  }
+
+  private static String findEnclosingMethodReturnType(String source, int lineIndex) {
+    String[] lines = source.split("\r?\n", -1);
+    Pattern methodHeaderPattern = Pattern.compile("(?:(?:public|protected|private|static|final|synchronized|native|strictfp)\\s+)*([A-Za-z0-9_$<\\[\\]>.,]+)\\s+([A-Za-z_$][\\w$]*)\\s*\\(");
+    for (int i = Math.min(lineIndex, lines.length - 1); i >= 0; i--) {
+      String line = lines[i].trim();
+      Matcher m = methodHeaderPattern.matcher(line);
+      if (m.find()) {
+        String type = m.group(1);
+        if (!type.equals("void") && (!KEYWORDS.contains(type) || PRIMITIVES.contains(type))) {
+          return type;
+        }
+      }
+    }
+    return "Object";
+  }
+
+  private static String defaultReturnValue(String returnType) {
+    if (returnType == null || returnType.isBlank()) return "null";
+    String clean = returnType.trim();
+    return switch (clean) {
+      case "boolean" -> "false";
+      case "byte", "short", "int", "long" -> "0";
+      case "float" -> "0.0f";
+      case "double" -> "0.0";
+      case "char" -> "'\\0'";
+      default -> "null";
+    };
+  }
+
+  private static boolean hasMethodDeclaration(String source, Method m) {
+    Pattern pattern = Pattern.compile("\\b" + Pattern.quote(m.getName()) + "\\s*\\(([^)]*)\\)");
+    Matcher matcher = pattern.matcher(source);
+    while (matcher.find()) {
+      String paramStr = matcher.group(1).trim();
+      if (m.getParameterCount() == 0 && paramStr.isEmpty()) {
+        return true;
+      }
+      if (m.getParameterCount() > 0 && !paramStr.isEmpty()) {
+        String[] params = paramStr.split(",");
+        if (params.length == m.getParameterCount()) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override

@@ -184,6 +184,20 @@ public interface IEntity {
   void perform(String actionName);
 
   /**
+   * Registers a listener to be notified whenever an action is performed on this entity.
+   *
+   * @param listener the action listener
+   */
+  void onActionPerformed(java.util.function.Consumer<String> listener);
+
+  /**
+   * Removes a registered action performed listener.
+   *
+   * @param listener the action listener
+   */
+  void removeActionPerformedListener(java.util.function.Consumer<String> listener);
+
+  /**
    * Registers an {@code EntityAction} with the specified name. It's later possible to execute these actions on the entity by using the
    * {@code Entity.perform(String actionName)} method.
    *

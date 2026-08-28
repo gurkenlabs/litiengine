@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.scripting;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -17,6 +18,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +29,9 @@ class ScriptRuntimeTests {
   void detachScripts() {
     if (this.host != null) {
       this.host.detachControllers();
-      Game.scripts().detach(this.host);
     }
+    Game.scripts().detachAll();
+    Game.scripts().setEnabled(true);
     Game.scripts().clearDiagnostics();
     Game.scripts().setEntityBindings(List.of());
     JavaEntityScript.reset();
@@ -652,8 +655,7 @@ class ScriptRuntimeTests {
 
     ScriptLanguageService.Document doc = new ScriptLanguageService.Document(null, code, 1, definition);
     List<ScriptLanguageService.TextEdit> edits = service.rename(doc, new ScriptLanguageService.Position(2, 15), "HeroScript");
-
-    assertEquals(2, edits.size(), "Should rename class name in annotation and class header.");
+    assertEquals(1, edits.size(), "Should rename class header without mutating string literal in @ScriptInfo.");
     assertTrue(edits.stream().allMatch(e -> e.text().equals("HeroScript")));
   }
 
@@ -1033,6 +1035,184 @@ class ScriptRuntimeTests {
     } finally {
       Game.scripts().setEnabled(true);
     }
+  }
+
+  public static final class ActionObservingScript extends EntityScript<TestEntity> {
+    final List<String> receivedActions = new CopyOnWriteArrayList<>();
+
+    @Override
+    protected void onAction(String action) {
+      this.receivedActions.add(action);
+    }
+  }
+
+  public static final class RecoverableFailScript extends EntityScript<TestEntity> {
+    static boolean shouldFailLoad = false;
+    static boolean shouldFailUpdate = false;
+    static int loadedCount = 0;
+    static int updateCount = 0;
+
+    @Override
+    protected void loaded() {
+      if (shouldFailLoad) {
+        throw new RuntimeException("Simulated load failure");
+      }
+      loadedCount++;
+    }
+
+    @Override
+    public void update() {
+      if (shouldFailUpdate) {
+        throw new RuntimeException("Simulated update failure");
+      }
+      updateCount++;
+    }
+  }
+
+  @Test
+  void actionPerformedObservationHookDispatchesToAllScriptsAndPreservesRealActions() {
+    TestEntity entity = new TestEntity();
+    java.util.concurrent.atomic.AtomicInteger jumpExecuted = new java.util.concurrent.atomic.AtomicInteger();
+    entity.actions().register("jump", jumpExecuted::incrementAndGet);
+
+    ScriptDefinition defA = new ScriptDefinition("action-a", "java", null, ActionObservingScript.class.getName(), ScriptHostType.ENTITY);
+    defA.setTargetType(TestEntity.class.getName());
+    ScriptDefinition defB = new ScriptDefinition("action-b", "java", null, ActionObservingScript.class.getName(), ScriptHostType.ENTITY);
+    defB.setTargetType(TestEntity.class.getName());
+    Game.scripts().setDefinitions(List.of(defA, defB));
+
+    ActionObservingScript scriptA = (ActionObservingScript) Game.scripts().attach(entity, new ScriptBinding("action-a"));
+    ActionObservingScript scriptB = (ActionObservingScript) Game.scripts().attach(entity, new ScriptBinding("action-b"));
+
+    assertNotNull(scriptA);
+    assertNotNull(scriptB);
+
+    entity.perform("jump");
+    assertEquals(1, jumpExecuted.get(), "Existing entity jump action should still execute.");
+    assertEquals(List.of("jump"), scriptA.receivedActions);
+    assertEquals(List.of("jump"), scriptB.receivedActions);
+
+    entity.perform("attack");
+    assertEquals(1, jumpExecuted.get());
+    assertEquals(List.of("jump", "attack"), scriptA.receivedActions);
+    assertEquals(List.of("jump", "attack"), scriptB.receivedActions);
+
+    Game.scripts().detach(entity);
+    ActionObservingScript scriptB2 = (ActionObservingScript) Game.scripts().attach(entity, new ScriptBinding("action-b"));
+    entity.perform("jump");
+    assertEquals(2, jumpExecuted.get(), "Jump action should still execute after detaching other scripts.");
+    assertEquals(List.of("jump"), scriptB2.receivedActions);
+  }
+
+  @Test
+  void failedScriptRecoversThroughHotReloadOnTargetHost() {
+    TestEntity entity = new TestEntity();
+    RecoverableFailScript.shouldFailLoad = true;
+    RecoverableFailScript.loadedCount = 0;
+    RecoverableFailScript.updateCount = 0;
+
+    ScriptDefinition def = new ScriptDefinition("recover-fail", "java", null, RecoverableFailScript.class.getName(), ScriptHostType.ENTITY);
+    def.setTargetType(TestEntity.class.getName());
+    Game.scripts().setDefinitions(List.of(def));
+
+    ScriptInstance instance = Game.scripts().attach(entity, new ScriptBinding("recover-fail"));
+    assertNull(instance);
+    assertEquals(0, RecoverableFailScript.loadedCount);
+
+    RecoverableFailScript.shouldFailLoad = false;
+
+    boolean reloaded = Game.scripts().reload("recover-fail");
+    assertTrue(reloaded, "Reload should succeed and re-attach to desired host.");
+    assertEquals(1, RecoverableFailScript.loadedCount);
+
+    Game.scripts().update();
+    assertEquals(1, RecoverableFailScript.updateCount);
+  }
+
+  @Test
+  void runtimeExceptionScriptRecoversThroughHotReload() {
+    TestEntity entity = new TestEntity();
+    RecoverableFailScript.shouldFailLoad = false;
+    RecoverableFailScript.shouldFailUpdate = false;
+    RecoverableFailScript.loadedCount = 0;
+    RecoverableFailScript.updateCount = 0;
+
+    ScriptDefinition def = new ScriptDefinition("runtime-fail", "java", null, RecoverableFailScript.class.getName(), ScriptHostType.ENTITY);
+    def.setTargetType(TestEntity.class.getName());
+    Game.scripts().setDefinitions(List.of(def));
+
+    ScriptInstance instance = Game.scripts().attach(entity, new ScriptBinding("runtime-fail"));
+    assertNotNull(instance);
+    assertEquals(1, RecoverableFailScript.loadedCount);
+
+    Game.scripts().update();
+    assertEquals(1, RecoverableFailScript.updateCount);
+
+    RecoverableFailScript.shouldFailUpdate = true;
+    Game.scripts().update();
+
+    RecoverableFailScript.shouldFailUpdate = false;
+    boolean reloaded = Game.scripts().reload("runtime-fail");
+    assertTrue(reloaded);
+
+    Game.scripts().update();
+    assertTrue(RecoverableFailScript.updateCount > 1, "Script should resume updating after hot reload.");
+  }
+
+  @Test
+  void pauseResumeThroughSetEnabledPreservesScriptState() {
+    TestEntity entity = new TestEntity();
+    JavaEntityScript.reset();
+
+    ScriptDefinition def = new ScriptDefinition("pause-test", "java", null, JavaEntityScript.class.getName(), ScriptHostType.ENTITY);
+    def.setTargetType(TestEntity.class.getName());
+    Game.scripts().setDefinitions(List.of(def));
+
+    ScriptBinding binding = new ScriptBinding("pause-test");
+    binding.setParameter("speed", "5");
+    ScriptInstance instance = Game.scripts().attach(entity, binding);
+    assertNotNull(instance);
+    assertEquals(1, JavaEntityScript.loaded);
+    assertEquals(0, JavaEntityScript.unloaded);
+
+    Game.scripts().update();
+    assertEquals(1, JavaEntityScript.updates);
+
+    Game.scripts().setEnabled(false);
+    assertEquals(0, JavaEntityScript.unloaded, "Pausing should not detach scripts.");
+
+    Game.scripts().update();
+    assertEquals(1, JavaEntityScript.updates, "Paused scripts should not receive update ticks.");
+
+    Game.scripts().setEnabled(true);
+    assertEquals(0, JavaEntityScript.unloaded);
+
+    Game.scripts().update();
+    assertEquals(2, JavaEntityScript.updates, "Resumed scripts should continue updating seamlessly.");
+  }
+
+  @Test
+  void definitionDefensiveCopiesAndRemovalCleanup() {
+    TestEntity entity = new TestEntity();
+    JavaEntityScript.reset();
+
+    ScriptDefinition def = new ScriptDefinition("def-copy-test", "java", null, JavaEntityScript.class.getName(), ScriptHostType.ENTITY);
+    def.setTargetType(TestEntity.class.getName());
+    Game.scripts().setDefinitions(List.of(def));
+
+    ScriptDefinition retrieved = Game.scripts().getDefinition("def-copy-test");
+    assertNotNull(retrieved);
+    retrieved.setId("mutated-id");
+    assertNotNull(Game.scripts().getDefinition("def-copy-test"), "Internal definitions map must not be corrupted by external mutation.");
+
+    ScriptBinding binding = new ScriptBinding("def-copy-test");
+    binding.setParameter("speed", "5");
+    Game.scripts().attach(entity, binding);
+    assertEquals(1, JavaEntityScript.loaded);
+    assertEquals(0, JavaEntityScript.unloaded);
+
+    Game.scripts().setDefinitions(List.of());
+    assertEquals(1, JavaEntityScript.unloaded, "Removing a definition must unload active instances.");
   }
 }
 

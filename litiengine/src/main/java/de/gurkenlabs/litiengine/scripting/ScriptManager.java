@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,6 +50,7 @@ public final class ScriptManager implements IUpdateable {
   private final Map<String, ScriptDefinition> definitions = new ConcurrentHashMap<>();
   private final Map<String, CompiledScript> compiled = new ConcurrentHashMap<>();
   private final List<Attachment> attachments = new CopyOnWriteArrayList<>();
+  private final List<HostBinding> desiredBindings = new CopyOnWriteArrayList<>();
   private final List<ScriptBinding> gameBindings = new CopyOnWriteArrayList<>();
   private final List<EntityScriptBinding> entityBindings = new CopyOnWriteArrayList<>();
   private final List<ScriptDiagnostic> diagnostics = new CopyOnWriteArrayList<>();
@@ -77,13 +79,7 @@ public final class ScriptManager implements IUpdateable {
   }
 
   public void setEnabled(boolean enabled) {
-    if (this.enabled == enabled) return;
     this.enabled = enabled;
-    if (!enabled) {
-      this.detachAll();
-    } else if (Game.world().environment() != null) {
-      this.environmentLoaded(Game.world().environment());
-    }
   }
 
   public ScriptGlobals globals() {
@@ -123,7 +119,13 @@ public final class ScriptManager implements IUpdateable {
     }
 
     this.definitions.forEach((id, previous) -> {
-      if (!previous.hasSameConfiguration(replacements.get(id))) {
+      ScriptDefinition replacement = replacements.get(id);
+      if (replacement == null) {
+        this.attachments.stream().filter(a -> a.definition.getId().equals(id)).toList().forEach(this::detachAttachment);
+        this.desiredBindings.removeIf(b -> b.binding().getScript().equals(id));
+        close(this.compiled.remove(id));
+        this.clearDiagnostics(id);
+      } else if (!previous.hasSameConfiguration(replacement)) {
         // Only close the compiled generation if no attachments still depend on it.
         // When attachments are active, keep the generation alive so that reload() can
         // find it as 'previous' and roll back if the replacement fails to attach.
@@ -139,11 +141,15 @@ public final class ScriptManager implements IUpdateable {
   }
 
   public Collection<ScriptDefinition> getDefinitions() {
-    return this.definitions.values().stream().sorted(Comparator.comparing(ScriptDefinition::getId)).toList();
+    return this.definitions.values().stream()
+      .sorted(Comparator.comparing(ScriptDefinition::getId))
+      .map(ScriptDefinition::new)
+      .toList();
   }
 
   public ScriptDefinition getDefinition(String id) {
-    return this.definitions.get(id);
+    ScriptDefinition definition = this.definitions.get(id);
+    return definition != null ? new ScriptDefinition(definition) : null;
   }
 
   /** Returns configurable fields from the currently compiled generation without compiling or executing new code. */
@@ -267,6 +273,10 @@ public final class ScriptManager implements IUpdateable {
   private ScriptInstance attach(Object host, ScriptBinding binding, boolean controllerManaged) {
     Objects.requireNonNull(host);
     Objects.requireNonNull(binding);
+    HostBinding target = new HostBinding(host, binding, controllerManaged);
+    if (!this.desiredBindings.contains(target)) {
+      this.desiredBindings.add(target);
+    }
     if (!this.enabled) return null;
     ScriptDefinition definition = this.definitions.get(binding.getScript());
     if (definition == null) {
@@ -327,14 +337,25 @@ public final class ScriptManager implements IUpdateable {
       return false;
     }
 
+    Set<HostBinding> targetSet = new LinkedHashSet<>();
+    for (HostBinding desired : this.desiredBindings) {
+      if (desired.binding().getScript().equals(scriptId)) {
+        targetSet.add(desired);
+      }
+    }
+    for (Attachment active : this.attachments) {
+      if (active.definition.getId().equals(scriptId)) {
+        targetSet.add(new HostBinding(active.host, active.binding, active.controllerManaged));
+      }
+    }
+    List<HostBinding> bindings = List.copyOf(targetSet);
 
     List<Attachment> affected = this.attachments.stream().filter(a -> a.definition.getId().equals(scriptId)).toList();
-    List<HostBinding> bindings = affected.stream().map(a -> new HostBinding(a.host, a.binding, a.controllerManaged)).toList();
     affected.forEach(this::detachAttachment);
     CompiledScript previous = this.compiled.put(scriptId, replacement);
     boolean success = true;
     for (HostBinding binding : bindings) {
-      success &= this.attach(binding.host, binding.binding, binding.controllerManaged) != null;
+      success &= this.attach(binding.host(), binding.binding(), binding.controllerManaged()) != null;
     }
     if (!success) {
       this.attachments.stream().filter(a -> a.definition.getId().equals(scriptId)).toList()
@@ -342,7 +363,7 @@ public final class ScriptManager implements IUpdateable {
       if (previous == null) this.compiled.remove(scriptId);
       else this.compiled.put(scriptId, previous);
       for (HostBinding binding : bindings) {
-        this.attach(binding.host, binding.binding, binding.controllerManaged);
+        this.attach(binding.host(), binding.binding(), binding.controllerManaged());
       }
       close(replacement);
       return false;
@@ -354,6 +375,7 @@ public final class ScriptManager implements IUpdateable {
   public void detach(Object host) {
     this.clearDiagnostics(host);
     this.attachments.stream().filter(attachment -> attachment.host == host).toList().forEach(this::detachAttachment);
+    this.desiredBindings.removeIf(b -> b.host() == host);
   }
 
   void detach(Object host, boolean controllerManaged) {
@@ -361,6 +383,7 @@ public final class ScriptManager implements IUpdateable {
     this.attachments.stream()
       .filter(attachment -> attachment.host == host && attachment.controllerManaged == controllerManaged)
       .toList().forEach(this::detachAttachment);
+    this.desiredBindings.removeIf(b -> b.host() == host && b.controllerManaged() == controllerManaged);
   }
 
   /** Sets the Java language level used for development-time source compilation. */
@@ -371,6 +394,7 @@ public final class ScriptManager implements IUpdateable {
 
   public void detachAll() {
     List.copyOf(this.attachments).forEach(this::detachAttachment);
+    this.desiredBindings.clear();
     this.compiled.values().forEach(ScriptManager::close);
     this.compiled.clear();
     this.detachUpdateLoop();
@@ -640,20 +664,19 @@ public final class ScriptManager implements IUpdateable {
       attachment.context.manage(() -> collisionEntity.removeCollisionListener(collisionListener));
     }
 
-    if (entity instanceof de.gurkenlabs.litiengine.entities.Entity concreteEntity && attachment.instance instanceof EntityScript<?> script) {
-      if (!concreteEntity.actions().exists(de.gurkenlabs.litiengine.input.PlatformingMovementController.JUMP_ACTION)) {
-        var jumpAction = concreteEntity.register(de.gurkenlabs.litiengine.input.PlatformingMovementController.JUMP_ACTION, () -> {
-          if (attachment.faulted) return;
-          try {
-            script.dispatchAction(de.gurkenlabs.litiengine.input.PlatformingMovementController.JUMP_ACTION);
-          } catch (Exception e) {
-            attachment.faulted = true;
-            this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script jump action handler failed: " + e.getMessage(), e);
-            this.detachAttachment(attachment);
-          }
-        });
-        attachment.context.manage(() -> concreteEntity.actions().unregister(jumpAction));
-      }
+    if (attachment.instance instanceof EntityScript<?> script) {
+      java.util.function.Consumer<String> actionListener = action -> {
+        if (attachment.faulted || !this.enabled) return;
+        try {
+          script.dispatchAction(action);
+        } catch (Exception e) {
+          attachment.faulted = true;
+          this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script action handler failed: " + e.getMessage(), e);
+          this.detachAttachment(attachment);
+        }
+      };
+      entity.onActionPerformed(actionListener);
+      attachment.context.manage(() -> entity.removeActionPerformedListener(actionListener));
     }
   }
 
@@ -899,7 +922,22 @@ public final class ScriptManager implements IUpdateable {
     }
   }
 
-  private record HostBinding(Object host, ScriptBinding binding, boolean controllerManaged) {}
+  private record HostBinding(Object host, ScriptBinding binding, boolean controllerManaged) {
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (!(obj instanceof HostBinding other)) return false;
+      return this.host == other.host
+          && this.controllerManaged == other.controllerManaged
+          && Objects.equals(this.binding != null ? this.binding.getScript() : null,
+                            other.binding != null ? other.binding.getScript() : null);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(System.identityHashCode(this.host), this.controllerManaged, this.binding != null ? this.binding.getScript() : null);
+    }
+  }
 
   private record ResolvedEntityBinding(EntityScriptBinding binding, int distance, int index) {}
 

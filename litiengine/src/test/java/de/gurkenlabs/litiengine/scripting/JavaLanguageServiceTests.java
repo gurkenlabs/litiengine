@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.scripting;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -380,6 +381,117 @@ class JavaLanguageServiceTests {
     assertTrue(onDeath.insertText().startsWith("protected void onDeath"), "Insert text should start with protected void onDeath");
     assertTrue(onDeath.insertText().contains("{\n  ${0}\n}"), "Insert text should contain method body template");
     assertFalse(onDeath.insertText().contains("${1:entity}"), "Insert text should not be a raw call with ${1:entity}");
+  }
+
+  @Test
+  void testSemanticRenameFieldDoesNotTouchLocalVariableOrCommentsOrStrings() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        @ScriptInfo(id = "MyScript")
+        public class MyScript extends GameScript {
+          private int speed = 10;
+
+          @Override
+          public void update() {
+            speed++;
+            // speed comment
+            String s = "speed";
+          }
+
+          public void other() {
+            int speed = 5;
+            speed--;
+          }
+        }
+        """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///MyScript.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.TextEdit> edits = this.service.rename(doc, new ScriptLanguageService.Position(5, 15), "velocity");
+    assertNotNull(edits);
+    assertEquals(2, edits.size(), "Semantic rename on field 'speed' should rename field declaration and 'speed++' reference only.");
+
+    for (ScriptLanguageService.TextEdit edit : edits) {
+      assertEquals("velocity", edit.text());
+      assertTrue(edit.range().start().line() == 5 || edit.range().start().line() == 9,
+          "Edits should only be on line 5 (field) and line 9 (speed++).");
+    }
+  }
+
+  @Test
+  void testSemanticRenameLocalVariableOnlyRenamesInScope() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class LocalScript extends GameScript {
+          private int speed = 10;
+
+          public void other() {
+            int speed = 5;
+            speed--;
+          }
+        }
+        """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///LocalScript.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.TextEdit> edits = this.service.rename(doc, new ScriptLanguageService.Position(7, 8), "localSpeed");
+    assertNotNull(edits);
+    assertEquals(2, edits.size(), "Semantic rename on local variable should rename local declaration and local usage only.");
+    for (ScriptLanguageService.TextEdit edit : edits) {
+      assertTrue(edit.range().start().line() == 7 || edit.range().start().line() == 8,
+          "Edits should only be on lines 7 and 8 within other().");
+    }
+  }
+
+  @Test
+  void testMissingReturnQuickFixTypesafe() {
+    String code = """
+        package scripts;
+        import de.gurkenlabs.litiengine.scripting.*;
+
+        public class ReturnScript extends GameScript {
+          public int getSpeed() {
+          }
+
+          public boolean isValid() {
+          }
+        }
+        """;
+
+    ScriptLanguageService.Document doc = new ScriptLanguageService.Document(
+      URI.create("memory:///ReturnScript.java"),
+      code,
+      1,
+      null
+    );
+
+    List<ScriptLanguageService.CodeAction> actionsSpeed = this.service.codeActions(
+      doc,
+      new ScriptLanguageService.Range(new ScriptLanguageService.Position(5, 2), new ScriptLanguageService.Position(5, 5)),
+      List.of()
+    );
+    assertTrue(actionsSpeed.stream().anyMatch(a -> a.title().equals("Add 'return 0;'")), "int method should offer 'return 0;'");
+
+    List<ScriptLanguageService.CodeAction> actionsValid = this.service.codeActions(
+      doc,
+      new ScriptLanguageService.Range(new ScriptLanguageService.Position(8, 2), new ScriptLanguageService.Position(8, 5)),
+      List.of()
+    );
+    assertTrue(actionsValid.stream().anyMatch(a -> a.title().equals("Add 'return false;'")), "boolean method should offer 'return false;'");
   }
 }
 
