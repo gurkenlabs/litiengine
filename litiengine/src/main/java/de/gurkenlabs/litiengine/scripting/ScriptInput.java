@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.scripting;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.IKeyboard;
 import de.gurkenlabs.litiengine.input.IMouse;
 import de.gurkenlabs.litiengine.input.Input;
@@ -47,6 +48,7 @@ public final class ScriptInput {
   public Subscription bindKey(int keyCode, Runnable onPress) {
     Objects.requireNonNull(onPress, "onPress must not be null.");
     IKeyboard.KeyPressedListener listener = e -> {
+      if (!Game.scripts().isEnabled()) return;
       if (e.getKeyCode() == keyCode) {
         onPress.run();
       }
@@ -66,6 +68,7 @@ public final class ScriptInput {
     IKeyboard keyboard = Input.keyboard();
     if (onRelease != null && keyboard != null) {
       IKeyboard.KeyReleasedListener listener = e -> {
+        if (!Game.scripts().isEnabled()) return;
         if (e.getKeyCode() == keyCode) {
           onRelease.run();
         }
@@ -83,7 +86,10 @@ public final class ScriptInput {
   /** Binds a consumer to receive key press events for the specified key code. */
   public Subscription bindKey(int keyCode, Consumer<KeyEvent> onPress) {
     Objects.requireNonNull(onPress, "onPress must not be null.");
-    IKeyboard.KeyPressedListener listener = onPress::accept;
+    IKeyboard.KeyPressedListener listener = e -> {
+      if (!Game.scripts().isEnabled()) return;
+      onPress.accept(e);
+    };
     IKeyboard keyboard = Input.keyboard();
     if (keyboard != null) {
       keyboard.onKeyPressed(keyCode, listener);
@@ -95,7 +101,10 @@ public final class ScriptInput {
   /** Binds a consumer to receive key typed events for the specified key code. */
   public Subscription bindKeyTyped(int keyCode, Consumer<KeyEvent> onTyped) {
     Objects.requireNonNull(onTyped, "onTyped must not be null.");
-    IKeyboard.KeyTypedListener listener = onTyped::accept;
+    IKeyboard.KeyTypedListener listener = e -> {
+      if (!Game.scripts().isEnabled()) return;
+      onTyped.accept(e);
+    };
     IKeyboard keyboard = Input.keyboard();
     if (keyboard != null) {
       keyboard.onKeyTyped(keyCode, listener);
@@ -138,6 +147,7 @@ public final class ScriptInput {
   public Subscription bindMouse(int button, Runnable onPress) {
     Objects.requireNonNull(onPress, "onPress must not be null.");
     IMouse.MousePressedListener listener = e -> {
+      if (!Game.scripts().isEnabled()) return;
       if (e.getButton() == button) {
         onPress.run();
       }
@@ -157,6 +167,7 @@ public final class ScriptInput {
     IMouse mouse = Input.mouse();
     if (onRelease != null && mouse != null) {
       IMouse.MouseReleasedListener listener = e -> {
+        if (!Game.scripts().isEnabled()) return;
         if (e.getButton() == button) {
           onRelease.run();
         }

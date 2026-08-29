@@ -412,7 +412,7 @@ public final class ScriptBindingService {
     writeSerialized(map, ScriptManager.BINDINGS_PROPERTY, bindings);
     undo.mapChanged(map);
     Environment active = Game.world().environment();
-    if (active != null && active.getMap() == map && Game.scripts().isEnabled()) {
+    if (active != null && active.getMap() == map) {
       Game.scripts().detach(active);
       Game.scripts().attachAll(active, bindings);
     }
@@ -474,7 +474,7 @@ public final class ScriptBindingService {
     Environment active = Game.world().environment();
     if (active == null || active.getMap() == null) return;
     BindingState environment = readSerialized(active.getMap(), ScriptManager.BINDINGS_PROPERTY);
-    if (environment instanceof BindingState.Valid validEnvironment && Game.scripts().isEnabled()) {
+    if (environment instanceof BindingState.Valid validEnvironment) {
       Game.scripts().detach(active);
       Game.scripts().attachAll(active, validEnvironment.bindings());
     }

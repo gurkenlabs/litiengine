@@ -8,17 +8,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.CombatEntity;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Entity;
+import de.gurkenlabs.litiengine.entities.EntityHitEvent;
 import de.gurkenlabs.litiengine.entities.EntityMessageEvent;
+import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.MapObjectLoader;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.input.Keyboard;
+import de.gurkenlabs.litiengine.input.Mouse;
+import de.gurkenlabs.litiengine.physics.CollisionEvent;
+import java.awt.Canvas;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +49,7 @@ class ScriptRuntimeTests {
     if (this.host != null) {
       this.host.detachControllers();
     }
+    Game.world().unloadEnvironment();
     Game.scripts().detachAll();
     Game.scripts().setEnabled(true);
     Game.scripts().clearDiagnostics();
@@ -1009,32 +1029,224 @@ class ScriptRuntimeTests {
         "Should offer Prop-specific method getMaterial directly on host().");
   }
 
-  @Test
-  void doesNotAttachOrUpdateWhenScriptsDisabled() {
-    try {
-      Game.scripts().setEnabled(false);
-      assertFalse(Game.scripts().isEnabled());
+  public static final class ComprehensivePauseTestScript extends CreatureScript {
+    static int loaded;
+    static int unloaded;
+    static int updates;
+    static int messages;
+    static int actions;
+    static int hits;
+    static int deaths;
+    static int collisions;
+    static int keyPressed;
+    static int mouseClicked;
+    static int renders;
 
-      ScriptDefinition definition = new ScriptDefinition("java-disabled", "java", null, JavaEntityScript.class.getName(), ScriptHostType.ENTITY);
-      definition.setTargetType(TestEntity.class.getName());
-      Game.scripts().setDefinitions(List.of(definition));
-      ScriptBinding binding = new ScriptBinding("java-disabled");
-      this.host = new TestEntity();
+    public ComprehensivePauseTestScript() {}
 
-      ScriptInstance instance = Game.scripts().attach(this.host, binding);
-      assertEquals(null, instance);
-      assertEquals(0, JavaEntityScript.loaded);
+    @Override protected void onLoaded() { loaded++; }
+    @Override protected void onUnloaded() { unloaded++; }
+    @Override public void update() { updates++; }
+    @Override protected void onMessage(EntityMessageEvent event) { messages++; }
+    @Override protected void onAction(String action) { actions++; }
+    @Override protected void onHit(EntityHitEvent event) { hits++; }
+    @Override protected void onDeath(ICombatEntity entity, EntityHitEvent hitEvent) { deaths++; }
+    @Override protected void onCollision(CollisionEvent event) { collisions++; }
+    @Override protected void onKeyPressed(KeyEvent event) { keyPressed++; }
+    @Override protected void onMouseClicked(MouseEvent event) { mouseClicked++; }
+    @Override protected void onRender(Graphics2D g) { renders++; }
 
-      EntityScriptController<TestEntity> controller = new EntityScriptController<>(this.host, List.of(binding));
-      this.host.addController(controller);
-      controller.attach();
-      assertFalse(controller.isAttached());
-
-      Game.scripts().update();
-      assertEquals(0, JavaEntityScript.updates);
-    } finally {
-      Game.scripts().setEnabled(true);
+    static void reset() {
+      loaded = 0;
+      unloaded = 0;
+      updates = 0;
+      messages = 0;
+      actions = 0;
+      hits = 0;
+      deaths = 0;
+      collisions = 0;
+      keyPressed = 0;
+      mouseClicked = 0;
+      renders = 0;
     }
+  }
+
+  public static final class ComprehensiveEnvPauseScript extends EnvironmentScript {
+    static int loaded;
+    static int unloaded;
+    static int updates;
+    static int cleared;
+    static int entityAdded;
+    static int entityRemoved;
+    static int renders;
+
+    public ComprehensiveEnvPauseScript() {}
+
+    @Override protected void onLoaded() { loaded++; }
+    @Override protected void onUnloaded() { unloaded++; }
+    @Override public void update() { updates++; }
+    @Override protected void onCleared() { cleared++; }
+    @Override protected void onEntityAdded(IEntity entity) { entityAdded++; }
+    @Override protected void onEntityRemoved(IEntity entity) { entityRemoved++; }
+    @Override protected void onRender(Graphics2D g) { renders++; }
+
+    static void reset() {
+      loaded = 0;
+      unloaded = 0;
+      updates = 0;
+      cleared = 0;
+      entityAdded = 0;
+      entityRemoved = 0;
+      renders = 0;
+    }
+  }
+
+  @Test
+  void pauseSuppressesAllEventAndRenderBridgesAndSupportsLoadingWhilePaused() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    Input.InputGameAdapter adapter = new Input.InputGameAdapter();
+    adapter.initialized();
+
+    ComprehensivePauseTestScript.reset();
+    ComprehensiveEnvPauseScript.reset();
+
+    ScriptDefinition creatureDef = new ScriptDefinition("pause-creature-script", "java", null, ComprehensivePauseTestScript.class.getName(), ScriptHostType.ENTITY);
+    creatureDef.setTargetType(Creature.class.getName());
+    ScriptDefinition envDef = new ScriptDefinition("pause-env-script", "java", null, ComprehensiveEnvPauseScript.class.getName(), ScriptHostType.ENVIRONMENT);
+    Game.scripts().setDefinitions(List.of(creatureDef, envDef));
+
+    // Pause scripts
+    Game.scripts().setEnabled(false);
+    assertFalse(Game.scripts().isEnabled());
+
+    // 1. Loading and attaching while paused should keep attachments intact under pause semantics
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(200, 200));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(20, 20));
+    String envEncoded = ScriptBindingCodec.encode(List.of(new ScriptBinding("pause-env-script")));
+    when(map.getStringValue(eq(ScriptManager.BINDINGS_PROPERTY), any())).thenReturn(envEncoded);
+    when(map.getStringValue(eq(ScriptManager.BINDINGS_PROPERTY))).thenReturn(envEncoded);
+
+    Environment environment = new Environment(map);
+    environment.init();
+    Game.world().loadEnvironment(environment);
+
+    Creature creature = new Creature();
+    creature.getHitPoints().setMax(100);
+    creature.getHitPoints().setValue(100);
+    environment.add(creature);
+
+    ScriptInstance creatureInstance = Game.scripts().attach(creature, new ScriptBinding("pause-creature-script"));
+    assertNotNull(creatureInstance, "Script instance should attach under pause semantics.");
+    assertEquals(1, ComprehensivePauseTestScript.loaded);
+    assertEquals(1, ComprehensiveEnvPauseScript.loaded);
+
+    // Also configure an entity controller while paused
+    TestEntity configuredEntity = new TestEntity();
+    EntityScriptBinding entityBinding = new EntityScriptBinding(TestEntity.class.getName());
+    entityBinding.getScripts().add(new ScriptBinding("pause-test"));
+    Game.scripts().setEntityBindings(List.of(entityBinding));
+    Game.scripts().configure(configuredEntity);
+    assertNotNull(configuredEntity.scripts(), "Entity script controller should be configured while paused.");
+
+    // 2. While paused, all callbacks and updates must be suppressed
+    Game.scripts().update();
+    assertEquals(0, ComprehensivePauseTestScript.updates, "Updates should be suppressed while paused.");
+    assertEquals(0, ComprehensiveEnvPauseScript.updates, "Environment script updates should be suppressed while paused.");
+
+    creature.sendMessage(creature, "ping");
+    assertEquals(0, ComprehensivePauseTestScript.messages, "Messages should be suppressed while paused.");
+
+    creature.perform("attack");
+    assertEquals(0, ComprehensivePauseTestScript.actions, "Actions should be suppressed while paused.");
+
+    creature.hit(20);
+    assertEquals(0, ComprehensivePauseTestScript.hits, "Hit callbacks should be suppressed while paused.");
+
+    creature.fireCollisionEvent(new CollisionEvent(creature, new de.gurkenlabs.litiengine.entities.ICollisionEntity[0]));
+    assertEquals(0, ComprehensivePauseTestScript.collisions, "Collision callbacks should be suppressed while paused.");
+
+    creature.die();
+    assertEquals(0, ComprehensivePauseTestScript.deaths, "Death callbacks should be suppressed while paused.");
+
+    Canvas dummy = new Canvas();
+    KeyEvent keyEvent = new KeyEvent(dummy, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_SPACE, ' ');
+    Keyboard keyboard = (Keyboard) Input.keyboard();
+    if (keyboard != null) {
+      keyboard.dispatchKeyEvent(keyEvent);
+      keyboard.update();
+    }
+    assertEquals(0, ComprehensivePauseTestScript.keyPressed, "Keyboard events should be suppressed while paused.");
+
+    MouseEvent mouseEvent = new MouseEvent(dummy, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, 10, 10, 1, false, MouseEvent.BUTTON1);
+    Mouse mouse = (Mouse) Input.mouse();
+    if (mouse != null) {
+      mouse.mouseClicked(mouseEvent);
+      mouse.update();
+    }
+    assertEquals(0, ComprehensivePauseTestScript.mouseClicked, "Mouse events should be suppressed while paused.");
+
+    BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = img.createGraphics();
+    Game.graphics().renderEntity(g, creature);
+    environment.render(g);
+    assertEquals(0, ComprehensivePauseTestScript.renders, "Entity render should be suppressed while paused.");
+    assertEquals(0, ComprehensiveEnvPauseScript.renders, "Environment render should be suppressed while paused.");
+
+    Creature extra = new Creature();
+    environment.add(extra);
+    environment.remove(extra);
+    assertEquals(0, ComprehensiveEnvPauseScript.entityAdded, "Environment entity-added should be suppressed while paused.");
+    assertEquals(0, ComprehensiveEnvPauseScript.entityRemoved, "Environment entity-removed should be suppressed while paused.");
+
+    // 3. Resume scripts: all callbacks and bridges must immediately work without needing reconciliation
+    Game.scripts().setEnabled(true);
+    assertTrue(Game.scripts().isEnabled());
+
+    creature.resurrect();
+    Game.scripts().update();
+    assertEquals(1, ComprehensivePauseTestScript.updates);
+    assertEquals(1, ComprehensiveEnvPauseScript.updates);
+
+    creature.sendMessage(creature, "ping");
+    assertEquals(1, ComprehensivePauseTestScript.messages);
+
+    creature.perform("attack");
+    assertEquals(1, ComprehensivePauseTestScript.actions);
+
+    creature.hit(20);
+    assertEquals(1, ComprehensivePauseTestScript.hits);
+
+    creature.fireCollisionEvent(new CollisionEvent(creature, new de.gurkenlabs.litiengine.entities.ICollisionEntity[0]));
+    assertEquals(1, ComprehensivePauseTestScript.collisions);
+
+    creature.die();
+    assertEquals(1, ComprehensivePauseTestScript.deaths);
+
+    if (keyboard != null) {
+      keyboard.dispatchKeyEvent(keyEvent);
+      keyboard.update();
+    }
+    assertEquals(1, ComprehensivePauseTestScript.keyPressed);
+
+    if (mouse != null) {
+      mouse.mouseClicked(mouseEvent);
+      mouse.update();
+    }
+    assertEquals(1, ComprehensivePauseTestScript.mouseClicked);
+
+    Game.graphics().renderEntity(g, creature);
+    environment.render(g);
+    assertTrue(ComprehensivePauseTestScript.renders >= 1);
+    assertTrue(ComprehensiveEnvPauseScript.renders >= 1);
+
+    environment.add(extra);
+    assertEquals(1, ComprehensiveEnvPauseScript.entityAdded);
+    environment.remove(extra);
+    assertEquals(1, ComprehensiveEnvPauseScript.entityRemoved);
+
+    Game.scripts().detach(creature);
+    Game.scripts().detach(environment);
   }
 
   public static final class ActionObservingScript extends EntityScript<TestEntity> {

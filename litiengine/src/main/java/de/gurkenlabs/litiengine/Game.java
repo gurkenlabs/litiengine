@@ -530,6 +530,8 @@ public final class Game {
       // initialize the game window
       window().init();
       world.setCamera(new Camera());
+      world.removeLoadedListener(gameTime);
+      world.onLoaded(gameTime);
 
       for (GameListener listener : gameListeners) {
         listener.initialized(args);

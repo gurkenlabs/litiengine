@@ -73,7 +73,7 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
    * @param binding the script binding to load
    */
   public void loadScript(final ScriptBinding binding) {
-    if (binding == null || binding.getScript() == null || !Game.scripts().isEnabled()) return;
+    if (binding == null || binding.getScript() == null) return;
     this.loadedBindings.removeIf(b -> binding.getScript().equals(b.getScript()));
     this.loadedBindings.add(new ScriptBinding(binding));
     this.scriptController.setBindings(this.loadedBindings);
@@ -85,7 +85,7 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
    * @param bindings the script bindings to load
    */
   public void loadScripts(final Collection<ScriptBinding> bindings) {
-    if (bindings == null || !Game.scripts().isEnabled()) return;
+    if (bindings == null) return;
     for (ScriptBinding binding : bindings) {
       if (binding != null && binding.getScript() != null) {
         this.loadedBindings.removeIf(b -> binding.getScript().equals(b.getScript()));
@@ -126,9 +126,7 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
 
   @Override
   public void attach() {
-    if (Game.scripts().isEnabled()) {
-      this.scriptController.attach();
-    }
+    this.scriptController.attach();
   }
 
   @Override

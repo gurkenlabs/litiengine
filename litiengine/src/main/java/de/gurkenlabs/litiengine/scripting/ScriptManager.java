@@ -3,6 +3,9 @@ package de.gurkenlabs.litiengine.scripting;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.entities.CollisionListener;
+import de.gurkenlabs.litiengine.entities.CombatEntityDeathListener;
+import de.gurkenlabs.litiengine.entities.CombatEntityHitListener;
 import de.gurkenlabs.litiengine.entities.EntityListener;
 import de.gurkenlabs.litiengine.entities.EntityMessageListener;
 import de.gurkenlabs.litiengine.entities.EntityRenderedListener;
@@ -62,16 +65,24 @@ public final class ScriptManager implements IUpdateable {
   private int projectJavaVersion = Runtime.version().feature();
   private boolean attachedToLoop;
   private boolean enabled = true;
+  private final de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener environmentLoadedListener = this::environmentLoaded;
+  private final de.gurkenlabs.litiengine.environment.EnvironmentUnloadedListener environmentUnloadedListener = this::detach;
 
   public ScriptManager() {
     this.registerProvider(new JavaScriptProvider());
     ServiceLoader.load(ScriptProvider.class).forEach(this::registerProvider);
     Game.addGameListener(new GameListener() {
+      @Override public void initialized(String... args) {
+        Game.world().removeLoadedListener(environmentLoadedListener);
+        Game.world().onLoaded(environmentLoadedListener);
+        Game.world().removeUnloadedListener(environmentUnloadedListener);
+        Game.world().onUnloaded(environmentUnloadedListener);
+      }
       @Override public void started() { attachAll(gameHost, gameBindings); }
       @Override public void terminated() { detachAll(); }
     });
-    Game.world().onLoaded(this::environmentLoaded);
-    Game.world().onUnloaded(this::detach);
+    Game.world().onLoaded(this.environmentLoadedListener);
+    Game.world().onUnloaded(this.environmentUnloadedListener);
   }
 
   public boolean isEnabled() {
@@ -80,6 +91,10 @@ public final class ScriptManager implements IUpdateable {
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
+  }
+
+  private boolean canDispatch(Attachment attachment) {
+    return this.enabled && !attachment.faulted;
   }
 
   public ScriptGlobals globals() {
@@ -195,7 +210,6 @@ public final class ScriptManager implements IUpdateable {
   /** Adds or refreshes the script controller that owns the default bindings for an entity type. */
   public void configure(IEntity entity) {
     Objects.requireNonNull(entity);
-    if (!this.enabled) return;
     List<ScriptBinding> defaults = this.resolveEntityBindings(entity);
     EntityScriptController<?> controller = entity.scripts();
     if (controller == null) {
@@ -256,7 +270,7 @@ public final class ScriptManager implements IUpdateable {
   }
 
   List<ScriptInstance> attachAll(Object host, Collection<ScriptBinding> bindings, boolean controllerManaged) {
-    if (!this.enabled || bindings == null) return List.of();
+    if (bindings == null) return List.of();
     this.clearDiagnostics(host);
     List<ScriptInstance> instances = new ArrayList<>();
     bindings.stream().filter(ScriptBinding::isEnabled).sorted(Comparator.comparingInt(ScriptBinding::getOrder)).forEach(binding -> {
@@ -277,7 +291,6 @@ public final class ScriptManager implements IUpdateable {
     if (!this.desiredBindings.contains(target)) {
       this.desiredBindings.add(target);
     }
-    if (!this.enabled) return null;
     ScriptDefinition definition = this.definitions.get(binding.getScript());
     if (definition == null) {
       String hostInfo = "";
@@ -413,7 +426,7 @@ public final class ScriptManager implements IUpdateable {
     if (!this.enabled) return;
     for (Attachment attachment : this.attachments) {
       if (attachment.controllerManaged != controllerManaged || host != null && attachment.host != host) continue;
-      if (attachment.faulted) continue;
+      if (!this.canDispatch(attachment)) continue;
       try {
         attachment.instance.update();
       } catch (Exception | LinkageError e) {
@@ -425,7 +438,6 @@ public final class ScriptManager implements IUpdateable {
   }
 
   private void environmentLoaded(Environment environment) {
-    if (!this.enabled) return;
     if (environment.getMap() instanceof ICustomPropertyProvider properties) {
       String encoded = properties.getStringValue(BINDINGS_PROPERTY, null);
       try {
@@ -604,10 +616,12 @@ public final class ScriptManager implements IUpdateable {
 
   private void registerEntityLifecycle(Attachment attachment, IEntity entity) {
     EntityMessageListener messageListener = event -> {
+      if (!this.canDispatch(attachment)) return;
       if (attachment.instance instanceof EntityScript<?> script) {
         try {
           script.dispatchMessage(event);
         } catch (Exception e) {
+          attachment.faulted = true;
           this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script message handler failed: " + e.getMessage(), e);
           this.detachAttachment(attachment);
         }
@@ -622,11 +636,13 @@ public final class ScriptManager implements IUpdateable {
     attachment.context.manage(() -> entity.removeListener(entityListener));
 
     if (entity instanceof de.gurkenlabs.litiengine.entities.ICombatEntity combatEntity) {
-      de.gurkenlabs.litiengine.entities.CombatEntityHitListener hitListener = event -> {
+      CombatEntityHitListener hitListener = event -> {
+        if (!this.canDispatch(attachment)) return;
         if (attachment.instance instanceof EntityScript<?> script) {
           try {
             script.dispatchHit(event);
           } catch (Exception e) {
+            attachment.faulted = true;
             this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script hit handler failed: " + e.getMessage(), e);
             this.detachAttachment(attachment);
           }
@@ -635,11 +651,13 @@ public final class ScriptManager implements IUpdateable {
       combatEntity.onHit(hitListener);
       attachment.context.manage(() -> combatEntity.removeListener(hitListener));
 
-      de.gurkenlabs.litiengine.entities.CombatEntityDeathListener deathListener = (deadEntity, hitEvent) -> {
+      CombatEntityDeathListener deathListener = (deadEntity, hitEvent) -> {
+        if (!this.canDispatch(attachment)) return;
         if (attachment.instance instanceof EntityScript<?> script) {
           try {
             script.dispatchDeath(deadEntity, hitEvent);
           } catch (Exception e) {
+            attachment.faulted = true;
             this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script death handler failed: " + e.getMessage(), e);
             this.detachAttachment(attachment);
           }
@@ -650,11 +668,13 @@ public final class ScriptManager implements IUpdateable {
     }
 
     if (entity instanceof de.gurkenlabs.litiengine.entities.ICollisionEntity collisionEntity) {
-      de.gurkenlabs.litiengine.entities.CollisionListener collisionListener = event -> {
+      CollisionListener collisionListener = event -> {
+        if (!this.canDispatch(attachment)) return;
         if (attachment.instance instanceof EntityScript<?> script) {
           try {
             script.dispatchCollision(event);
           } catch (Exception e) {
+            attachment.faulted = true;
             this.report(attachment.definition.getId(), attachment.definition.getSource(), "Script collision handler failed: " + e.getMessage(), e);
             this.detachAttachment(attachment);
           }
@@ -666,7 +686,7 @@ public final class ScriptManager implements IUpdateable {
 
     if (attachment.instance instanceof EntityScript<?> script) {
       java.util.function.Consumer<String> actionListener = action -> {
-        if (attachment.faulted || !this.enabled) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchAction(action);
         } catch (Exception e) {
@@ -684,7 +704,7 @@ public final class ScriptManager implements IUpdateable {
     IKeyboard keyboard = Input.keyboard();
     if (keyboard != null) {
       IKeyboard.KeyPressedListener keyPressed = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchKeyPressed(event);
         } catch (Exception e) {
@@ -694,7 +714,7 @@ public final class ScriptManager implements IUpdateable {
         }
       };
       IKeyboard.KeyReleasedListener keyReleased = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchKeyReleased(event);
         } catch (Exception e) {
@@ -704,7 +724,7 @@ public final class ScriptManager implements IUpdateable {
         }
       };
       IKeyboard.KeyTypedListener keyTyped = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchKeyTyped(event);
         } catch (Exception e) {
@@ -726,7 +746,7 @@ public final class ScriptManager implements IUpdateable {
     IMouse mouse = Input.mouse();
     if (mouse != null) {
       IMouse.MouseClickedListener mouseClicked = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchMouseClicked(event);
         } catch (Exception e) {
@@ -736,7 +756,7 @@ public final class ScriptManager implements IUpdateable {
         }
       };
       IMouse.MousePressedListener mousePressed = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchMousePressed(event);
         } catch (Exception e) {
@@ -746,7 +766,7 @@ public final class ScriptManager implements IUpdateable {
         }
       };
       IMouse.MouseReleasedListener mouseReleased = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchMouseReleased(event);
         } catch (Exception e) {
@@ -756,7 +776,7 @@ public final class ScriptManager implements IUpdateable {
         }
       };
       IMouse.MouseMovedListener mouseMoved = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchMouseMoved(event);
         } catch (Exception e) {
@@ -766,7 +786,7 @@ public final class ScriptManager implements IUpdateable {
         }
       };
       java.awt.event.MouseWheelListener mouseWheel = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           script.dispatchMouseWheel(event);
         } catch (Exception e) {
@@ -793,7 +813,7 @@ public final class ScriptManager implements IUpdateable {
   private void registerRenderLifecycle(Attachment attachment) {
     if (attachment.host instanceof IEntity entity) {
       EntityRenderedListener listener = event -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           attachment.instance.render(event.getGraphics());
         } catch (Exception | LinkageError e) {
@@ -806,7 +826,7 @@ public final class ScriptManager implements IUpdateable {
       attachment.context.manage(() -> entity.removeListener(listener));
     } else if (attachment.host instanceof Environment environment) {
       EnvironmentRenderedListener listener = (graphics, renderType) -> {
-        if (attachment.faulted) return;
+        if (!this.canDispatch(attachment)) return;
         try {
           attachment.instance.render(graphics);
         } catch (Exception | LinkageError e) {
@@ -820,7 +840,7 @@ public final class ScriptManager implements IUpdateable {
     } else if (attachment.host == this.gameHost) {
       if (!Game.isInNoGUIMode() && Game.window() != null && Game.window().getRenderComponent() != null) {
         java.util.function.Consumer<Graphics2D> renderConsumer = g -> {
-          if (attachment.faulted) return;
+          if (!this.canDispatch(attachment)) return;
           try {
             attachment.instance.render(g);
           } catch (Exception | LinkageError e) {
@@ -844,9 +864,11 @@ public final class ScriptManager implements IUpdateable {
     if (!(attachment.instance instanceof EnvironmentScript script)) return;
     EnvironmentListener listener = new EnvironmentListener() {
       @Override public void cleared(Environment cleared) {
+        if (!canDispatch(attachment)) return;
         try {
           script.dispatchCleared();
         } catch (Exception e) {
+          attachment.faulted = true;
           report(attachment.definition.getId(), attachment.definition.getSource(),
             "Script environment-clear handler failed: " + e.getMessage(), e);
           detachAttachment(attachment);
@@ -855,18 +877,22 @@ public final class ScriptManager implements IUpdateable {
     };
     de.gurkenlabs.litiengine.environment.EnvironmentEntityListener entityListener = new de.gurkenlabs.litiengine.environment.EnvironmentEntityListener() {
       @Override public void entityAdded(IEntity entity) {
+        if (!canDispatch(attachment)) return;
         try {
           script.dispatchEntityAdded(entity);
         } catch (Exception e) {
+          attachment.faulted = true;
           report(attachment.definition.getId(), attachment.definition.getSource(),
             "Script entity-added handler failed: " + e.getMessage(), e);
         }
       }
 
       @Override public void entityRemoved(IEntity entity) {
+        if (!canDispatch(attachment)) return;
         try {
           script.dispatchEntityRemoved(entity);
         } catch (Exception e) {
+          attachment.faulted = true;
           report(attachment.definition.getId(), attachment.definition.getSource(),
             "Script entity-removed handler failed: " + e.getMessage(), e);
         }
