@@ -1426,6 +1426,74 @@ class ScriptRuntimeTests {
     Game.scripts().setDefinitions(List.of());
     assertEquals(1, JavaEntityScript.unloaded, "Removing a definition must unload active instances.");
   }
+
+  public static final class FailingEnvironmentLifecycleScript extends EnvironmentScript {
+    static boolean failAdded = false;
+    static boolean failRemoved = false;
+    static int unloadedCount = 0;
+
+    @Override
+    protected void onUnloaded() {
+      unloadedCount++;
+    }
+
+    @Override
+    protected void onEntityAdded(IEntity entity) {
+      if (failAdded) {
+        throw new RuntimeException("Simulated onEntityAdded failure");
+      }
+    }
+
+    @Override
+    protected void onEntityRemoved(IEntity entity) {
+      if (failRemoved) {
+        throw new RuntimeException("Simulated onEntityRemoved failure");
+      }
+    }
+
+    static void reset() {
+      failAdded = false;
+      failRemoved = false;
+      unloadedCount = 0;
+    }
+  }
+
+  @Test
+  void gameBindingsDefensiveCopies() {
+    ScriptBinding binding = new ScriptBinding("initial-script");
+    binding.setParameter("speed", "10");
+    Game.scripts().setGameBindings(List.of(binding));
+
+    binding.setScript("mutated-script");
+    binding.setParameter("speed", "999");
+
+    List<ScriptBinding> retrieved = Game.scripts().getGameBindings();
+    assertEquals(1, retrieved.size());
+    assertEquals("initial-script", retrieved.get(0).getScript());
+    assertEquals("10", retrieved.get(0).getParameters().get("speed"));
+  }
+
+  @Test
+  void environmentEntityAddedOrRemovedFailureDetachesScript() {
+    FailingEnvironmentLifecycleScript.reset();
+    ScriptDefinition def = new ScriptDefinition("fail-env-script", "java", null, FailingEnvironmentLifecycleScript.class.getName(), ScriptHostType.ENVIRONMENT);
+    Game.scripts().setDefinitions(List.of(def));
+
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+    Environment env = new Environment(map);
+    env.init();
+
+    ScriptInstance instance = Game.scripts().attach(env, new ScriptBinding("fail-env-script"));
+    assertNotNull(instance);
+
+    FailingEnvironmentLifecycleScript.failAdded = true;
+    Creature creature = new Creature();
+    env.add(creature);
+
+    assertEquals(1, FailingEnvironmentLifecycleScript.unloadedCount, "Failure in onEntityAdded must fault and detach script.");
+  }
 }
 
 class ParentVisibleScript extends GameScript {

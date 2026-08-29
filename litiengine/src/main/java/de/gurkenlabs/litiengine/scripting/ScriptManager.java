@@ -185,7 +185,12 @@ public final class ScriptManager implements IUpdateable {
 
   public void setGameBindings(Collection<ScriptBinding> bindings) {
     this.gameBindings.clear();
-    if (bindings != null) this.gameBindings.addAll(bindings);
+    if (bindings != null) {
+      bindings.stream()
+        .filter(Objects::nonNull)
+        .map(ScriptBinding::new)
+        .forEach(this.gameBindings::add);
+    }
     if (Game.hasStarted()) {
       this.detach(this.gameHost);
       this.attachAll(this.gameHost, this.gameBindings);
@@ -884,6 +889,7 @@ public final class ScriptManager implements IUpdateable {
           attachment.faulted = true;
           report(attachment.definition.getId(), attachment.definition.getSource(),
             "Script entity-added handler failed: " + e.getMessage(), e);
+          detachAttachment(attachment);
         }
       }
 
@@ -895,6 +901,7 @@ public final class ScriptManager implements IUpdateable {
           attachment.faulted = true;
           report(attachment.definition.getId(), attachment.definition.getSource(),
             "Script entity-removed handler failed: " + e.getMessage(), e);
+          detachAttachment(attachment);
         }
       }
     };
