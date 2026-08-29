@@ -66,7 +66,6 @@ You've encountered an obvious issue or bug with LITIENGINE or want to request en
 ## :package: Libraries Used
 
 * [Input4J](https://github.com/gurkenlabs/input4j) for Gamepad support
-* Native Java Sound provider for .mp3 support
 * [Ogg Vorbis SPI](https://mvnrepository.com/artifact/com.googlecode.soundlibs/vorbisspi/1.0.3.3) for .ogg support
 
 ### utiLITI

@@ -126,12 +126,12 @@ class DequantizationTests {
 
   private MpegFrame createTestFrame() {
     byte[] header = new byte[]{(byte)0b11111111, (byte)0b11111010, (byte)0b00111000, (byte)0b11000100};
-    byte[] sideInfo = new byte[]{-52, -123, 71, 78, 13, 36, 81, 1, -127, 36, -87, -127, -84, 12, 112, -92, -57};
+    byte[] sideInfo = new byte[]{-52, -123, 71, 78, 13, 36, 89, 1, -127, 36, -87, -127, -84, 12, 112, -92, -57};
 
     var bytes = ByteBuffer.allocate(600);
     bytes.put(header);
-    bytes.put((byte)0x90); // CRC
-    bytes.put((byte)0x3b);
+    bytes.put((byte)0xba); // CRC
+    bytes.put((byte)0x38);
     bytes.put(sideInfo);
 
     // Add main data

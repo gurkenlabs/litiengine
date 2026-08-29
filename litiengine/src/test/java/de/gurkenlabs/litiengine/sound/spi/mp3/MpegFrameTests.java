@@ -12,7 +12,7 @@ class MpegFrameTests {
 
   private static final byte[] EXAMPLE_HEADER = new byte[]{(byte) 0b11111111, (byte) 0b11111010, (byte) 0b00111000, (byte) 0b11000100};
 
-  private static final byte[] EXAMPLE_SIDE_INFO = new byte[]{-52, -123, 71, 78, 13, 36, 81, 1, -127, 36, -87, -127, -84, 12, 112, -92, -57};
+  private static final byte[] EXAMPLE_SIDE_INFO = new byte[]{-52, -123, 71, 78, 13, 36, 89, 1, -127, 36, -87, -127, -84, 12, 112, -92, -57};
 
   @Test
   void testBitReader() {
@@ -75,14 +75,14 @@ class MpegFrameTests {
     assertEquals(262, frame.getSideInfo().channels[0].granules[0].big_values);
     assertEquals(146, frame.getSideInfo().channels[0].granules[0].global_gain);
     assertEquals(2, frame.getSideInfo().channels[0].granules[0].scalefac_compress);
-    assertEquals(0, frame.getSideInfo().channels[0].granules[0].block_type);
-    assertEquals(0, frame.getSideInfo().channels[0].granules[0].region0_count);
-    assertEquals(0, frame.getSideInfo().channels[0].granules[0].region1_count);
+    assertEquals(2, frame.getSideInfo().channels[0].granules[0].block_type);
+    assertEquals(8, frame.getSideInfo().channels[0].granules[0].region0_count);
+    assertEquals(12, frame.getSideInfo().channels[0].granules[0].region1_count);
     assertArrayEquals(new int[]{16, 3, 0}, frame.getSideInfo().channels[0].granules[0].table_select);
     assertArrayEquals(new int[]{0, 0, 4}, frame.getSideInfo().channels[0].granules[0].subblock_gain);
     assertTrue(frame.getSideInfo().channels[0].granules[0].window_switching_flag);
     assertFalse(frame.getSideInfo().channels[0].granules[0].mixed_block_flag);
-    assertFalse(frame.getSideInfo().channels[0].granules[0].preflag);
+    assertTrue(frame.getSideInfo().channels[0].granules[0].preflag);
     assertFalse(frame.getSideInfo().channels[0].granules[0].scalefac_scale);
     assertFalse(frame.getSideInfo().channels[0].granules[0].count1table_select);
   }
@@ -110,8 +110,8 @@ class MpegFrameTests {
   ByteBuffer exampleMpegDataWithMainData() {
     var bytes = ByteBuffer.allocate(600);
     bytes.put(EXAMPLE_HEADER);
-    bytes.put((byte) 0x90); // CRC
-    bytes.put((byte) 0x3b);
+    bytes.put((byte) 0xba); // CRC
+    bytes.put((byte) 0x38);
     bytes.put(EXAMPLE_SIDE_INFO);
 
     // Add some main data (scale factors and Huffman data placeholder)
@@ -126,8 +126,8 @@ class MpegFrameTests {
   ByteBuffer exampleMpegData() {
     var bytes = ByteBuffer.allocate(216);
     bytes.put(EXAMPLE_HEADER);
-    bytes.put((byte) 0x90); // CRC
-    bytes.put((byte) 0x3b);
+    bytes.put((byte) 0xba); // CRC
+    bytes.put((byte) 0x38);
     bytes.put(EXAMPLE_SIDE_INFO);
     bytes.flip();
     return bytes;
@@ -139,6 +139,17 @@ class MpegFrameTests {
     data.put(6, (byte) (data.get(6) ^ 1));
 
     assertThrows(UnsupportedAudioFileException.class, () -> new MpegFrame(data, 0));
+  }
+
+  @Test
+  void reservedSwitchedBlockTypesAreRejected() {
+    var data = exampleMpegData();
+    data.put(4, (byte) 0x90);
+    data.put(5, (byte) 0x3b);
+    data.put(12, (byte) (data.get(12) & ~0x0c));
+
+    var exception = assertThrows(UnsupportedAudioFileException.class, () -> new MpegFrame(data, 0));
+    assertEquals("Invalid block type in switched MPEG granule", exception.getMessage());
   }
 
   @Test

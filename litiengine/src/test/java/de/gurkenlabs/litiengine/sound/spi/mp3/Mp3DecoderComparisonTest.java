@@ -28,21 +28,22 @@ class Mp3DecoderComparisonTest {
   void decodedPcmMatchesGoldenOutput() throws Exception {
     byte[] pcm = decodeWithLitiengine(readSample(), false);
 
-    assertEquals(965376, pcm.length);
-    assertEquals("4720061d59420a39c21a4c61ee79c8c5f7c93fa66390bfb76c2660d59604c980",
+    assertEquals(963072, pcm.length);
+    assertEquals("4360f659134fd1a9641449da6982527726e32ed2cd641a399eb4c51a78323c8a",
       HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(pcm)));
   }
 
   @Test
   void decodedPcmMatchesIndependentReferenceCheckpoints() throws Exception {
     // Generated from the committed MP3 with JLayer 1.0.1.4, which can differ by one due to rounding.
+    // Offsets exclude the initial 1152-sample Xing metadata frame.
     int[][] referenceSamples = {
-      {0, 0}, {16384, -8051}, {32768, 32}, {49152, -7018}, {65536, 284},
-      {81920, 1002}, {98304, -140}, {114688, -684}, {131072, -1977}, {147456, -435},
-      {163840, 6499}, {180224, 1001}, {196608, 33}, {212992, -1518}, {229376, -4100},
-      {245760, 9}, {262144, -128}, {278528, 1}, {294912, 10394}, {311296, -603},
-      {327680, -4345}, {344064, 26}, {360448, -1205}, {376832, 52}, {393216, -217},
-      {409600, -403}, {425984, -6170}, {442368, -1591}, {458752, -9}, {475136, 623}
+      {15232, -8051}, {31616, 32}, {48000, -7018}, {64384, 284},
+      {80768, 1002}, {97152, -140}, {113536, -684}, {129920, -1977}, {146304, -435},
+      {162688, 6499}, {179072, 1001}, {195456, 33}, {211840, -1518}, {228224, -4100},
+      {244608, 9}, {260992, -128}, {277376, 1}, {293760, 10394}, {310144, -603},
+      {326528, -4345}, {342912, 26}, {359296, -1205}, {375680, 52}, {392064, -217},
+      {408448, -403}, {424832, -6170}, {441216, -1591}, {457600, -9}, {473984, 623}
     };
     byte[] pcm = decodeWithLitiengine(readSample(), false);
 

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Manual speaker test. Set LITIENGINE_TEST_AUDIO_PLAYBACK=true to enable it. */
 class Mp3PlaybackTest {
-  private static final long EXPECTED_PCM_BYTES = 965376;
+  private static final long EXPECTED_PCM_BYTES = 963072;
 
   @Test
   void playsDecodedMp3ThroughTheDefaultAudioDevice() throws Exception {

@@ -310,14 +310,14 @@ final class Mp3DecoderInputStream extends InputStream {
     return frameData;
   }
 
-  private static boolean hasXingHeader(byte[] frameData) {
-    int[] markerOffsets = {36, 32, 27, 23};
-    for (int markerOffset : markerOffsets) {
-      if (markerOffset + 4 > frameData.length) continue;
-      String marker = new String(frameData, markerOffset, 4, StandardCharsets.ISO_8859_1);
-      if ("Xing".equals(marker) || "Info".equals(marker)) return true;
-    }
-    return false;
+  static boolean hasXingHeader(byte[] frameData) {
+    int header = readHeader(frameData);
+    int crcLength = ((header >>> 16) & 1) == 0 ? 2 : 0;
+    int markerOffset = Integer.BYTES + crcLength + Mpeg.getSideInfoLength(detectChannels(frameData));
+    if (markerOffset + Integer.BYTES > frameData.length) return false;
+
+    String marker = new String(frameData, markerOffset, Integer.BYTES, StandardCharsets.ISO_8859_1);
+    return "Xing".equals(marker) || "Info".equals(marker);
   }
 
   private static int readHeader(byte[] data) {

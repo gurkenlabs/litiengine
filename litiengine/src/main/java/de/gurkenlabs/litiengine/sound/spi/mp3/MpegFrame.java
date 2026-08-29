@@ -258,7 +258,8 @@ class MpegFrame {
      * @param isProtected A flag indicating whether the MPEG frame is protected.
      * @param channels The number of channels of the MPEG frame.
      */
-    SideInfo(ByteBuffer byteBuffer, int frameOffset, boolean isProtected, int channels) {
+    SideInfo(ByteBuffer byteBuffer, int frameOffset, boolean isProtected, int channels)
+      throws UnsupportedAudioFileException {
       var payloadOffset = HEADER_SIZE_IN_BYTES + (isProtected ? CRC_SIZE_IN_BYTES : 0);
 
       // Use BitReader directly with ByteBuffer to read from the correct offset
@@ -289,6 +290,9 @@ class MpegFrame {
 
           if (this.channels[ch].granules[gr].window_switching_flag) {
             this.channels[ch].granules[gr].block_type = bits.get(2);
+            if (this.channels[ch].granules[gr].block_type == Granule.BLOCK_TYPE_RESERVED) {
+              throw new UnsupportedAudioFileException("Invalid block type in switched MPEG granule");
+            }
             this.channels[ch].granules[gr].mixed_block_flag = bits.getBoolean();
 
             this.channels[ch].granules[gr].table_select[0] = bits.get(5);
@@ -301,10 +305,7 @@ class MpegFrame {
 
             // Set region_count parameters since they are implicit in this case.
 
-            if (this.channels[ch].granules[gr].block_type == 0) {
-              //	 Side info bad: block_type == 0 in split block
-              return;
-            } else if (this.channels[ch].granules[gr].block_type == 2 && !this.channels[ch].granules[gr].mixed_block_flag) {
+            if (this.channels[ch].granules[gr].block_type == 2 && !this.channels[ch].granules[gr].mixed_block_flag) {
               this.channels[ch].granules[gr].region0_count = 8;
             } else {
               this.channels[ch].granules[gr].region0_count = 7;

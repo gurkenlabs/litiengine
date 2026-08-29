@@ -20,7 +20,7 @@ class SoundTests {
       assertEquals(AudioFormat.Encoding.PCM_SIGNED, sound.getFormat().getEncoding());
       assertEquals(32000.0f, sound.getFormat().getSampleRate());
       assertEquals(1, sound.getFormat().getChannels());
-      assertEquals(965376, sound.getStreamData().length);
+      assertEquals(963072, sound.getStreamData().length);
     }
   }
 
