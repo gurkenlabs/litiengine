@@ -41,7 +41,7 @@ public final class Mp3FileReader extends AudioFileReader {
     }
     frames.write(stream.readNBytes(MAX_FRAME_SEARCH + Integer.BYTES));
 
-    var frame = findFirstFrame(frames.toByteArray());
+    var frame = readFirstFrame(frames.toByteArray());
     var format = new AudioFormat(frame.getEncoding(), frame.getSampleRate(), AudioSystem.NOT_SPECIFIED,
       frame.getChannels(), AudioSystem.NOT_SPECIFIED, AudioSystem.NOT_SPECIFIED, false);
     return new AudioFileFormat(MP3, format, AudioSystem.NOT_SPECIFIED);
@@ -61,18 +61,10 @@ public final class Mp3FileReader extends AudioFileReader {
       | ((header[8] & 0x7f) << 7) | (header[9] & 0x7f);
   }
 
-  private static MpegFrame findFirstFrame(byte[] data) throws UnsupportedAudioFileException {
-    var buffer = ByteBuffer.wrap(data);
-    int limit = Math.min(data.length - Integer.BYTES, MAX_FRAME_SEARCH);
-    for (int offset = 0; offset <= limit; offset++) {
-      if (Mpeg.isStart(data[offset], data[offset + 1])) {
-        try {
-          return new MpegFrame(buffer, offset);
-        } catch (UnsupportedAudioFileException exception) {
-          // A sync-like byte sequence can occur in metadata; continue searching.
-        }
-      }
+  private static MpegFrame readFirstFrame(byte[] data) throws UnsupportedAudioFileException {
+    if (data.length < Integer.BYTES || !Mpeg.isStart(data[0], data[1])) {
+      throw new UnsupportedAudioFileException("No MPEG-1 Layer III frame found");
     }
-    throw new UnsupportedAudioFileException("No MPEG-1 Layer III frame found");
+    return new MpegFrame(ByteBuffer.wrap(data), 0);
   }
 }

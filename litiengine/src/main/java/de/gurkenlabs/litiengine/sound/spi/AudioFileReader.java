@@ -78,8 +78,12 @@ public abstract class AudioFileReader extends javax.sound.sampled.spi.AudioFileR
 
     var inputStream = stream.markSupported() ? stream : new BufferedInputStream(stream, this.markLimit);
     inputStream.mark(this.markLimit);
-    var audioFileFormat = getAudioFileFormat(inputStream, fileLength);
-    inputStream.reset();
+    AudioFileFormat audioFileFormat;
+    try {
+      audioFileFormat = getAudioFileFormat(inputStream, fileLength);
+    } finally {
+      inputStream.reset();
+    }
 
     return new AudioInputStream(inputStream, audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
   }

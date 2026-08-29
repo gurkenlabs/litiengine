@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -23,6 +24,29 @@ class Mp3FileReaderTests {
 
     assertThrows(UnsupportedAudioFileException.class,
       () -> reader.getAudioFileFormat(Resources.getLocation("de/gurkenlabs/litiengine/resources/bop.wav").openStream()));
+  }
+
+  @Test
+  void rejectingAnInputStreamRestoresItsPosition() throws Exception {
+    byte[] wav = readResource("de/gurkenlabs/litiengine/resources/bop.wav");
+    var stream = new ByteArrayInputStream(wav);
+
+    assertThrows(UnsupportedAudioFileException.class,
+      () -> new Mp3FileReader().getAudioInputStream(stream));
+
+    assertEquals('R', stream.read());
+  }
+
+  @Test
+  void doesNotClaimRiffDataContainingAnMpegFrame() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] riffWithMpegData = new byte[mp3.length + 12];
+    System.arraycopy("RIFF....WAVE".getBytes(StandardCharsets.US_ASCII), 0,
+      riffWithMpegData, 0, 12);
+    System.arraycopy(mp3, 0, riffWithMpegData, 12, mp3.length);
+
+    assertThrows(UnsupportedAudioFileException.class,
+      () -> new Mp3FileReader().getAudioFileFormat(new ByteArrayInputStream(riffWithMpegData)));
   }
 
   @Test
@@ -60,7 +84,11 @@ class Mp3FileReaderTests {
   }
 
   private static byte[] readSample() throws IOException {
-    try (var stream = Resources.getLocation(MP3_RESOURCE).openStream()) {
+    return readResource(MP3_RESOURCE);
+  }
+
+  private static byte[] readResource(String resource) throws IOException {
+    try (var stream = Resources.getLocation(resource).openStream()) {
       return stream.readAllBytes();
     }
   }
