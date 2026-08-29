@@ -150,6 +150,17 @@ class Mp3DecoderComparisonTest {
   }
 
   @Test
+  void vbriMetadataFrameDoesNotProducePcm() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] withVbri = Arrays.copyOf(mp3, mp3.length);
+    int firstFrameOffset = Mpeg.getId3TagLength(withVbri);
+    Arrays.fill(withVbri, firstFrameOffset + 21, firstFrameOffset + 25, (byte) 0);
+    System.arraycopy("VBRI".getBytes(StandardCharsets.ISO_8859_1), 0, withVbri, firstFrameOffset + 36, 4);
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false), decodeWithLitiengine(withVbri, false));
+  }
+
+  @Test
   void malformedLaterFramesFailTheDecodedStream() throws Exception {
     byte[] corrupted = readSample();
     int firstFrameOffset = Mpeg.getId3TagLength(corrupted);

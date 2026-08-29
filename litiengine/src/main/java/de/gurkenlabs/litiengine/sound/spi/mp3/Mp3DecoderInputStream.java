@@ -144,7 +144,7 @@ final class Mp3DecoderInputStream extends InputStream {
         frameOffset = encodedPosition;
         frameData = readFrame();
         if (frameData == null) return false;
-        if (!hasXingHeader(frameData)) break;
+        if (!isMetadataFrame(frameData)) break;
       }
 
       int header = readHeader(frameData);
@@ -327,6 +327,10 @@ final class Mp3DecoderInputStream extends InputStream {
     return frameData;
   }
 
+  static boolean isMetadataFrame(byte[] frameData) {
+    return hasXingHeader(frameData) || hasVbriHeader(frameData);
+  }
+
   static boolean hasXingHeader(byte[] frameData) {
     int header = readHeader(frameData);
     int crcLength = ((header >>> 16) & 1) == 0 ? 2 : 0;
@@ -334,6 +338,10 @@ final class Mp3DecoderInputStream extends InputStream {
     if (markerOffset + Integer.BYTES > frameData.length) return false;
 
     return matches(frameData, markerOffset, "Xing") || matches(frameData, markerOffset, "Info");
+  }
+
+  private static boolean hasVbriHeader(byte[] frameData) {
+    return matches(frameData, 36, "VBRI");
   }
 
   private static boolean matches(byte[] data, int offset, String marker) {
