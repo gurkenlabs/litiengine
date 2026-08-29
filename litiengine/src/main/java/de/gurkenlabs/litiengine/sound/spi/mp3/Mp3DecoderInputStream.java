@@ -293,6 +293,11 @@ final class Mp3DecoderInputStream extends InputStream {
       throw new IOException("Invalid MPEG header at byte " + (encodedPosition - Integer.BYTES), exception);
     }
 
+    int channels = detectChannels(headerBytes);
+    if (sampleRate != (int) targetFormat.getSampleRate() || channels != targetFormat.getChannels()) {
+      throw new IOException("MPEG stream format changed at byte " + (encodedPosition - Integer.BYTES));
+    }
+
     int frameSize = 144000 * bitrate / sampleRate + ((header >>> 9) & 1);
     byte[] frameData = new byte[frameSize];
     System.arraycopy(headerBytes, 0, frameData, 0, headerBytes.length);

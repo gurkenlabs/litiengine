@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
@@ -134,6 +135,24 @@ class Mp3DecoderComparisonTest {
   }
 
   @Test
+  void sampleRateChangesBetweenFramesAreRejected() throws Exception {
+    byte[] changed = readSample();
+    int nextFrameOffset = nextFrameOffset(changed);
+    changed[nextFrameOffset + 2] = (byte) ((changed[nextFrameOffset + 2] & ~0x0c) | 0x04);
+
+    assertFormatChangeRejected(changed, nextFrameOffset);
+  }
+
+  @Test
+  void channelChangesBetweenFramesAreRejected() throws Exception {
+    byte[] changed = readSample();
+    int nextFrameOffset = nextFrameOffset(changed);
+    changed[nextFrameOffset + 3] &= 0x3f;
+
+    assertFormatChangeRejected(changed, nextFrameOffset);
+  }
+
+  @Test
   void conversionPreservesRateAndChannels() throws Exception {
     try (var source = new Mp3FileReader().getAudioInputStream(new ByteArrayInputStream(readSample()))) {
       var provider = new Mp3FormatConversionProvider();
@@ -176,6 +195,19 @@ class Mp3DecoderComparisonTest {
   private static AudioFormat targetFormat(AudioFormat source, boolean bigEndian) {
     return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, source.getSampleRate(), 16,
       source.getChannels(), source.getChannels() * 2, source.getSampleRate(), bigEndian);
+  }
+
+  private static void assertFormatChangeRejected(byte[] mp3, int frameOffset) throws Exception {
+    try (var source = new Mp3FileReader().getAudioInputStream(new ByteArrayInputStream(mp3));
+      var decoded = new Mp3FormatConversionProvider().getAudioInputStream(targetFormat(source.getFormat(), false), source)) {
+      var exception = assertThrows(IOException.class, decoded::readAllBytes);
+      assertEquals("MPEG stream format changed at byte " + frameOffset, exception.getMessage());
+    }
+  }
+
+  private static int nextFrameOffset(byte[] mp3) throws UnsupportedAudioFileException {
+    int firstFrameOffset = Mpeg.getId3TagLength(mp3);
+    return firstFrameOffset + frameLength(mp3, firstFrameOffset);
   }
 
   private static int frameLength(byte[] mp3, int offset) {
