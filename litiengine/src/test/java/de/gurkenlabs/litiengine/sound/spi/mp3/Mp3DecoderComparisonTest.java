@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.HexFormat;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -38,6 +40,13 @@ class Mp3DecoderComparisonTest {
   }
 
   @Test
+  void largeCallerBuffersProduceTheSamePcm() throws Exception {
+    byte[] mp3 = readSample();
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false), decodeWithLitiengine(mp3, false, 600_000));
+  }
+
+  @Test
   void conversionPreservesRateAndChannels() throws Exception {
     try (var source = new Mp3FileReader().getAudioInputStream(new ByteArrayInputStream(readSample()))) {
       var provider = new Mp3FormatConversionProvider();
@@ -59,6 +68,20 @@ class Mp3DecoderComparisonTest {
       var target = targetFormat(source.getFormat(), bigEndian);
       try (var decoded = new Mp3FormatConversionProvider().getAudioInputStream(target, source)) {
         return decoded.readAllBytes();
+      }
+    }
+  }
+
+  private static byte[] decodeWithLitiengine(byte[] mp3Data, boolean bigEndian, int bufferSize) throws Exception {
+    try (AudioInputStream source = new Mp3FileReader()
+      .getAudioInputStream(new ByteArrayInputStream(mp3Data))) {
+      var target = targetFormat(source.getFormat(), bigEndian);
+      try (var decoded = new Mp3FormatConversionProvider().getAudioInputStream(target, source);
+        var output = new ByteArrayOutputStream()) {
+        byte[] buffer = new byte[bufferSize];
+        int read;
+        while ((read = decoded.read(buffer)) != -1) output.write(buffer, 0, read);
+        return output.toByteArray();
       }
     }
   }

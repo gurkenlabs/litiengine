@@ -17,6 +17,7 @@ public class Mp3AudioInputStream extends AudioInputStream {
   private final OverlapAdd[][] overlapAdd;
 
   private static final int RESERVOIR_SIZE = 4096;
+  private static final int SAMPLES_PER_FRAME = 1152;
   private final byte[] reservoir;
   private int reservoirWritePos;
   private int reservoirTotalWritten;
@@ -65,7 +66,8 @@ public class Mp3AudioInputStream extends AudioInputStream {
     if (closed) throw new IOException("Stream closed");
     if (len == 0) return 0;
 
-    while (pcmBuffer.position() < len) {
+    int pcmFrameSize = SAMPLES_PER_FRAME * targetFormat.getFrameSize();
+    while (pcmBuffer.position() < len && pcmBuffer.remaining() >= pcmFrameSize) {
       if (!decodeNextFrame()) break;
     }
 
@@ -209,7 +211,7 @@ public class Mp3AudioInputStream extends AudioInputStream {
 
       for (int ch = 0; ch < outputChannels; ch++) synthesisFilters[ch].resetPcmBufferIndex();
 
-      int[][] pcmTempBuffers = new int[outputChannels][1152];
+      int[][] pcmTempBuffers = new int[outputChannels][SAMPLES_PER_FRAME];
       var sideInfo = frame.getSideInfo();
 
       // Process each output channel
@@ -253,7 +255,9 @@ public class Mp3AudioInputStream extends AudioInputStream {
 
       int samplesPerChannel = synthesisFilters[0].getPcmBufferIndex();
       int bytesNeeded = samplesPerChannel * outputChannels * 2;
-      if (pcmBuffer.remaining() < bytesNeeded) return false;
+      if (pcmBuffer.remaining() < bytesNeeded) {
+        throw new IllegalStateException("Insufficient PCM buffer capacity");
+      }
 
       // Write samples with proper interleaving for stereo
       if (outputChannels == 2) {

@@ -33,7 +33,7 @@ class MpegFrame {
     this.header = new Header(byteBuffer, frameOffset);
 
     // 2. error check
-    if (this.isProtected() && !checkCrc(byteBuffer, frameOffset)) {
+    if (this.isProtected() && !checkCrc(byteBuffer, frameOffset, this.getChannels())) {
       throw new UnsupportedAudioFileException("CRC check failed. Inconsistent header data");
     }
 
@@ -49,7 +49,7 @@ class MpegFrame {
    */
   public MpegFrame(ByteBuffer headerAndSideInfo, int frameOffset, byte[] mainData) throws UnsupportedAudioFileException {
     this.header = new Header(headerAndSideInfo, frameOffset);
-    if (this.isProtected() && !checkCrc(headerAndSideInfo, frameOffset)) {
+    if (this.isProtected() && !checkCrc(headerAndSideInfo, frameOffset, this.getChannels())) {
       throw new UnsupportedAudioFileException("CRC check failed. Inconsistent header data");
     }
     this.sideInfo = new SideInfo(headerAndSideInfo, frameOffset, this.isProtected(), this.getChannels());
@@ -78,6 +78,16 @@ class MpegFrame {
 
   public String getModeExtension() {
     return this.header.modeExtension;
+  }
+
+  boolean usesIntensityStereo() {
+    return Mpeg.CHANNEL_MODE_JOINT_STEREO.equals(this.header.channelMode)
+      && (this.header.modeExtensionBits & 0b01) != 0;
+  }
+
+  boolean usesMidSideStereo() {
+    return Mpeg.CHANNEL_MODE_JOINT_STEREO.equals(this.header.channelMode)
+      && (this.header.modeExtensionBits & 0b10) != 0;
   }
 
   public boolean isOriginal() {
@@ -128,13 +138,30 @@ class MpegFrame {
     return this.mainData.getSamples();
   }
 
-  private static boolean checkCrc(ByteBuffer byteBuffer, int frameOffset) {
-    // read 16 bits (short) after the header
-    var crcBytes = new byte[CRC_SIZE_IN_BYTES];
-    byteBuffer.get(frameOffset + HEADER_SIZE_IN_BYTES, crcBytes);
+  private static boolean checkCrc(ByteBuffer byteBuffer, int frameOffset, int channels) {
+    int sideInfoSize = Mpeg.getSideInfoLength(channels);
+    int protectedDataEnd = frameOffset + HEADER_SIZE_IN_BYTES + CRC_SIZE_IN_BYTES + sideInfoSize;
+    if (frameOffset < 0 || protectedDataEnd > byteBuffer.limit()) return false;
 
-    // TODO: implement
-    return true;
+    int expected = (Byte.toUnsignedInt(byteBuffer.get(frameOffset + HEADER_SIZE_IN_BYTES)) << 8)
+      | Byte.toUnsignedInt(byteBuffer.get(frameOffset + HEADER_SIZE_IN_BYTES + 1));
+    int crc = 0xffff;
+    crc = updateCrc(crc, byteBuffer, frameOffset + 2, 2);
+    crc = updateCrc(crc, byteBuffer, frameOffset + HEADER_SIZE_IN_BYTES + CRC_SIZE_IN_BYTES, sideInfoSize);
+    return crc == expected;
+  }
+
+  private static int updateCrc(int crc, ByteBuffer data, int offset, int length) {
+    for (int index = offset; index < offset + length; index++) {
+      int value = Byte.toUnsignedInt(data.get(index));
+      for (int bit = 7; bit >= 0; bit--) {
+        boolean inputBit = ((value >>> bit) & 1) != 0;
+        boolean highBit = (crc & 0x8000) != 0;
+        crc = (crc << 1) & 0xffff;
+        if (highBit != inputBit) crc ^= 0x8005;
+      }
+    }
+    return crc;
   }
 
   /**
@@ -168,6 +195,7 @@ class MpegFrame {
     final boolean original;
     final String channelMode;
     final String modeExtension;
+    final int modeExtensionBits;
     final String emphasis;
 
     Header(ByteBuffer byteBuffer, int frameOffset) throws UnsupportedAudioFileException {
@@ -189,7 +217,8 @@ class MpegFrame {
       this.padding = bits.getBoolean();
       this.isPrivate = bits.getBoolean();
       this.channelMode = Mpeg.getChannelMode(bits.get(2));
-      this.modeExtension = Mpeg.getModeExtension(bits.get(2), this.channelMode);
+      this.modeExtensionBits = bits.get(2);
+      this.modeExtension = Mpeg.getModeExtension(this.modeExtensionBits, this.channelMode);
       this.copyright = bits.getBoolean();
       this.original = bits.getBoolean();
       this.emphasis = Mpeg.getEmphasis(bits.get(2));
@@ -503,6 +532,7 @@ class MpegFrame {
         dequantize(gr, ch);
       }
     }
+    StereoProcessing.process(this.frame, this.scaleFactors, this.samples);
   }
 
   /**
@@ -537,6 +567,7 @@ class MpegFrame {
         dequantize(gr, ch);
       }
     }
+    StereoProcessing.process(this.frame, this.scaleFactors, this.samples);
   }
 
     private void decodeHuffmanBits(BitReader bits, int gr, int ch, int endBit) {

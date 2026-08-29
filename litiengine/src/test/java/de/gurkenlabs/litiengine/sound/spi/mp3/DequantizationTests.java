@@ -130,8 +130,8 @@ class DequantizationTests {
 
     var bytes = ByteBuffer.allocate(600);
     bytes.put(header);
-    bytes.put((byte)0); // CRC
-    bytes.put((byte)0);
+    bytes.put((byte)0x90); // CRC
+    bytes.put((byte)0x3b);
     bytes.put(sideInfo);
 
     // Add main data

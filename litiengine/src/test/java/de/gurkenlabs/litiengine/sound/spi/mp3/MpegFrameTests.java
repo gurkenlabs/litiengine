@@ -110,8 +110,8 @@ class MpegFrameTests {
   ByteBuffer exampleMpegDataWithMainData() {
     var bytes = ByteBuffer.allocate(600);
     bytes.put(EXAMPLE_HEADER);
-    bytes.put((byte) 0); // CRC
-    bytes.put((byte) 0);
+    bytes.put((byte) 0x90); // CRC
+    bytes.put((byte) 0x3b);
     bytes.put(EXAMPLE_SIDE_INFO);
 
     // Add some main data (scale factors and Huffman data placeholder)
@@ -126,11 +126,37 @@ class MpegFrameTests {
   ByteBuffer exampleMpegData() {
     var bytes = ByteBuffer.allocate(216);
     bytes.put(EXAMPLE_HEADER);
-    bytes.put((byte) 0); // CRC (not supported yet)
-    bytes.put((byte) 0);
+    bytes.put((byte) 0x90); // CRC
+    bytes.put((byte) 0x3b);
     bytes.put(EXAMPLE_SIDE_INFO);
     bytes.flip();
     return bytes;
+  }
+
+  @Test
+  void protectedFramesRejectInvalidCrc() {
+    var data = exampleMpegData();
+    data.put(6, (byte) (data.get(6) ^ 1));
+
+    assertThrows(UnsupportedAudioFileException.class, () -> new MpegFrame(data, 0));
+  }
+
+  @Test
+  void decodesJointStereoModeFlags() throws UnsupportedAudioFileException {
+    byte[] midSideHeaderAndSideInfo = new byte[36];
+    midSideHeaderAndSideInfo[0] = (byte) 0xff;
+    midSideHeaderAndSideInfo[1] = (byte) 0xfb;
+    midSideHeaderAndSideInfo[2] = (byte) 0x90;
+    midSideHeaderAndSideInfo[3] = (byte) 0x60;
+
+    var midSide = new MpegFrame(ByteBuffer.wrap(midSideHeaderAndSideInfo), 0, new byte[0]);
+    midSideHeaderAndSideInfo[3] = (byte) 0x70;
+    var intensityAndMidSide = new MpegFrame(ByteBuffer.wrap(midSideHeaderAndSideInfo), 0, new byte[0]);
+
+    assertTrue(midSide.usesMidSideStereo());
+    assertFalse(midSide.usesIntensityStereo());
+    assertTrue(intensityAndMidSide.usesMidSideStereo());
+    assertTrue(intensityAndMidSide.usesIntensityStereo());
   }
 
   @Test
