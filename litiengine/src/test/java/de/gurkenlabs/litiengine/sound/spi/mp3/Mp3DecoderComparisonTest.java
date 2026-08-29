@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -123,6 +124,32 @@ class Mp3DecoderComparisonTest {
   }
 
   @Test
+  void trailingApev2TagDoesNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, emptyApev2Tag()), false));
+  }
+
+  @Test
+  void appendedId3v24TagDoesNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] id3v24 = {'I', 'D', '3', 4, 0, 0, 0, 0, 0, 0};
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, id3v24), false));
+  }
+
+  @Test
+  void unrecognizedTrailingDataIsRejected() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] trailingData = {'N', 'O', 'P', 'E'};
+
+    assertThrows(IOException.class,
+      () -> decodeWithLitiengine(withTrailingMetadata(mp3, trailingData), false));
+  }
+
+  @Test
   void malformedLaterFramesFailTheDecodedStream() throws Exception {
     byte[] corrupted = readSample();
     int firstFrameOffset = Mpeg.getId3TagLength(corrupted);
@@ -225,6 +252,21 @@ class Mp3DecoderComparisonTest {
     output.write(new byte[]{'3', 'D', 'I', 4, 0, 0x10, 0, 0, 0, 0});
     output.write(mp3);
     return output.toByteArray();
+  }
+
+  private static byte[] withTrailingMetadata(byte[] mp3, byte[] metadata) {
+    byte[] tagged = Arrays.copyOf(mp3, mp3.length + metadata.length);
+    System.arraycopy(metadata, 0, tagged, mp3.length, metadata.length);
+    return tagged;
+  }
+
+  private static byte[] emptyApev2Tag() {
+    byte[] tag = new byte[32];
+    System.arraycopy("APETAGEX".getBytes(StandardCharsets.US_ASCII), 0, tag, 0, 8);
+    tag[8] = (byte) 0xd0;
+    tag[9] = 0x07;
+    tag[12] = 32;
+    return tag;
   }
 
   private static byte[] readSample() throws IOException {

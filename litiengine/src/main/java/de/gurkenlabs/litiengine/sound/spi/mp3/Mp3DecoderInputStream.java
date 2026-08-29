@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 final class Mp3DecoderInputStream extends InputStream {
@@ -22,6 +21,7 @@ final class Mp3DecoderInputStream extends InputStream {
   private final AudioFormat targetFormat;
   private long encodedPosition;
   private boolean initialized;
+  private boolean endOfStream;
   private boolean closed;
   private final SynthesisFilter[] synthesisFilters;
   private final OverlapAdd[][] overlapAdd;
@@ -265,15 +265,32 @@ final class Mp3DecoderInputStream extends InputStream {
   }
 
   private byte[] readFrame() throws IOException {
+    if (endOfStream) return null;
+
+    long frameOffset = encodedPosition;
     byte[] headerBytes = encodedStream.readNBytes(Integer.BYTES);
     encodedPosition += headerBytes.length;
-    if (headerBytes.length == 0) return null;
-    if (headerBytes.length < Integer.BYTES) {
-      throw new IOException("Truncated MPEG header at byte " + (encodedPosition - headerBytes.length));
+    if (headerBytes.length == 0) {
+      endOfStream = true;
+      return null;
     }
-    if (headerBytes[0] == 'T' && headerBytes[1] == 'A' && headerBytes[2] == 'G') return null;
+    if (headerBytes.length < Integer.BYTES) {
+      throw new IOException("Truncated MPEG header at byte " + frameOffset);
+    }
+    if (matches(headerBytes, 0, "TAG") || matches(headerBytes, 0, "ID3")) {
+      endOfStream = true;
+      return null;
+    }
+    if (matches(headerBytes, 0, "APET")) {
+      byte[] markerEnd = encodedStream.readNBytes(Integer.BYTES);
+      encodedPosition += markerEnd.length;
+      if (matches(markerEnd, 0, "AGEX")) {
+        endOfStream = true;
+        return null;
+      }
+    }
     if (!Mpeg.isStart(headerBytes[0], headerBytes[1])) {
-      throw new IOException("Missing MPEG frame sync at byte " + (encodedPosition - Integer.BYTES));
+      throw new IOException("Missing MPEG frame sync at byte " + frameOffset);
     }
 
     int header = readHeader(headerBytes);
@@ -290,12 +307,12 @@ final class Mp3DecoderInputStream extends InputStream {
       bitrate = Mpeg.getBitRate(bitrateIndex);
       sampleRate = Mpeg.getSampleRate(sampleRateIndex);
     } catch (UnsupportedAudioFileException exception) {
-      throw new IOException("Invalid MPEG header at byte " + (encodedPosition - Integer.BYTES), exception);
+      throw new IOException("Invalid MPEG header at byte " + frameOffset, exception);
     }
 
     int channels = detectChannels(headerBytes);
     if (sampleRate != (int) targetFormat.getSampleRate() || channels != targetFormat.getChannels()) {
-      throw new IOException("MPEG stream format changed at byte " + (encodedPosition - Integer.BYTES));
+      throw new IOException("MPEG stream format changed at byte " + frameOffset);
     }
 
     int frameSize = 144000 * bitrate / sampleRate + ((header >>> 9) & 1);
@@ -305,7 +322,7 @@ final class Mp3DecoderInputStream extends InputStream {
     int read = encodedStream.readNBytes(frameData, headerBytes.length, remaining);
     encodedPosition += read;
     if (read != remaining) {
-      throw new IOException("Truncated MPEG frame at byte " + (encodedPosition - read - Integer.BYTES));
+      throw new IOException("Truncated MPEG frame at byte " + frameOffset);
     }
     return frameData;
   }
@@ -316,8 +333,15 @@ final class Mp3DecoderInputStream extends InputStream {
     int markerOffset = Integer.BYTES + crcLength + Mpeg.getSideInfoLength(detectChannels(frameData));
     if (markerOffset + Integer.BYTES > frameData.length) return false;
 
-    String marker = new String(frameData, markerOffset, Integer.BYTES, StandardCharsets.ISO_8859_1);
-    return "Xing".equals(marker) || "Info".equals(marker);
+    return matches(frameData, markerOffset, "Xing") || matches(frameData, markerOffset, "Info");
+  }
+
+  private static boolean matches(byte[] data, int offset, String marker) {
+    if (offset < 0 || offset + marker.length() > data.length) return false;
+    for (int i = 0; i < marker.length(); i++) {
+      if (data[offset + i] != (byte) marker.charAt(i)) return false;
+    }
+    return true;
   }
 
   private static int readHeader(byte[] data) {
