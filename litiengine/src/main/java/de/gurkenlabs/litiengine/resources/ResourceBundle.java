@@ -5,6 +5,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
+import de.gurkenlabs.litiengine.scripting.ScriptBinding;
+import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
+import de.gurkenlabs.litiengine.scripting.EntityScriptBinding;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -71,6 +74,18 @@ public class ResourceBundle implements Serializable {
   @XmlElement(name = "blueprint")
   private final List<Blueprint> blueprints;
 
+  @XmlElementWrapper(name = "scripts")
+  @XmlElement(name = "script")
+  private final List<ScriptDefinition> scripts;
+
+  @XmlElementWrapper(name = "gameScripts")
+  @XmlElement(name = "binding")
+  private final List<ScriptBinding> gameScripts;
+
+  @XmlElementWrapper(name = "entityScripts")
+  @XmlElement(name = "target")
+  private final List<EntityScriptBinding> entityScripts;
+
   @XmlElementWrapper(name = "sounds")
   @XmlElement(name = "sound")
   private final List<SoundResource> sounds;
@@ -84,6 +99,9 @@ public class ResourceBundle implements Serializable {
     this.tilesets = new ArrayList<>();
     this.emitters = new ArrayList<>();
     this.blueprints = new ArrayList<>();
+    this.scripts = new ArrayList<>();
+    this.gameScripts = new ArrayList<>();
+    this.entityScripts = new ArrayList<>();
     this.sounds = new ArrayList<>();
   }
 
@@ -244,6 +262,24 @@ public class ResourceBundle implements Serializable {
   @XmlTransient
   public List<Blueprint> getBluePrints() {
     return this.blueprints;
+  }
+
+  /** Gets reusable Java and runtime script definitions. */
+  @XmlTransient
+  public List<ScriptDefinition> getScripts() {
+    return this.scripts;
+  }
+
+  /** Gets scripts attached to the game lifecycle. */
+  @XmlTransient
+  public List<ScriptBinding> getGameScripts() {
+    return this.gameScripts;
+  }
+
+  /** Gets reusable script bindings that apply to entity project types. */
+  @XmlTransient
+  public List<EntityScriptBinding> getEntityScripts() {
+    return this.entityScripts;
   }
 
   /**

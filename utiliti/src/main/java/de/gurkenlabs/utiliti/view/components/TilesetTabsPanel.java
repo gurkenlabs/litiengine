@@ -22,12 +22,13 @@ final class TilesetTabsPanel extends JPanel {
   private List<ITileset> boundTilesets = List.of();
 
   TilesetTabsPanel() {
-    super(new BorderLayout(0, 6));
+    super(new BorderLayout(0, 0));
     setOpaque(true);
     setBackground(Style.background());
     setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-    this.commands = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+    this.commands = new JPanel();
     this.commands.setOpaque(false);
+    this.commands.setLayout(new javax.swing.BoxLayout(this.commands, javax.swing.BoxLayout.X_AXIS));
     JButton add = Style.iconButton(Icons.ADD_16);
     add.setToolTipText(Resources.strings().get("mapTilesets_add"));
     add.addActionListener(e -> UI.showMapTilesetMenu(add));
@@ -42,9 +43,25 @@ final class TilesetTabsPanel extends JPanel {
     remove.setToolTipText(Resources.strings().get("mapTilesets_remove"));
     remove.addActionListener(e -> UI.removeSelectedMapTileset(this));
     this.commands.add(add);
+    this.commands.add(javax.swing.Box.createHorizontalStrut(Style.SPACE_SMALL));
     this.commands.add(addAll);
+    this.commands.add(javax.swing.Box.createHorizontalStrut(Style.SPACE_SMALL));
     this.commands.add(create);
+    this.commands.add(javax.swing.Box.createHorizontalStrut(Style.SPACE_SMALL));
     this.commands.add(remove);
+    this.tabs.putClientProperty("JTabbedPane.noContentBorder", Boolean.TRUE);
+    this.tabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);
+    this.tabs.putClientProperty("JTabbedPane.contentInsets", new java.awt.Insets(0, 0, 0, 0));
+    this.tabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 0, 0, 0));
+    this.tabs.putClientProperty("JTabbedPane.tabType", "underlined");
+    this.tabs.putClientProperty("JTabbedPane.showTabSeparators", Boolean.TRUE);
+    this.tabs.putClientProperty("JTabbedPane.tabHeight", 28);
+    this.tabs.putClientProperty("JTabbedPane.tabInsets", new java.awt.Insets(2, 10, 2, 10));
+    this.tabs.putClientProperty("JTabbedPane.underlineColor", Style.accent());
+    this.tabs.putClientProperty("JTabbedPane.underlineHeight", 2);
+    this.tabs.putClientProperty("JTabbedPane.selectedBackground", Style.surface());
+    this.tabs.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()));
+    this.tabs.setBackground(Style.background());
     add(this.tabs, BorderLayout.CENTER);
     this.tabs.addChangeListener(_ -> publishSelectedEditor());
   }

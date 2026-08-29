@@ -53,12 +53,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       this.label.setText(formatEntityLabel(userObj));
       if (iconTreeListItem.getIcon() != null) {
         this.label.setIcon(iconTreeListItem.getIcon());
-      } else if (userObj instanceof Prop prop) {
-        label.setIcon(getIcon(prop));
-      } else if (userObj instanceof Creature creature) {
-        label.setIcon(getIcon(creature));
-      } else if (userObj instanceof LightSource lightSource) {
-        label.setIcon(getIcon(lightSource));
+      } else if (userObj instanceof de.gurkenlabs.litiengine.entities.IEntity entity) {
+        label.setIcon(de.gurkenlabs.utiliti.controller.SpriteVariantSelector.getEntityIcon(entity, null, 16));
       }
     }
     this.label.setBackground(selected ? Style.COLOR_SELECTION_INACTIVE : Style.COLOR_SURFACE);
@@ -83,117 +79,5 @@ public class IconTreeListRenderer implements TreeCellRenderer {
 
   private static String escapeHtml(String s) {
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-  }
-
-  private static Icon getIcon(Prop prop) {
-    if (prop == null || prop.getSpritesheetName() == null) {
-      return null;
-    }
-
-    String cacheKey =
-        Game.world().environment().getMap().getName()
-            + "-"
-            + prop.getSpritesheetName().toLowerCase()
-            + "-tree";
-    BufferedImage propImag =
-        Resources.images()
-            .get(
-                cacheKey,
-                () -> {
-                  final String fallbackName = PropAnimationController.getSpriteName(prop, false);
-
-                  Spritesheet sprite =
-                      Resources.spritesheets()
-                          .get(PropAnimationController.getSpriteName(prop, PropState.INTACT, true));
-                  if (sprite == null && Resources.spritesheets().contains(fallbackName)) {
-                    sprite = Resources.spritesheets().get(fallbackName);
-                  }
-
-                  if (sprite == null || sprite.getSprite(0) == null) {
-                    return null;
-                  }
-
-                  return Imaging.scale(sprite.getSprite(0), 16, 16, true);
-                });
-
-    if (propImag == null) {
-      return null;
-    }
-
-    return new ImageIcon(propImag);
-  }
-
-  private static Icon getIcon(Creature creature) {
-    String cacheKey =
-        Game.world().environment().getMap().getName()
-            + "-"
-            + creature.getSpritesheetName()
-            + "-"
-            + creature.getMapId()
-            + "-tree";
-
-    BufferedImage propImag =
-        Resources.images()
-            .get(
-                cacheKey,
-                () -> {
-                  Collection<Spritesheet> sprites =
-                      Resources.spritesheets()
-                          .get(
-                              s -> s.getName()
-                                  .equals(
-                                      CreatureAnimationController.getSpriteName(
-                                          creature, CreatureAnimationState.IDLE))
-                                  || s.getName()
-                                      .equals(
-                                          CreatureAnimationController.getSpriteName(
-                                              creature, CreatureAnimationState.MOVE))
-                                  || s.getName()
-                                      .equals(
-                                          CreatureAnimationController.getSpriteName(
-                                              creature, CreatureAnimationState.DEAD))
-                                  || s.getName()
-                                      .startsWith(creature.getSpritesheetName() + "-"));
-                  if (sprites.isEmpty()) {
-                    return null;
-                  }
-
-                  return Imaging.scale(sprites.iterator().next().getSprite(0), 16, 16, true);
-                });
-
-    if (propImag == null) {
-      return null;
-    }
-
-    return new ImageIcon(propImag);
-  }
-
-  private static Icon getIcon(LightSource lightSource) {
-    Color lightColor = lightSource.getColor();
-    if (lightColor != null) {
-      final String cacheKey =
-          Game.world().environment().getMap().getName()
-              + "-"
-              + Integer.toHexString(lightSource.getColor().getRGB());
-
-      BufferedImage newIconImage =
-          Resources.images()
-              .get(
-                  cacheKey,
-                  () -> {
-                    BufferedImage img = Imaging.getCompatibleImage(10, 10);
-                    Graphics2D g = (Graphics2D) Objects.requireNonNull(img).getGraphics();
-                    g.setColor(lightColor);
-                    g.fillRect(0, 0, 9, 9);
-                    g.setColor(Color.BLACK);
-                    g.drawRect(0, 0, 9, 9);
-                    g.dispose();
-                    return img;
-                  });
-
-      return new ImageIcon(newIconImage);
-    }
-
-    return null;
   }
 }

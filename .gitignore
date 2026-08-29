@@ -1,6 +1,8 @@
 **/.gradle/
+**/.gradle-user/
 **/build/
 **/bin/
+*.class
 
 **/config.properties
 **/.DS_Store

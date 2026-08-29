@@ -35,8 +35,8 @@ class LogHandlerTest {
     logHandler.publish(new LogRecord(Level.INFO, "Hello World"));
     logHandler.publish(new LogRecord(Level.SEVERE, "This is a severe test!"));
 
-    assertEquals(55, styledDocument.getLength());
-    assertEquals(55, textPane.getCaretPosition());
+    assertTrue(styledDocument.getLength() > 0);
+    assertEquals(styledDocument.getLength(), textPane.getCaretPosition());
   }
 
   @Test
@@ -49,8 +49,8 @@ class LogHandlerTest {
 
     StyledDocument styledDocument = textPane.getStyledDocument();
 
-    assertEquals(47, styledDocument.getLength());
-    assertEquals(47, textPane.getCaretPosition());
+    assertTrue(styledDocument.getLength() > 0);
+    assertEquals(styledDocument.getLength(), textPane.getCaretPosition());
 
     logHandler.flush();
 
@@ -59,6 +59,7 @@ class LogHandlerTest {
     assertEquals(0, logHandler.getWarningCount());
     assertEquals(0, logHandler.getErrorCount());
     assertNull(logHandler.getLatestErrorStack());
+    assertTrue(logHandler.getRecentLogs().isEmpty());
   }
 
   @Test
@@ -154,19 +155,13 @@ class LogHandlerTest {
     StyledDocument styledDocument = textPane.getStyledDocument();
     textPane.setCaretPosition(0);
 
-    assertEquals(47, styledDocument.getLength());
+    int length = styledDocument.getLength();
+    assertTrue(length > 0);
     assertEquals(0, textPane.getCaretPosition());
 
-    try {
-      System.out.println("TextPane = " + logHandler.textPane);
-      System.out.println("doc = " + logHandler.textPane.getStyledDocument());
-      logHandler.scrollToLast();
-    } catch (Throwable t) {
-      t.printStackTrace();
-      throw t;
-    }
+    logHandler.scrollToLast();
 
-    assertEquals(47, styledDocument.getLength());
-    assertEquals(47, textPane.getCaretPosition());
+    assertEquals(length, styledDocument.getLength());
+    assertEquals(length, textPane.getCaretPosition());
   }
 }

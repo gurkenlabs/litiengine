@@ -3,6 +3,8 @@ package de.gurkenlabs.utiliti.view.components;
 import com.github.weisj.darklaf.LafManager;
 import com.github.weisj.darklaf.theme.IntelliJTheme;
 import com.github.weisj.darklaf.theme.OneDarkTheme;
+import com.github.weisj.darklaf.ui.spinner.DarkSpinnerBorder;
+import com.github.weisj.darklaf.ui.text.DarkTextBorder;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameListener;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
@@ -14,8 +16,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.scripting.ScriptDefinition;
 import de.gurkenlabs.utiliti.controller.Controller;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ProjectLaunchPhase;
 import de.gurkenlabs.utiliti.controller.EntityController;
 import de.gurkenlabs.utiliti.controller.LayerController;
 import de.gurkenlabs.utiliti.controller.MapController;
@@ -45,10 +49,12 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -70,6 +76,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.AbstractAction;
@@ -79,13 +86,16 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -95,11 +105,12 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public final class UI {
   private static final int INSPECTOR_BASE_WIDTH = 380;
-  private static final int SCENE_GRAPH_MIN_WIDTH = 260;
-  private static final int SCENE_GRAPH_MAX_WIDTH = 340;
-  private static final int ASSET_PANEL_MIN_HEIGHT = 180;
+  private static final int SCENE_GRAPH_MIN_WIDTH = 340;
+  private static final int SCENE_GRAPH_MAX_WIDTH = 480;
+  private static final int ASSET_PANEL_MIN_HEIGHT = 280;
   private static final int ASSET_PANEL_MAX_HEIGHT = 420;
   private static final int SPLITTER_SIZE = 4;
+  private static final String INVISIBLE_SPLITTER_CONFIGURED = "Editor.invisibleSplitterConfigured";
 
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
   private static JPopupMenu canvasPopup;
@@ -109,6 +120,12 @@ public final class UI {
   private static int objectSelectionPopupY;
   private static AssetList assetComponent;
   private static ConsoleComponent consoleComponent;
+  private static JPanel bottomContentPanel;
+  private static JPanel bottomConsoleToolbar;
+  private static JToggleButton bottomConsoleTab;
+  private static JToggleButton bottomProblemsTab;
+  private static JToggleButton bottomResourcesTab;
+  private static JToggleButton bottomDebuggerTab;
 
   private static MapObjectInspector mapObjectPanel;
   private static MapPropertyPanel mapPropertyPanel;
@@ -117,6 +134,9 @@ public final class UI {
   private static TilesetEditorPanel tilesetEditorPanel;
   private static TilesetTabsPanel tileLayerTilesetEditorPanel;
   private static SpriteEditorPanel spriteEditorPanel;
+  private static ScriptWorkspacePanel scriptWorkspacePanel;
+  private static JPanel workspaceHost;
+  private static CardLayout workspaceCards;
   private static JPanel inspectorHost;
   private static CardLayout inspectorCards;
   private static String activeInspectorCard = "objects";
@@ -127,8 +147,13 @@ public final class UI {
   private static ViewportPanel viewportPanel;
   private static JButton inspectorBackButton;
   private static JButton inspectorForwardButton;
+  private static JToggleButton workspaceMapButton;
+  private static JToggleButton workspaceScriptButton;
   private static KeyStroke inspectorBackShortcut;
   private static KeyStroke inspectorForwardShortcut;
+  private static KeyStroke switchWorkspaceModeShortcut;
+  private static KeyStroke switchMapModeShortcut;
+  private static KeyStroke switchScriptModeShortcut;
 
   private static boolean initialized;
 
@@ -209,6 +234,12 @@ public final class UI {
 
   public static ConsoleComponent getConsole() {
     return consoleComponent;
+  }
+
+  public static void clearConsole() {
+    if (consoleComponent != null && consoleComponent.getLogHandler() != null) {
+      consoleComponent.getLogHandler().flush();
+    }
   }
 
   public static void showObjectInspector() {
@@ -456,6 +487,180 @@ public final class UI {
     return mapCombo;
   }
 
+  public static ScriptWorkspacePanel getScriptWorkspacePanel() {
+    return scriptWorkspacePanel;
+  }
+
+  public static boolean isScriptWorkspaceActive() {
+    return workspaceScriptButton != null && workspaceScriptButton.isSelected();
+  }
+
+  /** Cycles between map editing and script workspace modes. */
+  public static void cycleWorkspaceMode() {
+    if (isScriptWorkspaceActive()) {
+      showMapWorkspace();
+    } else {
+      showScriptWorkspace();
+    }
+  }
+
+  /** Switches the central area back to map editing. */
+  public static void showMapWorkspace() {
+    if (workspaceCards == null || workspaceHost == null) return;
+    if (workspaceMapButton != null) workspaceMapButton.setSelected(true);
+    workspaceCards.show(workspaceHost, "map");
+    if (inspectorCards != null) inspectorCards.show(inspectorHost, activeInspectorCard);
+    if (viewportToolbar != null) viewportToolbar.setScriptMode(false);
+    if (sceneGraph != null) sceneGraph.setScriptMode(false);
+    if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
+      menuBar.setScriptMode(false);
+    }
+    if (assetComponent != null) {
+      assetComponent.setScriptMode(false);
+    }
+    if (bottomResourcesTab != null) {
+      bottomResourcesTab.setText(Resources.strings().get("assettree_assets"));
+    }
+    if (viewportPanel != null) viewportPanel.requestFocusInWindow();
+  }
+
+  /** Switches the central area to the project scripting workspace. */
+  public static void showScriptWorkspace() {
+    if (workspaceCards == null || workspaceHost == null || scriptWorkspacePanel == null) return;
+    if (workspaceScriptButton != null) workspaceScriptButton.setSelected(true);
+    scriptWorkspacePanel.refreshScripts();
+    workspaceCards.show(workspaceHost, "scripts");
+    if (viewportToolbar != null) viewportToolbar.setScriptMode(true);
+    if (sceneGraph != null) sceneGraph.setScriptMode(true);
+    if (Game.window() != null && Game.window().getHostControl() instanceof JFrame window && window.getJMenuBar() instanceof MainMenuBar menuBar) {
+      menuBar.setScriptMode(true);
+    }
+    if (assetComponent != null) {
+      assetComponent.setScriptMode(true);
+    }
+    if (bottomResourcesTab != null) {
+      bottomResourcesTab.setText("Scripts");
+    }
+  }
+
+  /** Opens a script asset in the central scripting workspace. */
+  public static void openScript(ScriptDefinition definition) {
+    if (definition == null || scriptWorkspacePanel == null) return;
+    showScriptWorkspace();
+    scriptWorkspacePanel.open(definition);
+  }
+
+  /** Switches to the scripting workspace and creates a new project script inline. */
+  public static void createScript() {
+    showScriptWorkspace();
+    if (scriptWorkspacePanel != null) scriptWorkspacePanel.createScript();
+  }
+
+  public static AssetList getAssetComponent() {
+    return assetComponent;
+  }
+
+  public static void refreshScriptInspectors() {
+    if (mapObjectPanel != null) {
+      mapObjectPanel.refreshScripts();
+    }
+    if (mapPropertyPanel != null) {
+      mapPropertyPanel.refreshScripts();
+    }
+    if (assetComponent != null && assetComponent.isScriptMode()) {
+      assetComponent.refresh();
+    }
+  }
+
+  public static void showConsoleTab() {
+    if (bottomContentPanel != null && bottomConsoleTab != null) {
+      bottomConsoleTab.setSelected(true);
+      ((CardLayout) bottomContentPanel.getLayout()).show(bottomContentPanel, "console");
+      if (assetComponent != null && assetComponent.getToolbar() != null) {
+        assetComponent.getToolbar().setVisible(false);
+      }
+      if (bottomConsoleToolbar != null) {
+        bottomConsoleToolbar.setVisible(true);
+      }
+    }
+  }
+
+  public static void showProblemsTab() {
+    if (bottomContentPanel != null && bottomProblemsTab != null) {
+      bottomProblemsTab.setSelected(true);
+      if (scriptWorkspacePanel != null) {
+        bottomContentPanel.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
+      }
+      ((CardLayout) bottomContentPanel.getLayout()).show(bottomContentPanel, "problems");
+      if (assetComponent != null && assetComponent.getToolbar() != null) {
+        assetComponent.getToolbar().setVisible(false);
+      }
+      if (bottomConsoleToolbar != null) {
+        bottomConsoleToolbar.setVisible(false);
+      }
+    }
+  }
+
+  public static void showDebuggerTab() {
+    if (bottomContentPanel != null && bottomDebuggerTab != null) {
+      bottomDebuggerTab.setSelected(true);
+      if (scriptWorkspacePanel != null) {
+        bottomContentPanel.add(scriptWorkspacePanel.getDebuggerComponent(), "debugger");
+      }
+      ((CardLayout) bottomContentPanel.getLayout()).show(bottomContentPanel, "debugger");
+      if (assetComponent != null && assetComponent.getToolbar() != null) {
+        assetComponent.getToolbar().setVisible(false);
+      }
+      if (bottomConsoleToolbar != null) {
+        bottomConsoleToolbar.setVisible(false);
+      }
+    }
+  }
+
+  public static void updateProblemsStatus(int warnings, int errors) {
+    if (bottomProblemsTab != null) {
+      Runnable update = () -> {
+        bottomProblemsTab.putClientProperty("consoleWarnings", warnings);
+        bottomProblemsTab.putClientProperty("consoleErrors", errors);
+        bottomProblemsTab.setToolTipText(
+            warnings > 0 || errors > 0
+                ? (errors + " errors" + (warnings > 0 ? ", " + warnings + " warnings" : ""))
+                : null);
+        bottomProblemsTab.revalidate();
+        bottomProblemsTab.repaint();
+      };
+      if (SwingUtilities.isEventDispatchThread()) {
+        update.run();
+      } else {
+        SwingUtilities.invokeLater(update);
+      }
+    }
+  }
+
+  public static void updateRunControlStates() {
+    updateRunControlStates(ProjectLaunchPhase.IDLE);
+  }
+
+  public static void updateRunControlStates(boolean isStarting) {
+    updateRunControlStates(isStarting ? ProjectLaunchPhase.BUILDING : ProjectLaunchPhase.IDLE);
+  }
+
+  public static void updateRunControlStates(ProjectLaunchPhase phase) {
+    Runnable update = () -> {
+      boolean hasProject = Editor.instance().getProjectPath() != null;
+      boolean isRunning = Editor.instance().getProjectSession() != null && Editor.instance().getProjectSession().isActive();
+
+      if (viewportToolbar != null) {
+        viewportToolbar.updateRunState(hasProject, isRunning, phase);
+      }
+    };
+    if (SwingUtilities.isEventDispatchThread()) {
+      update.run();
+    } else {
+      SwingUtilities.invokeLater(update);
+    }
+  }
+
   private static void setupInterface() {
     JFrame window = initWindow();
     installInspectorNavigationShortcuts(window);
@@ -471,7 +676,15 @@ public final class UI {
     viewportPanel = new ViewportPanel(canvas);
     initDropTarget(canvas);
 
-    Component renderSplitPanel = initRenderSplitPanel(viewportPanel, winH);
+    scriptWorkspacePanel = new ScriptWorkspacePanel();
+    workspaceCards = new CardLayout();
+    workspaceHost = new JPanel(workspaceCards);
+    workspaceHost.add(viewportPanel, "map");
+    workspaceHost.add(scriptWorkspacePanel, "scripts");
+
+    Component workspaceWithBottomPanel = initRenderSplitPanel(workspaceHost, winH);
+
+    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, workspaceWithBottomPanel);
 
     int inspectorMinWidth = inspectorMinimumWidth();
     mapObjectPanel = new MapObjectInspector();
@@ -488,6 +701,7 @@ public final class UI {
     tileLayerTilesetEditorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
     ExpandableCard tileLayerTilesets = tileLayerPropertyPanel.addSection(
         Resources.strings().get("assettree_tilesets"), tileLayerTilesetEditorPanel, true);
+    tileLayerTilesets.setContentInsets(0, 0, 4, 0);
     tileLayerTilesets.setFillsAvailableHeight(true);
     tileLayerTilesets.setHeaderTrailing(tileLayerTilesetEditorPanel.getCommands());
     spriteEditorPanel = new SpriteEditorPanel();
@@ -500,6 +714,7 @@ public final class UI {
     javax.swing.JScrollPane tilesetInspectorScroll = new javax.swing.JScrollPane(tilesetEditorPanel);
     tilesetInspectorScroll.setBorder(null);
     tilesetInspectorScroll.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    tilesetInspectorScroll.getVerticalScrollBar().setUnitIncrement(24);
     tilesetInspectorScroll.getViewport().setBackground(Style.COLOR_BG);
     inspectorHost.add(tilesetInspectorScroll, "tilesets");
     inspectorHost.add(tileLayerPropertyPanel, "tileLayers");
@@ -515,9 +730,8 @@ public final class UI {
     JLabel inspectorTitle = new JLabel(Resources.strings().get("panel_inspector"));
     inspectorTitle.setFont(inspectorTitle.getFont().deriveFont(Font.BOLD));
     JPanel inspectorHeader = new JPanel(new BorderLayout());
-    inspectorHeader.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
-        BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+    inspectorHeader.setBorder(BorderFactory.createEmptyBorder(
+        Style.SPACE_MEDIUM, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM));
     inspectorHeader.add(inspectorTitle, BorderLayout.WEST);
     inspectorBackButton = Style.iconButton(Icons.BACK_16);
     inspectorBackButton.addActionListener(event -> Editor.instance().getMapComponent().navigateInspectorBack());
@@ -530,26 +744,42 @@ public final class UI {
     };
     Editor.instance().getMapComponent().onInspectorNavigationChanged(updateInspectorNavigation);
     Editor.instance().getMapComponent().onMapLoaded(ignored -> updateInspectorNavigation.run());
-    JPanel inspectorNavigation = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+    JPanel inspectorNavigation = new JPanel(new GridLayout(1, 2, Style.SPACE_SMALL, 0));
     inspectorNavigation.setOpaque(false);
     inspectorNavigation.add(inspectorBackButton);
     inspectorNavigation.add(inspectorForwardButton);
     inspectorHeader.add(inspectorNavigation, BorderLayout.EAST);
     updateInspectorNavigation.run();
-    JPanel inspectorPanel = new JPanel(new BorderLayout());
+    JPanel inspectorPanel = new RoundedPanel(new BorderLayout());
     inspectorPanel.add(inspectorHeader, BorderLayout.NORTH);
     inspectorPanel.add(inspectorHost, BorderLayout.CENTER);
     inspectorPanel.setMinimumSize(new Dimension(inspectorMinWidth, 0));
+    JPanel inspectorContainer = createDockPanel(inspectorPanel);
 
     int prefInspectorW = Math.max(inspectorMinWidth, (int) (winW * 0.20));
     int prefHierarchyW = Math.max(SCENE_GRAPH_MIN_WIDTH, Math.min(SCENE_GRAPH_MAX_WIDTH, (int) (winW * 0.18)));
     int initialHierarchyW = Editor.preferences().getMainSplitterPosition() != 0
-        ? Math.min(Editor.preferences().getMainSplitterPosition(), SCENE_GRAPH_MAX_WIDTH)
+        ? constrainSceneGraphWidth(Editor.preferences().getMainSplitterPosition())
         : prefHierarchyW;
-    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, renderSplitPanel);
+
     configureSplitPane(mainSplit);
     mainSplit.setContinuousLayout(false);
     mainSplit.setResizeWeight(0.0);
+
+    JPanel leftWorkspaceContainer = new JPanel(new BorderLayout());
+    leftWorkspaceContainer.add(viewportToolbar, BorderLayout.NORTH);
+    leftWorkspaceContainer.add(initWorkspaceModeBar(), BorderLayout.WEST);
+    leftWorkspaceContainer.add(mainSplit, BorderLayout.CENTER);
+
+    JSplitPane centerRightSplit = new JSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, leftWorkspaceContainer, inspectorContainer);
+    configureSplitPane(centerRightSplit);
+    centerRightSplit.setContinuousLayout(false);
+    centerRightSplit.setResizeWeight(1.0);
+    int initialInspectorDivider = initialInspectorDivider(
+        winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
+        Editor.preferences().getSelectionEditSplitter());
+
     mainSplit.addComponentListener(new ComponentAdapter() {
       @Override public void componentResized(ComponentEvent e) {
         Editor.preferences().setWidth(window.getWidth());
@@ -557,25 +787,12 @@ public final class UI {
       }
     });
     mainSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
-      int location = mainSplit.getDividerLocation();
-      if (location > SCENE_GRAPH_MAX_WIDTH) {
-        mainSplit.setDividerLocation(SCENE_GRAPH_MAX_WIDTH);
-        location = SCENE_GRAPH_MAX_WIDTH;
+      int location = constrainSceneGraphWidth(mainSplit.getDividerLocation());
+      if (location != mainSplit.getDividerLocation()) {
+        mainSplit.setDividerLocation(location);
       }
       Editor.preferences().setMainSplitter(location);
     });
-
-    JPanel workspacePanel = new JPanel(new BorderLayout());
-    workspacePanel.add(viewportToolbar, BorderLayout.NORTH);
-    workspacePanel.add(mainSplit, BorderLayout.CENTER);
-
-    JSplitPane centerRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, workspacePanel, inspectorPanel);
-    configureSplitPane(centerRightSplit);
-    centerRightSplit.setContinuousLayout(false);
-    centerRightSplit.setResizeWeight(1.0);
-    int initialInspectorDivider = initialInspectorDivider(
-        winW, initialHierarchyW, inspectorMinWidth, prefInspectorW,
-        Editor.preferences().getSelectionEditSplitter());
 
     JPanel rootPanel = new JPanel(new BorderLayout());
     window.setContentPane(rootPanel);
@@ -596,8 +813,149 @@ public final class UI {
     window.validate();
   }
 
+  static Component initWorkspaceModeBar() {
+    JPanel rail = new JPanel();
+    rail.setLayout(new javax.swing.BoxLayout(rail, javax.swing.BoxLayout.Y_AXIS));
+    rail.setPreferredSize(new Dimension(43 + Style.SPACE_MEDIUM, 0));
+    rail.setBackground(Style.background());
+    rail.setBorder(BorderFactory.createEmptyBorder(0, Style.SPACE_MEDIUM, 0, 0));
+    workspaceMapButton = createWorkspaceModeButton(Icons.MAP_16);
+    workspaceMapButton.setToolTipText(shortcutTooltip("workspace_map", KeyBindings.get(KeyBindings.Command.SWITCH_MAP_MODE)));
+    workspaceMapButton.addActionListener(event -> showMapWorkspace());
+    workspaceScriptButton = createWorkspaceModeButton(Icons.SCRIPT_16);
+    workspaceScriptButton.setToolTipText(shortcutTooltip("workspace_scripts", KeyBindings.get(KeyBindings.Command.SWITCH_SCRIPT_MODE)));
+    workspaceScriptButton.addActionListener(event -> showScriptWorkspace());
+    ButtonGroup modes = new ButtonGroup();
+    modes.add(workspaceMapButton);
+    modes.add(workspaceScriptButton);
+    workspaceMapButton.setSelected(true);
+    rail.add(workspaceMapButton);
+    rail.add(javax.swing.Box.createVerticalStrut(Style.SPACE_MEDIUM));
+    rail.add(workspaceScriptButton);
+    return rail;
+  }
+
+  private static JToggleButton createWorkspaceModeButton(Icon icon) {
+    JToggleButton button = new JToggleButton(icon) {
+      @Override
+      protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          boolean selected = isSelected();
+          boolean rollover = getModel().isRollover();
+          boolean pressed = getModel().isPressed();
+          int w = getWidth();
+          int h = getHeight();
+          int arc = Style.CORNER_RADIUS * 2;
+
+          Color bg;
+          if (selected) {
+            bg = new Color(Style.accent().getRed(), Style.accent().getGreen(), Style.accent().getBlue(), 36);
+          } else if (pressed) {
+            bg = Style.selection();
+          } else if (rollover) {
+            bg = Style.hover();
+          } else {
+            bg = Style.surface();
+          }
+          g2.setColor(bg);
+          g2.fillRoundRect(0, 0, w, h, arc, arc);
+
+          g2.setColor(selected ? Style.accent() : Style.border());
+          g2.setStroke(new java.awt.BasicStroke(selected ? 1.5f : 1f));
+          g2.drawRoundRect(0, 0, w - 1, h - 1, arc, arc);
+
+          if (selected) {
+            g2.setColor(Style.accent());
+            int pillWidth = 3;
+            int pillHeight = h - 16;
+            int pillX = 3;
+            int pillY = (h - pillHeight) / 2;
+            g2.fillRoundRect(pillX, pillY, pillWidth, pillHeight, 2, 2);
+          }
+
+          Icon currentIcon = getIcon();
+          if (currentIcon != null) {
+            int iconX = (w - currentIcon.getIconWidth()) / 2;
+            int iconY = (h - currentIcon.getIconHeight()) / 2;
+            currentIcon.paintIcon(this, g2, iconX, iconY);
+          }
+        } finally {
+          g2.dispose();
+        }
+      }
+    };
+    button.setFocusable(false);
+    button.setOpaque(false);
+    button.setContentAreaFilled(false);
+    button.setBorderPainted(false);
+    button.setFocusPainted(false);
+    button.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+    button.putClientProperty("Editor.buttonVariant", Style.ButtonVariant.TOOLBAR);
+    Dimension size = new Dimension(43, 42);
+    button.setPreferredSize(size);
+    button.setMinimumSize(size);
+    button.setMaximumSize(size);
+    button.setAlignmentX(Component.CENTER_ALIGNMENT);
+    return button;
+  }
+
   private static void installInspectorNavigationShortcuts(JFrame window) {
+    // Unbind Ctrl+Tab from Focus Traversal Keys so it can be used for editor mode cycling
+    try {
+      java.awt.KeyboardFocusManager focusManager = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager();
+      java.util.Set<java.awt.AWTKeyStroke> forwardKeys = new java.util.HashSet<>(
+          focusManager.getDefaultFocusTraversalKeys(java.awt.KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+      forwardKeys.remove(java.awt.AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+      focusManager.setDefaultFocusTraversalKeys(
+          java.awt.KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, java.util.Collections.unmodifiableSet(forwardKeys));
+
+      java.util.Set<java.awt.AWTKeyStroke> backwardKeys = new java.util.HashSet<>(
+          focusManager.getDefaultFocusTraversalKeys(java.awt.KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+      backwardKeys.remove(java.awt.AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.SHIFT_DOWN_MASK));
+      focusManager.setDefaultFocusTraversalKeys(
+          java.awt.KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, java.util.Collections.unmodifiableSet(backwardKeys));
+    } catch (Exception ignored) {
+    }
+
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(event -> {
+      if (event.getID() == KeyEvent.KEY_PRESSED) {
+        if (matchesShortcut(event, switchWorkspaceModeShortcut)) {
+          cycleWorkspaceMode();
+          return true;
+        }
+        if (matchesShortcut(event, switchMapModeShortcut)) {
+          showMapWorkspace();
+          return true;
+        }
+        if (matchesShortcut(event, switchScriptModeShortcut)) {
+          showScriptWorkspace();
+          return true;
+        }
+      }
+      return false;
+    });
+
     JComponent rootPane = window.getRootPane();
+    rootPane.getActionMap().put("switchWorkspaceMode", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent event) {
+        cycleWorkspaceMode();
+      }
+    });
+    rootPane.getActionMap().put("switchMapMode", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent event) {
+        showMapWorkspace();
+      }
+    });
+    rootPane.getActionMap().put("switchScriptMode", new AbstractAction() {
+      @Override
+      public void actionPerformed(java.awt.event.ActionEvent event) {
+        showScriptWorkspace();
+      }
+    });
     rootPane.getActionMap().put("inspectorBack", new AbstractAction() {
       @Override
       public void actionPerformed(java.awt.event.ActionEvent event) {
@@ -627,19 +985,47 @@ public final class UI {
 
   private static void refreshInspectorNavigationShortcuts(JFrame window) {
     javax.swing.InputMap inputMap = window.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    if (switchWorkspaceModeShortcut != null) {
+      inputMap.remove(switchWorkspaceModeShortcut);
+    }
+    if (switchMapModeShortcut != null) {
+      inputMap.remove(switchMapModeShortcut);
+    }
+    if (switchScriptModeShortcut != null) {
+      inputMap.remove(switchScriptModeShortcut);
+    }
     if (inspectorBackShortcut != null) {
       inputMap.remove(inspectorBackShortcut);
     }
     if (inspectorForwardShortcut != null) {
       inputMap.remove(inspectorForwardShortcut);
     }
+    switchWorkspaceModeShortcut = KeyBindings.get(KeyBindings.Command.SWITCH_WORKSPACE_MODE);
+    switchMapModeShortcut = KeyBindings.get(KeyBindings.Command.SWITCH_MAP_MODE);
+    switchScriptModeShortcut = KeyBindings.get(KeyBindings.Command.SWITCH_SCRIPT_MODE);
     inspectorBackShortcut = KeyBindings.get(KeyBindings.Command.INSPECTOR_BACK);
     inspectorForwardShortcut = KeyBindings.get(KeyBindings.Command.INSPECTOR_FORWARD);
+
+    if (switchWorkspaceModeShortcut != null) {
+      inputMap.put(switchWorkspaceModeShortcut, "switchWorkspaceMode");
+    }
+    if (switchMapModeShortcut != null) {
+      inputMap.put(switchMapModeShortcut, "switchMapMode");
+    }
+    if (switchScriptModeShortcut != null) {
+      inputMap.put(switchScriptModeShortcut, "switchScriptMode");
+    }
     if (inspectorBackShortcut != null) {
       inputMap.put(inspectorBackShortcut, "inspectorBack");
     }
     if (inspectorForwardShortcut != null) {
       inputMap.put(inspectorForwardShortcut, "inspectorForward");
+    }
+    if (workspaceMapButton != null) {
+      workspaceMapButton.setToolTipText(shortcutTooltip("workspace_map", switchMapModeShortcut));
+    }
+    if (workspaceScriptButton != null) {
+      workspaceScriptButton.setToolTipText(shortcutTooltip("workspace_scripts", switchScriptModeShortcut));
     }
     if (inspectorBackButton != null) {
       inspectorBackButton.setToolTipText(shortcutTooltip("inspector_back", inspectorBackShortcut));
@@ -647,6 +1033,31 @@ public final class UI {
     if (inspectorForwardButton != null) {
       inspectorForwardButton.setToolTipText(shortcutTooltip("inspector_forward", inspectorForwardShortcut));
     }
+  }
+
+  private static boolean matchesShortcut(KeyEvent event, KeyStroke shortcut) {
+    if (shortcut == null || event == null) {
+      return false;
+    }
+    if (event.getKeyCode() != shortcut.getKeyCode() && event.getExtendedKeyCode() != shortcut.getKeyCode()) {
+      return false;
+    }
+    int shortcutMods = shortcut.getModifiers();
+    boolean shortcutCtrl = (shortcutMods & (InputEvent.CTRL_DOWN_MASK | InputEvent.CTRL_MASK)) != 0;
+    boolean shortcutAlt = (shortcutMods & (InputEvent.ALT_DOWN_MASK | InputEvent.ALT_MASK)) != 0;
+    boolean shortcutShift = (shortcutMods & (InputEvent.SHIFT_DOWN_MASK | InputEvent.SHIFT_MASK)) != 0;
+    boolean shortcutMeta = (shortcutMods & (InputEvent.META_DOWN_MASK | InputEvent.META_MASK)) != 0;
+
+    int eventMods = event.getModifiersEx();
+    boolean eventCtrl = (eventMods & InputEvent.CTRL_DOWN_MASK) != 0;
+    boolean eventAlt = (eventMods & InputEvent.ALT_DOWN_MASK) != 0;
+    boolean eventShift = (eventMods & InputEvent.SHIFT_DOWN_MASK) != 0;
+    boolean eventMeta = (eventMods & InputEvent.META_DOWN_MASK) != 0;
+
+    return shortcutCtrl == eventCtrl
+        && shortcutAlt == eventAlt
+        && shortcutShift == eventShift
+        && shortcutMeta == eventMeta;
   }
 
   private static String shortcutTooltip(String resourceKey, KeyStroke shortcut) {
@@ -669,6 +1080,11 @@ public final class UI {
 
         return terminate;
       }
+
+      @Override public void terminated() {
+        Editor.instance().shutdown();
+        MonacoScriptEditor.shutdownCef();
+      }
     });
 
     window.setLocationRelativeTo(null);
@@ -688,7 +1104,7 @@ public final class UI {
     if (Editor.preferences().getBottomSplitter() != 0) {
       renderSplitPanel.setDividerLocation(Editor.preferences().getBottomSplitter());
     } else {
-      renderSplitPanel.setDividerLocation((int) (winH * 0.72));
+      renderSplitPanel.setDividerLocation((int) (winH * 0.70));
     }
     renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
       int location = constrainBottomDivider(
@@ -720,25 +1136,60 @@ public final class UI {
     return Math.max(minimumLocation, Math.min(maximumLocation, dividerLocation));
   }
 
-  static void configureSplitPane(JSplitPane splitPane) {
-    splitPane.setBorder(null);
-    splitPane.setDividerSize(SPLITTER_SIZE);
-    splitPane.setUI(new BasicSplitPaneUI() {
-      @Override public BasicSplitPaneDivider createDefaultDivider() {
-        return new BasicSplitPaneDivider(this) {
-          {
-            setBorder(null);
-            setBackground(Style.COLOR_BG);
-          }
+  static int constrainSceneGraphWidth(int width) {
+    return Math.max(SCENE_GRAPH_MIN_WIDTH, Math.min(SCENE_GRAPH_MAX_WIDTH, width));
+  }
 
-          @Override public void paint(Graphics g) {
-            g.setColor(Style.COLOR_BG);
-            g.fillRect(0, 0, getWidth(), getHeight());
-          }
-        };
-      }
-    });
+  public static void configureSplitPane(JSplitPane splitPane) {
+    if (!Boolean.TRUE.equals(splitPane.getClientProperty(INVISIBLE_SPLITTER_CONFIGURED))) {
+      splitPane.putClientProperty(INVISIBLE_SPLITTER_CONFIGURED, true);
+      splitPane.addPropertyChangeListener("UI", event -> {
+        if (!(splitPane.getUI() instanceof InvisibleSplitPaneUI)) {
+          installInvisibleSplitPaneUI(splitPane);
+        }
+      });
+    }
+    installInvisibleSplitPaneUI(splitPane);
+  }
+
+  private static void installInvisibleSplitPaneUI(JSplitPane splitPane) {
+    BasicSplitPaneUI ui = new InvisibleSplitPaneUI();
+    splitPane.setUI(ui);
+    if (ui.getDivider() != null) {
+      ui.getDivider().setBorder(null);
+      ui.getDivider().setBackground(Style.background());
+    }
+    splitPane.setBorder(null);
+    splitPane.setOpaque(true);
+    splitPane.setBackground(Style.background());
     splitPane.setDividerSize(SPLITTER_SIZE);
+  }
+
+  private static final class InvisibleSplitPaneUI extends BasicSplitPaneUI {
+    @Override
+    public BasicSplitPaneDivider createDefaultDivider() {
+      return new BasicSplitPaneDivider(this) {
+        @Override
+        public void paint(Graphics graphics) {
+          graphics.setColor(getBackground());
+          graphics.fillRect(0, 0, getWidth(), getHeight());
+        }
+      };
+    }
+  }
+
+  static JPanel createDockPanel(Component content) {
+    return createDockPanel(content, Style.SPACE_SMALL);
+  }
+
+  static JPanel createDockPanel(Component content, int topInset) {
+    JPanel container = new JPanel(new BorderLayout());
+    container.setOpaque(true);
+    container.setBackground(Style.background());
+    container.setBorder(BorderFactory.createEmptyBorder(
+        topInset, Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL));
+    container.add(content, BorderLayout.CENTER);
+    return container;
   }
 
   private static Component initLeftPanel() {
@@ -777,10 +1228,10 @@ public final class UI {
     });
     UI.setMapCombo(leftMapCombo);
 
-    JPanel leftPanel = new JPanel(new BorderLayout());
-    leftPanel.setOpaque(true);
-    leftPanel.setBackground(Style.COLOR_BG);
-    leftPanel.add(sceneGraph, BorderLayout.CENTER);
+    JPanel scenePanel = new RoundedPanel(new BorderLayout());
+    scenePanel.add(sceneGraph, BorderLayout.CENTER);
+
+    JPanel leftPanel = createDockPanel(scenePanel, 0);
     leftPanel.setMinimumSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 120));
     leftPanel.setPreferredSize(new Dimension(SCENE_GRAPH_MIN_WIDTH, 0));
     leftPanel.setMaximumSize(new Dimension(SCENE_GRAPH_MAX_WIDTH, Integer.MAX_VALUE));
@@ -832,7 +1283,7 @@ public final class UI {
   private static JPanel initBottomPanel() {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     bottomPanel.setOpaque(true);
-    bottomPanel.setBackground(Style.COLOR_BG);
+    bottomPanel.setBackground(Style.background());
     bottomPanel.setMinimumSize(new Dimension(600, ASSET_PANEL_MIN_HEIGHT));
     bottomPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, ASSET_PANEL_MAX_HEIGHT));
 
@@ -844,6 +1295,13 @@ public final class UI {
 
     JToggleButton resourcesTab = createBottomTab(Resources.strings().get("assettree_assets"), true, false);
     JToggleButton consoleTab = createBottomTab(Resources.strings().get("assettree_console"), false, true);
+    JToggleButton problemsTab = createBottomTab("Problems", false, true);
+    JToggleButton debuggerTab = createBottomTab("Debugger", false, false);
+
+    if (scriptWorkspacePanel != null) {
+      content.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
+    }
+
     Runnable updateConsoleStatus =
         () -> {
           Runnable update =
@@ -856,6 +1314,7 @@ public final class UI {
                     warnings > 0 || errors > 0
                         ? Resources.strings().get("console_status", warnings, errors)
                         : null);
+                consoleTab.revalidate();
                 consoleTab.repaint();
               };
           if (SwingUtilities.isEventDispatchThread()) {
@@ -869,6 +1328,8 @@ public final class UI {
     ButtonGroup tabs = new ButtonGroup();
     tabs.add(resourcesTab);
     tabs.add(consoleTab);
+    tabs.add(problemsTab);
+    tabs.add(debuggerTab);
 
     JPanel tabButtons = new JPanel(new GridBagLayout());
     tabButtons.setOpaque(false);
@@ -877,6 +1338,8 @@ public final class UI {
     tabConstraints.weighty = 1.0;
     tabButtons.add(resourcesTab, tabConstraints);
     tabButtons.add(consoleTab, tabConstraints);
+    tabButtons.add(problemsTab, tabConstraints);
+    tabButtons.add(debuggerTab, tabConstraints);
 
     JPanel header = new JPanel(new BorderLayout()) {
       @Override
@@ -888,18 +1351,55 @@ public final class UI {
     };
     header.setOpaque(true);
     Dimension headerSize = new Dimension(0, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
-    header.setMinimumSize(headerSize);
     header.setPreferredSize(headerSize);
+    header.setMinimumSize(headerSize);
+    JPanel consoleToolbar = new JPanel(new FlowLayout(FlowLayout.TRAILING, Style.SPACE_MEDIUM, Style.SPACE_MEDIUM));
+    consoleToolbar.setOpaque(false);
+
+    JButton clearBtn = Style.iconButton(Icons.CLEAR_CONSOLE_16);
+    clearBtn.setToolTipText(Resources.strings().get("console_clear"));
+    clearBtn.addActionListener(e -> consoleComponent.getLogHandler().flush());
+
+    JButton scrollBtn = Style.iconButton(Icons.SCROLL_DOWN_16);
+    scrollBtn.setToolTipText(Resources.strings().get("console_scroll_to_end"));
+    scrollBtn.addActionListener(e -> consoleComponent.getLogHandler().scrollToLast());
+
+    consoleToolbar.add(clearBtn);
+    consoleToolbar.add(scrollBtn);
+    consoleToolbar.setVisible(false);
+
     header.add(tabButtons, BorderLayout.WEST);
     header.add(assetComponent.getToolbar(), BorderLayout.CENTER);
+    header.add(consoleToolbar, BorderLayout.EAST);
+
+    bottomContentPanel = content;
+    bottomConsoleToolbar = consoleToolbar;
+    bottomResourcesTab = resourcesTab;
+    bottomConsoleTab = consoleTab;
+    bottomProblemsTab = problemsTab;
+    bottomDebuggerTab = debuggerTab;
 
     resourcesTab.addActionListener(e -> {
       ((CardLayout) content.getLayout()).show(content, "resources");
       assetComponent.getToolbar().setVisible(true);
+      consoleToolbar.setVisible(false);
     });
     consoleTab.addActionListener(e -> {
       ((CardLayout) content.getLayout()).show(content, "console");
       assetComponent.getToolbar().setVisible(false);
+      consoleToolbar.setVisible(true);
+    });
+    problemsTab.addActionListener(e -> {
+      if (scriptWorkspacePanel != null) {
+        content.add(scriptWorkspacePanel.getProblemsComponent(), "problems");
+      }
+      ((CardLayout) content.getLayout()).show(content, "problems");
+      assetComponent.getToolbar().setVisible(false);
+      consoleToolbar.setVisible(false);
+    });
+    debuggerTab.addActionListener(e -> {
+      showDebuggerTab();
+      consoleToolbar.setVisible(false);
     });
 
     bottomPanel.add(header, BorderLayout.NORTH);
@@ -910,6 +1410,31 @@ public final class UI {
 
   private static JToggleButton createBottomTab(String text, boolean selected, boolean showIndicators) {
     JToggleButton tab = new JToggleButton(text, selected) {
+      @Override
+      public Dimension getPreferredSize() {
+        FontMetrics metrics = getFontMetrics(getFont());
+        int textWidth = metrics.stringWidth(getText());
+        int warnings = showIndicators ? consoleCount(getClientProperty("consoleWarnings")) : 0;
+        int errors = showIndicators ? consoleCount(getClientProperty("consoleErrors")) : 0;
+        int badgeCount = (warnings > 0 ? 1 : 0) + (errors > 0 ? 1 : 0);
+        int indicatorWidth =
+            badgeCount > 0
+                ? Style.SPACE_SMALL + badgeCount * 18 + (badgeCount - 1) * 3
+                : 0;
+        int width = textWidth + indicatorWidth + Style.SPACE_LARGE * 2;
+        return new Dimension(width, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
+      }
+
+      @Override
+      public Dimension getMinimumSize() {
+        return getPreferredSize();
+      }
+
+      @Override
+      public Dimension getMaximumSize() {
+        return new Dimension(Integer.MAX_VALUE, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
+      }
+
       @Override
       protected void paintComponent(Graphics graphics) {
         Graphics2D g2 = (Graphics2D) graphics.create();
@@ -922,19 +1447,19 @@ public final class UI {
           }
           g2.setColor(isSelected() ? Style.text() : Style.mutedText());
           g2.setFont(getFont());
-          java.awt.FontMetrics metrics = g2.getFontMetrics();
+          FontMetrics metrics = g2.getFontMetrics();
           int warnings = showIndicators ? consoleCount(getClientProperty("consoleWarnings")) : 0;
           int errors = showIndicators ? consoleCount(getClientProperty("consoleErrors")) : 0;
           int badgeCount = (warnings > 0 ? 1 : 0) + (errors > 0 ? 1 : 0);
           int indicatorWidth =
               badgeCount > 0
-                  ? Style.SPACE_MEDIUM + badgeCount * 18 + (badgeCount - 1) * 3
+                  ? Style.SPACE_SMALL + badgeCount * 18 + (badgeCount - 1) * 3
                   : 0;
           int contentWidth = metrics.stringWidth(getText()) + indicatorWidth;
           int textX = Math.max(0, (getWidth() - contentWidth) / 2);
-          int textY = (getHeight() - metrics.getHeight()) / 2 + metrics.getAscent();
+          int textY = (getHeight() + metrics.getAscent() - metrics.getDescent()) / 2;
           g2.drawString(getText(), textX, textY);
-          int indicatorX = textX + metrics.stringWidth(getText()) + Style.SPACE_MEDIUM;
+          int indicatorX = textX + metrics.stringWidth(getText()) + Style.SPACE_SMALL;
           if (warnings > 0) {
             paintConsoleBadge(
                 g2, indicatorX, (getHeight() - 16) / 2, warnings, Style.COLOR_ORANGE);
@@ -953,7 +1478,7 @@ public final class UI {
       }
     };
     tab.setFont(Style.getHeaderFont());
-    int horizontalPadding = Style.SPACE_MEDIUM;
+    int horizontalPadding = Style.SPACE_LARGE;
     tab.setMargin(new java.awt.Insets(0, horizontalPadding, 0, horizontalPadding));
     tab.setBorder(BorderFactory.createEmptyBorder());
     tab.setOpaque(false);
@@ -961,12 +1486,6 @@ public final class UI {
     tab.setBorderPainted(false);
     tab.setFocusPainted(false);
     tab.setRolloverEnabled(true);
-    int textWidth = tab.getFontMetrics(tab.getFont()).stringWidth(text);
-    int width = textWidth + horizontalPadding * 2 + (showIndicators ? 42 : 0);
-    Dimension size = new Dimension(width, Style.CONTROL_HEIGHT + Style.SPACE_MEDIUM * 2);
-    tab.setPreferredSize(size);
-    tab.setMinimumSize(size);
-    tab.setMaximumSize(size);
     return tab;
   }
 
@@ -976,11 +1495,11 @@ public final class UI {
     graphics.setColor(Color.WHITE);
     graphics.setFont(Style.getHeaderFont().deriveFont(Font.BOLD, 10f));
     String text = count > 9 ? "9+" : Integer.toString(count);
-    java.awt.FontMetrics metrics = graphics.getFontMetrics();
+    FontMetrics metrics = graphics.getFontMetrics();
     graphics.drawString(
         text,
         x + (18 - metrics.stringWidth(text)) / 2,
-        y + (16 - metrics.getHeight()) / 2 + metrics.getAscent());
+        y + (16 + metrics.getAscent() - metrics.getDescent()) / 2);
   }
 
   private static int consoleCount(Object value) {
@@ -1036,8 +1555,9 @@ public final class UI {
       objectSelectionPopup.removeAll();
       for (IMapObject mapObject : mapObjects) {
         MapObjectType type = MapObjectType.get(mapObject.getType());
+        String typeName = type != null ? type.name() : (mapObject.getType() != null ? mapObject.getType() : "Object");
         String name = mapObject.getName() == null || mapObject.getName().isBlank()
-          ? type.name() : mapObject.getName();
+          ? typeName : mapObject.getName();
         JMenuItem item = new JMenuItem(name + " (#" + mapObject.getId() + ")", Icons.forMapObjectType(type));
         item.addActionListener(e -> {
           objectSelectionPopupInvoker = null;
@@ -1091,6 +1611,12 @@ public final class UI {
     if (viewportToolbar != null) {
       viewportToolbar.refreshTheme();
     }
+    if (scriptWorkspacePanel != null) {
+      scriptWorkspacePanel.refreshTheme();
+    }
+    if (Game.window() != null && Game.window().getHostControl() instanceof javax.swing.JFrame window && window.getJMenuBar() instanceof de.gurkenlabs.utiliti.view.menus.MainMenuBar mainMenuBar) {
+      mainMenuBar.refreshTheme();
+    }
     updateOrphanComponents();
     loadingTheme = false;
   }
@@ -1098,14 +1624,21 @@ public final class UI {
   private static void applyTokyoNightOverrides() {
     // Rounded corners for modern look
     applyCompactMetrics();
-    UIManager.put("Button.arc", 6);
-    UIManager.put("Component.arc", 6);
-    UIManager.put("TextComponent.arc", 5);
-    UIManager.put("TabbedPane.arc", 5);
+    UIManager.put("Button.arc", Style.CORNER_RADIUS);
+    UIManager.put("Component.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextField.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextComponent.arc", Style.CORNER_RADIUS);
+    UIManager.put("FormattedTextField.arc", Style.CORNER_RADIUS);
+    UIManager.put("PasswordField.arc", Style.CORNER_RADIUS);
+    UIManager.put("TabbedPane.arc", Style.CORNER_RADIUS);
+    UIManager.put("Spinner.arc", Style.CORNER_RADIUS);
+    UIManager.put("ComboBox.arc", Style.CORNER_RADIUS);
 
     // Panels - borderless design with subtle contrast
+    UIManager.put("Editor.background", Style.COLOR_BG);
     UIManager.put("Panel.background", Style.COLOR_BG);
     UIManager.put("Panel.foreground", Style.COLOR_TEXT);
+
     UIManager.put("Editor.surface", Style.COLOR_SURFACE);
     UIManager.put("Editor.surfaceRaised", Style.COLOR_SURFACE2);
     UIManager.put("Editor.border", Style.COLOR_BORDER);
@@ -1119,19 +1652,57 @@ public final class UI {
     UIManager.put("Editor.mapBacking", Style.COLOR_MAP_BACKING);
     UIManager.put("Editor.mapBorder", Style.COLOR_MAP_BORDER);
     Color INPUT_BG = Style.COLOR_INPUT_BG;
+    UIManager.put("TextField.borderThickness", 0);
+    UIManager.put("TextArea.borderThickness", 0);
+    UIManager.put("FormattedTextField.borderThickness", 0);
+    UIManager.put("PasswordField.borderThickness", 0);
+    UIManager.put("ComboBox.borderThickness", 0);
+    UIManager.put("Spinner.borderThickness", 0);
+
     UIManager.put("TextField.background", INPUT_BG);
     UIManager.put("TextField.foreground", Style.COLOR_TEXT);
     UIManager.put("TextField.caretForeground", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("TextField.borderColor", Style.COLOR_BORDER);
+    UIManager.put("TextField.border.enabled", Style.COLOR_BORDER);
+    UIManager.put("TextField.border.focus", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("TextArea.arc", Style.CORNER_RADIUS);
     UIManager.put("TextArea.background", INPUT_BG);
     UIManager.put("TextArea.foreground", Style.COLOR_TEXT);
-    UIManager.put("TextPane.background", Style.COLOR_ASSET_EXPLORER);
+    UIManager.put("TextArea.caretForeground", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("TextArea.borderColor", Style.COLOR_BORDER);
+    UIManager.put("TextArea.border.enabled", Style.COLOR_BORDER);
+    UIManager.put("TextArea.border.focus", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("TextPane.background", Style.COLOR_BG);
     UIManager.put("TextPane.foreground", Style.COLOR_TEXT);
     UIManager.put("FormattedTextField.background", INPUT_BG);
     UIManager.put("FormattedTextField.foreground", Style.COLOR_TEXT);
+    UIManager.put("FormattedTextField.borderColor", Style.COLOR_BORDER);
+    UIManager.put("FormattedTextField.border.enabled", Style.COLOR_BORDER);
+    UIManager.put("FormattedTextField.border.focus", Style.COLOR_ACCENT_BLUE);
     UIManager.put("PasswordField.background", INPUT_BG);
     UIManager.put("PasswordField.foreground", Style.COLOR_TEXT);
+    UIManager.put("PasswordField.borderColor", Style.COLOR_BORDER);
+    UIManager.put("PasswordField.border.enabled", Style.COLOR_BORDER);
+    UIManager.put("PasswordField.border.focus", Style.COLOR_ACCENT_BLUE);
     UIManager.put("ComboBox.background", INPUT_BG);
     UIManager.put("ComboBox.foreground", Style.COLOR_TEXT);
+    UIManager.put("ComboBox.borderColor", Style.COLOR_BORDER);
+    UIManager.put("ComboBox.activeBorderColor", Style.COLOR_BORDER);
+    UIManager.put("ComboBox.focusBorderColor", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("Spinner.background", INPUT_BG);
+    UIManager.put("Spinner.borderColor", Style.COLOR_BORDER);
+    UIManager.put("Spinner.activeBorderColor", Style.COLOR_BORDER);
+    UIManager.put("Spinner.focusBorderColor", Style.COLOR_ACCENT_BLUE);
+    UIManager.put("border.color", Style.COLOR_BORDER);
+    UIManager.put("Component.borderColor", Style.COLOR_BORDER);
+    UIManager.put("Component.focusColor", Style.COLOR_ACCENT_BLUE);
+
+    UIManager.put("TextField.border", new DarkTextBorder());
+    UIManager.put("TextArea.border", new DarkTextBorder());
+    UIManager.put("FormattedTextField.border", new DarkTextBorder());
+    UIManager.put("PasswordField.border", new DarkTextBorder());
+    UIManager.put("Spinner.border", new DarkSpinnerBorder());
+
     UIManager.put("ComboBox.selectionBackground", Style.COLOR_SELECTION_INACTIVE);
     UIManager.put("ComboBox.selectionForeground", Style.COLOR_TEXT);
     UIManager.put("List.background", Style.COLOR_BG);
@@ -1149,6 +1720,13 @@ public final class UI {
     UIManager.put("Tree.selectionForeground", Style.COLOR_TEXT);
     UIManager.put("Tree.textBackground", Style.COLOR_BG);
     UIManager.put("Tree.textForeground", Style.COLOR_TEXT);
+    UIManager.put("Tree.rendererBackground", Style.COLOR_BG);
+    UIManager.put("Tree.alternateRowBackground", Style.COLOR_BG);
+    UIManager.put("Tree.rowBackground", Style.COLOR_BG);
+    UIManager.put("Tree.alternateRowColor", Boolean.FALSE);
+    UIManager.put("Tree.paintLines", Boolean.FALSE);
+    UIManager.put("Tree.selectionBorderColor", Style.COLOR_TRANSPARENT);
+
 
     // TabbedPane - modern minimal headers
     UIManager.put("TabbedPane.background", Style.COLOR_BG);
@@ -1168,8 +1746,12 @@ public final class UI {
     UIManager.put("ToggleButton.select", Style.COLOR_SELECT);
     UIManager.put("CheckBox.background", Style.COLOR_BG);
     UIManager.put("CheckBox.foreground", Style.COLOR_TEXT);
+    UIManager.put("CheckBox.margin", new java.awt.Insets(0, 0, 0, 0));
+    UIManager.put("CheckBox.border", BorderFactory.createEmptyBorder(0, 0, 0, 0));
     UIManager.put("RadioButton.background", Style.COLOR_BG);
     UIManager.put("RadioButton.foreground", Style.COLOR_TEXT);
+    UIManager.put("RadioButton.margin", new java.awt.Insets(0, 0, 0, 0));
+    UIManager.put("RadioButton.border", BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
     // Menus
     applyMenuOverrides(
@@ -1183,6 +1765,10 @@ public final class UI {
     UIManager.put("Windows.TitlePane.foreground", Style.COLOR_TEXT);
     UIManager.put("Windows.TitlePane.inactiveForeground", Style.COLOR_SUBTEXT);
     UIManager.put("Windows.TitlePane.borderColor", Style.COLOR_BG);
+    UIManager.put("MenuBar.borderColor", Style.COLOR_BG);
+    UIManager.put("MenuBar.border", BorderFactory.createEmptyBorder());
+    UIManager.put("ToolBar.borderColor", Style.COLOR_BG);
+    UIManager.put("ToolBar.border", BorderFactory.createEmptyBorder());
     // ScrollBars - thinner, cleaner
     UIManager.put("ScrollBar.background", Style.COLOR_BG);
     UIManager.put("ScrollBar.foreground", Style.COLOR_BORDER);
@@ -1222,8 +1808,18 @@ public final class UI {
     applyCompactMetrics();
     UIManager.put("Button.arc", Style.CORNER_RADIUS);
     UIManager.put("Component.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextField.arc", Style.CORNER_RADIUS);
     UIManager.put("TextComponent.arc", Style.CORNER_RADIUS);
+    UIManager.put("FormattedTextField.arc", Style.CORNER_RADIUS);
+    UIManager.put("PasswordField.arc", Style.CORNER_RADIUS);
     UIManager.put("TabbedPane.arc", Style.CORNER_RADIUS);
+    UIManager.put("Spinner.arc", Style.CORNER_RADIUS);
+    UIManager.put("ComboBox.arc", Style.CORNER_RADIUS);
+    UIManager.put("TextField.borderThickness", 0);
+    UIManager.put("FormattedTextField.borderThickness", 0);
+    UIManager.put("PasswordField.borderThickness", 0);
+    UIManager.put("ComboBox.borderThickness", 0);
+    UIManager.put("Spinner.borderThickness", 0);
     Color panel = UIManager.getColor("Panel.background");
     Color control = UIManager.getColor("TextField.background");
     Color separator = UIManager.getColor("Separator.foreground");
@@ -1240,8 +1836,21 @@ public final class UI {
     UIManager.put("Editor.assetExplorerBackground", Style.COLOR_ASSET_EXPLORER_LIGHT);
     UIManager.put("TextPane.background", Style.COLOR_ASSET_EXPLORER_LIGHT);
     UIManager.put("Editor.mapBacking", Color.WHITE);
-    UIManager.put("Editor.mapBorder", new Color(105, 120, 136, 180));
+    UIManager.put("TextField.border", new DarkTextBorder());
+    UIManager.put("TextArea.border", new DarkTextBorder());
+    UIManager.put("FormattedTextField.border", new DarkTextBorder());
+    UIManager.put("PasswordField.border", new DarkTextBorder());
+    UIManager.put("Spinner.border", new DarkSpinnerBorder());
     UIManager.put("Table.gridColor", Style.COLOR_LIGHT_GRID);
+    Color lightBg = panel != null ? panel : new Color(248, 248, 248);
+    UIManager.put("Editor.background", lightBg);
+    UIManager.put("Windows.TitlePane.borderColor", lightBg);
+
+    UIManager.put("MenuBar.borderColor", lightBg);
+    UIManager.put("MenuBar.border", BorderFactory.createEmptyBorder());
+    UIManager.put("ToolBar.borderColor", lightBg);
+    UIManager.put("ToolBar.border", BorderFactory.createEmptyBorder());
+
     applyMenuOverrides(
         panel != null ? panel : new Color(248, 248, 248),
         new Color(53, 116, 242, 48),
@@ -1341,6 +1950,274 @@ public final class UI {
       Object value = UIManager.get(key);
       if (value instanceof javax.swing.plaf.FontUIResource) {
         UIManager.put(key, new FontUIResource(font));
+      }
+    }
+  }
+
+  /**
+   * Configures a JTree with standard Utiliti focus, hover, selection, and line style visuals.
+   */
+  public static void configureTreeVisuals(JTree tree) {
+    tree.putClientProperty("JTree.lineStyle", "None");
+    tree.setOpaque(false);
+    tree.setBackground(Style.COLOR_BG);
+
+    tree.addMouseMotionListener(new MouseAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        int row = tree.getRowForLocation(e.getX(), e.getY());
+        Object prev = tree.getClientProperty("hoverRow");
+        if (!Objects.equals(prev, row)) {
+          tree.putClientProperty("hoverRow", row >= 0 ? row : null);
+          tree.repaint();
+        }
+      }
+    });
+
+    tree.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseExited(MouseEvent e) {
+        if (tree.getClientProperty("hoverRow") != null) {
+          tree.putClientProperty("hoverRow", null);
+          tree.repaint();
+        }
+      }
+    });
+  }
+
+  /**
+   * Creates a JTree initialized with model and Utiliti focus, hover, and selection rendering.
+   */
+  public static JTree createStyledTree(javax.swing.tree.TreeModel model) {
+    return new StyledTree(model);
+  }
+
+
+  public static void paintHierarchyConnectors(JTree tree, Graphics graphics) {
+    if (tree.getRowCount() == 0) return;
+    Graphics2D g2 = (Graphics2D) graphics.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setColor(Style.border());
+      g2.setStroke(new java.awt.BasicStroke(1f));
+
+      for (int row = 0; row < tree.getRowCount(); row++) {
+        javax.swing.tree.TreePath parentPath = tree.getPathForRow(row);
+        if (parentPath == null || !tree.isExpanded(parentPath)
+            || !(parentPath.getLastPathComponent() instanceof javax.swing.tree.DefaultMutableTreeNode parent)
+            || parent.getChildCount() == 0) {
+          continue;
+        }
+        java.awt.Rectangle parentBounds = tree.getPathBounds(parentPath);
+        if (parentBounds == null) continue;
+
+        java.util.List<java.awt.Rectangle> childBounds = new java.util.ArrayList<>();
+        java.util.List<javax.swing.tree.DefaultMutableTreeNode> visibleChildren = new java.util.ArrayList<>();
+        for (int i = 0; i < parent.getChildCount(); i++) {
+          javax.swing.tree.DefaultMutableTreeNode childNode = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(i);
+          javax.swing.tree.TreePath childPath = parentPath.pathByAddingChild(childNode);
+          java.awt.Rectangle bounds = tree.getPathBounds(childPath);
+          if (bounds != null && tree.isVisible(childPath)) {
+            childBounds.add(bounds);
+            visibleChildren.add(childNode);
+          }
+        }
+        if (childBounds.isEmpty()) continue;
+
+        java.awt.Rectangle firstChild = childBounds.getFirst();
+        int indent = Math.max(12, firstChild.x - parentBounds.x);
+        int trunkX = firstChild.x - indent / 2;
+        int parentY = parentBounds.y + parentBounds.height;
+        int lastY = childBounds.getLast().y + childBounds.getLast().height / 2;
+        g2.drawLine(trunkX, parentY, trunkX, lastY);
+
+        for (int i = 0; i < childBounds.size(); i++) {
+          java.awt.Rectangle child = childBounds.get(i);
+          javax.swing.tree.DefaultMutableTreeNode childNode = visibleChildren.get(i);
+          int childY = child.y + child.height / 2;
+          int endpoint = childNode.isLeaf() ? child.x + 8 : child.x - 3;
+          g2.drawLine(trunkX, childY, endpoint, childY);
+        }
+      }
+    } finally {
+      g2.dispose();
+    }
+  }
+
+  public static void paintTreeRowVisuals(JTree tree, Graphics g) {
+    if (tree.getRowCount() == 0) return;
+    Graphics2D g2 = (Graphics2D) g.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      Object hoverVal = tree.getClientProperty("hoverRow");
+      int hoverRow = hoverVal instanceof Integer r ? r : -1;
+
+      for (int row = 0; row < tree.getRowCount(); row++) {
+        java.awt.Rectangle bounds = tree.getRowBounds(row);
+        if (bounds == null || bounds.width <= 0) continue;
+        int x = bounds.x;
+        int y = bounds.y + 1;
+        int width = Math.max(1, tree.getWidth() - x - 8);
+        int height = Math.max(1, bounds.height - 2);
+
+        if (tree.isRowSelected(row)) {
+          g2.setColor(Style.sceneRowSelected());
+          g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        } else if (row == hoverRow) {
+          g2.setColor(Style.sceneRowHover());
+          g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        }
+      }
+    } finally {
+      g2.dispose();
+    }
+  }
+
+
+  /**
+   * Configures a JList with standard Utiliti focus, hover, and selection visuals.
+   */
+  public static void configureListVisuals(JList<?> list) {
+    list.setOpaque(false);
+    list.setBackground(Style.COLOR_BG);
+
+    list.addMouseMotionListener(new MouseAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        int index = list.locationToIndex(e.getPoint());
+        if (index >= 0 && list.getCellBounds(index, index) != null
+            && !list.getCellBounds(index, index).contains(e.getPoint())) {
+          index = -1;
+        }
+        Object prev = list.getClientProperty("hoverIndex");
+        if (!Objects.equals(prev, index)) {
+          list.putClientProperty("hoverIndex", index >= 0 ? index : null);
+          list.repaint();
+        }
+      }
+    });
+
+    list.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseExited(MouseEvent e) {
+        if (list.getClientProperty("hoverIndex") != null) {
+          list.putClientProperty("hoverIndex", null);
+          list.repaint();
+        }
+      }
+    });
+  }
+
+  /**
+   * Creates a JList initialized with model and Utiliti focus, hover, and selection rendering.
+   */
+  public static <T> JList<T> createStyledList(javax.swing.ListModel<T> model) {
+    JList<T> list = new JList<T>(model) {
+      private boolean paintingBaseRows;
+
+      @Override
+      public boolean isSelectedIndex(int index) {
+        return !this.paintingBaseRows && super.isSelectedIndex(index);
+      }
+
+      @Override
+      public boolean hasFocus() {
+        return !this.paintingBaseRows && super.hasFocus();
+      }
+
+      @Override
+      protected void paintComponent(Graphics g) {
+        this.paintingBaseRows = true;
+        try {
+          super.paintComponent(g);
+        } finally {
+          this.paintingBaseRows = false;
+        }
+        paintListRowVisuals(this, g);
+      }
+    };
+    configureListVisuals(list);
+    return list;
+  }
+
+  public static void paintListRowVisuals(JList<?> list, Graphics g) {
+    Graphics2D g2 = (Graphics2D) g.create();
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      Object hoverVal = list.getClientProperty("hoverIndex");
+      int hoverIndex = hoverVal instanceof Integer idx ? idx : -1;
+      int leadIndex = list.getSelectedIndex();
+      boolean focused = list.hasFocus();
+
+      for (int index = 0; index < list.getModel().getSize(); index++) {
+        java.awt.Rectangle bounds = list.getCellBounds(index, index);
+        if (bounds == null) continue;
+        int x = bounds.x + 4;
+        int y = bounds.y + 1;
+        int width = Math.max(1, list.getWidth() - x - 8);
+        int height = Math.max(1, bounds.height - 2);
+
+        if (list.isSelectedIndex(index)) {
+          g2.setColor(Style.sceneRowSelected());
+          g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+          if (focused || index == leadIndex) {
+            g2.setColor(Style.selectionOutline());
+            g2.drawRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+          }
+          g2.setColor(Style.accent());
+          g2.fillRoundRect(4, y + 2, 3, Math.max(4, height - 4), 3, 3);
+        } else if (index == hoverIndex) {
+          g2.setColor(Style.sceneRowHover());
+          g2.fillRoundRect(x, y, width, height, Style.CORNER_RADIUS, Style.CORNER_RADIUS);
+        }
+      }
+    } finally {
+      g2.dispose();
+    }
+  }
+
+  public static javax.swing.JTextField createSearchTextField(String placeholder) {
+    javax.swing.JTextField field = new javax.swing.JTextField() {
+      @Override
+      public void updateUI() {
+        super.updateUI();
+        setBorder(BorderFactory.createEmptyBorder());
+        setOpaque(false);
+        putClientProperty("JComponent.outline", "none");
+      }
+
+      @Override
+      protected void paintBorder(Graphics g) {
+        // The parent search box owns the only visible border.
+      }
+    };
+    field.putClientProperty(com.github.weisj.darklaf.ui.text.DarkTextUI.KEY_DEFAULT_TEXT, placeholder);
+    field.setToolTipText(placeholder);
+    field.setBorder(BorderFactory.createEmptyBorder());
+    field.setOpaque(false);
+    field.putClientProperty("JComponent.outline", "none");
+    field.setFont(Style.getDefaultFont());
+    return field;
+  }
+
+  public static void openProjectScript(String className) {
+    if (scriptWorkspacePanel != null && className != null && Editor.instance().getGameFile() != null) {
+      var def = Editor.instance().getGameFile().getScripts().stream()
+        .filter(s -> className.equals(s.getImplementation()) || className.equals(s.getId()))
+        .findFirst().orElse(null);
+      if (def != null) {
+        scriptWorkspacePanel.open(def);
+      }
+    }
+  }
+
+  public static void registerProjectScript(String className) {
+    if (scriptWorkspacePanel != null && className != null && Editor.instance().getGameFile() != null) {
+      var def = Editor.instance().getGameFile().getScripts().stream()
+        .filter(s -> className.equals(s.getImplementation()) || className.equals(s.getId()))
+        .findFirst().orElse(null);
+      if (def != null) {
+        scriptWorkspacePanel.open(def);
       }
     }
   }

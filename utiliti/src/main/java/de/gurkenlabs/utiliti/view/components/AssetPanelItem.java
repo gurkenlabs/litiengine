@@ -407,7 +407,12 @@ public class AssetPanelItem extends JPanel {
         }
         requestFocus();
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-          addEntity();
+          if (origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition scriptDef) {
+            if (isRegisteredScript(scriptDef)) UI.openScript(scriptDef);
+            else UI.openProjectScript(scriptDef.getImplementation());
+          } else {
+            addEntity();
+          }
         }
       }
     };
@@ -440,7 +445,14 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void setupButtonActions() {
-    btnAdd.addActionListener(e -> addEntity());
+    btnAdd.addActionListener(e -> {
+      if (origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition definition
+          && !isRegisteredScript(definition)) {
+        UI.registerProjectScript(definition.getImplementation());
+      } else {
+        addEntity();
+      }
+    });
     btnEdit.addActionListener(e -> editAsset());
     btnDelete.addActionListener(e -> deleteAsset());
     btnExport.addActionListener(e -> exportAsset());
@@ -782,6 +794,12 @@ public class AssetPanelItem extends JPanel {
           deleted = true;
         }
       }
+      case de.gurkenlabs.litiengine.scripting.ScriptDefinition scriptDefinition -> {
+        if (!isRegisteredScript(scriptDefinition)) return;
+        if (UI.getScriptWorkspacePanel() == null) return;
+        UI.getScriptWorkspacePanel().deleteScript(scriptDefinition);
+        deleted = true;
+      }
       default -> {
       }
     }
@@ -797,6 +815,11 @@ public class AssetPanelItem extends JPanel {
   }
 
   public void addEntity() {
+    if (origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition definition
+        && !isRegisteredScript(definition)) {
+      UI.registerProjectScript(definition.getImplementation());
+      return;
+    }
     if (Game.world().environment() == null || Game.world().camera() == null) {
       return;
     }
@@ -963,11 +986,25 @@ public class AssetPanelItem extends JPanel {
       return PropPanel.getIdentifierBySpriteName(spritesheetResource.getName()) != null
         || CreaturePanel.getCreatureSpriteName(spritesheetResource.getName()) != null;
     }
-    return origin instanceof MapObject || origin instanceof EmitterAttributes;
+    return origin instanceof MapObject || origin instanceof EmitterAttributes
+      || origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition definition
+        && !isRegisteredScript(definition);
   }
 
   public boolean canEdit() {
     return origin instanceof Animation;
+  }
+
+  public boolean canDelete() {
+    return !(origin instanceof Tileset)
+      && (!(origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition definition)
+        || isRegisteredScript(definition));
+  }
+
+  private static boolean isRegisteredScript(
+      de.gurkenlabs.litiengine.scripting.ScriptDefinition definition) {
+    return definition != null && Editor.instance().getGameFile() != null
+      && Editor.instance().getGameFile().getScripts().stream().anyMatch(candidate -> candidate == definition);
   }
 
   private static int getDeleteDialog(String assetType, String assetName) {
@@ -984,9 +1021,12 @@ public class AssetPanelItem extends JPanel {
     } else if (origin instanceof Tileset || origin instanceof SoundResource) {
       btnAdd.setVisible(false);
       btnDelete.setVisible(origin instanceof SoundResource && visible);
-    } else if (origin instanceof Animation) {
-      btnAdd.setVisible(false);
-      btnDelete.setVisible(visible);
+    } else if (origin instanceof Animation || origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition) {
+      btnAdd.setVisible(visible && canAdd());
+      if (origin instanceof de.gurkenlabs.litiengine.scripting.ScriptDefinition) {
+        btnAdd.setToolTipText("Register project implementation");
+      }
+      btnDelete.setVisible(visible && canDelete());
     }
     btnEdit.setVisible(visible && canEdit());
     btnExport.setVisible(visible);

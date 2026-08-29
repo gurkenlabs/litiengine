@@ -3,6 +3,9 @@ package de.gurkenlabs.litiengine.entities;
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
+import de.gurkenlabs.litiengine.abilities.Ability;
+import de.gurkenlabs.litiengine.abilities.AbilityBuilder;
+import de.gurkenlabs.litiengine.abilities.AbilityExecution;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -16,6 +19,9 @@ import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import java.awt.geom.Point2D;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
   private final Collection<EntityMovedListener> movedListeners = ConcurrentHashMap.newKeySet();
+  private final Map<String, Ability> abilities = new ConcurrentHashMap<>();
 
   @TmxProperty(name = MapObjectProperty.MOVEMENT_ACCELERATION)
   private int acceleration;
@@ -291,6 +298,178 @@ public class Creature extends CombatEntity implements IMobileEntity {
    */
   protected IMovementController createMovementController() {
     return new MovementController<>(this);
+  }
+
+  /**
+   * Gets all abilities currently registered on this creature.
+   *
+   * @return A collection of registered abilities.
+   */
+  public Collection<Ability> getAbilities() {
+    return List.copyOf(this.abilities.values());
+  }
+
+  /**
+   * Gets an ability registered on this creature by its name.
+   *
+   * @param name The name of the ability to retrieve.
+   * @return An {@link Optional} containing the ability if found, or empty otherwise.
+   */
+  public Optional<Ability> getAbility(String name) {
+    if (name == null || name.isBlank()) {
+      return Optional.empty();
+    }
+    return Optional.ofNullable(this.abilities.get(name));
+  }
+
+  /**
+   * Gets the first ability of the specified class registered on this creature.
+   *
+   * @param <T> The ability type.
+   * @param abilityClass The class of the ability.
+   * @return An {@link Optional} containing the ability if found, or empty otherwise.
+   */
+  @SuppressWarnings("unchecked")
+  public <T extends Ability> Optional<T> getAbility(Class<T> abilityClass) {
+    if (abilityClass == null) {
+      return Optional.empty();
+    }
+    for (Ability ability : this.abilities.values()) {
+      if (abilityClass.isInstance(ability)) {
+        return Optional.of((T) ability);
+      }
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Checks whether this creature has an ability with the specified name.
+   *
+   * @param name The ability name.
+   * @return true if the ability exists, false otherwise.
+   */
+  public boolean hasAbility(String name) {
+    return name != null && this.abilities.containsKey(name);
+  }
+
+  /**
+   * Checks whether this creature has an ability of the specified class.
+   *
+   * @param abilityClass The class of the ability.
+   * @return true if an ability of the class is registered, false otherwise.
+   */
+  public boolean hasAbility(Class<? extends Ability> abilityClass) {
+    return this.getAbility(abilityClass).isPresent();
+  }
+
+  /**
+   * Adds an ability to this creature.
+   *
+   * @param ability The ability to register.
+   */
+  public void addAbility(Ability ability) {
+    if (ability == null) {
+      return;
+    }
+    String key = ability.getName() != null && !ability.getName().isBlank()
+        ? ability.getName()
+        : ability.getClass().getSimpleName();
+    this.abilities.put(key, ability);
+  }
+
+  /**
+   * Removes an ability from this creature.
+   *
+   * @param ability The ability to remove.
+   */
+  public void removeAbility(Ability ability) {
+    if (ability == null) {
+      return;
+    }
+    this.abilities.values().remove(ability);
+  }
+
+  /**
+   * Removes an ability with the specified name from this creature.
+   *
+   * @param name The name of the ability to remove.
+   */
+  public void removeAbility(String name) {
+    if (name == null) {
+      return;
+    }
+    this.abilities.remove(name);
+  }
+
+  /**
+   * Casts a registered ability by name.
+   *
+   * @param name The name of the ability to cast.
+   * @return The {@link AbilityExecution} if cast successfully, or null otherwise.
+   */
+  public AbilityExecution cast(String name) {
+    return this.getAbility(name).map(Ability::cast).orElse(null);
+  }
+
+  /**
+   * Casts a registered ability of the specified class.
+   *
+   * @param <T> The ability type.
+   * @param abilityClass The class of the ability to cast.
+   * @return The {@link AbilityExecution} if cast successfully, or null otherwise.
+   */
+  public <T extends Ability> AbilityExecution cast(Class<T> abilityClass) {
+    return this.getAbility(abilityClass).map(Ability::cast).orElse(null);
+  }
+
+  /**
+   * Checks whether a registered ability with the specified name can currently be cast.
+   *
+   * @param name The name of the ability.
+   * @return true if the ability exists and can be cast, false otherwise.
+   */
+  public boolean canCast(String name) {
+    return this.getAbility(name).map(Ability::canCast).orElse(false);
+  }
+
+  /**
+   * Checks whether a registered ability of the specified class can currently be cast.
+   *
+   * @param abilityClass The class of the ability.
+   * @return true if the ability exists and can be cast, false otherwise.
+   */
+  public boolean canCast(Class<? extends Ability> abilityClass) {
+    return this.getAbility(abilityClass).map(Ability::canCast).orElse(false);
+  }
+
+  /**
+   * Checks whether a registered ability with the specified name is currently on cooldown.
+   *
+   * @param name The name of the ability.
+   * @return true if the ability exists and is on cooldown, false otherwise.
+   */
+  public boolean isOnCooldown(String name) {
+    return this.getAbility(name).map(Ability::isOnCooldown).orElse(false);
+  }
+
+  /**
+   * Checks whether a registered ability of the specified class is currently on cooldown.
+   *
+   * @param abilityClass The class of the ability.
+   * @return true if the ability exists and is on cooldown, false otherwise.
+   */
+  public boolean isOnCooldown(Class<? extends Ability> abilityClass) {
+    return this.getAbility(abilityClass).map(Ability::isOnCooldown).orElse(false);
+  }
+
+  /**
+   * Begins fluently building a new {@link DynamicAbility} for this creature.
+   *
+   * @param name The name of the ability.
+   * @return An {@link AbilityBuilder} configured for this creature.
+   */
+  public AbilityBuilder createAbility(String name) {
+    return new AbilityBuilder(this, name);
   }
 
   private void fireMovedEvent(EntityMovedEvent event) {

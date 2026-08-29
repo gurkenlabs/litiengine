@@ -1,3 +1,6 @@
 compileJava.options.encoding = "UTF-8"
+compileJava.options.compilerArgs += ["-parameters"]
 compileTestJava.options.encoding = "UTF-8"
+compileTestJava.options.compilerArgs += ["-parameters"]
 javadoc.options.encoding = "UTF-8"
+

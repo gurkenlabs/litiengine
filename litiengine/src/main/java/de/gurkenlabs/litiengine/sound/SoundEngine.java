@@ -41,7 +41,9 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
         @Override
         public Thread newThread(Runnable r) {
-          return new Thread(r, "Sound Playback Thread " + ++id);
+          Thread t = new Thread(r, "Sound Playback Thread " + ++id);
+          t.setDaemon(true);
+          return t;
         }
       });
 
@@ -586,7 +588,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
       music = null;
     }
 
-    EXECUTOR.shutdown();
+    EXECUTOR.shutdownNow();
     synchronized (sounds) {
       for (SFXPlayback playback : sounds) {
         playback.cancel();

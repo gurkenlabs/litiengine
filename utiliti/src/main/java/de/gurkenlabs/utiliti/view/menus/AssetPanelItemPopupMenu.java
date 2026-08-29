@@ -38,7 +38,7 @@ public final class AssetPanelItemPopupMenu extends JPopupMenu {
     JMenuItem delete = new JMenuItem(Resources.strings().get("contextmenu_resource_delete_" + typeKey), Icons.DELETE_16);
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     delete.addActionListener(e -> item.deleteAsset());
-    delete.setEnabled(!(origin instanceof Tileset) && item.isIndividualActionsEnabled());
+    delete.setEnabled(item.canDelete() && item.isIndividualActionsEnabled());
 
     add(add);
     if (item.canEdit()) {

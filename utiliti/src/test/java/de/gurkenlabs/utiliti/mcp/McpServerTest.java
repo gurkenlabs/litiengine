@@ -119,8 +119,8 @@ public class McpServerTest {
       assertNotNull(client.ping());
       assertTrue(client.listTools().tools().stream()
           .anyMatch(tool -> "get-property-docs".equals(tool.name())));
-      assertEquals(9, client.listResources().resources().size());
-      assertEquals(6, client.listPrompts().prompts().size());
+      assertEquals(12, client.listResources().resources().size());
+      assertEquals(8, client.listPrompts().prompts().size());
     }
   }
 
@@ -306,9 +306,9 @@ public class McpServerTest {
             """)
         .body();
 
-    assertEquals(9, resources.getJsonObject("result").getJsonArray("resources").size());
+    assertEquals(12, resources.getJsonObject("result").getJsonArray("resources").size());
     assertEquals(
-        2, templates.getJsonObject("result").getJsonArray("resourceTemplates").size());
+        3, templates.getJsonObject("result").getJsonArray("resourceTemplates").size());
     String text = read.getJsonObject("result")
         .getJsonArray("contents")
         .getJsonObject(0)
@@ -332,7 +332,7 @@ public class McpServerTest {
             """)
         .body();
 
-    assertEquals(6, list.getJsonObject("result").getJsonArray("prompts").size());
+    assertEquals(8, list.getJsonObject("result").getJsonArray("prompts").size());
     JsonObject message =
         prompt.getJsonObject("result").getJsonArray("messages").getJsonObject(0);
     assertEquals("user", message.getString("role"));
@@ -452,7 +452,7 @@ public class McpServerTest {
                   "{\"jsonrpc\":\"2.0\",\"id\":" + id
                       + ",\"method\":\"resources/list\",\"params\":{}}")
               .body();
-          return response.getJsonObject("result").getJsonArray("resources").size() == 9;
+          return response.getJsonObject("result").getJsonArray("resources").size() == 12;
         });
       }
       assertTrue(executor.invokeAll(calls).stream().allMatch(future -> {

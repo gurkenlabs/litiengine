@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.entities.EntityListener;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.EntityQuery;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.entities.MapArea;
@@ -1044,6 +1045,17 @@ public final class Environment implements IRenderable {
     }
 
     return foundEntities;
+  }
+
+  /**
+   * Starts a fluent query for entities of the specified type in this environment.
+   *
+   * @param type The requested entity type.
+   * @param <T> The requested type.
+   * @return A reusable query over the current entity snapshot.
+   */
+  public <T> EntityQuery<T> query(Class<? extends T> type) {
+    return new EntityQuery<>(this.getEntities(type));
   }
 
   /**
@@ -2325,11 +2337,14 @@ public final class Environment implements IRenderable {
     loadUpdatableOrEmitterEntity(entity);
 
     // 3. if a gravity is defined, add a gravity force to the entity
-    if (entity instanceof IMobileEntity iMobileEntity && this.getGravity() != 0) {
+    if (entity instanceof IMobileEntity iMobileEntity && this.getGravity() != 0 && Game.physics().isEnabled()) {
       this.addGravityForce(iMobileEntity);
     }
 
-    // 4. attach all controllers
+    // 4. apply reusable script bindings before attaching all controllers
+    Game.scripts().configure(entity);
+
+    // 5. attach all controllers
     entity.attachControllers();
 
     if (this.loaded && (entity instanceof LightSource || entity instanceof StaticShadow)) {

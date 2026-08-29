@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,6 +39,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     ConcurrentHashMap.newKeySet();
   private final Map<String, Collection<EntityMessageListener>> messageListeners =
     new ConcurrentHashMap<>();
+  private final Collection<Consumer<String>> actionPerformedListeners = ConcurrentHashMap.newKeySet();
 
   private final EntityControllers controllers = new EntityControllers();
   private final EntityActionMap actions = new EntityActionMap();
@@ -290,15 +292,32 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
       return;
     }
 
-    if (!this.actions.exists(actionName)) {
+    if (this.actions.exists(actionName)) {
+      this.actions.get(actionName).perform();
+    } else {
       log.log(
         Level.INFO,
         "Entity \"{0}\" could not perform the action \"{1}\". \nMaybe you need to register the action or provide an appropriate Action annotation on the method you want to call.",
         new Object[] {this, actionName});
-      return;
     }
 
-    this.actions.get(actionName).perform();
+    for (Consumer<String> listener : this.actionPerformedListeners) {
+      listener.accept(actionName);
+    }
+  }
+
+  @Override
+  public void onActionPerformed(Consumer<String> listener) {
+    if (listener != null) {
+      this.actionPerformedListeners.add(listener);
+    }
+  }
+
+  @Override
+  public void removeActionPerformedListener(Consumer<String> listener) {
+    if (listener != null) {
+      this.actionPerformedListeners.remove(listener);
+    }
   }
 
   @Override

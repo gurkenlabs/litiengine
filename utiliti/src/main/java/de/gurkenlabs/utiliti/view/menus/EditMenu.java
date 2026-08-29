@@ -98,8 +98,11 @@ public final class EditMenu extends JMenu {
 
     UndoManager.onUndoStackChanged(
         manager -> {
-          undo.setEnabled(UndoManager.instance().canUndo());
-          redo.setEnabled(UndoManager.instance().canRedo());
+          if (!manager.isCurrentMap()) {
+            return;
+          }
+          undo.setEnabled(manager.canUndo());
+          redo.setEnabled(manager.canRedo());
         });
 
     Editor.instance()

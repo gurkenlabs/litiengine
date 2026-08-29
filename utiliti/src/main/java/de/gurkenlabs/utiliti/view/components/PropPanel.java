@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.SpriteVariantSelector;
 import de.gurkenlabs.utiliti.model.Icons;
@@ -61,10 +62,10 @@ public class PropPanel extends PropertyPanel {
     this.comboBoxRotation = new JComboBox<>();
     this.comboBoxRotation.setModel(new DefaultComboBoxModel<>(Rotation.values()));
 
-    this.chckbxShadow = new JCheckBox(Resources.strings().get("panel_prop_shadow"));
-    this.checkBoxHorizontalFlip = new JCheckBox(Resources.strings().get("panel_flip_horizontal"));
-    this.checkBoxVerticalFlip = new JCheckBox(Resources.strings().get("panel_flip_vertical"));
-    this.checkBoxScale = new JCheckBox(Resources.strings().get("panel_stretch_sprite"));
+    this.chckbxShadow = ControlBehavior.apply(new JCheckBox(Resources.strings().get("panel_prop_shadow")));
+    this.checkBoxHorizontalFlip = ControlBehavior.apply(new JCheckBox(Resources.strings().get("panel_flip_horizontal")));
+    this.checkBoxVerticalFlip = ControlBehavior.apply(new JCheckBox(Resources.strings().get("panel_flip_vertical")));
+    this.checkBoxScale = ControlBehavior.apply(new JCheckBox(Resources.strings().get("panel_stretch_sprite")));
     Resources.spritesheets().addClearedListener(this::clearSpriteCache);
 
     setLayout(this.createLayout());
@@ -230,6 +231,7 @@ public class PropPanel extends PropertyPanel {
   }
 
   private static JPanel wrapCheckbox(JCheckBox cb) {
+    ControlBehavior.apply(cb);
     JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     p.setOpaque(false);
     p.add(cb);

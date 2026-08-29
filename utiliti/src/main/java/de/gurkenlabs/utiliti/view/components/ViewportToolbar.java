@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.WangColor;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.WangSet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
+import de.gurkenlabs.utiliti.controller.ProjectLaunchPhase;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import de.gurkenlabs.utiliti.controller.Zoom;
 import de.gurkenlabs.utiliti.controller.tool.BucketFillTool;
@@ -19,8 +20,12 @@ import de.gurkenlabs.utiliti.controller.tool.Tool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.controller.tool.TerrainBrushTool;
 import de.gurkenlabs.utiliti.model.Icons;
+import de.gurkenlabs.utiliti.model.KeyBindings;
 import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.view.dialogs.GameScriptsDialog;
+import de.gurkenlabs.utiliti.view.dialogs.ScriptEventExplorerDialog;
 import de.gurkenlabs.utiliti.view.menus.AddMenu;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -53,6 +58,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -61,6 +67,7 @@ import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.AbstractBorder;
 
 public class ViewportToolbar extends JPanel {
@@ -85,21 +92,28 @@ public class ViewportToolbar extends JPanel {
   private final JToggleButton btnCollision;
   private final List<JPanel> controlGroups = new ArrayList<>();
   private final List<JPanel> groupDividers = new ArrayList<>();
+  private final JButton btnRunProject;
+  private final JButton btnDebugProject;
+  private final JButton btnStopProject;
+  private final LaunchStatusIndicator launchStatus;
+  private final JPanel runDebugDivider;
+  private final JPanel launchStatusDivider;
+  private final JPanel stopDivider;
+  private final JPanel mapSelectorContainer;
+  private final JPanel mapControlsContainer;
+  private final JPanel scriptControlsContainer;
+  private final JPanel rightControlsContainer;
 
   public ViewportToolbar(JComboBox<?> mapSelector) {
     super(new BorderLayout());
     setOpaque(true);
     setBackground(Style.background());
-    setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
-        BorderFactory.createEmptyBorder(
-            0, 0, TOOLBAR_VERTICAL_PADDING, 0)));
+    setBorder(BorderFactory.createEmptyBorder(Style.SPACE_SMALL, 0, Style.SPACE_SMALL, 0));
 
     JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
     left.setOpaque(false);
 
-    JPanel right = new JPanel();
-    right.setLayout(new BoxLayout(right, BoxLayout.X_AXIS));
+    JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, Style.SPACE_MEDIUM, 0));
     right.setOpaque(false);
 
     mapSelector.setPreferredSize(new Dimension(232, Style.CONTROL_HEIGHT));
@@ -112,7 +126,54 @@ public class ViewportToolbar extends JPanel {
     mapSelector.putClientProperty("JComponent.roundRect", true);
     mapSelector.putClientProperty("JComponent.outline", "none");
     mapSelector.getAccessibleContext().setAccessibleName(Resources.strings().get("toolbar_activeMap"));
-    left.add(controlGroup(mapSelector));
+    this.mapSelectorContainer = controlGroup(mapSelector);
+    left.add(this.mapSelectorContainer);
+
+    boolean initialHasProject = Editor.instance().getProjectPath() != null;
+
+    JPanel runGroup = controlGroup();
+    this.btnRunProject = button("", Icons.GREEN_PLAY_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) {
+        UI.getScriptWorkspacePanel().runProject();
+      }
+    }, null);
+    Style.styleButton(this.btnRunProject, Style.ButtonVariant.TOOLBAR);
+    this.btnRunProject.setToolTipText("Run Project (Shift+F10)");
+    this.btnRunProject.setEnabled(initialHasProject);
+    makeIconOnly(this.btnRunProject, 28);
+
+    this.btnDebugProject = button("", Icons.GREEN_DEBUG_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) {
+        UI.getScriptWorkspacePanel().debugProject();
+      }
+    }, null);
+    Style.styleButton(this.btnDebugProject, Style.ButtonVariant.TOOLBAR);
+    this.btnDebugProject.setDisabledIcon(Icons.DISABLED_DEBUG_16);
+    this.btnDebugProject.setToolTipText("Debug Project (Shift+F9)");
+    this.btnDebugProject.setEnabled(initialHasProject);
+    makeIconOnly(this.btnDebugProject, 28);
+
+    this.btnStopProject = button("", Icons.RED_STOP_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) {
+        UI.getScriptWorkspacePanel().stopProject();
+      }
+    }, null);
+    Style.styleButton(this.btnStopProject, Style.ButtonVariant.TOOLBAR);
+    this.btnStopProject.setEnabled(false);
+    makeIconOnly(this.btnStopProject, 28);
+    this.btnStopProject.setToolTipText(
+        "Stop Project (" + KeyBindings.format(KeyBindings.get(KeyBindings.Command.STOP_PROJECT)) + ")");
+
+    addToControlGroup(runGroup, this.btnRunProject);
+    this.runDebugDivider = addToControlGroup(runGroup, this.btnDebugProject);
+    this.launchStatus = new LaunchStatusIndicator();
+    this.launchStatus.setVisible(false);
+    this.launchStatusDivider = addToControlGroup(runGroup, this.launchStatus);
+    this.launchStatusDivider.setVisible(false);
+    this.stopDivider = addToControlGroup(runGroup, this.btnStopProject);
+    left.add(runGroup);
+
+    this.mapControlsContainer = controlStrip();
 
     ButtonGroup toolButtons = new ButtonGroup();
     JPanel toolGroup = controlGroup();
@@ -124,7 +185,7 @@ public class ViewportToolbar extends JPanel {
             toolGroup, tool instanceof TerrainBrushTool ? terrainSplitButton(button, tool) : button);
       }
     }
-    left.add(toolGroup);
+    addToControlStrip(this.mapControlsContainer, toolGroup);
     this.btnUndo = button(Resources.strings().get("menu_edit_undo"), Icons.UNDO_16, () -> UndoManager.instance().undo(), shortcut(KeyEvent.VK_Z));
     this.btnUndoHistory = button(Resources.strings().get("toolbar_undoHistory"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(this.btnUndoHistory, DROPDOWN_BUTTON_WIDTH);
@@ -133,8 +194,9 @@ public class ViewportToolbar extends JPanel {
     this.btnRedoHistory = button(Resources.strings().get("toolbar_redoHistory"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(this.btnRedoHistory, DROPDOWN_BUTTON_WIDTH);
     this.btnRedoHistory.addActionListener(e -> showHistory(this.btnRedoHistory, false));
-    left.add(controlGroup(splitButton(this.btnUndo, this.btnUndoHistory), splitButton(this.btnRedo, this.btnRedoHistory)));
-    left.add(controlGroup(addButton()));
+    addToControlStrip(this.mapControlsContainer,
+        controlGroup(splitButton(this.btnUndo, this.btnUndoHistory), splitButton(this.btnRedo, this.btnRedoHistory)));
+    addToControlStrip(this.mapControlsContainer, controlGroup(addButton()));
     this.btnCopy = button(Resources.strings().get("menu_edit_copy"), Icons.COPY_16, () -> {
       if (Editor.instance().getMapComponent() != null) {
         Editor.instance().getMapComponent().copy();
@@ -157,16 +219,60 @@ public class ViewportToolbar extends JPanel {
         Editor.instance().getMapComponent().paste();
       }
     }, shortcut(KeyEvent.VK_V));
-    left.add(controlGroup(this.btnCut, this.btnCopy, this.btnPaste, this.btnDelete));
+    addToControlStrip(this.mapControlsContainer,
+        controlGroup(this.btnCut, this.btnCopy, this.btnPaste, this.btnDelete));
+    left.add(this.mapControlsContainer);
 
+    this.scriptControlsContainer = controlStrip();
+    JPanel scriptGroup = controlGroup();
+    JButton btnNewScript = button("New script", Icons.ADD_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript();
+    }, null);
+    JButton btnNewScriptMenu = button("", new DropdownArrowIcon(), () -> {});
+    makeIconOnly(btnNewScriptMenu, DROPDOWN_BUTTON_WIDTH);
+    btnNewScriptMenu.addActionListener(e -> showNewScriptMenu(btnNewScriptMenu));
+
+    JButton btnSaveScript = button("Save", Icons.SAVE_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().saveActive();
+    }, null);
+
+    JButton btnDuplicateScript = button("Duplicate", Icons.COPY_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().duplicateActiveOrSelected();
+    }, null);
+    sizeLabeledButton(btnDuplicateScript);
+
+    JButton btnDeleteScript = button("Delete", Icons.DELETE_16, () -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().deleteActiveOrSelected();
+    }, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+    Style.styleButton(btnDeleteScript, Style.ButtonVariant.DESTRUCTIVE);
+    sizeLabeledButton(btnDeleteScript);
+
+    JButton btnMoreScriptActions = button("", Icons.MISC_24, () -> {}, null);
+    makeIconOnly(btnMoreScriptActions, 28);
+    btnMoreScriptActions.setToolTipText("More script actions");
+    btnMoreScriptActions.getAccessibleContext().setAccessibleName("More script actions");
+    btnMoreScriptActions.addActionListener(event ->
+      this.createScriptActionsMenu().show(btnMoreScriptActions, 0, btnMoreScriptActions.getHeight()));
+
+    addToControlGroup(scriptGroup, splitButton(btnNewScript, btnNewScriptMenu));
+    addToControlGroup(scriptGroup, btnSaveScript);
+    addToControlGroup(scriptGroup, btnDuplicateScript);
+    addToControlGroup(scriptGroup, btnDeleteScript);
+    addToControlGroup(scriptGroup, btnMoreScriptActions);
+    addToControlStrip(this.scriptControlsContainer, scriptGroup);
+    this.scriptControlsContainer.setVisible(false);
+    left.add(this.scriptControlsContainer);
     this.btnUndo.setEnabled(false);
     this.btnRedo.setEnabled(false);
     this.btnUndoHistory.setEnabled(false);
     this.btnRedoHistory.setEnabled(false);
     UndoManager.onUndoStackChanged(mgr -> {
       javax.swing.SwingUtilities.invokeLater(() -> {
-          this.btnUndo.setEnabled(UndoManager.instance().canUndo());
-          this.btnRedo.setEnabled(UndoManager.instance().canRedo());
+          if (!mgr.isCurrentMap()) {
+            return;
+          }
+          this.btnUndo.setEnabled(mgr.canUndo());
+          this.btnRedo.setEnabled(mgr.canRedo());
           this.btnUndoHistory.setEnabled(this.btnUndo.isEnabled());
           this.btnRedoHistory.setEnabled(this.btnRedo.isEnabled());
       });
@@ -208,12 +314,141 @@ public class ViewportToolbar extends JPanel {
         Resources.strings().get("toolbar_fit"));
     this.zoomControls.setZoomText(formatZoom());
     right.add(viewControls);
-    right.add(Box.createHorizontalStrut(Style.SPACE_MEDIUM));
     right.add(this.zoomControls);
-    right.add(Box.createHorizontalStrut(Style.SPACE_MEDIUM));
+    this.rightControlsContainer = right;
 
     add(left, BorderLayout.WEST);
     add(right, BorderLayout.EAST);
+  }
+
+  public void updateRunState(boolean hasProject, boolean isRunning) {
+    this.updateRunState(hasProject, isRunning, ProjectLaunchPhase.IDLE);
+  }
+
+  public void updateRunState(boolean hasProject, boolean isRunning, ProjectLaunchPhase phase) {
+    ProjectLaunchPhase currentPhase = phase == null ? ProjectLaunchPhase.IDLE : phase;
+    boolean isStarting = currentPhase.isLaunching();
+    boolean isStopping = currentPhase == ProjectLaunchPhase.STOPPING;
+    boolean showProgress = isStarting || isStopping;
+    this.btnRunProject.setEnabled(hasProject && !isRunning && !showProgress);
+    this.btnDebugProject.setEnabled(hasProject && !isRunning && !showProgress);
+    this.btnRunProject.setToolTipText(isStarting ? currentPhase.displayText() : "Run Project (Shift+F10)");
+    this.btnStopProject.setEnabled((isRunning || isStarting) && !isStopping);
+    this.btnRunProject.setVisible(!showProgress);
+    this.runDebugDivider.setVisible(!showProgress);
+    this.btnDebugProject.setVisible(!showProgress);
+    this.launchStatusDivider.setVisible(false);
+    this.stopDivider.setVisible(true);
+    this.launchStatus.setPhase(currentPhase, showProgress);
+    revalidate();
+    repaint();
+  }
+
+  public void setScriptMode(boolean scriptMode) {
+    this.mapSelectorContainer.setVisible(true);
+    this.mapControlsContainer.setVisible(!scriptMode);
+    this.scriptControlsContainer.setVisible(scriptMode);
+    this.rightControlsContainer.setVisible(!scriptMode);
+  }
+
+  JPopupMenu createScriptActionsMenu() {
+    JPopupMenu menu = new JPopupMenu();
+    JMenuItem format = new JMenuItem("Format code", Icons.FORMAT_CODE_16);
+    format.addActionListener(event -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().formatActive();
+    });
+    JMenuItem build = new JMenuItem("Build", Icons.COMPILE_16);
+    build.addActionListener(event -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().build();
+    });
+    JMenuItem reload = new JMenuItem("Reload from disk", Icons.RELOAD_16);
+    reload.addActionListener(event -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().reloadActiveFromDisk();
+    });
+    JMenuItem configure = new JMenuItem("Configure game scripts...", Icons.SETTINGS_16);
+    configure.addActionListener(event -> GameScriptsDialog.showDialog());
+    JMenuItem guide = new JMenuItem("Scripting guide", Icons.DOCUMENTATION_16);
+    guide.addActionListener(event -> ScriptEventExplorerDialog.showGuide());
+
+    menu.add(format);
+    menu.add(build);
+    menu.add(reload);
+    menu.addSeparator();
+    menu.add(configure);
+    menu.add(guide);
+    return menu;
+  }
+
+  private void showNewScriptMenu(Component invoker) {
+    JPopupMenu menu = new JPopupMenu();
+
+    JMenu entitySub = new JMenu("Entity Script");
+    entitySub.setIcon(Icons.SCRIPT_ENTITY_16);
+
+    JMenuItem creatureScript = new JMenuItem("Creature Script...", Icons.SCRIPT_ENTITY_16);
+    creatureScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Creature.class);
+    });
+
+    JMenuItem propScript = new JMenuItem("Prop Script...", Icons.SCRIPT_ENTITY_16);
+    propScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Prop.class);
+    });
+
+    JMenuItem triggerScript = new JMenuItem("Trigger Script...", Icons.SCRIPT_ENTITY_16);
+    triggerScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.Trigger.class);
+    });
+
+    JMenuItem emitterScript = new JMenuItem("Emitter Script...", Icons.SCRIPT_ENTITY_16);
+    emitterScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.graphics.emitters.Emitter.class);
+    });
+
+    JMenuItem collisionBoxScript = new JMenuItem("CollisionBox Script...", Icons.SCRIPT_ENTITY_16);
+    collisionBoxScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.CollisionBox.class);
+    });
+
+    JMenuItem lightSourceScript = new JMenuItem("LightSource Script...", Icons.SCRIPT_ENTITY_16);
+    lightSourceScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.LightSource.class);
+    });
+
+    JMenuItem genericEntityScript = new JMenuItem("Generic Entity Script...", Icons.SCRIPT_ENTITY_16);
+    genericEntityScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null)
+        UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENTITY, de.gurkenlabs.litiengine.entities.IEntity.class);
+    });
+
+    entitySub.add(creatureScript);
+    entitySub.add(propScript);
+    entitySub.add(triggerScript);
+    entitySub.add(emitterScript);
+    entitySub.add(collisionBoxScript);
+    entitySub.add(lightSourceScript);
+    entitySub.add(genericEntityScript);
+
+    JMenuItem gameScript = new JMenuItem("Game Script...", Icons.SCRIPT_GAME_16);
+    gameScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.GAME);
+    });
+
+    JMenuItem envScript = new JMenuItem("Environment Script...", Icons.SCRIPT_ENVIRONMENT_16);
+    envScript.addActionListener(e -> {
+      if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().createScript(ScriptWorkspacePanel.ScriptKind.ENVIRONMENT);
+    });
+
+    menu.add(entitySub);
+    menu.add(gameScript);
+    menu.add(envScript);
+    menu.show(invoker, 0, invoker.getHeight());
   }
 
   public void syncPreferenceButtons() {
@@ -224,10 +459,7 @@ public class ViewportToolbar extends JPanel {
 
   void refreshTheme() {
     setBackground(Style.background());
-    setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.border()),
-        BorderFactory.createEmptyBorder(
-            0, 0, TOOLBAR_VERTICAL_PADDING, 0)));
+    setBorder(BorderFactory.createEmptyBorder(0, 0, TOOLBAR_VERTICAL_PADDING, 0));
     this.zoomControls.refreshStyle();
     for (JPanel group : this.controlGroups) {
       group.setBackground(Style.surface());
@@ -644,9 +876,24 @@ public class ViewportToolbar extends JPanel {
     return group;
   }
 
-  private void addToControlGroup(JPanel group, java.awt.Component component) {
+  private static JPanel controlStrip() {
+    JPanel strip = new JPanel();
+    strip.setLayout(new BoxLayout(strip, BoxLayout.X_AXIS));
+    strip.setOpaque(false);
+    return strip;
+  }
+
+  private static void addToControlStrip(JPanel strip, Component component) {
+    if (strip.getComponentCount() > 0) {
+      strip.add(Box.createRigidArea(new Dimension(Style.SPACE_MEDIUM, 0)));
+    }
+    strip.add(component);
+  }
+
+  private JPanel addToControlGroup(JPanel group, java.awt.Component component) {
+    JPanel divider = null;
     if (group.getComponentCount() > 0) {
-      JPanel divider = new JPanel();
+      divider = new JPanel();
       divider.setOpaque(true);
       divider.setBackground(Style.border());
       divider.setPreferredSize(new Dimension(1, 18));
@@ -655,6 +902,7 @@ public class ViewportToolbar extends JPanel {
     }
     markGrouped(component);
     group.add(component);
+    return divider;
   }
 
   private static void markGrouped(java.awt.Component component) {
@@ -752,6 +1000,111 @@ public class ViewportToolbar extends JPanel {
       }
     } finally {
       g2.dispose();
+    }
+  }
+
+  static final class LaunchStatusIndicator extends JPanel {
+    private static final int SPINNER_SIZE = 15;
+    private static final int HORIZONTAL_PADDING = Style.SPACE_MEDIUM;
+    private static final int SPINNER_TEXT_GAP = Style.SPACE_MEDIUM;
+    private static final int ANIMATION_FRAMES = 120;
+    private static final int ANIMATION_DELAY_MILLIS = 40;
+    private final Timer animationTimer;
+    private String phaseText = "";
+    private int animationFrame;
+    private boolean active;
+
+    LaunchStatusIndicator() {
+      setFont(Style.getDefaultFont().deriveFont(12f));
+      updatePreferredSize();
+      setOpaque(false);
+      this.animationTimer = new Timer(ANIMATION_DELAY_MILLIS, event -> {
+        this.animationFrame = (this.animationFrame + 1) % ANIMATION_FRAMES;
+        repaint();
+      });
+      getAccessibleContext().setAccessibleName("Project launch status");
+    }
+
+    void setPhase(ProjectLaunchPhase phase, boolean active) {
+      this.phaseText = phase == null ? "" : phase.displayText();
+      this.active = active;
+      setToolTipText(this.phaseText);
+      getAccessibleContext().setAccessibleDescription(this.phaseText);
+      updatePreferredSize();
+      setVisible(active);
+      updateAnimationState();
+      repaint();
+    }
+
+    private void updatePreferredSize() {
+      int textWidth = getFontMetrics(getFont()).stringWidth(this.phaseText);
+      int width = HORIZONTAL_PADDING + SPINNER_SIZE + SPINNER_TEXT_GAP
+          + textWidth + HORIZONTAL_PADDING;
+      Dimension size = new Dimension(width, Style.CONTROL_HEIGHT);
+      setPreferredSize(size);
+      setMinimumSize(size);
+      setMaximumSize(size);
+      revalidate();
+    }
+
+    String phaseText() {
+      return this.phaseText;
+    }
+
+    boolean isAnimationRunning() {
+      return this.animationTimer.isRunning();
+    }
+
+    @Override
+    public void addNotify() {
+      super.addNotify();
+      updateAnimationState();
+    }
+
+    @Override
+    public void removeNotify() {
+      this.animationTimer.stop();
+      super.removeNotify();
+    }
+
+    private void updateAnimationState() {
+      if (this.active && isDisplayable()) {
+        this.animationTimer.start();
+      } else {
+        this.animationTimer.stop();
+      }
+    }
+
+    @Override
+    protected void paintComponent(Graphics graphics) {
+      Graphics2D g2 = (Graphics2D) graphics.create();
+      try {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        int height = getHeight();
+        int spinnerX = HORIZONTAL_PADDING;
+        int spinnerY = (height - SPINNER_SIZE) / 2;
+        g2.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setColor(Style.border());
+        g2.drawOval(spinnerX, spinnerY, SPINNER_SIZE, SPINNER_SIZE);
+        g2.setColor(Style.accent());
+        g2.drawArc(
+            spinnerX,
+            spinnerY,
+            SPINNER_SIZE,
+            SPINNER_SIZE,
+            90 - this.animationFrame * 6,
+            115);
+
+        g2.setFont(getFont());
+        g2.setColor(Style.text());
+        java.awt.FontMetrics metrics = g2.getFontMetrics();
+        int textY = (height - metrics.getHeight()) / 2 + metrics.getAscent();
+        g2.drawString(this.phaseText, spinnerX + SPINNER_SIZE + SPINNER_TEXT_GAP, textY);
+      } finally {
+        g2.dispose();
+      }
     }
   }
 
@@ -860,6 +1213,12 @@ public class ViewportToolbar extends JPanel {
 
     private ToolbarGroupBorder(Color color) {
       this.color = color;
+    }
+
+    @Override
+    public Insets getBorderInsets(Component component, Insets insets) {
+      insets.set(0, 0, 0, 1);
+      return insets;
     }
 
     @Override

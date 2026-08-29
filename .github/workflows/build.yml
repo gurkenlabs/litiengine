@@ -10,7 +10,7 @@ on:
       - "**.xml"
       - ".github/workflows/*.yml"
     branches:
-      - "**"
+      - main
   pull_request:
     branches:
       - main
@@ -64,3 +64,69 @@ jobs:
 
       - name: Code Style Validation
         run: ./gradlew spotlessCheck
+
+  macos:
+    name: macOS ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: JDK Setup
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      - name: Test
+        run: ./gradlew test -PskipSpotless --stacktrace --info --console=plain
+
+      - name: Package application image
+        run: ./gradlew :utiliti:jpackage -PskipSpotless --stacktrace --console=plain
+
+      - name: Dump failed tests
+        if: always()
+        run: |
+          find . -name "TEST-*.xml" -exec grep -Hn -E '<failure|<error' {} + || true
+          python3 -c '
+          import xml.etree.ElementTree as ET, glob, os
+          summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+          lines = ["### Failed Tests Summary"]
+          for f in glob.glob("**/test-results/**/*.xml", recursive=True):
+              try:
+                  tree = ET.parse(f)
+                  for ts in tree.findall(".//testcase"):
+                      for fail in list(ts.findall("failure")) + list(ts.findall("error")):
+                          cls = ts.get("classname", "")
+                          name = ts.get("name", "")
+                          msg = fail.get("message", "")
+                          text = (fail.text or "").strip()
+                          print(f"::error title={cls}#{name}::{msg}")
+                          lines.append(f"#### `{cls}#{name}`\n**Message:** {msg}\n```\n{text}\n```\n")
+              except Exception as e:
+                  pass
+          if summary_file and len(lines) > 1:
+              with open(summary_file, "a") as sf:
+                  sf.write("\n".join(lines) + "\n")
+          ' || true
+
+      - name: Publish Test Results
+        if: always()
+        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
+        with:
+          name: JUnit test results (macOS ${{ matrix.arch }})
+          reporter: java-junit
+          path: '**/test-results/**/*.xml'

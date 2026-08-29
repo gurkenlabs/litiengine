@@ -17,6 +17,9 @@ import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 @FunctionalInterface
 public interface IUpdateable {
 
+  /** Default update priority. Lower priorities are updated first. */
+  int DEFAULT_UPDATE_PRIORITY = 0;
+
   /**
    * This method is called by the game loop on all objects that are attached to the loop. It's called on every tick of the
    * loop and the frequency can be configured using the {@code ClientConfiguration}.
@@ -24,4 +27,14 @@ public interface IUpdateable {
    * @see ClientConfiguration#setMaxFps(int)
    */
   void update();
+
+  /**
+   * Determines this object's stable position in an update tick. Objects with the same priority retain their
+   * registration order.
+   *
+   * @return the update priority; lower values run first
+   */
+  default int getUpdatePriority() {
+    return DEFAULT_UPDATE_PRIORITY;
+  }
 }
