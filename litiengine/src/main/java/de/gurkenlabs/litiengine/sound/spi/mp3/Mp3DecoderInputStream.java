@@ -2,41 +2,38 @@ package de.gurkenlabs.litiengine.sound.spi.mp3;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
-public class Mp3AudioInputStream extends AudioInputStream {
+final class Mp3DecoderInputStream extends InputStream {
 
+  private static final int ID3_HEADER_LENGTH = 10;
+  private static final int RESERVOIR_SIZE = 4096;
+  private static final int SAMPLES_PER_FRAME = 1152;
+
+  private final PushbackInputStream encodedStream;
   private final ByteBuffer pcmBuffer;
   private final AudioFormat targetFormat;
-  private final byte[] mp3Data;
-  private int mp3Position;
-  private boolean closed = false;
+  private long encodedPosition;
+  private boolean initialized;
+  private boolean closed;
   private final SynthesisFilter[] synthesisFilters;
   private final OverlapAdd[][] overlapAdd;
 
-  private static final int RESERVOIR_SIZE = 4096;
-  private static final int SAMPLES_PER_FRAME = 1152;
   private final byte[] reservoir;
   private int reservoirWritePos;
   private int reservoirTotalWritten;
 
-  public Mp3AudioInputStream(AudioInputStream sourceStream, AudioFormat targetFormat) {
-    super(sourceStream, targetFormat, -1);
+  Mp3DecoderInputStream(AudioInputStream sourceStream, AudioFormat targetFormat) {
+    this.encodedStream = new PushbackInputStream(sourceStream, ID3_HEADER_LENGTH);
     this.targetFormat = targetFormat;
-
-    try {
-      this.mp3Data = sourceStream.readAllBytes();
-      this.mp3Position = 0;
-
-      if (mp3Data.length >= 10 && mp3Data[0] == 'I' && mp3Data[1] == 'D' && mp3Data[2] == '3') {
-        int id3Size = ((mp3Data[6] & 0x7f) << 21) | ((mp3Data[7] & 0x7f) << 14) | ((mp3Data[8] & 0x7f) << 7) | (mp3Data[9] & 0x7f);
-        mp3Position = 10 + id3Size;
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to read MP3 data", e);
-    }
+    this.encodedPosition = 0;
 
     int bufferSize = Math.max(65536, 4608 * 100);
     this.pcmBuffer = ByteBuffer.allocate(bufferSize);
@@ -62,9 +59,18 @@ public class Mp3AudioInputStream extends AudioInputStream {
   }
 
   @Override
+  public int read() throws IOException {
+    byte[] sample = new byte[1];
+    int read = read(sample, 0, 1);
+    return read == -1 ? -1 : Byte.toUnsignedInt(sample[0]);
+  }
+
+  @Override
   public int read(byte[] b, int off, int len) throws IOException {
+    Objects.checkFromIndexSize(off, len, b.length);
     if (closed) throw new IOException("Stream closed");
     if (len == 0) return 0;
+    ensureInitialized();
 
     int pcmFrameSize = SAMPLES_PER_FRAME * targetFormat.getFrameSize();
     while (pcmBuffer.position() < len && pcmBuffer.remaining() >= pcmFrameSize) {
@@ -77,7 +83,7 @@ public class Mp3AudioInputStream extends AudioInputStream {
     pcmBuffer.compact();
 
     if (bytesToRead == 0) {
-      if (mp3Position >= mp3Data.length || !decodeNextFrame()) return -1;
+      if (!decodeNextFrame()) return -1;
       return read(b, off, len);
     }
     return bytesToRead;
@@ -86,7 +92,25 @@ public class Mp3AudioInputStream extends AudioInputStream {
   @Override
   public void close() throws IOException {
     closed = true;
-    super.close();
+    encodedStream.close();
+  }
+
+  private void ensureInitialized() throws IOException {
+    if (this.initialized) return;
+
+    byte[] header = encodedStream.readNBytes(ID3_HEADER_LENGTH);
+    try {
+      int id3TagLength = Mpeg.getId3TagLength(header);
+      if (id3TagLength == 0) {
+        encodedStream.unread(header);
+      } else {
+        encodedStream.skipNBytes(id3TagLength - header.length);
+        encodedPosition = id3TagLength;
+      }
+    } catch (UnsupportedAudioFileException exception) {
+      throw new IOException("Invalid MP3 metadata", exception);
+    }
+    this.initialized = true;
   }
 
   private void writeReservoir(byte[] data, int offset, int length) {
@@ -112,82 +136,30 @@ public class Mp3AudioInputStream extends AudioInputStream {
     return result;
   }
 
-  private boolean decodeNextFrame() {
-    if (mp3Position >= mp3Data.length) return false;
-
+  private boolean decodeNextFrame() throws IOException {
+    long frameOffset = encodedPosition;
     try {
-      int searchStart = mp3Position;
-      while (searchStart < mp3Data.length - 4) {
-        if ((mp3Data[searchStart] & 0xFF) == 0xFF && (mp3Data[searchStart + 1] & 0xE0) == 0xE0) {
-          // Check for XING/Info header
-          int xingHeader = ((mp3Data[searchStart] & 0xFF) << 24) | ((mp3Data[searchStart + 1] & 0xFF) << 16)
-                         | ((mp3Data[searchStart + 2] & 0xFF) << 8) | (mp3Data[searchStart + 3] & 0xFF);
-          int xingBitrateIndex = (xingHeader >> 12) & 0xF;
-          int xingSampleRateIndex = (xingHeader >> 10) & 0x3;
-          int xingPadding = (xingHeader >> 9) & 0x1;
-          int xingVersion = (xingHeader >> 19) & 0x3;
-
-          int[] xingBitrates = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
-          int xingBitrate = xingBitrates[xingBitrateIndex] * 1000;
-          int[][] xingSampleRates = {{11025, 12000, 8000, 0}, {0, 0, 0, 0}, {22050, 24000, 16000, 0}, {44100, 48000, 32000, 0}};
-          int xingSampleRate = xingSampleRates[xingVersion][xingSampleRateIndex];
-
-          if (xingSampleRate > 0 && xingBitrate > 0) {
-            int xingFrameSize = (144 * xingBitrate / xingSampleRate) + xingPadding;
-
-            // Check for XING/Info marker at various offsets
-            boolean foundXing = false;
-            int[] xingOffsets = {36, 32, 27, 23};
-            for (int offset : xingOffsets) {
-              if (searchStart + offset + 4 <= mp3Data.length) {
-                String marker = new String(mp3Data, searchStart + offset, 4);
-                if ("Xing".equals(marker) || "Info".equals(marker)) {
-                  foundXing = true;
-                  break;
-                }
-              }
-            }
-            if (foundXing) {
-              searchStart += xingFrameSize; // Skip entire XING frame
-              continue;
-            }
-          }
-          break;
-        }
-        searchStart++;
+      byte[] frameData;
+      while (true) {
+        frameOffset = encodedPosition;
+        frameData = readFrame();
+        if (frameData == null) return false;
+        if (!hasXingHeader(frameData)) break;
       }
 
-      if (searchStart >= mp3Data.length - 4) return false;
-      mp3Position = searchStart;
-
-      int header = ((mp3Data[mp3Position] & 0xFF) << 24) | ((mp3Data[mp3Position + 1] & 0xFF) << 16)
-                 | ((mp3Data[mp3Position + 2] & 0xFF) << 8) | (mp3Data[mp3Position + 3] & 0xFF);
-
-      int bitrateIndex = (header >> 12) & 0xF;
-      int sampleRateIndex = (header >> 10) & 0x3;
-      int padding = (header >> 9) & 0x1;
-      int version = (header >> 19) & 0x3;
+      int header = readHeader(frameData);
       int protection = (header >> 16) & 0x1;
-      int channels = detectChannels(mp3Data, mp3Position);
+      int channels = detectChannels(frameData);
+      int frameSize = frameData.length;
+      int sideInfoSize = channels == 1 ? 17 : 32;
+      int headerAndSideInfoSize = 4 + (protection == 0 ? 2 : 0) + sideInfoSize;
 
-      int[] bitrates = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
-      int bitrate = bitrates[bitrateIndex] * 1000;
-
-      int[][] sampleRates = {{11025, 12000, 8000, 0}, {0, 0, 0, 0}, {22050, 24000, 16000, 0}, {44100, 48000, 32000, 0}};
-      int sampleRate = sampleRates[version][sampleRateIndex];
-
-    int frameSize = (144 * bitrate / sampleRate) + padding;
-    int sideInfoSize = (channels == 1) ? 17 : 32;
-    int headerAndSideInfoSize = 4 + (protection == 0 ? 2 : 0) + sideInfoSize;
-
-      int sideInfoOffset = mp3Position + 4 + (protection == 0 ? 2 : 0);
-      int mainDataBegin = ((mp3Data[sideInfoOffset] & 0xFF) << 1) | ((mp3Data[sideInfoOffset + 1] >> 7) & 1);
+      int sideInfoOffset = 4 + (protection == 0 ? 2 : 0);
+      int mainDataBegin = ((frameData[sideInfoOffset] & 0xFF) << 1) | ((frameData[sideInfoOffset + 1] >> 7) & 1);
       int mainDataSize = frameSize - headerAndSideInfoSize;
-
-
-      if (mainDataSize < 0 || mp3Position + frameSize > mp3Data.length) return false;
+      if (mainDataSize < 0) throw new IOException("Invalid MPEG frame size at byte " + frameOffset);
       byte[] currentMainData = new byte[mainDataSize];
-      System.arraycopy(mp3Data, mp3Position + headerAndSideInfoSize, currentMainData, 0, mainDataSize);
+      System.arraycopy(frameData, headerAndSideInfoSize, currentMainData, 0, mainDataSize);
 
       byte[] frameMainData = new byte[mainDataBegin + mainDataSize];
       byte[] previous = readReservoir(mainDataBegin);
@@ -197,14 +169,13 @@ public class Mp3AudioInputStream extends AudioInputStream {
 
       MpegFrame frame;
       try {
-        frame = new MpegFrame(ByteBuffer.wrap(mp3Data), mp3Position, frameMainData);
-      } catch (Exception e) {
-        mp3Position += frameSize;
-        return true;
+        frame = new MpegFrame(ByteBuffer.wrap(frameData), 0, frameMainData);
+      } catch (UnsupportedAudioFileException exception) {
+        throw new IOException("Invalid MPEG frame at byte " + frameOffset, exception);
       }
 
       float[][][] samples = frame.getSamples();
-      if (samples == null) { mp3Position += frameSize; return true; }
+      if (samples == null) throw new IOException("MPEG frame contains no decoded samples at byte " + frameOffset);
 
       int frameChannels = frame.getChannels();
       int outputChannels = synthesisFilters.length;
@@ -287,17 +258,70 @@ public class Mp3AudioInputStream extends AudioInputStream {
         }
       }
 
-      mp3Position += frameSize;
       return true;
-    } catch (Exception e) {
-      mp3Position += 1;
-      return mp3Position < mp3Data.length;
+    } catch (IndexOutOfBoundsException | ArithmeticException exception) {
+      throw new IOException("Malformed MPEG frame at byte " + frameOffset, exception);
     }
   }
 
-  private int detectChannels(byte[] data, int offset) {
-    if (offset + 4 > data.length) return 2;
-    int header = ((data[offset] & 0xFF) << 24) | ((data[offset + 1] & 0xFF) << 16) | ((data[offset + 2] & 0xFF) << 8) | (data[offset + 3] & 0xFF);
+  private byte[] readFrame() throws IOException {
+    byte[] headerBytes = encodedStream.readNBytes(Integer.BYTES);
+    encodedPosition += headerBytes.length;
+    if (headerBytes.length == 0) return null;
+    if (headerBytes.length < Integer.BYTES) {
+      throw new IOException("Truncated MPEG header at byte " + (encodedPosition - headerBytes.length));
+    }
+    if (headerBytes[0] == 'T' && headerBytes[1] == 'A' && headerBytes[2] == 'G') return null;
+    if (!Mpeg.isStart(headerBytes[0], headerBytes[1])) {
+      throw new IOException("Missing MPEG frame sync at byte " + (encodedPosition - Integer.BYTES));
+    }
+
+    int header = readHeader(headerBytes);
+    int bitrateIndex = (header >>> 12) & 0xf;
+    int sampleRateIndex = (header >>> 10) & 0x3;
+    int bitrate;
+    int sampleRate;
+    try {
+      String version = Mpeg.getVersion((header >>> 19) & 0x3);
+      String layer = Mpeg.getLayer((header >>> 17) & 0x3);
+      if (!Mpeg.VERSION_1_0.equals(version) || !Mpeg.LAYER_3.equals(layer)) {
+        throw new UnsupportedAudioFileException("Only MPEG-1 Layer III is supported");
+      }
+      bitrate = Mpeg.getBitRate(bitrateIndex);
+      sampleRate = Mpeg.getSampleRate(sampleRateIndex);
+    } catch (UnsupportedAudioFileException exception) {
+      throw new IOException("Invalid MPEG header at byte " + (encodedPosition - Integer.BYTES), exception);
+    }
+
+    int frameSize = 144000 * bitrate / sampleRate + ((header >>> 9) & 1);
+    byte[] frameData = new byte[frameSize];
+    System.arraycopy(headerBytes, 0, frameData, 0, headerBytes.length);
+    int remaining = frameSize - headerBytes.length;
+    int read = encodedStream.readNBytes(frameData, headerBytes.length, remaining);
+    encodedPosition += read;
+    if (read != remaining) {
+      throw new IOException("Truncated MPEG frame at byte " + (encodedPosition - read - Integer.BYTES));
+    }
+    return frameData;
+  }
+
+  private static boolean hasXingHeader(byte[] frameData) {
+    int[] markerOffsets = {36, 32, 27, 23};
+    for (int markerOffset : markerOffsets) {
+      if (markerOffset + 4 > frameData.length) continue;
+      String marker = new String(frameData, markerOffset, 4, StandardCharsets.ISO_8859_1);
+      if ("Xing".equals(marker) || "Info".equals(marker)) return true;
+    }
+    return false;
+  }
+
+  private static int readHeader(byte[] data) {
+    return ((data[0] & 0xff) << 24) | ((data[1] & 0xff) << 16)
+      | ((data[2] & 0xff) << 8) | (data[3] & 0xff);
+  }
+
+  private static int detectChannels(byte[] data) {
+    int header = readHeader(data);
     return ((header >> 6) & 0x3) == 3 ? 1 : 2;
   }
 }

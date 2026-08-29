@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.sound.spi.mp3;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.spi.FormatConversionProvider;
 
 import static javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED;
@@ -49,7 +50,7 @@ public final class Mp3FormatConversionProvider extends FormatConversionProvider 
     var sourceFormat = sourceStream.getFormat();
     var targetFormat = new AudioFormat(PCM_SIGNED, sourceFormat.getSampleRate(), 16,
       sourceFormat.getChannels(), sourceFormat.getChannels() * 2, sourceFormat.getSampleRate(), false);
-    return new Mp3AudioInputStream(sourceStream, targetFormat);
+    return decodedStream(sourceStream, targetFormat);
   }
 
   @Override
@@ -58,7 +59,12 @@ public final class Mp3FormatConversionProvider extends FormatConversionProvider 
     if (!isSupportedTarget(targetFormat, sourceFormat)) {
       throw new IllegalArgumentException("Unsupported MP3 conversion");
     }
-    return new Mp3AudioInputStream(sourceStream, targetFormat);
+    return decodedStream(sourceStream, targetFormat);
+  }
+
+  private static AudioInputStream decodedStream(AudioInputStream sourceStream, AudioFormat targetFormat) {
+    var decoder = new Mp3DecoderInputStream(sourceStream, targetFormat);
+    return new AudioInputStream(decoder, targetFormat, AudioSystem.NOT_SPECIFIED);
   }
 
   private boolean isSupportedTarget(AudioFormat targetFormat, AudioFormat sourceFormat) {

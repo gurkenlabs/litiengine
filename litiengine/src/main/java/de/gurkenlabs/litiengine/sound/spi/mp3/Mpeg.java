@@ -33,8 +33,6 @@ final class Mpeg {
 
   public static final float TIME_PER_FRAME = 1152f;
 
-  static final String ID3V2_TAG = "ID3";
-
   private Mpeg() {
   }
 
@@ -117,6 +115,21 @@ final class Mpeg {
   static boolean isStart(byte b1, byte b2) {
     // check for FRAME_SYNC bytes (11111111 11100000)
     return b1 == (byte) 0b11111111 && (b2 & (byte) 0xE0) == (byte) 0xE0;
+  }
+
+  static int getId3TagLength(byte[] header) throws UnsupportedAudioFileException {
+    if (header.length < 10 || header[0] != 'I' || header[1] != 'D' || header[2] != '3') return 0;
+
+    for (int index = 6; index < 10; index++) {
+      if ((header[index] & 0x80) != 0) {
+        throw new UnsupportedAudioFileException("Invalid ID3 tag size");
+      }
+    }
+
+    int dataLength = ((header[6] & 0x7f) << 21) | ((header[7] & 0x7f) << 14)
+      | ((header[8] & 0x7f) << 7) | (header[9] & 0x7f);
+    boolean hasFooter = header[3] == 4 && (header[5] & 0x10) != 0;
+    return 10 + dataLength + (hasFooter ? 10 : 0);
   }
 
   /**

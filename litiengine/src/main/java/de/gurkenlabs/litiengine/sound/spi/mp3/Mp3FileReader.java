@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 /** Reads MPEG-1 Layer III stream metadata for the Java Sound service provider. */
 public final class Mp3FileReader extends AudioFileReader {
@@ -34,8 +33,9 @@ public final class Mp3FileReader extends AudioFileReader {
     }
 
     var frames = new ByteArrayOutputStream();
-    if (hasId3Tag(header)) {
-      stream.skipNBytes(id3DataSize(header));
+    int id3TagLength = Mpeg.getId3TagLength(header);
+    if (id3TagLength > 0) {
+      stream.skipNBytes(id3TagLength - HEADER_LENGTH);
     } else {
       frames.write(header);
     }
@@ -45,20 +45,6 @@ public final class Mp3FileReader extends AudioFileReader {
     var format = new AudioFormat(frame.getEncoding(), frame.getSampleRate(), AudioSystem.NOT_SPECIFIED,
       frame.getChannels(), AudioSystem.NOT_SPECIFIED, AudioSystem.NOT_SPECIFIED, false);
     return new AudioFileFormat(MP3, format, AudioSystem.NOT_SPECIFIED);
-  }
-
-  private static boolean hasId3Tag(byte[] header) {
-    return Mpeg.ID3V2_TAG.equals(new String(header, 0, 3, StandardCharsets.ISO_8859_1));
-  }
-
-  private static int id3DataSize(byte[] header) throws UnsupportedAudioFileException {
-    for (int i = 6; i < HEADER_LENGTH; i++) {
-      if ((header[i] & 0x80) != 0) {
-        throw new UnsupportedAudioFileException("Invalid ID3 tag size");
-      }
-    }
-    return ((header[6] & 0x7f) << 21) | ((header[7] & 0x7f) << 14)
-      | ((header[8] & 0x7f) << 7) | (header[9] & 0x7f);
   }
 
   private static MpegFrame readFirstFrame(byte[] data) throws UnsupportedAudioFileException {

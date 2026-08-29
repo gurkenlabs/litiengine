@@ -7,13 +7,18 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class Mp3DecoderComparisonTest {
   private static final String MP3_RESOURCE = "de/gurkenlabs/litiengine/resources/sample.mp3";
@@ -25,6 +30,26 @@ class Mp3DecoderComparisonTest {
     assertEquals(965376, pcm.length);
     assertEquals("4720061d59420a39c21a4c61ee79c8c5f7c93fa66390bfb76c2660d59604c980",
       HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(pcm)));
+  }
+
+  @Test
+  void decodedPcmMatchesIndependentReferenceCheckpoints() throws Exception {
+    // Generated from the committed MP3 with JLayer 1.0.1.4, which can differ by one due to rounding.
+    int[][] referenceSamples = {
+      {0, 0}, {16384, -8051}, {32768, 32}, {49152, -7018}, {65536, 284},
+      {81920, 1002}, {98304, -140}, {114688, -684}, {131072, -1977}, {147456, -435},
+      {163840, 6499}, {180224, 1001}, {196608, 33}, {212992, -1518}, {229376, -4100},
+      {245760, 9}, {262144, -128}, {278528, 1}, {294912, 10394}, {311296, -603},
+      {327680, -4345}, {344064, 26}, {360448, -1205}, {376832, 52}, {393216, -217},
+      {409600, -403}, {425984, -6170}, {442368, -1591}, {458752, -9}, {475136, 623}
+    };
+    byte[] pcm = decodeWithLitiengine(readSample(), false);
+
+    for (int[] reference : referenceSamples) {
+      int byteOffset = reference[0] * 2;
+      short actual = (short) ((pcm[byteOffset] & 0xff) | (pcm[byteOffset + 1] << 8));
+      assertEquals(reference[1], actual, 1, "PCM sample " + reference[0]);
+    }
   }
 
   @Test
@@ -44,6 +69,68 @@ class Mp3DecoderComparisonTest {
     byte[] mp3 = readSample();
 
     assertArrayEquals(decodeWithLitiengine(mp3, false), decodeWithLitiengine(mp3, false, 600_000));
+  }
+
+  @Test
+  void creatingAConversionDoesNotEagerlyConsumeTheEncodedStream() throws Exception {
+    var encoded = new CountingInputStream(new ByteArrayInputStream(readSample()));
+    try (var source = new Mp3FileReader().getAudioInputStream(encoded)) {
+      int readsAfterFormatDetection = encoded.bytesRead;
+      try (var decoded = new Mp3FormatConversionProvider()
+        .getAudioInputStream(targetFormat(source.getFormat(), false), source)) {
+        assertEquals(readsAfterFormatDetection, encoded.bytesRead);
+
+        assertEquals(2, decoded.read(new byte[2]));
+        assertTrue(encoded.bytesRead > readsAfterFormatDetection);
+      }
+    }
+  }
+
+  @Test
+  void decodedStreamEnforcesPcmFrameSemantics() throws Exception {
+    try (var source = new Mp3FileReader().getAudioInputStream(new ByteArrayInputStream(readSample()));
+      var decoded = new Mp3FormatConversionProvider().getAudioInputStream(targetFormat(source.getFormat(), false), source)) {
+      byte[] buffer = new byte[5];
+
+      assertEquals(2, decoded.getFormat().getFrameSize());
+      assertEquals(0, decoded.read(buffer, 0, 1));
+      assertEquals(2, decoded.read(buffer, 0, 3));
+      assertEquals(4, decoded.read(buffer, 0, 5));
+      assertFalse(decoded.markSupported());
+      assertThrows(IOException.class, decoded::reset);
+    }
+  }
+
+  @Test
+  void skipAdvancesByCompletePcmFrames() throws Exception {
+    byte[] expected = decodeWithLitiengine(readSample(), false);
+    try (var source = new Mp3FileReader().getAudioInputStream(new ByteArrayInputStream(readSample()));
+      var decoded = new Mp3FormatConversionProvider().getAudioInputStream(targetFormat(source.getFormat(), false), source)) {
+      assertEquals(2, decoded.skip(3));
+      assertArrayEquals(Arrays.copyOfRange(expected, 2, expected.length), decoded.readAllBytes());
+    }
+  }
+
+  @Test
+  void id3v24FooterDoesNotChangeDecodedPcm() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] untagged = Arrays.copyOfRange(mp3, Mpeg.getId3TagLength(mp3), mp3.length);
+
+    assertArrayEquals(decodeWithLitiengine(untagged, false),
+      decodeWithLitiengine(withId3v24Footer(untagged), false));
+  }
+
+  @Test
+  void malformedLaterFramesFailTheDecodedStream() throws Exception {
+    byte[] corrupted = readSample();
+    int firstFrameOffset = Mpeg.getId3TagLength(corrupted);
+    int nextFrameOffset = firstFrameOffset + frameLength(corrupted, firstFrameOffset);
+    corrupted[nextFrameOffset] = 0;
+
+    try (var source = new Mp3FileReader().getAudioInputStream(new ByteArrayInputStream(corrupted));
+      var decoded = new Mp3FormatConversionProvider().getAudioInputStream(targetFormat(source.getFormat(), false), source)) {
+      assertThrows(IOException.class, decoded::readAllBytes);
+    }
   }
 
   @Test
@@ -91,9 +178,47 @@ class Mp3DecoderComparisonTest {
       source.getChannels(), source.getChannels() * 2, source.getSampleRate(), bigEndian);
   }
 
+  private static int frameLength(byte[] mp3, int offset) {
+    int header = ((mp3[offset] & 0xff) << 24) | ((mp3[offset + 1] & 0xff) << 16)
+      | ((mp3[offset + 2] & 0xff) << 8) | (mp3[offset + 3] & 0xff);
+    int bitrate = Mpeg.BITRATES_VERSION_1_0_LAYER_3[((header >>> 12) & 0xf) - 1];
+    int sampleRate = Mpeg.SAMPLERATES_VERSION_1_0[(header >>> 10) & 0x3];
+    return 144000 * bitrate / sampleRate + ((header >>> 9) & 1);
+  }
+
+  private static byte[] withId3v24Footer(byte[] mp3) throws IOException {
+    var output = new ByteArrayOutputStream();
+    output.write(new byte[]{'I', 'D', '3', 4, 0, 0x10, 0, 0, 0, 0});
+    output.write(new byte[]{'3', 'D', 'I', 4, 0, 0x10, 0, 0, 0, 0});
+    output.write(mp3);
+    return output.toByteArray();
+  }
+
   private static byte[] readSample() throws IOException {
     try (var stream = Resources.getLocation(MP3_RESOURCE).openStream()) {
       return stream.readAllBytes();
+    }
+  }
+
+  private static final class CountingInputStream extends FilterInputStream {
+    private int bytesRead;
+
+    private CountingInputStream(InputStream input) {
+      super(input);
+    }
+
+    @Override
+    public int read() throws IOException {
+      int value = super.read();
+      if (value != -1) bytesRead++;
+      return value;
+    }
+
+    @Override
+    public int read(byte[] buffer, int offset, int length) throws IOException {
+      int read = super.read(buffer, offset, length);
+      if (read > 0) bytesRead += read;
+      return read;
     }
   }
 }

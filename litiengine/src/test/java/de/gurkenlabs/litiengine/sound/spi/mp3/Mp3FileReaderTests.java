@@ -7,10 +7,12 @@ import org.junit.jupiter.api.io.TempDir;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -81,6 +83,20 @@ class Mp3FileReaderTests {
       assertEquals(0x49, fileStream.read());
       assertEquals(0x49, urlStream.read());
     }
+  }
+
+  @Test
+  void acceptsId3v24TagsWithFooters() throws Exception {
+    byte[] data = readSample();
+    byte[] untagged = Arrays.copyOfRange(data, Mpeg.getId3TagLength(data), data.length);
+    var tagged = new ByteArrayOutputStream();
+    tagged.write(new byte[]{'I', 'D', '3', 4, 0, 0x10, 0, 0, 0, 0});
+    tagged.write(new byte[]{'3', 'D', 'I', 4, 0, 0x10, 0, 0, 0, 0});
+    tagged.write(untagged);
+
+    var format = new Mp3FileReader().getAudioFileFormat(new ByteArrayInputStream(tagged.toByteArray()));
+
+    assertEquals(32000.0f, format.getFormat().getSampleRate());
   }
 
   private static byte[] readSample() throws IOException {
