@@ -21,6 +21,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -138,7 +139,7 @@ class GuiComponentTests {
     assertNull(component.getTag());
 
     component.mouseMoved(createTestEvent(50, 25));
-    assertNotNull(component.getTag());
+    assertNull(component.getTag());
 
     component.setVisible(true);
 
@@ -167,6 +168,144 @@ class GuiComponentTests {
     assertFalse(component.isPressed());
     assertTrue(component.isHovered());
     assertEquals(moved, component.getTag());
+  }
+
+  @Test
+  void onlyTopmostOverlappingComponentReceivesMouseEvents() {
+    TestComponent parent = new TestComponent(0, 0, 200, 200);
+    TestComponent lower = new TestComponent(0, 0, 100, 100);
+    TestComponent upper = new TestComponent(25, 25, 100, 100);
+    parent.getComponents().add(lower);
+    parent.getComponents().add(upper);
+    parent.setVisible(true);
+
+    lower.onMousePressed(event -> lower.setTag("pressed"));
+    upper.onMousePressed(event -> upper.setTag("pressed"));
+
+    MouseEvent overlap = createTestEvent(50, 50);
+    lower.mousePressed(overlap);
+    upper.mousePressed(overlap);
+
+    assertNull(lower.getTag());
+    assertEquals("pressed", upper.getTag());
+  }
+
+  @Test
+  void releaseAndClickNotifyOnlyTheirMatchingConsumers() {
+    TestComponent component = new TestComponent(0, 0, 100, 100);
+    component.setVisible(true);
+    int[] clicks = {0};
+    int[] releases = {0};
+    component.onClicked(event -> clicks[0]++);
+    component.onMouseReleased(event -> releases[0]++);
+
+    MouseEvent event = createTestEvent(50, 50);
+    component.mousePressed(event);
+    component.mouseReleased(event);
+
+    assertEquals(0, clicks[0]);
+    assertEquals(1, releases[0]);
+
+    component.mouseClicked(event);
+
+    assertEquals(1, clicks[0]);
+    assertEquals(1, releases[0]);
+  }
+
+  @Test
+  void topmostHitTestingFollowsNestedRenderOrder() {
+    TestComponent parent = new TestComponent(0, 0, 200, 200);
+    TestComponent lower = new TestComponent(0, 0, 100, 100);
+    TestComponent lowerChild = new TestComponent(25, 25, 50, 50);
+    TestComponent upper = new TestComponent(25, 25, 100, 100);
+    lower.getComponents().add(lowerChild);
+    parent.getComponents().add(lower);
+    parent.getComponents().add(upper);
+    parent.setVisible(true);
+
+    lowerChild.onClicked(event -> lowerChild.setTag("clicked"));
+    upper.onClicked(event -> upper.setTag("clicked"));
+
+    MouseEvent overlap = createTestEvent(50, 50);
+    lowerChild.mousePressed(overlap);
+    lowerChild.mouseClicked(overlap);
+    upper.mousePressed(overlap);
+    upper.mouseClicked(overlap);
+
+    assertNull(lowerChild.getTag());
+    assertEquals("clicked", upper.getTag());
+  }
+
+  @Test
+  void childReceivesMouseEventInsteadOfItsParent() {
+    TestComponent parent = new TestComponent(0, 0, 200, 200);
+    TestComponent child = new TestComponent(25, 25, 100, 100);
+    parent.getComponents().add(child);
+    parent.setVisible(true);
+    parent.onMousePressed(event -> parent.setTag("pressed"));
+    child.onMousePressed(event -> child.setTag("pressed"));
+
+    MouseEvent event = createTestEvent(50, 50);
+    parent.mousePressed(event);
+    child.mousePressed(event);
+
+    assertNull(parent.getTag());
+    assertEquals("pressed", child.getTag());
+  }
+
+  @Test
+  void ineligibleTopComponentDoesNotBlockLowerComponent() {
+    TestComponent parent = new TestComponent(0, 0, 200, 200);
+    TestComponent lower = new TestComponent(0, 0, 100, 100);
+    TestComponent upper = new TestComponent(25, 25, 100, 100);
+    parent.getComponents().add(lower);
+    parent.getComponents().add(upper);
+    parent.setVisible(true);
+    upper.setEnabled(false);
+    lower.onMousePressed(event -> lower.setTag("pressed"));
+
+    lower.mousePressed(createTestEvent(50, 50));
+
+    assertEquals("pressed", lower.getTag());
+  }
+
+  @Test
+  void mouseMovedRequiresAnEligibleTopmostHit() {
+    TestComponent component = new TestComponent(0, 0, 100, 100);
+    component.onMouseMoved(event -> component.setTag("moved"));
+
+    component.mouseMoved(createTestEvent(50, 50));
+    assertNull(component.getTag());
+
+    component.setVisible(true);
+    component.mouseMoved(createTestEvent(150, 150));
+    assertNull(component.getTag());
+
+    component.mouseMoved(createTestEvent(50, 50));
+    assertEquals("moved", component.getTag());
+  }
+
+  @Test
+  void mouseWheelRequiresAnEligibleTopmostHit() {
+    TestComponent parent = new TestComponent(0, 0, 200, 200);
+    TestComponent lower = new TestComponent(0, 0, 100, 100);
+    TestComponent upper = new TestComponent(25, 25, 100, 100);
+    parent.getComponents().add(lower);
+    parent.getComponents().add(upper);
+    parent.setVisible(true);
+    lower.onMouseWheelScrolled(event -> lower.setTag("scrolled"));
+    upper.onMouseWheelScrolled(event -> upper.setTag("scrolled"));
+
+    MouseWheelEvent overlap = createTestWheelEvent(50, 50);
+    lower.mouseWheelMoved(overlap);
+    upper.mouseWheelMoved(overlap);
+
+    assertNull(lower.getTag());
+    assertEquals("scrolled", upper.getTag());
+
+    upper.setTag(null);
+    upper.mouseWheelMoved(createTestWheelEvent(150, 150));
+    assertNull(upper.getTag());
   }
 
   @Test
@@ -415,6 +554,12 @@ class GuiComponentTests {
 
   private static MouseEvent createTestEvent(int x, int y) {
     return new MouseEvent(new JLabel(), 0, 0, 0, x, y, 0, false);
+  }
+
+  private static MouseWheelEvent createTestWheelEvent(int x, int y) {
+    return new MouseWheelEvent(
+      new JLabel(), 0, 0, 0, x, y, 0, false,
+      MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, 1);
   }
 
   private static class TestComponent extends GuiComponent {
