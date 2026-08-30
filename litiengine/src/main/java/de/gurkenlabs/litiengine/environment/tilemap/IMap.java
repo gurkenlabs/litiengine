@@ -8,6 +8,14 @@ import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.List;
 
+/// Engine-facing representation of a tile map and its layer hierarchy.
+///
+/// Dimensions returned by [#getWidth()] and [#getHeight()] are measured in tiles; use
+/// [#getSizeInPixels()] or [#getBounds()] for map-coordinate dimensions. Maps loaded from TMX are
+/// represented by [de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap].
+///
+/// @see de.gurkenlabs.litiengine.resources.Maps
+/// @see de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap
 public interface IMap extends ILayerList, Comparable<IMap> {
 
   /// Gets the tilesets.
@@ -31,9 +39,9 @@ public interface IMap extends ILayerList, Comparable<IMap> {
   /// @return the source URL
   URL getPath();
 
-  /// Gets the renderorder.
+  /// Gets the order in which orthogonal tile coordinates are rendered.
   ///
-  /// @return the renderorder
+  /// @return the render order declared by the map
   RenderOrder getRenderOrder();
 
   /// Gets the size in pixels.
@@ -51,9 +59,9 @@ public interface IMap extends ILayerList, Comparable<IMap> {
   /// @return the height in tiles
   int getHeight();
 
-  /// Gets the sizein tiles.
+  /// Gets the width and height in tiles.
   ///
-  /// @return the sizein tiles
+  /// @return the map size in tiles
   Dimension getSizeInTiles();
 
   /// Gets the bounding rectangle of the map in pixels.
@@ -86,14 +94,14 @@ public interface IMap extends ILayerList, Comparable<IMap> {
   /// @return the hex side length
   int getHexSideLength();
 
-  /// Gets the staggering axis
+  /// Gets the axis along which hexagonal or staggered rows are offset.
   ///
-  /// @return the tile size
+  /// @return the staggering axis
   StaggerAxis getStaggerAxis();
 
-  /// Gets the tile size.
+  /// Gets whether even or odd indexes are staggered.
   ///
-  /// @return the tile size
+  /// @return the staggering index
   StaggerIndex getStaggerIndex();
 
   /// Gets the version.

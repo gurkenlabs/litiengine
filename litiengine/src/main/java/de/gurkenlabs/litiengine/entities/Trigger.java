@@ -17,13 +17,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/// TODO: Triggers should be able to call entity actions (similar to the current message approach)
+/// An invisible map area that activates configured targets when an allowed entity collides or interacts.
+///
+/// Activator and target references are TMX map object IDs resolved when the environment loads.
+/// Conditions and listeners can further control or observe activation.
 @CollisionInfo(collision = false)
 @EntityInfo(renderType = RenderType.OVERLAY)
 @TmxType(MapObjectType.TRIGGER)
 public class Trigger extends CollisionEntity implements IUpdateable {
+  /// Selects the physical interaction that attempts to activate a trigger.
   public enum TriggerActivation {
+    /// Activate while an eligible entity overlaps the trigger area.
     COLLISION,
+    /// Activate when an eligible entity explicitly interacts with the trigger.
     INTERACT
   }
 

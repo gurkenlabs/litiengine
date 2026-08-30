@@ -5,6 +5,9 @@ import de.gurkenlabs.litiengine.util.Imaging;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/// Applies a constant alpha multiplier to every pixel of an image for the effect's lifetime.
+///
+/// @see Imaging#setAlpha(BufferedImage, float)
 public class TransparencyImageEffect extends ImageEffect {
   private final float alpha;
 

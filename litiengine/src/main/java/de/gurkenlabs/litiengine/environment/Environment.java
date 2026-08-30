@@ -75,6 +75,18 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/// The live collection of entities, map data, render layers, and physical state for one loaded map.
+///
+/// Environments are normally created and activated through [GameWorld] rather than constructed by
+/// game code directly. Use [Game#world()] to access the current world and [GameWorld#environment()]
+/// to access its active environment. Entity lookup can be expressed with [#query(Class)].
+///
+/// Map object loaders translate objects from an [IMap] into engine entities when the environment is
+/// loaded. Register custom loaders with [#registerMapObjectLoader(IMapObjectLoader)].
+///
+/// @see Game#world()
+/// @see GameWorld
+/// @see EntityQuery
 public final class Environment implements IRenderable {
 
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();

@@ -42,7 +42,8 @@ final class ScriptParameterNamer {
       case "Sound" -> "sound";
       case "Graphics2D" -> "g";
       case "int" -> {
-        if (methodName.contains("Pan") || methodName.contains("Shake") || methodName.contains("Duration")) yield "durationTicks";
+        if (methodName.contains("Shake")) yield index == total - 1 ? "durationMs" : "intervalMs";
+        if (methodName.contains("Pan") || methodName.contains("Duration")) yield "durationTicks";
         if (methodName.contains("Zoom") || methodName.contains("Delay") || methodName.contains("Time") || methodName.contains("Text") || methodName.contains("Banner")) yield "durationMs";
         if (index == 0 && total >= 2) yield "x";
         if (index == 1 && total >= 2) yield "y";

@@ -5,18 +5,23 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.GameWorld;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.EventListener;
 
-/// The Interface ICamera defines methods that allow to determine where entities or tiles are rendered on the current
-/// screen.
+/// Defines the viewport through which entities and tiles are rendered on screen.
 ///
 /// Camera control is based on a Focus system. Generally, the camera will always try to keep the focus point in the
 /// center of the viewport.
 ///
 /// There are two coordinate systems referenced in ICamera methods: map coordinates, and screen coordinates. The camera
 /// is responsible for converting between the two coordinate systems.
+///
+/// [Camera] provides the standard focus and zoom behavior. [FreeFlightCamera] allows independent
+/// movement, while [LocationLockCamera] follows a supplied location.
+///
+/// @see GameWorld#camera()
 public interface ICamera extends IUpdateable {
   /// Adds the specified zoom changed listener to receive events when the zoom of this camera changed.
   ///
@@ -27,7 +32,7 @@ public interface ICamera extends IUpdateable {
   /// Removes the specified zoom changed listener.
   ///
   /// @param listener
-  /// The listener to add.
+  /// The listener to remove.
   void removeZoomListener(ZoomChangedListener listener);
 
   /// Adds the specified focus changed listener to receive events when the focus of this camera changed.
@@ -39,7 +44,7 @@ public interface ICamera extends IUpdateable {
   /// Removes the specified focus changed listener.
   ///
   /// @param listener
-  /// The listener to add.
+  /// The listener to remove.
   void removeFocusListener(FocusChangedListener listener);
 
   /// Gets the map location that is focused by this camera.
@@ -190,14 +195,14 @@ public interface ICamera extends IUpdateable {
   /// @return The vertical alignment.
   Valign getClampValign();
 
-  /// Shake the camera for the specified duration (in frames). The way the camera shakes is implementation defined.
+  /// Shakes the camera for the specified duration. The way the camera shakes is implementation defined.
   ///
   /// @param intensity
   /// The intensity of the screen shake effect.
   /// @param delay
-  /// The delay before the effect starts.
+  /// The delay in milliseconds between randomized offset updates.
   /// @param duration
-  /// The duration of the effect.
+  /// The total duration of the effect in milliseconds.
   void shake(double intensity, final int delay, int duration);
 
   /// Currently an update function for the shake effect.

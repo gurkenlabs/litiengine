@@ -643,14 +643,14 @@ public abstract class PropertyPanel extends JPanel {
     return groupLayout;
   }
 
+  private boolean applying;
+
   /**
    * Applies changes to the map object by invoking the provided update action. This method also manages the undo/redo functionality and updates the
    * environment.
    *
    * @param updateAction the action to apply to the map object
    */
-  private boolean applying;
-
   protected void applyChanges(Consumer<IMapObject> updateAction) {
     if (applying) {
       return;

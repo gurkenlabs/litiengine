@@ -7,11 +7,25 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
+/// A [Slider] whose minimum value is at the top and maximum value is at the bottom.
+///
+/// Up/down arrow buttons and keyboard keys move between values using the configured step size.
 public class VerticalSlider extends Slider {
 
+  /// Icon used by the increment button below the slider.
   public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE804");
+  /// Icon used by the decrement button above the slider.
   public static final FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE807");
 
+  /// Creates a vertical slider.
+  ///
+  /// @param x The horizontal screen coordinate.
+  /// @param y The vertical screen coordinate.
+  /// @param width The component width.
+  /// @param height The component height.
+  /// @param minValue The value at the top.
+  /// @param maxValue The value at the bottom.
+  /// @param stepSize The amount changed by one step.
   public VerticalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue,
     final float stepSize) {
     super(x, y, width, height, minValue, maxValue, stepSize);

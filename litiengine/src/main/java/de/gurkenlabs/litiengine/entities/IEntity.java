@@ -14,6 +14,16 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
+/// A positioned object that can be added to an [Environment], updated by controllers, and rendered.
+///
+/// [Entity] provides the standard implementation of identity, transforms, tags, listeners, and
+/// controller ownership. Specialized implementations include [Creature], [Prop], and [MapArea].
+/// Coordinates exposed by this interface are map coordinates; rendering converts them through the
+/// active camera.
+///
+/// @see Entity
+/// @see Environment#add(IEntity)
+/// @see GameWorld
 public interface IEntity {
   /// Adds a [EntityMessageListener] to receive messages sent to this entity.
   ///
@@ -71,6 +81,9 @@ public interface IEntity {
   /// @param listener The [EntityRenderListener] to remove.
   void removeListener(final EntityRenderListener listener);
 
+  /// Returns the direction in which this entity is facing.
+  ///
+  /// @return The angle in degrees.
   double getAngle();
 
   /// Sets the angle (in degrees) in which the entity is directed.
@@ -119,6 +132,8 @@ public interface IEntity {
   <T extends IEntityController> T getController(Class<T> clss);
 
   /// Returns the controller that owns this entity's declarative script bindings, if one is configured.
+  ///
+  /// @return The script controller, or `null` when none is configured.
   default EntityScriptController<?> scripts() {
     return this.getController(EntityScriptController.class);
   }

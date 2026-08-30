@@ -19,6 +19,14 @@ import java.util.logging.Logger;
 public final class TmxPropertyMetadataRegistry {
   private static final Logger log = Logger.getLogger(TmxPropertyMetadataRegistry.class.getName());
 
+  /// Documentation and serialization metadata for one TMX property.
+  ///
+  /// @param name The serialized property name.
+  /// @param description The canonical English description.
+  /// @param category The editor grouping.
+  /// @param type The serialized value type.
+  /// @param defaultValue The default represented as text.
+  /// @param resourceKey The optional localization key.
   public record PropertyMetadata(
       String name,
       String description,
@@ -45,6 +53,12 @@ public final class TmxPropertyMetadataRegistry {
     }
   }
 
+  /// Documentation and localization metadata for one TMX object type.
+  ///
+  /// @param typeName The serialized type identifier.
+  /// @param displayName The editor-facing type name.
+  /// @param description The canonical English description.
+  /// @param resourceKey The optional localization key.
   public record TypeMetadata(
       String typeName,
       String displayName,
@@ -78,6 +92,9 @@ public final class TmxPropertyMetadataRegistry {
   private TmxPropertyMetadataRegistry() {
   }
 
+  /// Rebuilds the registry from the engine's annotated TMX model classes.
+  ///
+  /// Existing immutable snapshots are replaced atomically after indexing completes.
   public static synchronized void initialize() {
     Map<String, PropertyMetadata> newProperties = new LinkedHashMap<>();
     Map<String, TypeMetadata> newTypes = new LinkedHashMap<>();
