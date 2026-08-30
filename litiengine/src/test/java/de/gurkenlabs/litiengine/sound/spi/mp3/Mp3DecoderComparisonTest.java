@@ -124,11 +124,27 @@ class Mp3DecoderComparisonTest {
   }
 
   @Test
-  void trailingApev2TagDoesNotPreventCompleteDecoding() throws Exception {
+  void trailingApev2HeaderAndFooterDoNotPreventCompleteDecoding() throws Exception {
     byte[] mp3 = readSample();
 
     assertArrayEquals(decodeWithLitiengine(mp3, false),
-      decodeWithLitiengine(withTrailingMetadata(mp3, emptyApev2Tag()), false));
+      decodeWithLitiengine(withTrailingMetadata(mp3, apev2HeaderAndFooter()), false));
+  }
+
+  @Test
+  void trailingApev2ItemsAndFooterDoNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, apev2ItemsAndFooter()), false));
+  }
+
+  @Test
+  void trailingApev2FooterBeforeId3v1DoesNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, apev2FooterAndId3v1()), false));
   }
 
   @Test
@@ -147,6 +163,17 @@ class Mp3DecoderComparisonTest {
 
     assertThrows(IOException.class,
       () -> decodeWithLitiengine(withTrailingMetadata(mp3, trailingData), false));
+  }
+
+  @Test
+  void apev2FooterSizeMustCoverTheEntireTrailingTag() throws Exception {
+    byte[] mp3 = readSample();
+    var malformedTag = new ByteArrayOutputStream();
+    malformedTag.write("NOPE".getBytes(StandardCharsets.US_ASCII));
+    malformedTag.write(apev2Descriptor(32, 0, 0));
+
+    assertThrows(IOException.class,
+      () -> decodeWithLitiengine(withTrailingMetadata(mp3, malformedTag.toByteArray()), false));
   }
 
   @Test
@@ -271,13 +298,48 @@ class Mp3DecoderComparisonTest {
     return tagged;
   }
 
-  private static byte[] emptyApev2Tag() {
-    byte[] tag = new byte[32];
-    System.arraycopy("APETAGEX".getBytes(StandardCharsets.US_ASCII), 0, tag, 0, 8);
-    tag[8] = (byte) 0xd0;
-    tag[9] = 0x07;
-    tag[12] = 32;
-    return tag;
+  private static byte[] apev2HeaderAndFooter() throws IOException {
+    var output = new ByteArrayOutputStream();
+    output.write(apev2Descriptor(32, 0, 0xa0000000));
+    output.write(apev2Descriptor(32, 0, 0x80000000));
+    return output.toByteArray();
+  }
+
+  private static byte[] apev2ItemsAndFooter() throws IOException {
+    var item = new ByteArrayOutputStream();
+    item.write(new byte[]{4, 0, 0, 0, 0, 0, 0, 0});
+    item.write("Title\0Test".getBytes(StandardCharsets.UTF_8));
+
+    var output = new ByteArrayOutputStream();
+    output.write(item.toByteArray());
+    output.write(apev2Descriptor(32 + item.size(), 1, 0));
+    return output.toByteArray();
+  }
+
+  private static byte[] apev2FooterAndId3v1() throws IOException {
+    var output = new ByteArrayOutputStream();
+    output.write(apev2Descriptor(32, 0, 0));
+    byte[] id3v1 = new byte[128];
+    System.arraycopy("TAG".getBytes(StandardCharsets.US_ASCII), 0, id3v1, 0, 3);
+    output.write(id3v1);
+    return output.toByteArray();
+  }
+
+  private static byte[] apev2Descriptor(int tagSize, int itemCount, int flags) {
+    byte[] descriptor = new byte[32];
+    System.arraycopy("APETAGEX".getBytes(StandardCharsets.US_ASCII), 0, descriptor, 0, 8);
+    writeLittleEndianInt(descriptor, 8, 2000);
+    writeLittleEndianInt(descriptor, 12, tagSize);
+    writeLittleEndianInt(descriptor, 16, itemCount);
+    writeLittleEndianInt(descriptor, 20, flags);
+    return descriptor;
+  }
+
+  private static void writeLittleEndianInt(byte[] data, int offset, int value) {
+    data[offset] = (byte) value;
+    data[offset + 1] = (byte) (value >>> 8);
+    data[offset + 2] = (byte) (value >>> 16);
+    data[offset + 3] = (byte) (value >>> 24);
   }
 
   private static byte[] readSample() throws IOException {

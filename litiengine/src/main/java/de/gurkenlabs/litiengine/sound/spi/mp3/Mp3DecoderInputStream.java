@@ -13,6 +13,8 @@ import java.util.Objects;
 final class Mp3DecoderInputStream extends InputStream {
 
   private static final int ID3_HEADER_LENGTH = 10;
+  private static final int ID3V1_TAG_LENGTH = 128;
+  private static final int APE_DESCRIPTOR_LENGTH = 32;
   private static final int RESERVOIR_SIZE = 4096;
   private static final int SAMPLES_PER_FRAME = 1152;
 
@@ -22,6 +24,7 @@ final class Mp3DecoderInputStream extends InputStream {
   private long encodedPosition;
   private boolean initialized;
   private boolean endOfStream;
+  private boolean decodedAudioFrame;
   private boolean closed;
   private final SynthesisFilter[] synthesisFilters;
   private final OverlapAdd[][] overlapAdd;
@@ -258,6 +261,7 @@ final class Mp3DecoderInputStream extends InputStream {
         }
       }
 
+      decodedAudioFrame = true;
       return true;
     } catch (IndexOutOfBoundsException | ArithmeticException exception) {
       throw new IOException("Malformed MPEG frame at byte " + frameOffset, exception);
@@ -281,15 +285,11 @@ final class Mp3DecoderInputStream extends InputStream {
       endOfStream = true;
       return null;
     }
-    if (matches(headerBytes, 0, "APET")) {
-      byte[] markerEnd = encodedStream.readNBytes(Integer.BYTES);
-      encodedPosition += markerEnd.length;
-      if (matches(markerEnd, 0, "AGEX")) {
+    if (!Mpeg.isStart(headerBytes[0], headerBytes[1])) {
+      if (decodedAudioFrame && hasTrailingApev2Metadata(headerBytes)) {
         endOfStream = true;
         return null;
       }
-    }
-    if (!Mpeg.isStart(headerBytes[0], headerBytes[1])) {
       throw new IOException("Missing MPEG frame sync at byte " + frameOffset);
     }
 
@@ -352,6 +352,52 @@ final class Mp3DecoderInputStream extends InputStream {
     return true;
   }
 
+  private boolean hasTrailingApev2Metadata(byte[] prefix) throws IOException {
+    var tail = new TrailingMetadata();
+    tail.append(prefix, 0, prefix.length);
+
+    byte[] buffer = new byte[8192];
+    int read;
+    while ((read = encodedStream.readNBytes(buffer, 0, buffer.length)) > 0) {
+      encodedPosition += read;
+      tail.append(buffer, 0, read);
+    }
+
+    long apeEnd = tail.length();
+    if (apeEnd >= ID3V1_TAG_LENGTH && tail.matches(apeEnd - ID3V1_TAG_LENGTH, "TAG")) {
+      apeEnd -= ID3V1_TAG_LENGTH;
+    }
+
+    long footerOffset = apeEnd - APE_DESCRIPTOR_LENGTH;
+    if (!isApeDescriptor(tail, footerOffset, false)) return false;
+
+    long tagSize = tail.readLittleEndianInt(footerOffset + 12);
+    long itemCount = tail.readLittleEndianInt(footerOffset + 16);
+    long footerFlags = tail.readLittleEndianInt(footerOffset + 20);
+    if (tagSize < APE_DESCRIPTOR_LENGTH || tagSize > apeEnd) return false;
+
+    long tagStart = apeEnd - tagSize;
+    boolean hasHeader = (footerFlags & 0x80000000L) != 0;
+    if (!hasHeader) return tagStart == 0;
+    if (tagStart != APE_DESCRIPTOR_LENGTH || !isApeDescriptor(tail, 0, true)) return false;
+
+    return tail.readLittleEndianInt(8) == tail.readLittleEndianInt(footerOffset + 8)
+      && tail.readLittleEndianInt(12) == tagSize
+      && tail.readLittleEndianInt(16) == itemCount
+      && tail.readLittleEndianInt(20) == (footerFlags | 0x20000000L);
+  }
+
+  private static boolean isApeDescriptor(TrailingMetadata tail, long offset, boolean header) {
+    if (offset < 0 || !tail.matches(offset, "APETAGEX")) return false;
+    long version = tail.readLittleEndianInt(offset + 8);
+    long flags = tail.readLittleEndianInt(offset + 20);
+    long expectedTypeFlag = header ? 0x20000000L : 0;
+    return version == 2000
+      && (flags & 0x60000000L) == expectedTypeFlag
+      && (flags & 0x1fffffffL) == 0
+      && tail.isZero(offset + 24, 8);
+  }
+
   private static int readHeader(byte[] data) {
     return ((data[0] & 0xff) << 24) | ((data[1] & 0xff) << 16)
       | ((data[2] & 0xff) << 8) | (data[3] & 0xff);
@@ -360,5 +406,66 @@ final class Mp3DecoderInputStream extends InputStream {
   private static int detectChannels(byte[] data) {
     int header = readHeader(data);
     return ((header >> 6) & 0x3) == 3 ? 1 : 2;
+  }
+
+  private static final class TrailingMetadata {
+    private static final int RETAINED_TAIL_LENGTH = APE_DESCRIPTOR_LENGTH + ID3V1_TAG_LENGTH;
+
+    private final byte[] first = new byte[APE_DESCRIPTOR_LENGTH];
+    private final byte[] last = new byte[RETAINED_TAIL_LENGTH];
+    private long length;
+    private int firstLength;
+    private int lastWritePosition;
+
+    void append(byte[] data, int offset, int count) {
+      int firstBytes = Math.min(count, first.length - firstLength);
+      if (firstBytes > 0) {
+        System.arraycopy(data, offset, first, firstLength, firstBytes);
+        firstLength += firstBytes;
+      }
+      for (int i = 0; i < count; i++) {
+        last[lastWritePosition] = data[offset + i];
+        lastWritePosition = (lastWritePosition + 1) % last.length;
+      }
+      length += count;
+    }
+
+    long length() {
+      return length;
+    }
+
+    boolean matches(long offset, String marker) {
+      if (offset < 0 || offset + marker.length() > length) return false;
+      for (int i = 0; i < marker.length(); i++) {
+        if (get(offset + i) != (byte) marker.charAt(i)) return false;
+      }
+      return true;
+    }
+
+    long readLittleEndianInt(long offset) {
+      if (offset < 0 || offset + Integer.BYTES > length) return -1;
+      return Byte.toUnsignedLong(get(offset))
+        | (Byte.toUnsignedLong(get(offset + 1)) << 8)
+        | (Byte.toUnsignedLong(get(offset + 2)) << 16)
+        | (Byte.toUnsignedLong(get(offset + 3)) << 24);
+    }
+
+    boolean isZero(long offset, int count) {
+      if (offset < 0 || offset + count > length) return false;
+      for (int i = 0; i < count; i++) {
+        if (get(offset + i) != 0) return false;
+      }
+      return true;
+    }
+
+    private byte get(long offset) {
+      if (offset < firstLength) return first[(int) offset];
+
+      long retainedLength = Math.min(length, last.length);
+      long retainedOffset = length - retainedLength;
+      if (offset < retainedOffset || offset >= length) throw new IndexOutOfBoundsException();
+      int oldest = length <= last.length ? 0 : lastWritePosition;
+      return last[(oldest + (int) (offset - retainedOffset)) % last.length];
+    }
   }
 }
