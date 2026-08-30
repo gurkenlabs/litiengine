@@ -7,7 +7,7 @@ slf4j = "2.0.18"
 tomcat = "11.0.25"
 jcef = "146.0.10"
 jcefNatives = "jcef-d3de827+cef-146.0.10+g8219561+chromium-146.0.7680.179"
-monaco = "0.55.1"
+monaco = "0.56.0"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
