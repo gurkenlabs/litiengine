@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.input.Mouse;
 import de.gurkenlabs.litiengine.test.GameTestSuite;
 import de.gurkenlabs.litiengine.tweening.TweenType;
 import de.gurkenlabs.litiengine.util.ColorHelper;
@@ -191,6 +192,35 @@ class GuiComponentTests {
   }
 
   @Test
+  void removingTopmostComponentDuringDispatchDoesNotForwardSameEventToLowerComponent() {
+    TestComponent parent = new TestComponent(0, 0, 200, 200);
+    TestComponent lower = new TestComponent(0, 0, 100, 100);
+    TestComponent upper = new TestComponent(25, 25, 100, 100);
+    parent.getComponents().add(lower);
+    parent.getComponents().add(upper);
+    lower.onMousePressed(event -> lower.setTag("pressed"));
+    upper.onMousePressed(
+      event -> {
+        upper.setTag("pressed");
+        parent.getComponents().remove(upper);
+      });
+    parent.prepare();
+    Mouse mouse = (Mouse) Input.mouse();
+    mouse.setLocation(50, 50);
+
+    try {
+      mouse.mousePressed(createTestEvent(50, 50));
+    } finally {
+      parent.suspend();
+      upper.suspend();
+      mouse.mouseReleased(createTestEvent(50, 50));
+    }
+
+    assertNull(lower.getTag());
+    assertEquals("pressed", upper.getTag());
+  }
+
+  @Test
   void releaseAndClickNotifyOnlyTheirMatchingConsumers() {
     TestComponent component = new TestComponent(0, 0, 100, 100);
     component.setVisible(true);
@@ -199,14 +229,13 @@ class GuiComponentTests {
     component.onClicked(event -> clicks[0]++);
     component.onMouseReleased(event -> releases[0]++);
 
-    MouseEvent event = createTestEvent(50, 50);
-    component.mousePressed(event);
-    component.mouseReleased(event);
+    component.mousePressed(createTestEvent(50, 50));
+    component.mouseReleased(createTestEvent(50, 50));
 
     assertEquals(0, clicks[0]);
     assertEquals(1, releases[0]);
 
-    component.mouseClicked(event);
+    component.mouseClicked(createTestEvent(50, 50));
 
     assertEquals(1, clicks[0]);
     assertEquals(1, releases[0]);
@@ -226,11 +255,10 @@ class GuiComponentTests {
     lowerChild.onClicked(event -> lowerChild.setTag("clicked"));
     upper.onClicked(event -> upper.setTag("clicked"));
 
-    MouseEvent overlap = createTestEvent(50, 50);
-    lowerChild.mousePressed(overlap);
-    lowerChild.mouseClicked(overlap);
-    upper.mousePressed(overlap);
-    upper.mouseClicked(overlap);
+    lowerChild.mousePressed(createTestEvent(50, 50));
+    lowerChild.mouseClicked(createTestEvent(50, 50));
+    upper.mousePressed(createTestEvent(50, 50));
+    upper.mouseClicked(createTestEvent(50, 50));
 
     assertNull(lowerChild.getTag());
     assertEquals("clicked", upper.getTag());

@@ -568,6 +568,7 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     if (this.clickPending) {
       final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
       getClickConsumer().forEach(consumer -> consumer.accept(event));
@@ -582,6 +583,7 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     getMouseDraggedConsumer().forEach(consumer -> consumer.accept(event));
   }
@@ -597,6 +599,7 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     this.isHovered = true;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     getHoverConsumer().forEach(consumer -> consumer.accept(event));
@@ -633,6 +636,8 @@ public abstract class GuiComponent
     // before
     if (!isHovered()) {
       mouseEntered(e);
+    } else {
+      e.consume();
     }
 
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
@@ -645,6 +650,7 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     this.isPressed = true;
     this.clickPending = true;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
@@ -659,6 +665,7 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     this.isPressed = false;
 
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
@@ -672,6 +679,7 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     getMouseWheelConsumer().forEach(
       consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
   }
@@ -1536,6 +1544,7 @@ public abstract class GuiComponent
       && !isSuspended()
       && isVisibleInHierarchy()
       && e != null
+      && !e.isConsumed()
       && getBoundingBox().contains(e.getPoint());
   }
 
