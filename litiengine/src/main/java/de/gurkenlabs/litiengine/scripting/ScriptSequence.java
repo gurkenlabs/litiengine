@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/** A cancellable ordered sequence of delayed actions owned by a script context. */
+/// A cancellable ordered sequence of delayed actions owned by a script context.
 public final class ScriptSequence implements Subscription {
   private final ScriptContext<?> context;
   private final List<Step> steps = new ArrayList<>();
@@ -37,7 +37,7 @@ public final class ScriptSequence implements Subscription {
     return this;
   }
 
-  /** Schedules a camera pan to a given map location. */
+  /// Schedules a camera pan to a given map location.
   public ScriptSequence cameraPanTo(Point2D target, int durationTicks) {
     Objects.requireNonNull(target, "Target location must not be null.");
     return this.then(() -> {
@@ -47,7 +47,7 @@ public final class ScriptSequence implements Subscription {
     });
   }
 
-  /** Schedules a camera pan to center on a target entity. */
+  /// Schedules a camera pan to center on a target entity.
   public ScriptSequence cameraPanTo(IEntity target, int durationTicks) {
     Objects.requireNonNull(target, "Target entity must not be null.");
     return this.then(() -> {
@@ -57,7 +57,7 @@ public final class ScriptSequence implements Subscription {
     });
   }
 
-  /** Schedules a smooth camera zoom transition. */
+  /// Schedules a smooth camera zoom transition.
   public ScriptSequence cameraZoom(float targetZoom, int delayMs) {
     return this.then(() -> {
       if (Game.world().camera() != null) {
@@ -66,7 +66,7 @@ public final class ScriptSequence implements Subscription {
     });
   }
 
-  /** Schedules a screen shake effect. */
+  /// Schedules a screen shake effect.
   public ScriptSequence screenShake(double intensity, int delayMs, int durationTicks) {
     return this.then(() -> {
       if (Game.world().camera() != null) {
@@ -75,7 +75,7 @@ public final class ScriptSequence implements Subscription {
     });
   }
 
-  /** Schedules playing a sound effect by resource name. */
+  /// Schedules playing a sound effect by resource name.
   public ScriptSequence playSound(String soundName) {
     Objects.requireNonNull(soundName, "Sound name must not be null.");
     return this.then(() -> {
@@ -86,7 +86,7 @@ public final class ScriptSequence implements Subscription {
     });
   }
 
-  /** Schedules playing a sound effect. */
+  /// Schedules playing a sound effect.
   public ScriptSequence playSound(Sound sound) {
     Objects.requireNonNull(sound, "Sound must not be null.");
     return this.then(() -> Game.audio().playSound(sound));

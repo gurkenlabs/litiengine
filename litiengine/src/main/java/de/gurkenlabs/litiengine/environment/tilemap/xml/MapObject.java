@@ -76,30 +76,23 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   private transient MapObjectLayer layer;
 
-  /**
-   * Instantiates a new {@code MapObject} instance.
-   */
+  /// Instantiates a new `MapObject` instance.
   public MapObject() {}
 
-  /**
-   * Instantiates a new {@code MapObject} instance.
-   *
-   * @param type
-   *          The type of this map object.
-   */
+  /// Instantiates a new `MapObject` instance.
+  ///
+  /// @param type
+  /// The type of this map object.
   public MapObject(String type) {
     this.type = type;
   }
 
-  /**
-   * Instantiates a new {@code MapObject} instance by copying the specified original instance.
-   * <p>
-   * This variant of the constructor will assign an entirely new ID to the newly created MapObject.
-   * </p>
-   *
-   * @param original
-   *          the MapObject we want to copy
-   */
+  /// Instantiates a new `MapObject` instance by copying the specified original instance.
+  ///
+  /// This variant of the constructor will assign an entirely new ID to the newly created MapObject.
+  ///
+  /// @param original
+  /// the MapObject we want to copy
   public MapObject(MapObject original) {
     this(original, Game.world().environment().getNextMapId(), true);
   }
@@ -122,30 +115,25 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     this.point = original.point;
   }
 
-  /**
-   * Instantiates a new {@code MapObject} instance by copying the specified original instance.
-   * <p>
-   * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get
-   * a new ID.
-   * </p>
-   *
-   * @param original
-   *          the MapObject we want to copy
-   * @param keepID
-   *          decide if the new instance will adopt the old MapObject's ID or get a new, unique one.
-   */
+  /// Instantiates a new `MapObject` instance by copying the specified original instance.
+  ///
+  /// This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get
+  /// a new ID.
+  ///
+  /// @param original
+  /// the MapObject we want to copy
+  /// @param keepID
+  /// decide if the new instance will adopt the old MapObject's ID or get a new, unique one.
   public MapObject(MapObject original, boolean keepID) {
     this(original, keepID ? original.getId() : Game.world().environment().getNextMapId(), true);
   }
 
-  /**
-   * Instantiates a new {@code MapObject} instance by copying the specified original instance.
-   *
-   * @param original
-   *          the MapObject we want to copy
-   * @param id
-   *          The id of this instance.
-   */
+  /// Instantiates a new `MapObject` instance by copying the specified original instance.
+  ///
+  /// @param original
+  /// the MapObject we want to copy
+  /// @param id
+  /// The id of this instance.
   public MapObject(MapObject original, int id) {
     this(original, id, true);
   }
@@ -204,11 +192,9 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return this.name;
   }
 
-  /**
-   * Gets the type.
-   *
-   * @return the type
-   */
+  /// Gets the type.
+  ///
+  /// @return the type
   @Override
   public String getType() {
     return this.type;

@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.sound;
 import de.gurkenlabs.litiengine.Game;
 import javax.sound.sampled.LineUnavailableException;
 
-/** A {@code SoundPlayback} implementation for the playback music. */
+/// A `SoundPlayback` implementation for the playback music.
 public class MusicPlayback extends SoundPlayback {
   private final Track track;
   private final VolumeControl musicVolume;

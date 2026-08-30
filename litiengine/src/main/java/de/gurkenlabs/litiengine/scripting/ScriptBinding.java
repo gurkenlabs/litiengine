@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Configures one script attachment to a game, environment, or entity. */
+/// Configures one script attachment to a game, environment, or entity.
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class ScriptBinding {
   @XmlAttribute(required = true) private String script;
@@ -30,7 +30,7 @@ public final class ScriptBinding {
     this.enabled = enabled;
   }
 
-  /** Creates an independent copy suitable for controller ownership. */
+  /// Creates an independent copy suitable for controller ownership.
   public ScriptBinding(ScriptBinding binding) {
     this.script = binding.script;
     this.enabled = binding.enabled;

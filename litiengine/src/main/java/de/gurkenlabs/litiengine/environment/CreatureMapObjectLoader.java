@@ -32,31 +32,22 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     super(MapObjectType.CREATURE);
   }
 
-  /**
-   * <p>
-   * Registers a custom {@link Creature} implementation that can be automatically provided by this
-   * {@link MapObjectLoader}.
-   * </p>
-   *
-   * <p>
-   * <b>This should only be used if the particular implementation doesn't require any additional map object properties to
-   * be initialized.</b>
-   * </p>
-   * <p>
-   * Make sure that the implementation has the following present:
-   * <ol>
-   * <li>An {@link AnimationInfo} annotation with one or more sprite prefixes defined</li>
-   * <li>Either an empty constructor or a constructor that takes in the sprite prefix from the loader.</li>
-   * </ol>
-   *
-   * <p>
-   * The latter is particularly useful for classes that can have different sprite sheets, i.e. share the same logic but
-   * might have a different appearance.
-   * </p>
-   *
-   * @param <T>          The type of the custom creature implementation.
-   * @param creatureType The class of the custom {@link Creature} implementation.
-   */
+  /// Registers a custom [Creature] implementation that can be automatically provided by this
+  /// [MapObjectLoader].
+  ///
+  /// **This should only be used if the particular implementation doesn't require any additional map object properties to
+  /// be initialized.**
+  ///
+  /// Make sure that the implementation has the following present:
+  ///
+  /// 1. An [AnimationInfo] annotation with one or more sprite prefixes defined
+  /// 2. Either an empty constructor or a constructor that takes in the sprite prefix from the loader.
+  ///
+  /// The latter is particularly useful for classes that can have different sprite sheets, i.e. share the same logic but
+  /// might have a different appearance.
+  ///
+  /// @param <T>          The type of the custom creature implementation.
+  /// @param creatureType The class of the custom [Creature] implementation.
   public static <T extends Creature> void registerCustomCreatureType(Class<T> creatureType) {
     customCreatureType.add(creatureType);
   }

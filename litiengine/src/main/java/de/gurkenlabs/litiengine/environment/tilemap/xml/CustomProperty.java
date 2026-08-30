@@ -7,67 +7,53 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Objects;
 
-/**
- * The {@code CustomProperty} class is an implementation of the {@link ICustomProperty} interface.
- *
- * <p>This class provides functionality for managing custom properties with various data types,
- * including methods for setting and retrieving property values, handling property types, and supporting XML serialization and deserialization.
- */
+/// The `CustomProperty` class is an implementation of the [ICustomProperty] interface.
+///
+/// This class provides functionality for managing custom properties with various data types,
+/// including methods for setting and retrieving property values, handling property types, and supporting XML serialization and deserialization.
 public class CustomProperty implements ICustomProperty {
 
   private String type;
   private String value;
   private URL location;
 
-  /**
-   * Instantiates a new {@code CustomProperty} instance.
-   *
-   * <p>
-   * The default type for a custom property is {@code string} if not explicitly specified.
-   * </p>
-   */
+  /// Instantiates a new `CustomProperty` instance.
+  ///
+  /// The default type for a custom property is `string` if not explicitly specified.
   public CustomProperty() {
     this.type = CustomPropertyType.STRING;
     this.value = "";
   }
 
-  /**
-   * Instantiates a new {@code CustomProperty} instance.
-   *
-   * @param value The value of this custom property.
-   */
+  /// Instantiates a new `CustomProperty` instance.
+  ///
+  /// @param value The value of this custom property.
   public CustomProperty(String value) {
     this.type = CustomPropertyType.STRING;
     this.value = Objects.requireNonNull(value);
   }
 
-  /**
-   * Instantiates a new {@code CustomProperty} instance.
-   *
-   * @param type  The type of this custom property.
-   * @param value The value of this custom property.
-   */
+  /// Instantiates a new `CustomProperty` instance.
+  ///
+  /// @param type  The type of this custom property.
+  /// @param value The value of this custom property.
   public CustomProperty(String type, String value) {
     this.type = Objects.requireNonNull(type);
     this.value = Objects.requireNonNull(value);
   }
 
-  /**
-   * Instantiates a new {@code CustomProperty} instance.
-   *
-   * @param location The location of the file represented by this custom property.
-   */
+  /// Instantiates a new `CustomProperty` instance.
+  ///
+  /// @param location The location of the file represented by this custom property.
   public CustomProperty(URL location) {
     this.type = CustomPropertyType.FILE;
     this.value = location.toExternalForm();
     this.location = location;
   }
 
-  /**
-   * Instantiates a new {@code CustomProperty} instance by copying from the specified instance.
-   *
-   * @param propertyToBeCopied The property to be copied.
-   */
+  /// Instantiates a new `CustomProperty` instance by copying from the specified instance.
+  ///
+  /// @param propertyToBeCopied The property to be copied.
   public CustomProperty(ICustomProperty propertyToBeCopied) {
     this.type = propertyToBeCopied.getType();
     this.value = propertyToBeCopied.getAsString();

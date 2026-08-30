@@ -15,32 +15,24 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-/**
- * This class represents the ambient light in an environment. It extends the ColorLayer class and provides methods to render light sources and
- * shadows.
- */
+/// This class represents the ambient light in an environment. It extends the ColorLayer class and provides methods to render light sources and
+/// shadows.
 public class AmbientLight extends ColorLayer {
-  /**
-   * The default color for the ambient light.
-   */
+  /// The default color for the ambient light.
   public static final Color DEFAULT_COLOR = new Color(0, 0, 0, 0);
 
-  /**
-   * Constructor for the AmbientLight class.
-   *
-   * @param environment  The environment to which this instance is assigned.
-   * @param ambientColor The color of this instance.
-   */
+  /// Constructor for the AmbientLight class.
+  ///
+  /// @param environment  The environment to which this instance is assigned.
+  /// @param ambientColor The color of this instance.
   public AmbientLight(final Environment environment, final Color ambientColor) {
     super(environment, ambientColor);
   }
 
-  /**
-   * Renders a section of the environment with the ambient light and light sources.
-   *
-   * @param g       The Graphics2D object to render on.
-   * @param section The section of the environment to render.
-   */
+  /// Renders a section of the environment with the ambient light and light sources.
+  ///
+  /// @param g       The Graphics2D object to render on.
+  /// @param section The section of the environment to render.
   @Override
   protected void renderSection(Graphics2D g, Rectangle2D section) {
     renderAmbient(g, section);
@@ -51,12 +43,10 @@ public class AmbientLight extends ColorLayer {
     getEnvironment().getLightSources().forEach(light -> renderActualLight(g, light, section));
   }
 
-  /**
-   * Clears a section of the environment.
-   *
-   * @param g       The Graphics2D object to clear on.
-   * @param section The section of the environment to clear.
-   */
+  /// Clears a section of the environment.
+  ///
+  /// @param g       The Graphics2D object to clear on.
+  /// @param section The section of the environment to clear.
   @Override
   protected void clearSection(Graphics2D g, Rectangle2D section) {
     g.setColor(new Color(0, 0, 0, 0));
@@ -67,13 +57,11 @@ public class AmbientLight extends ColorLayer {
       (int) section.getHeight());
   }
 
-  /**
-   * Carves out a light source from the ambient light.
-   *
-   * @param g       The Graphics2D object to carve on.
-   * @param light   The light source to carve out.
-   * @param section The section of the environment to carve from.
-   */
+  /// Carves out a light source from the ambient light.
+  ///
+  /// @param g       The Graphics2D object to carve on.
+  /// @param light   The light source to carve out.
+  /// @param section The section of the environment to carve from.
   private void carveOutLight(Graphics2D g, LightSource light, Rectangle2D section) {
     if (!light.getBoundingBox().intersects(section) || !light.isActive()) {
       return;
@@ -81,13 +69,11 @@ public class AmbientLight extends ColorLayer {
     renderLightSource(g, light, section);
   }
 
-  /**
-   * Renders an actual light source on the environment.
-   *
-   * @param g       The Graphics2D object to render on.
-   * @param light   The light source to render.
-   * @param section The section of the environment to render on.
-   */
+  /// Renders an actual light source on the environment.
+  ///
+  /// @param g       The Graphics2D object to render on.
+  /// @param light   The light source to render.
+  /// @param section The section of the environment to render on.
   private void renderActualLight(Graphics2D g, LightSource light, Rectangle2D section) {
     if (!light.getBoundingBox().intersects(section)
       || !light.isActive()
@@ -100,24 +86,20 @@ public class AmbientLight extends ColorLayer {
     renderLightSource(g, light, section);
   }
 
-  /**
-   * Renders the ambient light on the environment.
-   *
-   * @param g       The Graphics2D object to render on.
-   * @param section The section of the environment to render.
-   */
+  /// Renders the ambient light on the environment.
+  ///
+  /// @param g       The Graphics2D object to render on.
+  /// @param section The section of the environment to render.
   private void renderAmbient(Graphics2D g, Rectangle2D section) {
     g.setColor(getColor());
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1));
     ShapeRenderer.render(g, section);
   }
 
-  /**
-   * Subtracts a shadow from a light area.
-   *
-   * @param lightArea The light area to subtract from.
-   * @param shadow    The shadow to subtract.
-   */
+  /// Subtracts a shadow from a light area.
+  ///
+  /// @param lightArea The light area to subtract from.
+  /// @param shadow    The shadow to subtract.
   private void subtractShadow(Area lightArea, StaticShadow shadow) {
     if (!lightArea.intersects(shadow.getBoundingBox())) {
       return;
@@ -163,13 +145,11 @@ public class AmbientLight extends ColorLayer {
     }
   }
 
-  /**
-   * Renders a light source on the environment.
-   *
-   * @param g       The Graphics2D object to render on.
-   * @param light   The light source to render.
-   * @param section The section of the environment to render on.
-   */
+  /// Renders a light source on the environment.
+  ///
+  /// @param g       The Graphics2D object to render on.
+  /// @param light   The light source to render.
+  /// @param section The section of the environment to render on.
   private void renderLightSource(final Graphics2D g, final LightSource light, Rectangle2D section) {
 
     Area lightArea = new Area(light.getLightShape());

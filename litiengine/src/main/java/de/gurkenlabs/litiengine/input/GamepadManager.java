@@ -13,16 +13,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The {@code GamepadManager} provides access to all gamepad input devices.
- *
- * <p>
- * Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and will auto-detect any
- * added/removed gamepads.
- *
- * @see #current()
- * @see #get(int)
- */
+/// The `GamepadManager` provides access to all gamepad input devices.
+///
+/// Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and will auto-detect any
+/// added/removed gamepads.
+///
+/// @see #current()
+/// @see #get(int)
 public final class GamepadManager extends GamepadEvents {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
 
@@ -88,72 +85,58 @@ public final class GamepadManager extends GamepadEvents {
     }
   }
 
-  /**
-   * Adds the specified gamepad added listener to receive events when gamepads are added.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified gamepad added listener to receive events when gamepads are added.
+  ///
+  /// @param listener The listener to add.
   public void onAdded(final GamepadAddedListener listener) {
     this.gamepadAddedConsumer.add(listener);
   }
 
-  /**
-   * Unregister the specified added listener from this instance.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Unregister the specified added listener from this instance.
+  ///
+  /// @param listener The listener to remove.
   public void removeAddedListener(GamepadAddedListener listener) {
     this.gamepadAddedConsumer.remove(listener);
   }
 
-  /**
-   * Adds the specified gamepad removed listener to receive events when gamepads are removed.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified gamepad removed listener to receive events when gamepads are removed.
+  ///
+  /// @param listener The listener to add.
   public void onRemoved(final GamepadRemovedListener listener) {
     this.gamepadRemovedConsumer.add(listener);
   }
 
-  /**
-   * Unregister the specified removed listener from this instance.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Unregister the specified removed listener from this instance.
+  ///
+  /// @param listener The listener to remove.
   public void removeRemovedListener(GamepadRemovedListener listener) {
     this.gamepadRemovedConsumer.remove(listener);
   }
 
-  /**
-   * Gets all gamepads that are currently available.
-   *
-   * @return All available gamepads.
-   * @see #get(int)
-   * @see #current()
-   */
+  /// Gets all gamepads that are currently available.
+  ///
+  /// @return All available gamepads.
+  /// @see #get(int)
+  /// @see #current()
   public List<Gamepad> getAll() {
     return this.gamePads;
   }
 
-  /**
-   * Gets the first gamepad that is currently available.
-   *
-   * @return The first available {@link Gamepad} instance
-   * @see #get(int)
-   * @see #getAll()
-   */
+  /// Gets the first gamepad that is currently available.
+  ///
+  /// @return The first available [Gamepad] instance
+  /// @see #get(int)
+  /// @see #getAll()
   public Gamepad current() {
     return get(0);
   }
 
-  /**
-   * Gets the gamepad by the index within the gamepad list.
-   *
-   * @param index The index of the {@link Gamepad}.
-   * @return The {@link Gamepad} with the specified index.
-   * @see #getAll()
-   * @see #current()
-   */
+  /// Gets the gamepad by the index within the gamepad list.
+  ///
+  /// @param index The index of the [Gamepad].
+  /// @return The [Gamepad] with the specified index.
+  /// @see #getAll()
+  /// @see #current()
   public Gamepad get(final int index) {
     if (this.gamePads.isEmpty()) {
       return null;
@@ -162,15 +145,13 @@ public final class GamepadManager extends GamepadEvents {
     return this.gamePads.get(index);
   }
 
-  /**
-   * Gets the gamepad with the specified id if it is still plugged in. After re-plugging a controller while the game is
-   * running, its id might change.
-   *
-   * @param id The id of the {@link Gamepad}.
-   * @return The {@link Gamepad} with the specified index.
-   * @see #getAll()
-   * @see #current()
-   */
+  /// Gets the gamepad with the specified id if it is still plugged in. After re-plugging a controller while the game is
+  /// running, its id might change.
+  ///
+  /// @param id The id of the [Gamepad].
+  /// @return The [Gamepad] with the specified index.
+  /// @see #getAll()
+  /// @see #current()
   public Gamepad getById(final String id) {
     for (final Gamepad gamepad : this.gamePads) {
       if (gamepad.getId().equals(id)) {
@@ -372,33 +353,25 @@ public final class GamepadManager extends GamepadEvents {
     }
   }
 
-  /**
-   * This listener interface receives events when gamepads gets added.
-   *
-   * @see GamepadManager#onAdded(GamepadAddedListener)
-   */
+  /// This listener interface receives events when gamepads gets added.
+  ///
+  /// @see GamepadManager#onAdded(GamepadAddedListener)
   @FunctionalInterface
   public interface GamepadAddedListener extends EventListener {
-    /**
-     * Invoked when a gamepad was added.
-     *
-     * @param gamepad The added gamepad.
-     */
+    /// Invoked when a gamepad was added.
+    ///
+    /// @param gamepad The added gamepad.
     void added(Gamepad gamepad);
   }
 
-  /**
-   * This listener interface receives events when gamepads gets removed.
-   *
-   * @see GamepadManager#onAdded(GamepadAddedListener)
-   */
+  /// This listener interface receives events when gamepads gets removed.
+  ///
+  /// @see GamepadManager#onAdded(GamepadAddedListener)
   @FunctionalInterface
   public interface GamepadRemovedListener extends EventListener {
-    /**
-     * Invoked when a gamepad was removed.
-     *
-     * @param gamepad The removed gamepad.
-     */
+    /// Invoked when a gamepad was removed.
+    ///
+    /// @param gamepad The removed gamepad.
     void removed(Gamepad gamepad);
   }
 }

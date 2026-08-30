@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/** Describes a reusable script source and its implementation class. */
+/// Describes a reusable script source and its implementation class.
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class ScriptDefinition {
   @XmlAttribute(required = true) private String id;
@@ -28,7 +28,7 @@ public final class ScriptDefinition {
     this.host = host;
   }
 
-  /** Creates an independent snapshot of another definition. */
+  /// Creates an independent snapshot of another definition.
   public ScriptDefinition(ScriptDefinition definition) {
     this(
       definition.id,

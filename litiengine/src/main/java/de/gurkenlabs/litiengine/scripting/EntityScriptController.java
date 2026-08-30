@@ -12,14 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Owns the script bindings of an entity and maps them onto the regular entity-controller lifecycle.
- *
- * <p>The controller is attached by the environment before {@link IEntity#loaded(Environment)} is fired. Script
- * instances are therefore created from the entity's loaded event, after its current environment is available.
- */
+/// Owns the script bindings of an entity and maps them onto the regular entity-controller lifecycle.
+///
+/// The controller is attached by the environment before [IEntity#loaded(Environment)] is fired. Script
+/// instances are therefore created from the entity's loaded event, after its current environment is available.
 public final class EntityScriptController<T extends IEntity> implements IEntityController {
-  /** Entity scripts are behavior orchestration and run after default movement controllers. */
+  /// Entity scripts are behavior orchestration and run after default movement controllers.
   public static final int SCRIPT_UPDATE_PRIORITY = 100;
   private final T entity;
   private final EntityListener lifecycleListener;
@@ -82,12 +80,12 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
     return this.bindings;
   }
 
-  /** Returns only bindings explicitly configured on this entity. */
+  /// Returns only bindings explicitly configured on this entity.
   public List<ScriptBinding> getExplicitBindings() {
     return this.explicitBindings;
   }
 
-  /** Replaces the ordered bindings and restarts this controller if it is active. */
+  /// Replaces the ordered bindings and restarts this controller if it is active.
   public void setBindings(Collection<ScriptBinding> bindings) {
     boolean restart = this.scriptsAttached;
     if (restart) this.detachScripts();
@@ -96,7 +94,7 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
     if (restart && this.controllerAttached && this.entity.isLoaded()) this.attachScripts();
   }
 
-  /** Replaces inherited type-level bindings while retaining per-entity overrides. */
+  /// Replaces inherited type-level bindings while retaining per-entity overrides.
   public void setDefaultBindings(Collection<ScriptBinding> bindings) {
     boolean restart = this.scriptsAttached;
     if (restart) this.detachScripts();

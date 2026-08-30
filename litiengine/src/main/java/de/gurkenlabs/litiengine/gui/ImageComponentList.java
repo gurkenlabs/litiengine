@@ -5,9 +5,7 @@ import java.awt.Image;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Represents a list of image components in a GUI. This class provides functionality to manage and display a list of image components.
- */
+/// Represents a list of image components in a GUI. This class provides functionality to manage and display a list of image components.
 public class ImageComponentList extends GuiComponent {
 
   private final Spritesheet background;
@@ -52,47 +50,37 @@ public class ImageComponentList extends GuiComponent {
     }
   }
 
-  /**
-   * Gets the background spritesheet of the image component list.
-   *
-   * @return The background spritesheet.
-   */
+  /// Gets the background spritesheet of the image component list.
+  ///
+  /// @return The background spritesheet.
   public Spritesheet getBackground() {
     return this.background;
   }
 
-  /**
-   * Gets the list of image components (cells) in the image component list.
-   *
-   * @return The list of image components.
-   */
+  /// Gets the list of image components (cells) in the image component list.
+  ///
+  /// @return The list of image components.
   public List<ImageComponent> getCellComponents() {
     return this.cells;
   }
 
-  /**
-   * Gets the number of columns in the image component list.
-   *
-   * @return The number of columns.
-   */
+  /// Gets the number of columns in the image component list.
+  ///
+  /// @return The number of columns.
   public int getColumns() {
     return this.columns;
   }
 
-  /**
-   * Gets the list of images in the image component list.
-   *
-   * @return The list of images.
-   */
+  /// Gets the list of images in the image component list.
+  ///
+  /// @return The list of images.
   public List<Image> getImages() {
     return this.images;
   }
 
-  /**
-   * Gets the number of rows in the image component list.
-   *
-   * @return The number of rows.
-   */
+  /// Gets the number of rows in the image component list.
+  ///
+  /// @return The number of rows.
   public int getRows() {
     return this.rows;
   }
@@ -125,72 +113,58 @@ public class ImageComponentList extends GuiComponent {
     super.prepare();
   }
 
-  /**
-   * Gets the height of each row in the image component list.
-   *
-   * @return The height of each row.
-   */
+  /// Gets the height of each row in the image component list.
+  ///
+  /// @return The height of each row.
   public double getRowHeight() {
     return this.rowHeight;
   }
 
-  /**
-   * Sets the height of each row in the image component list.
-   *
-   * @param rowHeight The height to set for each row.
-   */
+  /// Sets the height of each row in the image component list.
+  ///
+  /// @param rowHeight The height to set for each row.
   public void setRowHeight(double rowHeight) {
     this.rowHeight = rowHeight;
   }
 
-  /**
-   * Gets the width of each column in the image component list.
-   *
-   * @return The width of each column.
-   */
+  /// Gets the width of each column in the image component list.
+  ///
+  /// @return The width of each column.
   public double getColumnWidth() {
     return this.columnWidth;
   }
 
-  /**
-   * Sets the width of each column in the image component list.
-   *
-   * @param columnWidth The width to set for each column.
-   */
+  /// Sets the width of each column in the image component list.
+  ///
+  /// @param columnWidth The width to set for each column.
   public void setColumnWidth(double columnWidth) {
     this.columnWidth = columnWidth;
   }
 
-  /**
-   * Sets the horizontal offset for the image component list.
-   *
-   * @param xOffset The horizontal offset to set.
-   */
+  /// Sets the horizontal offset for the image component list.
+  ///
+  /// @param xOffset The horizontal offset to set.
   public void setXOffset(final double xOffset) {
     this.xOffset = xOffset;
   }
 
-  /**
-   * Sets the vertical offset for the image component list.
-   *
-   * @param yOffset The vertical offset to set.
-   */
+  /// Sets the vertical offset for the image component list.
+  ///
+  /// @param yOffset The vertical offset to set.
   public void setYOffset(final double yOffset) {
     this.yOffset = yOffset;
   }
 
-  /**
-   * Creates a new image component entry.
-   *
-   * @param x           The x-coordinate of the new entry.
-   * @param y           The y-coordinate of the new entry.
-   * @param width       The width of the new entry.
-   * @param height      The height of the new entry.
-   * @param spritesheet The spritesheet to be used for the new entry.
-   * @param text        The text to be displayed on the new entry.
-   * @param image       The image to be displayed on the new entry.
-   * @return The newly created image component.
-   */
+  /// Creates a new image component entry.
+  ///
+  /// @param x           The x-coordinate of the new entry.
+  /// @param y           The y-coordinate of the new entry.
+  /// @param width       The width of the new entry.
+  /// @param height      The height of the new entry.
+  /// @param spritesheet The spritesheet to be used for the new entry.
+  /// @param text        The text to be displayed on the new entry.
+  /// @param image       The image to be displayed on the new entry.
+  /// @return The newly created image component.
   protected ImageComponent createNewEntry(final double x, final double y, final double width, final double height, final Spritesheet spritesheet,
     final String text, final Image image) {
     return new ImageComponent(x, y, width, height, spritesheet, text, image);

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** MPEG-1 Layer III Huffman codebooks from ISO/IEC 11172-3, Annex B. */
+/// MPEG-1 Layer III Huffman codebooks from ISO/IEC 11172-3, Annex B.
 final class HuffmanCode {
   private static final int MAX_DEPTH = 32;
   private static final int TREE_JUMP = 250;

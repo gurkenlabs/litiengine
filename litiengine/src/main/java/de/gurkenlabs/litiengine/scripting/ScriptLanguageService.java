@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Editor-independent semantic tooling for a scripting language.
- *
- * <p>Implementations analyze source text only and must never execute a script. Positions are
- * zero-based so the API maps directly to editor and language-server protocols.
- */
+/// Editor-independent semantic tooling for a scripting language.
+///
+/// Implementations analyze source text only and must never execute a script. Positions are
+/// zero-based so the API maps directly to editor and language-server protocols.
 public interface ScriptLanguageService extends AutoCloseable {
   Analysis analyze(Document document);
 

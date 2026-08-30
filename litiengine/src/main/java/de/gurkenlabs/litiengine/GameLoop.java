@@ -9,24 +9,19 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Keyboard;
 import de.gurkenlabs.litiengine.input.Mouse;
 
-/**
- * The main update loop that executes the game logic by calling the update functions on all registered
- * {@code IUpdatable} instances. Subsequently, it performs the rendering of the current frame and tracks some
- * performance metrics on the process.
- *
- * @see IUpdateable#update()
- * @see Game#loop()
- * @see RenderComponent#render()
- */
+/// The main update loop that executes the game logic by calling the update functions on all registered
+/// `IUpdatable` instances. Subsequently, it performs the rendering of the current frame and tracks some
+/// performance metrics on the process.
+///
+/// @see IUpdateable#update()
+/// @see Game#loop()
+/// @see RenderComponent#render()
 public final class GameLoop extends UpdateLoop implements IGameLoop {
-  /**
-   * The tick {@link #getDeltaTime()} at which we consider the game not to run fluently anymore.
-   * <ul>
-   * <li>16.6 ms: 60 FPS</li>
-   * <li>33.3 ms: 30 FPS</li>
-   * <li>66.6 ms: 15 FPS</li>
-   * </ul>
-   */
+  /// The tick [#getDeltaTime()] at which we consider the game not to run fluently anymore.
+  ///
+  /// - 16.6 ms: 60 FPS
+  /// - 33.3 ms: 30 FPS
+  /// - 66.6 ms: 15 FPS
   public static final int TICK_DELTATIME_LAG = 67;
 
   private static int executionIndex = -1;
@@ -75,10 +70,8 @@ public final class GameLoop extends UpdateLoop implements IGameLoop {
     this.actions.removeIf(x -> x.getId() == id);
   }
 
-  /**
-   * In addition to the normal base implementation, the {@code GameLoop} performs registered action at the required time
-   * and tracks some detailed metrics.
-   */
+  /// In addition to the normal base implementation, the `GameLoop` performs registered action at the required time
+  /// and tracks some detailed metrics.
   @Override
   protected void process() {
     this.updateInvariableEngineComponents();

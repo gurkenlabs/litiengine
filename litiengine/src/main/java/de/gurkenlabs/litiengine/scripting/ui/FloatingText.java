@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Point2D;
 
-/** Represents a transient floating text item displayed in the game world. */
+/// Represents a transient floating text item displayed in the game world.
 public final class FloatingText {
   private final String text;
   private final Point2D location;

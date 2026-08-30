@@ -33,13 +33,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Represents an emitter that provides particle effects in the game.
- *
- * <p>The {@code Emitter} class extends {@link Entity} and implements the
- * {@link IUpdateable}, {@link ITimeToLive}, and {@link IRenderable} interfaces. It manages the lifecycle, rendering, and behavior of particles,
- * allowing for dynamic visual effects.
- */
+/// Represents an emitter that provides particle effects in the game.
+///
+/// The `Emitter` class extends [Entity] and implements the
+/// [IUpdateable], [ITimeToLive], and [IRenderable] interfaces. It manages the lifecycle, rendering, and behavior of particles,
+/// allowing for dynamic visual effects.
 @CollisionInfo(collision = false) @EmitterInfo @TmxType(MapObjectType.EMITTER) public class Emitter extends Entity
   implements IUpdateable, ITimeToLive, IRenderable {
 
@@ -56,13 +54,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
   private long lastSpawn;
   private Point2D origin;
 
-  /**
-   * Constructs a new {@code Emitter} instance.
-   *
-   * <p>Initializes the emitter with default settings, including particle collections,
-   * renderable mappings, and emitter data. If the {@link EmitterInfo} annotation is present on the class, its values are used to configure the
-   * emitter's properties.
-   */
+  /// Constructs a new `Emitter` instance.
+  ///
+  /// Initializes the emitter with default settings, including particle collections,
+  /// renderable mappings, and emitter data. If the [EmitterInfo] annotation is present on the class, its values are used to configure the
+  /// emitter's properties.
   public Emitter() {
     this.finishedListeners = ConcurrentHashMap.newKeySet();
     this.particles = new CopyOnWriteArrayList<>();
@@ -95,108 +91,92 @@ import java.util.concurrent.CopyOnWriteArrayList;
     }
   }
 
-  /**
-   * Constructs a new {@code Emitter} instance with the specified emitter data.
-   *
-   * <p>Initializes the emitter using the provided {@link EmitterAttributes}, which
-   * contains configuration details such as particle type, spawn rate, and emitter duration.
-   *
-   * @param emitterData the data used to configure this emitter
-   */
+  /// Constructs a new `Emitter` instance with the specified emitter data.
+  ///
+  /// Initializes the emitter using the provided [EmitterAttributes], which
+  /// contains configuration details such as particle type, spawn rate, and emitter duration.
+  ///
+  /// @param emitterData the data used to configure this emitter
   public Emitter(EmitterAttributes emitterData) {
     this();
     setEmitterData(emitterData);
   }
 
-  /**
-   * Constructs a new {@code Emitter} instance with the specified origin and emitter data.
-   *
-   * <p>Initializes the emitter at the given origin point and configures it using the provided
-   * {@link EmitterAttributes}, which contains details such as particle type, spawn rate, and emitter duration.
-   *
-   * @param origin      the origin point where the emitter is located
-   * @param emitterData the data used to configure this emitter
-   */
+  /// Constructs a new `Emitter` instance with the specified origin and emitter data.
+  ///
+  /// Initializes the emitter at the given origin point and configures it using the provided
+  /// [EmitterAttributes], which contains details such as particle type, spawn rate, and emitter duration.
+  ///
+  /// @param origin      the origin point where the emitter is located
+  /// @param emitterData the data used to configure this emitter
   public Emitter(final Point2D origin, EmitterAttributes emitterData) {
     this(origin);
     setEmitterData(emitterData);
   }
 
-  /**
-   * Constructs a new {@code Emitter} instance with the specified coordinates and emitter data.
-   *
-   * <p>Initializes the emitter at the given x and y coordinates and configures it using the provided
-   * {@link EmitterAttributes}, which contains details such as particle type, spawn rate, and emitter duration.
-   *
-   * @param x           the x-coordinate of the emitter's origin
-   * @param y           the y-coordinate of the emitter's origin
-   * @param emitterData the data used to configure this emitter
-   */
+  /// Constructs a new `Emitter` instance with the specified coordinates and emitter data.
+  ///
+  /// Initializes the emitter at the given x and y coordinates and configures it using the provided
+  /// [EmitterAttributes], which contains details such as particle type, spawn rate, and emitter duration.
+  ///
+  /// @param x           the x-coordinate of the emitter's origin
+  /// @param y           the y-coordinate of the emitter's origin
+  /// @param emitterData the data used to configure this emitter
   public Emitter(final double x, final double y, EmitterAttributes emitterData) {
     this(x, y);
     setEmitterData(emitterData);
   }
 
-  /**
-   * Constructs a new {@code Emitter} instance with the specified coordinates and emitter XML configuration.
-   *
-   * <p>Initializes the emitter at the given x and y coordinates and configures it using the provided
-   * XML file, which contains emitter settings such as particle type, spawn rate, and emitter duration.
-   *
-   * @param x          the x-coordinate of the emitter's origin
-   * @param y          the y-coordinate of the emitter's origin
-   * @param emitterXml the path to the XML file used to configure this emitter
-   */
+  /// Constructs a new `Emitter` instance with the specified coordinates and emitter XML configuration.
+  ///
+  /// Initializes the emitter at the given x and y coordinates and configures it using the provided
+  /// XML file, which contains emitter settings such as particle type, spawn rate, and emitter duration.
+  ///
+  /// @param x          the x-coordinate of the emitter's origin
+  /// @param y          the y-coordinate of the emitter's origin
+  /// @param emitterXml the path to the XML file used to configure this emitter
   public Emitter(final double x, final double y, final String emitterXml) {
     this(x, y);
     setEmitterData(emitterXml);
   }
 
-  /**
-   * Constructs a new {@code Emitter} instance with the specified origin and emitter XML configuration.
-   *
-   * <p>Initializes the emitter at the given origin point and configures it using the provided
-   * XML file, which contains emitter settings such as particle type, spawn rate, and emitter duration.
-   *
-   * @param origin     the origin point where the emitter is located
-   * @param emitterXml the path to the XML file used to configure this emitter
-   */
+  /// Constructs a new `Emitter` instance with the specified origin and emitter XML configuration.
+  ///
+  /// Initializes the emitter at the given origin point and configures it using the provided
+  /// XML file, which contains emitter settings such as particle type, spawn rate, and emitter duration.
+  ///
+  /// @param origin     the origin point where the emitter is located
+  /// @param emitterXml the path to the XML file used to configure this emitter
   public Emitter(final Point2D origin, final String emitterXml) {
     this(origin);
     setEmitterData(emitterXml);
   }
 
-  /**
-   * Constructs a new {@code Emitter} instance with the specified origin coordinates.
-   *
-   * <p>Initializes the emitter at the given x and y coordinates, represented as a {@link Point2D.Double}.
-   *
-   * @param originX the x-coordinate of the emitter's origin
-   * @param originY the y-coordinate of the emitter's origin
-   */
+  /// Constructs a new `Emitter` instance with the specified origin coordinates.
+  ///
+  /// Initializes the emitter at the given x and y coordinates, represented as a [Point2D.Double].
+  ///
+  /// @param originX the x-coordinate of the emitter's origin
+  /// @param originY the y-coordinate of the emitter's origin
   public Emitter(final double originX, final double originY) {
     this(new Point2D.Double(originX, originY));
   }
 
-  /**
-   * Constructs a new {@code Emitter} instance with the specified origin.
-   *
-   * <p>Initializes the emitter at the given origin point, setting its location
-   * and preparing it for further configuration or activation.
-   *
-   * @param origin the origin point where the emitter is located
-   */
+  /// Constructs a new `Emitter` instance with the specified origin.
+  ///
+  /// Initializes the emitter at the given origin point, setting its location
+  /// and preparing it for further configuration or activation.
+  ///
+  /// @param origin the origin point where the emitter is located
   public Emitter(final Point2D origin) {
     this();
     this.setLocation(origin);
   }
 
-  /**
-   * Activates the emitter.
-   *
-   * <p>Marks the emitter as activated, sets the activation tick to the current game time,
-   * and attaches the emitter to the game loop for updates. If the emitter is already activated, this method does nothing.
-   */
+  /// Activates the emitter.
+  ///
+  /// Marks the emitter as activated, sets the activation tick to the current game time,
+  /// and attaches the emitter to the game loop for updates. If the emitter is already activated, this method does nothing.
   public void activate() {
     if (this.activated) {
       return;
@@ -207,14 +187,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
     Game.loop().attach(this);
   }
 
-  /**
-   * Adds a particle to this emitter's list of particles.
-   *
-   * <p>If the emitter is stopped, this method does nothing. Otherwise, the specified particle
-   * is added to the internal particle collection for rendering and updates.
-   *
-   * @param particle the particle to be added to the emitter
-   */
+  /// Adds a particle to this emitter's list of particles.
+  ///
+  /// If the emitter is stopped, this method does nothing. Otherwise, the specified particle
+  /// is added to the internal particle collection for rendering and updates.
+  ///
+  /// @param particle the particle to be added to the emitter
   public void addParticle(final Particle particle) {
     if (this.isStopped()) {
       return;
@@ -222,13 +200,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
     this.particles.add(particle);
   }
 
-  /**
-   * Deactivates the emitter.
-   *
-   * <p>This method stops the emitter's activity and resets its state. It clears all particles,
-   * resets the alive time, activation tick, and last spawn time, and detaches the emitter from the game loop. If the emitter is not currently
-   * activated, this method does nothing.
-   */
+  /// Deactivates the emitter.
+  ///
+  /// This method stops the emitter's activity and resets its state. It clears all particles,
+  /// resets the alive time, activation tick, and last spawn time, and detaches the emitter from the game loop. If the emitter is not currently
+  /// activated, this method does nothing.
   public void deactivate() {
     if (!this.activated) {
       return;
@@ -242,12 +218,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
     Game.loop().detach(this);
   }
 
-  /**
-   * Deletes this emitter from the game world.
-   *
-   * <p>Deactivates the emitter, clears its particles, and removes it from the current environment
-   * if one exists. This method ensures that the emitter is no longer active or present in the game.
-   */
+  /// Deletes this emitter from the game world.
+  ///
+  /// Deactivates the emitter, clears its particles, and removes it from the current environment
+  /// if one exists. This method ensures that the emitter is no longer active or present in the game.
   public void delete() {
     this.deactivate();
     if (Game.world().environment() != null) {
@@ -256,39 +230,33 @@ import java.util.concurrent.CopyOnWriteArrayList;
   }
 
 
-  /**
-   * Retrieves the total alive time of the emitter.
-   *
-   * <p>This method returns the amount of time, in milliseconds, that the emitter
-   * has been active since its activation.
-   *
-   * @return the alive time of the emitter in milliseconds
-   */
+  /// Retrieves the total alive time of the emitter.
+  ///
+  /// This method returns the amount of time, in milliseconds, that the emitter
+  /// has been active since its activation.
+  ///
+  /// @return the alive time of the emitter in milliseconds
   @Override
   public long getAliveTime() {
     return this.aliveTime;
   }
 
-  /**
-   * Retrieves the emitter data associated with this emitter.
-   *
-   * <p>The emitter data contains configuration details such as particle type,
-   * spawn rate, and other properties that define the emitter's behavior.
-   *
-   * @return the {@link EmitterAttributes} object for this emitter
-   */
+  /// Retrieves the emitter data associated with this emitter.
+  ///
+  /// The emitter data contains configuration details such as particle type,
+  /// spawn rate, and other properties that define the emitter's behavior.
+  ///
+  /// @return the [EmitterAttributes] object for this emitter
   public EmitterAttributes data() {
     return this.emitterData;
   }
 
-  /**
-   * Retrieves the origin point of the emitter.
-   *
-   * <p>If the origin has not been calculated yet, this method updates the origin
-   * based on the emitter's current position and alignment settings.
-   *
-   * @return the origin point of the emitter as a {@link Point2D} object
-   */
+  /// Retrieves the origin point of the emitter.
+  ///
+  /// If the origin has not been calculated yet, this method updates the origin
+  /// based on the emitter's current position and alignment settings.
+  ///
+  /// @return the origin point of the emitter as a [Point2D] object
   public Point2D getOrigin() {
     if (this.origin == null) {
       this.updateOrigin();
@@ -296,12 +264,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
     return this.origin;
   }
 
-  /**
-   * Updates the origin point of the emitter.
-   *
-   * <p>This method recalculates the origin based on the emitter's current position,
-   * width, height, and alignment settings defined in the emitter data.
-   */
+  /// Updates the origin point of the emitter.
+  ///
+  /// This method recalculates the origin based on the emitter's current position,
+  /// width, height, and alignment settings defined in the emitter data.
   protected void updateOrigin() {
     this.origin = new Point2D.Double(
       getX() + data().getOriginAlign().getValue(getWidth()),
@@ -309,15 +275,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
     );
   }
 
-  /**
-   * Retrieves the renderable object associated with the specified render type.
-   *
-   * <p>If the provided render type is {@link RenderType#NONE}, this method returns {@code null}.
-   * Otherwise, it returns the {@link IRenderable} instance mapped to the given render type.
-   *
-   * @param type the render type for which the renderable object is requested
-   * @return the renderable object associated with the specified render type, or {@code null} if the type is {@link RenderType#NONE}
-   */
+  /// Retrieves the renderable object associated with the specified render type.
+  ///
+  /// If the provided render type is [RenderType#NONE], this method returns `null`.
+  /// Otherwise, it returns the [IRenderable] instance mapped to the given render type.
+  ///
+  /// @param type the render type for which the renderable object is requested
+  /// @return the renderable object associated with the specified render type, or `null` if the type is [RenderType#NONE]
   public IRenderable getRenderable(RenderType type) {
     if (type == RenderType.NONE) {
       return null;
@@ -326,119 +290,99 @@ import java.util.concurrent.CopyOnWriteArrayList;
     return this.renderables.get(type);
   }
 
-  /**
-   * Retrieves the list of particles managed by this emitter.
-   *
-   * <p>Returns a list containing all particles currently associated with this emitter.
-   * These particles are used for rendering and updates during the emitter's lifecycle.
-   *
-   * @return a list of particles managed by this emitter
-   */
+  /// Retrieves the list of particles managed by this emitter.
+  ///
+  /// Returns a list containing all particles currently associated with this emitter.
+  /// These particles are used for rendering and updates during the emitter's lifecycle.
+  ///
+  /// @return a list of particles managed by this emitter
   public List<Particle> getParticles() {
     return this.particles;
   }
 
-  /**
-   * Checks if the emitter is set to activate on initialization.
-   *
-   * <p>Returns a boolean indicating whether the emitter should automatically activate
-   * when it is initialized.
-   *
-   * @return {@code true} if the emitter activates on initialization, {@code false} otherwise
-   */
+  /// Checks if the emitter is set to activate on initialization.
+  ///
+  /// Returns a boolean indicating whether the emitter should automatically activate
+  /// when it is initialized.
+  ///
+  /// @return `true` if the emitter activates on initialization, `false` otherwise
   public boolean isActivateOnInit() {
     return this.activateOnInit;
   }
 
-  /**
-   * Checks if the emitter is currently activated.
-   *
-   * <p>Returns a boolean indicating whether the emitter is in an active state.
-   *
-   * @return {@code true} if the emitter is activated, {@code false} otherwise
-   */
+  /// Checks if the emitter is currently activated.
+  ///
+  /// Returns a boolean indicating whether the emitter is in an active state.
+  ///
+  /// @return `true` if the emitter is activated, `false` otherwise
   public boolean isActivated() {
     return this.activated;
   }
 
-  /**
-   * Determines if the emitter has finished its duration.
-   *
-   * <p>This method checks whether the emitter's time-to-live (TTL) is greater than zero
-   * and if the TTL has been reached. If both conditions are true, the emitter is considered finished.
-   *
-   * @return {@code true} if the emitter's duration is complete, {@code false} otherwise
-   */
+  /// Determines if the emitter has finished its duration.
+  ///
+  /// This method checks whether the emitter's time-to-live (TTL) is greater than zero
+  /// and if the TTL has been reached. If both conditions are true, the emitter is considered finished.
+  ///
+  /// @return `true` if the emitter's duration is complete, `false` otherwise
   public boolean isFinished() {
     return this.getTimeToLive() > 0 && this.timeToLiveReached();
   }
 
-  /**
-   * Checks whether the emitter is currently paused.
-   *
-   * <p>Returns a boolean indicating if the emitter is in a paused state.
-   *
-   * @return {@code true} if the emitter is paused, {@code false} otherwise
-   */
+  /// Checks whether the emitter is currently paused.
+  ///
+  /// Returns a boolean indicating if the emitter is in a paused state.
+  ///
+  /// @return `true` if the emitter is paused, `false` otherwise
   public boolean isPaused() {
     return this.paused;
   }
 
-  /**
-   * Sets the paused state of the emitter.
-   *
-   * <p>This method updates the emitter's paused status to the specified value.
-   * When paused, the emitter stops updating its particles and other behaviors.
-   *
-   * @param paused {@code true} to pause the emitter, {@code false} to resume it
-   */
+  /// Sets the paused state of the emitter.
+  ///
+  /// This method updates the emitter's paused status to the specified value.
+  /// When paused, the emitter stops updating its particles and other behaviors.
+  ///
+  /// @param paused `true` to pause the emitter, `false` to resume it
   public void setPaused(final boolean paused) {
     this.paused = paused;
   }
 
-  /**
-   * Checks if the emitter is currently stopped.
-   *
-   * <p>Returns a boolean indicating whether the emitter is in a stopped state.
-   *
-   * @return {@code true} if the emitter is stopped, {@code false} otherwise
-   */
+  /// Checks if the emitter is currently stopped.
+  ///
+  /// Returns a boolean indicating whether the emitter is in a stopped state.
+  ///
+  /// @return `true` if the emitter is stopped, `false` otherwise
   public boolean isStopped() {
     return this.stopped;
   }
 
-  /**
-   * Sets the stopped state of the emitter.
-   *
-   * <p>This method updates the emitter's stopped status to the specified value.
-   * When stopped, the emitter ceases all activity and updates.
-   *
-   * @param stopped {@code true} to stop the emitter, {@code false} to resume it
-   */
+  /// Sets the stopped state of the emitter.
+  ///
+  /// This method updates the emitter's stopped status to the specified value.
+  /// When stopped, the emitter ceases all activity and updates.
+  ///
+  /// @param stopped `true` to stop the emitter, `false` to resume it
   public void setStopped(final boolean stopped) {
     this.stopped = stopped;
   }
 
-  /**
-   * Registers a listener to be notified when the emitter finishes.
-   *
-   * <p>The specified {@link EmitterFinishedListener} is added to the list of listeners
-   * that will be invoked when the emitter completes its lifecycle.
-   *
-   * @param listener the listener to be notified when the emitter finishes
-   */
+  /// Registers a listener to be notified when the emitter finishes.
+  ///
+  /// The specified [EmitterFinishedListener] is added to the list of listeners
+  /// that will be invoked when the emitter completes its lifecycle.
+  ///
+  /// @param listener the listener to be notified when the emitter finishes
   public void onFinished(EmitterFinishedListener listener) {
     this.finishedListeners.add(listener);
   }
 
-  /**
-   * Removes a previously registered finished listener.
-   *
-   * <p>The specified {@link EmitterFinishedListener} is removed from the list of listeners
-   * that are notified when the emitter finishes.
-   *
-   * @param listener the listener to be removed
-   */
+  /// Removes a previously registered finished listener.
+  ///
+  /// The specified [EmitterFinishedListener] is removed from the list of listeners
+  /// that are notified when the emitter finishes.
+  ///
+  /// @param listener the listener to be removed
   public void removeFinishedListener(EmitterFinishedListener listener) {
     this.finishedListeners.remove(listener);
   }
@@ -447,14 +391,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
     this.renderParticles(g, RenderType.NONE);
   }
 
-  /**
-   * Sets the emitter data for this emitter.
-   *
-   * <p>This method updates the emitter's configuration using the provided {@link EmitterAttributes}.
-   * If the provided data is null, the method does nothing.
-   *
-   * @param emitterData the data used to configure this emitter
-   */
+  /// Sets the emitter data for this emitter.
+  ///
+  /// This method updates the emitter's configuration using the provided [EmitterAttributes].
+  /// If the provided data is null, the method does nothing.
+  ///
+  /// @param emitterData the data used to configure this emitter
   public void setEmitterData(final EmitterAttributes emitterData) {
     if (emitterData == null) {
       return;
@@ -462,44 +404,36 @@ import java.util.concurrent.CopyOnWriteArrayList;
     this.emitterData = emitterData;
   }
 
-  /**
-   * Sets the emitter data for this emitter using an XML configuration file.
-   *
-   * <p>This method loads the emitter data from the specified XML file and updates the emitter's
-   * configuration accordingly.
-   *
-   * @param emitterXmlPath the path to the XML file containing the emitter data
-   */
+  /// Sets the emitter data for this emitter using an XML configuration file.
+  ///
+  /// This method loads the emitter data from the specified XML file and updates the emitter's
+  /// configuration accordingly.
+  ///
+  /// @param emitterXmlPath the path to the XML file containing the emitter data
   public void setEmitterData(final String emitterXmlPath) {
     EmitterAttributes loaded = EmitterLoader.load(emitterXmlPath);
     setEmitterData(loaded);
   }
 
-  /**
-   * Time to live reached.
-   *
-   * @return true, if successful
-   */
+  /// Time to live reached.
+  ///
+  /// @return true, if successful
   @Override public boolean timeToLiveReached() {
     return this.activated && this.getTimeToLive() > 0 && this.getAliveTime() >= this.getTimeToLive();
   }
 
-  /**
-   * Toggles the paused state of the emitter.
-   *
-   * <p>This method switches the emitter's paused status between {@code true} and {@code false}.
-   * When paused, the emitter stops updating its particles and other behaviors.
-   */
+  /// Toggles the paused state of the emitter.
+  ///
+  /// This method switches the emitter's paused status between `true` and `false`.
+  /// When paused, the emitter stops updating its particles and other behaviors.
   public void togglePaused() {
     this.paused = !this.paused;
   }
 
-  /**
-   * Toggles the stopped state of the emitter.
-   *
-   * <p>This method switches the emitter's stopped status between {@code true} and {@code false}.
-   * When stopped, the emitter ceases all activity and updates.
-   */
+  /// Toggles the stopped state of the emitter.
+  ///
+  /// This method switches the emitter's stopped status between `true` and `false`.
+  /// When stopped, the emitter ceases all activity and updates.
   public void toggleStopped() {
     this.stopped = !this.stopped;
   }
@@ -544,27 +478,23 @@ import java.util.concurrent.CopyOnWriteArrayList;
   }
 
 
-  /**
-   * Checks if the emitter can accept new particles.
-   *
-   * <p>This method determines whether the current number of particles is less than
-   * the maximum allowed particles as defined in the emitter data configuration.
-   *
-   * @return {@code true} if the emitter can accept new particles, {@code false} otherwise
-   */
+  /// Checks if the emitter can accept new particles.
+  ///
+  /// This method determines whether the current number of particles is less than
+  /// the maximum allowed particles as defined in the emitter data configuration.
+  ///
+  /// @return `true` if the emitter can accept new particles, `false` otherwise
   protected boolean canTakeNewParticles() {
     return this.particles.size() < this.data().getMaxParticles();
   }
 
-  /**
-   * Creates a new particle based on the emitter's configuration.
-   *
-   * <p>This method generates a particle of the type specified in the emitter's data.
-   * The particle's dimensions are determined by the configured width and height. If the particle type is {@code SPRITE}, the method ensures the
-   * spritesheet is valid before creating the particle. If no specific type is defined, a rectangle particle is created by default.
-   *
-   * @return the newly created particle, or {@code null} if the particle type is {@code SPRITE} and the spritesheet is invalid
-   */
+  /// Creates a new particle based on the emitter's configuration.
+  ///
+  /// This method generates a particle of the type specified in the emitter's data.
+  /// The particle's dimensions are determined by the configured width and height. If the particle type is `SPRITE`, the method ensures the
+  /// spritesheet is valid before creating the particle. If no specific type is defined, a rectangle particle is created by default.
+  ///
+  /// @return the newly created particle, or `null` if the particle type is `SPRITE` and the spritesheet is invalid
   protected Particle createNewParticle() {
 
     float width = data().getParticleWidth().getRandomNumber().floatValue();
@@ -600,26 +530,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
     }
   }
 
-  /**
-   * Determines if a particle can be removed from the emitter.
-   *
-   * <p>This method checks whether the specified particle has reached its time-to-live (TTL).
-   * If the particle's TTL is reached, it is considered eligible for removal.
-   *
-   * @param particle the particle to check
-   * @return {@code true} if the particle's TTL is reached, {@code false} otherwise
-   */
+  /// Determines if a particle can be removed from the emitter.
+  ///
+  /// This method checks whether the specified particle has reached its time-to-live (TTL).
+  /// If the particle's TTL is reached, it is considered eligible for removal.
+  ///
+  /// @param particle the particle to check
+  /// @return `true` if the particle's TTL is reached, `false` otherwise
   protected boolean particleCanBeRemoved(final Particle particle) {
     return particle.timeToLiveReached();
   }
 
-  /**
-   * Spawns new particles for the emitter.
-   *
-   * <p>This method generates a number of particles based on the emitter's spawn amount
-   * configuration. It ensures that the emitter does not exceed its maximum allowed particles. If a new particle is successfully created, it is added
-   * to the emitter's particle list.
-   */
+  /// Spawns new particles for the emitter.
+  ///
+  /// This method generates a number of particles based on the emitter's spawn amount
+  /// configuration. It ensures that the emitter does not exceed its maximum allowed particles. If a new particle is successfully created, it is added
+  /// to the emitter's particle list.
   protected void spawnParticle() {
     for (short i = 0; i < this.data().getSpawnAmount(); i++) {
       if (!this.canTakeNewParticles()) {
@@ -633,13 +559,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
     }
   }
 
-  /**
-   * Render particles of this effect. The particles are always rendered relatively to this effects render location. A particle doesn't have an own map
-   * location. It is always relative to the effect it is assigned to.
-   *
-   * @param g          The graphics object to draw on.
-   * @param renderType The render type.
-   */
+  /// Render particles of this effect. The particles are always rendered relatively to this effects render location. A particle doesn't have an own map
+  /// location. It is always relative to the effect it is assigned to.
+  ///
+  /// @param g          The graphics object to draw on.
+  /// @param renderType The render type.
   private void renderParticles(final Graphics2D g, final RenderType renderType) {
     if (Game.config().graphics().getGraphicQuality().getValue() < this.data().getRequiredQuality().getValue()) {
       return;
@@ -654,19 +578,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
     }
   }
 
-  /**
-   * Listener interface for handling emitter completion events.
-   *
-   * <p>Implementations of this interface can be registered to an emitter to be notified
-   * when the emitter finishes its lifecycle.
-   */
+  /// Listener interface for handling emitter completion events.
+  ///
+  /// Implementations of this interface can be registered to an emitter to be notified
+  /// when the emitter finishes its lifecycle.
   @FunctionalInterface public interface EmitterFinishedListener extends EventListener {
 
-    /**
-     * Called when the emitter has finished its lifecycle.
-     *
-     * @param emitter the emitter that has finished
-     */
+    /// Called when the emitter has finished its lifecycle.
+    ///
+    /// @param emitter the emitter that has finished
     void finished(Emitter emitter);
   }
 }

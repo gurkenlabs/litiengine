@@ -29,19 +29,15 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
   private transient boolean added;
 
-  /**
-   * Instantiates a new {@code MapObjectLayer} instance.
-   */
+  /// Instantiates a new `MapObjectLayer` instance.
   public MapObjectLayer() {
     super();
   }
 
-  /**
-   * Instantiates a new {@code MapObjectLayer} instance by copying from the specified original.
-   *
-   * @param original
-   *          the layer we want to copy
-   */
+  /// Instantiates a new `MapObjectLayer` instance by copying from the specified original.
+  ///
+  /// @param original
+  /// the layer we want to copy
   public MapObjectLayer(MapObjectLayer original) {
     this(original, false);
   }

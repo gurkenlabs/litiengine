@@ -18,13 +18,11 @@ public final class Codec {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * Decodes a previously encoded angle.
-   *
-   * @param encodedAngle
-   *          The encoded angle.
-   * @return The decoded angle.
-   */
+  /// Decodes a previously encoded angle.
+  ///
+  /// @param encodedAngle
+  /// The encoded angle.
+  /// @return The decoded angle.
   public static float decodeAngle(final byte encodedAngle) {
     float angle = encodedAngle;
     angle += 127;
@@ -37,29 +35,24 @@ public final class Codec {
     return decodeSmallFloatingPointNumber(encodedAngle, 2);
   }
 
-  /**
-   * Decodes a small floating point number, previously encoded with {@link #encodeSmallFloatingPointNumber(float, int)
-   * encodeSmallFloatingPointNumber}.
-   *
-   * @param encodedNumber
-   *          The encoded number
-   * @param precision
-   *          The precision of the encoded number. The same precision, used for encoding.
-   * @return The decoded small floating point number.
-   */
+  /// Decodes a small floating point number, previously encoded with [int) encodeSmallFloatingPointNumber][#encodeSmallFloatingPointNumber(float,].
+  ///
+  /// @param encodedNumber
+  /// The encoded number
+  /// @param precision
+  /// The precision of the encoded number. The same precision, used for encoding.
+  /// @return The decoded small floating point number.
   public static float decodeSmallFloatingPointNumber(
       final short encodedNumber, final int precision) {
     return (float) ((encodedNumber + Short.MAX_VALUE) / Math.pow(10, precision));
   }
 
-  /**
-   * Encodes an angle, loosing some precision. The encoded / decoded values can differ at max. around 1.43 degrees from
-   * the original one.
-   *
-   * @param angle
-   *          The angle
-   * @return The encoded angle.
-   */
+  /// Encodes an angle, loosing some precision. The encoded / decoded values can differ at max. around 1.43 degrees from
+  /// the original one.
+  ///
+  /// @param angle
+  /// The angle
+  /// @return The encoded angle.
   public static byte encodeAngle(final float angle) {
     float encodedAngle = angle % 360;
     encodedAngle *= 256 / 360.0f;
@@ -79,15 +72,13 @@ public final class Codec {
     return encodeSmallFloatingPointNumber(encodedAngle, 2);
   }
 
-  /**
-   * Encodes positive numbers less than Short.MAX_VALUE * 2 / precision (6553.4 for precision = 1).
-   *
-   * @param smallNumber
-   *          The small number to encode
-   * @param precision
-   *          The comma precision for the encoding process.
-   * @return The encoded number.
-   */
+  /// Encodes positive numbers less than Short.MAX_VALUE * 2 / precision (6553.4 for precision = 1).
+  ///
+  /// @param smallNumber
+  /// The small number to encode
+  /// @param precision
+  /// The comma precision for the encoding process.
+  /// @return The encoded number.
   public static short encodeSmallFloatingPointNumber(final float smallNumber, final int precision) {
     if (smallNumber < 0 || (int) (smallNumber * Math.pow(10, precision)) > Short.MAX_VALUE * 2) {
       throw new IllegalArgumentException("The specified number is not within the range to encode.");
@@ -149,14 +140,12 @@ public final class Codec {
     return Base64.getEncoder().encodeToString(data);
   }
 
-  /**
-   * Decodes the specified {@code Base64} string to a byte array.
-   *
-   * @param base64
-   *          The Base64 string containing the encoded binary data.
-   * @return The decoded byte array.
-   * @see Base64
-   */
+  /// Decodes the specified `Base64` string to a byte array.
+  ///
+  /// @param base64
+  /// The Base64 string containing the encoded binary data.
+  /// @return The decoded byte array.
+  /// @see Base64
   public static byte[] decode(String base64) {
     return Base64.getDecoder().decode(base64);
   }

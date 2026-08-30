@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-/** A reusable, fluent query for selecting entities without game-specific collection boilerplate. */
+/// A reusable, fluent query for selecting entities without game-specific collection boilerplate.
 public final class EntityQuery<T> {
   private final Collection<T> source;
   private Predicate<T> predicate = entity -> true;

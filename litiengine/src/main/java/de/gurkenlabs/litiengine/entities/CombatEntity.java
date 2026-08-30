@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Represents a combat entity in the game. This class extends {@link CollisionEntity} and implements {@link ICombatEntity}.
- */
+/// Represents a combat entity in the game. This class extends [CollisionEntity] and implements [ICombatEntity].
 @CombatInfo
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
@@ -45,9 +43,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private ICombatEntity target;
   private long lastHit;
 
-  /**
-   * Represents a combat entity in the game. This class extends {@link CollisionEntity} and implements {@link ICombatEntity}.
-   */
+  /// Represents a combat entity in the game. This class extends [CollisionEntity] and implements [ICombatEntity].
   public CombatEntity() {
     super();
     this.listeners = ConcurrentHashMap.newKeySet();
@@ -123,21 +119,17 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     return this.appliedEffects;
   }
 
-  /**
-   * Gets the attributes.
-   *
-   * @return the attributes
-   */
+  /// Gets the attributes.
+  ///
+  /// @return the attributes
   @Override
   public RangeAttribute<Integer> getHitPoints() {
     return this.hitPoints;
   }
 
-  /**
-   * Gets the hit box.
-   *
-   * @return the hit box
-   */
+  /// Gets the hit box.
+  ///
+  /// @return the hit box
   @Override
   public Shape getHitBox() {
     return new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
@@ -202,11 +194,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.lastHit = Game.time().now();
   }
 
-  /**
-   * Fires a death event for the combat entity.
-   *
-   * @param entityHitEvent the event that triggered the death
-   */
+  /// Fires a death event for the combat entity.
+  ///
+  /// @param entityHitEvent the event that triggered the death
   protected void fireDeathEvent(EntityHitEvent entityHitEvent) {
     this.setCollision(false);
 
@@ -219,32 +209,26 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
   }
 
-  /**
-   * Checks if is dead.
-   *
-   * @return true, if is dead
-   */
+  /// Checks if is dead.
+  ///
+  /// @return true, if is dead
   @Override
   public boolean isDead() {
     return !this.isIndestructible() && this.getHitPoints().getModifiedValue() <= 0;
   }
 
-  /**
-   * Checks if is friendly.
-   *
-   * @param entity the entity
-   * @return true, if is friendly
-   */
+  /// Checks if is friendly.
+  ///
+  /// @param entity the entity
+  /// @return true, if is friendly
   @Override
   public boolean isFriendly(final ICombatEntity entity) {
     return entity != null && this.getTeam() == entity.getTeam();
   }
 
-  /**
-   * Checks if is indestructible.
-   *
-   * @return true, if is indestructible
-   */
+  /// Checks if is indestructible.
+  ///
+  /// @return true, if is indestructible
   @Override
   public boolean isIndestructible() {
     return this.isIndestructible;
@@ -255,9 +239,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     return this.getTeam() == 0;
   }
 
-  /**
-   * Resurrect.
-   */
+  /// Resurrect.
   @Override
   public void resurrect() {
     if (!this.isDead()) {
@@ -296,11 +278,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
   }
 
-  /**
-   * Sets the team.
-   *
-   * @param team the new team
-   */
+  /// Sets the team.
+  ///
+  /// @param team the new team
   @Override
   public void setTeam(final int team) {
     this.team = team;

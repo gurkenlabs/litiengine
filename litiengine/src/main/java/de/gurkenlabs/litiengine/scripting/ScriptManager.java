@@ -44,7 +44,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** Coordinates script providers, definitions, bindings, lifecycles, and explicit reloads. */
+/// Coordinates script providers, definitions, bindings, lifecycles, and explicit reloads.
 public final class ScriptManager implements IUpdateable {
   public static final String BINDINGS_PROPERTY = "scriptBindings";
   private static final Logger log = Logger.getLogger(ScriptManager.class.getName());
@@ -110,7 +110,7 @@ public final class ScriptManager implements IUpdateable {
     return List.copyOf(this.providers.values());
   }
 
-  /** Creates non-executing semantic tooling backed by the registered provider for a language. */
+  /// Creates non-executing semantic tooling backed by the registered provider for a language.
   public Optional<ScriptLanguageService> createLanguageService(String language) {
     if (language == null || language.isBlank()) return Optional.empty();
     ScriptProvider provider = this.providers.get(language.toLowerCase());
@@ -167,7 +167,7 @@ public final class ScriptManager implements IUpdateable {
     return definition != null ? new ScriptDefinition(definition) : null;
   }
 
-  /** Returns configurable fields from the currently compiled generation without compiling or executing new code. */
+  /// Returns configurable fields from the currently compiled generation without compiling or executing new code.
   public List<ScriptPropertyMetadata> getPropertyMetadata(String scriptId) {
     CompiledScript compiledScript = this.compiled.get(scriptId);
     if (compiledScript == null) return List.of();
@@ -201,7 +201,7 @@ public final class ScriptManager implements IUpdateable {
     return this.gameBindings.stream().map(ScriptBinding::new).toList();
   }
 
-  /** Replaces reusable bindings that are automatically applied when matching entities are loaded. */
+  /// Replaces reusable bindings that are automatically applied when matching entities are loaded.
   public void setEntityBindings(Collection<EntityScriptBinding> bindings) {
     this.entityBindings.clear();
     if (bindings != null) bindings.stream().filter(Objects::nonNull)
@@ -212,7 +212,7 @@ public final class ScriptManager implements IUpdateable {
     return this.entityBindings.stream().map(EntityScriptBinding::new).toList();
   }
 
-  /** Adds or refreshes the script controller that owns the default bindings for an entity type. */
+  /// Adds or refreshes the script controller that owns the default bindings for an entity type.
   public void configure(IEntity entity) {
     Objects.requireNonNull(entity);
     List<ScriptBinding> defaults = this.resolveEntityBindings(entity);
@@ -227,7 +227,7 @@ public final class ScriptManager implements IUpdateable {
     controller.setDefaultBindings(defaults);
   }
 
-  /** Sets the directory against which relative development-time source paths are resolved. */
+  /// Sets the directory against which relative development-time source paths are resolved.
   public void setProjectRoot(Path projectRoot) {
     this.projectRoot = projectRoot == null ? null : projectRoot.toAbsolutePath().normalize();
   }
@@ -236,12 +236,12 @@ public final class ScriptManager implements IUpdateable {
     return this.projectRoot;
   }
 
-  /** Sets the compiled project class loader used as the parent of runtime-compiled scripts. */
+  /// Sets the compiled project class loader used as the parent of runtime-compiled scripts.
   public void setProjectClassLoader(ClassLoader projectClassLoader) {
     this.projectClassLoader = projectClassLoader;
   }
 
-  /** Sets build-resolved locations used by development-time source compilation. */
+  /// Sets build-resolved locations used by development-time source compilation.
   public void setProjectClasspath(Collection<Path> projectClasspath) {
     this.projectClasspath = projectClasspath == null
       ? List.of()
@@ -404,7 +404,7 @@ public final class ScriptManager implements IUpdateable {
     this.desiredBindings.removeIf(b -> b.host() == host && b.controllerManaged() == controllerManaged);
   }
 
-  /** Sets the Java language level used for development-time source compilation. */
+  /// Sets the Java language level used for development-time source compilation.
   public void setProjectJavaVersion(int projectJavaVersion) {
     if (projectJavaVersion <= 0) throw new IllegalArgumentException("Project Java version must be positive.");
     this.projectJavaVersion = projectJavaVersion;

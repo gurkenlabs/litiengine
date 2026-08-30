@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-/** A projectile entity created dynamically via scripting that moves, impacts targets, and handles collision. */
+/// A projectile entity created dynamically via scripting that moves, impacts targets, and handles collision.
 public class ScriptedProjectile extends Creature implements IUpdateable {
   private final Environment environment;
   private final ICombatEntity sourceEntity;

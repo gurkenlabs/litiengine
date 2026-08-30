@@ -63,15 +63,13 @@ public final class ReflectionUtilities {
     }
   }
 
-  /**
-   * Recursively gets all fields of the specified type, respecting parent classes.
-   *
-   * @param fields
-   *          The list containing all fields.
-   * @param type
-   *          The type to retrieve the fields from.
-   * @return All fields of the specified type, including the fields of the parent classes.
-   */
+  /// Recursively gets all fields of the specified type, respecting parent classes.
+  ///
+  /// @param fields
+  /// The list containing all fields.
+  /// @param type
+  /// The type to retrieve the fields from.
+  /// @return All fields of the specified type, including the fields of the parent classes.
   public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
     fields.addAll(Arrays.asList(type.getDeclaredFields()));
 
@@ -82,18 +80,16 @@ public final class ReflectionUtilities {
     return fields;
   }
 
-  /**
-   * Recursively gets a method by the specified name respecting the parent classes and the parameters of the
-   * declaration.
-   *
-   * @param name
-   *          The name of the method.
-   * @param type
-   *          The type on which to search for the method.
-   * @param parameterTypes
-   *          The types of the parameters defined by the method declaration.
-   * @return The found method or null if no such method exists.
-   */
+  /// Recursively gets a method by the specified name respecting the parent classes and the parameters of the
+  /// declaration.
+  ///
+  /// @param name
+  /// The name of the method.
+  /// @param type
+  /// The type on which to search for the method.
+  /// @param parameterTypes
+  /// The types of the parameters defined by the method declaration.
+  /// @return The found method or null if no such method exists.
   public static Method getMethod(String name, Class<?> type, Class<?>... parameterTypes) {
     Method method = null;
     try {
@@ -347,18 +343,15 @@ public final class ReflectionUtilities {
     return methods;
   }
 
-  /**
-   * Gets the events for the specified type.
-   *
-   * <p>
-   * This will search for all methods that have a parameter of type {@code EventListener} and match the LITIENGINE's
-   * naming conventions for event subscription (i.e. the method name starts with one of the prefixes "add" or "on".
-   *
-   * @param type
-   *          The type to inspect the events on.
-   * @return All methods on the specified type that are considered to be events.
-   * @see EventListener
-   */
+  /// Gets the events for the specified type.
+  ///
+  /// This will search for all methods that have a parameter of type `EventListener` and match the LITIENGINE's
+  /// naming conventions for event subscription (i.e. the method name starts with one of the prefixes "add" or "on".
+  ///
+  /// @param type
+  /// The type to inspect the events on.
+  /// @return All methods on the specified type that are considered to be events.
+  /// @see EventListener
   public static Collection<Method> getEvents(final Class<?> type) {
     final String eventAddPrefix = "add";
     final String eventOnPrefix = "on";

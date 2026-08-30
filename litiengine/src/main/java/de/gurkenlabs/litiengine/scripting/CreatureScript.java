@@ -8,55 +8,55 @@ import de.gurkenlabs.litiengine.scripting.combat.ScriptedAbilityBuilder;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import java.awt.geom.Point2D;
 
-/** Convenient base class for creature behavior scripts with movement and combat helpers. */
+/// Convenient base class for creature behavior scripts with movement and combat helpers.
 public abstract class CreatureScript extends EntityScript<Creature> {
-  /** Moves the creature towards a target point in the game world. */
+  /// Moves the creature towards a target point in the game world.
   public void moveTowards(Point2D target) {
     if (target == null || this.host() == null) return;
     double angle = GeometricUtilities.calcRotationAngleInDegrees(this.host().getCenter(), target);
     Game.physics().move(this.host(), angle, this.host().getTickVelocity());
   }
 
-  /** Moves the creature towards a target entity. */
+  /// Moves the creature towards a target entity.
   public void moveTowards(IEntity target) {
     if (target != null) {
       this.moveTowards(target.getCenter());
     }
   }
 
-  /** Moves the creature in a specific compass direction. */
+  /// Moves the creature in a specific compass direction.
   public void moveInDirection(Direction direction) {
     if (direction != null && this.host() != null) {
       Game.physics().move(this.host(), direction.toAngle(), this.host().getTickVelocity());
     }
   }
 
-  /** Moves the creature at a specific angle in degrees (0 = North, 90 = East, 180 = South, 270 = West). */
+  /// Moves the creature at a specific angle in degrees (0 = North, 90 = East, 180 = South, 270 = West).
   public void moveInAngle(double angleDegrees) {
     if (this.host() != null) {
       Game.physics().move(this.host(), angleDegrees, this.host().getTickVelocity());
     }
   }
 
-  /** Checks if the creature is currently dead. */
+  /// Checks if the creature is currently dead.
   @Override
   public boolean isDead() {
     return this.host() != null && this.host().isDead();
   }
 
-  /** Returns current health / hitpoints. */
+  /// Returns current health / hitpoints.
   @Override
   public int getHealth() {
     return this.host() != null ? this.host().getHitPoints().getModifiedValue() : 0;
   }
 
-  /** Returns maximum health / hitpoints. */
+  /// Returns maximum health / hitpoints.
   @Override
   public int getMaxHealth() {
     return this.host() != null ? this.host().getHitPoints().getMax() : 0;
   }
 
-  /** Begins building a scripted ability executed by this creature. */
+  /// Begins building a scripted ability executed by this creature.
   public ScriptedAbilityBuilder createAbility(String name) {
     if (this.host() == null) {
       throw new IllegalStateException("Creature host is not attached.");
@@ -64,41 +64,37 @@ public abstract class CreatureScript extends EntityScript<Creature> {
     return new ScriptedAbilityBuilder(this.host(), name);
   }
 
-  /** Casts an ability registered on this creature by its name. */
+  /// Casts an ability registered on this creature by its name.
   public de.gurkenlabs.litiengine.abilities.AbilityExecution cast(String name) {
     return this.host() != null ? this.host().cast(name) : null;
   }
 
-  /** Gets an ability registered on this creature by its name. */
+  /// Gets an ability registered on this creature by its name.
   public java.util.Optional<de.gurkenlabs.litiengine.abilities.Ability> getAbility(String name) {
     return this.host() != null ? this.host().getAbility(name) : java.util.Optional.empty();
   }
 
-  /** Checks if this creature has an ability registered with the specified name. */
+  /// Checks if this creature has an ability registered with the specified name.
   public boolean hasAbility(String name) {
     return this.host() != null && this.host().hasAbility(name);
   }
 
-  /** Checks if an ability registered with the specified name can currently be cast. */
+  /// Checks if an ability registered with the specified name can currently be cast.
   public boolean canCast(String name) {
     return this.host() != null && this.host().canCast(name);
   }
 
-  /** Checks if an ability registered with the specified name is currently on cooldown. */
+  /// Checks if an ability registered with the specified name is currently on cooldown.
   public boolean isOnCooldown(String name) {
     return this.host() != null && this.host().isOnCooldown(name);
   }
 
-  /**
-   * Configures top-down WASD keyboard movement for this creature and binds its lifecycle to this script.
-   */
+  /// Configures top-down WASD keyboard movement for this creature and binds its lifecycle to this script.
   public de.gurkenlabs.litiengine.input.KeyboardEntityController<Creature> enableTopDownMovement() {
     return this.enableTopDownMovement(java.awt.event.KeyEvent.VK_W, java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.VK_A, java.awt.event.KeyEvent.VK_D);
   }
 
-  /**
-   * Configures top-down keyboard movement with custom keys for this creature and binds its lifecycle to this script.
-   */
+  /// Configures top-down keyboard movement with custom keys for this creature and binds its lifecycle to this script.
   public de.gurkenlabs.litiengine.input.KeyboardEntityController<Creature> enableTopDownMovement(int up, int down, int left, int right) {
     if (this.host() == null) {
       throw new IllegalStateException("Creature host is not attached.");
@@ -109,16 +105,12 @@ public abstract class CreatureScript extends EntityScript<Creature> {
     return controller;
   }
 
-  /**
-   * Configures platforming movement (A/D/Space) for this creature and binds its lifecycle to this script.
-   */
+  /// Configures platforming movement (A/D/Space) for this creature and binds its lifecycle to this script.
   public de.gurkenlabs.litiengine.input.PlatformingMovementController<Creature> enablePlatformingMovement() {
     return this.enablePlatformingMovement(java.awt.event.KeyEvent.VK_A, java.awt.event.KeyEvent.VK_D, java.awt.event.KeyEvent.VK_SPACE);
   }
 
-  /**
-   * Configures platforming movement with custom keys for this creature and binds its lifecycle to this script.
-   */
+  /// Configures platforming movement with custom keys for this creature and binds its lifecycle to this script.
   public de.gurkenlabs.litiengine.input.PlatformingMovementController<Creature> enablePlatformingMovement(int left, int right, int jump) {
     if (this.host() == null) {
       throw new IllegalStateException("Creature host is not attached.");
@@ -131,7 +123,7 @@ public abstract class CreatureScript extends EntityScript<Creature> {
     return controller;
   }
 
-  /** Disables and removes active movement controllers on this creature. */
+  /// Disables and removes active movement controllers on this creature.
   public void disableMovementController() {
     if (this.host() != null) {
       var current = this.host().getController(de.gurkenlabs.litiengine.physics.IMovementController.class);
@@ -142,7 +134,7 @@ public abstract class CreatureScript extends EntityScript<Creature> {
   }
 
 
-  /** Called when the platforming movement controller executes a jump action. */
+  /// Called when the platforming movement controller executes a jump action.
   protected void onJump() throws Exception {}
 
   @Override

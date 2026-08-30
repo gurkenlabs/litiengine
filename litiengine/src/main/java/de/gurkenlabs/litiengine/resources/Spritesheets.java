@@ -25,13 +25,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
-/**
- * Manages the loading, storing, and retrieval of spritesheets.
- * <p>
- * This class provides methods to load spritesheets from various sources, manage custom keyframe durations, and handle listeners for resource
- * container clearing events.
- * </p>
- */
+/// Manages the loading, storing, and retrieval of spritesheets.
+///
+/// This class provides methods to load spritesheets from various sources, manage custom keyframe durations, and handle listeners for resource
+/// container clearing events.
 public final class Spritesheets {
   private final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
   private final Map<String, Spritesheet> loadedSpritesheets = new ConcurrentHashMap<>();
@@ -42,58 +39,46 @@ public final class Spritesheets {
   Spritesheets() {
   }
 
-  /**
-   * Adds a spritesheet to the collection of loaded spritesheets.
-   *
-   * @param name        The name of the spritesheet.
-   * @param spritesheet The spritesheet to add.
-   */
+  /// Adds a spritesheet to the collection of loaded spritesheets.
+  ///
+  /// @param name        The name of the spritesheet.
+  /// @param spritesheet The spritesheet to add.
   public void add(String name, Spritesheet spritesheet) {
     this.loadedSpritesheets.put(name, spritesheet);
   }
 
-  /**
-   * Adds a listener for resource container clearing events.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds a listener for resource container clearing events.
+  ///
+  /// @param listener The listener to add.
   public void addClearedListener(ResourcesContainerClearedListener listener) {
     this.listeners.add(listener);
   }
 
-  /**
-   * Removes a listener for resource container clearing events.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes a listener for resource container clearing events.
+  ///
+  /// @param listener The listener to remove.
   public void removeClearedListener(ResourcesContainerClearedListener listener) {
     this.listeners.remove(listener);
   }
 
-  /**
-   * Clears all loaded spritesheets and notifies listeners of the clearing event.
-   */
+  /// Clears all loaded spritesheets and notifies listeners of the clearing event.
   public void clear() {
     this.loadedSpritesheets.clear();
     listeners.forEach(ResourcesContainerClearedListener::cleared);
   }
 
-  /**
-   * Checks if a spritesheet with the specified name is loaded.
-   *
-   * @param name The name of the spritesheet.
-   * @return True if the spritesheet is loaded, false otherwise.
-   */
+  /// Checks if a spritesheet with the specified name is loaded.
+  ///
+  /// @param name The name of the spritesheet.
+  /// @return True if the spritesheet is loaded, false otherwise.
   public boolean contains(String name) {
     return this.loadedSpritesheets.containsKey(name);
   }
 
-  /**
-   * Finds Spritesheets that were previously loaded by any load method or by the sprites.info file.
-   *
-   * @param path The path of the spritesheet.
-   * @return The {@link Spritesheet} associated with the path or null if not loaded yet
-   */
+  /// Finds Spritesheets that were previously loaded by any load method or by the sprites.info file.
+  ///
+  /// @param path The path of the spritesheet.
+  /// @return The [Spritesheet] associated with the path or null if not loaded yet
   public Spritesheet get(final String path) {
     if (path == null || path.isEmpty()) {
       return null;
@@ -104,12 +89,10 @@ public final class Spritesheets {
     return this.loadedSpritesheets.get(name); // this already returns null if absent
   }
 
-  /**
-   * Gets a collection of spritesheets that match the specified predicate.
-   *
-   * @param pred The predicate to filter the spritesheets.
-   * @return A collection of spritesheets that match the predicate, or an empty collection if the predicate is null.
-   */
+  /// Gets a collection of spritesheets that match the specified predicate.
+  ///
+  /// @param pred The predicate to filter the spritesheets.
+  /// @return A collection of spritesheets that match the predicate, or an empty collection if the predicate is null.
   public Collection<Spritesheet> get(Predicate<? super Spritesheet> pred) {
     if (pred == null) {
       return new ArrayList<>();
@@ -118,54 +101,44 @@ public final class Spritesheets {
     return this.loadedSpritesheets.values().stream().filter(pred).toList();
   }
 
-  /**
-   * Gets a collection of all loaded spritesheets.
-   *
-   * @return A collection of all loaded spritesheets.
-   */
+  /// Gets a collection of all loaded spritesheets.
+  ///
+  /// @return A collection of all loaded spritesheets.
   public Collection<Spritesheet> getAll() {
     return this.loadedSpritesheets.values();
   }
 
-  /**
-   * Gets the custom keyframe durations for the specified spritesheet name.
-   *
-   * @param name The name of the spritesheet.
-   * @return An array of custom keyframe durations, or an empty array if none are found.
-   */
+  /// Gets the custom keyframe durations for the specified spritesheet name.
+  ///
+  /// @param name The name of the spritesheet.
+  /// @return An array of custom keyframe durations, or an empty array if none are found.
   public int[] getCustomKeyFrameDurations(final String name) {
     return this.customKeyFrameDurations.getOrDefault(FileUtilities.getFileName(name), new int[0]);
   }
 
-  /**
-   * Gets the custom keyframe durations for the specified spritesheet.
-   *
-   * @param sprite The spritesheet to get the custom keyframe durations for.
-   * @return An array of custom keyframe durations, or an empty array if none are found.
-   */
+  /// Gets the custom keyframe durations for the specified spritesheet.
+  ///
+  /// @param sprite The spritesheet to get the custom keyframe durations for.
+  /// @return An array of custom keyframe durations, or an empty array if none are found.
   public int[] getCustomKeyFrameDurations(final Spritesheet sprite) {
     return getCustomKeyFrameDurations(sprite.getName());
   }
 
-  /**
-   * Loads a spritesheet from the specified image, path, width, and height.
-   *
-   * @param image        The image of the spritesheet.
-   * @param path         The path of the spritesheet.
-   * @param spriteWidth  The width of each sprite in the spritesheet.
-   * @param spriteHeight The height of each sprite in the spritesheet.
-   * @return The loaded spritesheet.
-   */
+  /// Loads a spritesheet from the specified image, path, width, and height.
+  ///
+  /// @param image        The image of the spritesheet.
+  /// @param path         The path of the spritesheet.
+  /// @param spriteWidth  The width of each sprite in the spritesheet.
+  /// @param spriteHeight The height of each sprite in the spritesheet.
+  /// @return The loaded spritesheet.
   public Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     return new Spritesheet(image, path, spriteWidth, spriteHeight);
   }
 
-  /**
-   * Loads a spritesheet from the specified tileset.
-   *
-   * @param tileset The tileset to load the spritesheet from.
-   * @return The loaded spritesheet, or null if the tileset or its image is null, or if the image's absolute source path is null.
-   */
+  /// Loads a spritesheet from the specified tileset.
+  ///
+  /// @param tileset The tileset to load the spritesheet from.
+  /// @return The loaded spritesheet, or null if the tileset or its image is null, or if the image's absolute source path is null.
   public Spritesheet load(final ITileset tileset) {
     if (tileset == null || tileset.getImage() == null) {
       return null;
@@ -179,12 +152,10 @@ public final class Spritesheets {
       tileset.getTileDimension().width, tileset.getTileDimension().height);
   }
 
-  /**
-   * Loads a spritesheet from the specified spritesheet resource.
-   *
-   * @param info The spritesheet resource containing the information to load the spritesheet.
-   * @return The loaded spritesheet, or null if the image is null or empty.
-   */
+  /// Loads a spritesheet from the specified spritesheet resource.
+  ///
+  /// @param info The spritesheet resource containing the information to load the spritesheet.
+  /// @return The loaded spritesheet, or null if the image is null or empty.
   public Spritesheet load(final SpritesheetResource info) {
     Spritesheet sprite;
     if (info.getImage() == null || info.getImage().isEmpty()) {
@@ -202,12 +173,10 @@ public final class Spritesheets {
     return sprite;
   }
 
-  /**
-   * The sprite info file must be located under the GameInfo#getSpritesDirectory() directory.
-   *
-   * @param spriteInfoFile The path to the sprite info file.
-   * @return A list of spritesheets that were loaded from the info file.
-   */
+  /// The sprite info file must be located under the GameInfo#getSpritesDirectory() directory.
+  ///
+  /// @param spriteInfoFile The path to the sprite info file.
+  /// @return A list of spritesheets that were loaded from the info file.
   public List<Spritesheet> loadFrom(final String spriteInfoFile) {
 
     final ArrayList<Spritesheet> sprites = new ArrayList<>();
@@ -245,13 +214,11 @@ public final class Spritesheets {
     return sprites;
   }
 
-  /**
-   * Saves the spritesheet information to the specified file.
-   *
-   * @param spriteInfoFile The path to the file where the spritesheet information will be saved.
-   * @param metadataOnly   If true, only the metadata will be saved; if false, both the sprites and metadata will be saved.
-   * @return True if the spritesheet information was successfully saved, false otherwise.
-   */
+  /// Saves the spritesheet information to the specified file.
+  ///
+  /// @param spriteInfoFile The path to the file where the spritesheet information will be saved.
+  /// @param metadataOnly   If true, only the metadata will be saved; if false, both the sprites and metadata will be saved.
+  /// @return True if the spritesheet information was successfully saved, false otherwise.
   public boolean saveTo(final String spriteInfoFile, boolean metadataOnly) {
     // get all spritesheets
     List<Spritesheet> allSpriteSheets = new ArrayList<>(getAll());
@@ -296,36 +263,30 @@ public final class Spritesheets {
     }
   }
 
-  /**
-   * Loads a spritesheet from the specified path, width, and height.
-   *
-   * @param path         The path of the spritesheet.
-   * @param spriteWidth  The width of each sprite in the spritesheet.
-   * @param spriteHeight The height of each sprite in the spritesheet.
-   * @return The loaded spritesheet.
-   */
+  /// Loads a spritesheet from the specified path, width, and height.
+  ///
+  /// @param path         The path of the spritesheet.
+  /// @param spriteWidth  The width of each sprite in the spritesheet.
+  /// @param spriteHeight The height of each sprite in the spritesheet.
+  /// @return The loaded spritesheet.
   public Spritesheet load(final String path, final int spriteWidth, final int spriteHeight) {
     return new Spritesheet(Resources.images().get(path, true), path, spriteWidth, spriteHeight);
   }
 
-  /**
-   * Removes a spritesheet from the collection of loaded spritesheets.
-   *
-   * @param path The path of the spritesheet to remove.
-   * @return The removed spritesheet, or null if no spritesheet was found for the specified path.
-   */
+  /// Removes a spritesheet from the collection of loaded spritesheets.
+  ///
+  /// @param path The path of the spritesheet to remove.
+  /// @return The removed spritesheet, or null if no spritesheet was found for the specified path.
   public Spritesheet remove(final String path) {
     Spritesheet spriteToRemove = this.loadedSpritesheets.remove(path);
     customKeyFrameDurations.remove(path);
     return spriteToRemove;
   }
 
-  /**
-   * Updates a spritesheet with the specified resource information.
-   *
-   * @param info The resource information for the spritesheet to update.
-   * @return The updated spritesheet, or null if the resource information is invalid or the spritesheet could not be updated.
-   */
+  /// Updates a spritesheet with the specified resource information.
+  ///
+  /// @param info The resource information for the spritesheet to update.
+  /// @return The updated spritesheet, or null if the resource information is invalid or the spritesheet could not be updated.
   public Spritesheet update(final SpritesheetResource info) {
     if (info == null || info.getName() == null) {
       return null;
@@ -343,14 +304,12 @@ public final class Spritesheets {
     return null;
   }
 
-  /**
-   * Parses a line from the sprite info file and loads the corresponding spritesheet.
-   *
-   * @param baseDirectory The base directory of the sprite info file.
-   * @param sprites       The list to which the loaded spritesheet will be added.
-   * @param items         The list of items parsed from the line.
-   * @param parts         The array of parts parsed from the line.
-   */
+  /// Parses a line from the sprite info file and loads the corresponding spritesheet.
+  ///
+  /// @param baseDirectory The base directory of the sprite info file.
+  /// @param sprites       The list to which the loaded spritesheet will be added.
+  /// @param items         The list of items parsed from the line.
+  /// @param parts         The array of parts parsed from the line.
   private void getSpriteSheetFromSpriteInfoLine(String baseDirectory, ArrayList<Spritesheet> sprites, List<String> items, String[] parts) {
     try {
       final String name = baseDirectory + items.get(0);

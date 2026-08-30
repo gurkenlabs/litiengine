@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Represents a layer of tiles in the tile map. This class extends the {@link Layer} class and implements the {@link ITileLayer} interface.
- */
+/// Represents a layer of tiles in the tile map. This class extends the [Layer] class and implements the [ITileLayer] interface.
 public class TileLayer extends Layer implements ITileLayer {
 
   @XmlElement
@@ -24,28 +22,22 @@ public class TileLayer extends Layer implements ITileLayer {
 
   private transient Tile[][] tiles;
 
-  /**
-   * Instantiates a new {@code TileLayer} instance.
-   */
+  /// Instantiates a new `TileLayer` instance.
   public TileLayer() {
     // keep for serialization
   }
 
-  /**
-   * Instantiates a new {@code TileLayer} instance with the specified data.
-   *
-   * @param data The tile data of this instance.
-   */
+  /// Instantiates a new `TileLayer` instance with the specified data.
+  ///
+  /// @param data The tile data of this instance.
   public TileLayer(TileData data) {
     this.data = data;
   }
 
-  /**
-   * Creates an empty, editable tile layer with the specified dimensions.
-   *
-   * @param width the layer width in tiles
-   * @param height the layer height in tiles
-   */
+  /// Creates an empty, editable tile layer with the specified dimensions.
+  ///
+  /// @param width the layer width in tiles
+  /// @param height the layer height in tiles
   public TileLayer(int width, int height) {
     if (width < 1 || height < 1) {
       throw new IllegalArgumentException("Tile layer dimensions must be positive.");
@@ -71,12 +63,10 @@ public class TileLayer extends Layer implements ITileLayer {
     }
   }
 
-  /**
-   * Copy constructor for the {@code TileLayer} class. Creates a new instance of the {@code TileLayer} class by copying the properties from the
-   * provided {@code TileLayer} object.
-   *
-   * @param original The original {@code TileLayer} object to copy from.
-   */
+  /// Copy constructor for the `TileLayer` class. Creates a new instance of the `TileLayer` class by copying the properties from the
+  /// provided `TileLayer` object.
+  ///
+  /// @param original The original `TileLayer` object to copy from.
   public TileLayer(TileLayer original) {
     super(original);
     this.data = original.data != null ? new TileData(original.data) : null;
@@ -166,20 +156,16 @@ public class TileLayer extends Layer implements ITileLayer {
     return super.getHeight();
   }
 
-  /**
-   * Gets the list of tiles in this layer.
-   *
-   * @return A list of {@link Tile} objects representing the tiles in this layer.
-   */
+  /// Gets the list of tiles in this layer.
+  ///
+  /// @return A list of [Tile] objects representing the tiles in this layer.
   protected List<Tile> getData() {
     return data.getTiles();
   }
 
-  /**
-   * Gets the raw tile data for this layer.
-   *
-   * @return The {@link TileData} object containing the raw tile data.
-   */
+  /// Gets the raw tile data for this layer.
+  ///
+  /// @return The [TileData] object containing the raw tile data.
   protected TileData getRawTileData() {
     return data;
   }

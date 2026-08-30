@@ -35,17 +35,13 @@ public class Tile extends CustomPropertyProvider implements ITile {
   private transient boolean flippedVertically;
   private transient boolean flipped;
 
-  /**
-   * Instantiates a new {@code Tile} instance.
-   */
+  /// Instantiates a new `Tile` instance.
   public Tile() {
   }
 
-  /**
-   * Instantiates a new {@code Tile} instance with the same attributes as a given {@code Tile}.
-   *
-   * @param original The original tile from which the values will be copied to this new instance.
-   */
+  /// Instantiates a new `Tile` instance with the same attributes as a given `Tile`.
+  ///
+  /// @param original The original tile from which the values will be copied to this new instance.
   public Tile(Tile original) {
     this.flipped = original.isFlipped();
     this.flippedDiagonally = original.isFlippedDiagonally();
@@ -56,14 +52,12 @@ public class Tile extends CustomPropertyProvider implements ITile {
     this.tileCoordinate = original.getTileCoordinate();
   }
 
-  /**
-   * Instantiates a new {@code Tile} instance.
-   *
-   * @param gidBitmask The grid ID bitmask used to identify flags of this instance.
-   * @see Tile#FLIPPED_HORIZONTALLY_FLAG
-   * @see Tile#FLIPPED_DIAGONALLY_FLAG
-   * @see Tile#FLIPPED_VERTICALLY_FLAG
-   */
+  /// Instantiates a new `Tile` instance.
+  ///
+  /// @param gidBitmask The grid ID bitmask used to identify flags of this instance.
+  /// @see Tile#FLIPPED_HORIZONTALLY_FLAG
+  /// @see Tile#FLIPPED_DIAGONALLY_FLAG
+  /// @see Tile#FLIPPED_VERTICALLY_FLAG
   public Tile(int gidBitmask) {
     // Clear the flags
     this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG) != 0;
@@ -192,20 +186,16 @@ public class Tile extends CustomPropertyProvider implements ITile {
     return this.getGridId() + String.valueOf(this.getTilesetEntry());
   }
 
-  /**
-   * Sets the tileset entry for this tile.
-   *
-   * @param entry The tileset entry to set.
-   */
+  /// Sets the tileset entry for this tile.
+  ///
+  /// @param entry The tileset entry to set.
   void setTilesetEntry(ITilesetEntry entry) {
     this.tilesetEntry = entry;
   }
 
-  /**
-   * Sets the grid ID for this tile.
-   *
-   * @param gid The grid ID to set.
-   */
+  /// Sets the grid ID for this tile.
+  ///
+  /// @param gid The grid ID to set.
   void setGridId(int gid) {
     this.flippedDiagonally = (gid & FLIPPED_DIAGONALLY_FLAG) != 0;
     this.flippedHorizontally = (gid & FLIPPED_HORIZONTALLY_FLAG) != 0;
@@ -214,11 +204,9 @@ public class Tile extends CustomPropertyProvider implements ITile {
     this.gid = gid & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
   }
 
-  /**
-   * Sets the tile coordinate.
-   *
-   * @param tileCoordinate the new tile coordinate
-   */
+  /// Sets the tile coordinate.
+  ///
+  /// @param tileCoordinate the new tile coordinate
   void setTileCoordinate(final Point tileCoordinate) {
     this.tileCoordinate = tileCoordinate;
   }

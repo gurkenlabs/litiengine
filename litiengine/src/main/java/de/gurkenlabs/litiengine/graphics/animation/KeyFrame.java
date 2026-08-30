@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-/**
- * The {@code Keyframe} class defines the relation between a particular sprite index and its animation duration.
- */
+/// The `Keyframe` class defines the relation between a particular sprite index and its animation duration.
 public class KeyFrame {
   private int duration;
   private int sprite;

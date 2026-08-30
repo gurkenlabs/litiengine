@@ -27,28 +27,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Counterpart to {@link XmlUtilities} for working with JSON resources using the
- * <a href="https://jakarta.ee/specifications/jsonb/">Jakarta JSON Binding</a> (JSON-B) and
- * <a href="https://jakarta.ee/specifications/jsonp/">Jakarta JSON Processing</a> (JSON-P) APIs.
- *
- * <p>
- * The class provides two layers of access:
- * </p>
- * <ul>
- *   <li>A binding layer ({@link #read(Class, URL)}, {@link #read(Class, Path)}, {@link #save(Object, Path)})
- *       that maps JSON documents to plain Java objects via JSON-B, mirroring the API offered by
- *       {@link XmlUtilities} for JAXB.</li>
- *   <li>A tree-model layer ({@link #readTree(URL)}, {@link #readTree(Path)}, {@link #saveTree(JsonValue, Path)})
- *       that exposes the underlying {@link JsonStructure} for cases where direct DOM-style access is
- *       preferable to data binding.</li>
- * </ul>
- *
- * <p>
- * Both layers cache their factories and {@link Jsonb} instances per configuration so repeated use
- * does not pay the cost of recreating them.
- * </p>
- */
+/// Counterpart to [XmlUtilities] for working with JSON resources using the
+/// [Jakarta JSON Binding](https://jakarta.ee/specifications/jsonb/) (JSON-B) and
+/// [Jakarta JSON Processing](https://jakarta.ee/specifications/jsonp/) (JSON-P) APIs.
+///
+/// The class provides two layers of access:
+///
+/// - A binding layer ([URL)][#read(Class,], [Path)][#read(Class,], [Path)][#save(Object,])
+/// that maps JSON documents to plain Java objects via JSON-B, mirroring the API offered by
+/// [XmlUtilities] for JAXB.
+/// - A tree-model layer ([#readTree(URL)], [#readTree(Path)], [Path)][#saveTree(JsonValue,])
+/// that exposes the underlying [JsonStructure] for cases where direct DOM-style access is
+/// preferable to data binding.
+///
+/// Both layers cache their factories and [Jsonb] instances per configuration so repeated use
+/// does not pay the cost of recreating them.
 public final class JsonUtilities {
   private static final Logger log = Logger.getLogger(JsonUtilities.class.getName());
 
@@ -64,12 +57,10 @@ public final class JsonUtilities {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * Returns a cached {@link Jsonb} instance configured with the requested formatting.
-   *
-   * @param pretty Whether the returned instance produces pretty-printed output.
-   * @return A shared, thread-safe {@link Jsonb} instance.
-   */
+  /// Returns a cached [Jsonb] instance configured with the requested formatting.
+  ///
+  /// @param pretty Whether the returned instance produces pretty-printed output.
+  /// @return A shared, thread-safe [Jsonb] instance.
   public static Jsonb getJsonb(boolean pretty) {
     return jsonbInstances.computeIfAbsent(pretty, key -> {
       JsonbConfig config = new JsonbConfig().withFormatting(key);
@@ -77,14 +68,12 @@ public final class JsonUtilities {
     });
   }
 
-  /**
-   * Reads a JSON document from the given URL and binds it to an instance of the requested class.
-   *
-   * @param cls  The target class.
-   * @param path The URL of the JSON document.
-   * @param <T>  The bound type.
-   * @return The bound instance, or {@code null} if the document cannot be read.
-   */
+  /// Reads a JSON document from the given URL and binds it to an instance of the requested class.
+  ///
+  /// @param cls  The target class.
+  /// @param path The URL of the JSON document.
+  /// @param <T>  The bound type.
+  /// @return The bound instance, or `null` if the document cannot be read.
   public static <T> T read(Class<T> cls, URL path) {
     if (path == null) {
       return null;
@@ -97,14 +86,12 @@ public final class JsonUtilities {
     }
   }
 
-  /**
-   * Reads a JSON document from the given path and binds it to an instance of the requested class.
-   *
-   * @param cls      The target class.
-   * @param filePath The path to the JSON document.
-   * @param <T>      The bound type.
-   * @return The bound instance, or {@code null} if the document cannot be read.
-   */
+  /// Reads a JSON document from the given path and binds it to an instance of the requested class.
+  ///
+  /// @param cls      The target class.
+  /// @param filePath The path to the JSON document.
+  /// @param <T>      The bound type.
+  /// @return The bound instance, or `null` if the document cannot be read.
   public static <T> T read(Class<T> cls, Path filePath) {
     if (filePath == null) {
       return null;
@@ -117,25 +104,21 @@ public final class JsonUtilities {
     }
   }
 
-  /**
-   * Reads a JSON document from the given reader and binds it to an instance of the requested class.
-   *
-   * @param cls    The target class.
-   * @param reader The reader providing the JSON content.
-   * @param <T>    The bound type.
-   * @return The bound instance.
-   */
+  /// Reads a JSON document from the given reader and binds it to an instance of the requested class.
+  ///
+  /// @param cls    The target class.
+  /// @param reader The reader providing the JSON content.
+  /// @param <T>    The bound type.
+  /// @return The bound instance.
   public static <T> T read(Class<T> cls, Reader reader) {
     return getJsonb(false).fromJson(reader, cls);
   }
 
-  /**
-   * Reads the JSON document referenced by the given URL into a {@link JsonStructure} (object or
-   * array). Useful when the document does not follow a fixed schema.
-   *
-   * @param path The URL of the JSON document.
-   * @return The parsed structure, or {@code null} if the document cannot be read.
-   */
+  /// Reads the JSON document referenced by the given URL into a [JsonStructure] (object or
+  /// array). Useful when the document does not follow a fixed schema.
+  ///
+  /// @param path The URL of the JSON document.
+  /// @return The parsed structure, or `null` if the document cannot be read.
   public static JsonStructure readTree(URL path) {
     if (path == null) {
       return null;
@@ -148,12 +131,10 @@ public final class JsonUtilities {
     }
   }
 
-  /**
-   * Reads the JSON document at the given path into a {@link JsonStructure} (object or array).
-   *
-   * @param filePath The path to the JSON document.
-   * @return The parsed structure, or {@code null} if the document cannot be read.
-   */
+  /// Reads the JSON document at the given path into a [JsonStructure] (object or array).
+  ///
+  /// @param filePath The path to the JSON document.
+  /// @return The parsed structure, or `null` if the document cannot be read.
   public static JsonStructure readTree(Path filePath) {
     if (filePath == null) {
       return null;
@@ -166,25 +147,21 @@ public final class JsonUtilities {
     }
   }
 
-  /**
-   * Reads the JSON document from the given reader into a {@link JsonStructure}.
-   *
-   * @param reader The reader providing the JSON content.
-   * @return The parsed structure.
-   */
+  /// Reads the JSON document from the given reader into a [JsonStructure].
+  ///
+  /// @param reader The reader providing the JSON content.
+  /// @return The parsed structure.
   public static JsonStructure readTree(Reader reader) {
     try (JsonReader jsonReader = readerFactory.createReader(reader)) {
       return jsonReader.read();
     }
   }
 
-  /**
-   * Binds the given object to JSON and writes it to the specified path (pretty-printed).
-   *
-   * @param object   The object to serialize.
-   * @param filePath The destination path.
-   * @return The destination path, or {@code null} if the path is {@code null} or writing fails.
-   */
+  /// Binds the given object to JSON and writes it to the specified path (pretty-printed).
+  ///
+  /// @param object   The object to serialize.
+  /// @param filePath The destination path.
+  /// @return The destination path, or `null` if the path is `null` or writing fails.
   public static Path save(Object object, Path filePath) {
     if (filePath == null) {
       return null;
@@ -198,15 +175,13 @@ public final class JsonUtilities {
     return filePath;
   }
 
-  /**
-   * Binds the given object to JSON and writes it to the specified path, ensuring the path ends with
-   * the supplied extension (e.g. {@code "json"} or {@code ".json"}).
-   *
-   * @param object    The object to serialize.
-   * @param path      The destination path.
-   * @param extension The file extension (with or without a leading dot).
-   * @return The actual destination path used.
-   */
+  /// Binds the given object to JSON and writes it to the specified path, ensuring the path ends with
+  /// the supplied extension (e.g. `"json"` or `".json"`).
+  ///
+  /// @param object    The object to serialize.
+  /// @param path      The destination path.
+  /// @param extension The file extension (with or without a leading dot).
+  /// @return The actual destination path used.
   public static Path save(Object object, Path path, String extension) {
     String fullExtension = extension.startsWith(".") ? extension : "." + extension;
     Path fullPath = path;
@@ -216,25 +191,21 @@ public final class JsonUtilities {
     return save(object, fullPath);
   }
 
-  /**
-   * Binds the given object to JSON and writes it to the supplied writer.
-   *
-   * @param object The object to serialize.
-   * @param writer The writer to write the JSON to.
-   * @param pretty Whether to pretty-print the output.
-   */
+  /// Binds the given object to JSON and writes it to the supplied writer.
+  ///
+  /// @param object The object to serialize.
+  /// @param writer The writer to write the JSON to.
+  /// @param pretty Whether to pretty-print the output.
   public static void save(Object object, Writer writer, boolean pretty) {
     getJsonb(pretty).toJson(object, writer);
   }
 
-  /**
-   * Writes a {@link JsonValue} tree to the specified path.
-   *
-   * @param value    The JSON value to write.
-   * @param filePath The destination path.
-   * @param pretty   Whether to pretty-print the output.
-   * @return The destination path, or {@code null} if writing fails.
-   */
+  /// Writes a [JsonValue] tree to the specified path.
+  ///
+  /// @param value    The JSON value to write.
+  /// @param filePath The destination path.
+  /// @param pretty   Whether to pretty-print the output.
+  /// @return The destination path, or `null` if writing fails.
   public static Path saveTree(JsonValue value, Path filePath, boolean pretty) {
     if (filePath == null || value == null) {
       return null;
@@ -250,24 +221,20 @@ public final class JsonUtilities {
     return filePath;
   }
 
-  /**
-   * Convenience overload that pretty-prints by default.
-   *
-   * @param value    The JSON value to write.
-   * @param filePath The destination path.
-   * @return The destination path.
-   */
+  /// Convenience overload that pretty-prints by default.
+  ///
+  /// @param value    The JSON value to write.
+  /// @param filePath The destination path.
+  /// @return The destination path.
   public static Path saveTree(JsonValue value, Path filePath) {
     return saveTree(value, filePath, true);
   }
 
-  /**
-   * Serializes the given JSON value to a string.
-   *
-   * @param value  The JSON value to serialize.
-   * @param pretty Whether to pretty-print the output.
-   * @return The serialized JSON string.
-   */
+  /// Serializes the given JSON value to a string.
+  ///
+  /// @param value  The JSON value to serialize.
+  /// @param pretty Whether to pretty-print the output.
+  /// @return The serialized JSON string.
   public static String writeTreeToString(JsonValue value, boolean pretty) {
     JsonWriterFactory factory = pretty ? prettyWriterFactory : compactWriterFactory;
     java.io.StringWriter sw = new java.io.StringWriter();

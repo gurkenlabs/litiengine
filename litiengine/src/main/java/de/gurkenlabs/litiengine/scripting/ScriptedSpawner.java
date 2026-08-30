@@ -13,9 +13,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/**
- * Fluent builder for spawning typed entities directly into an environment from scripts.
- */
+/// Fluent builder for spawning typed entities directly into an environment from scripts.
 public final class ScriptedSpawner {
   private final Environment environment;
 
@@ -23,17 +21,17 @@ public final class ScriptedSpawner {
     this.environment = Objects.requireNonNull(environment, "Environment must not be null.");
   }
 
-  /** Starts building a {@link Creature} to spawn. */
+  /// Starts building a [Creature] to spawn.
   public CreatureBuilder creature(String spritePrefix) {
     return new CreatureBuilder(this.environment, spritePrefix);
   }
 
-  /** Starts building a {@link Prop} to spawn. */
+  /// Starts building a [Prop] to spawn.
   public PropBuilder prop(String spriteSheet) {
     return new PropBuilder(this.environment, spriteSheet);
   }
 
-  /** Starts building an entity of arbitrary type via reflection. */
+  /// Starts building an entity of arbitrary type via reflection.
   public <T extends IEntity> EntityBuilder<T> entity(Class<T> type) {
     Objects.requireNonNull(type, "Entity class must not be null.");
     return new EntityBuilder<>(this.environment, () -> {
@@ -47,12 +45,12 @@ public final class ScriptedSpawner {
     });
   }
 
-  /** Starts building an entity supplied by a factory. */
+  /// Starts building an entity supplied by a factory.
   public <T extends IEntity> EntityBuilder<T> entity(Supplier<T> factory) {
     return new EntityBuilder<>(this.environment, factory);
   }
 
-  /** Starts configuring an existing entity instance to spawn. */
+  /// Starts configuring an existing entity instance to spawn.
   public <T extends IEntity> EntityBuilder<T> entity(T entity) {
     Objects.requireNonNull(entity, "Entity must not be null.");
     return new EntityBuilder<>(this.environment, () -> entity);

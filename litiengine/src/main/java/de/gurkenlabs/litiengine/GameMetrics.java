@@ -11,18 +11,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 
-/**
- * The class {@code GameMetrics} provides meta information about the game's metrics. This allows the developer to get a
- * feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and
- * to identify potential issues.
- * 
- * <p>
- * This information can be rendered as debug information if configured to get live data during a gameplay session.
- * </p>
- *
- * @see ClientConfiguration#showGameMetrics()
- * @see #render(Graphics2D)
- */
+/// The class `GameMetrics` provides meta information about the game's metrics. This allows the developer to get a
+/// feeling about the performance of different aspects (e.g. memory consumption, potential fps, network traffic, ...) and
+/// to identify potential issues.
+///
+/// This information can be rendered as debug information if configured to get live data during a gameplay session.
+///
+/// @see ClientConfiguration#showGameMetrics()
+/// @see #render(Graphics2D)
 public final class GameMetrics implements IRenderable {
   private static final Font TITLE_FONT = new Font(Font.MONOSPACED, Font.BOLD, 12);
   private static final Font METRIC_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
@@ -54,11 +50,9 @@ public final class GameMetrics implements IRenderable {
     return this.framesPerSecond;
   }
 
-  /**
-   * Gets the estimated maximum frame rate based on the latest frame processing time.
-   *
-   * @return the estimated maximum frames per second
-   */
+  /// Gets the estimated maximum frame rate based on the latest frame processing time.
+  ///
+  /// @return the estimated maximum frames per second
   public int getEstimatedMaxFramesPerSecond() {
     return this.maxFramesPerSecond;
   }
@@ -121,15 +115,13 @@ public final class GameMetrics implements IRenderable {
     this.maxFramesPerSecond = maxFrames;
   }
 
-  /**
-   * Sets the color that is used when rendering the metrics if {@code cl_showGameMetrics = true}.
-   * 
-   * @param color
-   *          The color for rendering the metrics.
-   * 
-   * @see ClientConfiguration#showGameMetrics()
-   * @see GameMetrics#render(Graphics2D)
-   */
+  /// Sets the color that is used when rendering the metrics if `cl_showGameMetrics = true`.
+  ///
+  /// @param color
+  /// The color for rendering the metrics.
+  ///
+  /// @see ClientConfiguration#showGameMetrics()
+  /// @see GameMetrics#render(Graphics2D)
   public void setRenderColor(Color color) {
     this.renderColor = color;
   }

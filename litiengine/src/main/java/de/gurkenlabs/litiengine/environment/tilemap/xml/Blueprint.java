@@ -11,20 +11,14 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The {@code Blueprint} class extends the {@code MapObject} class. It represents a blueprint that can contain multiple map objects and provides
- * functionality to build these objects at specified locations.
- */
+/// The `Blueprint` class extends the `MapObject` class. It represents a blueprint that can contain multiple map objects and provides
+/// functionality to build these objects at specified locations.
 @XmlRootElement(name = "template")
 public class Blueprint extends MapObject {
-  /**
-   * Templates in this format typically come from the Tiled editor and only support a single MapObject.
-   */
+  /// Templates in this format typically come from the Tiled editor and only support a single MapObject.
   public static final String TEMPLATE_FILE_EXTENSION = "tx";
 
-  /**
-   * Blueprint in this format support multiple map objects as children (extended template XML).
-   */
+  /// Blueprint in this format support multiple map objects as children (extended template XML).
   public static final String BLUEPRINT_FILE_EXTENSION = "xtx";
 
   @XmlElement(name = "object")
@@ -33,30 +27,24 @@ public class Blueprint extends MapObject {
   @XmlTransient
   private boolean keepIds;
 
-  /**
-   * Initializes a new instance of the {@code Blueprint} map object.
-   */
+  /// Initializes a new instance of the `Blueprint` map object.
   public Blueprint() {
     super();
   }
 
-  /**
-   * Initializes a new instance of the {@code Blueprint} map object.
-   *
-   * @param name       The name of the blueprint.
-   * @param mapObjects The map objects to build the blueprint from.
-   */
+  /// Initializes a new instance of the `Blueprint` map object.
+  ///
+  /// @param name       The name of the blueprint.
+  /// @param mapObjects The map objects to build the blueprint from.
   public Blueprint(String name, MapObject... mapObjects) {
     this(name, false, mapObjects);
   }
 
-  /**
-   * Initializes a new instance of the {@code Blueprint} map object.
-   *
-   * @param name       The name of the blueprint.
-   * @param keepIds    A flag indicating whether the IDs of the specified map objects should be kept.
-   * @param mapObjects The map objects to build the blueprint from.
-   */
+  /// Initializes a new instance of the `Blueprint` map object.
+  ///
+  /// @param name       The name of the blueprint.
+  /// @param keepIds    A flag indicating whether the IDs of the specified map objects should be kept.
+  /// @param mapObjects The map objects to build the blueprint from.
   public Blueprint(String name, boolean keepIds, MapObject... mapObjects) {
     this.keepIds = keepIds;
     this.setType(MapObjectType.AREA.toString());
@@ -76,43 +64,35 @@ public class Blueprint extends MapObject {
     }
   }
 
-  /**
-   * Gets the list of map objects contained in this blueprint.
-   *
-   * @return An iterable collection of map objects.
-   */
+  /// Gets the list of map objects contained in this blueprint.
+  ///
+  /// @return An iterable collection of map objects.
   @XmlTransient
   public Iterable<MapObject> getItems() {
     return this.items;
   }
 
-  /**
-   * Gets a value that indicates whether the IDs if this blueprint's map-objects should be kept. This is currently used when objects are cut and
-   * pasted afterwards.
-   *
-   * @return True if the ids for all {@link IMapObject}s of this {@link Blueprint} should be re-applied after building new instances.
-   */
+  /// Gets a value that indicates whether the IDs if this blueprint's map-objects should be kept. This is currently used when objects are cut and
+  /// pasted afterwards.
+  ///
+  /// @return True if the ids for all [IMapObject]s of this [Blueprint] should be re-applied after building new instances.
   public boolean keepIds() {
     return this.keepIds;
   }
 
-  /**
-   * Builds a list of map objects at the specified location.
-   *
-   * @param location The location where the map objects should be built.
-   * @return A list of built map objects.
-   */
+  /// Builds a list of map objects at the specified location.
+  ///
+  /// @param location The location where the map objects should be built.
+  /// @return A list of built map objects.
   public List<IMapObject> build(Point2D location) {
     return this.build(Math.round((float) location.getX()), Math.round((float) location.getY()));
   }
 
-  /**
-   * Builds a list of map objects at the specified coordinates.
-   *
-   * @param x The x-coordinate where the map objects should be built.
-   * @param y The y-coordinate where the map objects should be built.
-   * @return A list of built map objects.
-   */
+  /// Builds a list of map objects at the specified coordinates.
+  ///
+  /// @param x The x-coordinate where the map objects should be built.
+  /// @param y The y-coordinate where the map objects should be built.
+  /// @return A list of built map objects.
   public List<IMapObject> build(float x, float y) {
     List<IMapObject> builtObjects = new ArrayList<>();
 

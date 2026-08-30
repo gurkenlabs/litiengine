@@ -19,20 +19,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * The {@code CustomPropertyAdapter} class is an implementation of the {@link XmlAdapter} that facilitates the conversion between a
- * {@link PropertyList} and a {@link Map} of custom properties.
- *
- * <p>This adapter is used for XML serialization and deserialization of custom properties,
- * ensuring proper handling of property types, values, and locations.
- */
+/// The `CustomPropertyAdapter` class is an implementation of the [XmlAdapter] that facilitates the conversion between a
+/// [PropertyList] and a [Map] of custom properties.
+///
+/// This adapter is used for XML serialization and deserialization of custom properties,
+/// ensuring proper handling of property types, values, and locations.
 public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
-  /**
-   * Represents a custom property with attributes for name, type, value, and location.
-   *
-   * <p>This class is used for XML serialization and deserialization of individual properties.
-   * It implements the {@link Comparable} interface to allow sorting by property name.
-   */
+  /// Represents a custom property with attributes for name, type, value, and location.
+  ///
+  /// This class is used for XML serialization and deserialization of individual properties.
+  /// It implements the [Comparable] interface to allow sorting by property name.
   @XmlAccessorType(XmlAccessType.FIELD) static class Property implements Comparable<Property> {
     @XmlAttribute String name;
     @XmlAttribute String type;
@@ -44,14 +40,12 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
       // keep for serialization
     }
 
-    /**
-     * Constructs a new {@code Property} instance with the specified name and type.
-     *
-     * <p>If the provided type is {@code null} or invalid, it defaults to {@code CustomPropertyType.STRING}.
-     *
-     * @param name the name of the property
-     * @param type the type of the property, which must be a valid {@code CustomPropertyType}
-     */
+    /// Constructs a new `Property` instance with the specified name and type.
+    ///
+    /// If the provided type is `null` or invalid, it defaults to `CustomPropertyType.STRING`.
+    ///
+    /// @param name the name of the property
+    /// @param type the type of the property, which must be a valid `CustomPropertyType`
     Property(String name, String type) {
       this.name = name;
       this.type = type == null || !CustomPropertyType.isValid(type) ? CustomPropertyType.STRING : type;

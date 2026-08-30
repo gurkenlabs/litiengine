@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-/** Common stream and resource handling for LITIENGINE Java Sound file readers. */
+/// Common stream and resource handling for LITIENGINE Java Sound file readers.
 public abstract class AudioFileReader extends javax.sound.sampled.spi.AudioFileReader {
   private final int markLimit;
 

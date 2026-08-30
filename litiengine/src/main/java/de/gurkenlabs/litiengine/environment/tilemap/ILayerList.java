@@ -10,53 +10,41 @@ import de.gurkenlabs.litiengine.environment.Environment;
 
 public interface ILayerList extends ICustomPropertyProvider {
 
-  /**
-   * Gets all render layers in the Layer list.
-   *
-   * @return a List of ILayers
-   */
+  /// Gets all render layers in the Layer list.
+  ///
+  /// @return a List of ILayers
   List<ILayer> getRenderLayers();
 
-  /**
-   * Gets all MapObjectLayers in the Layer list.
-   *
-   * @return a List of IMapObjectLayers
-   */
+  /// Gets all MapObjectLayers in the Layer list.
+  ///
+  /// @return a List of IMapObjectLayers
   List<IMapObjectLayer> getMapObjectLayers();
 
-  /**
-   * Adds an {@code ILayer} to the Layer list.
-   *
-   * @param layer
-   *          the layer to be added
-   */
+  /// Adds an `ILayer` to the Layer list.
+  ///
+  /// @param layer
+  /// the layer to be added
   void addLayer(ILayer layer);
 
-  /**
-   * Adds an {@code ILayer} to the Layer list at the given index.
-   *
-   * @param index
-   *          the index
-   * @param layer
-   *          the layer to be added
-   */
+  /// Adds an `ILayer` to the Layer list at the given index.
+  ///
+  /// @param index
+  /// the index
+  /// @param layer
+  /// the layer to be added
   void addLayer(int index, ILayer layer);
 
-  /**
-   * Removes an {@code ILayer} from the Layer list.
-   *
-   * @param layer
-   *          the layer to be removed
-   */
+  /// Removes an `ILayer` from the Layer list.
+  ///
+  /// @param layer
+  /// the layer to be removed
   void removeLayer(ILayer layer);
 
-  /**
-   * Gets the {@code IMapObjectLayer} containing a given {@code IMapObject}.
-   *
-   * @param mapObject
-   *          the map object being searched
-   * @return the map object layer containing the map object
-   */
+  /// Gets the `IMapObjectLayer` containing a given `IMapObject`.
+  ///
+  /// @param mapObject
+  /// the map object being searched
+  /// @return the map object layer containing the map object
   default IMapObjectLayer getMapObjectLayer(IMapObject mapObject) {
     for (IMapObjectLayer layer : this.getMapObjectLayers()) {
       Optional<IMapObject> found = layer.getMapObjects().stream().filter(x -> x.getId() == mapObject.getId()).findFirst();
@@ -78,19 +66,15 @@ public interface ILayerList extends ICustomPropertyProvider {
     return layer.orElse(null);
   }
 
-  /**
-   * Removes a layer from the Layer list.
-   *
-   * @param index
-   *          the index of the layer to be removed
-   */
+  /// Removes a layer from the Layer list.
+  ///
+  /// @param index
+  /// the index of the layer to be removed
   void removeLayer(int index);
 
-  /**
-   * Gets all map objects in the layer list.
-   *
-   * @return a Collection of all IMapObjects in the layer list
-   */
+  /// Gets all map objects in the layer list.
+  ///
+  /// @return a Collection of all IMapObjects in the layer list
   default Collection<IMapObject> getMapObjects() {
     List<IMapObject> mapObjects = new ArrayList<>();
     if (this.getMapObjectLayers() == null) {
@@ -112,13 +96,11 @@ public interface ILayerList extends ICustomPropertyProvider {
     return Collections.unmodifiableCollection(mapObjects);
   }
 
-  /**
-   * Gets all map objects in the layer list that belong to the types passed as a parameter.
-   *
-   * @param types
-   *          an array of types for which the layer list is searched
-   * @return a Collection of IMapObjects matching the given MapObjectTypes
-   */
+  /// Gets all map objects in the layer list that belong to the types passed as a parameter.
+  ///
+  /// @param types
+  /// an array of types for which the layer list is searched
+  /// @return a Collection of IMapObjects matching the given MapObjectTypes
   default Collection<IMapObject> getMapObjects(String... types) {
     List<IMapObject> mapObjects = new ArrayList<>();
     if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || types.length == 0) {
@@ -136,18 +118,15 @@ public interface ILayerList extends ICustomPropertyProvider {
     return mapObjects;
   }
 
-  /**
-   * Gets all map objects in the layer list using the map IDs passed as a parameter. Please note that map IDs are intended
-   * to be unique identifiers for {@code IMapObject}s (and their corresponding {@code Entity}). This method is just a way
-   * of checking for non-unique IDs and re-assigning them before adding entities.
-   *
-   * @param mapIDs
-   *          an array of mapIDs for which the layer list is searched
-   *
-   * @return a Collection of IMapObjects matching the given MapObject IDs
-   * @see Environment#add
-   *
-   */
+  /// Gets all map objects in the layer list using the map IDs passed as a parameter. Please note that map IDs are intended
+  /// to be unique identifiers for `IMapObject`s (and their corresponding `Entity`). This method is just a way
+  /// of checking for non-unique IDs and re-assigning them before adding entities.
+  ///
+  /// @param mapIDs
+  /// an array of mapIDs for which the layer list is searched
+  ///
+  /// @return a Collection of IMapObjects matching the given MapObject IDs
+  /// @see Environment#add
   default Collection<IMapObject> getMapObjects(int... mapIDs) {
     List<IMapObject> mapObjects = new ArrayList<>();
     if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || mapIDs.length == 0) {
@@ -165,13 +144,11 @@ public interface ILayerList extends ICustomPropertyProvider {
     return mapObjects;
   }
 
-  /**
-   * Gets the first {@code IMapObject} with the given ID from a layer list.
-   *
-   * @param mapId
-   *          the map id of the desired {@code IMapObject}
-   * @return the {@code IMapObject} with the given ID
-   */
+  /// Gets the first `IMapObject` with the given ID from a layer list.
+  ///
+  /// @param mapId
+  /// the map id of the desired `IMapObject`
+  /// @return the `IMapObject` with the given ID
   default IMapObject getMapObject(int mapId) {
     if (this.getMapObjectLayers() == null) {
       return null;
@@ -192,12 +169,10 @@ public interface ILayerList extends ICustomPropertyProvider {
     return null;
   }
 
-  /**
-   * Removes the first {@code IMapObject} with the given ID.
-   *
-   * @param mapId
-   *          the map id of the {@code IMapObject} we want to remove
-   */
+  /// Removes the first `IMapObject` with the given ID.
+  ///
+  /// @param mapId
+  /// the map id of the `IMapObject` we want to remove
   default void removeMapObject(int mapId) {
     for (IMapObjectLayer layer : this.getMapObjectLayers()) {
       IMapObject remove = null;
@@ -215,25 +190,19 @@ public interface ILayerList extends ICustomPropertyProvider {
     }
   }
 
-  /**
-   * Gets the {@code ITileLayer}s contained in a Layer list.
-   *
-   * @return a {@code List} of all {@code ITileLayer}s
-   */
+  /// Gets the `ITileLayer`s contained in a Layer list.
+  ///
+  /// @return a `List` of all `ITileLayer`s
   List<ITileLayer> getTileLayers();
 
-  /**
-   * Gets the {@code IImageLayer}s contained in a Layer list.
-   *
-   * @return a {@code List} of all {@code IImageLayer}s
-   */
+  /// Gets the `IImageLayer`s contained in a Layer list.
+  ///
+  /// @return a `List` of all `IImageLayer`s
   List<IImageLayer> getImageLayers();
 
-  /**
-   * Gets the {@code IGroupLayer}s contained in a Layer list.
-   *
-   * @return a {@code List} of all {@code IGroupLayer}s
-   */
+  /// Gets the `IGroupLayer`s contained in a Layer list.
+  ///
+  /// @return a `List` of all `IGroupLayer`s
   List<IGroupLayer> getGroupLayers();
 
 }

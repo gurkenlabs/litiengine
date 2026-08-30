@@ -16,28 +16,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
-/**
- * Resource container for {@link Animation} resources.
- *
- * <p>
- * The container can import animations from the JSON format exported by
- * <a href="https://www.aseprite.org/docs/cli/#filename-format">Aseprite</a> and export existing
- * animations back to that format. This makes it possible to author animations in Aseprite and load
- * them directly at runtime via {@link Resources#animations()}.
- * </p>
- *
- * <p>
- * Aseprite exports a sprite sheet image together with a JSON sidecar describing each frame's
- * location and display duration. When loading, the container expects the sprite sheet image to live
- * next to the JSON file (as referenced by the {@code meta.image} field). All frames must have the
- * same width and height; the engine's {@link Spritesheet} model is grid-based and does not support
- * frames of arbitrary sizes.
- * </p>
- */
+/// Resource container for [Animation] resources.
+///
+/// The container can import animations from the JSON format exported by
+/// [Aseprite](https://www.aseprite.org/docs/cli/#filename-format) and export existing
+/// animations back to that format. This makes it possible to author animations in Aseprite and load
+/// them directly at runtime via [Resources#animations()].
+///
+/// Aseprite exports a sprite sheet image together with a JSON sidecar describing each frame's
+/// location and display duration. When loading, the container expects the sprite sheet image to live
+/// next to the JSON file (as referenced by the `meta.image` field). All frames must have the
+/// same width and height; the engine's [Spritesheet] model is grid-based and does not support
+/// frames of arbitrary sizes.
 public final class Animations extends ResourcesContainer<Animation> {
   private static final Logger log = Logger.getLogger(Animations.class.getName());
 
-  /** File extension recognised for Aseprite JSON sidecar files. */
+  /// File extension recognised for Aseprite JSON sidecar files.
   public static final String ASEPRITE_FILE_EXTENSION = "json";
 
   Animations() {
@@ -56,19 +50,15 @@ public final class Animations extends ResourcesContainer<Animation> {
     return fromAseprite(format, animationName, resourceName);
   }
 
-  /**
-   * Imports an Aseprite-exported animation from the given JSON file.
-   *
-   * <p>
-   * The loaded animation is registered with this container under the file name (without extension)
-   * of the JSON file. The associated sprite sheet is registered with {@link Resources#spritesheets()}.
-   * </p>
-   *
-   * @param asepriteJsonPath The path to the Aseprite JSON sidecar file.
-   * @return The imported animation.
-   * @throws IOException If the file cannot be read or parsed, or if the referenced image cannot be
-   *                     loaded.
-   */
+  /// Imports an Aseprite-exported animation from the given JSON file.
+  ///
+  /// The loaded animation is registered with this container under the file name (without extension)
+  /// of the JSON file. The associated sprite sheet is registered with [Resources#spritesheets()].
+  ///
+  /// @param asepriteJsonPath The path to the Aseprite JSON sidecar file.
+  /// @return The imported animation.
+  /// @throws IOException If the file cannot be read or parsed, or if the referenced image cannot be
+  /// loaded.
   public Animation importAseprite(Path asepriteJsonPath) throws IOException {
     AsepriteFormat format = AsepriteFormat.read(asepriteJsonPath);
     String animationName = FileUtilities.getFileName(asepriteJsonPath.getFileName().toString());
@@ -78,20 +68,16 @@ public final class Animations extends ResourcesContainer<Animation> {
     return animation;
   }
 
-  /**
-   * Exports the specified animation to the Aseprite JSON format.
-   *
-   * <p>
-   * The sprite sheet image referenced by the animation is written next to the JSON file using the
-   * sprite sheet's {@link Spritesheet#getName() name} and the {@code .png} file extension. The
-   * resulting {@code .json} file follows the layout produced by the Aseprite CLI when exported with
-   * the {@code --format json-hash} option.
-   * </p>
-   *
-   * @param animation     The animation to export.
-   * @param destinationJson The path of the JSON file to write.
-   * @return {@code true} if the export was successful; {@code false} otherwise.
-   */
+  /// Exports the specified animation to the Aseprite JSON format.
+  ///
+  /// The sprite sheet image referenced by the animation is written next to the JSON file using the
+  /// sprite sheet's [name][Spritesheet#getName()] and the `.png` file extension. The
+  /// resulting `.json` file follows the layout produced by the Aseprite CLI when exported with
+  /// the `--format json-hash` option.
+  ///
+  /// @param animation     The animation to export.
+  /// @param destinationJson The path of the JSON file to write.
+  /// @return `true` if the export was successful; `false` otherwise.
   public boolean exportAseprite(Animation animation, Path destinationJson) {
     if (animation == null) {
       return false;
@@ -119,12 +105,10 @@ public final class Animations extends ResourcesContainer<Animation> {
     }
   }
 
-  /**
-   * Builds an Aseprite JSON model from the given animation.
-   *
-   * @param animation The animation to describe.
-   * @return The Aseprite JSON model.
-   */
+  /// Builds an Aseprite JSON model from the given animation.
+  ///
+  /// @param animation The animation to describe.
+  /// @return The Aseprite JSON model.
   public static AsepriteFormat toAseprite(Animation animation) {
     AsepriteFormat result = new AsepriteFormat();
     Spritesheet sheet = animation.getSpritesheet();
@@ -156,22 +140,18 @@ public final class Animations extends ResourcesContainer<Animation> {
     return result;
   }
 
-  /**
-   * Builds an {@link Animation} (and its backing {@link Spritesheet}) from the given Aseprite model.
-   *
-   * <p>
-   * The image referenced by {@link AsepriteFormat#getImage()} is resolved relative to the supplied
-   * {@code baseUrl} and loaded via the engine's image resource container.
-   * </p>
-   *
-   * @param format        The Aseprite model to convert.
-   * @param animationName The name to assign to the resulting animation.
-   * @param baseUrl       The URL used to resolve the referenced image. May be {@code null} if the
-   *                      image is referenced by an absolute path.
-   * @return The created animation.
-   * @throws IOException If the referenced image cannot be loaded or if the frames are not uniform in
-   *                     size.
-   */
+  /// Builds an [Animation] (and its backing [Spritesheet]) from the given Aseprite model.
+  ///
+  /// The image referenced by [AsepriteFormat#getImage()] is resolved relative to the supplied
+  /// `baseUrl` and loaded via the engine's image resource container.
+  ///
+  /// @param format        The Aseprite model to convert.
+  /// @param animationName The name to assign to the resulting animation.
+  /// @param baseUrl       The URL used to resolve the referenced image. May be `null` if the
+  /// image is referenced by an absolute path.
+  /// @return The created animation.
+  /// @throws IOException If the referenced image cannot be loaded or if the frames are not uniform in
+  /// size.
   public static Animation fromAseprite(AsepriteFormat format, String animationName, URL baseUrl) throws IOException {
     List<AsepriteFormat.Frame> frames = format.getFrames();
     if (frames.isEmpty()) {
@@ -258,11 +238,9 @@ public final class Animations extends ResourcesContainer<Animation> {
     return new URL(parent + image);
   }
 
-  /**
-   * Convenience method: returns all loaded animations indexed by name.
-   *
-   * @return An ordered map of loaded animation name to {@link Animation} instance.
-   */
+  /// Convenience method: returns all loaded animations indexed by name.
+  ///
+  /// @return An ordered map of loaded animation name to [Animation] instance.
   public Map<String, Animation> getAllByName() {
     LinkedHashMap<String, Animation> map = new LinkedHashMap<>();
     for (Map.Entry<String, Animation> e : getResources().entrySet()) {
@@ -271,14 +249,12 @@ public final class Animations extends ResourcesContainer<Animation> {
     return map;
   }
 
-  /**
-   * Convenience overload that loads an Aseprite JSON file from the runtime classpath or file system.
-   *
-   * @param asepriteJsonPath The path to the Aseprite JSON sidecar file.
-   * @return The imported animation.
-   * @throws IOException If the file cannot be read or parsed, or if the referenced image cannot be
-   *                     loaded.
-   */
+  /// Convenience overload that loads an Aseprite JSON file from the runtime classpath or file system.
+  ///
+  /// @param asepriteJsonPath The path to the Aseprite JSON sidecar file.
+  /// @return The imported animation.
+  /// @throws IOException If the file cannot be read or parsed, or if the referenced image cannot be
+  /// loaded.
   public Animation importAseprite(String asepriteJsonPath) throws IOException {
     URL location = Resources.getLocation(asepriteJsonPath);
     if (location == null) {

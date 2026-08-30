@@ -25,10 +25,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * The {@code Creature} class extends the {@code CombatEntity} class and implements the {@code IMobileEntity} interface. It represents a creature
- * entity in the game with movement and combat capabilities.
- */
+/// The `Creature` class extends the `CombatEntity` class and implements the `IMobileEntity` interface. It represents a creature
+/// entity in the game with movement and combat capabilities.
 @MovementInfo
 @TmxType(MapObjectType.CREATURE)
 public class Creature extends CombatEntity implements IMobileEntity {
@@ -56,19 +54,15 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   private long lastMoved;
 
-  /**
-   * Instantiates a new {@code Creature} entity with default settings.
-   */
+  /// Instantiates a new `Creature` entity with default settings.
   public Creature() {
     this(null);
   }
 
-  /**
-   * Instantiates a new {@code Creature} entity.
-   *
-   * @param spritesheetName The spritesheet name that identifies the sprites bound to this instance.
-   * @see CreatureAnimationController#getSpriteName(Creature, de.gurkenlabs.litiengine.graphics.CreatureAnimationState)
-   */
+  /// Instantiates a new `Creature` entity.
+  ///
+  /// @param spritesheetName The spritesheet name that identifies the sprites bound to this instance.
+  /// @see CreatureAnimationController#getSpriteName(Creature, de.gurkenlabs.litiengine.graphics.CreatureAnimationState)
   public Creature(String spritesheetName) {
     super();
     final MovementInfo movementInfo = getClass().getAnnotation(MovementInfo.class);
@@ -124,11 +118,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return this.deceleration;
   }
 
-  /**
-   * Gets the facing direction of the creature based on its current angle.
-   *
-   * @return The direction the creature is facing.
-   */
+  /// Gets the facing direction of the creature based on its current angle.
+  ///
+  /// @return The direction the creature is facing.
   public Direction getFacingDirection() {
     return Direction.fromAngle(getAngle());
   }
@@ -138,14 +130,12 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return getController(IMovementController.class);
   }
 
-  /**
-   * Gets the current spritesheet name of this instance. Overwriting this allows for a more sophisticated logic that determines the sprite to be used;
-   * e.g. This method could append certain properties of the creature (state, weapon, ...) to the default string. <br>
-   * <br>
-   * The value of this method will be used e.g. by the {@link CreatureAnimationController} to determine the animation that it should play.
-   *
-   * @return The current spritesheet name of this instance.
-   */
+  /// Gets the current spritesheet name of this instance. Overwriting this allows for a more sophisticated logic that determines the sprite to be used;
+  /// e.g. This method could append certain properties of the creature (state, weapon, ...) to the default string.
+  ///
+  /// The value of this method will be used e.g. by the [CreatureAnimationController] to determine the animation that it should play.
+  ///
+  /// @return The current spritesheet name of this instance.
   public String getSpritesheetName() {
     return this.spritesheetName;
   }
@@ -165,20 +155,16 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return this.velocity;
   }
 
-  /**
-   * Checks if the creature's sprite is being scaled with the entity dimensions.
-   *
-   * @return true if the sprite is being scaled, false otherwise.
-   */
+  /// Checks if the creature's sprite is being scaled with the entity dimensions.
+  ///
+  /// @return true if the sprite is being scaled, false otherwise.
   public boolean isScaling() {
     return this.scaling;
   }
 
-  /**
-   * Checks if the creature is idle.
-   *
-   * @return true if the creature has not moved for a duration longer than the idle delay, false otherwise.
-   */
+  /// Checks if the creature is idle.
+  ///
+  /// @return true if the creature has not moved for a duration longer than the idle delay, false otherwise.
   public boolean isIdle() {
     return Game.time().since(this.lastMoved) > IDLE_DELAY;
   }
@@ -193,11 +179,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.deceleration = deceleration;
   }
 
-  /**
-   * Sets the facing direction of the creature.
-   *
-   * @param facingDirection The direction to set the creature's facing angle to.
-   */
+  /// Sets the facing direction of the creature.
+  ///
+  /// @param facingDirection The direction to set the creature's facing angle to.
   public void setFacingDirection(final Direction facingDirection) {
     this.setAngle(facingDirection.toAngle());
   }
@@ -224,11 +208,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.turnOnMove = turn;
   }
 
-  /**
-   * Sets the spritesheet name for this creature.
-   *
-   * @param spritesheetName The name of the spritesheet to set.
-   */
+  /// Sets the spritesheet name for this creature.
+  ///
+  /// @param spritesheetName The name of the spritesheet to set.
   public void setSpritesheetName(String spritesheetName) {
     if (this.spritesheetName != null && this.spritesheetName.equals(spritesheetName)) {
       return;
@@ -238,11 +220,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.updateAnimationController();
   }
 
-  /**
-   * Sets whether the creature's sprite should be scaled with the entity dimensions.
-   *
-   * @param scaling true to scale the sprite, false otherwise.
-   */
+  /// Sets whether the creature's sprite should be scaled with the entity dimensions.
+  ///
+  /// @param scaling true to scale the sprite, false otherwise.
   public void setScaling(boolean scaling) {
     this.scaling = scaling;
   }
@@ -271,10 +251,8 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return sb.toString();
   }
 
-  /**
-   * Updates the animation controller for the creature. This method creates a new animation controller and adds it to the creature's controllers. If
-   * the game world environment is loaded, the new controller is attached to the game loop.
-   */
+  /// Updates the animation controller for the creature. This method creates a new animation controller and adds it to the creature's controllers. If
+  /// the game world environment is loaded, the new controller is attached to the game loop.
   protected void updateAnimationController() {
     IEntityAnimationController<? extends Creature> controller = this.createAnimationController();
     getControllers().addController(controller);
@@ -283,39 +261,31 @@ public class Creature extends CombatEntity implements IMobileEntity {
     }
   }
 
-  /**
-   * Creates a new animation controller for the creature.
-   *
-   * @return A new instance of {@link IEntityAnimationController} for the creature.
-   */
+  /// Creates a new animation controller for the creature.
+  ///
+  /// @return A new instance of [IEntityAnimationController] for the creature.
   protected IEntityAnimationController<? extends Creature> createAnimationController() {
     return new CreatureAnimationController<>(this, true);
   }
 
-  /**
-   * Creates a new movement controller for the creature.
-   *
-   * @return A new instance of {@link IMovementController} for the creature.
-   */
+  /// Creates a new movement controller for the creature.
+  ///
+  /// @return A new instance of [IMovementController] for the creature.
   protected IMovementController createMovementController() {
     return new MovementController<>(this);
   }
 
-  /**
-   * Gets all abilities currently registered on this creature.
-   *
-   * @return A collection of registered abilities.
-   */
+  /// Gets all abilities currently registered on this creature.
+  ///
+  /// @return A collection of registered abilities.
   public Collection<Ability> getAbilities() {
     return List.copyOf(this.abilities.values());
   }
 
-  /**
-   * Gets an ability registered on this creature by its name.
-   *
-   * @param name The name of the ability to retrieve.
-   * @return An {@link Optional} containing the ability if found, or empty otherwise.
-   */
+  /// Gets an ability registered on this creature by its name.
+  ///
+  /// @param name The name of the ability to retrieve.
+  /// @return An [Optional] containing the ability if found, or empty otherwise.
   public Optional<Ability> getAbility(String name) {
     if (name == null || name.isBlank()) {
       return Optional.empty();
@@ -323,13 +293,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return Optional.ofNullable(this.abilities.get(name));
   }
 
-  /**
-   * Gets the first ability of the specified class registered on this creature.
-   *
-   * @param <T> The ability type.
-   * @param abilityClass The class of the ability.
-   * @return An {@link Optional} containing the ability if found, or empty otherwise.
-   */
+  /// Gets the first ability of the specified class registered on this creature.
+  ///
+  /// @param <T> The ability type.
+  /// @param abilityClass The class of the ability.
+  /// @return An [Optional] containing the ability if found, or empty otherwise.
   @SuppressWarnings("unchecked")
   public <T extends Ability> Optional<T> getAbility(Class<T> abilityClass) {
     if (abilityClass == null) {
@@ -343,31 +311,25 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return Optional.empty();
   }
 
-  /**
-   * Checks whether this creature has an ability with the specified name.
-   *
-   * @param name The ability name.
-   * @return true if the ability exists, false otherwise.
-   */
+  /// Checks whether this creature has an ability with the specified name.
+  ///
+  /// @param name The ability name.
+  /// @return true if the ability exists, false otherwise.
   public boolean hasAbility(String name) {
     return name != null && this.abilities.containsKey(name);
   }
 
-  /**
-   * Checks whether this creature has an ability of the specified class.
-   *
-   * @param abilityClass The class of the ability.
-   * @return true if an ability of the class is registered, false otherwise.
-   */
+  /// Checks whether this creature has an ability of the specified class.
+  ///
+  /// @param abilityClass The class of the ability.
+  /// @return true if an ability of the class is registered, false otherwise.
   public boolean hasAbility(Class<? extends Ability> abilityClass) {
     return this.getAbility(abilityClass).isPresent();
   }
 
-  /**
-   * Adds an ability to this creature.
-   *
-   * @param ability The ability to register.
-   */
+  /// Adds an ability to this creature.
+  ///
+  /// @param ability The ability to register.
   public void addAbility(Ability ability) {
     if (ability == null) {
       return;
@@ -378,11 +340,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.abilities.put(key, ability);
   }
 
-  /**
-   * Removes an ability from this creature.
-   *
-   * @param ability The ability to remove.
-   */
+  /// Removes an ability from this creature.
+  ///
+  /// @param ability The ability to remove.
   public void removeAbility(Ability ability) {
     if (ability == null) {
       return;
@@ -390,11 +350,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.abilities.values().remove(ability);
   }
 
-  /**
-   * Removes an ability with the specified name from this creature.
-   *
-   * @param name The name of the ability to remove.
-   */
+  /// Removes an ability with the specified name from this creature.
+  ///
+  /// @param name The name of the ability to remove.
   public void removeAbility(String name) {
     if (name == null) {
       return;
@@ -402,73 +360,59 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.abilities.remove(name);
   }
 
-  /**
-   * Casts a registered ability by name.
-   *
-   * @param name The name of the ability to cast.
-   * @return The {@link AbilityExecution} if cast successfully, or null otherwise.
-   */
+  /// Casts a registered ability by name.
+  ///
+  /// @param name The name of the ability to cast.
+  /// @return The [AbilityExecution] if cast successfully, or null otherwise.
   public AbilityExecution cast(String name) {
     return this.getAbility(name).map(Ability::cast).orElse(null);
   }
 
-  /**
-   * Casts a registered ability of the specified class.
-   *
-   * @param <T> The ability type.
-   * @param abilityClass The class of the ability to cast.
-   * @return The {@link AbilityExecution} if cast successfully, or null otherwise.
-   */
+  /// Casts a registered ability of the specified class.
+  ///
+  /// @param <T> The ability type.
+  /// @param abilityClass The class of the ability to cast.
+  /// @return The [AbilityExecution] if cast successfully, or null otherwise.
   public <T extends Ability> AbilityExecution cast(Class<T> abilityClass) {
     return this.getAbility(abilityClass).map(Ability::cast).orElse(null);
   }
 
-  /**
-   * Checks whether a registered ability with the specified name can currently be cast.
-   *
-   * @param name The name of the ability.
-   * @return true if the ability exists and can be cast, false otherwise.
-   */
+  /// Checks whether a registered ability with the specified name can currently be cast.
+  ///
+  /// @param name The name of the ability.
+  /// @return true if the ability exists and can be cast, false otherwise.
   public boolean canCast(String name) {
     return this.getAbility(name).map(Ability::canCast).orElse(false);
   }
 
-  /**
-   * Checks whether a registered ability of the specified class can currently be cast.
-   *
-   * @param abilityClass The class of the ability.
-   * @return true if the ability exists and can be cast, false otherwise.
-   */
+  /// Checks whether a registered ability of the specified class can currently be cast.
+  ///
+  /// @param abilityClass The class of the ability.
+  /// @return true if the ability exists and can be cast, false otherwise.
   public boolean canCast(Class<? extends Ability> abilityClass) {
     return this.getAbility(abilityClass).map(Ability::canCast).orElse(false);
   }
 
-  /**
-   * Checks whether a registered ability with the specified name is currently on cooldown.
-   *
-   * @param name The name of the ability.
-   * @return true if the ability exists and is on cooldown, false otherwise.
-   */
+  /// Checks whether a registered ability with the specified name is currently on cooldown.
+  ///
+  /// @param name The name of the ability.
+  /// @return true if the ability exists and is on cooldown, false otherwise.
   public boolean isOnCooldown(String name) {
     return this.getAbility(name).map(Ability::isOnCooldown).orElse(false);
   }
 
-  /**
-   * Checks whether a registered ability of the specified class is currently on cooldown.
-   *
-   * @param abilityClass The class of the ability.
-   * @return true if the ability exists and is on cooldown, false otherwise.
-   */
+  /// Checks whether a registered ability of the specified class is currently on cooldown.
+  ///
+  /// @param abilityClass The class of the ability.
+  /// @return true if the ability exists and is on cooldown, false otherwise.
   public boolean isOnCooldown(Class<? extends Ability> abilityClass) {
     return this.getAbility(abilityClass).map(Ability::isOnCooldown).orElse(false);
   }
 
-  /**
-   * Begins fluently building a new {@link DynamicAbility} for this creature.
-   *
-   * @param name The name of the ability.
-   * @return An {@link AbilityBuilder} configured for this creature.
-   */
+  /// Begins fluently building a new [de.gurkenlabs.litiengine.abilities.DynamicAbility] for this creature.
+  ///
+  /// @param name The name of the ability.
+  /// @return An [AbilityBuilder] configured for this creature.
   public AbilityBuilder createAbility(String name) {
     return new AbilityBuilder(this, name);
   }

@@ -20,31 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Java representation of the JSON export format produced by <a href="https://www.aseprite.org">Aseprite</a>.
- *
- * <p>
- * The Aseprite CLI can export a sprite sheet image together with a JSON sidecar that describes how
- * each frame of the sprite sheet is laid out and how long it should be displayed. See the
- * <a href="https://www.aseprite.org/docs/cli/#filename-format">Aseprite CLI documentation</a> for
- * details.
- * </p>
- *
- * <p>
- * This class supports both the "hash" (frames as an object map) and the "array" (frames as a JSON
- * array) layouts. When writing, the engine emits the "hash" form, which is the Aseprite default.
- * </p>
- *
- * <p>
- * Serialization is delegated to {@link JsonUtilities}, which is backed by the Jakarta JSON
- * Processing and Jakarta JSON Binding APIs.
- * </p>
- */
+/// Java representation of the JSON export format produced by [Aseprite](https://www.aseprite.org).
+///
+/// The Aseprite CLI can export a sprite sheet image together with a JSON sidecar that describes how
+/// each frame of the sprite sheet is laid out and how long it should be displayed. See the
+/// [Aseprite CLI documentation](https://www.aseprite.org/docs/cli/#filename-format) for
+/// details.
+///
+/// This class supports both the "hash" (frames as an object map) and the "array" (frames as a JSON
+/// array) layouts. When writing, the engine emits the "hash" form, which is the Aseprite default.
+///
+/// Serialization is delegated to [JsonUtilities], which is backed by the Jakarta JSON
+/// Processing and Jakarta JSON Binding APIs.
 public final class AsepriteFormat {
 
-  /**
-   * Describes a single rectangular region within an Aseprite sprite sheet.
-   */
+  /// Describes a single rectangular region within an Aseprite sprite sheet.
   public static final class Frame {
     private final String name;
     private final int x;
@@ -53,16 +43,14 @@ public final class AsepriteFormat {
     private final int height;
     private final int duration;
 
-    /**
-     * Creates a new frame entry.
-     *
-     * @param name     Name of the frame, typically of the form {@code "<animation> <index>.png"}.
-     * @param x        X position of the frame within the sprite sheet, in pixels.
-     * @param y        Y position of the frame within the sprite sheet, in pixels.
-     * @param width    Width of the frame, in pixels.
-     * @param height   Height of the frame, in pixels.
-     * @param duration Display duration of the frame, in milliseconds.
-     */
+    /// Creates a new frame entry.
+    ///
+    /// @param name     Name of the frame, typically of the form `"<animation> <index>.png"`.
+    /// @param x        X position of the frame within the sprite sheet, in pixels.
+    /// @param y        Y position of the frame within the sprite sheet, in pixels.
+    /// @param width    Width of the frame, in pixels.
+    /// @param height   Height of the frame, in pixels.
+    /// @param duration Display duration of the frame, in milliseconds.
     public Frame(String name, int x, int y, int width, int height, int duration) {
       this.name = name;
       this.x = x;
@@ -105,17 +93,15 @@ public final class AsepriteFormat {
   private String app = "https://litiengine.com";
   private String version = "1.0";
 
-  /** Creates an empty Aseprite format instance. */
+  /// Creates an empty Aseprite format instance.
   public AsepriteFormat() {
   }
 
-  /**
-   * Reads an Aseprite JSON document from the given URL.
-   *
-   * @param url The URL of the JSON file.
-   * @return The parsed Aseprite format.
-   * @throws IOException If the file cannot be read or parsed.
-   */
+  /// Reads an Aseprite JSON document from the given URL.
+  ///
+  /// @param url The URL of the JSON file.
+  /// @return The parsed Aseprite format.
+  /// @throws IOException If the file cannot be read or parsed.
   public static AsepriteFormat read(URL url) throws IOException {
     try (InputStream in = url.openStream(); Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
       return fromTree(JsonUtilities.readTree(reader));
@@ -124,13 +110,11 @@ public final class AsepriteFormat {
     }
   }
 
-  /**
-   * Reads an Aseprite JSON document from the given path.
-   *
-   * @param path The path to the JSON file.
-   * @return The parsed Aseprite format.
-   * @throws IOException If the file cannot be read or parsed.
-   */
+  /// Reads an Aseprite JSON document from the given path.
+  ///
+  /// @param path The path to the JSON file.
+  /// @return The parsed Aseprite format.
+  /// @throws IOException If the file cannot be read or parsed.
   public static AsepriteFormat read(Path path) throws IOException {
     try {
       return fromTree(JsonUtilities.readTree(path));
@@ -139,13 +123,11 @@ public final class AsepriteFormat {
     }
   }
 
-  /**
-   * Parses an Aseprite JSON document from the given JSON string.
-   *
-   * @param json The JSON text.
-   * @return The parsed Aseprite format.
-   * @throws IOException If the JSON is malformed or does not represent an Aseprite document.
-   */
+  /// Parses an Aseprite JSON document from the given JSON string.
+  ///
+  /// @param json The JSON text.
+  /// @return The parsed Aseprite format.
+  /// @throws IOException If the JSON is malformed or does not represent an Aseprite document.
   public static AsepriteFormat parse(String json) throws IOException {
     try (Reader reader = new java.io.StringReader(json)) {
       return fromTree(JsonUtilities.readTree(reader));
@@ -259,24 +241,20 @@ public final class AsepriteFormat {
     return value == null ? "" : value;
   }
 
-  /**
-   * Writes this Aseprite document to the given path as a (pretty-printed) JSON file.
-   *
-   * @param path The destination path.
-   * @throws IOException If writing fails.
-   */
+  /// Writes this Aseprite document to the given path as a (pretty-printed) JSON file.
+  ///
+  /// @param path The destination path.
+  /// @throws IOException If writing fails.
   public void write(Path path) throws IOException {
     if (JsonUtilities.saveTree(toJsonTree(), path, true) == null) {
       throw new IOException("Could not write Aseprite JSON to " + path);
     }
   }
 
-  /**
-   * Writes this Aseprite document as a JSON string.
-   *
-   * @param pretty Whether to format the output with indentation and line breaks.
-   * @return The JSON representation.
-   */
+  /// Writes this Aseprite document as a JSON string.
+  ///
+  /// @param pretty Whether to format the output with indentation and line breaks.
+  /// @return The JSON representation.
   public String writeToString(boolean pretty) {
     return JsonUtilities.writeTreeToString(toJsonTree(), pretty);
   }
@@ -337,12 +315,12 @@ public final class AsepriteFormat {
     return root.build();
   }
 
-  /** @return The list of frames defined by this document. */
+  /// @return The list of frames defined by this document.
   public List<Frame> getFrames() {
     return frames;
   }
 
-  /** @return The image filename referenced in the document's meta block (may be {@code null}). */
+  /// @return The image filename referenced in the document's meta block (may be `null`).
   public String getImage() {
     return image;
   }
@@ -351,7 +329,7 @@ public final class AsepriteFormat {
     this.image = image;
   }
 
-  /** @return The width of the referenced sprite sheet image, in pixels. */
+  /// @return The width of the referenced sprite sheet image, in pixels.
   public int getImageWidth() {
     return imageWidth;
   }
@@ -360,7 +338,7 @@ public final class AsepriteFormat {
     this.imageWidth = imageWidth;
   }
 
-  /** @return The height of the referenced sprite sheet image, in pixels. */
+  /// @return The height of the referenced sprite sheet image, in pixels.
   public int getImageHeight() {
     return imageHeight;
   }
@@ -369,7 +347,7 @@ public final class AsepriteFormat {
     this.imageHeight = imageHeight;
   }
 
-  /** @return The pixel format string from the document's meta block. */
+  /// @return The pixel format string from the document's meta block.
   public String getFormat() {
     return format;
   }

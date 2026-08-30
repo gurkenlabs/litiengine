@@ -19,31 +19,25 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-/**
- * The {@code CustomPropertyProvider} class provides an implementation of the {@link ICustomPropertyProvider} interface.
- *
- * <p>This class manages custom properties using a map, allowing for the storage,
- * retrieval, and manipulation of various property types. It supports operations such as setting, getting, and removing properties, as well as
- * handling default values and type conversions.
- */
+/// The `CustomPropertyProvider` class provides an implementation of the [ICustomPropertyProvider] interface.
+///
+/// This class manages custom properties using a map, allowing for the storage,
+/// retrieval, and manipulation of various property types. It supports operations such as setting, getting, and removing properties, as well as
+/// handling default values and type conversions.
 @XmlAccessorType(XmlAccessType.FIELD) public class CustomPropertyProvider implements ICustomPropertyProvider {
   @XmlElement @XmlJavaTypeAdapter(CustomPropertyAdapter.class) private Map<String, ICustomProperty> properties;
 
-  /**
-   * Default constructor for the {@code CustomPropertyProvider} class.
-   *
-   * <p>Initializes the properties map as a {@link Hashtable} to ensure
-   * that null keys and null values are not allowed.
-   */
+  /// Default constructor for the `CustomPropertyProvider` class.
+  ///
+  /// Initializes the properties map as a [Hashtable] to ensure
+  /// that null keys and null values are not allowed.
   public CustomPropertyProvider() {
     this.properties = new Hashtable<>(); // use Hashtable because it rejects null keys and null values
   }
 
-  /**
-   * Copy Constructor for copying instances of CustomPropertyProviders.
-   *
-   * @param propertyProviderToBeCopied the PropertyProvider we want to copy
-   */
+  /// Copy Constructor for copying instances of CustomPropertyProviders.
+  ///
+  /// @param propertyProviderToBeCopied the PropertyProvider we want to copy
   public CustomPropertyProvider(ICustomPropertyProvider propertyProviderToBeCopied) {
     this.properties = propertyProviderToBeCopied.getProperties().entrySet().stream()
       .collect(Collectors.toMap(Entry::getKey, e -> new CustomProperty((e.getValue()))));

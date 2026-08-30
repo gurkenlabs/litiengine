@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-/** Encodes structured script bindings in TMX-compatible JSON properties. */
+/// Encodes structured script bindings in TMX-compatible JSON properties.
 public final class ScriptBindingCodec {
   private ScriptBindingCodec() {}
 

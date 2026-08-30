@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** Owns a collection of registrations and releases them together. */
+/// Owns a collection of registrations and releases them together.
 public final class Subscriptions implements AutoCloseable {
   private static final Logger log = Logger.getLogger(Subscriptions.class.getName());
   private final Collection<Subscription> subscriptions = ConcurrentHashMap.newKeySet();

@@ -27,20 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
-/**
- * The {@code RenderComponent} class extends {@link Canvas} and handles the rendering of the game screen, including managing fade effects, capturing
- * screenshots, and rendering the game cursor.
- */
+/// The `RenderComponent` class extends [Canvas] and handles the rendering of the game screen, including managing fade effects, capturing
+/// screenshots, and rendering the game cursor.
 public class RenderComponent extends Canvas {
   private static final Logger log = Logger.getLogger(RenderComponent.class.getName());
-  /**
-   * The default background color for the rendering component.
-   */
+  /// The default background color for the rendering component.
   public static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
 
-  /**
-   * The default font for rendering text in the component.
-   */
+  /// The default font for rendering text in the component.
   public static final Font DEFAULT_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
 
   private final transient List<IntConsumer> fpsChangedConsumer = new CopyOnWriteArrayList<>();
@@ -59,11 +53,9 @@ public class RenderComponent extends Canvas {
 
   private boolean takeScreenShot;
 
-  /**
-   * Constructs a new {@code RenderComponent} with the specified size.
-   *
-   * @param size The size of the rendering component.
-   */
+  /// Constructs a new `RenderComponent` with the specified size.
+  ///
+  /// @param size The size of the rendering component.
   public RenderComponent(final Dimension size) {
     setBackground(DEFAULT_BACKGROUND_COLOR);
     setFont(DEFAULT_FONT);
@@ -71,39 +63,31 @@ public class RenderComponent extends Canvas {
     setPreferredSize(size);
   }
 
-  /**
-   * Initiates a fade-in effect over the specified duration.
-   *
-   * @param ms The duration of the fade-in effect in milliseconds.
-   */
+  /// Initiates a fade-in effect over the specified duration.
+  ///
+  /// @param ms The duration of the fade-in effect in milliseconds.
   public void fadeIn(final int ms) {
     resetFade();
     this.fadeInStart = Game.time().now();
     this.fadeInTime = ms;
   }
 
-  /**
-   * Initiates a fade-out effect over the specified duration.
-   *
-   * @param ms The duration of the fade-out effect in milliseconds.
-   */
+  /// Initiates a fade-out effect over the specified duration.
+  ///
+  /// @param ms The duration of the fade-out effect in milliseconds.
   public void fadeOut(final int ms) {
     resetFade();
     this.fadeOutStart = Game.time().now();
     this.fadeOutTime = ms;
   }
 
-  /**
-   * Resets the fade-in and fade-out timers.
-   */
+  /// Resets the fade-in and fade-out timers.
   private void resetFade() {
     this.fadeInStart = this.fadeOutStart = -1;
     this.fadeInTime = this.fadeOutTime = 0;
   }
 
-  /**
-   * Initializes the {@code RenderComponent}, setting up the buffer strategy for rendering.
-   */
+  /// Initializes the `RenderComponent`, setting up the buffer strategy for rendering.
   public void init() {
     if (!isDisplayable()) {
       return;
@@ -116,16 +100,14 @@ public class RenderComponent extends Canvas {
     }
   }
 
-  /**
-   * Configures the Java2D rendering pipeline system properties from the
-   * current game configuration. This must be called <em>before</em> any
-   * {@code Graphics2D} context is created (i.e. before the first
-   * {@code BufferedImage}, {@code Canvas.createGraphics()}, or
-   * {@code createBufferStrategy()} call), because the pipeline is locked in
-   * once the first graphics context is initialized.
-   *
-   * @see de.gurkenlabs.litiengine.configuration.Java2DPipeline
-   */
+  /// Configures the Java2D rendering pipeline system properties from the
+  /// current game configuration. This must be called *before* any
+  /// `Graphics2D` context is created (i.e. before the first
+  /// `BufferedImage`, `Canvas.createGraphics()`, or
+  /// `createBufferStrategy()` call), because the pipeline is locked in
+  /// once the first graphics context is initialized.
+  ///
+  /// @see de.gurkenlabs.litiengine.configuration.Java2DPipeline
   public static void configurePipeline() {
     var pipeline = Game.config().graphics().getJava2DPipeline();
     switch (pipeline) {
@@ -145,40 +127,32 @@ public class RenderComponent extends Canvas {
     }
   }
 
-  /**
-   * Registers a consumer to be notified when the frames per second (FPS) change.
-   *
-   * @param fpsConsumer The consumer to notify of FPS changes.
-   */
+  /// Registers a consumer to be notified when the frames per second (FPS) change.
+  ///
+  /// @param fpsConsumer The consumer to notify of FPS changes.
   public void onFpsChanged(final IntConsumer fpsConsumer) {
     if (!fpsChangedConsumer.contains(fpsConsumer)) {
       fpsChangedConsumer.add(fpsConsumer);
     }
   }
 
-  /**
-   * Registers a consumer to be notified after the component has been rendered.
-   *
-   * @param renderedConsumer The consumer to notify after rendering.
-   */
+  /// Registers a consumer to be notified after the component has been rendered.
+  ///
+  /// @param renderedConsumer The consumer to notify after rendering.
   public void onRendered(final Consumer<Graphics2D> renderedConsumer) {
     if (!this.renderedConsumer.contains(renderedConsumer)) {
       this.renderedConsumer.add(renderedConsumer);
     }
   }
 
-  /**
-   * Unregisters a consumer from being notified after the component has been rendered.
-   *
-   * @param renderedConsumer The consumer to remove.
-   */
+  /// Unregisters a consumer from being notified after the component has been rendered.
+  ///
+  /// @param renderedConsumer The consumer to remove.
   public void removeRenderedConsumer(final Consumer<Graphics2D> renderedConsumer) {
     this.renderedConsumer.remove(renderedConsumer);
   }
 
-  /**
-   * Renders the game screen, including handling fade effects, cursor rendering, and screenshot capture.
-   */
+  /// Renders the game screen, including handling fade effects, cursor rendering, and screenshot capture.
   public void render() {
     if (!isDisplayable() || getWidth() <= 0 || getHeight() <= 0) {
       return;
@@ -222,11 +196,9 @@ public class RenderComponent extends Canvas {
     }
   }
 
-  /**
-   * Clears the background and renders the current screen and other graphical elements.
-   *
-   * @param g The {@link Graphics2D} object used for rendering.
-   */
+  /// Clears the background and renders the current screen and other graphical elements.
+  ///
+  /// @param g The [Graphics2D] object used for rendering.
   private void renderGraphics(Graphics2D g) {
     clearBackground(g);
     applyRenderingHints(g);
@@ -245,11 +217,9 @@ public class RenderComponent extends Canvas {
     }
   }
 
-  /**
-   * Clears the background of the component.
-   *
-   * @param g The {@link Graphics2D} object used for rendering.
-   */
+  /// Clears the background of the component.
+  ///
+  /// @param g The [Graphics2D] object used for rendering.
   private void clearBackground(Graphics2D g) {
     g.setColor(getBackground());
     Rectangle bounds = new Rectangle(0, 0, getWidth(), getHeight());
@@ -257,11 +227,9 @@ public class RenderComponent extends Canvas {
     g.fill(bounds);
   }
 
-  /**
-   * Applies rendering hints for antialiasing and interpolation.
-   *
-   * @param g The {@link Graphics2D} object used for rendering.
-   */
+  /// Applies rendering hints for antialiasing and interpolation.
+  ///
+  /// @param g The [Graphics2D] object used for rendering.
   private void applyRenderingHints(Graphics2D g) {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       Game.config().graphics().colorInterpolation() ?
@@ -272,12 +240,10 @@ public class RenderComponent extends Canvas {
         RenderingHints.VALUE_INTERPOLATION_BILINEAR : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
   }
 
-  /**
-   * Renders the current game screen.
-   *
-   * @param g      The {@link Graphics2D} object used for rendering.
-   * @param screen The current {@link Screen} to render.
-   */
+  /// Renders the current game screen.
+  ///
+  /// @param g      The [Graphics2D] object used for rendering.
+  /// @param screen The current [Screen] to render.
   private void renderScreen(Graphics2D g, Screen screen) {
     long renderStart = System.nanoTime();
     screen.render(g);
@@ -288,11 +254,9 @@ public class RenderComponent extends Canvas {
     }
   }
 
-  /**
-   * Applies a fade overlay to the rendered content, if applicable.
-   *
-   * @param g The {@link Graphics2D} object used for rendering.
-   */
+  /// Applies a fade overlay to the rendered content, if applicable.
+  ///
+  /// @param g The [Graphics2D] object used for rendering.
   private void applyFadeOverlay(Graphics2D g) {
     if (!Float.isNaN(currentAlpha)) {
       int visibleAlpha = Math.clamp(Math.round(255 * (1 - currentAlpha)), 0, 255);
@@ -301,11 +265,9 @@ public class RenderComponent extends Canvas {
     }
   }
 
-  /**
-   * Captures and saves a screenshot of the current screen.
-   *
-   * @param screen The current {@link Screen} to capture.
-   */
+  /// Captures and saves a screenshot of the current screen.
+  ///
+  /// @param screen The current [Screen] to capture.
   private void takeAndSaveScreenshot(Screen screen) {
     BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics2D imgGraphics = img.createGraphics();
@@ -314,16 +276,12 @@ public class RenderComponent extends Canvas {
     saveScreenshot(img);
   }
 
-  /**
-   * Signals the {@code RenderComponent} to take a screenshot on the next render cycle.
-   */
+  /// Signals the `RenderComponent` to take a screenshot on the next render cycle.
   public void takeScreenshot() {
     this.takeScreenShot = true;
   }
 
-  /**
-   * Handles the fade-in and fade-out effects, adjusting the current alpha value based on time elapsed.
-   */
+  /// Handles the fade-in and fade-out effects, adjusting the current alpha value based on time elapsed.
   private void handleFade() {
     if (fadeOutStart != -1) {
       updateAlpha(fadeOutStart, fadeOutTime, false);
@@ -338,23 +296,19 @@ public class RenderComponent extends Canvas {
     }
   }
 
-  /**
-   * Updates the alpha value for fade effects.
-   *
-   * @param startTime The start time of the fade effect.
-   * @param duration  The duration of the fade effect.
-   * @param fadeIn    {@code true} if this is a fade-in effect, {@code false} if it's a fade-out.
-   */
+  /// Updates the alpha value for fade effects.
+  ///
+  /// @param startTime The start time of the fade effect.
+  /// @param duration  The duration of the fade effect.
+  /// @param fadeIn    `true` if this is a fade-in effect, `false` if it's a fade-out.
   private void updateAlpha(long startTime, int duration, boolean fadeIn) {
     long timePassed = Game.time().since(startTime);
     currentAlpha = Math.clamp((fadeIn ? timePassed : duration - timePassed) / (float) duration, 0, 1);
   }
 
-  /**
-   * Saves the provided image as a screenshot to the file system.
-   *
-   * @param img The {@link BufferedImage} to save as a screenshot.
-   */
+  /// Saves the provided image as a screenshot to the file system.
+  ///
+  /// @param img The [BufferedImage] to save as a screenshot.
   private void saveScreenshot(BufferedImage img) {
     try {
       String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());

@@ -26,21 +26,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * The 2D Render Engine is used to render texts, shapes and entities at their location in the {@code Environment} and with respect to the
- * {@code Camera} location and zoom.
- *
- * <p>
- * <i>Internally, it uses the static renderer implementations to actually execute the rendering
- * process. This class basically prepares the specified render subject and passed them to a renderer with the current correct context.</i>
- *
- * @see GameWorld#environment()
- * @see GameWorld#camera()
- * @see IEntity#getLocation()
- * @see ShapeRenderer
- * @see TextRenderer
- * @see ImageRenderer
- */
+/// The 2D Render Engine is used to render texts, shapes and entities at their location in the `Environment` and with respect to the
+/// `Camera` location and zoom.
+///
+/// *Internally, it uses the static renderer implementations to actually execute the rendering
+/// process. This class basically prepares the specified render subject and passed them to a renderer with the current correct context.*
+///
+/// @see GameWorld#environment()
+/// @see GameWorld#camera()
+/// @see IEntity#getLocation()
+/// @see ShapeRenderer
+/// @see TextRenderer
+/// @see ImageRenderer
 public final class RenderEngine {
 
   public static final float DEFAULT_RENDERSCALE = 3.0f;
@@ -51,11 +48,9 @@ public final class RenderEngine {
 
   private float baseRenderScale = DEFAULT_RENDERSCALE;
 
-  /**
-   * <b>You should never call this manually! Instead use the {@code Game.graphics()} instance.</b>
-   *
-   * @see Game#graphics()
-   */
+  /// **You should never call this manually! Instead use the `Game.graphics()` instance.**
+  ///
+  /// @see Game#graphics()
   public RenderEngine() {
     if (Game.graphics() != null) {
       throw new UnsupportedOperationException(
@@ -63,78 +58,62 @@ public final class RenderEngine {
     }
   }
 
-  /**
-   * Adds the specified entity rendered listener to receive events when entities were rendered.
-   *
-   * <p>
-   * This is the global equivalent to {@code IEntity.addEntityRenderedListener}
-   *
-   * @param listener The listener to add.
-   * @see IEntity#onRendered(EntityRenderedListener)
-   */
+  /// Adds the specified entity rendered listener to receive events when entities were rendered.
+  ///
+  /// This is the global equivalent to `IEntity.addEntityRenderedListener`
+  ///
+  /// @param listener The listener to add.
+  /// @see IEntity#onRendered(EntityRenderedListener)
   public void addEntityRenderedListener(final EntityRenderedListener listener) {
     this.entityRenderedListener.add(listener);
   }
 
-  /**
-   * Removes the specified entity rendered listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified entity rendered listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeEntityRenderedListener(final EntityRenderedListener listener) {
     this.entityRenderedListener.remove(listener);
   }
 
-  /**
-   * Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
-   *
-   * <p>
-   * This is the global equivalent to {@code IEntity.addEntityRenderListener}
-   *
-   * @param listener The listener to add.
-   * @see IEntity#addEntityRenderListener(EntityRenderListener)
-   */
+  /// Adds the specified entity render listener to receive events and callbacks about the rendering process of entities.
+  ///
+  /// This is the global equivalent to `IEntity.addEntityRenderListener`
+  ///
+  /// @param listener The listener to add.
+  /// @see IEntity#addEntityRenderListener(EntityRenderListener)
   public void addEntityRenderListener(final EntityRenderListener listener) {
     this.entityRenderListener.add(listener);
   }
 
-  /**
-   * Removes the specified entity render listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified entity render listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeEntityRenderListener(final EntityRenderListener listener) {
     this.entityRenderListener.remove(listener);
   }
 
-  /**
-   * Gets the base render scale of the game.
-   *
-   * @return The base render scale.
-   */
+  /// Gets the base render scale of the game.
+  ///
+  /// @return The base render scale.
   public float getBaseRenderScale() {
     return this.baseRenderScale;
   }
 
-  /**
-   * Sets the global base scale that is used to calculate the actual render scale of the game.
-   *
-   * @param scale The base render scale for the game.
-   * @see ICamera#getRenderScale()
-   */
+  /// Sets the global base scale that is used to calculate the actual render scale of the game.
+  ///
+  /// @param scale The base render scale for the game.
+  /// @see ICamera#getRenderScale()
   public void setBaseRenderScale(float scale) {
     this.baseRenderScale = scale;
   }
 
-  /**
-   * Renders the specified text to the defined map location.
-   *
-   * @param g         The graphics object to render on.
-   * @param text      The text to be rendered
-   * @param x         The x-coordinate of the text.
-   * @param y         The y-coordinate of the text
-   * @param antialias Configure whether to render the text with antialiasing.
-   */
+  /// Renders the specified text to the defined map location.
+  ///
+  /// @param g         The graphics object to render on.
+  /// @param text      The text to be rendered
+  /// @param x         The x-coordinate of the text.
+  /// @param y         The y-coordinate of the text
+  /// @param antialias Configure whether to render the text with antialiasing.
   public void renderText(
     final Graphics2D g, final String text, final double x, final double y, boolean antialias) {
     if (text == null || text.isEmpty()) {
@@ -150,71 +129,59 @@ public final class RenderEngine {
     g.setTransform(oldT);
   }
 
-  /**
-   * Renders the specified text to the defined map location.
-   *
-   * @param g    The graphics object to render on.
-   * @param text The text to be rendered
-   * @param x    The x-coordinate of the text.
-   * @param y    The y-coordinate of the text
-   */
+  /// Renders the specified text to the defined map location.
+  ///
+  /// @param g    The graphics object to render on.
+  /// @param text The text to be rendered
+  /// @param x    The x-coordinate of the text.
+  /// @param y    The y-coordinate of the text
   public void renderText(final Graphics2D g, final String text, final double x, final double y) {
     renderText(g, text, x, y, false);
   }
 
-  /**
-   * Renders the specified text to the defined map location.
-   *
-   * @param g         The graphics object to render on.
-   * @param text      The text to be rendered.
-   * @param location  The location on the map.
-   * @param antialias Configure whether to render the text with antialiasing.
-   */
+  /// Renders the specified text to the defined map location.
+  ///
+  /// @param g         The graphics object to render on.
+  /// @param text      The text to be rendered.
+  /// @param location  The location on the map.
+  /// @param antialias Configure whether to render the text with antialiasing.
   public void renderText(
     final Graphics2D g, final String text, final Point2D location, boolean antialias) {
     renderText(g, text, location.getX(), location.getY(), antialias);
   }
 
-  /**
-   * Renders the specified text to the defined map location.
-   *
-   * @param g        The graphics object to render on.
-   * @param text     The text to be rendered.
-   * @param location The location on the map.
-   */
+  /// Renders the specified text to the defined map location.
+  ///
+  /// @param g        The graphics object to render on.
+  /// @param text     The text to be rendered.
+  /// @param location The location on the map.
   public void renderText(final Graphics2D g, final String text, final Point2D location) {
     renderText(g, text, location, false);
   }
 
-  /**
-   * Renders the specified shape to the translated location in the game world.
-   *
-   * @param g     The graphics object to render on.
-   * @param shape The shape to be rendered.
-   */
+  /// Renders the specified shape to the translated location in the game world.
+  ///
+  /// @param g     The graphics object to render on.
+  /// @param shape The shape to be rendered.
   public void renderShape(final Graphics2D g, final Shape shape) {
     renderShape(g, shape, false);
   }
 
-  /**
-   * Renders the specified shape to the translated location in the game world.
-   *
-   * @param g            The graphics object to render on.
-   * @param shape        The shape to be rendered.
-   * @param antialiasing Configure whether to render the shape with antialiasing.
-   */
+  /// Renders the specified shape to the translated location in the game world.
+  ///
+  /// @param g            The graphics object to render on.
+  /// @param shape        The shape to be rendered.
+  /// @param antialiasing Configure whether to render the shape with antialiasing.
   public void renderShape(final Graphics2D g, final Shape shape, boolean antialiasing) {
     renderShape(g, shape, antialiasing, 0);
   }
 
-  /**
-   * Renders the specified shape to the translated location in the game world.
-   *
-   * @param g            The graphics object to render on.
-   * @param shape        The shape to be rendered.
-   * @param antialiasing Configure whether to render the shape with antialiasing.
-   * @param angle        The angle by which the shape will be rotated.
-   */
+  /// Renders the specified shape to the translated location in the game world.
+  ///
+  /// @param g            The graphics object to render on.
+  /// @param shape        The shape to be rendered.
+  /// @param antialiasing Configure whether to render the shape with antialiasing.
+  /// @param angle        The angle by which the shape will be rotated.
   public void renderShape(
     final Graphics2D g, final Shape shape, boolean antialiasing, double angle) {
     if (shape == null) {
@@ -240,64 +207,54 @@ public final class RenderEngine {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
   }
 
-  /**
-   * Renders the outline of the specified shape to the translated location in the game world.
-   *
-   * @param g     The graphics object to render on.
-   * @param shape The shape to be rendered.
-   */
+  /// Renders the outline of the specified shape to the translated location in the game world.
+  ///
+  /// @param g     The graphics object to render on.
+  /// @param shape The shape to be rendered.
   public void renderOutline(final Graphics2D g, final Shape shape) {
     renderOutline(g, shape, new BasicStroke(1 / Game.world().camera().getRenderScale()));
   }
 
-  /**
-   * Renders the outline of the specified shape to the translated location in the game world.
-   *
-   * @param g            The graphics object to render on.
-   * @param shape        The shape to be rendered.
-   * @param antialiasing Configure whether to render the shape with antialiasing.
-   */
+  /// Renders the outline of the specified shape to the translated location in the game world.
+  ///
+  /// @param g            The graphics object to render on.
+  /// @param shape        The shape to be rendered.
+  /// @param antialiasing Configure whether to render the shape with antialiasing.
   public void renderOutline(final Graphics2D g, final Shape shape, boolean antialiasing) {
     renderOutline(
       g, shape, new BasicStroke(1 / Game.world().camera().getRenderScale()), antialiasing);
   }
 
-  /**
-   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
-   *
-   * @param g      The graphics object to render on.
-   * @param shape  The shape to be rendered.
-   * @param stroke The stroke that is used to render the shape.
-   * @see Stroke
-   */
+  /// Renders the outline with the defined `Stroke` of the specified shape to the translated location in the game world.
+  ///
+  /// @param g      The graphics object to render on.
+  /// @param shape  The shape to be rendered.
+  /// @param stroke The stroke that is used to render the shape.
+  /// @see Stroke
   public void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
     this.renderOutline(g, shape, stroke, false);
   }
 
-  /**
-   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
-   *
-   * @param g            The graphics object to render on.
-   * @param shape        The shape to be rendered.
-   * @param stroke       The stroke that is used to render the shape.
-   * @param antialiasing Configure whether to render the shape with antialiasing.
-   * @see Stroke
-   */
+  /// Renders the outline with the defined `Stroke` of the specified shape to the translated location in the game world.
+  ///
+  /// @param g            The graphics object to render on.
+  /// @param shape        The shape to be rendered.
+  /// @param stroke       The stroke that is used to render the shape.
+  /// @param antialiasing Configure whether to render the shape with antialiasing.
+  /// @see Stroke
   public void renderOutline(
     final Graphics2D g, final Shape shape, final Stroke stroke, boolean antialiasing) {
     renderOutline(g, shape, stroke, antialiasing, 0);
   }
 
-  /**
-   * Renders the outline with the defined {@code Stroke} of the specified shape to the translated location in the game world.
-   *
-   * @param g            The graphics object to render on.
-   * @param shape        The shape to be rendered.
-   * @param stroke       The stroke that is used to render the shape.
-   * @param antialiasing Configure whether to render the shape with antialiasing.
-   * @param angle        The angle by which the shape will be rotated.
-   * @see Stroke
-   */
+  /// Renders the outline with the defined `Stroke` of the specified shape to the translated location in the game world.
+  ///
+  /// @param g            The graphics object to render on.
+  /// @param shape        The shape to be rendered.
+  /// @param stroke       The stroke that is used to render the shape.
+  /// @param antialiasing Configure whether to render the shape with antialiasing.
+  /// @param angle        The angle by which the shape will be rotated.
+  /// @see Stroke
   public void renderOutline(
     final Graphics2D g,
     final Shape shape,
@@ -333,25 +290,21 @@ public final class RenderEngine {
     return t;
   }
 
-  /**
-   * Renders the specified image at the defined map location.
-   *
-   * @param g     The graphics object to render on.
-   * @param image The image to be rendered.
-   * @param x     The x-coordinate of the image.
-   * @param y     The y-coordinate of the image
-   */
+  /// Renders the specified image at the defined map location.
+  ///
+  /// @param g     The graphics object to render on.
+  /// @param image The image to be rendered.
+  /// @param x     The x-coordinate of the image.
+  /// @param y     The y-coordinate of the image
   public void renderImage(Graphics2D g, final Image image, double x, double y) {
     renderImage(g, image, new Point2D.Double(x, y));
   }
 
-  /**
-   * Renders the specified image at the defined map location.
-   *
-   * @param g        The graphics object to render on.
-   * @param image    The image to be rendered.
-   * @param location The location of the image.
-   */
+  /// Renders the specified image at the defined map location.
+  ///
+  /// @param g        The graphics object to render on.
+  /// @param image    The image to be rendered.
+  /// @param location The location of the image.
   public void renderImage(Graphics2D g, final Image image, Point2D location) {
     Point2D viewPortLocation = Game.world().camera().getViewportLocation(location);
     ImageRenderer.render(
@@ -361,27 +314,22 @@ public final class RenderEngine {
       viewPortLocation.getY() * Game.world().camera().getRenderScale());
   }
 
-  /**
-   * Renders the specified entities at their current location in the environment.
-   *
-   * @param g        The graphics object to render on.
-   * @param entities The entities to be rendered.
-   */
+  /// Renders the specified entities at their current location in the environment.
+  ///
+  /// @param g        The graphics object to render on.
+  /// @param entities The entities to be rendered.
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities) {
     this.renderEntities(g, entities, true);
   }
 
-  /**
-   * Renders the specified entities at their current location in the environment.
-   *
-   * <p>
-   * This method sorts the specified entities by their y-coordinate unless the {@code sort} parameter is set to false.
-   *
-   * @param g        The graphics object to render on.
-   * @param entities The entities to be rendered.
-   * @param sort     Defines whether the entities should be sorted by the {@code EntityYComparator} to simulate 2.5D graphics.
-   * @see EntityYComparator
-   */
+  /// Renders the specified entities at their current location in the environment.
+  ///
+  /// This method sorts the specified entities by their y-coordinate unless the `sort` parameter is set to false.
+  ///
+  /// @param g        The graphics object to render on.
+  /// @param entities The entities to be rendered.
+  /// @param sort     Defines whether the entities should be sorted by the `EntityYComparator` to simulate 2.5D graphics.
+  /// @see EntityYComparator
   public void renderEntities(
     final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
     // filter out entities that are outside the viewport and always include emitters which have
@@ -415,25 +363,22 @@ public final class RenderEngine {
     }
   }
 
-  /**
-   * Renders the specified entity at its current location in the environment.
-   *
-   * <p>
-   * This method uses the {@code IEntityAnimationController} to render the appropriate {@code Animation}.<br> If the entity implements the
-   * {@code IRenderable} interface, its render method is being called afterwards.
-   *
-   * <p>
-   * To listen to events about this process, you can add a {@code EntityRenderListener} or {@code EntityRenderedListener} to the render engine.
-   *
-   * @param g      The graphics object to render on.
-   * @param entity The entity to be rendered.
-   * @see IEntity#animations()
-   * @see IAnimationController#getCurrentImage()
-   * @see IRenderable#render(Graphics2D)
-   * @see #canRender(IEntity)
-   * @see EntityRenderListener#canRender(IEntity)
-   * @see EntityRenderedListener#rendered(EntityRenderEvent)
-   */
+  /// Renders the specified entity at its current location in the environment.
+  ///
+  /// This method uses the `IEntityAnimationController` to render the appropriate `Animation`.
+  /// If the entity implements the
+  /// `IRenderable` interface, its render method is being called afterwards.
+  ///
+  /// To listen to events about this process, you can add a `EntityRenderListener` or `EntityRenderedListener` to the render engine.
+  ///
+  /// @param g      The graphics object to render on.
+  /// @param entity The entity to be rendered.
+  /// @see IEntity#animations()
+  /// @see IAnimationController#getCurrentImage()
+  /// @see IRenderable#render(Graphics2D)
+  /// @see #canRender(IEntity)
+  /// @see EntityRenderListener#canRender(IEntity)
+  /// @see EntityRenderedListener#rendered(EntityRenderEvent)
   public void renderEntity(final Graphics2D g, final IEntity entity) {
     if (entity == null) {
       return;
@@ -515,19 +460,16 @@ public final class RenderEngine {
     }
   }
 
-  /**
-   * Determines whether the specified entity can be rendered by evaluating the callbacks to all registered {@code EntityRenderListeners}.
-   *
-   * <p>
-   * If the {@code RenderType} of the specified entity is set to {@code NONE} or there are any callbacks that prevent the entity from being rendered,
-   * this method will return false.
-   *
-   * @param entity The entity to check whether it can be rendered or not.
-   * @return True if the entity can be rendered; otherwise false.
-   * @see IEntity#getRenderType()
-   * @see RenderType#NONE
-   * @see EntityRenderListener#canRender(IEntity)
-   */
+  /// Determines whether the specified entity can be rendered by evaluating the callbacks to all registered `EntityRenderListeners`.
+  ///
+  /// If the `RenderType` of the specified entity is set to `NONE` or there are any callbacks that prevent the entity from being rendered,
+  /// this method will return false.
+  ///
+  /// @param entity The entity to check whether it can be rendered or not.
+  /// @return True if the entity can be rendered; otherwise false.
+  /// @see IEntity#getRenderType()
+  /// @see RenderType#NONE
+  /// @see EntityRenderListener#canRender(IEntity)
   public boolean canRender(final IEntity entity) {
     if (entity.getRenderType() == RenderType.NONE) {
       return false;

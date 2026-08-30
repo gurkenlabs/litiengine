@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.scripting;
 
 import java.util.List;
 
-/** Indicates that a script could not be compiled, instantiated, configured, or executed. */
+/// Indicates that a script could not be compiled, instantiated, configured, or executed.
 public class ScriptException extends Exception {
   private final List<ScriptDiagnostic> diagnostics;
 

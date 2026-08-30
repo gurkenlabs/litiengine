@@ -18,12 +18,10 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   private String spritePrefix;
   private boolean autoScaling;
 
-  /**
-   * Initializes a new instance of the {@code EntityAnimationController} class.
-   *
-   * @param entity The entity related to this animation controller.
-   * @see #getEntity()
-   */
+  /// Initializes a new instance of the `EntityAnimationController` class.
+  ///
+  /// @param entity The entity related to this animation controller.
+  /// @see #getEntity()
   public EntityAnimationController(final T entity) {
     super();
     this.entity = entity;
@@ -33,16 +31,14 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     }
   }
 
-  /**
-   * Initializes a new instance of the {@code EntityAnimationController} class.
-   *
-   * @param entity           The entity related to this animation controller.
-   * @param defaultAnimation The default animation for this controller.
-   * @param animations       Additional animations that are managed by this controller instance.
-   * @see #getEntity()
-   * @see #getDefault()
-   * @see #getAll()
-   */
+  /// Initializes a new instance of the `EntityAnimationController` class.
+  ///
+  /// @param entity           The entity related to this animation controller.
+  /// @param defaultAnimation The default animation for this controller.
+  /// @param animations       Additional animations that are managed by this controller instance.
+  /// @see #getEntity()
+  /// @see #getDefault()
+  /// @see #getAll()
   public EntityAnimationController(
     final T entity, final Animation defaultAnimation, final Animation... animations) {
     super(defaultAnimation, animations);
@@ -51,23 +47,19 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.spritePrefix = Game.random().choose(getDefaultSpritePrefixes(entity.getClass()));
   }
 
-  /**
-   * Initializes a new instance of the {@code EntityAnimationController} class.
-   *
-   * @param entity The entity related to this animation controller.
-   * @param sprite The sprite sheet used by the default animation of this controller.
-   */
+  /// Initializes a new instance of the `EntityAnimationController` class.
+  ///
+  /// @param entity The entity related to this animation controller.
+  /// @param sprite The sprite sheet used by the default animation of this controller.
   public EntityAnimationController(final T entity, final Spritesheet sprite) {
     this(entity, sprite, true);
   }
 
-  /**
-   * Initializes a new instance of the {@code EntityAnimationController} class.
-   *
-   * @param entity The entity related to this animation controller.
-   * @param sprite The sprite sheet used by the default animation of this controller.
-   * @param loop   A flag indicating whether the default animation should be looped or only played once.
-   */
+  /// Initializes a new instance of the `EntityAnimationController` class.
+  ///
+  /// @param entity The entity related to this animation controller.
+  /// @param sprite The sprite sheet used by the default animation of this controller.
+  /// @param loop   A flag indicating whether the default animation should be looped or only played once.
   public EntityAnimationController(final T entity, final Spritesheet sprite, boolean loop) {
     this(
       entity,
@@ -144,26 +136,22 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     }
   }
 
-  /**
-   * Retrieves the sprite prefix associated with this animation controller.
-   *
-   * <p>The sprite prefix is used to determine the default sprite for the entity
-   * managed by this animation controller.
-   *
-   * @return the sprite prefix as a {@code String}
-   */
+  /// Retrieves the sprite prefix associated with this animation controller.
+  ///
+  /// The sprite prefix is used to determine the default sprite for the entity
+  /// managed by this animation controller.
+  ///
+  /// @return the sprite prefix as a `String`
   protected String getSpritePrefix() {
     return this.spritePrefix;
   }
 
-  /**
-   * Sets the sprite prefix for this animation controller.
-   *
-   * <p>The sprite prefix is used to determine the default sprite for the entity
-   * managed by this animation controller.
-   *
-   * @param prefix the new sprite prefix to set
-   */
+  /// Sets the sprite prefix for this animation controller.
+  ///
+  /// The sprite prefix is used to determine the default sprite for the entity
+  /// managed by this animation controller.
+  ///
+  /// @param prefix the new sprite prefix to set
   protected void setSpritePrefix(String prefix) {
     this.spritePrefix = prefix;
   }

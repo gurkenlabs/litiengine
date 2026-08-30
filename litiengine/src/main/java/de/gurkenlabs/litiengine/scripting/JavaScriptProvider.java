@@ -28,7 +28,7 @@ import javax.tools.SimpleJavaFileObject;
 
 import javax.tools.ToolProvider;
 
-/** Compiles Java source files at runtime using the system Java compiler or loads precompiled script classes. */
+/// Compiles Java source files at runtime using the system Java compiler or loads precompiled script classes.
 public class JavaScriptProvider implements ScriptProvider {
   @Override
   public String language() {

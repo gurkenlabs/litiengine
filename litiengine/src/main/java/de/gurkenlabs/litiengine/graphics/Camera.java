@@ -15,9 +15,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Represents the camera used for rendering the game world. The camera handles focus, zoom, shake effects, and viewport calculations.
- */
+/// Represents the camera used for rendering the game world. The camera handles focus, zoom, shake effects, and viewport calculations.
 public class Camera implements ICamera, Tweenable {
   private final Collection<ZoomChangedListener> zoomListeners = ConcurrentHashMap.newKeySet();
   private final Collection<FocusChangedListener> focusChangedListeners =
@@ -52,9 +50,7 @@ public class Camera implements ICamera, Tweenable {
   private Align align = Align.LEFT;
   private Valign valign = Valign.TOP;
 
-  /**
-   * Instantiates a new {@code Camera} instance.
-   */
+  /// Instantiates a new `Camera` instance.
   public Camera() {
     this.focus = new Point2D.Double();
     this.viewport = new Rectangle2D.Double();
@@ -295,17 +291,14 @@ public class Camera implements ICamera, Tweenable {
     this.pan(new Point2D.Double(x, y), duration);
   }
 
-  /**
-   * Clamps a given focus point to ensure it remains within the visible bounds of the current map.
-   * <p>
-   * This method ensures that the camera's focus point does not move outside the boundaries of the map. It centers the camera around the focus point,
-   * but only to the extent that the map dimensions allow. If the viewport is larger than the map in either dimension, the Camera's Align and VAlign
-   * is applied to determine how to handle the excess space.
-   * </p>
-   *
-   * @param focus the desired focus point in map coordinates.
-   * @return a new {@link Point2D} representing the clamped focus point, adjusted to remain within the bounds of the map view.
-   */
+  /// Clamps a given focus point to ensure it remains within the visible bounds of the current map.
+  ///
+  /// This method ensures that the camera's focus point does not move outside the boundaries of the map. It centers the camera around the focus point,
+  /// but only to the extent that the map dimensions allow. If the viewport is larger than the map in either dimension, the Camera's Align and VAlign
+  /// is applied to determine how to handle the excess space.
+  ///
+  /// @param focus the desired focus point in map coordinates.
+  /// @return a new [Point2D] representing the clamped focus point, adjusted to remain within the bounds of the map view.
   protected Point2D clampToMap(Point2D focus) {
 
     if (Game.world().environment() == null
@@ -335,43 +328,35 @@ public class Camera implements ICamera, Tweenable {
     return new Point2D.Double(x, y);
   }
 
-  /**
-   * Gets the remaining pan time for the camera.
-   *
-   * @return The remaining time (in ticks) for the camera to complete its pan operation.
-   */
+  /// Gets the remaining pan time for the camera.
+  ///
+  /// @return The remaining time (in ticks) for the camera to complete its pan operation.
   protected int panTime() {
     return this.panTime;
   }
 
-  /**
-   * Calculates the width of the camera's viewport in world units.
-   * <p>
-   * The viewport width is determined by dividing the game window's resolution width by the current render scale.
-   *
-   * @return The width of the viewport in world units.
-   */
+  /// Calculates the width of the camera's viewport in world units.
+  ///
+  /// The viewport width is determined by dividing the game window's resolution width by the current render scale.
+  ///
+  /// @return The width of the viewport in world units.
   protected double getViewportWidth() {
     return Game.window().getResolution().getWidth() / this.getRenderScale();
   }
 
-  /**
-   * Calculates the height of the camera's viewport in world units.
-   * <p>
-   * The viewport height is determined by dividing the game window's resolution height by the current render scale.
-   *
-   * @return The height of the viewport in world units.
-   */
+  /// Calculates the height of the camera's viewport in world units.
+  ///
+  /// The viewport height is determined by dividing the game window's resolution height by the current render scale.
+  ///
+  /// @return The height of the viewport in world units.
   protected double getViewportHeight() {
     return Game.window().getResolution().getHeight() / this.getRenderScale();
   }
 
-  /**
-   * Apply shake effect.
-   *
-   * @param cameraLocation the camera location
-   * @return the point2 d
-   */
+  /// Apply shake effect.
+  ///
+  /// @param cameraLocation the camera location
+  /// @return the point2 d
   private Point2D applyShakeEffect(final Point2D cameraLocation) {
     if (this.isShakeEffectActive()) {
       return new Point2D.Double(
@@ -381,68 +366,54 @@ public class Camera implements ICamera, Tweenable {
     return cameraLocation;
   }
 
-  /**
-   * Gets the shake duration.
-   *
-   * @return the shake duration
-   */
+  /// Gets the shake duration.
+  ///
+  /// @return the shake duration
   private int getShakeDuration() {
     return this.shakeDuration;
   }
 
-  /**
-   * Gets the shake offset.
-   *
-   * @return the shake offset
-   */
+  /// Gets the shake offset.
+  ///
+  /// @return the shake offset
   private double getShakeIntensity() {
     return this.shakeIntensity;
   }
 
-  /**
-   * Gets the shake tick.
-   *
-   * @return the shake tick
-   */
+  /// Gets the shake tick.
+  ///
+  /// @return the shake tick
   private long getShakeTick() {
     return this.shakeTick;
   }
 
-  /**
-   * Calculates the horizontal center of the viewport in world units.
-   *
-   * @return The X-coordinate of the viewport's center.
-   */
+  /// Calculates the horizontal center of the viewport in world units.
+  ///
+  /// @return The X-coordinate of the viewport's center.
   private double getViewPortCenterX() {
     return this.getViewportWidth() * 0.5;
   }
 
-  /**
-   * Calculates the vertical center of the viewport in world units.
-   *
-   * @return The Y-coordinate of the viewport's center.
-   */
+  /// Calculates the vertical center of the viewport in world units.
+  ///
+  /// @return The Y-coordinate of the viewport's center.
   private double getViewPortCenterY() {
     return this.getViewportHeight() * 0.5;
   }
 
-  /**
-   * Checks if the camera's shake effect is currently active.
-   * <p>
-   * The shake effect is considered active if the shake tick is non-zero and the time since the shake tick is less than the shake duration.
-   *
-   * @return {@code true} if the shake effect is active; {@code false} otherwise.
-   */
+  /// Checks if the camera's shake effect is currently active.
+  ///
+  /// The shake effect is considered active if the shake tick is non-zero and the time since the shake tick is less than the shake duration.
+  ///
+  /// @return `true` if the shake effect is active; `false` otherwise.
   private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0
       && Game.time().since(this.getShakeTick()) < this.getShakeDuration();
   }
 
-  /**
-   * Provides current tween values for camera-related {@link TweenType}s so that the camera can be animated by the
-   * {@link de.gurkenlabs.litiengine.tweening.TweenEngine}. Supports {@link TweenType#ZOOM}, {@link TweenType#LOCATION_X},
-   * {@link TweenType#LOCATION_Y} and {@link TweenType#LOCATION_XY} for zooming and panning.
-   */
+  /// Provides current tween values for camera-related [TweenType]s so that the camera can be animated by the
+  /// [de.gurkenlabs.litiengine.tweening.TweenEngine]. Supports [TweenType#ZOOM], [TweenType#LOCATION_X],
+  /// [TweenType#LOCATION_Y] and [TweenType#LOCATION_XY] for zooming and panning.
   @Override
   public float[] getTweenValues(final TweenType tweenType) {
     return switch (tweenType) {
@@ -454,9 +425,7 @@ public class Camera implements ICamera, Tweenable {
     };
   }
 
-  /**
-   * Applies interpolated tween values to the camera. See {@link #getTweenValues(TweenType)} for the list of supported tween types.
-   */
+  /// Applies interpolated tween values to the camera. See [#getTweenValues(TweenType)] for the list of supported tween types.
   @Override
   public void setTweenValues(final TweenType tweenType, final float[] newValues) {
     switch (tweenType) {

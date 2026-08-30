@@ -5,11 +5,9 @@ import java.awt.Graphics2D;
 import java.io.Serial;
 import java.util.EventObject;
 
-/**
- * This {@code EventObject} contains data about the rendering process of an entity.
- *
- * @see RenderEngine#renderEntity(Graphics2D, IEntity)
- */
+/// This `EventObject` contains data about the rendering process of an entity.
+///
+/// @see RenderEngine#renderEntity(Graphics2D, IEntity)
 public class EntityRenderEvent extends EventObject {
   @Serial private static final long serialVersionUID = 6397005859146712222L;
 
@@ -23,20 +21,16 @@ public class EntityRenderEvent extends EventObject {
     this.entity = entity;
   }
 
-  /**
-   * Gets the graphics object on which the entity is rendered.
-   *
-   * @return The graphics object on which the entity is rendered.
-   */
+  /// Gets the graphics object on which the entity is rendered.
+  ///
+  /// @return The graphics object on which the entity is rendered.
   public Graphics2D getGraphics() {
     return this.graphics;
   }
 
-  /**
-   * Get the entity involved with the rendering process.
-   *
-   * @return The entity involved with the rendering process.
-   */
+  /// Get the entity involved with the rendering process.
+  ///
+  /// @return The entity involved with the rendering process.
   public IEntity getEntity() {
     return this.entity;
   }

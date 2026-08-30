@@ -7,7 +7,7 @@ import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.entities.Creature;
 import java.util.function.Consumer;
 
-/** Fluent builder for constructing and registering {@link ScriptedAbility} instances. */
+/// Fluent builder for constructing and registering [ScriptedAbility] instances.
 public final class ScriptedAbilityBuilder extends AbilityBuilder {
 
   public ScriptedAbilityBuilder(Creature executor, String name) {

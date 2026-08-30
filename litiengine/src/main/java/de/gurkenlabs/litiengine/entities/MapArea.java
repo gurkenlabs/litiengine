@@ -10,43 +10,37 @@ import java.awt.Shape;
 public class MapArea extends Entity {
   Shape shape;
 
-  /**
-   * Instantiates a new {@code MapArea} entity.
-   */
+  /// Instantiates a new `MapArea` entity.
   public MapArea() {}
 
-  /**
-   * Instantiates a new {@code MapArea} entity.
-   *
-   * @param x
-   *          The x-coordinate of this instance.
-   * @param y
-   *          The y-coordinate of this instance.
-   * @param width
-   *          The width of this instance.
-   * @param height
-   *          The height of this instance.
-   */
+  /// Instantiates a new `MapArea` entity.
+  ///
+  /// @param x
+  /// The x-coordinate of this instance.
+  /// @param y
+  /// The y-coordinate of this instance.
+  /// @param width
+  /// The width of this instance.
+  /// @param height
+  /// The height of this instance.
   public MapArea(final double x, final double y, final double width, final double height) {
     this(0, null, x, y, width, height);
   }
 
-  /**
-   * Instantiates a new {@code MapArea} entity.
-   *
-   * @param id
-   *          The id of this instance.
-   * @param name
-   *          The name of this instance.
-   * @param x
-   *          The x-coordinate of this instance.
-   * @param y
-   *          The y-coordinate of this instance.
-   * @param width
-   *          The width of this instance.
-   * @param height
-   *          The height of this instance.
-   */
+  /// Instantiates a new `MapArea` entity.
+  ///
+  /// @param id
+  /// The id of this instance.
+  /// @param name
+  /// The name of this instance.
+  /// @param x
+  /// The x-coordinate of this instance.
+  /// @param y
+  /// The y-coordinate of this instance.
+  /// @param width
+  /// The width of this instance.
+  /// @param height
+  /// The height of this instance.
   public MapArea(
       final int id,
       final String name,

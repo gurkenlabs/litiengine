@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Central documentation catalog for LITIENGINE scripting API, classes, annotations, and lifecycle events. */
+/// Central documentation catalog for LITIENGINE scripting API, classes, annotations, and lifecycle events.
 public final class ScriptDocumentation {
   private static final Map<String, String> CLASS_DOCS = new HashMap<>();
   private static final Map<String, String> METHOD_DOCS = new HashMap<>();

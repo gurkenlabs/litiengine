@@ -18,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-/** Standalone launcher to bootstrap and run LITIengine games and script-based projects without custom Java entry points. */
+/// Standalone launcher to bootstrap and run LITIengine games and script-based projects without custom Java entry points.
 public final class GameLauncher {
   private static final Logger log = Logger.getLogger(GameLauncher.class.getName());
   private static final java.util.regex.Pattern PACKAGE_DECLARATION = java.util.regex.Pattern.compile(
@@ -189,15 +189,12 @@ public final class GameLauncher {
     }
   }
 
-  /**
-   * Strips comments from Java source while preserving string and character literal contents.
-   * Uses a simple lexical state machine rather than regexes so that:
-   * <ul>
-   *   <li>Multi-line block comments ({@code /* ... * /}) are removed even across newlines</li>
-   *   <li>Comment-like sequences inside string literals ({@code "https://..."}) are preserved</li>
-   *   <li>Character literals ({@code '/'}) do not trigger comment detection</li>
-   * </ul>
-   */
+  /// Strips comments from Java source while preserving string and character literal contents.
+  /// Uses a simple lexical state machine rather than regexes so that:
+  ///
+  /// - Multi-line block comments (`/* ... * /`) are removed even across newlines
+  /// - Comment-like sequences inside string literals (`"https://..."`) are preserved
+  /// - Character literals (`'/'`) do not trigger comment detection
   static String stripComments(String content) {
     StringBuilder out = new StringBuilder(content.length());
     int i = 0;
@@ -267,25 +264,21 @@ public final class GameLauncher {
       host.find() ? ScriptHostType.valueOf(host.group(1)) : ScriptHostType.ENTITY, targetType));
   }
 
-  /**
-   * Resolves a simple type name from {@code @ScriptInfo(target = Foo.class)} to a fully qualified
-   * class name using only source-level heuristics.
-   *
-   * <p>Supported resolution paths:
-   * <ul>
-   *   <li>Fully qualified names ({@code com.example.Player.class}) — returned as-is</li>
-   *   <li>Explicit single-type imports ({@code import com.example.Player;})</li>
-   *   <li>Engine entity types ({@code Prop}, {@code Creature}, etc. from {@code de.gurkenlabs.litiengine.entities})</li>
-   *   <li>Same-package types (inferred from the source file's {@code package} declaration)</li>
-   * </ul>
-   *
-   * <p><strong>Not supported</strong> (use a fully qualified name instead):
-   * <ul>
-   *   <li>Wildcard imports ({@code import foo.bar.*;})</li>
-   *   <li>Nested/inner types ({@code Types.Player.class})</li>
-   *   <li>Static imports</li>
-   * </ul>
-   */
+  /// Resolves a simple type name from `@ScriptInfo(target = Foo.class)` to a fully qualified
+  /// class name using only source-level heuristics.
+  ///
+  /// Supported resolution paths:
+  ///
+  /// - Fully qualified names (`com.example.Player.class`) — returned as-is
+  /// - Explicit single-type imports (`import com.example.Player;`)
+  /// - Engine entity types (`Prop`, `Creature`, etc. from `de.gurkenlabs.litiengine.entities`)
+  /// - Same-package types (inferred from the source file's `package` declaration)
+  ///
+  /// **Not supported** (use a fully qualified name instead):
+  ///
+  /// - Wildcard imports (`import foo.bar.*;`)
+  /// - Nested/inner types (`Types.Player.class`)
+  /// - Static imports
   private static String resolveTypeName(String content, String typeName) {
     if ("Object".equals(typeName) || "java.lang.Object".equals(typeName)) return null;
     if (typeName.contains(".")) {

@@ -27,19 +27,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
   @TmxProperty(name = MapObjectProperty.SPAWN_PIVOT_OFFSETY) private double spawnOffsetY;
 
-  /**
-   * Instantiates a new {@code Spawnpoint} entity.
-   */
+  /// Instantiates a new `Spawnpoint` entity.
   public Spawnpoint() {
     this.setSize(1, 1);
   }
 
-  /**
-   * Instantiates a new {@code Spawnpoint} entity.
-   *
-   * @param x The x-coordinate of this instance.
-   * @param y The y-coordinate of this instance.
-   */
+  /// Instantiates a new `Spawnpoint` entity.
+  ///
+  /// @param x The x-coordinate of this instance.
+  /// @param y The y-coordinate of this instance.
   public Spawnpoint(double x, double y) {
     this(0, x, y);
   }
@@ -56,192 +52,153 @@ import java.util.concurrent.ConcurrentHashMap;
     this(0, location, direction);
   }
 
-  /**
-   * Instantiates a new {@code Spawnpoint} entity.
-   *
-   * @param mapId The map id of this instance.
-   * @param x     The x-coordinate of this instance.
-   * @param y     The y-coordinate of this instance.
-   */
+  /// Instantiates a new `Spawnpoint` entity.
+  ///
+  /// @param mapId The map id of this instance.
+  /// @param x     The x-coordinate of this instance.
+  /// @param y     The y-coordinate of this instance.
   public Spawnpoint(int mapId, double x, double y) {
     this(mapId, new Point2D.Double(x, y));
   }
 
-  /**
-   * Instantiates a new {@code Spawnpoint} entity.
-   *
-   * @param mapId    The map id of this instance.
-   * @param location The location of this instance.
-   */
+  /// Instantiates a new `Spawnpoint` entity.
+  ///
+  /// @param mapId    The map id of this instance.
+  /// @param location The location of this instance.
   public Spawnpoint(int mapId, Point2D location) {
     super(mapId);
     this.setSize(1, 1);
     this.setLocation(location);
   }
 
-  /**
-   * Instantiates a new {@code Spawnpoint} entity.
-   *
-   * @param mapId     The map id of this instance.
-   * @param x         The x-coordinate of this instance.
-   * @param y         The y-coordinate of this instance.
-   * @param direction The direction in which entities will be spawned by this instance.
-   */
+  /// Instantiates a new `Spawnpoint` entity.
+  ///
+  /// @param mapId     The map id of this instance.
+  /// @param x         The x-coordinate of this instance.
+  /// @param y         The y-coordinate of this instance.
+  /// @param direction The direction in which entities will be spawned by this instance.
   public Spawnpoint(int mapId, double x, double y, Direction direction) {
     this(mapId, new Point2D.Double(x, y), direction);
   }
 
-  /**
-   * Instantiates a new {@code Spawnpoint} entity.
-   *
-   * @param mapId     The map id of this instance.
-   * @param location  The location of this instance.
-   * @param direction The direction in which entities will be spawned by this instance.
-   */
+  /// Instantiates a new `Spawnpoint` entity.
+  ///
+  /// @param mapId     The map id of this instance.
+  /// @param location  The location of this instance.
+  /// @param direction The direction in which entities will be spawned by this instance.
   public Spawnpoint(int mapId, Point2D location, Direction direction) {
     this(mapId, location);
     this.setDirection(direction);
   }
 
-  /**
-   * Instantiates a new {@code Spawnpoint} entity.
-   *
-   * @param direction The direction in which entities will be spawned by this instance.
-   */
+  /// Instantiates a new `Spawnpoint` entity.
+  ///
+  /// @param direction The direction in which entities will be spawned by this instance.
   public Spawnpoint(Direction direction) {
     this.setDirection(direction);
   }
 
-  /**
-   * Instantiates a new {@code Spawnpoint} entity.
-   *
-   * @param direction The direction in which entities will be spawned by this instance.
-   * @param spawnType The type that defines additional information about the entities spawned by this instance.
-   */
+  /// Instantiates a new `Spawnpoint` entity.
+  ///
+  /// @param direction The direction in which entities will be spawned by this instance.
+  /// @param spawnType The type that defines additional information about the entities spawned by this instance.
   public Spawnpoint(Direction direction, String spawnType) {
     this(direction);
     this.setSpawnInfo(spawnType);
   }
 
-  /**
-   * Adds the specified entity spawned listener to receive events when entities are spawned by this instance.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified entity spawned listener to receive events when entities are spawned by this instance.
+  ///
+  /// @param listener The listener to add.
   public void onSpawned(EntitySpawnedListener listener) {
     this.spawnedListeners.add(listener);
   }
 
-  /**
-   * Removes the specified entity spawned listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified entity spawned listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeSpawnedListener(EntitySpawnedListener listener) {
     this.spawnedListeners.remove(listener);
   }
 
-  /**
-   * Gets the direction in which entities will be spawned by this instance.
-   *
-   * @return the spawn direction
-   */
+  /// Gets the direction in which entities will be spawned by this instance.
+  ///
+  /// @return the spawn direction
   public Direction getDirection() {
     return direction;
   }
 
-  /**
-   * Sets the direction in which entities will be spawned by this instance.
-   *
-   * @param direction the new spawn direction
-   */
+  /// Sets the direction in which entities will be spawned by this instance.
+  ///
+  /// @param direction the new spawn direction
   public void setDirection(Direction direction) {
     this.direction = direction;
   }
 
-  /**
-   * Gets the spawn information for this instance.
-   *
-   * @return the spawn information
-   */
+  /// Gets the spawn information for this instance.
+  ///
+  /// @return the spawn information
   public String getSpawnInfo() {
     return spawnInfo;
   }
 
-  /**
-   * Sets the spawn information for this instance.
-   *
-   * @param spawnInfo the new spawn information
-   */
+  /// Sets the spawn information for this instance.
+  ///
+  /// @param spawnInfo the new spawn information
   public void setSpawnInfo(String spawnInfo) {
     this.spawnInfo = spawnInfo;
   }
 
-  /**
-   * Gets the spawn pivot type for this instance.
-   *
-   * @return the spawn pivot type
-   */
+  /// Gets the spawn pivot type for this instance.
+  ///
+  /// @return the spawn pivot type
   public EntityPivotType getSpawnPivotType() {
     return spawnPivotType;
   }
 
-  /**
-   * Sets the spawn pivot type for this instance.
-   *
-   * @param spawnPivotType the new spawn pivot type
-   */
+  /// Sets the spawn pivot type for this instance.
+  ///
+  /// @param spawnPivotType the new spawn pivot type
   public void setSpawnPivotType(EntityPivotType spawnPivotType) {
     this.spawnPivotType = spawnPivotType;
   }
 
-  /**
-   * Gets the spawn offset on the X-axis for this instance.
-   *
-   * @return the spawn offset on the X-axis
-   */
+  /// Gets the spawn offset on the X-axis for this instance.
+  ///
+  /// @return the spawn offset on the X-axis
   public double getSpawnOffsetX() {
     return spawnOffsetX;
   }
 
-  /**
-   * Sets the spawn offset on the X-axis for this instance.
-   *
-   * @param spawnOffsetX the new spawn offset on the X-axis
-   */
+  /// Sets the spawn offset on the X-axis for this instance.
+  ///
+  /// @param spawnOffsetX the new spawn offset on the X-axis
   public void setSpawnOffsetX(double spawnOffsetX) {
     this.spawnOffsetX = spawnOffsetX;
   }
 
-  /**
-   * Gets the spawn offset on the Y-axis for this instance.
-   *
-   * @return the spawn offset on the Y-axis
-   */
+  /// Gets the spawn offset on the Y-axis for this instance.
+  ///
+  /// @return the spawn offset on the Y-axis
   public double getSpawnOffsetY() {
     return spawnOffsetY;
   }
 
-  /**
-   * Sets the spawn offset on the Y-axis for this instance.
-   *
-   * @param spawnOffsetY the new spawn offset on the Y-axis
-   */
+  /// Sets the spawn offset on the Y-axis for this instance.
+  ///
+  /// @param spawnOffsetY the new spawn offset on the Y-axis
   public void setSpawnOffsetY(double spawnOffsetY) {
     this.spawnOffsetY = spawnOffsetY;
   }
 
-  /**
-   * Spawns the specified entity to the {@code Environment} of the {@code Spawnpoint} or the currently active {@code Environment}.
-   *
-   * <p>
-   * Spawning will set the location of the entity to the location defined by the spawnpoint and optionally also set the angle of the entity, if a
-   * spawn direction is defined.
-   *
-   * @param entity The entity to spawn at the specified location.
-   * @return True if the entity was spawned; otherwise false, which is typically the case if no environment is loaded.
-   * @see GameWorld#environment()
-   */
+  /// Spawns the specified entity to the `Environment` of the `Spawnpoint` or the currently active `Environment`.
+  ///
+  /// Spawning will set the location of the entity to the location defined by the spawnpoint and optionally also set the angle of the entity, if a
+  /// spawn direction is defined.
+  ///
+  /// @param entity The entity to spawn at the specified location.
+  /// @return True if the entity was spawned; otherwise false, which is typically the case if no environment is loaded.
+  /// @see GameWorld#environment()
   public boolean spawn(IEntity entity) {
     Environment env = Optional.ofNullable(getEnvironment()).orElse(Game.world().environment());
     if (env == null) {
@@ -266,12 +223,10 @@ import java.util.concurrent.ConcurrentHashMap;
     return true;
   }
 
-  /**
-   * Gets the location of the entity based on the spawn pivot type.
-   *
-   * @param entity The entity for which to get the location.
-   * @return The location of the entity based on the spawn pivot type.
-   */
+  /// Gets the location of the entity based on the spawn pivot type.
+  ///
+  /// @param entity The entity for which to get the location.
+  /// @return The location of the entity based on the spawn pivot type.
   private Point2D getEntityLocationByPivot(IEntity entity) {
     if (getSpawnPivotType() == null || getSpawnPivotType() == EntityPivotType.LOCATION) {
       return getLocation();
@@ -282,16 +237,12 @@ import java.util.concurrent.ConcurrentHashMap;
     return pivot.getPoint();
   }
 
-  /**
-   * Functional interface for listening to entity spawned events.
-   */
+  /// Functional interface for listening to entity spawned events.
   @FunctionalInterface
   public interface EntitySpawnedListener extends EventListener {
-    /**
-     * Invoked when an entity is spawned.
-     *
-     * @param event The event that contains information about the spawned entity.
-     */
+    /// Invoked when an entity is spawned.
+    ///
+    /// @param event The event that contains information about the spawned entity.
     void spawned(EntitySpawnedEvent event);
   }
 }

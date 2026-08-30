@@ -8,25 +8,19 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-/**
- * Manages the loading and storage of Tileset resources.
- */
+/// Manages the loading and storage of Tileset resources.
 public class Tilesets extends ResourcesContainer<Tileset> {
 
-  /**
-   * Default constructor for the Tilesets class. This constructor is kept for serialization purposes.
-   */
+  /// Default constructor for the Tilesets class. This constructor is kept for serialization purposes.
   Tilesets() {
   }
 
-  /**
-   * Loads a Tileset from the specified URL.
-   *
-   * @param resourceName The URL of the resource to load.
-   * @return The loaded Tileset.
-   * @throws IOException        If an I/O error occurs.
-   * @throws URISyntaxException If the URL is not formatted correctly.
-   */
+  /// Loads a Tileset from the specified URL.
+  ///
+  /// @param resourceName The URL of the resource to load.
+  /// @return The loaded Tileset.
+  /// @throws IOException        If an I/O error occurs.
+  /// @throws URISyntaxException If the URL is not formatted correctly.
   @Override
   protected Tileset load(URL resourceName) throws IOException, URISyntaxException {
     try {

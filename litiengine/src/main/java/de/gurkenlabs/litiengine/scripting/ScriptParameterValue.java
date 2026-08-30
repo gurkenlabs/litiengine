@@ -4,7 +4,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 
-/** A persisted string representation of a typed script parameter. */
+/// A persisted string representation of a typed script parameter.
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class ScriptParameterValue {
   @XmlAttribute(required = true) private String name;

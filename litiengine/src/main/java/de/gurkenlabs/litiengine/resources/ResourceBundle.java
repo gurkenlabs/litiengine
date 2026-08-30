@@ -39,10 +39,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipException;
 
-/**
- * Represents a resource bundle that can be serialized. This class is used to manage various game resources such as maps, sprite sheets, tilesets,
- * emitters, blueprints, and sounds.
- */
+/// Represents a resource bundle that can be serialized. This class is used to manage various game resources such as maps, sprite sheets, tilesets,
+/// emitters, blueprints, and sounds.
 @XmlRootElement(name = "litidata")
 public class ResourceBundle implements Serializable {
   private static final Logger log = Logger.getLogger(ResourceBundle.class.getName());
@@ -90,9 +88,7 @@ public class ResourceBundle implements Serializable {
   @XmlElement(name = "sound")
   private final List<SoundResource> sounds;
 
-  /**
-   * Constructs a new ResourceBundle instance. Initializes the lists for sprite sheets, maps, tilesets, emitters, blueprints, and sounds.
-   */
+  /// Constructs a new ResourceBundle instance. Initializes the lists for sprite sheets, maps, tilesets, emitters, blueprints, and sounds.
   public ResourceBundle() {
     this.spriteSheets = new ArrayList<>();
     this.maps = new ArrayList<>();
@@ -105,12 +101,10 @@ public class ResourceBundle implements Serializable {
     this.sounds = new ArrayList<>();
   }
 
-  /**
-   * Loads a ResourceBundle from a Path.
-   *
-   * @param filePath The Path to load the ResourceBundle from.
-   * @return The loaded ResourceBundle, or null if loading fails.
-   */
+  /// Loads a ResourceBundle from a Path.
+  ///
+  /// @param filePath The Path to load the ResourceBundle from.
+  /// @return The loaded ResourceBundle, or null if loading fails.
   public static ResourceBundle load(Path filePath) {
     if (!Files.exists(filePath)) {
       log.log(Level.WARNING, "File does not exist: {0}", filePath);
@@ -157,24 +151,20 @@ public class ResourceBundle implements Serializable {
     return null;
   }
 
-  /**
-   * Loads a ResourceBundle from a string file path (convenience overload).
-   *
-   * @param filePath The file path as a string to load the ResourceBundle from.
-   * @return The loaded ResourceBundle, or null if loading fails.
-   */
+  /// Loads a ResourceBundle from a string file path (convenience overload).
+  ///
+  /// @param filePath The file path as a string to load the ResourceBundle from.
+  /// @return The loaded ResourceBundle, or null if loading fails.
   public static ResourceBundle load(String filePath) {
     return load(Path.of(filePath));
   }
 
 
-  /**
-   * Loads a ResourceBundle from a URL (convenience overload). This method uses the Resources utility to resolve the URL and then delegates to the
-   * Path-based method.
-   *
-   * @param fileUrl The URL to load the ResourceBundle from.
-   * @return The loaded ResourceBundle, or null if loading fails.
-   */
+  /// Loads a ResourceBundle from a URL (convenience overload). This method uses the Resources utility to resolve the URL and then delegates to the
+  /// Path-based method.
+  ///
+  /// @param fileUrl The URL to load the ResourceBundle from.
+  /// @return The loaded ResourceBundle, or null if loading fails.
   public static ResourceBundle load(final URL fileUrl) {
     try {
       ResourceBundle gameFile = getResourceBundleFromUrl(fileUrl);
@@ -214,91 +204,77 @@ public class ResourceBundle implements Serializable {
     return null;
   }
 
-  /**
-   * Gets the list of maps in this resource bundle.
-   *
-   * @return The list of maps.
-   */
+  /// Gets the list of maps in this resource bundle.
+  ///
+  /// @return The list of maps.
   @XmlTransient
   public List<TmxMap> getMaps() {
     return this.maps;
   }
 
-  /**
-   * Gets the list of sprite sheets in this resource bundle.
-   *
-   * @return The list of sprite sheets.
-   */
+  /// Gets the list of sprite sheets in this resource bundle.
+  ///
+  /// @return The list of sprite sheets.
   @XmlTransient
   public List<SpritesheetResource> getSpriteSheets() {
     return this.spriteSheets;
   }
 
-  /**
-   * Gets the list of tilesets in this resource bundle.
-   *
-   * @return The list of tilesets.
-   */
+  /// Gets the list of tilesets in this resource bundle.
+  ///
+  /// @return The list of tilesets.
   @XmlTransient
   public List<Tileset> getTilesets() {
     return this.tilesets;
   }
 
-  /**
-   * Gets the list of emitters in this resource bundle.
-   *
-   * @return The list of emitters.
-   */
+  /// Gets the list of emitters in this resource bundle.
+  ///
+  /// @return The list of emitters.
   @XmlTransient
   public List<EmitterAttributes> getEmitters() {
     return this.emitters;
   }
 
-  /**
-   * Gets the list of blueprints in this resource bundle.
-   *
-   * @return The list of blueprints.
-   */
+  /// Gets the list of blueprints in this resource bundle.
+  ///
+  /// @return The list of blueprints.
   @XmlTransient
   public List<Blueprint> getBluePrints() {
     return this.blueprints;
   }
 
-  /** Gets reusable Java and runtime script definitions. */
+  /// Gets reusable Java and runtime script definitions.
   @XmlTransient
   public List<ScriptDefinition> getScripts() {
     return this.scripts;
   }
 
-  /** Gets scripts attached to the game lifecycle. */
+  /// Gets scripts attached to the game lifecycle.
   @XmlTransient
   public List<ScriptBinding> getGameScripts() {
     return this.gameScripts;
   }
 
-  /** Gets reusable script bindings that apply to entity project types. */
+  /// Gets reusable script bindings that apply to entity project types.
   @XmlTransient
   public List<EntityScriptBinding> getEntityScripts() {
     return this.entityScripts;
   }
 
-  /**
-   * Gets the list of sounds in this resource bundle.
-   *
-   * @return The list of sounds.
-   */
+  /// Gets the list of sounds in this resource bundle.
+  ///
+  /// @return The list of sounds.
   @XmlTransient
   public List<SoundResource> getSounds() {
     return this.sounds;
   }
 
-  /**
-   * Saves the ResourceBundle to a file.
-   *
-   * @param fileName The name of the file to save the ResourceBundle to.
-   * @param compress Whether to compress the file or not.
-   * @return The path of the saved file as a string.
-   */
+  /// Saves the ResourceBundle to a file.
+  ///
+  /// @param fileName The name of the file to save the ResourceBundle to.
+  /// @param compress Whether to compress the file or not.
+  /// @return The path of the saved file as a string.
   public String save(final String fileName, final boolean compress) {
     String fileNameWithExtension = fileName;
     if (!fileNameWithExtension.endsWith("." + FILE_EXTENSION)) {
@@ -349,12 +325,10 @@ public class ResourceBundle implements Serializable {
     return newFile.toString();
   }
 
-  /**
-   * Prepares the ResourceBundle for marshalling. This method ensures that the lists of sprite sheets and tilesets contain only distinct elements. It
-   * also sets the version of the ResourceBundle if it is not already set.
-   *
-   * @param m The Marshaller instance used for marshalling.
-   */
+  /// Prepares the ResourceBundle for marshalling. This method ensures that the lists of sprite sheets and tilesets contain only distinct elements. It
+  /// also sets the version of the ResourceBundle if it is not already set.
+  ///
+  /// @param m The Marshaller instance used for marshalling.
   void beforeMarshal(Marshaller m) {
     List<SpritesheetResource> distinctList = new ArrayList<>();
     for (SpritesheetResource sprite : this.getSpriteSheets()) {
@@ -383,15 +357,13 @@ public class ResourceBundle implements Serializable {
     }
   }
 
-  /**
-   * Retrieves a ResourceBundle from a specified Path. This method attempts to load the ResourceBundle from a compressed GZIP stream first. If that
-   * fails, it falls back to loading from plain XML.
-   *
-   * @param filePath The Path of the resource bundle file.
-   * @return The loaded ResourceBundle.
-   * @throws JAXBException If an error occurs during the unmarshalling process.
-   * @throws IOException   If an I/O error occurs.
-   */
+  /// Retrieves a ResourceBundle from a specified Path. This method attempts to load the ResourceBundle from a compressed GZIP stream first. If that
+  /// fails, it falls back to loading from plain XML.
+  ///
+  /// @param filePath The Path of the resource bundle file.
+  /// @return The loaded ResourceBundle.
+  /// @throws JAXBException If an error occurs during the unmarshalling process.
+  /// @throws IOException   If an I/O error occurs.
   private static ResourceBundle getResourceBundle(Path filePath) throws JAXBException, IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
     final Unmarshaller um = Objects.requireNonNull(jaxbContext).createUnmarshaller();
@@ -407,15 +379,13 @@ public class ResourceBundle implements Serializable {
     }
   }
 
-  /**
-   * Retrieves a ResourceBundle from a specified URL. This method attempts to load the ResourceBundle from a compressed GZIP stream first. If that
-   * fails, it falls back to loading from plain XML.
-   *
-   * @param fileUrl The URL of the resource bundle file.
-   * @return The loaded ResourceBundle.
-   * @throws JAXBException If an error occurs during the unmarshalling process.
-   * @throws IOException   If an I/O error occurs.
-   */
+  /// Retrieves a ResourceBundle from a specified URL. This method attempts to load the ResourceBundle from a compressed GZIP stream first. If that
+  /// fails, it falls back to loading from plain XML.
+  ///
+  /// @param fileUrl The URL of the resource bundle file.
+  /// @return The loaded ResourceBundle.
+  /// @throws JAXBException If an error occurs during the unmarshalling process.
+  /// @throws IOException   If an I/O error occurs.
   private static ResourceBundle getResourceBundleFromUrl(URL fileUrl) throws JAXBException, IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
     final Unmarshaller um = Objects.requireNonNull(jaxbContext).createUnmarshaller();

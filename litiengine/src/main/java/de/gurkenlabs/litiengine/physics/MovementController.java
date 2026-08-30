@@ -87,10 +87,8 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     handleMovement();
   }
 
-  /**
-   * Handles the movement of the entity. This method calculates the new velocity and direction of the entity based on the current forces and movement
-   * predicates. It also updates the entity's position accordingly.
-   */
+  /// Handles the movement of the entity. This method calculates the new velocity and direction of the entity based on the current forces and movement
+  /// predicates. It also updates the entity's position accordingly.
   public void handleMovement() {
     if (!isMovementAllowed()) {
       this.velocity = 0;
@@ -161,11 +159,9 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     Game.physics().move(getEntity(), this.moveAngle, getVelocity());
   }
 
-  /**
-   * Checks if the movement is allowed based on the movement predicates.
-   *
-   * @return true if all movement predicates allow movement, false otherwise
-   */
+  /// Checks if the movement is allowed based on the movement predicates.
+  ///
+  /// @return true if all movement predicates allow movement, false otherwise
   protected boolean isMovementAllowed() {
     return movementPredicates.stream().allMatch(p -> p.test(getEntity()));
   }

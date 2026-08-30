@@ -8,48 +8,36 @@ public interface IMapImage extends ICustomPropertyProvider {
 
   URL getAbsoluteSourcePath(); // XXX merge with getSource
 
-  /**
-   * Gets the width.
-   *
-   * @return the width
-   */
+  /// Gets the width.
+  ///
+  /// @return the width
   int getWidth();
 
-  /**
-   * Gets the height.
-   *
-   * @return the height
-   */
+  /// Gets the height.
+  ///
+  /// @return the height
   int getHeight();
 
-  /**
-   * Gets the dimension.
-   *
-   * @return the dimension
-   */
+  /// Gets the dimension.
+  ///
+  /// @return the dimension
   Dimension getDimension();
 
-  /**
-   * Gets the source.
-   *
-   * @return the source
-   */
+  /// Gets the source.
+  ///
+  /// @return the source
   String getSource();
 
-  /**
-   * Gets the transparent color.
-   *
-   * @return the transparent color
-   */
+  /// Gets the transparent color.
+  ///
+  /// @return the transparent color
   Color getTransparentColor();
 
-  /**
-   * Tests for equality between two map images. Two map images are <i>equal</i> if they have the same absolute source path and the same transparent
-   * color.
-   *
-   * @param anObject The map image to test for equality with
-   * @return Whether this map image is equal to the provided map image, or {@code false} if {@code anObject} is not a map image
-   */
+  /// Tests for equality between two map images. Two map images are *equal* if they have the same absolute source path and the same transparent
+  /// color.
+  ///
+  /// @param anObject The map image to test for equality with
+  /// @return Whether this map image is equal to the provided map image, or `false` if `anObject` is not a map image
   boolean equals(Object anObject);
 
   void setTransparentColor(Color color);

@@ -11,11 +11,9 @@ import java.util.function.Function;
 // TODO: Implement spawn event/listener
 // TODO: Implement additional constructors to enhance the API
 
-/**
- * Represents an abstract entity spawner. This class implements the {@link IEntitySpawner} interface.
- *
- * @param <T> The type of entity to be spawned, which must extend {@link IEntity}.
- */
+/// Represents an abstract entity spawner. This class implements the [IEntitySpawner] interface.
+///
+/// @param <T> The type of entity to be spawned, which must extend [IEntity].
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private int amount;
   private int interval;
@@ -43,14 +41,12 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.spawnMode = spawnMode;
   }
 
-  /**
-   * Initializes a new instance of the {@code EntitySpawner} class.
-   *
-   * @param spawnpoints The spawnpoints from which this instance will choose from when spawning entities.
-   * @param interval    The interval in which entities will be spawned.
-   * @param amount      The amount of entities to spawn on every spawn event.
-   * @param spawnMode   the spawning behaviour
-   */
+  /// Initializes a new instance of the `EntitySpawner` class.
+  ///
+  /// @param spawnpoints The spawnpoints from which this instance will choose from when spawning entities.
+  /// @param interval    The interval in which entities will be spawned.
+  /// @param amount      The amount of entities to spawn on every spawn event.
+  /// @param spawnMode   the spawning behaviour
   protected EntitySpawner(final List<Spawnpoint> spawnpoints, final int interval, final int amount, SpawnMode spawnMode) {
     this.interval = interval;
     this.spawnDelay = 1000;
@@ -138,11 +134,9 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     return new ArrayList<>();
   }
 
-  /**
-   * Spawn new entities, depending on the {@code SpawnMode}, spawnAmount, spawnDelay, and spawnInterval of an {@code EntitySpawner}.
-   *
-   * @see SpawnMode
-   */
+  /// Spawn new entities, depending on the `SpawnMode`, spawnAmount, spawnDelay, and spawnInterval of an `EntitySpawner`.
+  ///
+  /// @see SpawnMode
   protected void spawnNewEntities() {
     if (this.getSpawnMode() != SpawnMode.CUSTOMSPAWNPOINTS && this.getSpawnPoints().isEmpty()) {
       return;

@@ -5,49 +5,39 @@ import java.util.Iterator;
 import java.util.Objects;
 import javax.sound.sampled.AudioFormat;
 
-/**
- * A {@code Track} that plays an intro sound and then loops the specified music sound.
- */
+/// A `Track` that plays an intro sound and then loops the specified music sound.
 public class IntroTrack implements Track {
   private final Sound intro;
   private final Sound loop;
 
-  /**
-   * Initializes a new {@code IntroTrack} for the specified sound.
-   *
-   * @param intro The name of the sound to be played as intro.
-   * @param loop  The name of the sound to be looped.
-   */
+  /// Initializes a new `IntroTrack` for the specified sound.
+  ///
+  /// @param intro The name of the sound to be played as intro.
+  /// @param loop  The name of the sound to be looped.
   public IntroTrack(String intro, String loop) {
     this(Resources.sounds().get(intro), Resources.sounds().get(loop));
   }
 
-  /**
-   * Initializes a new {@code IntroTrack} for the specified sound.
-   *
-   * @param intro The sound to be played as intro.
-   * @param loop  The name of the sound to be looped.
-   */
+  /// Initializes a new `IntroTrack` for the specified sound.
+  ///
+  /// @param intro The sound to be played as intro.
+  /// @param loop  The name of the sound to be looped.
   public IntroTrack(Sound intro, String loop) {
     this(intro, Resources.sounds().get(loop));
   }
 
-  /**
-   * Initializes a new {@code IntroTrack} for the specified sound.
-   *
-   * @param intro The name of the sound to be played as intro.
-   * @param loop  The sound to be looped.
-   */
+  /// Initializes a new `IntroTrack` for the specified sound.
+  ///
+  /// @param intro The name of the sound to be played as intro.
+  /// @param loop  The sound to be looped.
   public IntroTrack(String intro, Sound loop) {
     this(Resources.sounds().get(intro), loop);
   }
 
-  /**
-   * Initializes a new {@code IntroTrack} for the specified sound.
-   *
-   * @param intro The sound to be played as intro.
-   * @param loop  The sound to be looped.
-   */
+  /// Initializes a new `IntroTrack` for the specified sound.
+  ///
+  /// @param intro The sound to be played as intro.
+  /// @param loop  The sound to be looped.
   public IntroTrack(Sound intro, Sound loop) {
     Objects.requireNonNull(intro);
     Objects.requireNonNull(loop);

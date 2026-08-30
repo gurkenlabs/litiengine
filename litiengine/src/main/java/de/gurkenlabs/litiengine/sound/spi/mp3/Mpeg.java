@@ -132,15 +132,13 @@ final class Mpeg {
     return 10 + dataLength + (hasFooter ? 10 : 0);
   }
 
-  /**
-   * <p/>
-   * Mono   : 136 bits (= 17 bytes)<br>
-   * Stereo : 256 bits (= 32 bytes)
-   * <p/>
-   *
-   * @param channels The number of channels
-   * @return The length of the side information
-   */
+  /// Mono   : 136 bits (= 17 bytes)
+  ///
+  /// Stereo : 256 bits (= 32 bytes)
+  ///
+  ///
+  /// @param channels The number of channels
+  /// @return The length of the side information
   static int getSideInfoLength(int channels) {
     return channels == 1 ? 17 : 32;
   }

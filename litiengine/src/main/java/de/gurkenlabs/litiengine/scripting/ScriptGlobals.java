@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 
-/** Global thread-safe shared state store accessible across entity, game, and behavior scripts. */
+/// Global thread-safe shared state store accessible across entity, game, and behavior scripts.
 public final class ScriptGlobals {
   private final Map<String, Object> values = new ConcurrentHashMap<>();
   private final Map<String, List<BiConsumer<Object, Object>>> listeners = new ConcurrentHashMap<>();

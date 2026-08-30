@@ -17,12 +17,10 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-/**
- * The {@code SoundPlayback} class is a wrapper {@code SourceDataLine} on which a {@code Sound}
- * playback can be carried out.
- *
- * @see #play(Sound)
- */
+/// The `SoundPlayback` class is a wrapper `SourceDataLine` on which a `Sound`
+/// playback can be carried out.
+///
+/// @see #play(Sound)
 public abstract class SoundPlayback implements Runnable {
 
   protected final SourceDataLine line;
@@ -49,11 +47,9 @@ public abstract class SoundPlayback implements Runnable {
     this.masterVolume = this.createVolumeControl();
   }
 
-  /**
-   * Starts playing the audio.
-   *
-   * @throws IllegalStateException if the audio has already been started
-   */
+  /// Starts playing the audio.
+  ///
+  /// @throws IllegalStateException if the audio has already been started
   public synchronized void start() {
     if (this.started) {
       throw new IllegalStateException("already started");
@@ -62,29 +58,23 @@ public abstract class SoundPlayback implements Runnable {
     this.started = true;
   }
 
-  /**
-   * Adds a {@code SoundPlaybackListener} to this instance.
-   *
-   * @param listener The {@code SoundPlaybackListener} to be added.
-   */
+  /// Adds a `SoundPlaybackListener` to this instance.
+  ///
+  /// @param listener The `SoundPlaybackListener` to be added.
   public void addSoundPlaybackListener(SoundPlaybackListener listener) {
     this.listeners.add(listener);
   }
 
-  /**
-   * Removes a {@code SoundPlaybackListener} from this instance.
-   *
-   * @param listener The {@code SoundPlaybackListener} to be removed.
-   */
+  /// Removes a `SoundPlaybackListener` from this instance.
+  ///
+  /// @param listener The `SoundPlaybackListener` to be removed.
   public void removeSoundPlaybackListener(SoundPlaybackListener listener) {
     this.listeners.remove(listener);
   }
 
-  /**
-   * Sets the paused state of this playback to the provided value.
-   *
-   * @param paused Whether to pause or resume this playback
-   */
+  /// Sets the paused state of this playback to the provided value.
+  ///
+  /// @param paused Whether to pause or resume this playback
   public void setPaused(boolean paused) {
     if (paused) {
       this.pausePlayback();
@@ -93,71 +83,57 @@ public abstract class SoundPlayback implements Runnable {
     }
   }
 
-  /**
-   * Pauses this playback. If this playback is already paused, this call has no effect.
-   */
+  /// Pauses this playback. If this playback is already paused, this call has no effect.
   public void pausePlayback() {
     if (this.line.isOpen()) {
       this.line.stop();
     }
   }
 
-  /**
-   * Resumes this playback. If this playback is already playing, this call has no effect.
-   */
+  /// Resumes this playback. If this playback is already playing, this call has no effect.
   public void resumePlayback() {
     if (this.line.isOpen()) {
       this.line.start();
     }
   }
 
-  /**
-   * Fades this playback's volume to 0 over the given duration.
-   *
-   * @param duration the fade duration in milliseconds.
-   */
+  /// Fades this playback's volume to 0 over the given duration.
+  ///
+  /// @param duration the fade duration in milliseconds.
   public void fade(int duration) {
     this.fade(duration, 0f, TweenFunction.LINEAR);
   }
 
-  /**
-   * Fades this playback's volume to the target value over the given duration using the given
-   * {@code TweenFunction}.
-   *
-   * @param duration   the fade duration in milliseconds.
-   * @param target     the target volume at the end of the fade
-   * @param easingType the TweenFunction determining the falloff curve of this fade.
-   */
+  /// Fades this playback's volume to the target value over the given duration using the given
+  /// `TweenFunction`.
+  ///
+  /// @param duration   the fade duration in milliseconds.
+  /// @param target     the target volume at the end of the fade
+  /// @param easingType the TweenFunction determining the falloff curve of this fade.
   public void fade(int duration, float target, TweenFunction easingType) {
     for (VolumeControl v : this.getVolumeControls()) {
       Game.tweens().start(v, TweenType.VOLUME, duration).target(target).ease(easingType);
     }
   }
 
-  /**
-   * Determines if this playback is paused.
-   *
-   * @return Whether this playback is paused
-   */
+  /// Determines if this playback is paused.
+  ///
+  /// @return Whether this playback is paused
   public boolean isPaused() {
     return !this.line.isActive();
   }
 
-  /**
-   * Determines if this playback has sound to play. If it is paused but still in the middle of
-   * playback, it will return {@code true}, but it will return {@code false} if it has finished or
-   * it has been cancelled.
-   *
-   * @return Whether this playback has sound to play
-   */
+  /// Determines if this playback has sound to play. If it is paused but still in the middle of
+  /// playback, it will return `true`, but it will return `false` if it has finished or
+  /// it has been cancelled.
+  ///
+  /// @return Whether this playback has sound to play
   public boolean isPlaying() {
     return this.line.isOpen();
   }
 
-  /**
-   * Attempts to cancel the playback of this audio. If the playback was successfully cancelled, it
-   * will notify listeners.
-   */
+  /// Attempts to cancel the playback of this audio. If the playback was successfully cancelled, it
+  /// will notify listeners.
   public synchronized void cancel() {
     if (!this.started) {
       throw new IllegalStateException("not started");
@@ -173,12 +149,10 @@ public abstract class SoundPlayback implements Runnable {
     }
   }
 
-  /**
-   * Gets the current volume of this playback, considering all {@code VolumeControl} objects created
-   * for it.
-   *
-   * @return The current volume.
-   */
+  /// Gets the current volume of this playback, considering all `VolumeControl` objects created
+  /// for it.
+  ///
+  /// @return The current volume.
   public float getMasterVolume() {
     if (this.muteControl.getValue()) {
       return 0f;
@@ -186,21 +160,17 @@ public abstract class SoundPlayback implements Runnable {
     return (float) Math.pow(10.0, this.gainControl.getValue() / 20.0);
   }
 
-  /**
-   * Gets the current master volume of this playback. This will be approximately equal to the value
-   * set by a previous call to {@code setVolume}, though rounding errors may occur.
-   *
-   * @return The settable volume.
-   */
+  /// Gets the current master volume of this playback. This will be approximately equal to the value
+  /// set by a previous call to `setVolume`, though rounding errors may occur.
+  ///
+  /// @return The settable volume.
   public float getVolume() {
     return this.masterVolume.get();
   }
 
-  /**
-   * Sets the master volume of this playback.
-   *
-   * @param volume The new volume.
-   */
+  /// Sets the master volume of this playback.
+  ///
+  /// @param volume The new volume.
   public void setVolume(float volume) {
     this.masterVolume.set(volume);
   }
@@ -219,12 +189,10 @@ public abstract class SoundPlayback implements Runnable {
     SoundEngine.EXECUTOR.submit(this);
   }
 
-  /**
-   * Plays a sound to this object's data line.
-   *
-   * @param sound The sound to play
-   * @return Whether the sound was cancelled while playing
-   */
+  /// Plays a sound to this object's data line.
+  ///
+  /// @param sound The sound to play
+  /// @return Whether the sound was cancelled while playing
   boolean play(Sound sound) throws LineUnavailableException {
     this.line.open();
     this.line.start();
@@ -242,10 +210,8 @@ public abstract class SoundPlayback implements Runnable {
     return this.cancelled;
   }
 
-  /**
-   * Finishes the playback. If this playback was not cancelled in the process, it will notify
-   * listeners.
-   */
+  /// Finishes the playback. If this playback was not cancelled in the process, it will notify
+  /// listeners.
   void finish() {
     this.line.drain();
     synchronized (this) {
@@ -276,12 +242,10 @@ public abstract class SoundPlayback implements Runnable {
   }
 
 
-  /**
-   * An object for controlling the volume of a {@code SoundPlayback}. Each distinct instance
-   * represents an independent factor contributing to its volume.
-   *
-   * @see SoundPlayback#createVolumeControl()
-   */
+  /// An object for controlling the volume of a `SoundPlayback`. Each distinct instance
+  /// represents an independent factor contributing to its volume.
+  ///
+  /// @see SoundPlayback#createVolumeControl()
   public class VolumeControl implements Tweenable, AutoCloseable {
 
     private volatile float value = 1f;
@@ -289,20 +253,16 @@ public abstract class SoundPlayback implements Runnable {
     private VolumeControl() {
     }
 
-    /**
-     * Gets the value of this volume control.
-     *
-     * @return The value of this control.
-     */
+    /// Gets the value of this volume control.
+    ///
+    /// @return The value of this control.
     public float get() {
       return this.value;
     }
 
-    /**
-     * Sets the value of this volume control.
-     *
-     * @param value The value to be set.
-     */
+    /// Sets the value of this volume control.
+    ///
+    /// @param value The value to be set.
     public void set(float value) {
       if (value < 0f) {
         throw new IllegalArgumentException("negative volume");

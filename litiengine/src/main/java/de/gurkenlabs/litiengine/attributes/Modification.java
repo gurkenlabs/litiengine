@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.attributes;
 
-/**
- * Represents the types of modifications that can be applied. Each modification type has an associated apply order.
- */
+/// Represents the types of modifications that can be applied. Each modification type has an associated apply order.
 public enum Modification {
   ADD(1),
   DIVIDE(4),
@@ -17,11 +15,9 @@ public enum Modification {
     this.applyOrder = order;
   }
 
-  /**
-   * Gets the apply order of this modification type.
-   *
-   * @return the apply order
-   */
+  /// Gets the apply order of this modification type.
+  ///
+  /// @return the apply order
   public int getApplyOrder() {
     return this.applyOrder;
   }

@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-/**
- * Fluent builder for constructing and registering {@link DynamicAbility} instances on a creature.
- */
+/// Fluent builder for constructing and registering [DynamicAbility] instances on a creature.
 public class AbilityBuilder {
   private final Creature executor;
   private final String name;
@@ -77,12 +75,10 @@ public class AbilityBuilder {
     return this;
   }
 
-  /**
-   * Adds an {@link Effect} to this ability.
-   *
-   * @param effect The effect to attach.
-   * @return This builder instance for chaining.
-   */
+  /// Adds an [Effect] to this ability.
+  ///
+  /// @param effect The effect to attach.
+  /// @return This builder instance for chaining.
   public AbilityBuilder effect(Effect effect) {
     if (effect != null) {
       this.effects.add(effect);
@@ -108,11 +104,9 @@ public class AbilityBuilder {
     return ability;
   }
 
-  /**
-   * Constructs the ability and registers it directly on the executing creature.
-   *
-   * @return The registered {@link DynamicAbility}
-   */
+  /// Constructs the ability and registers it directly on the executing creature.
+  ///
+  /// @return The registered [DynamicAbility]
   public DynamicAbility register() {
     DynamicAbility ability = this.build();
     if (this.executor != null) {

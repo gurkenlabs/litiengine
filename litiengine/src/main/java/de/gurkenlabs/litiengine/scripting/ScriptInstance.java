@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.scripting;
 
 import java.awt.Graphics2D;
 
-/** One configured runtime instance of a script. */
+/// One configured runtime instance of a script.
 public interface ScriptInstance {
   void attach(ScriptContext<?> context) throws Exception;
 

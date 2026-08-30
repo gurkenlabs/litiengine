@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.sound.spi.mp3;
 
-/** Reconstructs MPEG-1 Layer III joint-stereo channels before spectral reordering. */
+/// Reconstructs MPEG-1 Layer III joint-stereo channels before spectral reordering.
 final class StereoProcessing {
   private static final float SQRT_HALF = 0.707106781f;
   private static final float[] INTENSITY_RATIOS = {

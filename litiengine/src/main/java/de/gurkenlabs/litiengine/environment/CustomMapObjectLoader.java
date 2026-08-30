@@ -9,65 +9,56 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The {@code CustomMapObjectLoader} class extends the {@link MapObjectLoader} class to provide custom functionality for loading map objects into
- * entities.
- *
- * <p>This class uses a functional interface {@code ConstructorInvocation} to dynamically
- * invoke constructors of entity classes based on the provided {@link IMapObject} and {@link Environment}. It supports various constructor signatures
- * and prioritizes them based on their parameter types.
- *
- * <p>It also overrides the {@code load} method to handle the creation and initialization
- * of entities from map objects.
- */
+/// The `CustomMapObjectLoader` class extends the [MapObjectLoader] class to provide custom functionality for loading map objects into
+/// entities.
+///
+/// This class uses a functional interface `ConstructorInvocation` to dynamically
+/// invoke constructors of entity classes based on the provided [IMapObject] and [Environment]. It supports various constructor signatures
+/// and prioritizes them based on their parameter types.
+///
+/// It also overrides the `load` method to handle the creation and initialization
+/// of entities from map objects.
 public final class CustomMapObjectLoader extends MapObjectLoader {
   private static final Logger log = Logger.getLogger(CustomMapObjectLoader.class.getName());
   private final ConstructorInvocation invoke;
 
-  /**
-   * A functional interface for invoking constructors of entity classes.
-   *
-   * <p>This interface defines a single method {@code invoke}, which dynamically
-   * creates an instance of an {@link IEntity} using the provided {@link Environment} and {@link IMapObject}.
-   */
+  /// A functional interface for invoking constructors of entity classes.
+  ///
+  /// This interface defines a single method `invoke`, which dynamically
+  /// creates an instance of an [IEntity] using the provided [Environment] and [IMapObject].
   @FunctionalInterface
   interface ConstructorInvocation {
     IEntity invoke(Environment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
   }
 
-  /**
-   * Constructs a new {@code CustomMapObjectLoader} instance with the specified map object type and constructor invocation logic.
-   *
-   * <p>This constructor initializes the loader with a specific map object type and a functional
-   * interface for dynamically invoking constructors of entity classes.
-   *
-   * @param mapObjectType the type of the map object to be handled by this loader
-   * @param invocation    the {@link ConstructorInvocation} functional interface used to create entities
-   */
+  /// Constructs a new `CustomMapObjectLoader` instance with the specified map object type and constructor invocation logic.
+  ///
+  /// This constructor initializes the loader with a specific map object type and a functional
+  /// interface for dynamically invoking constructors of entity classes.
+  ///
+  /// @param mapObjectType the type of the map object to be handled by this loader
+  /// @param invocation    the [ConstructorInvocation] functional interface used to create entities
   CustomMapObjectLoader(String mapObjectType, ConstructorInvocation invocation) {
     super(mapObjectType);
     this.invoke = invocation;
   }
 
-  /**
-   * Finds the most suitable constructor for the specified entity type.
-   *
-   * <p>This method iterates through all constructors of the given entity class and determines
-   * the best match based on the parameter types. It prioritizes constructors in the following order:
-   * <ol>
-   *   <li>Constructor with parameters {@link Environment} and {@link IMapObject}</li>
-   *   <li>Constructor with parameters {@link IMapObject} and {@link Environment}</li>
-   *   <li>Constructor with a single {@link IMapObject} parameter</li>
-   *   <li>Constructor with a single {@link Environment} parameter</li>
-   *   <li>Default (no-argument) constructor</li>
-   * </ol>
-   *
-   * <p>If multiple constructors match, the one with the highest priority is selected.
-   *
-   * @param entityType the class of the entity for which a constructor is to be found
-   * @return a {@link ConstructorInvocation} functional interface for invoking the selected constructor, or {@code null} if no suitable constructor is
-   * uctor is found
-   */
+  /// Finds the most suitable constructor for the specified entity type.
+  ///
+  /// This method iterates through all constructors of the given entity class and determines
+  /// the best match based on the parameter types. It prioritizes constructors in the following order:
+  ///
+  /// 1. Constructor with parameters [Environment] and [IMapObject]
+  /// 2. Constructor with parameters [IMapObject] and [Environment]
+  /// 3. Constructor with a single [IMapObject] parameter
+  /// 4. Constructor with a single [Environment] parameter
+  /// 5. Default (no-argument) constructor
+  ///
+  /// If multiple constructors match, the one with the highest priority is selected.
+  ///
+  /// @param entityType the class of the entity for which a constructor is to be found
+  /// @return a [ConstructorInvocation] functional interface for invoking the selected constructor, or `null` if no suitable constructor is
+  /// uctor is found
   static ConstructorInvocation findConstructor(Class<? extends IEntity> entityType) {
     ConstructorInvocation inv = null;
 

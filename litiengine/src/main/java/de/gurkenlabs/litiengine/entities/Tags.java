@@ -6,14 +6,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * This attribute provides initial values for Entity tags. Annotate an Entity with one or multiple Tags to add them
- * automatically when the constructor is called. {@code Tags} is just intended as a container class, use the repeatable
- * {@code Tag} annotation instead.
- *
- * @see IEntity#addTag(String)
- * @see Tag
- */
+/// This attribute provides initial values for Entity tags. Annotate an Entity with one or multiple Tags to add them
+/// automatically when the constructor is called. `Tags` is just intended as a container class, use the repeatable
+/// `Tag` annotation instead.
+///
+/// @see IEntity#addTag(String)
+/// @see Tag
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

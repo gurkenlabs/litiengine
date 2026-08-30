@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Provides descriptive parameter names for reflected methods in script intellisense. */
+/// Provides descriptive parameter names for reflected methods in script intellisense.
 final class ScriptParameterNamer {
   private ScriptParameterNamer() {}
 

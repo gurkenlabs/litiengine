@@ -26,22 +26,19 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * The {@code DebugRenderer} class provides functionality for rendering debug information in the game. It includes methods for rendering debug details
- * for entities and maps, as well as managing listeners for custom debug rendering.
- *
- * <p>This class is final and cannot be instantiated. It serves as a utility class
- * for debug rendering purposes.
- *
- * <p>Key features:
- * <ul>
- *   <li>Render debug information for entities, such as bounding boxes and hitboxes.</li>
- *   <li>Render debug information for maps, such as collision boxes and tile metrics.</li>
- *   <li>Support for adding and removing custom debug rendering listeners.</li>
- * </ul>
- *
- * <p>Note: Debug rendering is controlled by the game's debug configuration settings.
- */
+/// The `DebugRenderer` class provides functionality for rendering debug information in the game. It includes methods for rendering debug details
+/// for entities and maps, as well as managing listeners for custom debug rendering.
+///
+/// This class is final and cannot be instantiated. It serves as a utility class
+/// for debug rendering purposes.
+///
+/// Key features:
+///
+/// - Render debug information for entities, such as bounding boxes and hitboxes.
+/// - Render debug information for maps, such as collision boxes and tile metrics.
+/// - Support for adding and removing custom debug rendering listeners.
+///
+/// Note: Debug rendering is controlled by the game's debug configuration settings.
 public final class DebugRenderer {
   private static final List<MapRenderedListener> mapDebugListener;
   private static final List<EntityRenderedListener> entityDebugListeners;
@@ -55,61 +52,50 @@ public final class DebugRenderer {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * Add the specified entity rendered listener to attach custom debug rendering after the default debug information for an entity has been rendered.
-   *
-   * @param listener The listener to add.
-   */
+  /// Add the specified entity rendered listener to attach custom debug rendering after the default debug information for an entity has been rendered.
+  ///
+  /// @param listener The listener to add.
   public static void addEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.add(listener);
   }
 
-  /**
-   * Removes the specified entity rendered listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified entity rendered listener.
+  ///
+  /// @param listener The listener to remove.
   public static void removeEntityDebugListener(EntityRenderedListener listener) {
     entityDebugListeners.remove(listener);
   }
 
-  /**
-   * Add the specified map rendered listener to attach custom debug rendering after layers of the type {@code GROUND} have beend rendered.
-   *
-   * @param listener The listener to add.
-   * @see RenderType#GROUND
-   * @see Environment#render(Graphics2D)
-   */
+  /// Add the specified map rendered listener to attach custom debug rendering after layers of the type `GROUND` have beend rendered.
+  ///
+  /// @param listener The listener to add.
+  /// @see RenderType#GROUND
+  /// @see Environment#render(Graphics2D)
   public static void addMapRenderedListener(MapRenderedListener listener) {
     mapDebugListener.add(listener);
   }
 
-  /**
-   * Removes the specified map rendered listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified map rendered listener.
+  ///
+  /// @param listener The listener to remove.
   public static void removeMapRenderedListener(MapRenderedListener listener) {
     mapDebugListener.remove(listener);
   }
 
-  /**
-   * Renders debug information for a specific entity.
-   *
-   * <p>This method draws various debug details for the provided entity, such as:
-   * <ul>
-   *   <li>Entity names, if enabled in the debug configuration.</li>
-   *   <li>Hitboxes for combat entities, highlighted in red.</li>
-   *   <li>Bounding boxes for all entities, highlighted in red, and additional range indicators for sound sources.</li>
-   *   <li>Collision boxes for collision entities, highlighted in red (active) or orange (inactive).</li>
-   * </ul>
-   *
-   * <p>After rendering the default debug information, it triggers any registered {@code EntityRenderedListener}
-   * to allow custom debug rendering.
-   *
-   * @param g      The {@code Graphics2D} object used for rendering.
-   * @param entity The entity for which debug information is rendered.
-   */
+  /// Renders debug information for a specific entity.
+  ///
+  /// This method draws various debug details for the provided entity, such as:
+  ///
+  /// - Entity names, if enabled in the debug configuration.
+  /// - Hitboxes for combat entities, highlighted in red.
+  /// - Bounding boxes for all entities, highlighted in red, and additional range indicators for sound sources.
+  /// - Collision boxes for collision entities, highlighted in red (active) or orange (inactive).
+  ///
+  /// After rendering the default debug information, it triggers any registered `EntityRenderedListener`
+  /// to allow custom debug rendering.
+  ///
+  /// @param g      The `Graphics2D` object used for rendering.
+  /// @param entity The entity for which debug information is rendered.
   public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
     if (!Game.config().debug().isDebugEnabled()) {
       return;
@@ -157,21 +143,18 @@ public final class DebugRenderer {
     }
   }
 
-  /**
-   * Renders debug information for the specified map.
-   *
-   * <p>This method draws various debug details for the provided map, such as:
-   * <ul>
-   *   <li>Collision boxes from the shape layer, highlighted in red.</li>
-   *   <li>Tile metrics, including mouse tile information, if enabled in the debug configuration.</li>
-   * </ul>
-   *
-   * <p>After rendering the default debug information, it triggers any registered {@code MapRenderedListener}
-   * to allow custom debug rendering.
-   *
-   * @param g   The {@code Graphics2D} object used for rendering.
-   * @param map The map for which debug information is rendered.
-   */
+  /// Renders debug information for the specified map.
+  ///
+  /// This method draws various debug details for the provided map, such as:
+  ///
+  /// - Collision boxes from the shape layer, highlighted in red.
+  /// - Tile metrics, including mouse tile information, if enabled in the debug configuration.
+  ///
+  /// After rendering the default debug information, it triggers any registered `MapRenderedListener`
+  /// to allow custom debug rendering.
+  ///
+  /// @param g   The `Graphics2D` object used for rendering.
+  /// @param map The map for which debug information is rendered.
   public static void renderMapDebugInfo(final Graphics2D g, final IMap map) {
     if (!Game.config().debug().isDebugEnabled()) {
       return;

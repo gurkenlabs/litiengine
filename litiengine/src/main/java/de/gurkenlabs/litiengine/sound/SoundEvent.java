@@ -3,12 +3,10 @@ package de.gurkenlabs.litiengine.sound;
 import java.io.Serial;
 import java.util.EventObject;
 
-/**
- * This implementation is used for all events that need to pass a {@code Sound} object to their listeners.
- *
- * @see SoundPlayback#cancel()
- * @see SoundPlayback#finish()
- */
+/// This implementation is used for all events that need to pass a `Sound` object to their listeners.
+///
+/// @see SoundPlayback#cancel()
+/// @see SoundPlayback#finish()
 public class SoundEvent extends EventObject {
   @Serial private static final long serialVersionUID = -2070316328855430839L;
 
@@ -19,11 +17,9 @@ public class SoundEvent extends EventObject {
     this.sound = sound;
   }
 
-  /**
-   * Gets the related {@code Sound} instance.
-   *
-   * @return The sound object.
-   */
+  /// Gets the related `Sound` instance.
+  ///
+  /// @return The sound object.
   public Sound getSound() {
     return this.sound;
   }

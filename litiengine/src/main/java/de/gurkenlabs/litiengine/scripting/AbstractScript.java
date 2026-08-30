@@ -13,7 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
-/** Base implementation that provides typed access to a script host, context, and global state. */
+/// Base implementation that provides typed access to a script host, context, and global state.
 public abstract class AbstractScript<T> implements ScriptInstance {
   private ScriptContext<T> context;
   protected final ScriptGlobals globals = Game.scripts().globals();
@@ -42,31 +42,31 @@ public abstract class AbstractScript<T> implements ScriptInstance {
     this.onRender(g);
   }
 
-  /** Called during the render pass for custom graphics rendering. */
+  /// Called during the render pass for custom graphics rendering.
   protected void onRender(Graphics2D g) throws Exception {}
 
-  /** Called when a key is pressed. */
+  /// Called when a key is pressed.
   protected void onKeyPressed(KeyEvent event) throws Exception {}
 
-  /** Called when a key is released. */
+  /// Called when a key is released.
   protected void onKeyReleased(KeyEvent event) throws Exception {}
 
-  /** Called when a key is typed. */
+  /// Called when a key is typed.
   protected void onKeyTyped(KeyEvent event) throws Exception {}
 
-  /** Called when a mouse button is clicked (pressed and released). */
+  /// Called when a mouse button is clicked (pressed and released).
   protected void onMouseClicked(MouseEvent event) throws Exception {}
 
-  /** Called when a mouse button is pressed. */
+  /// Called when a mouse button is pressed.
   protected void onMousePressed(MouseEvent event) throws Exception {}
 
-  /** Called when a mouse button is released. */
+  /// Called when a mouse button is released.
   protected void onMouseReleased(MouseEvent event) throws Exception {}
 
-  /** Called when the mouse is moved. */
+  /// Called when the mouse is moved.
   protected void onMouseMoved(MouseEvent event) throws Exception {}
 
-  /** Called when the mouse wheel is rotated. */
+  /// Called when the mouse wheel is rotated.
   protected void onMouseWheel(MouseWheelEvent event) throws Exception {}
 
   protected final ScriptContext<T> context() {
@@ -78,7 +78,7 @@ public abstract class AbstractScript<T> implements ScriptInstance {
     return this.context().host();
   }
 
-  /** Returns the host's current environment, or {@code null} for game scripts without one. */
+  /// Returns the host's current environment, or `null` for game scripts without one.
   protected final Environment environment() {
     return this.context().environment();
   }
@@ -87,62 +87,62 @@ public abstract class AbstractScript<T> implements ScriptInstance {
     return this.globals;
   }
 
-  /** Returns the managed input helper for key/mouse bindings and state queries. */
+  /// Returns the managed input helper for key/mouse bindings and state queries.
   protected final ScriptInput input() {
     return this.context().input();
   }
 
-  /** Returns the scripted UI overlay service owned by this context. */
+  /// Returns the scripted UI overlay service owned by this context.
   protected final ScriptUiOverlay ui() {
     return this.context().ui();
   }
 
-  /** Returns the active camera from the game world. */
+  /// Returns the active camera from the game world.
   protected final ICamera camera() {
     return this.context().camera();
   }
 
-  /** Returns a fluent spawner for creating entities in the current environment. */
+  /// Returns a fluent spawner for creating entities in the current environment.
   protected final ScriptedSpawner spawner() {
     return this.context().spawner();
   }
 
-  /** Spawns a creature with the given sprite prefix at the specified coordinates. */
+  /// Spawns a creature with the given sprite prefix at the specified coordinates.
   protected final Creature spawnCreature(String spritePrefix, double x, double y) {
     return this.context().spawnCreature(spritePrefix, x, y);
   }
 
-  /** Spawns a creature with the given sprite prefix at the specified location. */
+  /// Spawns a creature with the given sprite prefix at the specified location.
   protected final Creature spawnCreature(String spritePrefix, Point2D location) {
     return this.context().spawnCreature(spritePrefix, location);
   }
 
-  /** Spawns a prop with the given spritesheet at the specified coordinates. */
+  /// Spawns a prop with the given spritesheet at the specified coordinates.
   protected final Prop spawnProp(String spriteSheet, double x, double y) {
     return this.context().spawnProp(spriteSheet, x, y);
   }
 
-  /** Spawns a prop with the given spritesheet at the specified location. */
+  /// Spawns a prop with the given spritesheet at the specified location.
   protected final Prop spawnProp(String spriteSheet, Point2D location) {
     return this.context().spawnProp(spriteSheet, location);
   }
 
-  /** Spawns an entity of the given type at the specified coordinates. */
+  /// Spawns an entity of the given type at the specified coordinates.
   protected final <E extends IEntity> E spawn(Class<E> entityType, double x, double y) {
     return this.context().spawn(entityType, x, y);
   }
 
-  /** Spawns an entity of the given type at the specified location. */
+  /// Spawns an entity of the given type at the specified location.
   protected final <E extends IEntity> E spawn(Class<E> entityType, Point2D location) {
     return this.context().spawn(entityType, location);
   }
 
-  /** Spawns the given entity at the specified coordinates. */
+  /// Spawns the given entity at the specified coordinates.
   protected final <E extends IEntity> E spawn(E entity, double x, double y) {
     return this.context().spawn(entity, x, y);
   }
 
-  /** Spawns the given entity at the specified location. */
+  /// Spawns the given entity at the specified location.
   protected final <E extends IEntity> E spawn(E entity, Point2D location) {
     return this.context().spawn(entity, location);
   }

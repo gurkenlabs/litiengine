@@ -12,13 +12,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Thread-safe registry that indexes all annotated map object properties and types in LITIengine.
- * <p>
- * Provides canonical English documentation, data types, default values, and category groupings
- * for MCP exposure and in-editor documentation, while resolving translations via {@link Resources#strings()}.
- * </p>
- */
+/// Thread-safe registry that indexes all annotated map object properties and types in LITIengine.
+///
+/// Provides canonical English documentation, data types, default values, and category groupings
+/// for MCP exposure and in-editor documentation, while resolving translations via [Resources#strings()].
 public final class TmxPropertyMetadataRegistry {
   private static final Logger log = Logger.getLogger(TmxPropertyMetadataRegistry.class.getName());
 
@@ -30,12 +27,10 @@ public final class TmxPropertyMetadataRegistry {
       String defaultValue,
       String resourceKey) {
 
-    /**
-     * Gets the localized description if a resource key translation is available,
-     * falling back to the canonical English description.
-     *
-     * @return The localized or canonical description.
-     */
+    /// Gets the localized description if a resource key translation is available,
+    /// falling back to the canonical English description.
+    ///
+    /// @return The localized or canonical description.
     public String getTranslatedDescription() {
       if (resourceKey != null && !resourceKey.isEmpty()) {
         try {
@@ -56,11 +51,9 @@ public final class TmxPropertyMetadataRegistry {
       String description,
       String resourceKey) {
 
-    /**
-     * Gets the localized description if available, falling back to the canonical English description.
-     *
-     * @return The localized or canonical description.
-     */
+    /// Gets the localized description if available, falling back to the canonical English description.
+    ///
+    /// @return The localized or canonical description.
     public String getTranslatedDescription() {
       if (resourceKey != null && !resourceKey.isEmpty()) {
         try {
@@ -146,31 +139,25 @@ public final class TmxPropertyMetadataRegistry {
     }
   }
 
-  /**
-   * Retrieves metadata for a registered TMX property by name.
-   *
-   * @param propertyName The property name key.
-   * @return The {@link PropertyMetadata}, or {@code null} if not registered.
-   */
+  /// Retrieves metadata for a registered TMX property by name.
+  ///
+  /// @param propertyName The property name key.
+  /// @return The [PropertyMetadata], or `null` if not registered.
   public static PropertyMetadata getProperty(String propertyName) {
     return propertyName != null ? PROPERTIES.get(propertyName) : null;
   }
 
-  /**
-   * Retrieves all registered property metadata objects.
-   *
-   * @return Unmodifiable list of property metadata.
-   */
+  /// Retrieves all registered property metadata objects.
+  ///
+  /// @return Unmodifiable list of property metadata.
   public static List<PropertyMetadata> getAllProperties() {
     return Collections.unmodifiableList(new ArrayList<>(PROPERTIES.values()));
   }
 
-  /**
-   * Retrieves all properties belonging to a specific category.
-   *
-   * @param category The category name.
-   * @return List of matching property metadata objects.
-   */
+  /// Retrieves all properties belonging to a specific category.
+  ///
+  /// @param category The category name.
+  /// @return List of matching property metadata objects.
   public static List<PropertyMetadata> getPropertiesByCategory(String category) {
     if (category == null || category.isEmpty()) {
       return getAllProperties();
@@ -184,21 +171,17 @@ public final class TmxPropertyMetadataRegistry {
     return Collections.unmodifiableList(list);
   }
 
-  /**
-   * Retrieves metadata for a map object type.
-   *
-   * @param typeName The type name string.
-   * @return The {@link TypeMetadata}, or {@code null} if not registered.
-   */
+  /// Retrieves metadata for a map object type.
+  ///
+  /// @param typeName The type name string.
+  /// @return The [TypeMetadata], or `null` if not registered.
   public static TypeMetadata getType(String typeName) {
     return typeName != null ? TYPES.get(typeName) : null;
   }
 
-  /**
-   * Retrieves all registered map object type metadata objects.
-   *
-   * @return Unmodifiable list of type metadata.
-   */
+  /// Retrieves all registered map object type metadata objects.
+  ///
+  /// @return Unmodifiable list of type metadata.
   public static List<TypeMetadata> getAllTypes() {
     return Collections.unmodifiableList(new ArrayList<>(TYPES.values()));
   }

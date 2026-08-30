@@ -8,7 +8,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Reusable script bindings that are automatically applied to entities of a project type. */
+/// Reusable script bindings that are automatically applied to entities of a project type.
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class EntityScriptBinding {
   @XmlAttribute(required = true) private String targetType;

@@ -343,11 +343,9 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     setLocation(new Point2D.Double(x, y));
   }
 
-  /**
-   * Sets the map location.
-   *
-   * @param location the new map location
-   */
+  /// Sets the map location.
+  ///
+  /// @param location the new map location
   @Override
   public void setLocation(final Point2D location) {
     if (location.equals(getLocation())) {
@@ -358,9 +356,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     fireLocationChangedEvent();
   }
 
-  /**
-   * Sets an id which should only be filled when an entity gets added due to map information.
-   */
+  /// Sets an id which should only be filled when an entity gets added due to map information.
   @Override
   public void setMapId(final int mapId) {
     this.mapId = mapId;
@@ -611,9 +607,7 @@ public abstract class Entity implements IEntity, EntityRenderListener, Tweenable
     return event;
   }
 
-  /**
-   * Registers all default actions that are annotated with a {@code EntityAction} annotation.
-   */
+  /// Registers all default actions that are annotated with a `EntityAction` annotation.
   private void registerActions() {
     List<Method> methods =
       ReflectionUtilities.getMethodsAnnotatedWith(this.getClass(), Action.class);

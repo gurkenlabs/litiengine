@@ -1,10 +1,8 @@
 package de.gurkenlabs.litiengine.sound.spi.mp3;
 
-/**
- * A class for the synthesis filter bank.
- * This class performs the polyphase synthesis filter required for MP3 decoding.
- * It converts 32 subband samples into 32 PCM samples.
- */
+/// A class for the synthesis filter bank.
+/// This class performs the polyphase synthesis filter required for MP3 decoding.
+/// It converts 32 subband samples into 32 PCM samples.
 final class SynthesisFilter {
     private final float[] v1;
     private final float[] v2;
@@ -54,9 +52,7 @@ final class SynthesisFilter {
         System.arraycopy(s, 0, samples, 0, 32);
     }
 
-    /**
-     * Compute new values via a fast cosine transform.
-     */
+    /// Compute new values via a fast cosine transform.
     private void computeNewV() {
         float newV0, newV1, newV2, newV3, newV4, newV5, newV6, newV7, newV8, newV9;
         float newV10, newV11, newV12, newV13, newV14, newV15, newV16, newV17, newV18, newV19;

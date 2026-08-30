@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
-/** This implementation provides information about the mouse input in the LITIENGINE. */
+/// This implementation provides information about the mouse input in the LITIENGINE.
 public final class Mouse
   implements MouseListener, MouseMotionListener, MouseWheelListener, IMouse, IUpdateable {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
@@ -56,12 +56,10 @@ public final class Mouse
   private MouseEvent updateLocation;
   private boolean updatingLocation;
 
-  /**
-   * Instantiates a new mouse.
-   *
-   * @throws AWTException
-   *   In case the {@link Robot} class could not be initialized.
-   */
+  /// Instantiates a new mouse.
+  ///
+  /// @throws AWTException
+  /// In case the [Robot] class could not be initialized.
   Mouse() throws AWTException {
     try {
       this.robot = new Robot();
@@ -449,12 +447,10 @@ public final class Mouse
       original.getPreciseWheelRotation());
   }
 
-  /**
-   * Calculates the location of the ingame mouse by the position diff and locks the original mouse to the center of the screen.
-   *
-   * @param e
-   *   The event containing information about the original mouse.
-   */
+  /// Calculates the location of the ingame mouse by the position diff and locks the original mouse to the center of the screen.
+  ///
+  /// @param e
+  /// The event containing information about the original mouse.
   private void setLocation(final MouseEvent e) {
     if (this.grabMouse && !Game.window().isFocusOwner()) {
       return;
@@ -497,12 +493,10 @@ public final class Mouse
     this.location = new Point2D.Double(newX, newY);
   }
 
-  /**
-   * Sets the pressed.
-   *
-   * @param pressed
-   *   the new pressed
-   */
+  /// Sets the pressed.
+  ///
+  /// @param pressed
+  /// the new pressed
   private void setPressed(final boolean pressed) {
     this.pressed = pressed;
   }
@@ -515,11 +509,9 @@ public final class Mouse
     this.updateLocation = mouseEvent;
   }
 
-  /**
-   * Calculates the center screen position where the mouse should be locked when grab mouse is enabled.
-   *
-   * @return The screen coordinates where the mouse should be centered.
-   */
+  /// Calculates the center screen position where the mouse should be locked when grab mouse is enabled.
+  ///
+  /// @return The screen coordinates where the mouse should be centered.
   private Point getGrabPosition() {
     final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
     final double screenCenterY = Game.window().getResolution().getHeight() * 0.5;

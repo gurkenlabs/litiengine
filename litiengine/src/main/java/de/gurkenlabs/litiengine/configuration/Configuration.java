@@ -16,9 +16,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Configuration class that manages multiple configuration groups and handles loading and saving settings.
- */
+/// Configuration class that manages multiple configuration groups and handles loading and saving settings.
 public class Configuration {
   private static final Logger log = Logger.getLogger(Configuration.class.getName());
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
@@ -26,32 +24,26 @@ public class Configuration {
   private final List<ConfigurationGroup> configurationGroups;
   private final Path path;
 
-  /**
-   * Initializes a new instance of the {@code Configuration} class.
-   *
-   * @param configurationGroups The configuration groups managed by this instance.
-   */
+  /// Initializes a new instance of the `Configuration` class.
+  ///
+  /// @param configurationGroups The configuration groups managed by this instance.
   public Configuration(final ConfigurationGroup... configurationGroups) {
     this(DEFAULT_CONFIGURATION_FILE_NAME, configurationGroups);
   }
 
-  /**
-   * Constructs a new instance of the {@code Configuration} class using the specified file name. This constructor converts the provided file name
-   * string into a {@code Path} object and delegates the initialization to another constructor.
-   *
-   * @param path                The path of the file from which to load the settings.
-   * @param configurationGroups The configuration groups managed by this instance.
-   */
+  /// Constructs a new instance of the `Configuration` class using the specified file name. This constructor converts the provided file name
+  /// string into a `Path` object and delegates the initialization to another constructor.
+  ///
+  /// @param path                The path of the file from which to load the settings.
+  /// @param configurationGroups The configuration groups managed by this instance.
   public Configuration(final String path, final ConfigurationGroup... configurationGroups) {
     this(Path.of(path), configurationGroups);
   }
 
-  /**
-   * Initializes a new instance of the {@code Configuration} class.
-   *
-   * @param path                The path of the file from which to load the settings.
-   * @param configurationGroups The configuration groups managed by this instance.
-   */
+  /// Initializes a new instance of the `Configuration` class.
+  ///
+  /// @param path                The path of the file from which to load the settings.
+  /// @param configurationGroups The configuration groups managed by this instance.
   public Configuration(final Path path, final ConfigurationGroup... configurationGroups) {
     this.path = path;
     this.configurationGroups = new ArrayList<>();
@@ -60,13 +52,11 @@ public class Configuration {
     }
   }
 
-  /**
-   * Gets the strongly typed configuration group if it was previously added to the configuration.
-   *
-   * @param <T>        The type of the config group.
-   * @param groupClass The class that provides the generic type for this method.
-   * @return The configuration group of the specified type or null if none can be found.
-   */
+  /// Gets the strongly typed configuration group if it was previously added to the configuration.
+  ///
+  /// @param <T>        The type of the config group.
+  /// @param groupClass The class that provides the generic type for this method.
+  /// @return The configuration group of the specified type or null if none can be found.
   public <T extends ConfigurationGroup> T getConfigurationGroup(final Class<T> groupClass) {
     for (final ConfigurationGroup group : getConfigurationGroups()) {
       if (group.getClass().equals(groupClass)) {
@@ -77,12 +67,10 @@ public class Configuration {
     return null;
   }
 
-  /**
-   * Gets the configuration group with the specified prefix.
-   *
-   * @param prefix The prefix of the configuration group to retrieve.
-   * @return The configuration group with the specified prefix, or null if none can be found.
-   */
+  /// Gets the configuration group with the specified prefix.
+  ///
+  /// @param prefix The prefix of the configuration group to retrieve.
+  /// @return The configuration group with the specified prefix, or null if none can be found.
   public ConfigurationGroup getConfigurationGroup(final String prefix) {
     for (final ConfigurationGroup group : getConfigurationGroups()) {
 
@@ -99,38 +87,30 @@ public class Configuration {
     return null;
   }
 
-  /**
-   * Gets all {@code ConfigurationGroups} from the configuration.
-   *
-   * @return All config groups.
-   */
+  /// Gets all `ConfigurationGroups` from the configuration.
+  ///
+  /// @return All config groups.
   public List<ConfigurationGroup> getConfigurationGroups() {
     return this.configurationGroups;
   }
 
-  /**
-   * Adds the specified configuration group to the configuration.
-   *
-   * @param group The group to add.
-   */
+  /// Adds the specified configuration group to the configuration.
+  ///
+  /// @param group The group to add.
   public void add(ConfigurationGroup group) {
     getConfigurationGroups().add(group);
   }
 
-  /**
-   * Gets the path of the file to which this configuration is saved.
-   *
-   * @return The path of the configuration file.
-   * @see #save()
-   */
+  /// Gets the path of the file to which this configuration is saved.
+  ///
+  /// @return The path of the configuration file.
+  /// @see #save()
   public Path getPath() {
     return this.path;
   }
 
-  /**
-   * Tries to load the configuration from file in the application folder. If none exists, it tries to load the file from any resource folder. If none
-   * exists, it creates a new configuration file in the application folder.
-   */
+  /// Tries to load the configuration from file in the application folder. If none exists, it tries to load the file from any resource folder. If none
+  /// exists, it creates a new configuration file in the application folder.
   public void load() {
     try (InputStream settingsStream = Resources.get(getPath().toString())) {
       if (!Files.exists(getPath()) || !Files.isRegularFile(getPath()) || settingsStream == null) {
@@ -158,12 +138,10 @@ public class Configuration {
     }
   }
 
-  /**
-   * Saves this configuration to a file with the specified name of this instance (config.properties is the engines default config file).
-   *
-   * @see #getPath()
-   * @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME
-   */
+  /// Saves this configuration to a file with the specified name of this instance (config.properties is the engines default config file).
+  ///
+  /// @see #getPath()
+  /// @see Configuration#DEFAULT_CONFIGURATION_FILE_NAME
   public void save() {
     try {
       Files.deleteIfExists(getPath());

@@ -197,12 +197,10 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
     this.executeTypedKeys();
   }
 
-  /**
-   * Adds the pressed key.
-   *
-   * @param keyCode
-   *          the key code
-   */
+  /// Adds the pressed key.
+  ///
+  /// @param keyCode
+  /// the key code
   private void addPressedKey(final KeyEvent keyCode) {
     if (this.pressedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
       return;
@@ -211,12 +209,10 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
     this.pressedKeys.add(keyCode);
   }
 
-  /**
-   * Adds the released key.
-   *
-   * @param keyCode
-   *          the key code
-   */
+  /// Adds the released key.
+  ///
+  /// @param keyCode
+  /// the key code
   private void addReleasedKey(final KeyEvent keyCode) {
     if (this.releasedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
       return;
@@ -225,12 +221,10 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
     this.releasedKeys.add(keyCode);
   }
 
-  /**
-   * Adds the typed key.
-   *
-   * @param keyCode
-   *          the key code
-   */
+  /// Adds the typed key.
+  ///
+  /// @param keyCode
+  /// the key code
   private void addTypedKey(final KeyEvent keyCode) {
     if (this.typedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
       return;
@@ -239,7 +233,7 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
     this.typedKeys.add(keyCode);
   }
 
-  /** Execute pressed keys. */
+  /// Execute pressed keys.
   private void executePressedKeys() {
     // called at the rate of the updaterate
     this.pressedKeys.forEach(
@@ -253,7 +247,7 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
         });
   }
 
-  /** Execute released keys. */
+  /// Execute released keys.
   private void executeReleasedKeys() {
     this.releasedKeys.forEach(
         key -> {
@@ -268,7 +262,7 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
     this.releasedKeys.clear();
   }
 
-  /** Execute typed keys. */
+  /// Execute typed keys.
   private void executeTypedKeys() {
     this.typedKeys.forEach(
         key -> {
@@ -283,12 +277,10 @@ public final class Keyboard implements KeyEventDispatcher, IKeyboard, IUpdateabl
     this.typedKeys.clear();
   }
 
-  /**
-   * Removes the pressed key.
-   *
-   * @param keyCode
-   *          the key code
-   */
+  /// Removes the pressed key.
+  ///
+  /// @param keyCode
+  /// the key code
   private void removePressedKey(final KeyEvent keyCode) {
     for (final KeyEvent removeKey : this.pressedKeys) {
       if (removeKey.getKeyCode() == keyCode.getKeyCode()) {
