@@ -166,20 +166,33 @@ class Mp3DecoderComparisonTest {
   @Test
   void appendedId3v24TagDoesNotPreventCompleteDecoding() throws Exception {
     byte[] mp3 = readSample();
-    byte[] id3v24 = {'I', 'D', '3', 4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0};
 
     assertArrayEquals(decodeWithLitiengine(mp3, false),
-      decodeWithLitiengine(withTrailingMetadata(mp3, id3v24), false));
+      decodeWithLitiengine(withTrailingMetadata(mp3, appendedId3v24()), false));
+  }
+
+  @Test
+  void appendedId3v24BeforeId3v1DoesNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, appendedId3v24(), id3v1()), false));
+  }
+
+  @Test
+  void appendedId3v24BeforeApev2AndId3v1DoesNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, appendedId3v24(), apev2Descriptor(32, 0, 0), id3v1()), false));
   }
 
   @Test
   void trailingId3v1TagDoesNotPreventCompleteDecoding() throws Exception {
     byte[] mp3 = readSample();
-    byte[] id3v1 = new byte[128];
-    System.arraycopy("TAG".getBytes(StandardCharsets.US_ASCII), 0, id3v1, 0, 3);
 
     assertArrayEquals(decodeWithLitiengine(mp3, false),
-      decodeWithLitiengine(withTrailingMetadata(mp3, id3v1), false));
+      decodeWithLitiengine(withTrailingMetadata(mp3, id3v1()), false));
   }
 
   @Test
@@ -345,10 +358,25 @@ class Mp3DecoderComparisonTest {
     return output.toByteArray();
   }
 
-  private static byte[] withTrailingMetadata(byte[] mp3, byte[] metadata) {
-    byte[] tagged = Arrays.copyOf(mp3, mp3.length + metadata.length);
-    System.arraycopy(metadata, 0, tagged, mp3.length, metadata.length);
-    return tagged;
+  private static byte[] withTrailingMetadata(byte[] mp3, byte[]... metadata) throws IOException {
+    var output = new ByteArrayOutputStream();
+    output.write(mp3);
+    for (byte[] tag : metadata) output.write(tag);
+    return output.toByteArray();
+  }
+
+  private static byte[] appendedId3v24() throws IOException {
+    var output = new ByteArrayOutputStream();
+    output.write(new byte[]{'I', 'D', '3', 4, 0, 0x10, 0, 0, 0, 4});
+    output.write(new byte[4]);
+    output.write(new byte[]{'3', 'D', 'I', 4, 0, 0x10, 0, 0, 0, 4});
+    return output.toByteArray();
+  }
+
+  private static byte[] id3v1() {
+    byte[] tag = new byte[128];
+    System.arraycopy("TAG".getBytes(StandardCharsets.US_ASCII), 0, tag, 0, 3);
+    return tag;
   }
 
   private static byte[] apev2HeaderAndFooter() throws IOException {
@@ -376,9 +404,7 @@ class Mp3DecoderComparisonTest {
   private static byte[] apev2FooterAndId3v1() throws IOException {
     var output = new ByteArrayOutputStream();
     output.write(apev2Descriptor(32, 0, 0));
-    byte[] id3v1 = new byte[128];
-    System.arraycopy("TAG".getBytes(StandardCharsets.US_ASCII), 0, id3v1, 0, 3);
-    output.write(id3v1);
+    output.write(id3v1());
     return output.toByteArray();
   }
 

@@ -281,16 +281,8 @@ final class Mp3DecoderInputStream extends InputStream {
     if (headerBytes.length < Integer.BYTES) {
       throw new IOException("Truncated MPEG header at byte " + frameOffset);
     }
-    if (matches(headerBytes, 0, "TAG") && decodedAudioFrame && hasTrailingId3v1Metadata()) {
-      endOfStream = true;
-      return null;
-    }
-    if (matches(headerBytes, 0, "ID3") && decodedAudioFrame && hasTrailingId3v2Metadata(headerBytes)) {
-      endOfStream = true;
-      return null;
-    }
     if (!Mpeg.isStart(headerBytes[0], headerBytes[1])) {
-      if (decodedAudioFrame && hasTrailingApev2Metadata(headerBytes)) {
+      if (decodedAudioFrame && hasTrailingMetadata(headerBytes)) {
         endOfStream = true;
         return null;
       }
@@ -356,6 +348,25 @@ final class Mp3DecoderInputStream extends InputStream {
     return true;
   }
 
+  private boolean hasTrailingMetadata(byte[] prefix) throws IOException {
+    byte[] marker = prefix;
+    while (true) {
+      if (matches(marker, 0, "TAG")) {
+        return consumeExactly(ID3V1_TAG_LENGTH - Integer.BYTES) && encodedStream.read() == -1;
+      }
+      if (matches(marker, 0, "ID3")) {
+        if (!consumeTrailingId3v2Metadata(marker)) return false;
+      } else {
+        return hasTrailingApev2Metadata(marker);
+      }
+
+      marker = encodedStream.readNBytes(Integer.BYTES);
+      encodedPosition += marker.length;
+      if (marker.length == 0) return true;
+      if (marker.length < Integer.BYTES) return false;
+    }
+  }
+
   private boolean hasTrailingApev2Metadata(byte[] prefix) throws IOException {
     var tail = new TrailingMetadata();
     tail.append(prefix, 0, prefix.length);
@@ -391,11 +402,7 @@ final class Mp3DecoderInputStream extends InputStream {
       && tail.readLittleEndianInt(20) == (footerFlags | 0x20000000L);
   }
 
-  private boolean hasTrailingId3v1Metadata() throws IOException {
-    return consumeToEnd(ID3V1_TAG_LENGTH - Integer.BYTES);
-  }
-
-  private boolean hasTrailingId3v2Metadata(byte[] prefix) throws IOException {
+  private boolean consumeTrailingId3v2Metadata(byte[] prefix) throws IOException {
     byte[] header = new byte[ID3_HEADER_LENGTH];
     System.arraycopy(prefix, 0, header, 0, prefix.length);
     int read = encodedStream.readNBytes(header, prefix.length, header.length - prefix.length);
@@ -403,7 +410,7 @@ final class Mp3DecoderInputStream extends InputStream {
     if (read != header.length - prefix.length || !hasValidId3v2Header(header)) return false;
 
     try {
-      return consumeToEnd(Mpeg.getId3TagLength(header) - ID3_HEADER_LENGTH);
+      return consumeExactly(Mpeg.getId3TagLength(header) - ID3_HEADER_LENGTH);
     } catch (UnsupportedAudioFileException exception) {
       return false;
     }
@@ -423,7 +430,7 @@ final class Mp3DecoderInputStream extends InputStream {
     return (flags & reservedFlags) == 0;
   }
 
-  private boolean consumeToEnd(long expectedBytes) throws IOException {
+  private boolean consumeExactly(long expectedBytes) throws IOException {
     byte[] buffer = new byte[8192];
     long remaining = expectedBytes;
     while (remaining > 0) {
@@ -432,11 +439,7 @@ final class Mp3DecoderInputStream extends InputStream {
       if (read == 0) return false;
       remaining -= read;
     }
-
-    int extra = encodedStream.read();
-    if (extra == -1) return true;
-    encodedPosition++;
-    return false;
+    return true;
   }
 
   private static boolean isApeDescriptor(TrailingMetadata tail, long offset, boolean header) {
