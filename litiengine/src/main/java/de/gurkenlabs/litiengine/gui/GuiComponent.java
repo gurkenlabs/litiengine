@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 /**
  * The abstract Class GuiComponent provides all properties and methods needed for screens, built-in,
@@ -88,6 +90,7 @@ public abstract class GuiComponent
 
   private boolean isHovered;
   private boolean isPressed;
+  private boolean clickPending;
   private boolean isSelected;
   private String name;
   private boolean suspended;
@@ -103,6 +106,7 @@ public abstract class GuiComponent
   private boolean visible;
   private Point2D location;
   private Rectangle2D boundingBox;
+  private GuiComponent parent;
 
   private double relativeX;
   private double relativeY;
@@ -130,7 +134,7 @@ public abstract class GuiComponent
    * @param height the height
    */
   protected GuiComponent(final double x, final double y, final double width, final double height) {
-    this.components = new CopyOnWriteArrayList<>();
+    this.components = new ChildComponentList();
     this.clickConsumer = new CopyOnWriteArrayList<>();
     this.hoverConsumer = new CopyOnWriteArrayList<>();
     this.mousePressedConsumer = new CopyOnWriteArrayList<>();
@@ -242,7 +246,9 @@ public abstract class GuiComponent
   }
 
   /**
-   * Gets the child components of this GuiComponent.
+   * Gets the child components of this GuiComponent. Components are rendered in list order. A later
+   * component is therefore above an earlier component and receives mouse input first where their
+   * bounds overlap.
    *
    * @return the child components
    */
@@ -557,12 +563,16 @@ public abstract class GuiComponent
   @Override
   public void mouseClicked(final MouseEvent e) {
     if (!mouseEventShouldBeForwarded(e)) {
+      this.clickPending = false;
+      this.isPressed = false;
       return;
     }
 
-    if (isPressed()) {
+    e.consume();
+    if (this.clickPending) {
       final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
       getClickConsumer().forEach(consumer -> consumer.accept(event));
+      this.clickPending = false;
       this.isPressed = false;
     }
   }
@@ -573,6 +583,7 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     getMouseDraggedConsumer().forEach(consumer -> consumer.accept(event));
   }
@@ -588,6 +599,7 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     this.isHovered = true;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     getHoverConsumer().forEach(consumer -> consumer.accept(event));
@@ -600,20 +612,23 @@ public abstract class GuiComponent
 
   @Override
   public void mouseExited(final MouseEvent e) {
+    this.isHovered = false;
+    this.isPressed = false;
+    this.clickPending = false;
     if (!isForwardMouseEvents()) {
       return;
     }
 
-    this.isHovered = false;
-    this.isPressed = false;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     getMouseLeaveConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if (!mouseEventShouldBeForwarded(e) && isHovered()) {
-      mouseExited(e);
+    if (!mouseEventShouldBeForwarded(e)) {
+      if (isHovered()) {
+        mouseExited(e);
+      }
       return;
     }
 
@@ -621,6 +636,8 @@ public abstract class GuiComponent
     // before
     if (!isHovered()) {
       mouseEntered(e);
+    } else {
+      e.consume();
     }
 
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
@@ -633,7 +650,9 @@ public abstract class GuiComponent
       return;
     }
 
+    e.consume();
     this.isPressed = true;
+    this.clickPending = true;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     getMousePressedConsumer().forEach(consumer -> consumer.accept(event));
   }
@@ -641,20 +660,26 @@ public abstract class GuiComponent
   @Override
   public void mouseReleased(final MouseEvent e) {
     if (!mouseEventShouldBeForwarded(e)) {
+      this.isPressed = false;
+      this.clickPending = false;
       return;
     }
 
+    e.consume();
     this.isPressed = false;
 
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
 
-    // TODO: check if this should really call the clicked consumers...
-    getClickConsumer().forEach(consumer -> consumer.accept(event));
     getMouseReleasedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
+    if (!mouseEventShouldBeForwarded(e)) {
+      return;
+    }
+
+    e.consume();
     getMouseWheelConsumer().forEach(
       consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
   }
@@ -1509,12 +1534,194 @@ public abstract class GuiComponent
    * @return true, if the Mouse event should be forwarded
    */
   protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return acceptsMouseEvent(e) && isTopmostComponentAt(e);
+  }
+
+  private boolean acceptsMouseEvent(final MouseEvent e) {
     return isForwardMouseEvents()
       && isVisible()
       && isEnabled()
       && !isSuspended()
+      && isVisibleInHierarchy()
       && e != null
+      && !e.isConsumed()
       && getBoundingBox().contains(e.getPoint());
+  }
+
+  private boolean isVisibleInHierarchy() {
+    GuiComponent ancestor = this.parent;
+    while (ancestor != null) {
+      if (!ancestor.isVisible() || ancestor.isSuspended()) {
+        return false;
+      }
+      ancestor = ancestor.parent;
+    }
+
+    return true;
+  }
+
+  private boolean isTopmostComponentAt(final MouseEvent e) {
+    if (hasEligibleDescendantAt(this, e)) {
+      return false;
+    }
+
+    GuiComponent component = this;
+    GuiComponent componentParent = this.parent;
+    while (componentParent != null) {
+      final List<GuiComponent> siblings = componentParent.getComponents();
+      final int componentIndex = siblings.lastIndexOf(component);
+      if (componentIndex < 0) {
+        component.parent = null;
+        break;
+      }
+      for (int i = siblings.size() - 1; i > componentIndex; i--) {
+        if (hasEligibleComponentAt(siblings.get(i), e)) {
+          return false;
+        }
+      }
+
+      component = componentParent;
+      componentParent = componentParent.parent;
+    }
+
+    return true;
+  }
+
+  private static boolean hasEligibleDescendantAt(
+    final GuiComponent component, final MouseEvent e) {
+    final List<GuiComponent> children = component.getComponents();
+    for (int i = children.size() - 1; i >= 0; i--) {
+      if (hasEligibleComponentAt(children.get(i), e)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private static boolean hasEligibleComponentAt(
+    final GuiComponent component, final MouseEvent e) {
+    if (!component.isVisible() || component.isSuspended()) {
+      return false;
+    }
+    return component.acceptsMouseEvent(e) || hasEligibleDescendantAt(component, e);
+  }
+
+  private final class ChildComponentList extends CopyOnWriteArrayList<GuiComponent> {
+    @Override
+    public boolean add(final GuiComponent component) {
+      final boolean added = super.add(component);
+      if (added) {
+        component.parent = GuiComponent.this;
+      }
+      return added;
+    }
+
+    @Override
+    public void add(final int index, final GuiComponent component) {
+      super.add(index, component);
+      component.parent = GuiComponent.this;
+    }
+
+    @Override
+    public boolean addAll(final Collection<? extends GuiComponent> components) {
+      final boolean added = super.addAll(components);
+      if (added) {
+        for (final GuiComponent component : components) {
+          component.parent = GuiComponent.this;
+        }
+      }
+      return added;
+    }
+
+    @Override
+    public boolean addAll(
+      final int index, final Collection<? extends GuiComponent> components) {
+      final boolean added = super.addAll(index, components);
+      if (added) {
+        for (final GuiComponent component : components) {
+          component.parent = GuiComponent.this;
+        }
+      }
+      return added;
+    }
+
+    @Override
+    public GuiComponent set(final int index, final GuiComponent component) {
+      final GuiComponent replaced = super.set(index, component);
+      component.parent = GuiComponent.this;
+      detach(replaced);
+      return replaced;
+    }
+
+    @Override
+    public GuiComponent remove(final int index) {
+      final GuiComponent removed = super.remove(index);
+      detach(removed);
+      return removed;
+    }
+
+    @Override
+    public boolean remove(final Object component) {
+      final boolean removed = super.remove(component);
+      if (removed && component instanceof GuiComponent removedComponent) {
+        detach(removedComponent);
+      }
+      return removed;
+    }
+
+    @Override
+    public boolean removeAll(final Collection<?> components) {
+      final List<GuiComponent> previousComponents = List.copyOf(this);
+      final boolean removed = super.removeAll(components);
+      if (removed) {
+        previousComponents.forEach(this::detach);
+      }
+      return removed;
+    }
+
+    @Override
+    public boolean retainAll(final Collection<?> components) {
+      final List<GuiComponent> previousComponents = List.copyOf(this);
+      final boolean removed = super.retainAll(components);
+      if (removed) {
+        previousComponents.forEach(this::detach);
+      }
+      return removed;
+    }
+
+    @Override
+    public boolean removeIf(final Predicate<? super GuiComponent> filter) {
+      final List<GuiComponent> previousComponents = List.copyOf(this);
+      final boolean removed = super.removeIf(filter);
+      if (removed) {
+        previousComponents.forEach(this::detach);
+      }
+      return removed;
+    }
+
+    @Override
+    public void replaceAll(final UnaryOperator<GuiComponent> operator) {
+      final List<GuiComponent> previousComponents = List.copyOf(this);
+      super.replaceAll(operator);
+      for (final GuiComponent component : this) {
+        component.parent = GuiComponent.this;
+      }
+      previousComponents.forEach(this::detach);
+    }
+
+    @Override
+    public void clear() {
+      final List<GuiComponent> removed = List.copyOf(this);
+      super.clear();
+      removed.forEach(this::detach);
+    }
+
+    private void detach(final GuiComponent component) {
+      if (!contains(component) && component.parent == GuiComponent.this) {
+        component.parent = null;
+      }
+    }
   }
 
   /**

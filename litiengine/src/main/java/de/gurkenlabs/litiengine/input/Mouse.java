@@ -249,7 +249,8 @@ public final class Mouse
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
+    final MouseWheelEvent wrappedEvent = this.createWheelEvent(e);
+    this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(wrappedEvent));
   }
 
   @Override
@@ -428,6 +429,24 @@ public final class Mouse
       original.getClickCount(),
       original.isPopupTrigger(),
       original.getButton());
+  }
+
+  private MouseWheelEvent createWheelEvent(final MouseWheelEvent original) {
+    return new MouseWheelEvent(
+      original.getComponent(),
+      original.getID(),
+      original.getWhen(),
+      original.getModifiersEx(),
+      (int) getLocation().getX(),
+      (int) getLocation().getY(),
+      original.getXOnScreen(),
+      original.getYOnScreen(),
+      original.getClickCount(),
+      original.isPopupTrigger(),
+      original.getScrollType(),
+      original.getScrollAmount(),
+      original.getWheelRotation(),
+      original.getPreciseWheelRotation());
   }
 
   /**

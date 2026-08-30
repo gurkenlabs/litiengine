@@ -106,6 +106,10 @@ public class MouseDrawComponent extends ImageComponent {
    */
   @Override
   public void mouseDragged(MouseEvent e) {
+    if (!mouseEventShouldBeForwarded(e)) {
+      return;
+    }
+
     super.mouseDragged(e);
 
     double brushX = e.getX();
