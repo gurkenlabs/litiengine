@@ -132,11 +132,27 @@ class Mp3DecoderComparisonTest {
   }
 
   @Test
+  void trailingReadOnlyApev2HeaderAndFooterDoNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, apev2HeaderAndFooter(1)), false));
+  }
+
+  @Test
   void trailingApev2ItemsAndFooterDoNotPreventCompleteDecoding() throws Exception {
     byte[] mp3 = readSample();
 
     assertArrayEquals(decodeWithLitiengine(mp3, false),
       decodeWithLitiengine(withTrailingMetadata(mp3, apev2ItemsAndFooter()), false));
+  }
+
+  @Test
+  void trailingReadOnlyApev2FooterDoesNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, apev2Descriptor(32, 0, 1)), false));
   }
 
   @Test
@@ -150,10 +166,47 @@ class Mp3DecoderComparisonTest {
   @Test
   void appendedId3v24TagDoesNotPreventCompleteDecoding() throws Exception {
     byte[] mp3 = readSample();
-    byte[] id3v24 = {'I', 'D', '3', 4, 0, 0, 0, 0, 0, 0};
+    byte[] id3v24 = {'I', 'D', '3', 4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0};
 
     assertArrayEquals(decodeWithLitiengine(mp3, false),
       decodeWithLitiengine(withTrailingMetadata(mp3, id3v24), false));
+  }
+
+  @Test
+  void trailingId3v1TagDoesNotPreventCompleteDecoding() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] id3v1 = new byte[128];
+    System.arraycopy("TAG".getBytes(StandardCharsets.US_ASCII), 0, id3v1, 0, 3);
+
+    assertArrayEquals(decodeWithLitiengine(mp3, false),
+      decodeWithLitiengine(withTrailingMetadata(mp3, id3v1), false));
+  }
+
+  @Test
+  void malformedTrailingId3IsRejected() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] malformedId3 = {'I', 'D', '3', 'X'};
+
+    assertThrows(IOException.class,
+      () -> decodeWithLitiengine(withTrailingMetadata(mp3, malformedId3), false));
+  }
+
+  @Test
+  void truncatedId3v1IsRejected() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] truncatedId3v1 = {'T', 'A', 'G', 'X'};
+
+    assertThrows(IOException.class,
+      () -> decodeWithLitiengine(withTrailingMetadata(mp3, truncatedId3v1), false));
+  }
+
+  @Test
+  void truncatedId3v2PayloadIsRejected() throws Exception {
+    byte[] mp3 = readSample();
+    byte[] truncatedId3v24 = {'I', 'D', '3', 4, 0, 0, 0, 0, 0, 4};
+
+    assertThrows(IOException.class,
+      () -> decodeWithLitiengine(withTrailingMetadata(mp3, truncatedId3v24), false));
   }
 
   @Test
@@ -299,9 +352,13 @@ class Mp3DecoderComparisonTest {
   }
 
   private static byte[] apev2HeaderAndFooter() throws IOException {
+    return apev2HeaderAndFooter(0);
+  }
+
+  private static byte[] apev2HeaderAndFooter(int flags) throws IOException {
     var output = new ByteArrayOutputStream();
-    output.write(apev2Descriptor(32, 0, 0xa0000000));
-    output.write(apev2Descriptor(32, 0, 0x80000000));
+    output.write(apev2Descriptor(32, 0, 0xa0000000 | flags));
+    output.write(apev2Descriptor(32, 0, 0x80000000 | flags));
     return output.toByteArray();
   }
 

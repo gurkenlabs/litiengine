@@ -281,7 +281,11 @@ final class Mp3DecoderInputStream extends InputStream {
     if (headerBytes.length < Integer.BYTES) {
       throw new IOException("Truncated MPEG header at byte " + frameOffset);
     }
-    if (matches(headerBytes, 0, "TAG") || matches(headerBytes, 0, "ID3")) {
+    if (matches(headerBytes, 0, "TAG") && decodedAudioFrame && hasTrailingId3v1Metadata()) {
+      endOfStream = true;
+      return null;
+    }
+    if (matches(headerBytes, 0, "ID3") && decodedAudioFrame && hasTrailingId3v2Metadata(headerBytes)) {
       endOfStream = true;
       return null;
     }
@@ -387,6 +391,54 @@ final class Mp3DecoderInputStream extends InputStream {
       && tail.readLittleEndianInt(20) == (footerFlags | 0x20000000L);
   }
 
+  private boolean hasTrailingId3v1Metadata() throws IOException {
+    return consumeToEnd(ID3V1_TAG_LENGTH - Integer.BYTES);
+  }
+
+  private boolean hasTrailingId3v2Metadata(byte[] prefix) throws IOException {
+    byte[] header = new byte[ID3_HEADER_LENGTH];
+    System.arraycopy(prefix, 0, header, 0, prefix.length);
+    int read = encodedStream.readNBytes(header, prefix.length, header.length - prefix.length);
+    encodedPosition += read;
+    if (read != header.length - prefix.length || !hasValidId3v2Header(header)) return false;
+
+    try {
+      return consumeToEnd(Mpeg.getId3TagLength(header) - ID3_HEADER_LENGTH);
+    } catch (UnsupportedAudioFileException exception) {
+      return false;
+    }
+  }
+
+  private static boolean hasValidId3v2Header(byte[] header) {
+    int version = Byte.toUnsignedInt(header[3]);
+    int revision = Byte.toUnsignedInt(header[4]);
+    int flags = Byte.toUnsignedInt(header[5]);
+    if (version < 2 || version > 4 || revision == 0xff) return false;
+
+    int reservedFlags = switch (version) {
+      case 2 -> 0x3f;
+      case 3 -> 0x1f;
+      default -> 0x0f;
+    };
+    return (flags & reservedFlags) == 0;
+  }
+
+  private boolean consumeToEnd(long expectedBytes) throws IOException {
+    byte[] buffer = new byte[8192];
+    long remaining = expectedBytes;
+    while (remaining > 0) {
+      int read = encodedStream.readNBytes(buffer, 0, (int) Math.min(buffer.length, remaining));
+      encodedPosition += read;
+      if (read == 0) return false;
+      remaining -= read;
+    }
+
+    int extra = encodedStream.read();
+    if (extra == -1) return true;
+    encodedPosition++;
+    return false;
+  }
+
   private static boolean isApeDescriptor(TrailingMetadata tail, long offset, boolean header) {
     if (offset < 0 || !tail.matches(offset, "APETAGEX")) return false;
     long version = tail.readLittleEndianInt(offset + 8);
@@ -394,7 +446,7 @@ final class Mp3DecoderInputStream extends InputStream {
     long expectedTypeFlag = header ? 0x20000000L : 0;
     return version == 2000
       && (flags & 0x60000000L) == expectedTypeFlag
-      && (flags & 0x1fffffffL) == 0
+      && (flags & 0x1ffffffeL) == 0
       && tail.isZero(offset + 24, 8);
   }
 
