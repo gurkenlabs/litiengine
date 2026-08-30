@@ -46,6 +46,7 @@ public final class GameWorld implements IUpdateable {
 
   private Environment environment;
   private final List<ICamera> cameras = new CopyOnWriteArrayList<>();
+  private final ThreadLocal<ICamera> renderCamera = new ThreadLocal<>();
   private int currentCameraIndex = 0;
   private int gravity;
 
@@ -223,10 +224,37 @@ public final class GameWorld implements IUpdateable {
    * @see ICamera
    */
   public ICamera camera() {
+    ICamera renderCamera = this.renderCamera();
+    if (renderCamera != null) {
+      return renderCamera;
+    }
     if (this.cameras.isEmpty()) {
       return null;
     }
     return this.cameras.get(this.currentCameraIndex);
+  }
+
+  /**
+   * Gets the camera currently overriding the global render camera for the active screen render.
+   *
+   * @return The render camera override, or {@code null} if no override is active.
+   */
+  public ICamera renderCamera() {
+    return this.renderCamera.get();
+  }
+
+  /**
+   * Sets the camera used for the current render context. This avoids mutating the global camera selection
+   * while a screen-specific render is being performed.
+   *
+   * @param camera The screen-specific camera to use while rendering, or {@code null} to clear the override.
+   */
+  public void setRenderCamera(ICamera camera) {
+    if (camera == null) {
+      this.renderCamera.remove();
+      return;
+    }
+    this.renderCamera.set(camera);
   }
 
   /**
@@ -266,6 +294,10 @@ public final class GameWorld implements IUpdateable {
    * @param index The index of the camera to activate. If the index is out of bounds, it defaults to 0.
    */
   public void setCurrentCameraIndex(int index) {
+    if (this.cameras.isEmpty()) {
+      this.currentCameraIndex = 0;
+      return;
+    }
     if (index < 0 || index >= this.cameras.size()) {
       this.currentCameraIndex = 0;
     } else {
@@ -557,6 +589,18 @@ public final class GameWorld implements IUpdateable {
       return;
     }
 
+    if (cam != null && this.cameras.contains(cam) && this.cameras.indexOf(cam) != index) {
+      int existingIndex = this.cameras.indexOf(cam);
+      Game.loop().detach(cam);
+      this.cameras.remove(existingIndex);
+      if (existingIndex < index) {
+        index--;
+      }
+      if (existingIndex < this.currentCameraIndex) {
+        this.currentCameraIndex--;
+      }
+    }
+
     // detach old camera at index if present
     if (index >= 0 && index < this.cameras.size()) {
       ICamera old = this.cameras.get(index);
@@ -591,6 +635,12 @@ public final class GameWorld implements IUpdateable {
     if (cam == null) {
       return -1;
     }
+
+    int existingIndex = this.cameras.indexOf(cam);
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
+
     this.cameras.add(cam);
     int index = this.cameras.size() - 1;
     if (!Game.isInNoGUIMode()) {
@@ -625,6 +675,7 @@ public final class GameWorld implements IUpdateable {
       Game.loop().detach(cam);
     }
     this.cameras.clear();
+    this.renderCamera.remove();
     this.currentCameraIndex = 0;
   }
 
@@ -698,11 +749,13 @@ public final class GameWorld implements IUpdateable {
   private void adjustCurrentCameraIndexAfterRemoval(int removedIndex) {
     if (removedIndex < this.currentCameraIndex) {
       this.currentCameraIndex--;
-      return;
     }
 
     if (this.currentCameraIndex >= this.cameras.size()) {
       this.currentCameraIndex = Math.max(0, this.cameras.size() - 1);
+    }
+    if (this.currentCameraIndex < 0) {
+      this.currentCameraIndex = 0;
     }
   }
 }

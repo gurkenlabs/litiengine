@@ -67,17 +67,19 @@ public class GameScreen extends Screen {
 
   @Override
   public void render(final Graphics2D g) {
-    int previousCameraIndex = Game.world().currentCameraIndex();
-    int renderCameraIndex = this.getResolvedCameraIndex();
+    ICamera renderCamera = this.getCamera();
+    if (renderCamera == null) {
+      super.render(g);
+      return;
+    }
+
+    ICamera previousRenderCamera = Game.world().renderCamera();
+    Game.world().setRenderCamera(renderCamera);
     try {
-      if (renderCameraIndex >= 0) {
-        Game.world().setCurrentCameraIndex(renderCameraIndex);
-      }
       if (Game.world().environment() != null) {
         Graphics2D environmentGraphics = (Graphics2D) g.create();
         try {
-          environmentGraphics.translate(this.getX(), this.getY());
-          environmentGraphics.clip(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
+          environmentGraphics.clip(new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight()));
           Game.world().environment().render(environmentGraphics);
         } finally {
           environmentGraphics.dispose();
@@ -85,9 +87,7 @@ public class GameScreen extends Screen {
       }
       super.render(g);
     } finally {
-      if (renderCameraIndex >= 0) {
-        Game.world().setCurrentCameraIndex(previousCameraIndex);
-      }
+      Game.world().setRenderCamera(previousRenderCamera);
     }
   }
 

@@ -99,18 +99,21 @@ public final class ScreenManager {
    *          The screen to remove.
    */
   public void remove(Screen screen) {
-    final boolean wasCurrent = this.current() == screen;
+    if (screen == null) {
+      return;
+    }
+
+    final Screen previous = this.current();
     this.screens.remove(screen);
     if (this.activeScreens.contains(screen)) {
-      this.removeScreen(screen);
+      this.removeActiveScreen(screen);
     }
-    if (wasCurrent && this.activeScreens.isEmpty()) {
-      if (!this.screens.isEmpty()) {
-        this.display(this.screens.get(0));
-      } else {
-        this.display((Screen) null);
-      }
+    if (previous == screen && this.activeScreens.isEmpty() && !this.screens.isEmpty()) {
+      Screen fallback = this.screens.get(0);
+      this.activeScreens.add(fallback);
+      this.sortActiveScreens();
     }
+    this.fireScreenChangedIfCurrentChanged(previous);
   }
 
   /**
@@ -130,7 +133,7 @@ public final class ScreenManager {
 
     final Screen previous = this.current();
     for (Screen activeScreen : new ArrayList<>(this.activeScreens)) {
-      this.removeScreen(activeScreen);
+      this.removeActiveScreen(activeScreen);
     }
 
     if (screen != null) {
@@ -144,10 +147,7 @@ public final class ScreenManager {
     }
 
     this.lastScreenChange = Game.loop().getTicks();
-    final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
-    for (final ScreenChangedListener listener : this.screenChangedListeners) {
-      listener.changed(event);
-    }
+    this.fireScreenChangedIfCurrentChanged(previous);
   }
 
   /**
@@ -202,26 +202,19 @@ public final class ScreenManager {
     final Screen previous = this.current();
 
     final boolean removedOldScreen = this.removeActiveScreen(oldScreen);
+    final boolean newScreenWasAlreadyActive = newScreen != null && this.activeScreens.contains(newScreen);
 
     if (newScreen == null) {
-      this.lastScreenChange = Game.loop().getTicks();
-      final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
-      for (final ScreenChangedListener listener : this.screenChangedListeners) {
-        listener.changed(event);
-      }
+      this.fireScreenChangedIfCurrentChanged(previous);
       return;
     }
 
-    if (this.activeScreens.contains(newScreen)) {
+    if (newScreenWasAlreadyActive) {
       if (!removedOldScreen) {
         return;
       }
 
-      this.lastScreenChange = Game.loop().getTicks();
-      final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
-      for (final ScreenChangedListener listener : this.screenChangedListeners) {
-        listener.changed(event);
-      }
+      this.fireScreenChangedIfCurrentChanged(previous);
       return;
     }
 
@@ -233,12 +226,7 @@ public final class ScreenManager {
       newScreen.prepare();
     }
 
-    this.lastScreenChange = Game.loop().getTicks();
-
-    final ScreenChangedEvent event = new ScreenChangedEvent(this.current(), previous);
-    for (final ScreenChangedListener listener : this.screenChangedListeners) {
-      listener.changed(event);
-    }
+    this.fireScreenChangedIfCurrentChanged(previous);
   }
 
   /**
@@ -285,7 +273,20 @@ public final class ScreenManager {
    * @param screen The screen to remove from the active screens (may be {@code null}).
    */
   public void removeScreen(final Screen screen) {
+    if (screen == null) {
+      return;
+    }
+
+    final Screen previous = this.current();
     this.removeActiveScreen(screen);
+    if (this.activeScreens.isEmpty() && !this.screens.isEmpty()) {
+      Screen fallback = this.screens.stream().filter(candidate -> candidate != screen).findFirst().orElse(null);
+      if (fallback != null) {
+        this.activeScreens.add(fallback);
+        this.sortActiveScreens();
+      }
+    }
+    this.fireScreenChangedIfCurrentChanged(previous);
   }
 
   /**
@@ -379,6 +380,19 @@ public final class ScreenManager {
   private void onWindowResolutionChanged(Dimension newResolution) {
     for (Screen screen : this.screens) {
       screen.onResolutionChanged(newResolution);
+    }
+  }
+
+  private void fireScreenChangedIfCurrentChanged(Screen previous) {
+    Screen current = this.current();
+    if (current == previous) {
+      return;
+    }
+
+    this.lastScreenChange = Game.loop().getTicks();
+    final ScreenChangedEvent event = new ScreenChangedEvent(current, previous);
+    for (final ScreenChangedListener listener : this.screenChangedListeners) {
+      listener.changed(event);
     }
   }
 
