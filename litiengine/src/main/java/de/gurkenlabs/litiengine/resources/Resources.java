@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterAttributes;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterLoader;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
+import de.gurkenlabs.litiengine.Game;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -19,6 +20,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -178,6 +180,18 @@ public final class Resources {
     final ResourceBundle file = ResourceBundle.load(gameResourceFile);
     if (file == null) {
       return;
+    }
+
+    Game.scripts().setDefinitions(file.getScripts());
+    Game.scripts().setGameBindings(file.getGameScripts());
+    Game.scripts().setEntityBindings(file.getEntityScripts());
+    if ("file".equalsIgnoreCase(gameResourceFile.getProtocol())) {
+      try {
+        Path resourcePath = Path.of(gameResourceFile.toURI());
+        Game.scripts().setProjectRoot(resourcePath.getParent());
+      } catch (URISyntaxException ignored) {
+        // Classpath and custom URL schemes continue to resolve scripts through Resources.
+      }
     }
 
     final List<String> failures = Collections.synchronizedList(new ArrayList<>());
@@ -364,6 +378,10 @@ public final class Resources {
    * Clears the all resource containers by removing previously loaded resources.
    */
   public static void clearAll() {
+    Game.scripts().detachAll();
+    Game.scripts().setDefinitions(List.of());
+    Game.scripts().setGameBindings(List.of());
+    Game.scripts().setEntityBindings(List.of());
     fonts().clear();
     sounds().clear();
     maps().clear();

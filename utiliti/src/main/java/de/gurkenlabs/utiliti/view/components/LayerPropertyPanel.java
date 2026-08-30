@@ -142,7 +142,7 @@ public class LayerPropertyPanel extends JPanel {
     this.accordion.setBackground(Style.background());
     this.accordion.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-    this.generalCard = new ExpandableCard(Resources.strings().get("panel_layer"), createGeneralPanel(), false);
+    this.generalCard = new ExpandableCard(Resources.strings().get("panel_layer"), createGeneralPanel(null), false);
     this.imageSourceControl.setVisible(false);
     this.labelImageSource.setVisible(false);
     ExpandableCard renderingCard =
@@ -150,9 +150,9 @@ public class LayerPropertyPanel extends JPanel {
     ExpandableCard propertiesCard =
         new ExpandableCard(Resources.strings().get("layerProperties_customProperties"), createPropertiesPanel(buttonAdd, buttonRemove), false);
 
-    this.generalCard.setContentInsets(8, 0, 8, 0);
-    renderingCard.setContentInsets(8, 0, 8, 0);
-    propertiesCard.setContentInsets(8, 0, 8, 0);
+    this.generalCard.setInspectorContentInsets();
+    renderingCard.setInspectorContentInsets();
+    propertiesCard.setInspectorContentInsets();
 
     this.accordion.add(this.generalCard);
     this.accordion.add(renderingCard);
@@ -161,6 +161,7 @@ public class LayerPropertyPanel extends JPanel {
     JScrollPane hostScrollPane = new JScrollPane(this.accordion);
     hostScrollPane.setBorder(null);
     hostScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    hostScrollPane.getVerticalScrollBar().setUnitIncrement(24);
     hostScrollPane.getViewport().setBackground(Style.background());
     add(hostScrollPane, BorderLayout.CENTER);
 
@@ -169,35 +170,43 @@ public class LayerPropertyPanel extends JPanel {
 
   ExpandableCard addSection(String title, JComponent content, boolean expanded) {
     ExpandableCard card = new ExpandableCard(title, content, expanded);
-    card.setContentInsets(8, 0, 8, 0);
+    card.setInspectorContentInsets();
     this.accordion.add(card);
     this.accordion.revalidate();
     return card;
   }
 
-  private JPanel createGeneralPanel() {
+  private JPanel createGeneralPanel(ILayer layer) {
+    List<JLabel> labels = new ArrayList<>();
+    List<JComponent> controls = new ArrayList<>();
+    List<Integer> heights = new ArrayList<>();
+
+    labels.add(createLabel(Resources.strings().get("panel_name")));
+    controls.add(this.textFieldName);
+    heights.add(PropertyPanel.CONTROL_HEIGHT);
+
+    labels.add(createLabel(Resources.strings().get("layerProperties_opacity")));
+    controls.add(this.spinnerOpacity);
+    heights.add(PropertyPanel.CONTROL_HEIGHT);
+
+    labels.add(createLabel(Resources.strings().get("layerProperties_visible")));
+    controls.add(this.checkBoxVisible);
+    heights.add(PropertyPanel.CONTROL_HEIGHT);
+
+    if (layer instanceof IMapObjectLayer) {
+      labels.add(this.labelLayerColor);
+      controls.add(this.layerColorComponent);
+      heights.add(PropertyPanel.CONTROL_HEIGHT);
+    } else if (layer instanceof IImageLayer) {
+      labels.add(this.labelImageSource);
+      controls.add(this.imageSourceControl);
+      heights.add(PropertyPanel.CONTROL_HEIGHT);
+    }
+
     return createForm(
-        new JLabel[] {
-            createLabel(Resources.strings().get("panel_name")),
-            createLabel(Resources.strings().get("layerProperties_opacity")),
-            createLabel(Resources.strings().get("layerProperties_visible")),
-            this.labelLayerColor,
-            this.labelImageSource,
-        },
-        new JComponent[] {
-            this.textFieldName,
-            this.spinnerOpacity,
-            this.checkBoxVisible,
-            this.layerColorComponent,
-            this.imageSourceControl,
-        },
-        new int[] {
-            PropertyPanel.CONTROL_HEIGHT,
-            PropertyPanel.CONTROL_HEIGHT,
-            PropertyPanel.CONTROL_HEIGHT,
-            PropertyPanel.CONTROL_HEIGHT,
-            PropertyPanel.CONTROL_HEIGHT,
-        });
+        labels.toArray(new JLabel[0]),
+        controls.toArray(new JComponent[0]),
+        heights.stream().mapToInt(Integer::intValue).toArray());
   }
 
   private JPanel createRenderingPanel() {
@@ -210,26 +219,26 @@ public class LayerPropertyPanel extends JPanel {
         new JComponent[] { this.comboRenderType },
         new int[] { PropertyPanel.CONTROL_HEIGHT });
     panel.add(renderTypeRow);
+    panel.add(Box.createVerticalStrut(PropertyPanel.CONTROL_MARGIN));
     setRowSize(this.tintColorComponent, this.tintColorComponent.getPreferredSize().height);
     panel.add(this.tintColorComponent);
     return panel;
   }
 
   private JPanel createPropertiesPanel(JButton buttonAdd, JButton buttonRemove) {
-    int inset = PropertyPanel.LABEL_WIDTH + PropertyPanel.GUTTER_WIDTH - 6;
-    JPanel panel = new JPanel();
+    JPanel panel = new JPanel(new BorderLayout(0, 4));
     panel.setOpaque(false);
-    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    panel.add(createAlignedControl(this.scrollPane, 150, inset));
-    panel.add(Box.createVerticalStrut(6));
+    this.scrollPane.setPreferredSize(new Dimension(0, 96));
+    this.scrollPane.setBorder(BorderFactory.createLineBorder(Style.border()));
+    this.scrollPane.getViewport().setBackground(Style.surface());
+    this.scrollPane.getVerticalScrollBar().setUnitIncrement(24);
+    panel.add(this.scrollPane, BorderLayout.CENTER);
+
     JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
     buttonRow.setOpaque(false);
     buttonRow.add(buttonAdd);
     buttonRow.add(buttonRemove);
-    JPanel buttonWrapper = new JPanel(new BorderLayout());
-    buttonWrapper.setOpaque(false);
-    buttonWrapper.add(buttonRow, BorderLayout.WEST);
-    panel.add(createAlignedControl(buttonWrapper, buttonRow.getPreferredSize().height, inset));
+    panel.add(buttonRow, BorderLayout.SOUTH);
     return panel;
   }
 
@@ -237,6 +246,7 @@ public class LayerPropertyPanel extends JPanel {
     JPanel form = new JPanel();
     form.setOpaque(false);
     GroupLayout gl = new GroupLayout(form);
+    gl.setHonorsVisibility(false);
     form.setLayout(gl);
     gl.setAutoCreateGaps(false);
 
@@ -245,17 +255,18 @@ public class LayerPropertyPanel extends JPanel {
     GroupLayout.SequentialGroup vertical = gl.createSequentialGroup();
 
     for (int i = 0; i < labels.length; i++) {
-      if (labels[i] == null || !labels[i].isVisible()) {
+      if (labels[i] == null) {
         continue;
       }
       labelGroup.addComponent(labels[i], PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH, PropertyPanel.LABEL_WIDTH);
       controlGroup.addComponent(controls[i], PropertyPanel.CONTROL_MIN_WIDTH, PropertyPanel.CONTROL_WIDTH, Short.MAX_VALUE);
-      vertical
-          .addGroup(
-              gl.createParallelGroup(Alignment.LEADING)
-                  .addComponent(labels[i], heights[i], heights[i], heights[i])
-                  .addComponent(controls[i], heights[i], heights[i], heights[i]))
-          .addGap(PropertyPanel.CONTROL_MARGIN);
+      vertical.addGroup(
+          gl.createParallelGroup(Alignment.LEADING)
+              .addComponent(labels[i], heights[i], heights[i], heights[i])
+              .addComponent(controls[i], heights[i], heights[i], heights[i]));
+      if (i < labels.length - 1) {
+        vertical.addGap(PropertyPanel.CONTROL_MARGIN);
+      }
     }
 
     gl.setHorizontalGroup(
@@ -369,7 +380,7 @@ public class LayerPropertyPanel extends JPanel {
       this.imageSourceControl.setVisible(isImageLayer);
       bindImageSources(isImageLayer && ((IImageLayer) layer).getImage() != null
           ? ((IImageLayer) layer).getImage().getSource() : null);
-      this.generalCard.revalidate();
+      this.generalCard.setContent(createGeneralPanel(layer));
 
       this.setControlValues(layer);
       String layerName = layer.getName() != null && !layer.getName().isBlank()
@@ -382,6 +393,7 @@ public class LayerPropertyPanel extends JPanel {
 
   public void clearControls() {
     this.generalCard.setTitle(Resources.strings().get("panel_layer"));
+    this.generalCard.setContent(createGeneralPanel(null));
     this.textFieldName.setText("");
     this.imageSourceCombo.removeAllItems();
     this.imagePreview.setIcon(null);

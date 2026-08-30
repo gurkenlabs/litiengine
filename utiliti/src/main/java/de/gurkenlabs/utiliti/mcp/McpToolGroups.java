@@ -47,6 +47,7 @@ final class McpToolGroups {
     return toolName.startsWith("delete-")
         || toolName.startsWith("remove-")
         || toolName.startsWith("clear-")
+        || toolName.startsWith("unbind-")
         || toolName.startsWith("import-")
         || "load-project".equals(toolName)
         || "save-project".equals(toolName)
@@ -62,7 +63,10 @@ final class McpToolGroups {
         || toolName.startsWith("configure-")
         || toolName.startsWith("select-")
         || toolName.startsWith("deselect-")
-        || toolName.startsWith("center-");
+        || toolName.startsWith("center-")
+        || toolName.startsWith("bind-")
+        || toolName.startsWith("unbind-")
+        || toolName.startsWith("update-");
   }
 
   private static String title(String toolName) {

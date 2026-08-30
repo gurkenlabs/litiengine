@@ -1,9 +1,11 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.Editor;
@@ -86,7 +88,7 @@ public class SpriteEditorPanel extends JPanel {
   private final DefaultTableModel keyframeModel;
   private final JTable keyframeTable;
   private final Timer animationPreviewTimer;
-  private final JComboBox<String> variantCombo;
+  private final JComboBox<VariantItem> variantCombo;
 
   private SpritesheetResource spritesheetResource;
   private BufferedImage image;
@@ -108,11 +110,19 @@ public class SpriteEditorPanel extends JPanel {
       if (this.binding || this.spritesheetResource == null) {
         return;
       }
-      String selectedName = (String) this.variantCombo.getSelectedItem();
-      if (selectedName != null && !selectedName.equals(this.spritesheetResource.getName())) {
-        SpritesheetResource target = findSpriteResource(selectedName);
-        if (target != null) {
-          bind(target);
+      Object selected = this.variantCombo.getSelectedItem();
+      if (selected instanceof VariantItem item) {
+        if (!item.name().equalsIgnoreCase(this.spritesheetResource.getName())) {
+          SpritesheetResource target = findSpriteResource(item.name());
+          if (target != null) {
+            bind(target);
+          } else if (item.isMirrored() && item.sourceName() != null) {
+            SpritesheetResource source = findSpriteResource(item.sourceName());
+            if (source != null) {
+              SpritesheetResource virtual = createMirroredResource(source, item.name());
+              bind(virtual);
+            }
+          }
         }
       }
     });
@@ -216,7 +226,7 @@ public class SpriteEditorPanel extends JPanel {
         ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
         ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scroll.setBorder(null);
-    scroll.getVerticalScrollBar().setUnitIncrement(16);
+    scroll.getVerticalScrollBar().setUnitIncrement(24);
     scroll.getViewport().setBackground(Style.background());
     JPanel header = createHeader();
     header.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
@@ -297,10 +307,10 @@ public class SpriteEditorPanel extends JPanel {
     toolbar.setOpaque(false);
     JPanel playback = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
     playback.setOpaque(false);
-    JButton previous = Style.iconButton(Icons.REWIND_16);
+    JButton previous = Style.iconButton(Icons.STEP_BACK_16);
     configureButton(previous, "spriteEditor_previousFrame");
     previous.addActionListener(_ -> stepFrame(-1));
-    JButton next = Style.iconButton(Icons.PLAY_16);
+    JButton next = Style.iconButton(Icons.STEP_FORWARD_16);
     configureButton(next, "spriteEditor_nextFrame");
     next.addActionListener(_ -> stepFrame(1));
     playback.add(previous);
@@ -442,10 +452,19 @@ public class SpriteEditorPanel extends JPanel {
           this.spritesheetResource.getWidth(), this.spritesheetResource.getHeight()) + " px");
       this.frameCountLabel.setText(String.valueOf(frameCount));
       this.imageSizeLabel.setText(dimensions(this.image.getWidth(), this.image.getHeight()) + " px");
-      this.metadataLabel.setText(Resources.strings().get(
-          "spriteEditor_metadata",
-          dimensions(this.image.getWidth(), this.image.getHeight()),
-          String.valueOf(frameCount)));
+      boolean virtual = isVirtualMirrored(this.spritesheetResource.getName());
+      String opposite = virtual ? CreaturePanel.oppositeHorizontalDirection(this.spritesheetResource.getName()) : null;
+      String dimensionsText = dimensions(this.image.getWidth(), this.image.getHeight());
+      String frameCountText = String.valueOf(frameCount);
+      if (virtual && opposite != null) {
+        this.metadataLabel.setText(Resources.strings().get("spriteEditor_mirroredFrom", opposite)
+            + "  ·  " + dimensionsText + " px  ·  " + frameCountText + " frames");
+      } else {
+        this.metadataLabel.setText(Resources.strings().get(
+            "spriteEditor_metadata",
+            dimensionsText,
+            frameCountText));
+      }
 
       BufferedImage thumbnail = scaleNearest(frameImage(0), 42, 42, true);
       this.thumbnailLabel.setIcon(thumbnail != null ? new ImageIcon(thumbnail) : null);
@@ -473,64 +492,144 @@ public class SpriteEditorPanel extends JPanel {
     }
 
     String currentName = this.spritesheetResource.getName();
-    java.util.List<String> variants = getFamilyVariants(currentName);
+    java.util.List<VariantItem> variants = getFamilyVariants(currentName);
     if (variants.size() <= 1) {
       this.variantCombo.setVisible(false);
       return;
     }
 
-    javax.swing.DefaultComboBoxModel<String> model = new javax.swing.DefaultComboBoxModel<>();
-    for (String variant : variants) {
+    javax.swing.DefaultComboBoxModel<VariantItem> model = new javax.swing.DefaultComboBoxModel<>();
+    VariantItem selected = null;
+    for (VariantItem variant : variants) {
       model.addElement(variant);
+      if (variant.name().equalsIgnoreCase(currentName)) {
+        selected = variant;
+      }
     }
     this.variantCombo.setModel(model);
-    this.variantCombo.setSelectedItem(currentName);
+    if (selected != null) {
+      this.variantCombo.setSelectedItem(selected);
+    }
     this.variantCombo.setVisible(true);
   }
 
-  private static java.util.List<String> getFamilyVariants(String currentName) {
-    java.util.List<String> variants = new java.util.ArrayList<>();
+  public static java.util.List<VariantItem> getFamilyVariants(String currentName) {
+    java.util.List<VariantItem> variants = new java.util.ArrayList<>();
     if (currentName == null || Editor.instance().getGameFile() == null) {
+      return variants;
+    }
+
+    java.util.Set<String> explicitNames = new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    for (SpritesheetResource resource : Editor.instance().getGameFile().getSpriteSheets()) {
+      if (resource != null && resource.getName() != null) {
+        explicitNames.add(resource.getName());
+      }
+    }
+
+    String creatureBase = CreaturePanel.getCreatureSpriteName(currentName);
+    if (creatureBase != null) {
+      java.util.Set<String> familyNames = new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+      for (String name : explicitNames) {
+        if (creatureBase.equalsIgnoreCase(CreaturePanel.getCreatureSpriteName(name))) {
+          familyNames.add(name);
+        }
+      }
+      if (creatureBase.equalsIgnoreCase(CreaturePanel.getCreatureSpriteName(currentName))) {
+        familyNames.add(currentName);
+      }
+
+      java.util.Set<String> mirroredNames = new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+      for (String name : familyNames) {
+        String opposite = CreaturePanel.oppositeHorizontalDirection(name);
+        if (opposite != null && !explicitNames.contains(opposite) && !familyNames.contains(opposite)) {
+          mirroredNames.add(opposite);
+        }
+      }
+
+      for (String name : familyNames) {
+        boolean virtual = !explicitNames.contains(name);
+        String source = virtual ? CreaturePanel.oppositeHorizontalDirection(name) : null;
+        variants.add(new VariantItem(name, virtual, source));
+      }
+      for (String name : mirroredNames) {
+        String source = CreaturePanel.oppositeHorizontalDirection(name);
+        variants.add(new VariantItem(name, true, source));
+      }
+
+      variants.sort(java.util.Comparator.comparing(VariantItem::name, String.CASE_INSENSITIVE_ORDER));
       return variants;
     }
 
     String propId = PropPanel.getIdentifierBySpriteName(currentName);
     if (propId != null) {
-      for (SpritesheetResource resource : Editor.instance().getGameFile().getSpriteSheets()) {
-        if (resource != null && resource.getName() != null && propId.equalsIgnoreCase(PropPanel.getIdentifierBySpriteName(resource.getName()))) {
-          variants.add(resource.getName());
+      for (String name : explicitNames) {
+        if (propId.equalsIgnoreCase(PropPanel.getIdentifierBySpriteName(name))) {
+          variants.add(new VariantItem(name, false, null));
         }
       }
-      java.util.Collections.sort(variants);
-      return variants;
-    }
-
-    String creatureBase = CreaturePanel.getCreatureSpriteName(currentName);
-    if (creatureBase != null) {
-      for (SpritesheetResource resource : Editor.instance().getGameFile().getSpriteSheets()) {
-        if (resource != null && resource.getName() != null && creatureBase.equalsIgnoreCase(CreaturePanel.getCreatureSpriteName(resource.getName()))) {
-          variants.add(resource.getName());
-        }
+      if (!explicitNames.contains(currentName)) {
+        variants.add(new VariantItem(currentName, false, null));
       }
-      java.util.Collections.sort(variants);
+      variants.sort(java.util.Comparator.comparing(VariantItem::name, String.CASE_INSENSITIVE_ORDER));
       return variants;
     }
 
     int lastDash = currentName.lastIndexOf('-');
     if (lastDash > 0) {
       String prefix = currentName.substring(0, lastDash);
-      for (SpritesheetResource resource : Editor.instance().getGameFile().getSpriteSheets()) {
-        if (resource != null && resource.getName() != null && resource.getName().startsWith(prefix + "-")) {
-          variants.add(resource.getName());
+      for (String name : explicitNames) {
+        if (name.toLowerCase(java.util.Locale.ROOT).startsWith(prefix.toLowerCase(java.util.Locale.ROOT) + "-")) {
+          variants.add(new VariantItem(name, false, null));
         }
       }
-      java.util.Collections.sort(variants);
+      if (!explicitNames.contains(currentName)) {
+        variants.add(new VariantItem(currentName, false, null));
+      }
+      variants.sort(java.util.Comparator.comparing(VariantItem::name, String.CASE_INSENSITIVE_ORDER));
     }
 
     return variants;
   }
 
-  private static SpritesheetResource findSpriteResource(String name) {
+  public static boolean isVirtualMirrored(String name) {
+    if (name == null || Editor.instance().getGameFile() == null) {
+      return false;
+    }
+    return findSpriteResource(name) == null
+        && CreaturePanel.oppositeHorizontalDirection(name) != null
+        && findSpriteResource(CreaturePanel.oppositeHorizontalDirection(name)) != null;
+  }
+
+  public static SpritesheetResource createMirroredResource(SpritesheetResource source, String mirroredName) {
+    if (source == null) {
+      return null;
+    }
+    BufferedImage sourceImage = Codec.decodeImage(source.getImage());
+    if (sourceImage == null) {
+      return null;
+    }
+    int spriteWidth = Math.max(1, source.getWidth());
+    int spriteHeight = Math.max(1, source.getHeight());
+    int columns = Math.max(1, sourceImage.getWidth() / spriteWidth);
+    int rows = Math.max(1, sourceImage.getHeight() / spriteHeight);
+    BufferedImage flipped = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = flipped.createGraphics();
+    for (int col = 0; col < columns; col++) {
+      for (int row = 0; row < rows; row++) {
+        int x = col * spriteWidth;
+        int y = row * spriteHeight;
+        BufferedImage sub = sourceImage.getSubimage(x, y, spriteWidth, spriteHeight);
+        g.drawImage(sub, x + spriteWidth, y, -spriteWidth, spriteHeight, null);
+      }
+    }
+    g.dispose();
+    SpritesheetResource mirrored = new SpritesheetResource(flipped, mirroredName, source.getWidth(), source.getHeight());
+    mirrored.setImageFormat(source.getImageFormat() != null ? source.getImageFormat() : de.gurkenlabs.litiengine.resources.ImageFormat.PNG);
+    mirrored.setKeyframes(source.getKeyframes());
+    return mirrored;
+  }
+
+  public static SpritesheetResource findSpriteResource(String name) {
     if (name == null || Editor.instance().getGameFile() == null) {
       return null;
     }
@@ -540,6 +639,16 @@ public class SpriteEditorPanel extends JPanel {
       }
     }
     return null;
+  }
+
+  public record VariantItem(String name, boolean isMirrored, String sourceName) {
+    @Override
+    public String toString() {
+      if (isMirrored) {
+        return name + " (" + Resources.strings().get("spriteEditor_mirrored") + ")";
+      }
+      return name;
+    }
   }
 
   private DefaultTableModel createKeyframeModel() {
@@ -821,12 +930,45 @@ public class SpriteEditorPanel extends JPanel {
 
   private void changeSprite(java.util.function.Consumer<SpritesheetResource> change) {
     SpritesheetResource before = new SpritesheetResource(this.spritesheetResource);
+    boolean wasVirtual = isVirtualMirrored(this.spritesheetResource.getName());
+    String previousName = this.spritesheetResource.getName();
     change.accept(this.spritesheetResource);
     SpritesheetResource after = new SpritesheetResource(this.spritesheetResource);
-    if (Game.world().environment() != null) {
-      UndoManager.instance().resourceChanged(() -> applySnapshot(before), () -> applySnapshot(after));
+    if (wasVirtual) {
+      if (Editor.instance().getGameFile() != null
+          && !Editor.instance().getGameFile().getSpriteSheets().contains(this.spritesheetResource)) {
+        Editor.instance().getGameFile().getSpriteSheets().add(this.spritesheetResource);
+      }
+      if (Game.world().environment() != null) {
+        UndoManager.instance().resourceChanged(
+          () -> {
+            if (Editor.instance().getGameFile() != null) {
+              Editor.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equalsIgnoreCase(after.getName()));
+            }
+            Resources.spritesheets().remove(after.getName());
+            if (Editor.instance().getGameFile() != null) {
+              Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
+            }
+            String opp = CreaturePanel.oppositeHorizontalDirection(after.getName());
+            SpritesheetResource oppRes = findSpriteResource(opp);
+            if (oppRes != null) {
+              bind(oppRes);
+            }
+          },
+          () -> {
+            if (Editor.instance().getGameFile() != null && !Editor.instance().getGameFile().getSpriteSheets().contains(after)) {
+              Editor.instance().getGameFile().getSpriteSheets().add(after);
+            }
+            applySnapshot(after, after.getName());
+          }
+        );
+      }
+    } else {
+      if (Game.world().environment() != null) {
+        UndoManager.instance().resourceChanged(() -> applySnapshot(before), () -> applySnapshot(after));
+      }
     }
-    applySnapshot(after, before.getName());
+    applySnapshot(after, previousName);
   }
 
   private void applySnapshot(SpritesheetResource snapshot) {
@@ -837,7 +979,9 @@ public class SpriteEditorPanel extends JPanel {
     this.spritesheetResource.copyFrom(snapshot);
     Resources.spritesheets().remove(previousName);
     Resources.spritesheets().remove(this.spritesheetResource.getName());
-    Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
+    if (Editor.instance().getGameFile() != null) {
+      Editor.instance().loadSpriteSheets(Editor.instance().getGameFile().getSpriteSheets(), true);
+    }
     refreshControls();
     UI.showSpriteInspector(this.spritesheetResource);
   }

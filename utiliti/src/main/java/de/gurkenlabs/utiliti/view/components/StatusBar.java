@@ -45,7 +45,7 @@ public final class StatusBar extends JPanel {
   static final Color FPS_WARNING_COLOR = new Color(220, 180, 70);
 
   private final JLabel stateLabel = new JLabel();
-  private final JLabel mcpLabel = new JLabel(new McpStatusIcon());
+  private final JLabel mcpLabel = createMcpBadge();
   private final JLabel toolLabel = new JLabel();
   private final JLabel positionLabel = new JLabel();
   private final JLabel tileLabel = new JLabel();
@@ -71,7 +71,7 @@ public final class StatusBar extends JPanel {
     setOpaque(true);
     setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()),
-        BorderFactory.createEmptyBorder(2, 8, 2, 8)));
+        BorderFactory.createEmptyBorder(3, Style.SPACE_SMALL, 0, Style.SPACE_SMALL)));
 
     Font font = new Font(
         Style.FONTNAME_CONSOLE,
@@ -82,20 +82,6 @@ public final class StatusBar extends JPanel {
         this.gridLabel, this.snapLabel, this.fpsLabel}) {
       label.setFont(font);
     }
-    Dimension mcpIndicatorSize = new Dimension(62, 16);
-    this.mcpLabel.setPreferredSize(mcpIndicatorSize);
-    this.mcpLabel.setMinimumSize(new Dimension(44, 16));
-    this.mcpLabel.setMaximumSize(new Dimension(64, 16));
-    this.mcpLabel.getAccessibleContext().setAccessibleName("MCP server status");
-    this.mcpLabel.getAccessibleContext().setAccessibleDescription(
-        "Shows MCP activity and connected clients");
-    this.mcpLabel.addMouseListener(new MouseAdapter() {
-      @Override public void mouseClicked(MouseEvent event) {
-        if (SwingUtilities.isLeftMouseButton(event) && McpServer.instance().isRunning()) {
-          showMcpPanel();
-        }
-      }
-    });
 
     add(this.stateLabel);
     add(separator());
@@ -152,7 +138,7 @@ public final class StatusBar extends JPanel {
     setBackground(Style.background());
     setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createMatteBorder(1, 0, 0, 0, Style.border()),
-        BorderFactory.createEmptyBorder(2, 8, 2, 8)));
+        BorderFactory.createEmptyBorder(3, Style.SPACE_SMALL, 0, Style.SPACE_SMALL)));
     this.stateLabel.setForeground(Style.text());
     this.mcpLabel.setForeground(mcpColor(
         McpServer.instance().isRunning(), McpServer.instance().getActionStatus()));
@@ -253,7 +239,49 @@ public final class StatusBar extends JPanel {
     };
   }
 
-  private void showMcpPanel() {
+  public static JLabel createMcpBadge() {
+    Icon icon = new McpStatusIcon();
+    JLabel label = new JLabel(icon) {
+      @Override
+      public Dimension getPreferredSize() {
+        return new Dimension(icon.getIconWidth(), icon.getIconHeight());
+      }
+
+      @Override
+      public Dimension getMinimumSize() {
+        return getPreferredSize();
+      }
+
+      @Override
+      public Dimension getMaximumSize() {
+        return getPreferredSize();
+      }
+    };
+    label.setAlignmentY(0.5f);
+    label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    label.getAccessibleContext().setAccessibleName("MCP server status");
+    label.getAccessibleContext().setAccessibleDescription("Shows MCP activity and connected clients");
+    label.addMouseListener(new MouseAdapter() {
+      @Override public void mouseClicked(MouseEvent event) {
+        if (SwingUtilities.isLeftMouseButton(event) && McpServer.instance().isRunning()) {
+          showMcpPanel(label);
+        }
+      }
+    });
+    Timer timer = new Timer(50, event -> {
+      McpServer server = McpServer.instance();
+      boolean running = server.isRunning();
+      ActionStatus action = server.getActionStatus();
+      label.setToolTipText(mcpTooltip(server.getPort(), action));
+      if (running && action.state() == ActionState.RUNNING) {
+        label.repaint();
+      }
+    });
+    timer.start();
+    return label;
+  }
+
+  public static void showMcpPanel(Component invoker) {
     McpServer server = McpServer.instance();
     if (!server.isRunning()) {
       return;
@@ -344,7 +372,7 @@ public final class StatusBar extends JPanel {
     refreshBtn.addMouseListener(new MouseAdapter() {
       @Override public void mouseClicked(MouseEvent e) {
         menu.setVisible(false);
-        SwingUtilities.invokeLater(() -> showMcpPanel());
+        SwingUtilities.invokeLater(() -> showMcpPanel(invoker));
       }
     });
     clientsHeader.add(refreshBtn);
@@ -368,10 +396,10 @@ public final class StatusBar extends JPanel {
       }
     }
 
-    menu.show(this.mcpLabel, 0, this.mcpLabel.getHeight());
+    menu.show(invoker, 0, invoker.getHeight());
   }
 
-  private JPanel clientEntry(ConnectedClient client) {
+  private static JPanel clientEntry(ConnectedClient client) {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setOpaque(false);
@@ -443,17 +471,18 @@ public final class StatusBar extends JPanel {
     };
   }
 
-  private JPanel separator() {
+  public static JPanel separator() {
     JPanel wrapper = new JPanel();
     wrapper.setOpaque(false);
     wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
-    wrapper.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+    wrapper.setBorder(BorderFactory.createEmptyBorder(0, Style.SPACE_SMALL, 0, Style.SPACE_SMALL));
+    wrapper.setAlignmentY(0.5f);
 
     JPanel line = new JPanel();
     line.setPreferredSize(new Dimension(1, 12));
     line.setMaximumSize(new Dimension(1, 12));
     line.setBackground(Style.border());
-    this.separatorLines.add(line);
+    line.setAlignmentY(0.5f);
     wrapper.add(line);
     return wrapper;
   }
@@ -463,7 +492,7 @@ public final class StatusBar extends JPanel {
 
     @Override public int getIconWidth() {
       int count = McpServer.instance().getConnectedClientCount();
-      return count > 0 ? 52 : 36;
+      return count > 0 ? 54 : 40;
     }
     @Override public int getIconHeight() { return HEIGHT; }
 
@@ -481,34 +510,35 @@ public final class StatusBar extends JPanel {
         FontMetrics fm = g.getFontMetrics();
 
         int textWidth = fm.stringWidth("MCP");
-        int contentWidth = textWidth + 12; // "MCP" + dot space
+        int contentWidth = textWidth + 10; // "MCP" + dot space
         if (clientCount > 0) {
-          contentWidth += 6 + fm.stringWidth(String.valueOf(clientCount));
+          contentWidth += 5 + fm.stringWidth(String.valueOf(clientCount));
         }
 
-        int pillWidth = contentWidth + 10; // 5px left & right padding
+        int pillWidth = contentWidth + 8; // 4px left & right padding
+        int drawY = y + Math.max(0, (component.getHeight() - HEIGHT) / 2);
 
         // Background pill
         int fillAlpha = action.state() == ActionState.RUNNING
             ? 38 + (int) (38 * (1 + Math.sin(System.nanoTime() / 120_000_000.0)) / 2)
             : 28;
         g.setColor(new Color(dotColor.getRed(), dotColor.getGreen(), dotColor.getBlue(), fillAlpha));
-        g.fillRoundRect(x, y, pillWidth - 1, HEIGHT - 1, 8, 8);
+        g.fillRoundRect(x, drawY, pillWidth - 1, HEIGHT - 1, 8, 8);
         g.setColor(dotColor);
-        g.drawRoundRect(x, y, pillWidth - 1, HEIGHT - 1, 8, 8);
+        g.drawRoundRect(x, drawY, pillWidth - 1, HEIGHT - 1, 8, 8);
 
         // "MCP" text
-        g.drawString("MCP", x + 5, y + 11);
+        g.drawString("MCP", x + 4, drawY + 11);
 
         // Status dot
-        int dotX = x + 5 + textWidth + 5;
-        g.fillOval(dotX, y + 5, 5, 5);
+        int dotX = x + 4 + textWidth + 4;
+        g.fillOval(dotX, drawY + 5, 5, 5);
 
         // Client count badge (only rendered when > 0)
         if (clientCount > 0) {
           String countStr = String.valueOf(clientCount);
-          int countX = dotX + 8;
-          g.drawString(countStr, countX, y + 11);
+          int countX = dotX + 7;
+          g.drawString(countStr, countX, drawY + 11);
         }
       } finally {
         g.dispose();

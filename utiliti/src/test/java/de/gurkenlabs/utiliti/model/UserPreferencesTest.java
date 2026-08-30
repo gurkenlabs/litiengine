@@ -53,4 +53,15 @@ class UserPreferencesTest {
     preferences.setEditorFpsCap(0);
     assertEquals(UserPreferences.EDITOR_FPS_CAP_MIN, preferences.getEditorFpsCap());
   }
+
+  @Test
+  void gradleLaunchArgumentsAreOptionalAndNormalized() {
+    UserPreferences preferences = new UserPreferences();
+
+    assertEquals("", preferences.getGradleLaunchArguments());
+    preferences.setGradleLaunchArguments("  --stacktrace --info  ");
+    assertEquals("--stacktrace --info", preferences.getGradleLaunchArguments());
+    preferences.setGradleLaunchArguments(null);
+    assertEquals("", preferences.getGradleLaunchArguments());
+  }
 }

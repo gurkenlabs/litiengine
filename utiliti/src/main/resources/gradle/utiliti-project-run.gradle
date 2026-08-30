@@ -1,0 +1,45 @@
+import org.gradle.jvm.tasks.Jar
+import org.gradle.api.tasks.JavaExec
+
+def encodedArtifacts = System.getProperty("utiliti.reusableArtifacts", "")
+def normalizeArtifact = { path ->
+  File.separatorChar == '\\' ? path.toLowerCase(Locale.ROOT) : path
+}
+def reusableArtifacts = encodedArtifacts.isBlank()
+  ? [] as Set
+  : new String(Base64.decoder.decode(encodedArtifacts), "UTF-8")
+    .readLines()
+    .collect { normalizeArtifact(it) }
+    .toSet()
+def debugProject = Boolean.getBoolean("utiliti.debugProject")
+def debugPort = Integer.getInteger("utiliti.debugPort", 5005)
+def configuredLaunchTask = System.getProperty("utiliti.launchTask", ":run")
+def launchTaskPath = configuredLaunchTask.startsWith(":") ? configuredLaunchTask : ":${configuredLaunchTask}"
+
+gradle.projectsLoaded {
+  gradle.rootProject.allprojects { target ->
+    target.tasks.withType(Jar).configureEach { jarTask ->
+      jarTask.onlyIf("artifact is not already loaded by utiLITI") {
+        def artifact = jarTask.archiveFile.get().asFile.toPath()
+          .toAbsolutePath().normalize().toString()
+        artifact = normalizeArtifact(artifact)
+        !reusableArtifacts.contains(artifact)
+      }
+    }
+    target.tasks.withType(JavaExec).configureEach { javaExecTask ->
+      if (javaExecTask.path == launchTaskPath) {
+        javaExecTask.doFirst {
+          println "UTILITI_LAUNCH_PHASE:STARTING_GAME"
+        }
+        if (debugProject) {
+          javaExecTask.debugOptions {
+            enabled = true
+            port = debugPort
+            server = true
+            suspend = true
+          }
+        }
+      }
+    }
+  }
+}

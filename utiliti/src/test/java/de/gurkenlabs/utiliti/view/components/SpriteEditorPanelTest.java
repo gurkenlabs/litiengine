@@ -1,6 +1,8 @@
 package de.gurkenlabs.utiliti.view.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
@@ -9,6 +11,7 @@ import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -91,5 +94,79 @@ class SpriteEditorPanelTest {
     assertEquals(250, sprite.getKeyframes()[1]);
     UndoManager.instance().undo();
     assertEquals(120, sprite.getKeyframes()[1]);
+  }
+
+  @Test
+  void getFamilyVariantsIncludesMirroredCounterpartsWithIndicator() {
+    Editor.instance().getGameFile().getSpriteSheets().clear();
+    SpritesheetResource idleLeft = new SpritesheetResource(
+        new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB), "warrior-idle-left", 2, 2);
+    SpritesheetResource walkLeft = new SpritesheetResource(
+        new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB), "warrior-walk-left", 2, 2);
+    Editor.instance().getGameFile().getSpriteSheets().add(idleLeft);
+    Editor.instance().getGameFile().getSpriteSheets().add(walkLeft);
+
+    List<SpriteEditorPanel.VariantItem> variants = SpriteEditorPanel.getFamilyVariants("warrior-idle-left");
+
+    assertEquals(4, variants.size());
+    assertEquals("warrior-idle-left", variants.get(0).name());
+    assertFalse(variants.get(0).isMirrored());
+
+    assertEquals("warrior-idle-right", variants.get(1).name());
+    assertTrue(variants.get(1).isMirrored());
+    assertTrue(variants.get(1).toString().contains("mirrored"));
+
+    assertEquals("warrior-walk-left", variants.get(2).name());
+    assertFalse(variants.get(2).isMirrored());
+
+    assertEquals("warrior-walk-right", variants.get(3).name());
+    assertTrue(variants.get(3).isMirrored());
+    assertTrue(variants.get(3).toString().contains("mirrored"));
+
+    Editor.instance().getGameFile().getSpriteSheets().clear();
+  }
+
+  @Test
+  void editingMirroredVariantMaterializesResourceAndIsUndoable() throws Exception {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    map.setName("mirrored-materialize-test");
+    map.setWidth(1);
+    map.setHeight(1);
+    map.setTileWidth(16);
+    map.setTileHeight(16);
+    Game.world().loadEnvironment(map);
+
+    Editor.instance().getGameFile().getSpriteSheets().clear();
+    SpritesheetResource idleLeft = new SpritesheetResource(
+        new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB), "jorge-idle-left", 2, 2);
+    idleLeft.setKeyframes(new int[] {100, 100});
+    Editor.instance().getGameFile().getSpriteSheets().add(idleLeft);
+
+    assertTrue(SpriteEditorPanel.isVirtualMirrored("jorge-idle-right"));
+
+    SpritesheetResource virtualRight = SpriteEditorPanel.createMirroredResource(idleLeft, "jorge-idle-right");
+    SpriteEditorPanel panel = new SpriteEditorPanel();
+    panel.bind(virtualRight);
+
+    // Edit keyframe on mirrored variant
+    panel.setDurationForTest(1, 240);
+
+    // Should now be materialized into GameFile
+    SpritesheetResource materialized = SpriteEditorPanel.findSpriteResource("jorge-idle-right");
+    assertEquals(virtualRight, materialized);
+    assertEquals(240, materialized.getKeyframes()[1]);
+    assertEquals(100, materialized.getKeyframes()[0]);
+    assertFalse(SpriteEditorPanel.isVirtualMirrored("jorge-idle-right"));
+
+    // Original left remains unchanged
+    assertEquals(100, idleLeft.getKeyframes()[1]);
+
+    // Undo should remove the materialized resource
+    UndoManager.instance().undo();
+    assertEquals(null, SpriteEditorPanel.findSpriteResource("jorge-idle-right"));
+    assertTrue(SpriteEditorPanel.isVirtualMirrored("jorge-idle-right"));
+
+    Editor.instance().getGameFile().getSpriteSheets().clear();
   }
 }

@@ -17,8 +17,7 @@ class KeyBindingsTest {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.resolve(
         "SAVE_PROJECT=alt pressed S;DELETE=");
 
-    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK),
-        bindings.get(Command.NEW_PROJECT));
+    assertEquals(Command.NEW_PROJECT.defaultKeyStroke(), bindings.get(Command.NEW_PROJECT));
     assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK),
         bindings.get(Command.SAVE_PROJECT));
     assertNull(bindings.get(Command.DELETE));
@@ -39,8 +38,9 @@ class KeyBindingsTest {
 
   @Test
   void formatsShortcutsForDisplay() {
-    assertEquals("Ctrl+S", KeyBindings.format(
-        KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)));
+    KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK);
+    String expected = InputEvent.getModifiersExText(InputEvent.CTRL_DOWN_MASK) + "+" + KeyEvent.getKeyText(KeyEvent.VK_S);
+    assertEquals(expected, KeyBindings.format(stroke));
     assertEquals("", KeyBindings.format(null));
   }
 
@@ -65,7 +65,54 @@ class KeyBindingsTest {
   void includesQuickSearchDefault() {
     EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
 
-    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
+    int ctrlOrCmd = KeyBindings.platformModifiers(
+        InputEvent.CTRL_DOWN_MASK, System.getProperty("os.name", ""));
+    assertEquals(
+        KeyStroke.getKeyStroke(KeyEvent.VK_P, ctrlOrCmd),
         bindings.get(Command.QUICK_SEARCH));
+  }
+
+  @Test
+  void includesProjectLifecycleDefaults() {
+    EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
+
+    int ctrlOrCmd = KeyBindings.platformModifiers(
+        InputEvent.CTRL_DOWN_MASK, System.getProperty("os.name", ""));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.RUN_PROJECT));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.DEBUG_PROJECT));
+    assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_F2, ctrlOrCmd),
+        bindings.get(Command.STOP_PROJECT));
+  }
+
+  @Test
+  void usesCommandInsteadOfControlForMacDefaults() {
+    assertEquals(
+        InputEvent.META_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK,
+        KeyBindings.platformModifiers(
+            InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK, "Mac OS X"));
+    assertEquals(
+        InputEvent.CTRL_DOWN_MASK,
+        KeyBindings.platformModifiers(InputEvent.CTRL_DOWN_MASK, "Linux"));
+  }
+
+  @Test
+  void includesWorkspaceSwitchingDefaults() {
+    EnumMap<Command, KeyStroke> bindings = KeyBindings.defaults();
+
+    int ctrlOrCmd = KeyBindings.platformModifiers(
+        InputEvent.CTRL_DOWN_MASK, System.getProperty("os.name", ""));
+    assertEquals(
+        KeyStroke.getKeyStroke(
+            KeyEvent.VK_M, ctrlOrCmd | InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.SWITCH_MAP_MODE));
+    assertEquals(
+        KeyStroke.getKeyStroke(
+            KeyEvent.VK_S, ctrlOrCmd | InputEvent.SHIFT_DOWN_MASK),
+        bindings.get(Command.SWITCH_SCRIPT_MODE));
+    assertEquals(
+        KeyStroke.getKeyStroke(KeyEvent.VK_TAB, ctrlOrCmd),
+        bindings.get(Command.SWITCH_WORKSPACE_MODE));
   }
 }

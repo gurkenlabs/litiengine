@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
 import de.gurkenlabs.litiengine.entities.behavior.IBehaviorController;
+import de.gurkenlabs.litiengine.scripting.EntityScriptController;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
@@ -155,6 +156,11 @@ public interface IEntity {
    */
   <T extends IEntityController> T getController(Class<T> clss);
 
+  /** Returns the controller that owns this entity's declarative script bindings, if one is configured. */
+  default EntityScriptController<?> scripts() {
+    return this.getController(EntityScriptController.class);
+  }
+
   /**
    * All registered actions of this entity.
    *
@@ -176,6 +182,20 @@ public interface IEntity {
    * @see IEntity#register(String, Runnable)
    */
   void perform(String actionName);
+
+  /**
+   * Registers a listener to be notified whenever an action is performed on this entity.
+   *
+   * @param listener the action listener
+   */
+  void onActionPerformed(java.util.function.Consumer<String> listener);
+
+  /**
+   * Removes a registered action performed listener.
+   *
+   * @param listener the action listener
+   */
+  void removeActionPerformedListener(java.util.function.Consumer<String> listener);
 
   /**
    * Registers an {@code EntityAction} with the specified name. It's later possible to execute these actions on the entity by using the

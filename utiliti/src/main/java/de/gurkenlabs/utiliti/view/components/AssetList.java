@@ -9,21 +9,24 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.FileDrop;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.JToggleButton;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -35,11 +38,17 @@ public class AssetList extends JSplitPane implements Controller {
   private static final int SEARCH_WIDTH = 340;
   private final AssetPanel assetPanel;
   private final AssetTree assetTree;
+  private final ScriptAssetTree scriptTree;
+  private final CardLayout leftCardLayout;
+  private final JPanel leftCardsPanel;
   private final JTextField searchField;
   private final JSlider zoomSlider;
   private final JLabel summaryLabel;
   private final JPanel toolbar;
+  private final JScrollPane categoryScrollPane;
+  private final JScrollPane scriptScrollPane;
   private final JScrollPane scrollPane;
+  private boolean scriptMode;
 
   public AssetList() {
     super(JSplitPane.HORIZONTAL_SPLIT);
@@ -47,24 +56,40 @@ public class AssetList extends JSplitPane implements Controller {
     this.setResizeWeight(0.0);
     this.assetPanel = new AssetPanel();
     this.assetTree = new AssetTree(this.assetPanel);
+    this.scriptTree = new ScriptAssetTree(this.assetPanel);
     this.assetPanel.setChangedCallback(this::updateSummary);
 
     this.assetTree.setBorder(javax.swing.BorderFactory.createEmptyBorder(
+      Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL));
+    this.scriptTree.setBorder(javax.swing.BorderFactory.createEmptyBorder(
       Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL, Style.SPACE_SMALL));
 
     JPanel leftPanel = new JPanel(new BorderLayout()) {
       @Override
       public void updateUI() {
         super.updateUI();
-        setBackground(Style.assetExplorerBackground());
+        setBackground(Style.background());
       }
     };
-    leftPanel.setOpaque(true);
+    leftPanel.setOpaque(false);
+    leftPanel.setBackground(Style.background());
     leftPanel.setBorder(null);
+
     leftPanel.setMinimumSize(new Dimension(RESOURCE_EXPLORER_MIN_WIDTH, 0));
     leftPanel.setPreferredSize(new Dimension(RESOURCE_EXPLORER_DEFAULT_WIDTH, 0));
     leftPanel.setMaximumSize(new Dimension(RESOURCE_EXPLORER_MAX_WIDTH, Integer.MAX_VALUE));
-    leftPanel.add(assetTree, BorderLayout.CENTER);
+
+    this.categoryScrollPane = StyledTree.createScrollPane(assetTree);
+    this.scriptScrollPane = StyledTree.createScrollPane(scriptTree);
+
+
+
+    this.leftCardLayout = new CardLayout();
+    this.leftCardsPanel = new JPanel(this.leftCardLayout);
+    this.leftCardsPanel.setOpaque(false);
+    this.leftCardsPanel.add(this.categoryScrollPane, "assets");
+    this.leftCardsPanel.add(this.scriptScrollPane, "scripts");
+    leftPanel.add(this.leftCardsPanel, BorderLayout.CENTER);
     this.setLeftComponent(leftPanel);
 
     new FileDrop(assetPanel, files -> Editor.instance().importResources(files));
@@ -118,9 +143,11 @@ public class AssetList extends JSplitPane implements Controller {
     this.summaryLabel.setForeground(Style.mutedText());
     this.summaryLabel.setFont(this.summaryLabel.getFont().deriveFont(
       Math.max(10f, this.summaryLabel.getFont().getSize2D() - 1f)));
+    this.summaryLabel.setVerticalAlignment(SwingConstants.CENTER);
 
     this.zoomSlider = new JSlider(96, 150, Editor.preferences().getAssetCardSize());
     this.zoomSlider.setPreferredSize(new Dimension(100, Style.CONTROL_HEIGHT));
+    this.zoomSlider.setBorder(BorderFactory.createEmptyBorder());
     this.zoomSlider.setOpaque(false);
     this.zoomSlider.setToolTipText(Resources.strings().get("assetlist_card_size"));
     this.zoomSlider.getAccessibleContext().setAccessibleName(
@@ -199,6 +226,29 @@ public class AssetList extends JSplitPane implements Controller {
     return this.assetTree;
   }
 
+  public ScriptAssetTree getScriptTree() {
+    return this.scriptTree;
+  }
+
+  public boolean isScriptMode() {
+    return this.scriptMode;
+  }
+
+  public void setScriptMode(boolean scriptMode) {
+    if (this.scriptMode == scriptMode) return;
+    this.scriptMode = scriptMode;
+    if (scriptMode) {
+      this.leftCardLayout.show(this.leftCardsPanel, "scripts");
+      this.scriptTree.forceUpdate();
+      this.scriptTree.selectDefault();
+    } else {
+      this.leftCardLayout.show(this.leftCardsPanel, "assets");
+      this.assetTree.forceUpdate();
+      this.assetTree.selectDefault();
+    }
+    updateSummary();
+  }
+
   public JPanel getToolbar() {
     return this.toolbar;
   }
@@ -212,11 +262,21 @@ public class AssetList extends JSplitPane implements Controller {
     if (this.scrollPane != null) {
       this.scrollPane.getViewport().setBackground(Style.assetExplorerBackground());
     }
+    if (this.categoryScrollPane != null) {
+      this.categoryScrollPane.getViewport().setBackground(Style.assetExplorerBackground());
+    }
+    if (this.scriptScrollPane != null) {
+      this.scriptScrollPane.getViewport().setBackground(Style.assetExplorerBackground());
+    }
   }
 
   @Override
   public void refresh() {
-    this.assetTree.forceUpdate();
+    if (this.scriptMode) {
+      this.scriptTree.forceUpdate();
+    } else {
+      this.assetTree.forceUpdate();
+    }
     this.searchField.setText("");
     updateSummary();
   }

@@ -80,6 +80,10 @@ public final class MapObjectProperty {
   @TmxPropertyInfo(name = "implementation", description = "Project-defined implementation identifier for a built-in map object type.", category = "General", type = "string")
   public static final String IMPLEMENTATION = "implementation";
 
+  /** Versioned JSON bindings for scripts attached to an entity. */
+  @TmxPropertyInfo(name = "scriptBindings", description = "Structured Java or runtime script bindings assigned to this entity.", category = "Behavior", type = "scripts")
+  public static final String SCRIPT_BINDINGS = "scriptBindings";
+
   // mobile entity
   /** Acceleration value of a mobile entity, in milliseconds to reach max velocity. */
   @TmxPropertyInfo(name = "acceleration", description = "Acceleration value of a mobile entity in milliseconds to reach max velocity.", category = "Movement", type = "int", defaultValue = "0")

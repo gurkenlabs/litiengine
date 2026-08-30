@@ -17,17 +17,25 @@ public final class ControlBehavior {
   private ControlBehavior() {}
 
   public static <T extends Component> T apply(T component) {
-    if (component instanceof JTextField jTextField) {
-      applyRoundedControlShape(jTextField);
-      jTextField.setBackground(inputBackground());
-      jTextField.setCaretColor(Style.accent());
-      jTextField.addFocusListener(
-          new FocusAdapter() {
-            @Override
-            public void focusGained(final FocusEvent e) {
-              jTextField.selectAll();
-            }
-          });
+    if (component instanceof javax.swing.AbstractButton button && (button instanceof javax.swing.JCheckBox || button instanceof javax.swing.JRadioButton)) {
+      button.setMargin(new java.awt.Insets(0, 0, 0, 0));
+      button.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+      button.setOpaque(false);
+      return component;
+    }
+
+    if (component instanceof javax.swing.text.JTextComponent jText) {
+      applyRoundedControlShape(jText);
+      jText.setCaretColor(Style.accent());
+      if (jText instanceof JTextField jTextField) {
+        jTextField.addFocusListener(
+            new FocusAdapter() {
+              @Override
+              public void focusGained(final FocusEvent e) {
+                jTextField.selectAll();
+              }
+            });
+      }
       return component;
     }
 
@@ -39,7 +47,6 @@ public final class ControlBehavior {
       JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
       JTextField textField = editor.getTextField();
       applyRoundedControlShape(textField);
-      textField.setBackground(inputBackground());
       textField.setCaretColor(Style.accent());
       textField.addFocusListener(
           new FocusAdapter() {
@@ -67,17 +74,11 @@ public final class ControlBehavior {
 
   public static void applyRoundedBorder(JComponent component) {
     component.putClientProperty("JComponent.arc", Style.CORNER_RADIUS);
-    component.putClientProperty("JComponent.roundRect", true);
+    component.putClientProperty("JTextField.arc", Style.CORNER_RADIUS);
   }
 
   private static void applyRoundedControlShape(JComponent component) {
     component.putClientProperty("JComponent.arc", Style.CORNER_RADIUS);
-    component.putClientProperty("JComponent.roundRect", true);
     component.putClientProperty("JTextField.arc", Style.CORNER_RADIUS);
-  }
-
-  private static Color inputBackground() {
-    Color color = javax.swing.UIManager.getColor("TextField.background");
-    return color != null ? color : INPUT_BG;
   }
 }

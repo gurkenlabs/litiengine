@@ -277,4 +277,29 @@ class MapComponentTest {
     assertEquals("  100 ,  200  , 30 ", result.value());
     assertEquals(2, result.replacements());
   }
+
+  @Test
+  void reloadEnvironmentRebuildsCachedEnvironment() throws Exception {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    try {
+      MapComponent component = new MapComponent();
+      TmxMap map = mapWithCollisionBox("reloaded");
+      Environment original = new Environment(map);
+      original.init();
+      Game.world().loadEnvironment(original);
+
+      component.loadEnvironment(map);
+      Environment firstCached = component.getCachedEnvironmentForTest(map);
+
+      component.reloadEnvironment();
+      Environment reloadedCached = component.getCachedEnvironmentForTest(map);
+
+      assertNotSame(firstCached, reloadedCached);
+      assertSame(reloadedCached, Game.world().environment());
+    } finally {
+      Method terminate = Game.class.getDeclaredMethod("terminate");
+      terminate.setAccessible(true);
+      terminate.invoke(null);
+    }
+  }
 }

@@ -54,11 +54,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
   private final ExpandableCard collisionCard;
   private final ExpandableCard combatCard;
   private final ExpandableCard movementCard;
+  private final ExpandableCard scriptsCard;
   private final ExpandableCard customCard;
 
   private final CollisionPanel collisionPanel;
   private final CombatPanel combatPanel;
   private final MovementPanel movementPanel;
+  private final ScriptBindingsInspectorPanel scriptsPanel;
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
   private final JComboBox<RenderType> renderType;
@@ -94,6 +96,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.collisionPanel = new CollisionPanel();
     this.combatPanel = new CombatPanel();
     this.movementPanel = new MovementPanel();
+    this.scriptsPanel = new ScriptBindingsInspectorPanel();
     this.customPanel = new CustomPanel();
 
     this.textFieldName = new JTextField();
@@ -191,22 +194,27 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     this.movementCard =
         new ExpandableCard(
             Resources.strings().get("panel_mobileEntity"), this.movementPanel, true);
+    this.scriptsCard =
+        new ExpandableCard(
+            Resources.strings().get("panel_scriptBindings"), this.scriptsPanel, false);
     this.customCard =
         new ExpandableCard(
             Resources.strings().get("panel_customProperties"), this.customPanel, true);
 
-    generalCard.setContentInsets(8, 0, 8, 0);
+    generalCard.setInspectorContentInsets();
     generalCard.setHeaderTrailing(headerContent);
-    typeCard.setContentInsets(8, 0, 8, 0);
-    collisionCard.setContentInsets(8, 0, 8, 0);
-    combatCard.setContentInsets(8, 0, 8, 0);
-    movementCard.setContentInsets(8, 0, 8, 0);
-    customCard.setContentInsets(8, 0, 8, 0);
+    typeCard.setInspectorContentInsets();
+    collisionCard.setInspectorContentInsets();
+    combatCard.setInspectorContentInsets();
+    movementCard.setInspectorContentInsets();
+    scriptsCard.setInspectorContentInsets();
+    customCard.setInspectorContentInsets();
 
     typeCard.setVisible(false);
     collisionCard.setVisible(false);
     combatCard.setVisible(false);
     movementCard.setVisible(false);
+    scriptsCard.setVisible(false);
     customCard.setVisible(false);
 
     accordion.add(generalCard);
@@ -214,11 +222,13 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     accordion.add(collisionCard);
     accordion.add(combatCard);
     accordion.add(movementCard);
+    accordion.add(scriptsCard);
     accordion.add(customCard);
 
     JScrollPane scrollPane = new JScrollPane(accordion);
     scrollPane.setBorder(null);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.getVerticalScrollBar().setUnitIncrement(24);
     scrollPane.getViewport().setBackground(Style.background());
     add(scrollPane, BorderLayout.CENTER);
 
@@ -273,6 +283,9 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     bindPanel(this.collisionPanel, supportsCollisionAndCombat ? targets : List.of());
     bindPanel(this.combatPanel, supportsCollisionAndCombat ? targets : List.of());
     bindPanel(this.movementPanel, commonType == MapObjectType.CREATURE ? targets : List.of());
+    boolean supportsScripts = commonType != null && commonType != MapObjectType.AREA;
+    this.scriptsPanel.bind(supportsScripts && targets.size() == 1 ? targets.get(0) : null);
+    this.scriptsCard.setVisible(supportsScripts && targets.size() == 1);
 
     bindPanel(this.customPanel, targets.size() == 1 ? targets : List.of());
     updateMultiEditState(targets);
@@ -301,6 +314,10 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     }
     updateImplementationVisibility();
     updateRenderTypeEnabled();
+  }
+
+  boolean isScriptsCardVisibleForTest() {
+    return this.scriptsCard.isVisible();
   }
 
   private static java.util.Set<String> emitterProperties() {
@@ -349,7 +366,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     lblH.setHorizontalAlignment(SwingConstants.TRAILING);
 
     int transformLabelWidth = SECTION_LABEL_WIDTH;
-    int secondaryLabelWidth = 24;
+    int secondaryLabelWidth = (int) (18 * Editor.preferences().getUiScale());
+    int gutter = GUTTER_WIDTH;
     int gap = CONTROL_MARGIN;
 
     gl.setAutoCreateGaps(false);
@@ -358,28 +376,32 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
           .addComponent(lblX, transformLabelWidth, transformLabelWidth, transformLabelWidth)
           .addComponent(lblW, transformLabelWidth, transformLabelWidth, transformLabelWidth))
-        .addGap(gap)
+        .addGap(gutter)
         .addGroup(gl.createParallelGroup()
-          .addComponent(spnX, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
-          .addComponent(spnW, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH))
-        .addGap(gap)
+          .addComponent(spnX, 0, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addComponent(spnW, 0, SPINNER_WIDTH, Integer.MAX_VALUE))
+        .addGap(gutter)
         .addGroup(gl.createParallelGroup(Alignment.TRAILING)
           .addComponent(lblY, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth)
           .addComponent(lblH, secondaryLabelWidth, secondaryLabelWidth, secondaryLabelWidth))
-        .addGap(gap)
+        .addGap(gutter)
         .addGroup(gl.createParallelGroup()
-          .addComponent(spnY, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)
-          .addComponent(spnH, SPINNER_WIDTH, SPINNER_WIDTH, SPINNER_WIDTH)));
+          .addComponent(spnY, 0, SPINNER_WIDTH, Integer.MAX_VALUE)
+          .addComponent(spnH, 0, SPINNER_WIDTH, Integer.MAX_VALUE)));
     gl.setVerticalGroup(
       gl.createSequentialGroup()
         .addGap(2)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblX).addComponent(spnX)
-          .addComponent(lblY).addComponent(spnY))
+          .addComponent(lblX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(spnX, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(lblY, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(spnY, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblW).addComponent(spnW)
-          .addComponent(lblH).addComponent(spnH))
+          .addComponent(lblW, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(spnW, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(lblH, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(spnH, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(2));
     return grid;
   }
@@ -397,6 +419,7 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
     JLabel lblTags = new JLabel(Resources.strings().get("panel_tags"));
     lblTags.setHorizontalAlignment(SwingConstants.TRAILING);
 
+    int gutter = GUTTER_WIDTH;
     int gap = CONTROL_MARGIN;
 
     gl.setAutoCreateGaps(false);
@@ -406,9 +429,8 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
            .addComponent(lblName, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
            .addComponent(labelImplementation, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
            .addComponent(lblRenderType, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH)
-          .addGap(PropertyPanel.CONTROL_HEIGHT)
           .addComponent(lblTags, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH, SECTION_LABEL_WIDTH))
-        .addGap(gap)
+        .addGap(gutter)
         .addGroup(gl.createParallelGroup()
            .addComponent(textFieldName, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
            .addComponent(implementation, 0, CONTROL_WIDTH, Integer.MAX_VALUE)
@@ -419,22 +441,22 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
       gl.createSequentialGroup()
         .addGap(2)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-           .addComponent(lblName)
-           .addComponent(textFieldName))
+           .addComponent(lblName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+           .addComponent(textFieldName, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(labelImplementation)
-          .addComponent(implementation))
+          .addComponent(labelImplementation, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(implementation, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblRenderType)
-          .addComponent(renderType))
+          .addComponent(lblRenderType, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(renderType, CONTROL_HEIGHT, CONTROL_HEIGHT, CONTROL_HEIGHT))
         .addGap(gap)
-        .addComponent(checkBoxRenderWithLayer)
+        .addComponent(checkBoxRenderWithLayer, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
         .addGap(gap)
         .addGroup(gl.createParallelGroup(Alignment.CENTER)
-          .addComponent(lblTags)
-          .addComponent(tagPanel))
+          .addComponent(lblTags, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+          .addComponent(tagPanel, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE, Integer.MAX_VALUE))
         .addGap(2));
     return panel;
   }
@@ -486,6 +508,12 @@ public class MapObjectInspector extends PropertyPanel implements PropertyInspect
 
     revalidate();
     repaint();
+  }
+
+  public void refreshScripts() {
+    if (this.scriptsPanel != null) {
+      this.scriptsPanel.refreshAvailableScripts(getDataSource());
+    }
   }
 
   @Override

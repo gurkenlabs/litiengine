@@ -294,6 +294,10 @@ public abstract class PropertyPanel extends JPanel {
     return this.dataSources;
   }
 
+  protected boolean isBinding() {
+    return this.binding;
+  }
+
   /**
    * Retrieves the identifier for the property panel.
    *
@@ -395,6 +399,7 @@ public abstract class PropertyPanel extends JPanel {
     if (property == null || property.isEmpty()) {
       return;
     }
+    ControlBehavior.apply(checkbox);
     checkbox.addActionListener(
       new MapObjectPropertyActionListener(m -> !m.hasCustomProperty(property) || m.getBoolValue(property) != checkbox.isSelected(),
         m -> m.setValue(property, checkbox.isSelected())));
@@ -501,6 +506,7 @@ public abstract class PropertyPanel extends JPanel {
     if (property == null || property.isEmpty()) {
       return;
     }
+    ControlBehavior.apply(textField);
     textField.addFocusListener(new MapObjectPropertyFocusListener(textField,
       m -> !Objects.equals(m.getStringValue(property, null), textField.getText()),
       m -> m.setValue(property, textField.getText())));
@@ -552,9 +558,14 @@ public abstract class PropertyPanel extends JPanel {
    * object, reloads it from the map, and refreshes the entity controller with the map object's ID.
    */
   protected void updateEnvironment() {
+    if (Game.world().environment() == null) {
+      return;
+    }
     for (IMapObject obj : getDataSources()) {
       Game.world().environment().reloadFromMap(obj.getId());
-      UI.getEntityController().refresh(obj.getId());
+      if (UI.getEntityController() != null) {
+        UI.getEntityController().refresh(obj.getId());
+      }
     }
     if (Editor.instance() != null && Editor.instance().getMapComponent() != null) {
       Editor.instance().getMapComponent().refreshInspector();
@@ -640,18 +651,23 @@ public abstract class PropertyPanel extends JPanel {
    */
   private boolean applying;
 
-  private void applyChanges(Consumer<IMapObject> updateAction) {
+  protected void applyChanges(Consumer<IMapObject> updateAction) {
     if (applying) {
       return;
     }
     applying = true;
-    UndoManager undoManager = UndoManager.instance();
-    boolean operationStarted = this.dataSources.size() > 1 && undoManager.tryBeginOperation();
+    boolean hasEnvironment = Game.world().environment() != null && Game.world().environment().getMap() != null;
+    UndoManager undoManager = hasEnvironment ? UndoManager.instance() : null;
+    boolean operationStarted = undoManager != null && this.dataSources.size() > 1 && undoManager.tryBeginOperation();
     try {
       for (IMapObject mapObject : this.dataSources) {
-        undoManager.mapObjectChanging(mapObject);
+        if (undoManager != null) {
+          undoManager.mapObjectChanging(mapObject);
+        }
         updateAction.accept(mapObject);
-        undoManager.mapObjectChanged(mapObject);
+        if (undoManager != null) {
+          undoManager.mapObjectChanged(mapObject);
+        }
       }
       updateEnvironment();
     } finally {

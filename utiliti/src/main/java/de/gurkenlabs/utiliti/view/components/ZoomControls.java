@@ -30,15 +30,18 @@ final class ZoomControls extends JPanel {
     JButton fitButton = Style.iconButton(Icons.FIT_16);
     configureButton(out, Resources.strings().get("menu_view_zoomOut"), zoomOut);
     configureButton(in, Resources.strings().get("menu_view_zoomIn"), zoomIn);
-    configureButton(fitButton, fitTooltip, fit);
+    fitButton.setToolTipText(fitTooltip);
+    fitButton.addActionListener(event -> fit.run());
+    fitButton.setPreferredSize(new Dimension(Style.CONTROL_HEIGHT, Style.CONTROL_HEIGHT));
     out.putClientProperty("Editor.groupedButtonEdge", "left");
     in.putClientProperty("Editor.groupedButtonEdge", "right");
     out.setFont(out.getFont().deriveFont(18f));
     in.setFont(in.getFont().deriveFont(18f));
 
     this.zoomLabel = new JLabel("100%", SwingConstants.CENTER);
-    this.zoomLabel.setOpaque(true);
-    this.zoomLabel.setPreferredSize(new Dimension(58, Style.CONTROL_HEIGHT));
+    this.zoomLabel.setOpaque(false);
+    this.zoomLabel.setFont(Style.getDefaultFont().deriveFont(11f));
+    this.zoomLabel.setPreferredSize(new Dimension(54, Style.CONTROL_HEIGHT));
     this.zoomLabel.setMinimumSize(this.zoomLabel.getPreferredSize());
     this.zoomLabel.getAccessibleContext().setAccessibleName(
         Resources.strings().get("toolbar_zoomLevel"));
@@ -48,7 +51,8 @@ final class ZoomControls extends JPanel {
     this.zoomGroup.add(this.zoomLabel, BorderLayout.CENTER);
     this.zoomGroup.add(in, BorderLayout.EAST);
 
-    this.fitGroup = new RoundedGroupPanel();
+    this.fitGroup = new JPanel(new BorderLayout());
+    this.fitGroup.setOpaque(false);
     this.fitGroup.add(fitButton, BorderLayout.CENTER);
 
     add(this.zoomGroup);
@@ -74,10 +78,8 @@ final class ZoomControls extends JPanel {
 
   void refreshStyle() {
     this.zoomLabel.setForeground(Style.text());
-    this.zoomLabel.setBackground(Style.surface());
     this.zoomLabel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Style.border()));
     styleGroup(this.zoomGroup);
-    styleGroup(this.fitGroup);
   }
 
   @Override public void updateUI() {

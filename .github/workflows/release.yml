@@ -62,7 +62,7 @@ jobs:
 
       - name: Commit CITATION.cff
         if: inputs.stage == 'final'
-        uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10.0.0
+        uses: EndBug/add-and-commit@cc9c08ba6c8df3b93a8f2db63e89b98368ae2ae8 # v11.1.1
         with:
           message: 'Update CITATION.cff for release ${{ env.RELEASE_VERSION }}'
           committer_name: GitHub Actions
@@ -144,11 +144,9 @@ jobs:
           path: utiliti/build/jpackage
 
       - name: Set up Butler
-        if: runner.arch == 'X64'
-        uses: jdno/setup-butler@6a3cf1036132a3d691dc22ab3de46e85ac4f5bad # v1.6.0
+        uses: jdno/setup-butler@a28a0c10cb902786de2669a56953d101a89b48be # v2.0.0
 
       - name: Upload to itch.io
-        if: runner.arch == 'X64'
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |

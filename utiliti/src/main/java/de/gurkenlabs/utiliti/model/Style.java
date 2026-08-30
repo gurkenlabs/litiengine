@@ -88,7 +88,7 @@ public final class Style {
   public static final Color COLOR_STATUS = Color.WHITE;
 
   // Semantic UI state colors
-  public static final Color COLOR_INPUT_BG = new Color(36, 37, 42);
+  public static final Color COLOR_INPUT_BG = COLOR_SURFACE2;
   public static final Color COLOR_HOVER = new Color(38, 42, 52);
   public static final Color COLOR_PLACEHOLDER = new Color(74, 74, 74);
   public static final Color COLOR_SELECT = new Color(59, 66, 97);
@@ -105,8 +105,8 @@ public final class Style {
   public static final Color COLOR_SCENE_ROW_SELECTED = new Color(COLOR_ACCENT_BLUE.getRed(), COLOR_ACCENT_BLUE.getGreen(), COLOR_ACCENT_BLUE.getBlue(), 30);
   public static final Color COLOR_WORKSPACE_TOP = new Color(24, 24, 28);
   public static final Color COLOR_WORKSPACE_BOTTOM = new Color(14, 14, 17);
-  public static final Color COLOR_ASSET_EXPLORER = new Color(14, 14, 16);
-  public static final Color COLOR_ASSET_EXPLORER_LIGHT = new Color(245, 245, 247);
+  public static final Color COLOR_ASSET_EXPLORER = COLOR_BG;
+  public static final Color COLOR_ASSET_EXPLORER_LIGHT = new Color(248, 248, 248);
   public static final Color COLOR_MAP_BACKING = new Color(10, 10, 12);
   public static final Color COLOR_MAP_BORDER = new Color(92, 92, 104, 180);
 
@@ -289,10 +289,30 @@ public final class Style {
     button.setPreferredSize(size);
     button.setMinimumSize(size);
     button.setMaximumSize(size);
+    updateDisabledIcons(button);
+    if (!Boolean.TRUE.equals(button.getClientProperty("Editor.disabledIconListener"))) {
+      button.putClientProperty("Editor.disabledIconListener", true);
+      button.addPropertyChangeListener(AbstractButton.ICON_CHANGED_PROPERTY, event -> updateDisabledIcons(button));
+      button.addPropertyChangeListener(AbstractButton.SELECTED_ICON_CHANGED_PROPERTY, event -> updateDisabledIcons(button));
+    }
     updateAccessibleName(button, null);
     if (!Boolean.TRUE.equals(button.getClientProperty("Editor.accessibleNameListener"))) {
       button.putClientProperty("Editor.accessibleNameListener", true);
       button.addPropertyChangeListener("ToolTipText", event -> updateAccessibleName(button, event.getOldValue()));
+    }
+  }
+
+  public static void updateDisabledIcons(AbstractButton button) {
+    if (button == null) {
+      return;
+    }
+    Icon icon = button.getIcon();
+    if (icon != null) {
+      button.setDisabledIcon(disabledVectorIcon(icon));
+    }
+    Icon selectedIcon = button.getSelectedIcon();
+    if (selectedIcon != null) {
+      button.setDisabledSelectedIcon(disabledVectorIcon(selectedIcon));
     }
   }
 
@@ -366,6 +386,65 @@ public final class Style {
     }
   }
 
+  public static Icon disabledVectorIcon(Icon icon) {
+    if (icon == null) {
+      return null;
+    }
+    if (icon instanceof DisabledVectorIcon disabled) {
+      return disabled;
+    }
+    return new DisabledVectorIcon(icon);
+  }
+
+  public static final class DisabledVectorIcon implements Icon {
+    private final Icon delegate;
+
+    public DisabledVectorIcon(Icon delegate) {
+      this.delegate = delegate;
+    }
+
+    public Icon getDelegate() {
+      return this.delegate;
+    }
+
+    @Override
+    public int getIconWidth() {
+      return this.delegate.getIconWidth();
+    }
+
+    @Override
+    public int getIconHeight() {
+      return this.delegate.getIconHeight();
+    }
+
+    @Override
+    public void paintIcon(Component component, Graphics graphics, int x, int y) {
+      double scaleX = 1;
+      double scaleY = 1;
+      if (graphics instanceof Graphics2D graphics2D) {
+        scaleX = Math.abs(graphics2D.getTransform().getScaleX());
+        scaleY = Math.abs(graphics2D.getTransform().getScaleY());
+      }
+      int imageWidth = Math.max(1, (int) Math.ceil(getIconWidth() * scaleX));
+      int imageHeight = Math.max(1, (int) Math.ceil(getIconHeight() * scaleY));
+      BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+      Graphics2D imageGraphics = image.createGraphics();
+      try {
+        imageGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        imageGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        imageGraphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        imageGraphics.scale(scaleX, scaleY);
+        this.delegate.paintIcon(component, imageGraphics, 0, 0);
+        imageGraphics.setComposite(AlphaComposite.SrcIn);
+        imageGraphics.setColor(disabledIconColor());
+        imageGraphics.fillRect(0, 0, getIconWidth(), getIconHeight());
+      } finally {
+        imageGraphics.dispose();
+      }
+      graphics.drawImage(image, x, y, getIconWidth(), getIconHeight(), null);
+    }
+  }
+
   /**
    * Creates a ghost/clear button with no visible border by default, only a subtle hover fill.
    * Used for inline clear (X) buttons inside search boxes.
@@ -382,8 +461,9 @@ public final class Style {
   }
 
   public static Color background() {
-    return uiColor("Panel.background", COLOR_BG);
+    return uiColor("Editor.background", COLOR_BG);
   }
+
 
   public static Color surface() {
     return uiColor("Editor.surface", COLOR_SURFACE);
@@ -391,6 +471,10 @@ public final class Style {
 
   public static Color raisedSurface() {
     return uiColor("Editor.surfaceRaised", COLOR_SURFACE2);
+  }
+
+  public static Color inputBackground() {
+    return uiColor("TextField.background", COLOR_INPUT_BG);
   }
 
   public static Color border() {
@@ -403,6 +487,14 @@ public final class Style {
 
   public static Color mutedText() {
     return uiColor("Editor.mutedText", COLOR_SUBTEXT);
+  }
+
+  public static Color disabledText() {
+    return uiColor("Editor.disabledText", COLOR_DISABLED_TEXT);
+  }
+
+  public static Color disabledIconColor() {
+    return uiColor("Editor.disabledIcon", COLOR_DISABLED_TEXT);
   }
 
   public static Color accent() {
@@ -454,10 +546,12 @@ public final class Style {
   }
 
   public static Color assetExplorerBackground() {
-    return Editor.preferences().getTheme() == Theme.DARK
-      ? COLOR_ASSET_EXPLORER
-      : COLOR_ASSET_EXPLORER_LIGHT;
+    return background();
   }
+
+
+
+
 
   public static Color mapBacking() {
     return uiColor("Editor.mapBacking", COLOR_MAP_BACKING);

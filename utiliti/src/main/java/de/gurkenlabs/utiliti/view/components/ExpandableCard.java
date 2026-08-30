@@ -42,9 +42,21 @@ public class ExpandableCard extends JPanel {
     this.expanded = startExpanded;
     setLayout(new BorderLayout());
     setOpaque(false);
-    setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+    setBorder(BorderFactory.createEmptyBorder(0, 0, Style.SPACE_SMALL, 0));
 
     this.headerPanel = new JPanel(new BorderLayout()) {
+      @Override
+      public Dimension getPreferredSize() {
+        Dimension pref = super.getPreferredSize();
+        return new Dimension(pref.width, Math.max(pref.height, 36));
+      }
+
+      @Override
+      public Dimension getMinimumSize() {
+        Dimension min = super.getMinimumSize();
+        return new Dimension(min.width, Math.max(min.height, 36));
+      }
+
       @Override
       protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
@@ -53,8 +65,6 @@ public class ExpandableCard extends JPanel {
         if (expanded) {
           g2.fillRoundRect(0, 0, getWidth(), getHeight() + ARC, ARC, ARC);
           g2.fillRect(0, getHeight() - ARC, getWidth(), ARC);
-          g2.setColor(Style.border());
-          g2.fillRect(1, getHeight() - 1, getWidth() - 2, 1);
         } else {
           g2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC, ARC);
         }
@@ -67,7 +77,7 @@ public class ExpandableCard extends JPanel {
       }
     };
     headerPanel.setOpaque(false);
-    headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+    headerPanel.setBorder(BorderFactory.createEmptyBorder(0, Style.SPACE_MEDIUM, 0, Style.SPACE_MEDIUM));
     headerPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     headerPanel.setFocusable(true);
     headerPanel.getAccessibleContext().setAccessibleName(title);
@@ -95,7 +105,7 @@ public class ExpandableCard extends JPanel {
     });
 
     this.contentPanel = new JPanel(new BorderLayout());
-    contentPanel.setOpaque(true);
+    contentPanel.setOpaque(false);
     contentPanel.setBackground(Style.surface());
     contentPanel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
     contentPanel.setVisible(expanded);
@@ -147,7 +157,8 @@ public class ExpandableCard extends JPanel {
     if (expanded && g instanceof Graphics2D g2) {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setColor(Style.surface());
-      g2.fillRect(0, 0, getWidth(), getHeight());
+      int cardHeight = getHeight() - getInsets().bottom;
+      g2.fillRoundRect(0, 0, getWidth(), cardHeight, ARC, ARC);
     }
     super.paintComponent(g);
   }
@@ -183,6 +194,10 @@ public class ExpandableCard extends JPanel {
 
   public void setContentInsets(int top, int left, int bottom, int right) {
     contentPanel.setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
+  }
+
+  public void setInspectorContentInsets() {
+    setContentInsets(4, Style.SPACE_MEDIUM, 4, Style.SPACE_MEDIUM);
   }
 
   public void setTitle(String title) {

@@ -86,10 +86,12 @@ public class ConsoleActionPanel extends JPanel {
   }
 
   private JButton createButton(Icon icon, String tooltip, ActionListener actionListener) {
-    JButton button = new JButton("");
-    button.setIcon(icon);
+    JButton button = Style.iconButton(icon);
     button.setToolTipText(tooltip);
     button.addActionListener(actionListener);
+    button.setPreferredSize(BUTTON_SIZE);
+    button.setMinimumSize(BUTTON_SIZE);
+    button.setMaximumSize(BUTTON_SIZE);
 
     return button;
   }

@@ -82,6 +82,49 @@ class UndoManagerTest {
   }
 
   @Test
+  void recordsMapObjectChangesForInactiveMap() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    TmxMap map = newMap("inactive-map");
+    MapObjectLayer layer = new MapObjectLayer();
+    MapObject object = new MapObject();
+    object.setId(42);
+    layer.addMapObject(object);
+    map.addLayer(layer);
+    UndoManager manager = UndoManager.forMap(map);
+
+    manager.mapObjectChanging(object);
+    object.setX(12);
+    manager.mapObjectChanged(object);
+
+    assertTrue(manager.canUndo());
+    manager.undo();
+    assertEquals(0, object.getX());
+  }
+
+  @Test
+  void failingStackListenerDoesNotBlockOtherListenersOrRecording() {
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    UndoManager manager = UndoManager.forMap(newMap("listener-isolation"));
+    AtomicInteger events = new AtomicInteger();
+    Consumer<UndoManager> failing = ignored -> {
+      throw new IllegalStateException("listener failure");
+    };
+    Consumer<UndoManager> succeeding = ignored -> events.incrementAndGet();
+    UndoManager.onUndoStackChanged(failing);
+    UndoManager.onUndoStackChanged(succeeding);
+
+    try {
+      manager.resourceChanged(() -> {}, () -> {});
+
+      assertTrue(manager.canUndo());
+      assertEquals(1, events.get());
+    } finally {
+      UndoManager.removeUndoStackChanged(failing);
+      UndoManager.removeUndoStackChanged(succeeding);
+    }
+  }
+
+  @Test
   void undoManagerIdentitySurvivesMapRename() {
     Game.init(Game.COMMANDLINE_ARG_NOGUI);
     TmxMap map = newMap("before");

@@ -1,10 +1,10 @@
 package de.gurkenlabs.litiengine.sound;
 
 import de.gurkenlabs.litiengine.util.io.StreamUtilities;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -14,15 +14,13 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public final class Sound {
 
-  private AudioFormat format;
+  private final AudioFormat format;
 
   private final String name;
 
-  private AudioInputStream stream;
+  private final byte[] streamData;
 
-  private byte[] streamData;
-
-  private byte[] data;
+  private final byte[] data;
 
   /**
    * Creates a new Sound instance by the specified file path. Loads the sound data into a byte array and also retrieves
@@ -46,15 +44,11 @@ public final class Sound {
 
     this.data = StreamUtilities.getBytes(is);
 
-    AudioInputStream in = AudioSystem.getAudioInputStream(is);
-    if (in != null) {
-      final AudioFormat baseFormat = in.getFormat();
-      final AudioFormat decodedFormat = getOutFormat(baseFormat);
-      // Get AudioInputStream that will be decoded by underlying VorbisSPI
-      in = AudioSystem.getAudioInputStream(decodedFormat, in);
-      this.stream = in;
-      this.streamData = StreamUtilities.getBytes(this.stream);
-      this.format = this.stream.getFormat();
+    try (var dataStream = new ByteArrayInputStream(this.data);
+      var encodedStream = AudioSystem.getAudioInputStream(dataStream);
+      var decodedStream = AudioSystem.getAudioInputStream(getOutFormat(encodedStream.getFormat()), encodedStream)) {
+      this.streamData = StreamUtilities.getBytes(decodedStream);
+      this.format = decodedStream.getFormat();
     }
   }
 
@@ -97,9 +91,9 @@ public final class Sound {
   }
 
   private static AudioFormat getOutFormat(final AudioFormat inFormat) {
-    final int ch = inFormat.getChannels();
+    final int channels = inFormat.getChannels();
     final float rate = inFormat.getSampleRate();
-    return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, rate, 16, ch, ch * 2, rate, false);
+    return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, rate, 16, channels, channels * 2, rate, false);
   }
 
   @Override

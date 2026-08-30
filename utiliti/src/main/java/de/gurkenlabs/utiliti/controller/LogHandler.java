@@ -58,19 +58,28 @@ public class LogHandler extends java.util.logging.Handler {
     }
 
     StyledDocument doc = textPane.getStyledDocument();
-    SimpleAttributeSet keyWord = new SimpleAttributeSet();
-    StyleConstants.setForeground(keyWord, getColor(rec.getLevel()));
-    StyleConstants.setBold(keyWord, true);
-    StyleConstants.setFontSize(keyWord, 12);
-    StyleConstants.setFontFamily(keyWord, Style.FONTNAME_CONSOLE);
+
+    SimpleAttributeSet timestampStyle = new SimpleAttributeSet();
+    StyleConstants.setForeground(timestampStyle, new Color(130, 140, 160));
+    StyleConstants.setFontSize(timestampStyle, 11);
+    StyleConstants.setFontFamily(timestampStyle, Style.FONTNAME_CONSOLE);
+
+    SimpleAttributeSet badgeStyle = new SimpleAttributeSet();
+    StyleConstants.setIcon(badgeStyle, new de.gurkenlabs.utiliti.view.components.LevelBadgeIcon(rec.getLevel()));
+
+    SimpleAttributeSet spaceStyle = new SimpleAttributeSet();
+    StyleConstants.setFontSize(spaceStyle, 11);
+    StyleConstants.setFontFamily(spaceStyle, Style.FONTNAME_CONSOLE);
 
     SimpleAttributeSet text = new SimpleAttributeSet();
-    StyleConstants.setForeground(text, getColor(rec.getLevel()));
+    StyleConstants.setForeground(text, Style.text());
+    StyleConstants.setFontSize(text, 11);
     StyleConstants.setFontFamily(text, Style.FONTNAME_CONSOLE);
 
     SimpleAttributeSet linkStyle = new SimpleAttributeSet();
     StyleConstants.setForeground(linkStyle, new Color(80, 170, 255));
     StyleConstants.setUnderline(linkStyle, true);
+    StyleConstants.setFontSize(linkStyle, 11);
     StyleConstants.setFontFamily(linkStyle, Style.FONTNAME_CONSOLE);
 
     String message;
@@ -105,9 +114,18 @@ public class LogHandler extends java.util.logging.Handler {
       recentLogs.remove(0);
     }
 
+    java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm:ss");
+    String timeStr = timeFormat.format(new java.util.Date(rec.getMillis())) + "  ";
+
     Runnable insertTask = () -> {
       try {
-        doc.insertString(doc.getLength(), String.format("%1$-10s", rec.getLevel()), keyWord);
+        SimpleAttributeSet rowBadgeStyle = new SimpleAttributeSet(badgeStyle);
+        rowBadgeStyle.addAttribute("IS_LEVEL_BADGE", Boolean.TRUE);
+        rowBadgeStyle.addAttribute("LOG_ENTRY_TEXT", formattedMessage);
+
+        doc.insertString(doc.getLength(), timeStr, timestampStyle);
+        doc.insertString(doc.getLength(), " ", rowBadgeStyle);
+        doc.insertString(doc.getLength(), "  ", spaceStyle);
 
         Matcher matcher = PATH_PATTERN.matcher(formattedMessage);
         int lastEnd = 0;
@@ -170,6 +188,7 @@ public class LogHandler extends java.util.logging.Handler {
       SwingUtilities.invokeLater(flushTask);
     }
 
+    this.recentLogs.clear();
     this.warningCount.set(0);
     this.errorCount.set(0);
     this.latestErrorStack = null;
