@@ -37,16 +37,16 @@ jobs:
       - name: Gradle Wrapper Validation
         uses: gradle/actions/wrapper-validation@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
-      - name: D-BUS AT-SPI Installation
-        run: sudo apt-get -y install at-spi2-core
+      - name: Install headless test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install at-spi2-core xvfb
 
       - name: Build
         run: ./gradlew build -x test -PskipSpotless
 
       - name: Test
-        uses: coactions/setup-xvfb@b6b4fcfb9f5a895edadc3bc76318fae0ac17c8b3 # v1.0.1
-        with:
-          run: ./gradlew jacocoTestReport -PskipSpotless
+        run: xvfb-run -a ./gradlew jacocoTestReport -PskipSpotless
 
       - name: Publish Test Results
         uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
