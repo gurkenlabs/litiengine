@@ -75,6 +75,18 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/// The live collection of entities, map data, render layers, and physical state for one loaded map.
+///
+/// Environments are normally created and activated through [GameWorld] rather than constructed by
+/// game code directly. Use [Game#world()] to access the current world and [GameWorld#environment()]
+/// to access its active environment. Entity lookup can be expressed with [#query(Class)].
+///
+/// Map object loaders translate objects from an [IMap] into engine entities when the environment is
+/// loaded. Register custom loaders with [#registerMapObjectLoader(IMapObjectLoader)].
+///
+/// @see Game#world()
+/// @see GameWorld
+/// @see EntityQuery
 public final class Environment implements IRenderable {
 
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
@@ -133,11 +145,9 @@ public final class Environment implements IRenderable {
     registerMapObjectLoader(new SoundSourceMapObjectLoader());
   }
 
-  /**
-   * Instantiates a new {@code Environment} for the specified map.
-   *
-   * @param map The map that defines this environment.
-   */
+  /// Instantiates a new `Environment` for the specified map.
+  ///
+  /// @param map The map that defines this environment.
   public Environment(final IMap map) {
     this.map = map;
     if (this.getMap() != null) {
@@ -151,51 +161,41 @@ public final class Environment implements IRenderable {
     }
   }
 
-  /**
-   * Instantiates a new {@code Environment} for the specified map.
-   *
-   * @param mapPath The path to the map resource that defines this environment.
-   */
+  /// Instantiates a new `Environment` for the specified map.
+  ///
+  /// @param mapPath The path to the map resource that defines this environment.
   public Environment(final String mapPath) {
     this(Resources.maps().get(mapPath));
   }
 
-  /**
-   * Registers a custom loader instance that is responsible for loading and initializing entities of the defined MapObjectType. <br>
-   * <br>
-   * There can only be one loader for a particular type. Calling this method again for the same type will overwrite the previously registered loader.
-   *
-   * @param mapObjectLoader The MapObjectLoader instance to be registered.
-   * @see IMapObjectLoader#getMapObjectType()
-   */
+  /// Registers a custom loader instance that is responsible for loading and initializing entities of the defined MapObjectType.
+  ///
+  /// There can only be one loader for a particular type. Calling this method again for the same type will overwrite the previously registered loader.
+  ///
+  /// @param mapObjectLoader The MapObjectLoader instance to be registered.
+  /// @see IMapObjectLoader#getMapObjectType()
   public static void registerMapObjectLoader(IMapObjectLoader mapObjectLoader) {
     mapObjectLoaders.put(mapObjectLoader.getMapObjectType(), mapObjectLoader);
   }
 
-  /**
-   * Registers a custom {@code IEntity} implementation to support being loaded from an {@code IMap} instance. Note that the specified class needs to
-   * be accessible in a static manner. Inner classes that aren't declared statically are not supported.
-   * <p>
-   * This is an overload of the {@link #registerCustomEntityType(Class)} method that allows to explicitly specify the {@code MapObjectType} without
-   * having to provide an {@code EntityInfo} annotation containing this information.
-   *
-   * <p>
-   * Custom entity types need to provide at least one constructor that matches the following criteria:
-   * </p>
-   *
-   * <ul>
-   * <li>has 2 parameters: {@code Environment, IMapObject}</li>
-   * <li>has 2 parameters: {@code IMapObject, Environment}</li>
-   * <li>has 1 parameter: {@code IMapObject}</li>
-   * <li>has 1 parameter: {@code Environment}</li>
-   * <li>is empty constructor</li>
-   * </ul>
-   *
-   * @param mapObjectType The custom mapobjectType that is used by {@code IMapObjects} to determine the target entity implementation.
-   * @param entityType    The class type of the custom entity implementation.
-   * @see IMapObject#getType()
-   * @see EntityInfo#customMapObjectType()
-   */
+  /// Registers a custom `IEntity` implementation to support being loaded from an `IMap` instance. Note that the specified class needs to
+  /// be accessible in a static manner. Inner classes that aren't declared statically are not supported.
+  ///
+  /// This is an overload of the [#registerCustomEntityType(Class)] method that allows to explicitly specify the `MapObjectType` without
+  /// having to provide an `EntityInfo` annotation containing this information.
+  ///
+  /// Custom entity types need to provide at least one constructor that matches the following criteria:
+  ///
+  /// - has 2 parameters: `Environment, IMapObject`
+  /// - has 2 parameters: `IMapObject, Environment`
+  /// - has 1 parameter: `IMapObject`
+  /// - has 1 parameter: `Environment`
+  /// - is empty constructor
+  ///
+  /// @param mapObjectType The custom mapobjectType that is used by `IMapObjects` to determine the target entity implementation.
+  /// @param entityType    The class type of the custom entity implementation.
+  /// @see IMapObject#getType()
+  /// @see EntityInfo#customMapObjectType()
   public static void registerCustomEntityType(String mapObjectType,
     Class<? extends IEntity> entityType) {
     if (entityType.isInterface() || Modifier.isAbstract(entityType.getModifiers())) {
@@ -218,17 +218,15 @@ public final class Environment implements IRenderable {
     registerMapObjectLoader(mapObjectLoader);
   }
 
-  /**
-   * Registers a custom {@code IEntity} implementation to support being loaded from an {@code IMap} instance. Note that the specified class needs to
-   * be accessible in a static manner. Inner classes that aren't declared statically are not supported.
-   * <p>
-   * This implementation uses the provided {@code EntityInfo.customMapObjectType()} to determine for which type the specified class should be used.
-   *
-   * @param entityType The class type of the custom entity implementation.
-   * @see Environment#registerCustomEntityType(String, Class)
-   * @see IMapObject#getType()
-   * @see EntityInfo#customMapObjectType()
-   */
+  /// Registers a custom `IEntity` implementation to support being loaded from an `IMap` instance. Note that the specified class needs to
+  /// be accessible in a static manner. Inner classes that aren't declared statically are not supported.
+  ///
+  /// This implementation uses the provided `EntityInfo.customMapObjectType()` to determine for which type the specified class should be used.
+  ///
+  /// @param entityType The class type of the custom entity implementation.
+  /// @see Environment#registerCustomEntityType(String, Class)
+  /// @see IMapObject#getType()
+  /// @see EntityInfo#customMapObjectType()
   public static void registerCustomEntityType(Class<? extends IEntity> entityType) {
     EntityInfo info = entityType.getAnnotation(EntityInfo.class);
     if (info == null || info.customMapObjectType().isEmpty()) {
@@ -241,11 +239,9 @@ public final class Environment implements IRenderable {
     registerCustomEntityType(info.customMapObjectType(), entityType);
   }
 
-  /**
-   * Registers an entity type declared for map editing with {@link MapObjectDefinition}.
-   *
-   * @param entityType the annotated entity implementation
-   */
+  /// Registers an entity type declared for map editing with [MapObjectDefinition].
+  ///
+  /// @param entityType the annotated entity implementation
   public static void registerMapObjectDefinition(Class<? extends IEntity> entityType) {
     MapObjectDefinition definition = entityType.getAnnotation(MapObjectDefinition.class);
     if (definition == null || definition.id().isBlank()) {
@@ -262,72 +258,58 @@ public final class Environment implements IRenderable {
     }
   }
 
-  /**
-   * Adds the specified environment rendered listener to receive events when this instance renders the specified renderType.
-   *
-   * @param renderType The type that defines to which render process this listener should be attached.
-   * @param listener   The listener to add.
-   */
+  /// Adds the specified environment rendered listener to receive events when this instance renders the specified renderType.
+  ///
+  /// @param renderType The type that defines to which render process this listener should be attached.
+  /// @param listener   The listener to add.
   public void onRendered(RenderType renderType, EnvironmentRenderedListener listener) {
     this.renderListeners.get(renderType).add(listener);
   }
 
-  /**
-   * Removes the specified environment rendered listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified environment rendered listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeListener(EnvironmentRenderedListener listener) {
     for (Collection<EnvironmentRenderedListener> rends : this.renderListeners.values()) {
       rends.remove(listener);
     }
   }
 
-  /**
-   * Adds the specified environment listener to receive events about the basic environment life-cycle.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified environment listener to receive events about the basic environment life-cycle.
+  ///
+  /// @param listener The listener to add.
   public void addListener(EnvironmentListener listener) {
     this.listeners.add(listener);
   }
 
-  /**
-   * Removes the environment listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the environment listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeListener(EnvironmentListener listener) {
     this.listeners.remove(listener);
   }
 
-  /**
-   * Adds the specified environment entity listener to receive events about entities on this environment.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified environment entity listener to receive events about entities on this environment.
+  ///
+  /// @param listener The listener to add.
   public void addEntityListener(EnvironmentEntityListener listener) {
     this.entityListeners.add(listener);
   }
 
-  /**
-   * Removes the environment entity listener listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the environment entity listener listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeEntityListener(EnvironmentEntityListener listener) {
     this.entityListeners.remove(listener);
   }
 
-  /**
-   * Adds the specified entity to the environment container. This also loads the entity (registers entity and controllers for update) if the
-   * environment has already been loaded. The entity will not be bound to a layer.
-   *
-   * @param entity The entity to add to the environment.
-   * @see #isLoaded()
-   * @see IEntity#loaded(Environment)
-   * @see EnvironmentEntityListener#entityAdded(IEntity)
-   */
+  /// Adds the specified entity to the environment container. This also loads the entity (registers entity and controllers for update) if the
+  /// environment has already been loaded. The entity will not be bound to a layer.
+  ///
+  /// @param entity The entity to add to the environment.
+  /// @see #isLoaded()
+  /// @see IEntity#loaded(Environment)
+  /// @see EnvironmentEntityListener#entityAdded(IEntity)
   public void add(IEntity entity) {
     if (entity == null) {
       return;
@@ -337,16 +319,14 @@ public final class Environment implements IRenderable {
     this.fireEntityEvent(l -> l.entityAdded(entity));
   }
 
-  /**
-   * Adds all the specified entities to the environment container.
-   *
-   * @param <T>      The type of the entity.
-   * @param entities The entities to be added to the environment.
-   * @see #add(IEntity)
-   * @see #addAll(IEntity...)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Adds all the specified entities to the environment container.
+  ///
+  /// @param <T>      The type of the entity.
+  /// @param entities The entities to be added to the environment.
+  /// @see #add(IEntity)
+  /// @see #addAll(IEntity...)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public <T extends IEntity> void addAll(Iterable<T> entities) {
     if (entities == null) {
       return;
@@ -357,40 +337,34 @@ public final class Environment implements IRenderable {
     }
   }
 
-  /**
-   * Adds all the specified entities to the environment container.
-   *
-   * @param entities The entities to be added to the environment.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Adds all the specified entities to the environment container.
+  ///
+  /// @param entities The entities to be added to the environment.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public void addAll(IEntity... entities) {
     this.addAll(Arrays.asList(entities));
   }
 
-  /**
-   * Forces an update on the lighting layers for the entire map.
-   *
-   * @see #getStaticShadowLayer()
-   * @see #getAmbientLight()
-   * @see ColorLayer#updateSection(Rectangle2D)
-   */
+  /// Forces an update on the lighting layers for the entire map.
+  ///
+  /// @see #getStaticShadowLayer()
+  /// @see #getAmbientLight()
+  /// @see ColorLayer#updateSection(Rectangle2D)
   public void updateLighting() {
     if (this.getMap() != null) {
       this.updateLighting(this.getMap().getBounds());
     }
   }
 
-  /**
-   * Forces an update on the lighting layers for the specified section on the map.
-   *
-   * @param section The section for which to update the lighting layers.
-   * @see #getStaticShadowLayer()
-   * @see #getAmbientLight()
-   * @see ColorLayer#updateSection(Rectangle2D)
-   */
+  /// Forces an update on the lighting layers for the specified section on the map.
+  ///
+  /// @param section The section for which to update the lighting layers.
+  /// @see #getStaticShadowLayer()
+  /// @see #getAmbientLight()
+  /// @see ColorLayer#updateSection(Rectangle2D)
   public void updateLighting(Rectangle2D section) {
     if (getStaticShadowLayer() != null) {
       getStaticShadowLayer().updateSection(section);
@@ -401,46 +375,36 @@ public final class Environment implements IRenderable {
     }
   }
 
-  /**
-   * Adds the specified instance to be rendered with the defined {@code RenderType} whenever the environment's render pipeline is executed.
-   *
-   * <p>
-   * This method can be used for any custom rendering that is not related to an entity, a GUI component or the map.
-   * </p>
-   *
-   * <p>
-   * Note that you don't need to explicitly add an {@code Entity} if it implements {@code IRenderable}. The render engine will inherently call an
-   * entity's render method.
-   * </p>
-   *
-   * @param renderable The instance that should be rendered.
-   * @param renderType The render type that determines how the instance is processed by the environment's render pipeline.
-   * @see #render(Graphics2D)
-   * @see RenderEngine#renderEntity(Graphics2D, IEntity)
-   */
+  /// Adds the specified instance to be rendered with the defined `RenderType` whenever the environment's render pipeline is executed.
+  ///
+  /// This method can be used for any custom rendering that is not related to an entity, a GUI component or the map.
+  ///
+  /// Note that you don't need to explicitly add an `Entity` if it implements `IRenderable`. The render engine will inherently call an
+  /// entity's render method.
+  ///
+  /// @param renderable The instance that should be rendered.
+  /// @param renderType The render type that determines how the instance is processed by the environment's render pipeline.
+  /// @see #render(Graphics2D)
+  /// @see RenderEngine#renderEntity(Graphics2D, IEntity)
   public void add(IRenderable renderable, RenderType renderType) {
     this.renderables.get(renderType).add(renderable);
   }
 
-  /**
-   * Adds entities by the specified blueprint to this environment at the defined location.
-   *
-   * @param blueprint The blueprint, defining the map object to load the entities from.
-   * @param x         The x-coordinate of the location at which to spawn the entities.
-   * @param y         The y-coordinate of the location at which to spawn the entities.
-   * @return A collection with all added entities.
-   */
+  /// Adds entities by the specified blueprint to this environment at the defined location.
+  ///
+  /// @param blueprint The blueprint, defining the map object to load the entities from.
+  /// @param x         The x-coordinate of the location at which to spawn the entities.
+  /// @param y         The y-coordinate of the location at which to spawn the entities.
+  /// @return A collection with all added entities.
   public Collection<IEntity> build(Blueprint blueprint, double x, double y) {
     return this.build(blueprint, new Point2D.Double(x, y));
   }
 
-  /**
-   * Adds entities by the specified blueprint to this environment at the defined location.
-   *
-   * @param blueprint The blueprint, defining the map object to load the entities from.
-   * @param location  The location at which to spawn the entities.
-   * @return A collection with all added entities.
-   */
+  /// Adds entities by the specified blueprint to this environment at the defined location.
+  ///
+  /// @param blueprint The blueprint, defining the map object to load the entities from.
+  /// @param location  The location at which to spawn the entities.
+  /// @return A collection with all added entities.
   public Collection<IEntity> build(Blueprint blueprint, Point2D location) {
     Collection<IMapObject> mapObjects = blueprint.build(location);
     Collection<IEntity> loadedEntities = new ArrayList<>();
@@ -451,9 +415,7 @@ public final class Environment implements IRenderable {
     return loadedEntities;
   }
 
-  /**
-   * Clears all loaded entities and renderable instances from this environment.
-   */
+  /// Clears all loaded entities and renderable instances from this environment.
   public void clear() {
     Game.physics().clear();
 
@@ -497,43 +459,35 @@ public final class Environment implements IRenderable {
     this.fireEvent(l -> l.cleared(this));
   }
 
-  /**
-   * Determines whether the environment contains the specified entity.
-   *
-   * @param entity The entity to check for.
-   * @return True if the environment contains the specified entity; otherwise false.
-   */
+  /// Determines whether the environment contains the specified entity.
+  ///
+  /// @param entity The entity to check for.
+  /// @return True if the environment contains the specified entity; otherwise false.
   public boolean contains(IEntity entity) {
     return this.contains(entity.getMapId());
   }
 
-  /**
-   * Determines whether the environment contains any entity with the specified map ID.
-   *
-   * @param mapId The map ID of the entity to check for.
-   * @return True if the environment contains an entity with the specified map ID; otherwise false.
-   */
+  /// Determines whether the environment contains any entity with the specified map ID.
+  ///
+  /// @param mapId The map ID of the entity to check for.
+  /// @return True if the environment contains an entity with the specified map ID; otherwise false.
   public boolean contains(int mapId) {
     return this.allEntities.containsKey(mapId);
   }
 
-  /**
-   * Attempts to find all combat entities whose hitBox intersects with the specified shape.
-   *
-   * @param shape The shape to check intersection for.
-   * @return A collection of all combat entities that intersect the specified {@link Shape}.
-   */
+  /// Attempts to find all combat entities whose hitBox intersects with the specified shape.
+  ///
+  /// @param shape The shape to check intersection for.
+  /// @return A collection of all combat entities that intersect the specified [Shape].
   public Collection<ICombatEntity> findCombatEntities(final Shape shape) {
     return this.findCombatEntities(shape, entity -> true);
   }
 
-  /**
-   * Attempts to find all combat entities whose hitBox intersects with the specified shape.
-   *
-   * @param shape     The shape to check intersection for.
-   * @param condition An additional condition that allows to specify a condition which determines if a {@link ICombatEntity} should be considered.
-   * @return A collection of all combat entities that intersect the specified {@link Shape}.
-   */
+  /// Attempts to find all combat entities whose hitBox intersects with the specified shape.
+  ///
+  /// @param shape     The shape to check intersection for.
+  /// @param condition An additional condition that allows to specify a condition which determines if a [ICombatEntity] should be considered.
+  /// @return A collection of all combat entities that intersect the specified [Shape].
   public Collection<ICombatEntity> findCombatEntities(final Shape shape,
     final Predicate<ICombatEntity> condition) {
     final Collection<ICombatEntity> foundCombatEntities = new ArrayList<>();
@@ -566,12 +520,10 @@ public final class Environment implements IRenderable {
     return foundCombatEntities;
   }
 
-  /**
-   * Attempts to find all entities whose bounding box intersects with the specified shape.
-   *
-   * @param shape The shape to check intersection for.
-   * @return A collection of all entities that intersect the specified {@link Shape}.
-   */
+  /// Attempts to find all entities whose bounding box intersects with the specified shape.
+  ///
+  /// @param shape The shape to check intersection for.
+  /// @return A collection of all entities that intersect the specified [Shape].
   public Collection<IEntity> findEntities(final Shape shape) {
     final Collection<IEntity> foundEntities = new ArrayList<>();
     if (shape == null) {
@@ -597,22 +549,18 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
-  /**
-   * Gets the entity with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The entity with the specified map ID or null if no entity could be found.
-   */
+  /// Gets the entity with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The entity with the specified map ID or null if no entity could be found.
   public IEntity get(final int mapId) {
     return this.allEntities.get(mapId);
   }
 
-  /**
-   * Gets all entities with the specified map IDs from this environment.
-   *
-   * @param mapIds The map IDs to search for.
-   * @return A {@code List} of entities found, in the order given by the parameters.
-   */
+  /// Gets all entities with the specified map IDs from this environment.
+  ///
+  /// @param mapIds The map IDs to search for.
+  /// @return A `List` of entities found, in the order given by the parameters.
   public List<IEntity> get(final int... mapIds) {
     final List<IEntity> foundEntities = new ArrayList<>();
     if (mapIds == null) {
@@ -629,14 +577,12 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
-  /**
-   * Gets the strongly typed entity with the specified map ID from this environment.
-   *
-   * @param <T>   The type of the entity.
-   * @param clss  The class instance defining the type of the entity.
-   * @param mapId The map ID of the entity.
-   * @return The strongly typed entity with the specified map ID or null if no entity could be found or if the defined type doesn't match.
-   */
+  /// Gets the strongly typed entity with the specified map ID from this environment.
+  ///
+  /// @param <T>   The type of the entity.
+  /// @param clss  The class instance defining the type of the entity.
+  /// @param mapId The map ID of the entity.
+  /// @return The strongly typed entity with the specified map ID or null if no entity could be found or if the defined type doesn't match.
   public <T extends IEntity> T get(Class<T> clss, int mapId) {
     IEntity ent = this.get(mapId);
     if (!clss.isInstance(ent)) {
@@ -646,12 +592,10 @@ public final class Environment implements IRenderable {
     return clss.cast(ent);
   }
 
-  /**
-   * Gets the entity with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The entity with the specified name or null if no entity could be found or if the defined type doesn't match.
-   */
+  /// Gets the entity with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The entity with the specified name or null if no entity could be found or if the defined type doesn't match.
   public IEntity get(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
@@ -666,14 +610,12 @@ public final class Environment implements IRenderable {
     return null;
   }
 
-  /**
-   * Gets the strongly typed entity with the specified name from this environment.
-   *
-   * @param <T>  The type of the entity.
-   * @param clss The class instance defining the type of the entity.
-   * @param name The name of the entity.
-   * @return The strongly typed entity with the specified name or null if no entity could be found or if the defined type doesn't match.
-   */
+  /// Gets the strongly typed entity with the specified name from this environment.
+  ///
+  /// @param <T>  The type of the entity.
+  /// @param clss The class instance defining the type of the entity.
+  /// @param name The name of the entity.
+  /// @return The strongly typed entity with the specified name or null if no entity could be found or if the defined type doesn't match.
   public <T extends IEntity> T get(Class<T> clss, String name) {
     IEntity ent = this.get(name);
     if (!clss.isInstance(ent)) {
@@ -683,12 +625,10 @@ public final class Environment implements IRenderable {
     return clss.cast(ent);
   }
 
-  /**
-   * Gets a distinct collection of all entities with any of the specified tags.
-   *
-   * @param tags The tags to search for.
-   * @return All entities with any of the specified tags.
-   */
+  /// Gets a distinct collection of all entities with any of the specified tags.
+  ///
+  /// @param tags The tags to search for.
+  /// @return All entities with any of the specified tags.
   public Collection<IEntity> getByTag(String... tags) {
     Collection<IEntity> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
@@ -703,14 +643,12 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
-  /**
-   * Gets a distinct and strongly named collection of all entities with any of the specified tags.
-   *
-   * @param <T>  The type of the entity.
-   * @param clss The class instance defining the type of the entity.
-   * @param tags The tags to search for.
-   * @return All entities with any of the specified tags.
-   */
+  /// Gets a distinct and strongly named collection of all entities with any of the specified tags.
+  ///
+  /// @param <T>  The type of the entity.
+  /// @param clss The class instance defining the type of the entity.
+  /// @param tags The tags to search for.
+  /// @return All entities with any of the specified tags.
   public <T extends IEntity> Collection<T> getByTag(Class<? extends T> clss, String... tags) {
     Collection<T> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
@@ -727,67 +665,53 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
-  /**
-   * Gets the ambient light instance of this environment.
-   *
-   * @return The ambient light instance of this environment.
-   * @see #getStaticShadowLayer()
-   */
+  /// Gets the ambient light instance of this environment.
+  ///
+  /// @return The ambient light instance of this environment.
+  /// @see #getStaticShadowLayer()
   public AmbientLight getAmbientLight() {
     return this.ambientLight;
   }
 
-  /**
-   * Gets the static shadow lighting layer of this environment.
-   *
-   * @return The static shadow lighting layer of this environment.
-   * @see #getAmbientLight()
-   */
+  /// Gets the static shadow lighting layer of this environment.
+  ///
+  /// @return The static shadow lighting layer of this environment.
+  /// @see #getAmbientLight()
   public StaticShadowLayer getStaticShadowLayer() {
     return this.staticShadowLayer;
   }
 
-  /**
-   * Gets an immutable collection with all assigned map IDs on this environment.
-   *
-   * @return An immutable collection with all map IDs.
-   */
+  /// Gets an immutable collection with all assigned map IDs on this environment.
+  ///
+  /// @return An immutable collection with all map IDs.
   public Collection<Integer> getAllMapIDs() {
     return Collections.unmodifiableCollection(this.allEntities.keySet());
   }
 
-  /**
-   * Gets an immutable collection containing all {@link MapArea} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link MapArea} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [MapArea] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [MapArea] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<MapArea> getAreas() {
     return Collections.unmodifiableCollection(this.mapAreas);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link MapArea} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link MapArea} entities have to provide to be returned.
-   * @return An immutable collection with all {@link MapArea} entities with the specified tag.
-   * @see #getAreas()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [MapArea] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [MapArea] entities have to provide to be returned.
+  /// @return An immutable collection with all [MapArea] entities with the specified tag.
+  /// @see #getAreas()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<MapArea> getAreas(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getAreas();
@@ -796,62 +720,50 @@ public final class Environment implements IRenderable {
     return this.mapAreas.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link MapArea} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link MapArea} with the specified map ID or null if no entity is found.
-   * @see #getArea(String)
-   * @see #getAreas()
-   */
+  /// Gets the [MapArea] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [MapArea] with the specified map ID or null if no entity is found.
+  /// @see #getArea(String)
+  /// @see #getAreas()
   public MapArea getArea(final int mapId) {
     return getById(this.mapAreas, mapId);
   }
 
-  /**
-   * Gets the {@link MapArea} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link MapArea} with the specified name or null if no entity is found.
-   * @see #getArea(int)
-   * @see #getAreas()
-   */
+  /// Gets the [MapArea] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [MapArea] with the specified name or null if no entity is found.
+  /// @see #getArea(int)
+  /// @see #getAreas()
   public MapArea getArea(final String name) {
     return getByName(this.mapAreas, name);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Emitter} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link Emitter} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Emitter] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [Emitter] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Emitter> getEmitters() {
     return Collections.unmodifiableCollection(this.emitters);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Emitter} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link Emitter} entities have to provide to be returned.
-   * @return An immutable collection with all {@link Emitter} entities with the specified tag.
-   * @see #getEmitters()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Emitter] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [Emitter] entities have to provide to be returned.
+  /// @return An immutable collection with all [Emitter] entities with the specified tag.
+  /// @see #getEmitters()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Emitter> getEmitters(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getEmitters();
@@ -860,62 +772,50 @@ public final class Environment implements IRenderable {
     return this.emitters.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link Emitter} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link Emitter} with the specified map ID or null if no entity is found.
-   * @see #getEmitter(String)
-   * @see #getEmitters()
-   */
+  /// Gets the [Emitter] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [Emitter] with the specified map ID or null if no entity is found.
+  /// @see #getEmitter(String)
+  /// @see #getEmitters()
   public Emitter getEmitter(int mapId) {
     return getById(this.emitters, mapId);
   }
 
-  /**
-   * Gets the {@link Emitter} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link Emitter} with the specified name or null if no entity is found.
-   * @see #getEmitter(int)
-   * @see #getEmitters()
-   */
+  /// Gets the [Emitter] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [Emitter] with the specified name or null if no entity is found.
+  /// @see #getEmitter(int)
+  /// @see #getEmitters()
   public Emitter getEmitter(String name) {
     return getByName(this.emitters, name);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link CollisionBox} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link CollisionBox} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [CollisionBox] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [CollisionBox] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<CollisionBox> getCollisionBoxes() {
     return Collections.unmodifiableCollection(this.colliders);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link CollisionBox} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link CollisionBox} entities have to provide to be returned.
-   * @return An immutable collection with all {@link CollisionBox} entities with the specified tag.
-   * @see #getCollisionBoxes()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [CollisionBox] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [CollisionBox] entities have to provide to be returned.
+  /// @return An immutable collection with all [CollisionBox] entities with the specified tag.
+  /// @see #getCollisionBoxes()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<CollisionBox> getCollisionBoxes(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getCollisionBoxes();
@@ -924,62 +824,50 @@ public final class Environment implements IRenderable {
     return this.colliders.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link CollisionBox} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link CollisionBox} with the specified map ID or null if no entity is found.
-   * @see #getCollisionBox(String)
-   * @see #getCollisionBoxes()
-   */
+  /// Gets the [CollisionBox] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [CollisionBox] with the specified map ID or null if no entity is found.
+  /// @see #getCollisionBox(String)
+  /// @see #getCollisionBoxes()
   public CollisionBox getCollisionBox(int mapId) {
     return getById(this.colliders, mapId);
   }
 
-  /**
-   * Gets the {@link CollisionBox} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link CollisionBox} with the specified name or null if no entity is found.
-   * @see #getCollisionBox(int)
-   * @see #getCollisionBoxes()
-   */
+  /// Gets the [CollisionBox] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [CollisionBox] with the specified name or null if no entity is found.
+  /// @see #getCollisionBox(int)
+  /// @see #getCollisionBoxes()
   public CollisionBox getCollisionBox(String name) {
     return getByName(this.colliders, name);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link ICombatEntity} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link ICombatEntity} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [ICombatEntity] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [ICombatEntity] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<ICombatEntity> getCombatEntities() {
     return Collections.unmodifiableCollection(this.combatEntities.values());
   }
 
-  /**
-   * Gets an immutable collection containing all {@link ICombatEntity} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link ICombatEntity} entities have to provide to be returned.
-   * @return An immutable collection with all {@link ICombatEntity} entities with the specified tag.
-   * @see #getMobileEntities()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [ICombatEntity] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [ICombatEntity] entities have to provide to be returned.
+  /// @return An immutable collection with all [ICombatEntity] entities with the specified tag.
+  /// @see #getMobileEntities()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<ICombatEntity> getCombatEntities(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getCombatEntities();
@@ -988,54 +876,44 @@ public final class Environment implements IRenderable {
     return this.combatEntities.values().stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link ICombatEntity} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link ICombatEntity} with the specified map ID or null if no entity is found.
-   * @see #getCombatEntity(String)
-   * @see #getCombatEntities()
-   */
+  /// Gets the [ICombatEntity] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [ICombatEntity] with the specified map ID or null if no entity is found.
+  /// @see #getCombatEntity(String)
+  /// @see #getCombatEntities()
   public ICombatEntity getCombatEntity(final int mapId) {
     return getById(this.combatEntities.values(), mapId);
   }
 
-  /**
-   * Gets the {@link ICombatEntity} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link ICombatEntity} with the specified name or null if no entity is found.
-   * @see #getCombatEntity(int)
-   * @see #getCombatEntities()
-   */
+  /// Gets the [ICombatEntity] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [ICombatEntity] with the specified name or null if no entity is found.
+  /// @see #getCombatEntity(int)
+  /// @see #getCombatEntities()
   public ICombatEntity getCombatEntity(String name) {
     return getByName(this.combatEntities.values(), name);
   }
 
-  /**
-   * Gets an immutable collection containing all entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<IEntity> getEntities() {
     return Collections.unmodifiableCollection(this.allEntities.values());
   }
 
-  /**
-   * Gets all entities of the specified type on this environment.
-   *
-   * @param <T> The type of the entity.
-   * @param cls The class instance defining the type of the entity.
-   * @return All entities of the specified type.
-   */
+  /// Gets all entities of the specified type on this environment.
+  ///
+  /// @param <T> The type of the entity.
+  /// @param cls The class instance defining the type of the entity.
+  /// @return All entities of the specified type.
   public <T> Collection<T> getEntities(Class<? extends T> cls) {
     Collection<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.allEntities.values()) {
@@ -1047,25 +925,21 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
-  /**
-   * Starts a fluent query for entities of the specified type in this environment.
-   *
-   * @param type The requested entity type.
-   * @param <T> The requested type.
-   * @return A reusable query over the current entity snapshot.
-   */
+  /// Starts a fluent query for entities of the specified type in this environment.
+  ///
+  /// @param type The requested entity type.
+  /// @param <T> The requested type.
+  /// @return A reusable query over the current entity snapshot.
   public <T> EntityQuery<T> query(Class<? extends T> type) {
     return new EntityQuery<>(this.getEntities(type));
   }
 
-  /**
-   * Gets all entities of the specified type on this environment.
-   *
-   * @param <T> The type of the entity.
-   * @param cls The class instance defining the type of the entity.
-   * @param tag A tag that decides whether the defined entity should be included in the result.
-   * @return All entities of the specified type.
-   */
+  /// Gets all entities of the specified type on this environment.
+  ///
+  /// @param <T> The type of the entity.
+  /// @param cls The class instance defining the type of the entity.
+  /// @param tag A tag that decides whether the defined entity should be included in the result.
+  /// @return All entities of the specified type.
   public <T> Collection<T> getEntities(Class<? extends T> cls, String tag) {
     Collection<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.allEntities.values()) {
@@ -1077,14 +951,12 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
-  /**
-   * Gets all entities of the specified type on this environment.
-   *
-   * @param <T>  The type of the entity.
-   * @param cls  The class instance defining the type of the entity.
-   * @param pred A predicate that decides whether the defined entity should be included in the result.
-   * @return All entities of the specified type.
-   */
+  /// Gets all entities of the specified type on this environment.
+  ///
+  /// @param <T>  The type of the entity.
+  /// @param cls  The class instance defining the type of the entity.
+  /// @param pred A predicate that decides whether the defined entity should be included in the result.
+  /// @return All entities of the specified type.
   public <T> Collection<T> getEntities(Class<? extends T> cls, Predicate<T> pred) {
     Collection<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.allEntities.values()) {
@@ -1100,32 +972,26 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
-  /**
-   * Gets the entities with the specified render type that are not bound to layers.
-   * <p>
-   * Entities are unbound from there originating {@code MapObjectLayer} if their {@code RenderType} differs from the layer's {@code RenderType}.
-   * </p>
-   *
-   * @param renderType The render type
-   * @return The miscellaneous entities with the specified render type
-   * @see IEntity#getRenderType()
-   * @see ILayer#getRenderType()
-   */
+  /// Gets the entities with the specified render type that are not bound to layers.
+  ///
+  /// Entities are unbound from there originating `MapObjectLayer` if their `RenderType` differs from the layer's `RenderType`.
+  ///
+  /// @param renderType The render type
+  /// @return The miscellaneous entities with the specified render type
+  /// @see IEntity#getRenderType()
+  /// @see ILayer#getRenderType()
   public Collection<IEntity> getEntities(final RenderType renderType) {
     return Collections.unmodifiableCollection(this.miscEntities.get(renderType).values());
   }
 
-  /**
-   * Gets the entities that are bound to the specified layer.
-   * <p>
-   * Entities are bound to a layer if their {@code RenderType} matches the layer's {@code RenderType}
-   * </p>
-   *
-   * @param layer The layer that the entities are bound to.
-   * @return The entities that are bound to the specified layer.
-   * @see IEntity#getRenderType()
-   * @see ILayer#getRenderType()
-   */
+  /// Gets the entities that are bound to the specified layer.
+  ///
+  /// Entities are bound to a layer if their `RenderType` matches the layer's `RenderType`
+  ///
+  /// @param layer The layer that the entities are bound to.
+  /// @return The entities that are bound to the specified layer.
+  /// @see IEntity#getRenderType()
+  /// @see ILayer#getRenderType()
   public Collection<IEntity> getEntities(final IMapObjectLayer layer) {
     if (layer == null || !this.layerEntities.containsKey(layer)) {
       return Collections.emptySet();
@@ -1134,18 +1000,15 @@ public final class Environment implements IRenderable {
     return Collections.unmodifiableCollection(this.layerEntities.get(layer));
   }
 
-  /**
-   * Gets the entities that are bound to layer with the specified name.
-   * <p>
-   * Entities are bound to a layer if their {@code RenderType} matches the layer's {@code RenderType}
-   * </p>
-   *
-   * @param name The name of the layer
-   * @return The entities that are bound to the specified layer.
-   * @see IEntity#getRenderType()
-   * @see ILayer#getRenderType()
-   * @see ILayer#getName()
-   */
+  /// Gets the entities that are bound to layer with the specified name.
+  ///
+  /// Entities are bound to a layer if their `RenderType` matches the layer's `RenderType`
+  ///
+  /// @param name The name of the layer
+  /// @return The entities that are bound to the specified layer.
+  /// @see IEntity#getRenderType()
+  /// @see ILayer#getRenderType()
+  /// @see ILayer#getName()
   public Collection<IEntity> getEntitiesByLayer(final String name) {
     if (name == null || name.isEmpty()) {
       return Collections.emptySet();
@@ -1160,18 +1023,15 @@ public final class Environment implements IRenderable {
     return Collections.emptySet();
   }
 
-  /**
-   * Gets the entities that are bound to layer with the specified layer ID.
-   * <p>
-   * Entities are bound to a layer if their {@code RenderType} matches the layer's {@code RenderType}
-   * </p>
-   *
-   * @param layerId The id of the layer
-   * @return The entities that are bound to the specified layer.
-   * @see IEntity#getRenderType()
-   * @see ILayer#getRenderType()
-   * @see ILayer#getId()
-   */
+  /// Gets the entities that are bound to layer with the specified layer ID.
+  ///
+  /// Entities are bound to a layer if their `RenderType` matches the layer's `RenderType`
+  ///
+  /// @param layerId The id of the layer
+  /// @return The entities that are bound to the specified layer.
+  /// @see IEntity#getRenderType()
+  /// @see ILayer#getRenderType()
+  /// @see ILayer#getId()
   public Collection<IEntity> getEntitiesByLayer(final int layerId) {
     for (Entry<IMapObjectLayer, List<IEntity>> entry : this.layerEntities.entrySet()) {
       if (layerId == entry.getKey().getId()) {
@@ -1182,47 +1042,37 @@ public final class Environment implements IRenderable {
     return Collections.emptySet();
   }
 
-  /**
-   * <b>DON'T USE THIS! THIS IS FOR ENGINE INTERNAL PURPOSES ONLY!</b>.
-   *
-   * @return A map with all entities by tags.
-   */
+  /// **DON'T USE THIS! THIS IS FOR ENGINE INTERNAL PURPOSES ONLY!**.
+  ///
+  /// @return A map with all entities by tags.
   public Map<String, Collection<IEntity>> getEntitiesByTag() {
     return this.entitiesByTag;
   }
 
-  /**
-   * Gets an immutable collection containing all {@link LightSource} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link LightSource} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [LightSource] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [LightSource] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<LightSource> getLightSources() {
     return Collections.unmodifiableCollection(this.lightSources);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link LightSource} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link LightSource} entities have to provide to be returned.
-   * @return An immutable collection with all {@link LightSource} entities with the specified tag.
-   * @see #getLightSources()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [LightSource] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [LightSource] entities have to provide to be returned.
+  /// @return An immutable collection with all [LightSource] entities with the specified tag.
+  /// @see #getLightSources()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<LightSource> getLightSources(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getLightSources();
@@ -1231,80 +1081,64 @@ public final class Environment implements IRenderable {
     return this.lightSources.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link LightSource} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link LightSource} with the specified map ID or null if no entity is found.
-   * @see #getLightSource(String)
-   * @see #getLightSources()
-   */
+  /// Gets the [LightSource] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [LightSource] with the specified map ID or null if no entity is found.
+  /// @see #getLightSource(String)
+  /// @see #getLightSources()
   public LightSource getLightSource(final int mapId) {
     return getById(this.lightSources, mapId);
   }
 
-  /**
-   * Gets the {@link LightSource} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link LightSource} with the specified name or null if no entity is found.
-   * @see #getLightSource(int)
-   * @see #getLightSources()
-   */
+  /// Gets the [LightSource] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [LightSource] with the specified name or null if no entity is found.
+  /// @see #getLightSource(int)
+  /// @see #getLightSources()
   public LightSource getLightSource(String name) {
     return getByName(this.lightSources, name);
   }
 
-  /**
-   * Gets the next unique local map id. (All local map ids are negative).
-   *
-   * @return The next unique local map id.
-   */
+  /// Gets the next unique local map id. (All local map ids are negative).
+  ///
+  /// @return The next unique local map id.
   public static synchronized int getLocalMapId() {
     return --localIdSequence;
   }
 
-  /**
-   * Gets the map on which this environment is based upon.
-   *
-   * @return The map of this environment.
-   */
+  /// Gets the map on which this environment is based upon.
+  ///
+  /// @return The map of this environment.
   public IMap getMap() {
     return this.map;
   }
 
-  /**
-   * Gets an immutable collection containing all {@link IMobileEntity} instances on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link IMobileEntity} instances.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [IMobileEntity] instances on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [IMobileEntity] instances.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<IMobileEntity> getMobileEntities() {
     return Collections.unmodifiableCollection(this.mobileEntities.values());
   }
 
-  /**
-   * Gets an immutable collection containing all {@link IMobileEntity} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link IMobileEntity} entities have to provide to be returned.
-   * @return An immutable collection with all {@link IMobileEntity} entities with the specified tag.
-   * @see #getMobileEntities()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [IMobileEntity] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [IMobileEntity] entities have to provide to be returned.
+  /// @return An immutable collection with all [IMobileEntity] entities with the specified tag.
+  /// @see #getMobileEntities()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<IMobileEntity> getMobileEntities(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getMobileEntities();
@@ -1313,88 +1147,70 @@ public final class Environment implements IRenderable {
     return this.mobileEntities.values().stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link IMobileEntity} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link IMobileEntity} with the specified map ID or null if no entity is found.
-   * @see #getMobileEntity(String)
-   * @see #getMobileEntities()
-   */
+  /// Gets the [IMobileEntity] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [IMobileEntity] with the specified map ID or null if no entity is found.
+  /// @see #getMobileEntity(String)
+  /// @see #getMobileEntities()
   public IMobileEntity getMobileEntity(final int mapId) {
     return getById(this.mobileEntities.values(), mapId);
   }
 
-  /**
-   * Gets the {@link IMobileEntity} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link IMobileEntity} with the specified name or null if no entity is found.
-   * @see #getMobileEntity(int)
-   * @see #getMobileEntities()
-   */
+  /// Gets the [IMobileEntity] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [IMobileEntity] with the specified name or null if no entity is found.
+  /// @see #getMobileEntity(int)
+  /// @see #getMobileEntities()
   public IMobileEntity getMobileEntity(String name) {
     return getByName(this.mobileEntities.values(), name);
   }
 
-  /**
-   * Gets the next unique global map id.
-   *
-   * @return The next unique global map id.
-   */
+  /// Gets the next unique global map id.
+  ///
+  /// @return The next unique global map id.
   public synchronized int getNextMapId() {
     int maxMapID = MapUtilities.getMaxMapId(this.getMap());
     return ++maxMapID;
   }
 
-  /**
-   * Gets an immutable collection containing all {@link IRenderable} instances for the specified render type on this environment.
-   *
-   * <p>
-   * To add or remove instances, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param renderType The render type of the renderable instances.
-   * @return An immutable collection with all {@link IRenderable} instances.
-   * @see #add(IRenderable, RenderType)
-   * @see #removeRenderable(IRenderable)
-   */
+  /// Gets an immutable collection containing all [IRenderable] instances for the specified render type on this environment.
+  ///
+  /// To add or remove instances, use the corresponding methods on this environment.
+  ///
+  /// @param renderType The render type of the renderable instances.
+  /// @return An immutable collection with all [IRenderable] instances.
+  /// @see #add(IRenderable, RenderType)
+  /// @see #removeRenderable(IRenderable)
   public Collection<IRenderable> getRenderables(RenderType renderType) {
     return Collections.unmodifiableCollection(this.renderables.get(renderType));
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Prop} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link Prop} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Prop] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [Prop] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Prop> getProps() {
     return Collections.unmodifiableCollection(this.props);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Prop} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link Prop} entities have to provide to be returned.
-   * @return An immutable collection with all {@link Prop} entities with the specified tag.
-   * @see #getProps()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Prop] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [Prop] entities have to provide to be returned.
+  /// @return An immutable collection with all [Prop] entities with the specified tag.
+  /// @see #getProps()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Prop> getProps(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getProps();
@@ -1403,62 +1219,50 @@ public final class Environment implements IRenderable {
     return this.props.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link Prop} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link Prop} with the specified map ID or null if no entity is found.
-   * @see #getProp(String)
-   * @see #getProps()
-   */
+  /// Gets the [Prop] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [Prop] with the specified map ID or null if no entity is found.
+  /// @see #getProp(String)
+  /// @see #getProps()
   public Prop getProp(int mapId) {
     return getById(this.props, mapId);
   }
 
-  /**
-   * Gets the {@link Prop} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link Prop} with the specified name or null if no entity is found.
-   * @see #getProp(int)
-   * @see #getProps()
-   */
+  /// Gets the [Prop] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [Prop] with the specified name or null if no entity is found.
+  /// @see #getProp(int)
+  /// @see #getProps()
   public Prop getProp(String name) {
     return getByName(this.props, name);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Creature} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link Creature} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Creature] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [Creature] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Creature> getCreatures() {
     return Collections.unmodifiableCollection(this.creatures);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Creature} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link Creature} entities have to provide to be returned.
-   * @return An immutable collection with all {@link Creature} entities with the specified tag.
-   * @see #getCreatures()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Creature] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [Creature] entities have to provide to be returned.
+  /// @return An immutable collection with all [Creature] entities with the specified tag.
+  /// @see #getCreatures()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Creature> getCreatures(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getCreatures();
@@ -1467,62 +1271,50 @@ public final class Environment implements IRenderable {
     return this.creatures.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link Creature} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link Creature} with the specified map ID or null if no entity is found.
-   * @see #getCreature(String)
-   * @see #getCreatures()
-   */
+  /// Gets the [Creature] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [Creature] with the specified map ID or null if no entity is found.
+  /// @see #getCreature(String)
+  /// @see #getCreatures()
   public Creature getCreature(int mapId) {
     return getById(this.creatures, mapId);
   }
 
-  /**
-   * Gets the {@link Creature} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link Creature} with the specified name or null if no entity is found.
-   * @see #getCreature(int)
-   * @see #getCreatures()
-   */
+  /// Gets the [Creature] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [Creature] with the specified name or null if no entity is found.
+  /// @see #getCreature(int)
+  /// @see #getCreatures()
   public Creature getCreature(String name) {
     return getByName(this.creatures, name);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Spawnpoint} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link Spawnpoint} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Spawnpoint] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [Spawnpoint] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Spawnpoint> getSpawnpoints() {
     return Collections.unmodifiableCollection(this.spawnPoints);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Spawnpoint} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link Spawnpoint} entities have to provide to be returned.
-   * @return An immutable collection with all {@link Spawnpoint} entities with the specified tag.
-   * @see #getSpawnpoints()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Spawnpoint] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [Spawnpoint] entities have to provide to be returned.
+  /// @return An immutable collection with all [Spawnpoint] entities with the specified tag.
+  /// @see #getSpawnpoints()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Spawnpoint> getSpawnpoints(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getSpawnpoints();
@@ -1531,62 +1323,50 @@ public final class Environment implements IRenderable {
     return this.spawnPoints.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link Spawnpoint} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link Spawnpoint} with the specified map ID or null if no entity is found.
-   * @see #getSpawnpoint(String)
-   * @see #getSpawnpoints()
-   */
+  /// Gets the [Spawnpoint] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [Spawnpoint] with the specified map ID or null if no entity is found.
+  /// @see #getSpawnpoint(String)
+  /// @see #getSpawnpoints()
   public Spawnpoint getSpawnpoint(final int mapId) {
     return getById(this.spawnPoints, mapId);
   }
 
-  /**
-   * Gets the {@link Spawnpoint} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link Spawnpoint} with the specified name or null if no entity is found.
-   * @see #getSpawnpoint(int)
-   * @see #getSpawnpoints()
-   */
+  /// Gets the [Spawnpoint] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [Spawnpoint] with the specified name or null if no entity is found.
+  /// @see #getSpawnpoint(int)
+  /// @see #getSpawnpoints()
   public Spawnpoint getSpawnpoint(final String name) {
     return getByName(this.spawnPoints, name);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link SoundSource} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link SoundSource} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [SoundSource] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [SoundSource] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<SoundSource> getSoundSources() {
     return Collections.unmodifiableCollection(this.soundSources);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link SoundSource} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link SoundSource} entities have to provide to be returned.
-   * @return An immutable collection with all {@link SoundSource} entities with the specified tag.
-   * @see #getSoundSources()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [SoundSource] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [SoundSource] entities have to provide to be returned.
+  /// @return An immutable collection with all [SoundSource] entities with the specified tag.
+  /// @see #getSoundSources()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<SoundSource> getSoundSources(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getSoundSources();
@@ -1595,62 +1375,50 @@ public final class Environment implements IRenderable {
     return this.soundSources.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link SoundSource} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link SoundSource} with the specified map ID or null if no entity is found.
-   * @see #getSpawnpoint(String)
-   * @see #getSpawnpoints()
-   */
+  /// Gets the [SoundSource] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [SoundSource] with the specified map ID or null if no entity is found.
+  /// @see #getSpawnpoint(String)
+  /// @see #getSpawnpoints()
   public SoundSource getSoundSource(final int mapId) {
     return getById(this.soundSources, mapId);
   }
 
-  /**
-   * Gets the {@link SoundSource} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link SoundSource} with the specified name or null if no entity is found.
-   * @see #getSpawnpoint(int)
-   * @see #getSpawnpoints()
-   */
+  /// Gets the [SoundSource] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [SoundSource] with the specified name or null if no entity is found.
+  /// @see #getSpawnpoint(int)
+  /// @see #getSpawnpoints()
   public SoundSource getSoundSource(final String name) {
     return getByName(this.soundSources, name);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link StaticShadow} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link StaticShadow} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [StaticShadow] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [StaticShadow] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<StaticShadow> getStaticShadows() {
     return Collections.unmodifiableCollection(this.staticShadows);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link StaticShadow} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link StaticShadow} entities have to provide to be returned.
-   * @return An immutable collection with all {@link StaticShadow} entities with the specified tag.
-   * @see #getStaticShadows()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [StaticShadow] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [StaticShadow] entities have to provide to be returned.
+  /// @return An immutable collection with all [StaticShadow] entities with the specified tag.
+  /// @see #getStaticShadows()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<StaticShadow> getStaticShadows(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getStaticShadows();
@@ -1659,62 +1427,50 @@ public final class Environment implements IRenderable {
     return this.staticShadows.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link StaticShadow} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link StaticShadow} with the specified map ID or null if no entity is found.
-   * @see #getStaticShadow(String)
-   * @see #getStaticShadows()
-   */
+  /// Gets the [StaticShadow] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [StaticShadow] with the specified map ID or null if no entity is found.
+  /// @see #getStaticShadow(String)
+  /// @see #getStaticShadows()
   public StaticShadow getStaticShadow(int mapId) {
     return getById(this.staticShadows, mapId);
   }
 
-  /**
-   * Gets the {@link StaticShadow} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link StaticShadow} with the specified name or null if no entity is found.
-   * @see #getStaticShadow(int)
-   * @see #getStaticShadows()
-   */
+  /// Gets the [StaticShadow] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [StaticShadow] with the specified name or null if no entity is found.
+  /// @see #getStaticShadow(int)
+  /// @see #getStaticShadows()
   public StaticShadow getStaticShadow(String name) {
     return getByName(this.staticShadows, name);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Trigger} entities on this environment.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @return An immutable collection with all {@link Trigger} entities.
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Trigger] entities on this environment.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @return An immutable collection with all [Trigger] entities.
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Trigger> getTriggers() {
     return Collections.unmodifiableCollection(this.triggers);
   }
 
-  /**
-   * Gets an immutable collection containing all {@link Trigger} entities with the specified tag.
-   *
-   * <p>
-   * To add or remove entities, use the corresponding methods on this environment.
-   * </p>
-   *
-   * @param tag The tag that the {@link Trigger} entities have to provide to be returned.
-   * @return An immutable collection with all {@link Trigger} entities with the specified tag.
-   * @see #getTriggers()
-   * @see #add(IEntity)
-   * @see #addAll(Iterable)
-   * @see #remove(IEntity)
-   * @see #removeAll(Iterable)
-   */
+  /// Gets an immutable collection containing all [Trigger] entities with the specified tag.
+  ///
+  /// To add or remove entities, use the corresponding methods on this environment.
+  ///
+  /// @param tag The tag that the [Trigger] entities have to provide to be returned.
+  /// @return An immutable collection with all [Trigger] entities with the specified tag.
+  /// @see #getTriggers()
+  /// @see #add(IEntity)
+  /// @see #addAll(Iterable)
+  /// @see #remove(IEntity)
+  /// @see #removeAll(Iterable)
   public Collection<Trigger> getTriggers(String tag) {
     if (tag == null || tag.isEmpty()) {
       return this.getTriggers();
@@ -1723,55 +1479,45 @@ public final class Environment implements IRenderable {
     return this.triggers.stream().filter(p -> p.hasTag(tag)).toList();
   }
 
-  /**
-   * Gets the {@link Trigger} with the specified map ID from this environment.
-   *
-   * @param mapId The map ID of the entity.
-   * @return The {@link Trigger} with the specified map ID or null if no entity is found.
-   * @see #getTrigger(String)
-   * @see #getTriggers()
-   */
+  /// Gets the [Trigger] with the specified map ID from this environment.
+  ///
+  /// @param mapId The map ID of the entity.
+  /// @return The [Trigger] with the specified map ID or null if no entity is found.
+  /// @see #getTrigger(String)
+  /// @see #getTriggers()
   public Trigger getTrigger(final int mapId) {
     return getById(this.triggers, mapId);
   }
 
-  /**
-   * Gets the {@link Trigger} with the specified name from this environment.
-   *
-   * @param name The name of the entity.
-   * @return The {@link Trigger} with the specified name or null if no entity is found.
-   * @see #getTrigger(int)
-   * @see #getTriggers()
-   */
+  /// Gets the [Trigger] with the specified name from this environment.
+  ///
+  /// @param name The name of the entity.
+  /// @return The [Trigger] with the specified name or null if no entity is found.
+  /// @see #getTrigger(int)
+  /// @see #getTriggers()
   public Trigger getTrigger(final String name) {
     return getByName(this.triggers, name);
   }
 
-  /**
-   * Gets all tags that are assigned to entities on this environment.
-   *
-   * @return All assigned tags of this environment.
-   */
+  /// Gets all tags that are assigned to entities on this environment.
+  ///
+  /// @return All assigned tags of this environment.
   public Collection<String> getUsedTags() {
     return Collections.unmodifiableCollection(this.getEntitiesByTag().keySet());
   }
 
-  /**
-   * Gets the center location of the boundaries defined by the map of this environment.
-   *
-   * @return The center of this environment.
-   * @see #getMap()
-   */
+  /// Gets the center location of the boundaries defined by the map of this environment.
+  ///
+  /// @return The center of this environment.
+  /// @see #getMap()
   public Point2D getCenter() {
     return new Point2D.Double(this.getMap().getSizeInPixels().getWidth() / 2.0,
       this.getMap().getSizeInPixels().getHeight() / 2.0);
   }
 
-  /**
-   * Initializes all entities and lighting layers of this environment.
-   *
-   * @see EnvironmentListener#initialized(Environment)
-   */
+  /// Initializes all entities and lighting layers of this environment.
+  ///
+  /// @see EnvironmentListener#initialized(Environment)
   public void init() {
     if (this.initialized) {
       return;
@@ -1788,24 +1534,20 @@ public final class Environment implements IRenderable {
     this.initialized = true;
   }
 
-  /**
-   * Determines whether this environment has been loaded.
-   *
-   * @return True if this environment has been loaded; otherwise false.
-   * @see #load()
-   * @see #unload()
-   */
+  /// Determines whether this environment has been loaded.
+  ///
+  /// @return True if this environment has been loaded; otherwise false.
+  /// @see #load()
+  /// @see #unload()
   public boolean isLoaded() {
     return this.loaded;
   }
 
-  /**
-   * Initializes and loads this environment and all its entities.
-   *
-   * @see #init()
-   * @see EnvironmentListener#loaded(Environment)
-   * @see #isLoaded()
-   */
+  /// Initializes and loads this environment and all its entities.
+  ///
+  /// @see #init()
+  /// @see EnvironmentListener#loaded(Environment)
+  /// @see #isLoaded()
   public void load() {
     this.init();
     if (this.loaded) {
@@ -1824,12 +1566,10 @@ public final class Environment implements IRenderable {
     this.fireEvent(l -> l.loaded(this));
   }
 
-  /**
-   * Loads the entities from the map object with the specified map ID from the map of this environment.
-   *
-   * @param mapId The map ID of the map object.
-   * @return True if any entity could be loaded; otherwise false.
-   */
+  /// Loads the entities from the map object with the specified map ID from the map of this environment.
+  ///
+  /// @param mapId The map ID of the map object.
+  /// @return True if any entity could be loaded; otherwise false.
   public boolean loadFromMap(final int mapId) {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
       Optional<IMapObject> opt = layer.getMapObjects().stream().filter(
@@ -1843,26 +1583,22 @@ public final class Environment implements IRenderable {
     return false;
   }
 
-  /**
-   * Reloads the map object with the specified map ID from the map by first removing any previously loaded entity and then loading it freshly from its
-   * map definition.
-   *
-   * @param mapId The map ID of the map object.
-   * @see #remove(int)
-   * @see Environment#loadFromMap(int)
-   */
+  /// Reloads the map object with the specified map ID from the map by first removing any previously loaded entity and then loading it freshly from its
+  /// map definition.
+  ///
+  /// @param mapId The map ID of the map object.
+  /// @see #remove(int)
+  /// @see Environment#loadFromMap(int)
   public void reloadFromMap(final int mapId) {
     this.remove(mapId);
     this.loadFromMap(mapId);
   }
 
-  /**
-   * Loads all entities for the specified map object.
-   *
-   * @param mapObject The mapObject to load the entities from.
-   * @return A collection of all loaded entities.
-   * @see MapObjectLoader#load(Environment, IMapObject)
-   */
+  /// Loads all entities for the specified map object.
+  ///
+  /// @param mapObject The mapObject to load the entities from.
+  /// @return A collection of all loaded entities.
+  /// @see MapObjectLoader#load(Environment, IMapObject)
   public Collection<IEntity> load(final IMapObject mapObject) {
     if (mapObject == null) {
       return Collections.emptySet();
@@ -1906,24 +1642,20 @@ public final class Environment implements IRenderable {
     return Collections.emptySet();
   }
 
-  /**
-   * Attempts to interact with triggers on this environment.
-   *
-   * @param source The entity that attempts to interacts with triggers.
-   * @return The trigger that the source entity was able to interact with or null.
-   */
+  /// Attempts to interact with triggers on this environment.
+  ///
+  /// @param source The entity that attempts to interacts with triggers.
+  /// @return The trigger that the source entity was able to interact with or null.
   public Trigger interact(ICollisionEntity source) {
     return this.interact(source, null);
   }
 
-  /**
-   * Attempts to interact with triggers on this environment.
-   *
-   * @param source    The entity that attempts to interacts with triggers.
-   * @param condition The condition that determines whether a trigger can be interacted with.
-   * @return The trigger that the entity was able to interact with or null.
-   * @see Trigger#canTrigger(ICollisionEntity)
-   */
+  /// Attempts to interact with triggers on this environment.
+  ///
+  /// @param source    The entity that attempts to interacts with triggers.
+  /// @param condition The condition that determines whether a trigger can be interacted with.
+  /// @return The trigger that the entity was able to interact with or null.
+  /// @see Trigger#canTrigger(ICollisionEntity)
   public Trigger interact(ICollisionEntity source, Predicate<Trigger> condition) {
     for (final Trigger trigger : this.triggers) {
       if (trigger.canTrigger(source) && (condition == null || condition.test(trigger))) {
@@ -1937,18 +1669,16 @@ public final class Environment implements IRenderable {
     return null;
   }
 
-  /**
-   * Removes the specified entity from this environment and unloads is.
-   *
-   * @param entity The entity to be removed.
-   * @see #remove(int)
-   * @see #remove(String)
-   * @see #removeAll(Iterable)
-   * @see #unload(IEntity)
-   * @see EnvironmentEntityListener#entityRemoved(IEntity)
-   * @see IEntity#removed(Environment)
-   * @see EntityListener#removed(IEntity, Environment)
-   */
+  /// Removes the specified entity from this environment and unloads is.
+  ///
+  /// @param entity The entity to be removed.
+  /// @see #remove(int)
+  /// @see #remove(String)
+  /// @see #removeAll(Iterable)
+  /// @see #unload(IEntity)
+  /// @see EnvironmentEntityListener#entityRemoved(IEntity)
+  /// @see IEntity#removed(Environment)
+  /// @see EntityListener#removed(IEntity, Environment)
   public void remove(final IEntity entity) {
     if (entity == null) {
       return;
@@ -2025,18 +1755,16 @@ public final class Environment implements IRenderable {
     this.fireEntityEvent(l -> l.entityRemoved(entity));
   }
 
-  /**
-   * Removes the entity with the specified map ID from this environment and unloads is.
-   *
-   * @param mapId The map ID of the entity to be removed.
-   * @see #remove(int)
-   * @see #remove(String)
-   * @see #removeAll(Iterable)
-   * @see #unload(IEntity)
-   * @see EnvironmentEntityListener#entityRemoved(IEntity)
-   * @see IEntity#removed(Environment)
-   * @see EntityListener#removed(IEntity, Environment)
-   */
+  /// Removes the entity with the specified map ID from this environment and unloads is.
+  ///
+  /// @param mapId The map ID of the entity to be removed.
+  /// @see #remove(int)
+  /// @see #remove(String)
+  /// @see #removeAll(Iterable)
+  /// @see #unload(IEntity)
+  /// @see EnvironmentEntityListener#entityRemoved(IEntity)
+  /// @see IEntity#removed(Environment)
+  /// @see EntityListener#removed(IEntity, Environment)
   public void remove(final int mapId) {
     final IEntity ent = this.get(mapId);
     if (ent == null) {
@@ -2046,18 +1774,16 @@ public final class Environment implements IRenderable {
     this.remove(ent);
   }
 
-  /**
-   * Removes the entity with the specified name from this environment and unloads is.
-   *
-   * @param name The name of the entity to be removed.
-   * @see #remove(int)
-   * @see #remove(String)
-   * @see #removeAll(Iterable)
-   * @see #unload(IEntity)
-   * @see EnvironmentEntityListener#entityRemoved(IEntity)
-   * @see IEntity#removed(Environment)
-   * @see EntityListener#removed(IEntity, Environment)
-   */
+  /// Removes the entity with the specified name from this environment and unloads is.
+  ///
+  /// @param name The name of the entity to be removed.
+  /// @see #remove(int)
+  /// @see #remove(String)
+  /// @see #removeAll(Iterable)
+  /// @see #unload(IEntity)
+  /// @see EnvironmentEntityListener#entityRemoved(IEntity)
+  /// @see IEntity#removed(Environment)
+  /// @see EntityListener#removed(IEntity, Environment)
   public void remove(String name) {
     final IEntity ent = this.get(name);
     if (ent == null) {
@@ -2067,14 +1793,12 @@ public final class Environment implements IRenderable {
     this.remove(ent);
   }
 
-  /**
-   * Removes all specified entities from this environment.
-   *
-   * @param <T>      The type of the specified entities
-   * @param entities The entities to be removed.
-   * @see #remove(int)
-   * @see #remove(String)
-   */
+  /// Removes all specified entities from this environment.
+  ///
+  /// @param <T>      The type of the specified entities
+  /// @param entities The entities to be removed.
+  /// @see #remove(int)
+  /// @see #remove(String)
   public <T extends IEntity> void removeAll(Iterable<T> entities) {
     if (entities == null) {
       return;
@@ -2085,13 +1809,11 @@ public final class Environment implements IRenderable {
     }
   }
 
-  /**
-   * Removes all specified entities from this environment.
-   *
-   * @param entities The entities to be removed.
-   * @see #remove(int)
-   * @see #remove(String)
-   */
+  /// Removes all specified entities from this environment.
+  ///
+  /// @param entities The entities to be removed.
+  /// @see #remove(int)
+  /// @see #remove(String)
   public void removeAll(IEntity... entities) {
     this.removeAll(Arrays.asList(entities));
   }
@@ -2158,30 +1880,24 @@ public final class Environment implements IRenderable {
     }
   }
 
-  /**
-   * Gets the gravity defined for this environment.
-   *
-   * @return The gravity of this environment.
-   * @see GameWorld#gravity()
-   * @see GameWorld#setGravity(int)
-   * @see #setGravity(int)
-   */
+  /// Gets the gravity defined for this environment.
+  ///
+  /// @return The gravity of this environment.
+  /// @see GameWorld#gravity()
+  /// @see GameWorld#setGravity(int)
+  /// @see #setGravity(int)
   public int getGravity() {
     return this.gravity;
   }
 
-  /**
-   * Sets the gravity for this particular environment.
-   *
-   * <p>
-   * This typically only needs to be called explicitly, when the gravity is different than for other environments.
-   * </p>
-   *
-   * @param gravity The new gravity for this environment. If 0, no gravity will be applied.
-   * @see GameWorld#gravity()
-   * @see GameWorld#setGravity(int)
-   * @see #getGravity()
-   */
+  /// Sets the gravity for this particular environment.
+  ///
+  /// This typically only needs to be called explicitly, when the gravity is different than for other environments.
+  ///
+  /// @param gravity The new gravity for this environment. If 0, no gravity will be applied.
+  /// @see GameWorld#gravity()
+  /// @see GameWorld#setGravity(int)
+  /// @see #getGravity()
   public void setGravity(int gravity) {
     this.gravity = gravity;
 
@@ -2200,12 +1916,10 @@ public final class Environment implements IRenderable {
     }
   }
 
-  /**
-   * Unloads all entities of this environment.
-   *
-   * @see #unload(IEntity)
-   * @see EnvironmentListener#unloaded(Environment)
-   */
+  /// Unloads all entities of this environment.
+  ///
+  /// @see #unload(IEntity)
+  /// @see EnvironmentListener#unloaded(Environment)
   public void unload() {
     if (!this.loaded) {
       return;
@@ -2312,18 +2026,15 @@ public final class Environment implements IRenderable {
     this.staticShadowLayer = new StaticShadowLayer(this, color);
   }
 
-  /**
-   * Loads the specified entity by performing the following steps:
-   * <ol>
-   * <li>add to physics engine</li>
-   * <li>register entity for update</li>
-   * <li>register animation controller for update</li>
-   * <li>register movement controller for update</li>
-   * <li>register AI controller for update</li>
-   * </ol>
-   *
-   * @param entity
-   */
+  /// Loads the specified entity by performing the following steps:
+  ///
+  /// 1. add to physics engine
+  /// 2. register entity for update
+  /// 3. register animation controller for update
+  /// 4. register movement controller for update
+  /// 5. register AI controller for update
+  ///
+  /// @param entity
   private void load(final IEntity entity) {
     // an entity can only exist on one environment at a time, so remove it from the current one
     if (entity.getEnvironment() != null) {
@@ -2446,18 +2157,15 @@ public final class Environment implements IRenderable {
     return normalized;
   }
 
-  /**
-   * Unload the specified entity by performing the following steps:
-   * <ol>
-   * <li>remove entities from physics engine</li>
-   * <li>unregister units from update</li>
-   * <li>unregister ai controller from update</li>
-   * <li>unregister animation controller from update</li>
-   * <li>unregister movement controller from update</li>
-   * </ol>
-   *
-   * @param entity
-   */
+  /// Unload the specified entity by performing the following steps:
+  ///
+  /// 1. remove entities from physics engine
+  /// 2. unregister units from update
+  /// 3. unregister ai controller from update
+  /// 4. unregister animation controller from update
+  /// 5. unregister movement controller from update
+  ///
+  /// @param entity
   private void unload(final IEntity entity) {
     // 1. remove from physics engine
     if (entity instanceof ICollisionEntity iCollisionEntity) {

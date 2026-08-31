@@ -1,21 +1,13 @@
 package de.gurkenlabs.litiengine.configuration;
 
-/**
- * Enum representing the different display modes available.
- */
+/// Enum representing the different display modes available.
 public enum DisplayMode {
-  /**
-   * Fullscreen display mode.
-   */
+  /// Fullscreen display mode.
   FULLSCREEN,
 
-  /**
-   * Windowed display mode.
-   */
+  /// Windowed display mode.
   WINDOWED,
 
-  /**
-   * Borderless window display mode.
-   */
+  /// Borderless window display mode.
   BORDERLESS,
 }

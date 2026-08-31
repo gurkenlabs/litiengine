@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Represents a group layer in a tile map. This class extends the {@link Layer} class and implements the {@link IGroupLayer} interface.
- */
+/// Represents a group layer in a tile map. This class extends the [Layer] class and implements the [IGroupLayer] interface.
 public class GroupLayer extends Layer implements IGroupLayer {
 
   @XmlElements({
@@ -36,19 +34,15 @@ public class GroupLayer extends Layer implements IGroupLayer {
   private final transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
   private final transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
 
-  /**
-   * Creates an empty group for map editors and programmatic map construction.
-   */
+  /// Creates an empty group for map editors and programmatic map construction.
   public GroupLayer() {
     this.layers = new ArrayList<>();
   }
 
-  /**
-   * Copy constructor for the GroupLayer class. Creates a new instance of the GroupLayer class by copying the properties from the provided GroupLayer
-   * object.
-   *
-   * @param original The original GroupLayer object to copy from.
-   */
+  /// Copy constructor for the GroupLayer class. Creates a new instance of the GroupLayer class by copying the properties from the provided GroupLayer
+  /// object.
+  ///
+  /// @param original The original GroupLayer object to copy from.
   public GroupLayer(GroupLayer original) {
     super(original);
     this.layers = new ArrayList<>();
@@ -111,11 +105,9 @@ public class GroupLayer extends Layer implements IGroupLayer {
     }
   }
 
-  /**
-   * Removes the specified layer from the appropriate raw layer list based on its type.
-   *
-   * @param layer The layer to be removed.
-   */
+  /// Removes the specified layer from the appropriate raw layer list based on its type.
+  ///
+  /// @param layer The layer to be removed.
   private void layerRemoved(ILayer layer) {
     if (layer instanceof ITileLayer) {
       this.rawTileLayers.remove(layer);
@@ -131,11 +123,9 @@ public class GroupLayer extends Layer implements IGroupLayer {
     }
   }
 
-  /**
-   * Adds the specified layer to the appropriate raw layer list based on its type.
-   *
-   * @param layer The layer to be added.
-   */
+  /// Adds the specified layer to the appropriate raw layer list based on its type.
+  ///
+  /// @param layer The layer to be added.
   private void layerAdded(ILayer layer) {
     if (layer instanceof ITileLayer itl) {
       this.rawTileLayers.add(itl);

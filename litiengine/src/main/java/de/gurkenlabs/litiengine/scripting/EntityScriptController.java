@@ -12,14 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Owns the script bindings of an entity and maps them onto the regular entity-controller lifecycle.
- *
- * <p>The controller is attached by the environment before {@link IEntity#loaded(Environment)} is fired. Script
- * instances are therefore created from the entity's loaded event, after its current environment is available.
- */
+/// Owns the script bindings of an entity and maps them onto the regular entity-controller lifecycle.
+///
+/// The controller is attached by the environment before [IEntity#loaded(Environment)] is fired. Script
+/// instances are therefore created from the entity's loaded event, after its current environment is available.
 public final class EntityScriptController<T extends IEntity> implements IEntityController {
-  /** Entity scripts are behavior orchestration and run after default movement controllers. */
+  /// Entity scripts are behavior orchestration and run after default movement controllers.
   public static final int SCRIPT_UPDATE_PRIORITY = 100;
   private final T entity;
   private final EntityListener lifecycleListener;
@@ -29,6 +27,10 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
   private boolean controllerAttached;
   private boolean scriptsAttached;
 
+  /// Creates a script controller for an entity.
+  ///
+  /// @param entity The entity to control.
+  /// @param bindings The initial explicit bindings, or `null` for none.
   public EntityScriptController(T entity, Collection<ScriptBinding> bindings) {
     this.entity = Objects.requireNonNull(entity);
     this.explicitBindings = copyBindings(bindings);
@@ -78,16 +80,23 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
     return this.entity;
   }
 
+  /// Returns the merged, ordered list of active script bindings for this entity.
+  ///
+  /// @return The list of merged bindings.
   public List<ScriptBinding> getBindings() {
     return this.bindings;
   }
 
-  /** Returns only bindings explicitly configured on this entity. */
+  /// Returns only bindings explicitly configured on this entity.
+  ///
+  /// @return The list of explicit bindings.
   public List<ScriptBinding> getExplicitBindings() {
     return this.explicitBindings;
   }
 
-  /** Replaces the ordered bindings and restarts this controller if it is active. */
+  /// Replaces the ordered bindings and restarts this controller if it is active.
+  ///
+  /// @param bindings The replacement bindings, or `null` to clear them.
   public void setBindings(Collection<ScriptBinding> bindings) {
     boolean restart = this.scriptsAttached;
     if (restart) this.detachScripts();
@@ -96,7 +105,9 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
     if (restart && this.controllerAttached && this.entity.isLoaded()) this.attachScripts();
   }
 
-  /** Replaces inherited type-level bindings while retaining per-entity overrides. */
+  /// Replaces inherited type-level bindings while retaining per-entity overrides.
+  ///
+  /// @param bindings The default bindings, or `null` to clear them.
   public void setDefaultBindings(Collection<ScriptBinding> bindings) {
     boolean restart = this.scriptsAttached;
     if (restart) this.detachScripts();
@@ -105,6 +116,9 @@ public final class EntityScriptController<T extends IEntity> implements IEntityC
     if (restart && this.controllerAttached && this.entity.isLoaded()) this.attachScripts();
   }
 
+  /// Returns whether script instances are currently attached to the entity.
+  ///
+  /// @return `true` if scripts are attached.
   public boolean isAttached() {
     return this.scriptsAttached;
   }

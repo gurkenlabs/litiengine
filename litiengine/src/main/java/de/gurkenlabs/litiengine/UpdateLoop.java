@@ -10,13 +10,11 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
-/**
- * The {@code UpdateLoop} is a basic loop implementation that performs operations at the specified {@code tickRate} by
- * continuously processing the registered logic and delaying the loop until the requested rate is met.
- *
- * @see #process()
- * @see #delay()
- */
+/// The `UpdateLoop` is a basic loop implementation that performs operations at the specified `tickRate` by
+/// continuously processing the registered logic and delaying the loop until the requested rate is met.
+///
+/// @see #process()
+/// @see #delay()
 public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
   private static final Logger log = Logger.getLogger(UpdateLoop.class.getName());
   private final Set<IUpdateable> updatables = new LinkedHashSet<>();
@@ -36,16 +34,14 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
     this.tickRate = tickRate;
   }
 
-  /**
-   * The loop implementation, executing the {@code process()} method which does the actual work. It also tracks the
-   * processing time and the total number of performed ticks while making sure that the expected tick rate is met by
-   * delaying the loop accordingly.
-   * 
-   * @see #process()
-   * @see #delay()
-   * @see #getDeltaTime()
-   * @see #getProcessTime()
-   */
+  /// The loop implementation, executing the `process()` method which does the actual work. It also tracks the
+  /// processing time and the total number of performed ticks while making sure that the expected tick rate is met by
+  /// delaying the loop accordingly.
+  ///
+  /// @see #process()
+  /// @see #delay()
+  /// @see #getDeltaTime()
+  /// @see #getProcessTime()
   @Override
   public void run() {
     while (!interrupted()) {
@@ -155,10 +151,8 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
     return this.updatables;
   }
 
-  /**
-   * Performs the actual workload of a tick. This base implementation just calls the update method on all registered
-   * instances. For derived loop implementations this is more sophisticated.
-   */
+  /// Performs the actual workload of a tick. This base implementation just calls the update method on all registered
+  /// instances. For derived loop implementations this is more sophisticated.
   protected void process() {
     this.update();
   }
@@ -167,11 +161,9 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
     return (long) (1000.0 / this.tickRate);
   }
 
-  /**
-   * Calls the {@code update()} procedure on all registered instances.
-   * 
-   * @see IUpdateable#update()
-   */
+  /// Calls the `update()` procedure on all registered instances.
+  ///
+  /// @see IUpdateable#update()
   protected void update() {
     // Update a snapshot so an updateable can safely attach or detach objects for the next tick.
     for (IUpdateable updatable : List.copyOf(this.getUpdatables())) {
@@ -189,14 +181,12 @@ public class UpdateLoop extends Thread implements AutoCloseable, ILoop {
     }
   }
 
-  /**
-   * This method determines how long the current tick should be delayed to match the expected delta time for the specified
-   * tick rate. It then delays the execution of this loop by pausing the thread for the necessary delay.
-   * 
-   * @return The delay for which this tick was paused after the actual processing.
-   * @throws InterruptedException
-   *           If the thread was interrupted while sleeping
-   */
+  /// This method determines how long the current tick should be delayed to match the expected delta time for the specified
+  /// tick rate. It then delays the execution of this loop by pausing the thread for the necessary delay.
+  ///
+  /// @return The delay for which this tick was paused after the actual processing.
+  /// @throws InterruptedException
+  /// If the thread was interrupted while sleeping
   protected double delay() throws InterruptedException {
     double delay = Math.max(0, this.getExpectedDelta() - this.getProcessTime());
     long sleepDelay = Math.round(delay);

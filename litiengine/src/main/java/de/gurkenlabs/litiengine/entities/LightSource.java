@@ -23,41 +23,29 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.function.Predicate;
 
-/**
- * This class represents a light source in an environment. It extends the Entity class and implements IRenderable interface. It provides methods to
- * render light sources and shadows.
- */
+/// This class represents a light source in an environment. It extends the Entity class and implements IRenderable interface. It provides methods to
+/// render light sources and shadows.
 @EntityInfo(renderType = RenderType.OVERLAY)
 @TmxType(MapObjectType.LIGHTSOURCE)
 public class LightSource extends Entity implements IRenderable {
-  /**
-   * Enum representing the type of light source.
-   */
+  /// Enum representing the type of light source.
   public enum Type {
-    /**
-     * Ellipse-shaped light source.
-     */
+    /// Ellipse-shaped light source.
     ELLIPSE,
-    /**
-     * Rectangle-shaped light source.
-     */
+    /// Rectangle-shaped light source.
     RECTANGLE
   }
 
-  /** Message identifier used to toggle this light source via the engine's messaging system. */
+  /// Message identifier used to toggle this light source via the engine's messaging system.
   public static final String TOGGLE_MESSAGE = "toggle";
-  /** Default light intensity used when none is specified. */
+  /// Default light intensity used when none is specified.
   public static final int DEFAULT_INTENSITY = 100;
 
   private static final float OBSTRUCTED_VISION_RADIUS = 200f;
   private static final float SHADOW_GRADIENT_SIZE = 100f;
-  /**
-   * The fractions for our shadow gradient, going from 0.0 (black) to 1.0 (transparent).
-   */
+  /// The fractions for our shadow gradient, going from 0.0 (black) to 1.0 (transparent).
   private static final float[] SHADOW_GRADIENT_FRACTIONS = new float[] {0f, 1f};
-  /**
-   * The colors for our shadow, going from opaque black to transparent black.
-   */
+  /// The colors for our shadow, going from opaque black to transparent black.
   private static final Color[] SHADOW_GRADIENT_COLORS =
     new Color[] {new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f)};
 
@@ -73,14 +61,12 @@ public class LightSource extends Entity implements IRenderable {
   private Color color;
   private Shape lightShape;
 
-  /**
-   * Constructor for the LightSource class.
-   *
-   * @param intensity  The intensity of this instance.
-   * @param lightColor The color of this instance.
-   * @param shapeType  The shape type of this instance.
-   * @param activated  A flag indicating whether this light is activated by default.
-   */
+  /// Constructor for the LightSource class.
+  ///
+  /// @param intensity  The intensity of this instance.
+  /// @param lightColor The color of this instance.
+  /// @param shapeType  The shape type of this instance.
+  /// @param activated  A flag indicating whether this light is activated by default.
   public LightSource(final int intensity, final Color lightColor, final Type shapeType, boolean activated) {
     super();
     this.color = lightColor;
@@ -90,9 +76,7 @@ public class LightSource extends Entity implements IRenderable {
     this.activated = activated;
   }
 
-  /**
-   * Activates the light source.
-   */
+  /// Activates the light source.
   public void activate() {
     if (isActive()) {
       return;
@@ -101,9 +85,7 @@ public class LightSource extends Entity implements IRenderable {
     updateAmbientLayers();
   }
 
-  /**
-   * Deactivates the light source.
-   */
+  /// Deactivates the light source.
   public void deactivate() {
     if (!isActive()) {
       return;
@@ -113,20 +95,16 @@ public class LightSource extends Entity implements IRenderable {
     updateAmbientLayers();
   }
 
-  /**
-   * Gets the color of the light emitted by this source.
-   *
-   * @return the light color
-   */
+  /// Gets the color of the light emitted by this source.
+  ///
+  /// @return the light color
   public Color getColor() {
     return color;
   }
 
-  /**
-   * Builds the radial gradient paint used to render the light cone, fading from the source color outwards.
-   *
-   * @return the gradient paint
-   */
+  /// Builds the radial gradient paint used to render the light cone, fading from the source color outwards.
+  ///
+  /// @return the gradient paint
   public RadialGradientPaint getGradientPaint() {
     final Color[] transColors =
       new Color[] {
@@ -140,67 +118,53 @@ public class LightSource extends Entity implements IRenderable {
   }
 
 
-  /**
-   * Gets the light intensity. Returns {@code 0} when the light source is inactive.
-   *
-   * @return the current intensity
-   */
+  /// Gets the light intensity. Returns `0` when the light source is inactive.
+  ///
+  /// @return the current intensity
   public int getIntensity() {
     return isActive() ? intensity : 0;
   }
 
-  /**
-   * Gets the geometric shape representing this light source's emission area.
-   *
-   * @return the light shape
-   */
+  /// Gets the geometric shape representing this light source's emission area.
+  ///
+  /// @return the light shape
   public Shape getLightShape() {
     return lightShape;
   }
 
-  /**
-   * Gets the type of shape used by this light source.
-   *
-   * @return the shape type
-   */
+  /// Gets the type of shape used by this light source.
+  ///
+  /// @return the shape type
   public Type getLightShapeType() {
     return lightShapeType;
   }
 
-  /**
-   * Returns whether the light source is currently active.
-   *
-   * @return {@code true} if active
-   */
+  /// Returns whether the light source is currently active.
+  ///
+  /// @return `true` if active
   public boolean isActive() {
     return activated;
   }
 
-  /**
-   * Sets the color of the light emitted by this source and refreshes the affected ambient layers.
-   *
-   * @param color the new color
-   */
+  /// Sets the color of the light emitted by this source and refreshes the affected ambient layers.
+  ///
+  /// @param color the new color
   public void setColor(final Color color) {
     this.color = color;
     updateAmbientLayers();
   }
 
-  /**
-   * Sets the intensity of the light and refreshes the affected ambient layers.
-   *
-   * @param intensity the new intensity
-   */
+  /// Sets the intensity of the light and refreshes the affected ambient layers.
+  ///
+  /// @param intensity the new intensity
   public void setIntensity(final int intensity) {
     this.intensity = intensity;
     updateAmbientLayers();
   }
 
-  /**
-   * Sets the shape type of the light source.
-   *
-   * @param shapeType the new shape type
-   */
+  /// Sets the shape type of the light source.
+  ///
+  /// @param shapeType the new shape type
   public void setLightShapeType(final Type shapeType) {
     this.lightShapeType = shapeType;
   }
@@ -221,9 +185,7 @@ public class LightSource extends Entity implements IRenderable {
     updateAmbientLayers(previousBounds.createUnion(getBoundingBox()));
   }
 
-  /**
-   * Toggles the light source between active and inactive states.
-   */
+  /// Toggles the light source between active and inactive states.
   public void toggle() {
     this.activated = !this.activated;
     updateAmbientLayers();
@@ -251,9 +213,7 @@ public class LightSource extends Entity implements IRenderable {
   }
 
 
-  /**
-   * Updates the ambient layers of the environment.
-   */
+  /// Updates the ambient layers of the environment.
   private void updateAmbientLayers() {
     updateAmbientLayers(getBoundingBox());
   }
@@ -274,9 +234,7 @@ public class LightSource extends Entity implements IRenderable {
     }
   }
 
-  /**
-   * Updates the shape of the light source based on its type.
-   */
+  /// Updates the shape of the light source based on its type.
   private void updateShape() {
     if (getLightShapeType() == Type.RECTANGLE) {
       this.lightShape =
@@ -287,31 +245,29 @@ public class LightSource extends Entity implements IRenderable {
     }
   }
 
-  /**
-   * Renders the shadows using simple vector math. The steps are as follows:
-   *
-   * <pre>
-   * for each entity
-   *     if entity is not moving:
-   *         ignore entity
-   *     if entity is too far from mouse:
-   *         ignore entity
-   *
-   *     determine unit vector from mouse to entity center
-   *     get perpendicular of unit vector
-   *
-   *     Create Points A + B:
-   *         extrude perpendicular in either direction, by the half-size of the entity
-   *     Create Points C + D:
-   *         extrude A + B away from mouse location
-   *
-   *     construct polygon with points A, B, C, D
-   *
-   *     render with RadialGradientPaint to give it a "fade-out" appearance
-   * </pre>
-   *
-   * @param graphic the graphics to use for rendering
-   */
+  /// Renders the shadows using simple vector math. The steps are as follows:
+  ///
+  /// ```
+  /// for each entity
+  ///     if entity is not moving:
+  ///         ignore entity
+  ///     if entity is too far from mouse:
+  ///         ignore entity
+  ///
+  ///     determine unit vector from mouse to entity center
+  ///     get perpendicular of unit vector
+  ///
+  ///     Create Points A + B:
+  ///         extrude perpendicular in either direction, by the half-size of the entity
+  ///     Create Points C + D:
+  ///         extrude A + B away from mouse location
+  ///
+  ///     construct polygon with points A, B, C, D
+  ///
+  ///     render with RadialGradientPaint to give it a "fade-out" appearance
+  /// ```
+  ///
+  /// @param graphic the graphics to use for rendering
   private void renderShadows(final Graphics2D graphic) {
     if (Game.world().environment().getCombatEntities().stream()
       .noneMatch(isInRange(getCenter()))) {
@@ -355,13 +311,11 @@ public class LightSource extends Entity implements IRenderable {
       .contains(mob.getCenter());
   }
 
-  /**
-   * Gets the area of obstructed vision for a given entity.
-   *
-   * @param entity The entity for which to get the obstructed vision area.
-   * @param center The center point of the light source.
-   * @return The area of obstructed vision.
-   */
+  /// Gets the area of obstructed vision for a given entity.
+  ///
+  /// @param entity The entity for which to get the obstructed vision area.
+  /// @param center The center point of the light source.
+  /// @return The area of obstructed vision.
   private static Area getObstructedVisionArea(final IEntity entity, final Point2D center) {
     final Polygon shadowPolygon = new Polygon();
 

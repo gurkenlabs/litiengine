@@ -12,12 +12,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 
-/**
- * A SpeechBubble is a GuiComponent with a given text that is pinned to an entity and moves with it. After initializing
- * the speech bubble, you can start it separately, which will add the component to the current screen, register it for
- * updates and make it visible on screen. Stopping the speech bubble will remove the component and deregister its
- * updates.
- */
+/// A SpeechBubble is a GuiComponent with a given text that is pinned to an entity and moves with it. After initializing
+/// the speech bubble, you can start it separately, which will add the component to the current screen, register it for
+/// updates and make it visible on screen. Stopping the speech bubble will remove the component and deregister its
+/// updates.
 public class SpeechBubble extends GuiComponent implements IUpdateable {
   private int displayTime = GuiProperties.getDefaultSpeechBubbleDisplayTime();
   private long startedTick;
@@ -33,33 +31,29 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
   private long lastTypeTick;
   private final String totalText;
 
-  /**
-   * Instantiates a new speech bubble.
-   *
-   * @param entity
-   *          the entity to which the Speech bubble will be pinned
-   * @param text
-   *          the text which will appear in the speech bubble
-   */
+  /// Instantiates a new speech bubble.
+  ///
+  /// @param entity
+  /// the entity to which the Speech bubble will be pinned
+  /// @param text
+  /// the text which will appear in the speech bubble
   public SpeechBubble(IEntity entity, String text) {
     this(entity, entity.getWidth() * 4 * Game.world().camera().getRenderScale(), entity.getHeight() * 2 * Game.world().camera().getRenderScale(),
         3000, text);
   }
 
-  /**
-   * Instantiates a new Speech bubble.
-   *
-   * @param entity
-   *          the entity to which the Speech bubble will be pinned
-   * @param width
-   *          the width of the text box
-   * @param height
-   *          the height of the text box
-   * @param displayTime
-   *          the display time in milliseconds
-   * @param text
-   *          the text which will appear in the speech bubble
-   */
+  /// Instantiates a new Speech bubble.
+  ///
+  /// @param entity
+  /// the entity to which the Speech bubble will be pinned
+  /// @param width
+  /// the width of the text box
+  /// @param height
+  /// the height of the text box
+  /// @param displayTime
+  /// the display time in milliseconds
+  /// @param text
+  /// the text which will appear in the speech bubble
   public SpeechBubble(IEntity entity, double width, double height, int displayTime, String text) {
     super(Game.world().camera().getViewportDimensionCenter(entity).getX() * Game.world().camera().getRenderScale() - width / 2d,
         Game.world().camera().getViewportLocation(entity).getY() * Game.world().camera().getRenderScale() - height, width, height);
@@ -74,38 +68,30 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
     setTypeDelay((int) (getDisplayTime() * 0.5 / totalText.length()));
   }
 
-  /**
-   * Gets the entity to which this speech bubble is pinned.
-   *
-   * @return the entity
-   */
+  /// Gets the entity to which this speech bubble is pinned.
+  ///
+  /// @return the entity
   public IEntity getEntity() {
     return entity;
   }
 
-  /**
-   * Gets the duration in milliseconds for which this speech bubble will be active.
-   *
-   * @return the display time in milliseconds
-   */
+  /// Gets the duration in milliseconds for which this speech bubble will be active.
+  ///
+  /// @return the display time in milliseconds
   public int getDisplayTime() {
     return displayTime;
   }
 
-  /**
-   * Sets the duration in milliseconds for which this speech bubble will be active.
-   *
-   * @param displayTime
-   *          the display time in milliseconds
-   */
+  /// Sets the duration in milliseconds for which this speech bubble will be active.
+  ///
+  /// @param displayTime
+  /// the display time in milliseconds
   public void setDisplayTime(int displayTime) {
     this.displayTime = displayTime;
   }
 
-  /**
-   * Start the speech bubble. This will add it to the current Screen's components, make it visible and register it for
-   * updates in the Game loop. After the display time has elapsed, the speech bubble will be stopped automatically.
-   */
+  /// Start the speech bubble. This will add it to the current Screen's components, make it visible and register it for
+  /// updates in the Game loop. After the display time has elapsed, the speech bubble will be stopped automatically.
   public void start() {
     startedTick = Game.time().now();
     Game.screens().current().getComponents().add(this);
@@ -113,10 +99,8 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
     Game.loop().attach(this);
   }
 
-  /**
-   * Stop the speech bubble. This will remove it from the current Screen's components, make it invisible and deregister it
-   * from updates in the Game loop.
-   */
+  /// Stop the speech bubble. This will remove it from the current Screen's components, make it invisible and deregister it
+  /// from updates in the Game loop.
   public void stop() {
     Game.screens().current().getComponents().remove(this);
     suspend();
@@ -136,21 +120,17 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
     super.render(g);
   }
 
-  /**
-   * Gets the horizontal speech bubble alignment that dictates its position relative to the entity center point.
-   *
-   * @return the box Align
-   */
+  /// Gets the horizontal speech bubble alignment that dictates its position relative to the entity center point.
+  ///
+  /// @return the box Align
   public Align getBoxAlign() {
     return boxAlign;
   }
 
-  /**
-   * Sets the horizontal speech bubble alignment that dictates its position relative to the entity center point.
-   *
-   * @param boxAlign
-   *          the box Align
-   */
+  /// Sets the horizontal speech bubble alignment that dictates its position relative to the entity center point.
+  ///
+  /// @param boxAlign
+  /// the box Align
   public void setBoxAlign(Align boxAlign) {
     this.boxAlign = boxAlign;
   }
@@ -172,21 +152,17 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
     type();
   }
 
-  /**
-   * Checks if the triangle indicator is active.
-   *
-   * @return true, if the speech bubble is rendering a triangle indicator on the bottom.
-   */
+  /// Checks if the triangle indicator is active.
+  ///
+  /// @return true, if the speech bubble is rendering a triangle indicator on the bottom.
   public boolean isRenderingTriangle() {
     return renderTriangle;
   }
 
-  /**
-   * Sets the visibility status of the triangle indicator.
-   *
-   * @param renderTriangle
-   *          if true, the triangle will be visible.
-   */
+  /// Sets the visibility status of the triangle indicator.
+  ///
+  /// @param renderTriangle
+  /// if true, the triangle will be visible.
   public void setRenderTriangle(boolean renderTriangle) {
     this.renderTriangle = renderTriangle;
   }
@@ -209,11 +185,9 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
     super.setHeight(height);
   }
 
-  /**
-   * Gets the triangle indicator's shape, translated to the correct location on screen.
-   *
-   * @return A Path2D object representing the triangle indicator.
-   */
+  /// Gets the triangle indicator's shape, translated to the correct location on screen.
+  ///
+  /// @return A Path2D object representing the triangle indicator.
   public Path2D getTriangle() {
     if (triangle != null) {
       return triangle;
@@ -231,29 +205,23 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
     return triangle;
   }
 
-  /**
-   * Gets the triangle indicator size. Its size is identical for width and height.
-   *
-   * @return the triangle indicator size
-   */
+  /// Gets the triangle indicator size. Its size is identical for width and height.
+  ///
+  /// @return the triangle indicator size
   public double getTriangleSize() {
     return triangleSize;
   }
 
-  /**
-   * Gets the triangle indicator size. Its size is identical for width and height.
-   *
-   * @param triangleSize
-   *          the new triangle indicator size
-   */
+  /// Gets the triangle indicator size. Its size is identical for width and height.
+  ///
+  /// @param triangleSize
+  /// the new triangle indicator size
   public void setTriangleSize(double triangleSize) {
     this.triangle = null; // trigger recreation in next boundingBox getter call
     this.triangleSize = triangleSize;
   }
 
-  /**
-   * Updates the displayed text for a typewriter effect
-   */
+  /// Updates the displayed text for a typewriter effect
   private void type() {
     // display new text
     if (textIndex < totalText.length() && Game.time().since(lastTypeTick) > getTypeDelay()) {
@@ -266,49 +234,39 @@ public class SpeechBubble extends GuiComponent implements IUpdateable {
     }
   }
 
-  /**
-   * Gets type delay, which determines how fast the typewriter effect will be.
-   *
-   * @return the type delay in milliseconds
-   */
+  /// Gets type delay, which determines how fast the typewriter effect will be.
+  ///
+  /// @return the type delay in milliseconds
   public int getTypeDelay() {
     return typeDelay;
   }
 
-  /**
-   * Sets type delay, which determines how fast the typewriter effect will be.
-   *
-   * @param typeDelay
-   *          the type delay in milliseconds
-   */
+  /// Sets type delay, which determines how fast the typewriter effect will be.
+  ///
+  /// @param typeDelay
+  /// the type delay in milliseconds
   public void setTypeDelay(int typeDelay) {
     this.typeDelay = typeDelay;
   }
 
-  /**
-   * Gets the sound that is played every time a new letter appears.
-   *
-   * @return the type sound
-   */
+  /// Gets the sound that is played every time a new letter appears.
+  ///
+  /// @return the type sound
   public Sound getTypeSound() {
     return typeSound;
   }
 
-  /**
-   * Sets the sound that is played every time a new letter appears.
-   *
-   * @param typeSound
-   *          the type sound
-   */
+  /// Sets the sound that is played every time a new letter appears.
+  ///
+  /// @param typeSound
+  /// the type sound
   public void setTypeSound(Sound typeSound) {
     this.typeSound = typeSound;
   }
 
-  /**
-   * Gets the total text that this Speech bubble will display.
-   *
-   * @return the total text
-   */
+  /// Gets the total text that this Speech bubble will display.
+  ///
+  /// @return the total text
   public String getTotalText() {
     return totalText;
   }

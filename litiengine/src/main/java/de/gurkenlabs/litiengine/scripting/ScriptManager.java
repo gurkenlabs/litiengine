@@ -44,8 +44,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** Coordinates script providers, definitions, bindings, lifecycles, and explicit reloads. */
+/// Coordinates script providers, definitions, bindings, lifecycles, diagnostics, and explicit reloads.
+///
+/// The game-wide instance is available from [Game#scripts()]. It attaches game bindings when the
+/// game starts, configures entity bindings when matching entities are loaded, and releases managed
+/// resources when their host is detached. After a failed [#reload(String)], the manager attempts to
+/// restore the previous compiled generation and records any attachment failures as diagnostics.
+///
+/// @see ScriptDefinition
+/// @see ScriptBinding
+/// @see ScriptContext
 public final class ScriptManager implements IUpdateable {
+  /// Map property containing serialized entity script bindings.
   public static final String BINDINGS_PROPERTY = "scriptBindings";
   private static final Logger log = Logger.getLogger(ScriptManager.class.getName());
 
@@ -68,6 +78,7 @@ public final class ScriptManager implements IUpdateable {
   private final de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener environmentLoadedListener = this::environmentLoaded;
   private final de.gurkenlabs.litiengine.environment.EnvironmentUnloadedListener environmentUnloadedListener = this::detach;
 
+  /// Creates a manager with Java support and discovers additional providers through [ServiceLoader].
   public ScriptManager() {
     this.registerProvider(new JavaScriptProvider());
     ServiceLoader.load(ScriptProvider.class).forEach(this::registerProvider);
@@ -85,10 +96,16 @@ public final class ScriptManager implements IUpdateable {
     Game.world().onUnloaded(this.environmentUnloadedListener);
   }
 
+  /// Returns whether lifecycle callbacks are dispatched to attached scripts.
+  ///
+  /// @return `true` when dispatch is enabled.
   public boolean isEnabled() {
     return this.enabled;
   }
 
+  /// Enables or pauses callback dispatch without detaching scripts.
+  ///
+  /// @param enabled `true` to dispatch callbacks.
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
   }
@@ -97,20 +114,33 @@ public final class ScriptManager implements IUpdateable {
     return this.enabled && !attachment.faulted;
   }
 
+  /// Returns the values shared by all managed scripts.
+  ///
+  /// @return The mutable global binding registry.
   public ScriptGlobals globals() {
     return this.globals;
   }
 
+  /// Registers or replaces the provider for its case-insensitive language identifier.
+  ///
+  /// @param provider The provider to register.
+  /// @throws NullPointerException if `provider` is `null`.
   public void registerProvider(ScriptProvider provider) {
     Objects.requireNonNull(provider);
     this.providers.put(provider.language().toLowerCase(), provider);
   }
 
+  /// Returns a snapshot of registered language providers.
+  ///
+  /// @return The registered providers in unspecified order.
   public Collection<ScriptProvider> getProviders() {
     return List.copyOf(this.providers.values());
   }
 
-  /** Creates non-executing semantic tooling backed by the registered provider for a language. */
+  /// Creates non-executing semantic tooling backed by the registered provider for a language.
+  ///
+  /// @param language The case-insensitive language identifier.
+  /// @return A language service, or an empty optional if the language is unknown or unsupported.
   public Optional<ScriptLanguageService> createLanguageService(String language) {
     if (language == null || language.isBlank()) return Optional.empty();
     ScriptProvider provider = this.providers.get(language.toLowerCase());
@@ -121,6 +151,12 @@ public final class ScriptManager implements IUpdateable {
     return provider.createLanguageService(new ScriptLanguageService.Workspace(this.projectRoot, loader, this.projectClasspath, Map.of()));
   }
 
+  /// Replaces all registered definitions with validated defensive copies.
+  ///
+  /// Invalid or duplicate definitions are skipped and recorded as diagnostics. Removing a
+  /// definition detaches its instances and closes its compiled generation.
+  ///
+  /// @param definitions The replacement definitions, or `null` to clear them.
   public void setDefinitions(Collection<ScriptDefinition> definitions) {
     Map<String, ScriptDefinition> replacements = new LinkedHashMap<>();
     if (definitions != null) for (ScriptDefinition definition : definitions) {
@@ -155,6 +191,9 @@ public final class ScriptManager implements IUpdateable {
     this.definitions.putAll(replacements);
   }
 
+  /// Returns defensive copies of all definitions, sorted by identifier.
+  ///
+  /// @return An unmodifiable definition snapshot.
   public Collection<ScriptDefinition> getDefinitions() {
     return this.definitions.values().stream()
       .sorted(Comparator.comparing(ScriptDefinition::getId))
@@ -162,12 +201,19 @@ public final class ScriptManager implements IUpdateable {
       .toList();
   }
 
+  /// Finds a registered definition.
+  ///
+  /// @param id The definition identifier.
+  /// @return A defensive copy, or `null` if no definition is registered.
   public ScriptDefinition getDefinition(String id) {
     ScriptDefinition definition = this.definitions.get(id);
     return definition != null ? new ScriptDefinition(definition) : null;
   }
 
-  /** Returns configurable fields from the currently compiled generation without compiling or executing new code. */
+  /// Returns configurable fields from the currently compiled generation without compiling or executing new code.
+  ///
+  /// @param scriptId The script identifier.
+  /// @return The configurable properties, or an empty list if the script has not been compiled.
   public List<ScriptPropertyMetadata> getPropertyMetadata(String scriptId) {
     CompiledScript compiledScript = this.compiled.get(scriptId);
     if (compiledScript == null) return List.of();
@@ -183,6 +229,11 @@ public final class ScriptManager implements IUpdateable {
       .thenComparing(ScriptPropertyMetadata::displayName)).toList();
   }
 
+  /// Replaces scripts attached to the game lifecycle.
+  ///
+  /// If the game is running, existing game scripts are detached and replacements attach immediately.
+  ///
+  /// @param bindings The replacement bindings, or `null` to clear them.
   public void setGameBindings(Collection<ScriptBinding> bindings) {
     this.gameBindings.clear();
     if (bindings != null) {
@@ -197,22 +248,33 @@ public final class ScriptManager implements IUpdateable {
     }
   }
 
+  /// Returns defensive copies of the configured game bindings.
+  ///
+  /// @return An unmodifiable binding snapshot.
   public List<ScriptBinding> getGameBindings() {
     return this.gameBindings.stream().map(ScriptBinding::new).toList();
   }
 
-  /** Replaces reusable bindings that are automatically applied when matching entities are loaded. */
+  /// Replaces reusable bindings that are automatically applied when matching entities are loaded.
+  ///
+  /// @param bindings The replacement bindings, or `null` to clear them.
   public void setEntityBindings(Collection<EntityScriptBinding> bindings) {
     this.entityBindings.clear();
     if (bindings != null) bindings.stream().filter(Objects::nonNull)
       .map(EntityScriptBinding::new).forEach(this.entityBindings::add);
   }
 
+  /// Returns defensive copies of the configured entity binding rules.
+  ///
+  /// @return An unmodifiable binding snapshot.
   public List<EntityScriptBinding> getEntityBindings() {
     return this.entityBindings.stream().map(EntityScriptBinding::new).toList();
   }
 
-  /** Adds or refreshes the script controller that owns the default bindings for an entity type. */
+  /// Adds or refreshes the script controller that owns the default bindings for an entity type.
+  ///
+  /// @param entity The entity to configure.
+  /// @throws NullPointerException if `entity` is `null`.
   public void configure(IEntity entity) {
     Objects.requireNonNull(entity);
     List<ScriptBinding> defaults = this.resolveEntityBindings(entity);
@@ -227,40 +289,62 @@ public final class ScriptManager implements IUpdateable {
     controller.setDefaultBindings(defaults);
   }
 
-  /** Sets the directory against which relative development-time source paths are resolved. */
+  /// Sets the directory against which relative development-time source paths are resolved.
+  ///
+  /// @param projectRoot The project root, or `null` to clear it.
   public void setProjectRoot(Path projectRoot) {
     this.projectRoot = projectRoot == null ? null : projectRoot.toAbsolutePath().normalize();
   }
 
+  /// Returns the normalized project root used to resolve script source paths.
+  ///
+  /// @return The project root, or `null` when none is configured.
   public Path getProjectRoot() {
     return this.projectRoot;
   }
 
-  /** Sets the compiled project class loader used as the parent of runtime-compiled scripts. */
+  /// Sets the compiled project class loader used as the parent of runtime-compiled scripts.
+  ///
+  /// @param projectClassLoader The parent loader, or `null` to use the context or engine loader.
   public void setProjectClassLoader(ClassLoader projectClassLoader) {
     this.projectClassLoader = projectClassLoader;
   }
 
-  /** Sets build-resolved locations used by development-time source compilation. */
+  /// Sets build-resolved locations used by development-time source compilation.
+  ///
+  /// @param projectClasspath The class-path entries; `null` clears the class path.
   public void setProjectClasspath(Collection<Path> projectClasspath) {
     this.projectClasspath = projectClasspath == null
       ? List.of()
       : projectClasspath.stream().filter(Objects::nonNull).map(Path::toAbsolutePath).map(Path::normalize).distinct().toList();
   }
 
+  /// Returns a snapshot of compilation and lifecycle diagnostics.
+  ///
+  /// @return The diagnostics in reporting order.
   public List<ScriptDiagnostic> getDiagnostics() {
     return List.copyOf(this.diagnostics);
   }
 
+  /// Removes all recorded diagnostics.
   public void clearDiagnostics() {
     this.diagnostics.clear();
   }
 
+  /// Removes diagnostics associated with a script identifier.
+  ///
+  /// @param scriptId The identifier to clear; `null` has no effect.
   public void clearDiagnostics(String scriptId) {
     if (scriptId == null) return;
     this.diagnostics.removeIf(d -> Objects.equals(d.scriptId(), scriptId));
   }
 
+  /// Removes diagnostics whose messages identify an entity host.
+  ///
+  /// Diagnostics for other host types are not associated with their host and cannot be cleared by
+  /// this method.
+  ///
+  /// @param host The entity host to clear; other values, including `null`, have no effect.
   public void clearDiagnostics(Object host) {
     if (host == null) return;
     if (host instanceof IEntity entity) {
@@ -270,6 +354,13 @@ public final class ScriptManager implements IUpdateable {
   }
 
 
+  /// Attaches all enabled bindings to a host in ascending binding order.
+  ///
+  /// Failures are reported through [#getDiagnostics()] and omitted from the result.
+  ///
+  /// @param host The object exposed as the script host.
+  /// @param bindings The bindings to attach, or `null` for none.
+  /// @return An unmodifiable list of successfully attached instances.
   public List<ScriptInstance> attachAll(Object host, Collection<ScriptBinding> bindings) {
     return this.attachAll(host, bindings, false);
   }
@@ -285,6 +376,12 @@ public final class ScriptManager implements IUpdateable {
     return List.copyOf(instances);
   }
 
+  /// Attaches one binding to a host.
+  ///
+  /// @param host The object exposed as the script host.
+  /// @param binding The binding to attach.
+  /// @return The attached instance, or `null` when attachment failed.
+  /// @throws NullPointerException if `host` or `binding` is `null`.
   public ScriptInstance attach(Object host, ScriptBinding binding) {
     return this.attach(host, binding, false);
   }
@@ -343,6 +440,15 @@ public final class ScriptManager implements IUpdateable {
     return null;
   }
 
+  /// Recompiles a script and replaces all of its active attachments.
+  ///
+  /// Existing instances are detached before the replacement instances attach. If compilation or
+  /// attachment fails, the replacement is discarded and the manager attempts to reattach the
+  /// previous generation. Rollback attachment failures are recorded as diagnostics. Lifecycle
+  /// callbacks therefore run during both replacement and rollback.
+  ///
+  /// @param scriptId The identifier of the script to reload.
+  /// @return `true` if the replacement compiled and all desired bindings were attached.
   public boolean reload(String scriptId) {
     ScriptDefinition definition = this.definitions.get(scriptId);
     if (definition == null) return false;
@@ -390,6 +496,9 @@ public final class ScriptManager implements IUpdateable {
     return success;
   }
 
+  /// Detaches every script attached to a host and forgets its desired bindings.
+  ///
+  /// @param host The host identified by object identity.
   public void detach(Object host) {
     this.clearDiagnostics(host);
     this.attachments.stream().filter(attachment -> attachment.host == host).toList().forEach(this::detachAttachment);
@@ -404,12 +513,16 @@ public final class ScriptManager implements IUpdateable {
     this.desiredBindings.removeIf(b -> b.host() == host && b.controllerManaged() == controllerManaged);
   }
 
-  /** Sets the Java language level used for development-time source compilation. */
+  /// Sets the Java language level used for development-time source compilation.
+  ///
+  /// @param projectJavaVersion The positive Java feature version.
+  /// @throws IllegalArgumentException if the version is not positive.
   public void setProjectJavaVersion(int projectJavaVersion) {
     if (projectJavaVersion <= 0) throw new IllegalArgumentException("Project Java version must be positive.");
     this.projectJavaVersion = projectJavaVersion;
   }
 
+  /// Detaches all scripts, closes compiled generations, and unregisters from the update loop.
   public void detachAll() {
     List.copyOf(this.attachments).forEach(this::detachAttachment);
     this.desiredBindings.clear();
@@ -418,6 +531,7 @@ public final class ScriptManager implements IUpdateable {
     this.detachUpdateLoop();
   }
 
+  /// Dispatches one update to non-controller-managed script attachments.
   @Override
   public void update() {
     this.updateAttachments(null, false);

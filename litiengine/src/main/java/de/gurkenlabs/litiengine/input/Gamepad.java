@@ -12,10 +12,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * The {@code Gamepad} class is designed as a wrapper implementation for any gamepad input that provides events and
- * information about player input via gamepad.
- */
+/// The `Gamepad` class is designed as a wrapper implementation for any gamepad input that provides events and
+/// information about player input via gamepad.
 public final class Gamepad extends GamepadEvents implements IUpdateable, InputDeviceListener {
   private final InputDevice inputDevice;
 
@@ -42,65 +40,52 @@ public final class Gamepad extends GamepadEvents implements IUpdateable, InputDe
     this.type = inputDevice.getProductName();
   }
 
-  /**
-   * Gets the unique id of this gamepad by which it is identified.
-   *
-   * @return The unique id of this gamepad.
-   */
+  /// Gets the unique id of this gamepad by which it is identified.
+  ///
+  /// @return The unique id of this gamepad.
   public String getId() {
     return this.inputDevice.getID();
   }
 
-  /**
-   * Gets the name of this gamepad.
-   *
-   * @return The name of this gamepad.
-   */
+  /// Gets the name of this gamepad.
+  ///
+  /// @return The name of this gamepad.
   public String getName() {
     return this.inputDevice.getName();
   }
 
-  /**
-   * Gets the poll data for the specified component on this gamepad.
-   *
-   * <p>
-   * Returns the data from the last time the control has been polled.If this axis is a button, the value returned will be
-   * either 0.0f or 1.0f.If this axis is normalized, the value returned will be between -1.0f and1.0f.
-   *
-   * @param componentId The component to retrieve the poll data for.
-   * @return The data from the last time the specified component has been polled; 0 if this gamepad doesn't provide the
-   * requested component.
-   */
+  /// Gets the poll data for the specified component on this gamepad.
+  ///
+  /// Returns the data from the last time the control has been polled.If this axis is a button, the value returned will be
+  /// either 0.0f or 1.0f.If this axis is normalized, the value returned will be between -1.0f and1.0f.
+  ///
+  /// @param componentId The component to retrieve the poll data for.
+  /// @return The data from the last time the specified component has been polled; 0 if this gamepad doesn't provide the
+  /// requested component.
   public float getPollData(final InputComponent.ID componentId) {
     var component = this.inputDevice.getComponent(componentId);
     return component.map(InputComponent::getData).orElse(0F);
 
   }
 
-  /**
-   * Gets the deadzone for any axis components on this gamepad.
-   *
-   * <p>
-   * A deadzone defines the poll value at which the events of this gamepad are not being triggered. This is useful to
-   * smooth out controller input and not react to idle noise.
-   *
-   * @return The axis deadzone for this component.
-   * @see #setAxisDeadzone(float)
-   */
+  /// Gets the deadzone for any axis components on this gamepad.
+  ///
+  /// A deadzone defines the poll value at which the events of this gamepad are not being triggered. This is useful to
+  /// smooth out controller input and not react to idle noise.
+  ///
+  /// @return The axis deadzone for this component.
+  /// @see #setAxisDeadzone(float)
   public float getAxisDeadzone() {
     return this.axisDeadzone;
   }
 
-  /**
-   * Gets the deadzone for any trigger components on this gamepad.
-   *
-   * <p>
-   * A deadzone defines the poll value at which the events of this gamepad are not being triggered. This is useful to
-   * smooth out controller input and not react to idle noise.
-   *
-   * @return The trigger deadzone for this gamepad.
-   * @see #setTriggerDeadzone(float)
-   */
+  /// Gets the deadzone for any trigger components on this gamepad.
+  ///
+  /// A deadzone defines the poll value at which the events of this gamepad are not being triggered. This is useful to
+  /// smooth out controller input and not react to idle noise.
+  ///
+  /// @return The trigger deadzone for this gamepad.
+  /// @see #setTriggerDeadzone(float)
   public float getTriggerDeadzone() {
     return this.triggerDeadzone;
   }
@@ -123,22 +108,18 @@ public final class Gamepad extends GamepadEvents implements IUpdateable, InputDe
     return this.inputDevice.getComponent(gamepadComponent).isPresent();
   }
 
-  /**
-   * Sets the deadzone for any axis components on this gamepad.
-   *
-   * @param axisDeadzone The axis deadzone for this gamepad.
-   * @see #getAxisDeadzone()
-   */
+  /// Sets the deadzone for any axis components on this gamepad.
+  ///
+  /// @param axisDeadzone The axis deadzone for this gamepad.
+  /// @see #getAxisDeadzone()
   public void setAxisDeadzone(float axisDeadzone) {
     this.axisDeadzone = axisDeadzone;
   }
 
-  /**
-   * Sets the deadzone for any trigger components on this gamepad.
-   *
-   * @param triggerDeadzone The trigger deadzone for this gamepad.
-   * @see #getTriggerDeadzone()
-   */
+  /// Sets the deadzone for any trigger components on this gamepad.
+  ///
+  /// @param triggerDeadzone The trigger deadzone for this gamepad.
+  /// @see #getTriggerDeadzone()
   public void setTriggerDeadzone(float triggerDeadzone) {
     this.triggerDeadzone = triggerDeadzone;
   }

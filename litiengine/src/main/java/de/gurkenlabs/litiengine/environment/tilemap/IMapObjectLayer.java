@@ -6,11 +6,9 @@ import java.util.List;
 
 public interface IMapObjectLayer extends ILayer {
 
-  /**
-   * Gets the shapes.
-   *
-   * @return the shapes
-   */
+  /// Gets the shapes.
+  ///
+  /// @return the shapes
   List<IMapObject> getMapObjects();
 
   void addMapObject(IMapObject mapObject);

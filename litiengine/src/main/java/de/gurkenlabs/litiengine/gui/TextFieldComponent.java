@@ -13,19 +13,13 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * A single-line text input GUI component. Supports input filtering through a regex {@linkplain #getFormat() format}, a maximum length, a flickering
- * caret while focused, and confirmation listeners that fire when the user presses {@code ENTER}/{@code ESC} or clicks outside the component.
- */
+/// A single-line text input GUI component. Supports input filtering through a regex [format][#getFormat()], a maximum length, a flickering
+/// caret while focused, and confirmation listeners that fire when the user presses `ENTER`/`ESC` or clicks outside the component.
 public class TextFieldComponent extends ImageComponent {
 
-  /**
-   * Regex matching signed decimal numbers including scientific notation.
-   */
+  /// Regex matching signed decimal numbers including scientific notation.
   public static final String DOUBLE_FORMAT = "[-+]?[0-9]*\\.?[0-9]*([eE][-+]?[0-9]*)?";
-  /**
-   * Regex matching positive integers up to 10 digits.
-   */
+  /// Regex matching positive integers up to 10 digits.
   public static final String INTEGER_FORMAT = "[0-9]{1,10}";
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
   private final List<Consumer<String>> changeConfirmedConsumers;
@@ -37,15 +31,13 @@ public class TextFieldComponent extends ImageComponent {
   private long lastToggled;
   private int maxLength = 0;
 
-  /**
-   * Constructs a new {@code TextFieldComponent}.
-   *
-   * @param x      the x coordinate of the component
-   * @param y      the y coordinate of the component
-   * @param width  the width of the component
-   * @param height the height of the component
-   * @param text   the initial text content
-   */
+  /// Constructs a new `TextFieldComponent`.
+  ///
+  /// @param x      the x coordinate of the component
+  /// @param y      the y coordinate of the component
+  /// @param width  the width of the component
+  /// @param height the height of the component
+  /// @param text   the initial text content
   public TextFieldComponent(
       final double x, final double y, final double width, final double height, final String text) {
     super(x, y, width, height, text);
@@ -72,56 +64,44 @@ public class TextFieldComponent extends ImageComponent {
     setAutomaticLineBreaks(true);
   }
 
-  /**
-   * Gets the regex pattern used to filter typed input.
-   *
-   * @return the format pattern, or {@code null} if no filter is set
-   */
+  /// Gets the regex pattern used to filter typed input.
+  ///
+  /// @return the format pattern, or `null` if no filter is set
   public String getFormat() {
     return format;
   }
 
-  /**
-   * Sets the regex pattern used to filter typed input.
-   *
-   * @param format the format pattern, or {@code null} to disable filtering
-   */
+  /// Sets the regex pattern used to filter typed input.
+  ///
+  /// @param format the format pattern, or `null` to disable filtering
   public void setFormat(final String format) {
     this.format = format;
   }
 
-  /**
-   * Gets the string rendered as the caret while the field is focused.
-   *
-   * @return the caret string
-   */
+  /// Gets the string rendered as the caret while the field is focused.
+  ///
+  /// @return the caret string
   public String getCursor() {
     return cursor;
   }
 
-  /**
-   * Sets the string rendered as the caret while the field is focused.
-   *
-   * @param newCursor the caret string
-   */
+  /// Sets the string rendered as the caret while the field is focused.
+  ///
+  /// @param newCursor the caret string
   public void setCursor(String newCursor) {
     this.cursor = newCursor;
   }
 
-  /**
-   * Gets the maximum number of characters allowed in the field, or {@code 0} if unlimited.
-   *
-   * @return the maximum length
-   */
+  /// Gets the maximum number of characters allowed in the field, or `0` if unlimited.
+  ///
+  /// @return the maximum length
   public int getMaxLength() {
     return maxLength;
   }
 
-  /**
-   * Sets the maximum number of characters allowed in the field.
-   *
-   * @param maxLength the maximum length, or {@code 0} for unlimited
-   */
+  /// Sets the maximum number of characters allowed in the field.
+  ///
+  /// @param maxLength the maximum length, or `0` for unlimited
   public void setMaxLength(final int maxLength) {
     this.maxLength = maxLength;
   }
@@ -142,11 +122,9 @@ public class TextFieldComponent extends ImageComponent {
         : super.getTextToRender(g) + "  ";
   }
 
-  /**
-   * Handles a key typed event by dispatching to the relevant editing routine (backspace, accept, or normal typing).
-   *
-   * @param event the key event
-   */
+  /// Handles a key typed event by dispatching to the relevant editing routine (backspace, accept, or normal typing).
+  ///
+  /// @param event the key event
   public void handleTypedKey(final KeyEvent event) {
     if (!canHandleInput()) {
       return;
@@ -159,21 +137,17 @@ public class TextFieldComponent extends ImageComponent {
   }
 
 
-  /**
-   * Returns whether this component is currently in a state in which it should accept user input.
-   *
-   * @return {@code true} if input can be handled
-   */
+  /// Returns whether this component is currently in a state in which it should accept user input.
+  ///
+  /// @return `true` if input can be handled
   public boolean canHandleInput() {
     return !isSuspended() && isSelected() && isVisible() && isEnabled();
   }
 
-  /**
-   * Registers a callback that is invoked with the current text whenever the user confirms the input (by pressing {@code ENTER}/{@code ESC} or
-   * clicking outside the component).
-   *
-   * @param cons the consumer to register
-   */
+  /// Registers a callback that is invoked with the current text whenever the user confirms the input (by pressing `ENTER`/`ESC` or
+  /// clicking outside the component).
+  ///
+  /// @param cons the consumer to register
   public void onChangeConfirmed(final Consumer<String> cons) {
     changeConfirmedConsumers.add(cons);
   }
@@ -187,11 +161,9 @@ public class TextFieldComponent extends ImageComponent {
     }
   }
 
-  /**
-   * Sets the delay (in milliseconds) between caret flicker toggles.
-   *
-   * @param flickerDelayMillis the flicker delay
-   */
+  /// Sets the delay (in milliseconds) between caret flicker toggles.
+  ///
+  /// @param flickerDelayMillis the flicker delay
   public void setFlickerDelay(int flickerDelayMillis) {
     this.flickerDelay = flickerDelayMillis;
   }

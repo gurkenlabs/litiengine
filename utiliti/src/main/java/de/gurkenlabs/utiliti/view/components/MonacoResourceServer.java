@@ -8,12 +8,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
 /** Serves only bundled editor assets on a tokenized loopback origin. */
 final class MonacoResourceServer implements AutoCloseable {
-  private static final String MONACO_ROOT = "META-INF/resources/webjars/monaco-editor/0.55.1/";
+  private static final String MONACO_METADATA = "META-INF/maven/org.webjars.npm/monaco-editor/pom.properties";
+  private static final String MONACO_ROOT_PREFIX = "META-INF/resources/webjars/monaco-editor/";
   private static final String EDITOR_ROOT = "de/gurkenlabs/utiliti/script-editor/";
   private static final Map<String, String> CONTENT_TYPES = Map.of(
     "html", "text/html; charset=utf-8",
@@ -24,9 +26,11 @@ final class MonacoResourceServer implements AutoCloseable {
     "svg", "image/svg+xml");
 
   private final HttpServer server;
+  private final String monacoRoot;
   private final String token = UUID.randomUUID().toString().replace("-", "");
 
   MonacoResourceServer() throws IOException {
+    this.monacoRoot = resolveMonacoRoot();
     this.server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
     this.server.createContext("/" + this.token + "/", this::serve);
     this.server.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
@@ -52,7 +56,7 @@ final class MonacoResourceServer implements AutoCloseable {
       }
       String relative = path.substring(prefix.length());
       String resource = relative.startsWith("monaco/")
-        ? MONACO_ROOT + relative.substring("monaco/".length())
+        ? this.monacoRoot + relative.substring("monaco/".length())
         : relative.startsWith("editor/") ? EDITOR_ROOT + relative.substring("editor/".length()) : null;
       if (resource == null) {
         send(exchange, 404, new byte[0]);
@@ -81,6 +85,22 @@ final class MonacoResourceServer implements AutoCloseable {
             + "font-src 'self' data:; img-src 'self' data:; worker-src 'self' blob:; connect-src 'self'");
         send(exchange, 200, stream.readAllBytes());
       }
+    }
+  }
+
+  private static String resolveMonacoRoot() throws IOException {
+    ClassLoader classLoader = MonacoResourceServer.class.getClassLoader();
+    try (InputStream input = classLoader.getResourceAsStream(MONACO_METADATA)) {
+      if (input == null) {
+        throw new IOException("Monaco WebJar metadata is missing: " + MONACO_METADATA);
+      }
+      Properties metadata = new Properties();
+      metadata.load(input);
+      String version = metadata.getProperty("version");
+      if (version == null || version.isBlank()) {
+        throw new IOException("Monaco WebJar metadata does not declare a version: " + MONACO_METADATA);
+      }
+      return MONACO_ROOT_PREFIX + version + "/";
     }
   }
 

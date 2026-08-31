@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Manages script execution scope, global helper bindings, and type inference. */
+/// Manages script execution scope, global helper bindings, and type inference.
 final class ScriptScope {
   record RootFunction(String name, Class<?> returnType, String returnTypeSimple, String documentation) {}
 

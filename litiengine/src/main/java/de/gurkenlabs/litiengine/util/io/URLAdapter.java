@@ -8,30 +8,24 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-/**
- * This class allows for absolute and relative URLs to be unmarshalled as Java URL objects.
- *
- * @see XmlJavaTypeAdapter
- */
+/// This class allows for absolute and relative URLs to be unmarshalled as Java URL objects.
+///
+/// @see XmlJavaTypeAdapter
 public class URLAdapter extends XmlAdapter<String, URL> {
   private URL base;
 
-  /**
-   * Constructs a new {@code URLAdapter}, with no additional properties. This constructor is called if no configured
-   * instance is available to an unmarshaller.
-   */
+  /// Constructs a new `URLAdapter`, with no additional properties. This constructor is called if no configured
+  /// instance is available to an unmarshaller.
   public URLAdapter() {
     this(null);
   }
 
-  /**
-   * Constructs a new {@code URLAdapter}, configured to use relative URLs using the supplied URL as a base.
-   *
-   * @param base
-   *          The base URL to use
-   * @see Unmarshaller#setAdapter(XmlAdapter)
-   * @see Marshaller#setAdapter(XmlAdapter)
-   */
+  /// Constructs a new `URLAdapter`, configured to use relative URLs using the supplied URL as a base.
+  ///
+  /// @param base
+  /// The base URL to use
+  /// @see Unmarshaller#setAdapter(XmlAdapter)
+  /// @see Marshaller#setAdapter(XmlAdapter)
   public URLAdapter(URL base) {
     this.base = base;
   }
@@ -88,11 +82,9 @@ public class URLAdapter extends XmlAdapter<String, URL> {
     return builder.substring(1);
   }
 
-  /**
-   * Gets the base URL used by this {@code URLAdapter} instance.
-   *
-   * @return The base URL used, or {@code null} if this instance has not been configured for relative URLs
-   */
+  /// Gets the base URL used by this `URLAdapter` instance.
+  ///
+  /// @return The base URL used, or `null` if this instance has not been configured for relative URLs
   public URL getBaseURL() {
     return this.base;
   }

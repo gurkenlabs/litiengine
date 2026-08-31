@@ -23,6 +23,12 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
+/// JAXB helpers used to read and write engine XML resources.
+///
+/// JAXB contexts are cached by root type. Convenience save methods log marshalling failures and
+/// return the requested path; [#read(Class, URL)] exposes unmarshalling failures to its caller.
+///
+/// @see de.gurkenlabs.litiengine.resources.Resources
 public final class XmlUtilities {
   private static final Logger log = Logger.getLogger(XmlUtilities.class.getName());
 
@@ -36,14 +42,15 @@ public final class XmlUtilities {
     jaxbContexts = new ConcurrentHashMap<>();
   }
 
-  /**
-   * Saves the XML, contained by the specified input with the custom indentation. If the input is the result of jaxb marshalling, make sure to set
-   * Marshaller.JAXB_FORMATTED_OUTPUT to false in order for this method to work properly.
-   *
-   * @param input       The input stream that contains the original XML.
-   * @param fos         The output stream that is used to save the XML.
-   * @param indentation The indentation with which the XML should be saved.
-   */
+  /// Writes XML with custom indentation and closes the output stream after a successful transformation.
+  ///
+  /// If `input` is the result of JAXB marshalling, set [Marshaller#JAXB_FORMATTED_OUTPUT] to `false`
+  /// so existing indentation does not interfere. Transformation, flushing, and closing failures are
+  /// logged rather than propagated. The input stream is not closed.
+  ///
+  /// @param input       The input stream that contains the original XML.
+  /// @param fos         The output stream that is used to save the XML.
+  /// @param indentation The indentation with which the XML should be saved.
   public static void saveWithCustomIndentation(ByteArrayInputStream input, OutputStream fos, int indentation) {
     try {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -63,6 +70,13 @@ public final class XmlUtilities {
     }
   }
 
+  /// Returns the cached JAXB context for a root type, creating it when necessary.
+  ///
+  /// Context-creation failures are logged.
+  ///
+  /// @param cls The JAXB root type.
+  /// @param <T> The root type.
+  /// @return The cached context, or `null` if it could not be created.
   public static <T> JAXBContext getContext(Class<T> cls) {
     try {
       final JAXBContext jaxbContext;
@@ -80,6 +94,13 @@ public final class XmlUtilities {
     return null;
   }
 
+  /// Unmarshals an XML resource and resolves relative URLs against that resource.
+  ///
+  /// @param cls The expected root type.
+  /// @param path The resource URL.
+  /// @param <T> The root type.
+  /// @return The unmarshalled object, or `null` if a JAXB context could not be created.
+  /// @throws JAXBException if unmarshalling fails.
   public static <T> T read(Class<T> cls, URL path) throws JAXBException {
     final JAXBContext jaxbContext = getContext(cls);
     if (jaxbContext == null) {
@@ -92,6 +113,13 @@ public final class XmlUtilities {
     return cls.cast(um.unmarshal(path));
   }
 
+  /// Marshals an object to a file using formatted XML output.
+  ///
+  /// Marshalling failures are logged rather than thrown.
+  ///
+  /// @param object The JAXB object to save.
+  /// @param filePath The destination path.
+  /// @return `filePath`, or `null` when the path or JAXB context is unavailable.
   public static Path save(Object object, Path filePath) {
     if (filePath == null) {
       return null;
@@ -110,6 +138,12 @@ public final class XmlUtilities {
     return filePath;
   }
 
+  /// Marshals an object after ensuring that the destination has an extension.
+  ///
+  /// @param object The JAXB object to save.
+  /// @param path The destination path without or with an extension.
+  /// @param extension The required extension, with or without a leading dot.
+  /// @return The actual destination path, or `null` if saving could not be initialized.
   public static Path save(Object object, Path path, String extension) {
     String fullExtension = extension.startsWith(".") ? extension : "." + extension;
     Path fullPath = path;

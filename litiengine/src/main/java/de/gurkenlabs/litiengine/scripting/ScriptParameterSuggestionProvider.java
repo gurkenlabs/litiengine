@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** Suggests context-aware values and constants for active method parameter types. */
+/// Suggests context-aware values and constants for active method parameter types.
 final class ScriptParameterSuggestionProvider {
   private static final List<String> COLOR_NAMES = List.of(
     "RED", "GREEN", "BLUE", "YELLOW", "WHITE", "BLACK", "ORANGE", "CYAN", "MAGENTA", "GRAY", "DARK_GRAY", "LIGHT_GRAY", "PINK"

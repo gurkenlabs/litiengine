@@ -22,67 +22,57 @@ public class StaticShadow extends MapArea {
   private final CollisionBox origin;
   private Area area;
 
-  /**
-   * Instantiates a new {@code StaticShadow} entity.
-   *
-   * @param shadowType The type of the static shadow.
-   * @param offset     The offset for the shadow.
-   */
+  /// Instantiates a new `StaticShadow` entity.
+  ///
+  /// @param shadowType The type of the static shadow.
+  /// @param offset     The offset for the shadow.
   public StaticShadow(StaticShadowType shadowType, int offset) {
     this.shadowType = shadowType;
     this.shadowOffset = offset;
     this.origin = null;
   }
 
-  /**
-   * Instantiates a new {@code StaticShadow} entity.
-   *
-   * @param shadowType The type of the static shadow.
-   */
+  /// Instantiates a new `StaticShadow` entity.
+  ///
+  /// @param shadowType The type of the static shadow.
   public StaticShadow(StaticShadowType shadowType) {
     this.shadowType = shadowType;
     this.shadowOffset = DEFAULT_OFFSET;
     this.origin = null;
   }
 
-  /**
-   * Instantiates a new {@code StaticShadow} entity.
-   *
-   * @param x          The x-coordinate of this instance.
-   * @param y          The y-coordinate of this instance.
-   * @param width      The width of this instance.
-   * @param height     The height of this instance.
-   * @param shadowType The type of the static shadow.
-   */
+  /// Instantiates a new `StaticShadow` entity.
+  ///
+  /// @param x          The x-coordinate of this instance.
+  /// @param y          The y-coordinate of this instance.
+  /// @param width      The width of this instance.
+  /// @param height     The height of this instance.
+  /// @param shadowType The type of the static shadow.
   public StaticShadow(double x, double y, float width, float height, StaticShadowType shadowType) {
     this(0, null, x, y, width, height, shadowType);
   }
 
-  /**
-   * Instantiates a new {@code StaticShadow} entity.
-   *
-   * @param id         The id of this entity.
-   * @param x          The x-coordinate of this instance.
-   * @param y          The y-coordinate of this instance.
-   * @param width      The width of this instance.
-   * @param height     The height of this instance.
-   * @param shadowType The type of the static shadow.
-   */
+  /// Instantiates a new `StaticShadow` entity.
+  ///
+  /// @param id         The id of this entity.
+  /// @param x          The x-coordinate of this instance.
+  /// @param y          The y-coordinate of this instance.
+  /// @param width      The width of this instance.
+  /// @param height     The height of this instance.
+  /// @param shadowType The type of the static shadow.
   public StaticShadow(int id, double x, double y, float width, float height, StaticShadowType shadowType) {
     this(id, null, x, y, width, height, shadowType);
   }
 
-  /**
-   * Instantiates a new {@code StaticShadow} entity.
-   *
-   * @param id         The id of this entity.
-   * @param name       The name of this entity.
-   * @param x          The x-coordinate of this instance.
-   * @param y          The y-coordinate of this instance.
-   * @param width      The width of this instance.
-   * @param height     The height of this instance.
-   * @param shadowType The type of the static shadow.
-   */
+  /// Instantiates a new `StaticShadow` entity.
+  ///
+  /// @param id         The id of this entity.
+  /// @param name       The name of this entity.
+  /// @param x          The x-coordinate of this instance.
+  /// @param y          The y-coordinate of this instance.
+  /// @param width      The width of this instance.
+  /// @param height     The height of this instance.
+  /// @param shadowType The type of the static shadow.
   public StaticShadow(int id, String name, double x, double y, float width, float height, StaticShadowType shadowType) {
     super(id, name, x, y, width, height);
     this.setShadowType(shadowType);
@@ -90,11 +80,9 @@ public class StaticShadow extends MapArea {
     this.shadowOffset = DEFAULT_OFFSET;
   }
 
-  /**
-   * Instantiates a new {@code StaticShadow} entity.
-   *
-   * @param collisionBox The collision box from which this shadow instance originates from.
-   */
+  /// Instantiates a new `StaticShadow` entity.
+  ///
+  /// @param collisionBox The collision box from which this shadow instance originates from.
   public StaticShadow(CollisionBox collisionBox) {
     super(0, null, collisionBox.getX(), collisionBox.getY(), collisionBox.getWidth(), collisionBox.getHeight());
     this.setShadowType(StaticShadowType.NONE);
@@ -102,20 +90,16 @@ public class StaticShadow extends MapArea {
     this.shadowOffset = DEFAULT_OFFSET;
   }
 
-  /**
-   * Gets the type of the static shadow.
-   *
-   * @return the current shadow type.
-   */
+  /// Gets the type of the static shadow.
+  ///
+  /// @return the current shadow type.
   public StaticShadowType getShadowType() {
     return this.shadowType;
   }
 
-  /**
-   * Sets the type of the static shadow and invalidates the current area.
-   *
-   * @param shadowType the new shadow type to set.
-   */
+  /// Sets the type of the static shadow and invalidates the current area.
+  ///
+  /// @param shadowType the new shadow type to set.
   public void setShadowType(final StaticShadowType shadowType) {
     this.shadowType = shadowType;
     this.area = null;
@@ -146,21 +130,17 @@ public class StaticShadow extends MapArea {
     this.area = null;
   }
 
-  /**
-   * Gets the origin collision box of this static shadow.
-   *
-   * @return the origin collision box, or null if there is no origin.
-   */
+  /// Gets the origin collision box of this static shadow.
+  ///
+  /// @return the origin collision box, or null if there is no origin.
   public CollisionBox getOrigin() {
     return this.origin;
   }
 
-  /**
-   * Returns a string representation of this static shadow. If the origin is not null, the string representation includes the origin's string
-   * representation.
-   *
-   * @return a string representation of this static shadow.
-   */
+  /// Returns a string representation of this static shadow. If the origin is not null, the string representation includes the origin's string
+  /// representation.
+  ///
+  /// @return a string representation of this static shadow.
   @Override public String toString() {
     if (this.getOrigin() == null) {
       return super.toString();
@@ -169,12 +149,10 @@ public class StaticShadow extends MapArea {
     return "[" + this.getOrigin().toString() + "] -> " + super.toString();
   }
 
-  /**
-   * Gets the area of the static shadow. If the shadow type is NONE, returns null. If the area is not already created, it calls the
-   * {@link StaticShadow#createArea()} method to generate it.
-   *
-   * @return the area of the static shadow, or null if the shadow type is NONE.
-   */
+  /// Gets the area of the static shadow. If the shadow type is NONE, returns null. If the area is not already created, it calls the
+  /// [StaticShadow#createArea()] method to generate it.
+  ///
+  /// @return the area of the static shadow, or null if the shadow type is NONE.
   public Area getArea() {
     if (getShadowType() == StaticShadowType.NONE) {
       return null;
@@ -186,9 +164,7 @@ public class StaticShadow extends MapArea {
     return area;
   }
 
-  /**
-   * Creates the area for the static shadow based on its type and dimensions. This method constructs a parallelogram shape and sets it as the area.
-   */
+  /// Creates the area for the static shadow based on its type and dimensions. This method constructs a parallelogram shape and sets it as the area.
   private void createArea() {
     if (getShadowType() == StaticShadowType.NONE) {
       return;
@@ -266,20 +242,16 @@ public class StaticShadow extends MapArea {
     this.area = new Area(parallelogram);
   }
 
-  /**
-   * Gets the offset for the shadow.
-   *
-   * @return the shadow offset.
-   */
+  /// Gets the offset for the shadow.
+  ///
+  /// @return the shadow offset.
   public int getOffset() {
     return shadowOffset;
   }
 
-  /**
-   * Sets the offset for the shadow and invalidates the current area.
-   *
-   * @param shadowOffset the new shadow offset to set.
-   */
+  /// Sets the offset for the shadow and invalidates the current area.
+  ///
+  /// @param shadowOffset the new shadow offset to set.
   public void setOffset(int shadowOffset) {
     this.shadowOffset = shadowOffset;
     this.area = null;

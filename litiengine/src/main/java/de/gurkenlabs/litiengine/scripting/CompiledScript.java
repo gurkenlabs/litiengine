@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.scripting;
 
-/** A compiled script generation that can create fresh instances. */
+/// A compiled script generation that can create fresh instances.
 public interface CompiledScript extends AutoCloseable {
   ScriptInstance create() throws ScriptException;
 

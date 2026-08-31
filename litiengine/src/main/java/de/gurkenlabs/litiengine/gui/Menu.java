@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntConsumer;
 
-/**
- * Represents a menu component that extends the ImageComponentList. This class provides functionality to create a menu with selectable items.
- */
+/// Represents a menu component that extends the ImageComponentList. This class provides functionality to create a menu with selectable items.
 public class Menu extends ImageComponentList {
 
   private int currentSelection;
@@ -20,16 +18,14 @@ public class Menu extends ImageComponentList {
 
   private final Orientation orientation;
 
-  /**
-   * Constructs a new Menu with the specified position, size, and orientation.
-   *
-   * @param x           The x-coordinate of the menu.
-   * @param y           The y-coordinate of the menu.
-   * @param width       The width of the menu.
-   * @param height      The height of the menu.
-   * @param orientation The orientation of the menu (horizontal or vertical).
-   * @param items       The items to be displayed in the menu.
-   */
+  /// Constructs a new Menu with the specified position, size, and orientation.
+  ///
+  /// @param x           The x-coordinate of the menu.
+  /// @param y           The y-coordinate of the menu.
+  /// @param width       The width of the menu.
+  /// @param height      The height of the menu.
+  /// @param orientation The orientation of the menu (horizontal or vertical).
+  /// @param items       The items to be displayed in the menu.
   public Menu(
     double x,
     double y,
@@ -40,15 +36,13 @@ public class Menu extends ImageComponentList {
     this(x, y, width, height, null, orientation, items);
   }
 
-  /**
-   * Constructs a new Menu with the specified position, size, and items.
-   *
-   * @param x      The x-coordinate of the menu.
-   * @param y      The y-coordinate of the menu.
-   * @param width  The width of the menu.
-   * @param height The height of the menu.
-   * @param items  The items to be displayed in the menu.
-   */
+  /// Constructs a new Menu with the specified position, size, and items.
+  ///
+  /// @param x      The x-coordinate of the menu.
+  /// @param y      The y-coordinate of the menu.
+  /// @param width  The width of the menu.
+  /// @param height The height of the menu.
+  /// @param items  The items to be displayed in the menu.
   public Menu(
     double x,
     double y,
@@ -58,17 +52,15 @@ public class Menu extends ImageComponentList {
     this(x, y, width, height, null, Orientation.VERTICAL, items);
   }
 
-  /**
-   * Constructs a new Menu with the specified position, size, background, and orientation.
-   *
-   * @param x           The x-coordinate of the menu.
-   * @param y           The y-coordinate of the menu.
-   * @param width       The width of the menu.
-   * @param height      The height of the menu.
-   * @param background  The background of the menu.
-   * @param orientation The orientation of the menu (horizontal or vertical).
-   * @param items       The items to be displayed in the menu.
-   */
+  /// Constructs a new Menu with the specified position, size, background, and orientation.
+  ///
+  /// @param x           The x-coordinate of the menu.
+  /// @param y           The y-coordinate of the menu.
+  /// @param width       The width of the menu.
+  /// @param height      The height of the menu.
+  /// @param background  The background of the menu.
+  /// @param orientation The orientation of the menu (horizontal or vertical).
+  /// @param items       The items to be displayed in the menu.
   public Menu(
     double x,
     double y,
@@ -88,36 +80,28 @@ public class Menu extends ImageComponentList {
     this.prepareInput();
   }
 
-  /**
-   * Gets the current selection index of the menu.
-   *
-   * @return The current selection index of the menu.
-   */
+  /// Gets the current selection index of the menu.
+  ///
+  /// @return The current selection index of the menu.
   public int getCurrentSelection() {
     return this.currentSelection;
   }
 
-  /**
-   * Gets the orientation of the menu.
-   *
-   * @return The orientation of the menu.
-   */
+  /// Gets the orientation of the menu.
+  ///
+  /// @return The orientation of the menu.
   public Orientation getOrientation() {
     return orientation;
   }
 
-  /**
-   * Adds a consumer that will be notified when the selection of the menu changes.
-   *
-   * @param cons The consumer that will be notified when the selection of the menu changes.
-   */
+  /// Adds a consumer that will be notified when the selection of the menu changes.
+  ///
+  /// @param cons The consumer that will be notified when the selection of the menu changes.
   public void onChange(final IntConsumer cons) {
     this.selectionChangeConsumers.add(cons);
   }
 
-  /**
-   * Prepares the menu by setting the text of the menu buttons and adding the click listeners.
-   */
+  /// Prepares the menu by setting the text of the menu buttons and adding the click listeners.
   @Override
   public void prepare() {
 
@@ -133,11 +117,9 @@ public class Menu extends ImageComponentList {
     }
   }
 
-  /**
-   * Sets the current selection index of the menu and updates the selection state of the menu items.
-   *
-   * @param newSelection The index of the item to be selected.
-   */
+  /// Sets the current selection index of the menu and updates the selection state of the menu items.
+  ///
+  /// @param newSelection The index of the item to be selected.
   public void setCurrentSelection(final int newSelection) {
     if (getCellComponents().isEmpty()) {
       return;

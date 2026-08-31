@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/** Manages transient UI elements, floating combat text, banners, and script-driven overlays. */
+/// Manages transient UI elements, floating combat text, banners, and script-driven overlays.
 public final class ScriptUiOverlay implements IUpdateable, Subscription {
   private final List<FloatingText> floatingTexts = new CopyOnWriteArrayList<>();
   private final List<ScreenText> screenTexts = new CopyOnWriteArrayList<>();

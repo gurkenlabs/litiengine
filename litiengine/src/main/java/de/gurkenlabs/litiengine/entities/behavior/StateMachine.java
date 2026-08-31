@@ -5,27 +5,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Represents a state machine that manages the states and transitions of an entity.
- */
+/// Represents a state machine that manages the states and transitions of an entity.
 public class StateMachine implements IUpdateable {
 
   private State currentState;
 
-  /**
-   * Gets the current state of the state machine.
-   *
-   * @return the current state
-   */
+  /// Gets the current state of the state machine.
+  ///
+  /// @return the current state
   public State getCurrentState() {
     return currentState;
   }
 
-  /**
-   * Sets a new state for the state machine.
-   *
-   * @param newState the new state to be set
-   */
+  /// Sets a new state for the state machine.
+  ///
+  /// @param newState the new state to be set
   public void setState(State newState) {
     if (currentState != null) {
       currentState.exit();
@@ -35,9 +29,7 @@ public class StateMachine implements IUpdateable {
     currentState.enter();
   }
 
-  /**
-   * Updates the state machine, performing the current state's actions and handling transitions.
-   */
+  /// Updates the state machine, performing the current state's actions and handling transitions.
   @Override
   public void update() {
     if (currentState == null) {

@@ -35,7 +35,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
 
-/** Language service providing Monaco intellisense (completion, hover, diagnostics, definition) for Java scripts. */
+/// Language service providing Monaco intellisense (completion, hover, diagnostics, definition) for Java scripts.
 public class JavaLanguageService implements ScriptLanguageService {
   private static final Logger log = Logger.getLogger(JavaLanguageService.class.getName());
   private static final Pattern IMPORT = Pattern.compile("(?m)^\\s*import\\s+(?:static\\s+)?([\\w.$]+(?:\\.\\*)?)(?:\\s+as\\s+([A-Za-z_$][\\w$]*))?\\s*;?\\s*$");

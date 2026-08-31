@@ -17,19 +17,16 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Handles the uncaught exceptions that might occur while running a game or application with the
- * LITIENGINE.
- * <p>
- * It provides proper logging of the exception in a {@code crash.txt} file in the game's root
- * directory that can be further used to report the issue if it's a generic one.
- * </p>
- * <p>
- * Depending on the configuration, the default behavior might force the game to exit upon an
- * unexpected exception which can be useful to detect problems in your game early.
- *
- * @see ClientConfiguration#exitOnError()
- */
+/// Handles the uncaught exceptions that might occur while running a game or application with the
+/// LITIENGINE.
+///
+/// It provides proper logging of the exception in a `crash.txt` file in the game's root
+/// directory that can be further used to report the issue if it's a generic one.
+///
+/// Depending on the configuration, the default behavior might force the game to exit upon an
+/// unexpected exception which can be useful to detect problems in your game early.
+///
+/// @see ClientConfiguration#exitOnError()
 public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler {
 
   private static final Logger log = Logger.getLogger(
@@ -38,24 +35,20 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
   private volatile boolean exitOnException;
   private volatile boolean dumpThreads;
 
-  /**
-   * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
-   *
-   * @param exitOnException A flag indicating whether the game should exit when an unexpected
-   *                        exception occurs. The game will still exit if it encounters an Error.
-   */
+  /// Initializes a new instance of the `DefaultUncaughtExceptionHandler` class.
+  ///
+  /// @param exitOnException A flag indicating whether the game should exit when an unexpected
+  /// exception occurs. The game will still exit if it encounters an Error.
   public DefaultUncaughtExceptionHandler(boolean exitOnException) {
     this(exitOnException, false);
   }
 
-  /**
-   * Initializes a new instance of the {@code DefaultUncaughtExceptionHandler} class.
-   *
-   * @param exitOnException A flag indicating whether the game should exit when an unexpected
-   *                        exception occurs. The game will still exit if it encounters an Error
-   * @param dumpThreads     A flag indicating whether the crash report should contain an additional
-   *                        thread dump.
-   */
+  /// Initializes a new instance of the `DefaultUncaughtExceptionHandler` class.
+  ///
+  /// @param exitOnException A flag indicating whether the game should exit when an unexpected
+  /// exception occurs. The game will still exit if it encounters an Error
+  /// @param dumpThreads     A flag indicating whether the crash report should contain an additional
+  /// thread dump.
   public DefaultUncaughtExceptionHandler(boolean exitOnException, boolean dumpThreads) {
     this.exitOnException = exitOnException;
     this.dumpThreads = dumpThreads;
@@ -83,38 +76,30 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
     }
   }
 
-  /**
-   * Indicates whether this hander currently exits the game upon an unhandled exception.
-   * <p>
-   * Note that this handler will still exit if it encounters an unhandled Error.
-   *
-   * @return True if the game will exit upon an unhandled exception; otherwise false.
-   */
+  /// Indicates whether this hander currently exits the game upon an unhandled exception.
+  ///
+  /// Note that this handler will still exit if it encounters an unhandled Error.
+  ///
+  /// @return True if the game will exit upon an unhandled exception; otherwise false.
   public boolean exitOnException() {
     return this.exitOnException;
   }
 
-  /**
-   * @return true if the generated crash report will contain a thread dump
-   */
+  /// @return true if the generated crash report will contain a thread dump
   public boolean dumpsThreads() {
     return this.dumpThreads;
   }
 
-  /**
-   * Set whether the game will exit upon an unhandled exception.
-   *
-   * @param exit The flag that defines whether the game will exit upon an unhandled exception.
-   */
+  /// Set whether the game will exit upon an unhandled exception.
+  ///
+  /// @param exit The flag that defines whether the game will exit upon an unhandled exception.
   public void setExitOnException(boolean exit) {
     this.exitOnException = exit;
   }
 
-  /**
-   * Set whether the generated crash report will contain an additional thread dump
-   *
-   * @param dumpThreads The flag that defines whether crash report will contain a thread dump.
-   */
+  /// Set whether the generated crash report will contain an additional thread dump
+  ///
+  /// @param dumpThreads The flag that defines whether crash report will contain a thread dump.
   public void dumpThreads(boolean dumpThreads) {
     this.dumpThreads = dumpThreads;
   }

@@ -6,15 +6,13 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.nio.ByteBuffer;
 
-/**
- * An MPEG frame is organized like this:
- *
- * <pre>
- * +--------+------------------+-----------+----------------+
- * | HEADER | SIDE INFORMATION | MAIN DATA | ANCILLARY DATA |
- * +--------+------------------+-----------+----------------+
- * </pre>
- */
+/// An MPEG frame is organized like this:
+///
+/// ```
+/// +--------+------------------+-----------+----------------+
+/// | HEADER | SIDE INFORMATION | MAIN DATA | ANCILLARY DATA |
+/// +--------+------------------+-----------+----------------+
+/// ```
 class MpegFrame {
 
   private static final int HEADER_SIZE_IN_BYTES = 4;
@@ -44,9 +42,7 @@ class MpegFrame {
     this.mainData = new MainData(byteBuffer, frameOffset, this);
   }
 
-  /**
-   * Constructor that accepts header+side info and main data separately.
-   */
+  /// Constructor that accepts header+side info and main data separately.
   public MpegFrame(ByteBuffer headerAndSideInfo, int frameOffset, byte[] mainData) throws UnsupportedAudioFileException {
     this.header = new Header(headerAndSideInfo, frameOffset);
     if (this.isProtected() && !checkCrc(headerAndSideInfo, frameOffset, this.getChannels())) {
@@ -164,23 +160,21 @@ class MpegFrame {
     return crc;
   }
 
-  /**
-   * The frame header is organized like this:
-   *
-   * <pre>
-   * |     1st byte   |     2nd byte         |      3rd byte         |       4th byte          |
-   * +----------------+----------------------+-----------------------+-------------------------+
-   * | 1 1 1 1 1 1 1 1 1 1 1 | 0 0 | 0 0 | 0 | 0 0 0 0 | 0 0 | 0 | 0 | 0 0 | 0 0 | 0 | 0 | 0 0 |
-   * +-----------------------+-----+-----+---+---------+-----+---+---+-----+-----+---+---+-----+
-   *  \__________ __________/ \_ _/ \_ _/ \ / \___ ___/ \_ _/ \ / \ / \_ _/ \_ _/ \ / \ / \_ _/
-   *             V              V     V    V      V       V    V   V    V     V    V   V    V
-   *         syncword          ID   layer  | bitrate_index|    | private|     |    | org/cop|
-   *                                error_protection      | padding   mode    | copyright emphasis
-   *                                             sampling_frequency     mode_extension
-   * </pre>
-   * <p>
-   * If the protection bit is zero, the header is followed by a two byte CRC.
-   */
+  /// The frame header is organized like this:
+  ///
+  /// ```
+  /// |     1st byte   |     2nd byte         |      3rd byte         |       4th byte          |
+  /// +----------------+----------------------+-----------------------+-------------------------+
+  /// | 1 1 1 1 1 1 1 1 1 1 1 | 0 0 | 0 0 | 0 | 0 0 0 0 | 0 0 | 0 | 0 | 0 0 | 0 0 | 0 | 0 | 0 0 |
+  /// +-----------------------+-----+-----+---+---------+-----+---+---+-----+-----+---+---+-----+
+  ///  \__________ __________/ \_ _/ \_ _/ \ / \___ ___/ \_ _/ \ / \ / \_ _/ \_ _/ \ / \ / \_ _/
+  ///             V              V     V    V      V       V    V   V    V     V    V   V    V
+  ///         syncword          ID   layer  | bitrate_index|    | private|     |    | org/cop|
+  ///                                error_protection      | padding   mode    | copyright emphasis
+  ///                                             sampling_frequency     mode_extension
+  /// ```
+  ///
+  /// If the protection bit is zero, the header is followed by a two byte CRC.
   static class Header {
     private static final int FRAME_SYNC = 0b11111111111;
 
@@ -225,39 +219,33 @@ class MpegFrame {
     }
   }
 
-  /**
-   * The side information is organized like this:
-   * <pre>
-   *   +-----------------+--------------+-------+-------------------------+-------------------------+
-   *   | MAIN_DATA_BEGIN | PRIVATE_BITS | SCFSI | SIDE_INFO_FOR_GRANULE_1 | SIDE_INFO_FOR_GRANULE_2 |
-   *   +-----------------+--------------+-------+-------------------------+-------------------------+
-   * </pre>
-   */
+  /// The side information is organized like this:
+  /// ```
+  ///   +-----------------+--------------+-------+-------------------------+-------------------------+
+  ///   | MAIN_DATA_BEGIN | PRIVATE_BITS | SCFSI | SIDE_INFO_FOR_GRANULE_1 | SIDE_INFO_FOR_GRANULE_2 |
+  ///   +-----------------+--------------+-------+-------------------------+-------------------------+
+  /// ```
   static class SideInfo {
-    /**
-     * A pointer that points to the beginning of the main data. The variable has
-     * nine bits and specifies the location of the main data as a negative offset
-     * (jumping backwards) in bytes from the first byte of the audio sync word.
-     * The number of bytes of the header and side information are not taken into
-     * account while calculating the location of the main data. This is called bit
-     * reservoir technique and it allows the encoder to use some extra bits while
-     * encoding a difficult frame. Since it is nine bits long, it can point upto
-     * 29 −1 = 511 bytes in front of the header. If the value of main_data_begin is
-     * zero, then the main data follows immediately the side information.
-     */
+    /// A pointer that points to the beginning of the main data. The variable has
+    /// nine bits and specifies the location of the main data as a negative offset
+    /// (jumping backwards) in bytes from the first byte of the audio sync word.
+    /// The number of bytes of the header and side information are not taken into
+    /// account while calculating the location of the main data. This is called bit
+    /// reservoir technique and it allows the encoder to use some extra bits while
+    /// encoding a difficult frame. Since it is nine bits long, it can point upto
+    /// 29 −1 = 511 bytes in front of the header. If the value of main_data_begin is
+    /// zero, then the main data follows immediately the side information.
     final int mainDataBegin;
 
     final int privateBits;
 
     final Channel[] channels;
 
-    /**
-     * Reads the side info from the bytebuffer.
-     * @param byteBuffer The buffer to read the info from.
-     * @param frameOffset The offset of the frame within the buffer.
-     * @param isProtected A flag indicating whether the MPEG frame is protected.
-     * @param channels The number of channels of the MPEG frame.
-     */
+    /// Reads the side info from the bytebuffer.
+    /// @param byteBuffer The buffer to read the info from.
+    /// @param frameOffset The offset of the frame within the buffer.
+    /// @param isProtected A flag indicating whether the MPEG frame is protected.
+    /// @param channels The number of channels of the MPEG frame.
     SideInfo(ByteBuffer byteBuffer, int frameOffset, boolean isProtected, int channels)
       throws UnsupportedAudioFileException {
       var payloadOffset = HEADER_SIZE_IN_BYTES + (isProtected ? CRC_SIZE_IN_BYTES : 0);
@@ -357,16 +345,14 @@ class MpegFrame {
 
     static class Channel {
 
-      /**
-       * Scale factor select information.
-       * <p/>
-       * Layer III contains two granules and the encoder can specify separately for
-       * each group of scale factor bands whether the second granule will reuse the
-       * scale factor information of the first granule or not. If the value of scfsi is
-       * true, then sharing of scale factors is allowed between the granules.
-       * <p/>
-       * Irrelevant for MPEG-2 which only has one granule per frame.
-       */
+      /// Scale factor select information.
+      ///
+      /// Layer III contains two granules and the encoder can specify separately for
+      /// each group of scale factor bands whether the second granule will reuse the
+      /// scale factor information of the first granule or not. If the value of scfsi is
+      /// true, then sharing of scale factors is allowed between the granules.
+      ///
+      /// Irrelevant for MPEG-2 which only has one granule per frame.
       final boolean[] scfsi;
 
       final Granule[] granules;
@@ -414,21 +400,19 @@ class MpegFrame {
     }
   }
 
-  /**
-   * The main data does not follow the side information in the bitstream.
-   * The main data ends at a location in the bitstream preceding the frame header of the frame at an offset
-   * given by the value of main_data_start.
-   * <p/>
-   * <p>
-   * The main data is organized like this:
-   * <pre>
-   *   +---------------+---------------------------+----------------+
-   *   | SCALE FACTORS | HUFFMAN CODED RAW SAMPLES | ANCILLARY INFO |
-   *   +---------------+---------------------------+----------------+
-   * </pre>
-   *
-   * @return The decoded samples.
-   */
+  /// The main data does not follow the side information in the bitstream.
+  /// The main data ends at a location in the bitstream preceding the frame header of the frame at an offset
+  /// given by the value of main_data_start.
+  ///
+  ///
+  /// The main data is organized like this:
+  /// ```
+  ///   +---------------+---------------------------+----------------+
+  ///   | SCALE FACTORS | HUFFMAN CODED RAW SAMPLES | ANCILLARY INFO |
+  ///   +---------------+---------------------------+----------------+
+  /// ```
+  ///
+  /// @return The decoded samples.
   static class MainData {
     private final float[][][] samples; // [channel][granule][576]
     private final MpegFrame frame;
@@ -536,9 +520,7 @@ class MpegFrame {
     StereoProcessing.process(this.frame, this.scaleFactors, this.samples);
   }
 
-  /**
-   * Constructor that accepts main data directly (for bit reservoir support).
-   */
+  /// Constructor that accepts main data directly (for bit reservoir support).
   MainData(byte[] mainData, MpegFrame frame) {
     this.frame = frame;
     this.samples = new float[frame.getChannels()][2][576];
@@ -693,10 +675,8 @@ class MpegFrame {
       return this.samples;
     }
 
-    /**
-     * Dequantize the Huffman-decoded samples using scale factors and global gain.
-     * Formula: xr[i] = sign(is[i]) * |is[i]|^(4/3) * 2^(0.25 * (global_gain - 210)) * 2^(-scalefactor/4)
-     */
+    /// Dequantize the Huffman-decoded samples using scale factors and global gain.
+    /// Formula: xr[i] = sign(is[i]) * |is[i]|^(4/3) * 2^(0.25 * (global_gain - 210)) * 2^(-scalefactor/4)
     private void dequantize(int gr, int ch) {
       var sideInfo = this.frame.getSideInfo();
       var granule = sideInfo.channels[ch].granules[gr];

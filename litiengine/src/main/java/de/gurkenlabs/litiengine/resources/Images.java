@@ -7,18 +7,14 @@ import java.io.IOException;
 import java.net.URL;
 import javax.imageio.ImageIO;
 
-/**
- * A container class for managing image resources. This class extends the ResourcesContainer class, specifically for BufferedImage objects.
- */
+/// A container class for managing image resources. This class extends the ResourcesContainer class, specifically for BufferedImage objects.
 public final class Images extends ResourcesContainer<BufferedImage> {
   Images() {
   }
 
-  /**
-   * Loads all images from the specified texture atlas.
-   *
-   * @param textureAtlas The texture atlas that contains all the images.
-   */
+  /// Loads all images from the specified texture atlas.
+  ///
+  /// @param textureAtlas The texture atlas that contains all the images.
   public void load(TextureAtlas textureAtlas) {
     BufferedImage atlasImage = Resources.images().get(textureAtlas.getAbsoluteImagePath());
     if (atlasImage == null || atlasImage.getWidth() == 0 || atlasImage.getHeight() == 0) {
@@ -35,12 +31,10 @@ public final class Images extends ResourcesContainer<BufferedImage> {
     }
   }
 
-  /**
-   * Loads the image by the specified resourceName. This method supports both loading images from a folder and loading them from the resources.
-   *
-   * @param resourceName The path to the image.
-   * @return the image
-   */
+  /// Loads the image by the specified resourceName. This method supports both loading images from a folder and loading them from the resources.
+  ///
+  /// @param resourceName The path to the image.
+  /// @return the image
   @Override
   protected BufferedImage load(URL resourceName) throws IOException {
     BufferedImage img = ImageIO.read(resourceName);

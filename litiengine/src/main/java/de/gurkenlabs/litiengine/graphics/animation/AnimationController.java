@@ -17,10 +17,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * The {@code AnimationController} class implements the {@code IAnimationController} interface. It manages animations and image effects, allowing for
- * the control and playback of animations.
- */
+/// The `AnimationController` class implements the `IAnimationController` interface. It manages animations and image effects, allowing for
+/// the control and playback of animations.
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
   private AffineTransform affineTransform;
@@ -32,9 +30,7 @@ public class AnimationController implements IAnimationController {
   private final List<ImageEffect> imageEffects;
   private final List<AnimationListener> listeners;
 
-  /**
-   * Initializes a new instance of the {@code AnimationController} class.
-   */
+  /// Initializes a new instance of the `AnimationController` class.
   public AnimationController() {
     this.animations = new ConcurrentHashMap<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
@@ -42,25 +38,21 @@ public class AnimationController implements IAnimationController {
     this.enabled = true;
   }
 
-  /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
-   *
-   * @param defaultAnimation The default animation for this controller.
-   * @see #getDefault()
-   */
+  /// Initializes a new instance of the `AnimationController` class with the specified default animation.
+  ///
+  /// @param defaultAnimation The default animation for this controller.
+  /// @see #getDefault()
   public AnimationController(final Animation defaultAnimation) {
     this();
     this.setDefault(defaultAnimation);
   }
 
-  /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
-   *
-   * @param defaultAnimation The default animation for this controller.
-   * @param animations       Additional animations that are managed by this controller instance.
-   * @see #getDefault()
-   * @see #getAll()
-   */
+  /// Initializes a new instance of the `AnimationController` class with the specified default animation.
+  ///
+  /// @param defaultAnimation The default animation for this controller.
+  /// @param animations       Additional animations that are managed by this controller instance.
+  /// @see #getDefault()
+  /// @see #getAll()
   public AnimationController(final Animation defaultAnimation, final Animation... animations) {
     this(defaultAnimation);
 
@@ -73,33 +65,27 @@ public class AnimationController implements IAnimationController {
     }
   }
 
-  /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
-   *
-   * @param sprite The sprite sheet used by the default animation of this controller.
-   */
+  /// Initializes a new instance of the `AnimationController` class with the specified default animation.
+  ///
+  /// @param sprite The sprite sheet used by the default animation of this controller.
   public AnimationController(final Spritesheet sprite) {
     this(sprite, true);
   }
 
-  /**
-   * Initializes a new instance of the {@code AnimationController} class with the specified default animation.
-   *
-   * @param sprite The sprite sheet used by the default animation of this controller.
-   * @param loop   A flag indicating whether the default animation should be looped or only played once.
-   */
+  /// Initializes a new instance of the `AnimationController` class with the specified default animation.
+  ///
+  /// @param sprite The sprite sheet used by the default animation of this controller.
+  /// @param loop   A flag indicating whether the default animation should be looped or only played once.
   public AnimationController(final Spritesheet sprite, final boolean loop) {
     this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
 
-  /**
-   * Creates a new animation with the sprites flipped either vertically or horizontally.
-   *
-   * @param anim          The original animation to be flipped.
-   * @param newSpriteName The name for the new flipped spritesheet.
-   * @param vertical      A boolean flag indicating whether to flip the sprites vertically. If false, the sprites will be flipped horizontally.
-   * @return A new Animation object with the flipped sprites.
-   */
+  /// Creates a new animation with the sprites flipped either vertically or horizontally.
+  ///
+  /// @param anim          The original animation to be flipped.
+  /// @param newSpriteName The name for the new flipped spritesheet.
+  /// @param vertical      A boolean flag indicating whether to flip the sprites vertically. If false, the sprites will be flipped horizontally.
+  /// @return A new Animation object with the flipped sprites.
   public static Animation flippedAnimation(Animation anim, String newSpriteName, boolean vertical) {
     final BufferedImage flippedImage =
       vertical ? Imaging.flipSpritesVertically(anim.getSpritesheet()) : Imaging.flipSpritesHorizontally(anim.getSpritesheet());
@@ -134,11 +120,9 @@ public class AnimationController implements IAnimationController {
     this.listeners.add(listener);
   }
 
-  /**
-   * Attach the {@code AnimationController}, as well as all its {@code Animation}s to the Game loop.
-   *
-   * @see ILoop
-   */
+  /// Attach the `AnimationController`, as well as all its `Animation`s to the Game loop.
+  ///
+  /// @see ILoop
   public void attach() {
     Game.loop().attach(this);
   }
@@ -147,11 +131,9 @@ public class AnimationController implements IAnimationController {
     this.animations.clear();
   }
 
-  /**
-   * Detach the {@code AnimationController}, as well as all its {@code Animation}s from the Game loop.
-   *
-   * @see ILoop
-   */
+  /// Detach the `AnimationController`, as well as all its `Animation`s from the Game loop.
+  ///
+  /// @see ILoop
   public void detach() {
     Game.loop().detach(this);
   }
@@ -346,12 +328,10 @@ public class AnimationController implements IAnimationController {
     }
   }
 
-  /**
-   * Build a unique cache key for the current frame. The spritesheet's {@code hashCode}, the current keyframe's sprite index, as well as all applied
-   * {@code ImageEffect}s' names, are considered when determining the current cache key.
-   *
-   * @return the unique cache key for the current key frame
-   */
+  /// Build a unique cache key for the current frame. The spritesheet's `hashCode`, the current keyframe's sprite index, as well as all applied
+  /// `ImageEffect`s' names, are considered when determining the current cache key.
+  ///
+  /// @return the unique cache key for the current key frame
   protected String buildCurrentCacheKey() {
     if (this.getCurrent() == null || this.getCurrent().getCurrentKeyFrame() == null || this.getCurrent().getSpritesheet() == null) {
       return null;

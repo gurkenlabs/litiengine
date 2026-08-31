@@ -2,17 +2,14 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
-/**
- * XML adapter that converts between a {@link String} representation and a generic {@link Number}.
- * <p>
- * Used to serialize {@code Number}-typed fields of generic classes (e.g.
- * {@link de.gurkenlabs.litiengine.attributes.Attribute}) where the concrete numeric type cannot be
- * recovered at unmarshalling time. The adapter always returns a {@link Double} when the value
- * contains a decimal point (or scientific notation) and a {@link Long} otherwise. Consumers are
- * expected to convert the returned {@code Number} to the desired concrete type via
- * {@link Number#floatValue()}, {@link Number#longValue()}, etc.
- * </p>
- */
+/// XML adapter that converts between a [String] representation and a generic [Number].
+///
+/// Used to serialize `Number`-typed fields of generic classes (e.g.
+/// [de.gurkenlabs.litiengine.attributes.Attribute]) where the concrete numeric type cannot be
+/// recovered at unmarshalling time. The adapter always returns a [Double] when the value
+/// contains a decimal point (or scientific notation) and a [Long] otherwise. Consumers are
+/// expected to convert the returned `Number` to the desired concrete type via
+/// [Number#floatValue()], [Number#longValue()], etc.
 public class NumberAdapter extends XmlAdapter<String, Number> {
 
   @Override

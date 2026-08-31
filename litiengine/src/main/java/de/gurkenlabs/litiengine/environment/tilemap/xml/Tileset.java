@@ -35,10 +35,8 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The {@code Tileset} class represents a collection of tiles used in a tile-based map. It extends the {@code CustomPropertyProvider} class and
- * implements the {@code ITileset} interface. This class provides various properties and methods to manage and access tileset information.
- */
+/// The `Tileset` class represents a collection of tiles used in a tile-based map. It extends the `CustomPropertyProvider` class and
+/// implements the `ITileset` interface. This class provides various properties and methods to manage and access tileset information.
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tileset extends CustomPropertyProvider implements ITileset {
@@ -118,21 +116,17 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   private transient Spritesheet spriteSheet;
 
-  /**
-   * Default constructor for the {@code Tileset} class. Initializes a new instance of the {@code Tileset} class and sets up a listener to clear the
-   * sprite sheet when images are cleared.
-   */
+  /// Default constructor for the `Tileset` class. Initializes a new instance of the `Tileset` class and sets up a listener to clear the
+  /// sprite sheet when images are cleared.
   public Tileset() {
     this.allTiles = new ArrayList<>();
     Resources.images().addClearedListener(() -> this.spriteSheet = null);
   }
 
-  /**
-   * Copy constructor for the {@code Tileset} class. Creates a new instance of the {@code Tileset} class by copying the properties from the provided
-   * {@code Tileset} object.
-   *
-   * @param original The original {@code Tileset} object to copy from.
-   */
+  /// Copy constructor for the `Tileset` class. Creates a new instance of the `Tileset` class by copying the properties from the provided
+  /// `Tileset` object.
+  ///
+  /// @param original The original `Tileset` object to copy from.
   public Tileset(Tileset original) {
     super(original.source == null ? original : new CustomPropertyProvider());
 
@@ -175,12 +169,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     this.spriteSheet = original.sourceTileset != null ? original.sourceTileset.spriteSheet : original.spriteSheet;
   }
 
-  /**
-   * Creates a map-local copy of a tileset with the supplied first global tile ID.
-   *
-   * @param original the project tileset to copy
-   * @param firstGridId the first global tile ID assigned to the copy
-   */
+  /// Creates a map-local copy of a tileset with the supplied first global tile ID.
+  ///
+  /// @param original the project tileset to copy
+  /// @param firstGridId the first global tile ID assigned to the copy
   public Tileset(Tileset original, int firstGridId) {
     this(original);
     this.setFirstGridId(firstGridId);
@@ -432,11 +424,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.firstgid;
   }
 
-  /**
-   * Sets the first global tile ID used by this tileset in its containing map.
-   *
-   * @param firstGridId the first global tile ID, starting at {@code 1}
-   */
+  /// Sets the first global tile ID used by this tileset in its containing map.
+  ///
+  /// @param firstGridId the first global tile ID, starting at `1`
   public void setFirstGridId(int firstGridId) {
     if (firstGridId < 1) {
       throw new IllegalArgumentException("The first grid ID must be positive.");
@@ -476,11 +466,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     this.spriteSheet = null;
   }
 
-  /**
-   * Gets the margin.
-   *
-   * @return the margin
-   */
+  /// Gets the margin.
+  ///
+  /// @return the margin
   @Override
   public int getMargin() {
     if (this.sourceTileset != null) {
@@ -520,11 +508,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     this.source = source;
   }
 
-  /**
-   * Gets the spacing.
-   *
-   * @return the spacing
-   */
+  /// Gets the spacing.
+  ///
+  /// @return the spacing
   @Override
   public int getSpacing() {
     if (this.sourceTileset != null) {
@@ -567,21 +553,17 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.sourceTileset != null ? this.sourceTileset.getTileDimension() : new Dimension(this.getTileWidth(), this.getTileHeight());
   }
 
-  /**
-   * Gets the tile height.
-   *
-   * @return the tile height
-   */
+  /// Gets the tile height.
+  ///
+  /// @return the tile height
   @Override
   public int getTileHeight() {
     return this.sourceTileset != null ? this.sourceTileset.getTileHeight() : this.tileheight != null ? this.tileheight : 0;
   }
 
-  /**
-   * Gets the tile width.
-   *
-   * @return the tile width
-   */
+  /// Gets the tile width.
+  ///
+  /// @return the tile width
   @Override
   public int getTileWidth() {
     return this.sourceTileset != null ? this.sourceTileset.getTileWidth() : this.tilewidth != null ? this.tilewidth : 0;
@@ -683,29 +665,23 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.allTiles != null && id < this.allTiles.size() ? this.allTiles.get(id) : null;
   }
 
-  /**
-   * Gets the tile transformations.
-   *
-   * @return the tile transformations
-   */
+  /// Gets the tile transformations.
+  ///
+  /// @return the tile transformations
   public TileTransformations getTransformations() {
     return this.sourceTileset != null ? this.sourceTileset.getTransformations() : this.transformations;
   }
 
-  /**
-   * Gets the tileset class.
-   *
-   * @return the tileset class
-   */
+  /// Gets the tileset class.
+  ///
+  /// @return the tileset class
   public String getTilesetClass() {
     return this.sourceTileset != null ? this.sourceTileset.getTilesetClass() : this.tilesetClass;
   }
 
-  /**
-   * Gets the object alignment.
-   *
-   * @return the object alignment
-   */
+  /// Gets the object alignment.
+  ///
+  /// @return the object alignment
   public String getObjectalignment() {
     return this.sourceTileset != null ? this.sourceTileset.getObjectalignment() : this.objectalignment;
   }
@@ -718,11 +694,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     this.objectalignment = objectalignment == null || objectalignment.isBlank() ? null : objectalignment;
   }
 
-  /**
-   * Gets the tile render size.
-   *
-   * @return the tile render size
-   */
+  /// Gets the tile render size.
+  ///
+  /// @return the tile render size
   public String getTilerendersize() {
     return this.sourceTileset != null ? this.sourceTileset.getTilerendersize() : this.tilerendersize;
   }
@@ -735,11 +709,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     this.tilerendersize = tilerendersize == null || tilerendersize.isBlank() ? null : tilerendersize;
   }
 
-  /**
-   * Gets the fill mode.
-   *
-   * @return the fill mode
-   */
+  /// Gets the fill mode.
+  ///
+  /// @return the fill mode
   public String getFillmode() {
     return this.sourceTileset != null ? this.sourceTileset.getFillmode() : this.fillmode;
   }
@@ -825,11 +797,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
   }
 
-  /**
-   * Saves the source tileset to the specified base path.
-   *
-   * @param path The base path where the source tileset should be saved.
-   */
+  /// Saves the source tileset to the specified base path.
+  ///
+  /// @param path The base path where the source tileset should be saved.
   public void saveSource(Path path) {
     if (this.sourceTileset == null) {
       return;
@@ -838,20 +808,16 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     XmlUtilities.save(this.sourceTileset, path.resolve(source), FILE_EXTENSION);
   }
 
-  /**
-   * Checks if the tileset is external.
-   *
-   * @return true if the tileset is external, false otherwise.
-   */
+  /// Checks if the tileset is external.
+  ///
+  /// @return true if the tileset is external, false otherwise.
   public boolean isExternal() {
     return this.source != null;
   }
 
-  /**
-   * Loads the source tileset from the provided list of raw tilesets.
-   *
-   * @param rawTilesets The list of raw tilesets to load the source tileset from.
-   */
+  /// Loads the source tileset from the provided list of raw tilesets.
+  ///
+  /// @param rawTilesets The list of raw tilesets to load the source tileset from.
   public void load(List<Tileset> rawTilesets) {
     if (this.source == null) {
       return;

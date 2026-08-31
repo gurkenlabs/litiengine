@@ -34,38 +34,30 @@ public class MapRenderer {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * Adds the specified layer rendered listener to receive events when a layer has been rendered.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified layer rendered listener to receive events when a layer has been rendered.
+  ///
+  /// @param listener The listener to add.
   public static void onLayerRendered(LayerRenderedListener listener) {
     layerRenderedListeners.add(listener);
   }
 
-  /**
-   * Removes the specified layer rendered listener..
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified layer rendered listener..
+  ///
+  /// @param listener The listener to remove.
   public static void removeLayerRenderedListener(LayerRenderedListener listener) {
     layerRenderedListeners.remove(listener);
   }
 
-  /**
-   * Adds the specified layer render condition to control whether layers should be rendered.
-   *
-   * @param condition The condition to add.
-   */
+  /// Adds the specified layer render condition to control whether layers should be rendered.
+  ///
+  /// @param condition The condition to add.
   public static void addLayerRenderCondition(LayerRenderCondition condition) {
     layerRenderConditions.add(condition);
   }
 
-  /**
-   * Removes the specified layer render condition.
-   *
-   * @param condition The condition to remove.
-   */
+  /// Removes the specified layer render condition.
+  ///
+  /// @param condition The condition to remove.
   public static void removeLayerRenderCondition(LayerRenderCondition condition) {
     layerRenderConditions.remove(condition);
   }
@@ -227,34 +219,26 @@ public class MapRenderer {
     }
   }
 
-  /**
-   * This listener interface receives events when a layer was rendered.
-   *
-   * @see MapRenderer#onLayerRendered(LayerRenderedListener)
-   */
+  /// This listener interface receives events when a layer was rendered.
+  ///
+  /// @see MapRenderer#onLayerRendered(LayerRenderedListener)
   @FunctionalInterface
   public interface LayerRenderedListener extends EventListener {
-    /**
-     * Invoked when a layer has been rendered.
-     *
-     * @param event The layer render event.
-     */
+    /// Invoked when a layer has been rendered.
+    ///
+    /// @param event The layer render event.
     void rendered(LayerRenderEvent event);
   }
 
-  /**
-   * This listener interface provides a condition callback to contol whether a layer should be rendered.
-   *
-   * @see MapRenderer#addLayerRenderCondition(LayerRenderCondition)
-   */
+  /// This listener interface provides a condition callback to contol whether a layer should be rendered.
+  ///
+  /// @see MapRenderer#addLayerRenderCondition(LayerRenderCondition)
   @FunctionalInterface
   public interface LayerRenderCondition extends EventListener {
-    /**
-     * Invoked before the rendering of a layer to determine if it should be rendered.
-     *
-     * @param event The layer render event.
-     * @return Return true if the layer should be rendered; otherwise false.
-     */
+    /// Invoked before the rendering of a layer to determine if it should be rendered.
+    ///
+    /// @param event The layer render event.
+    /// @return Return true if the layer should be rendered; otherwise false.
     boolean canRender(LayerRenderEvent event);
   }
 }

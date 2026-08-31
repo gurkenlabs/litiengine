@@ -8,10 +8,8 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.awt.Color;
 import java.net.URL;
 
-/**
- * Represents an image layer in a tile map. This class extends the {@link Layer} class and implements the {@link IImageLayer} interface. It includes
- * attributes for repeating the image horizontally and vertically, the image itself, and a transparent color.
- */
+/// Represents an image layer in a tile map. This class extends the [Layer] class and implements the [IImageLayer] interface. It includes
+/// attributes for repeating the image horizontally and vertically, the image itself, and a transparent color.
 public class ImageLayer extends Layer implements IImageLayer {
 
   @XmlAttribute
@@ -27,19 +25,15 @@ public class ImageLayer extends Layer implements IImageLayer {
   @XmlJavaTypeAdapter(ColorAdapter.class)
   private Color trans;
 
-  /**
-   * Default no-args constructor for the {@link ImageLayer} class. Initializes a new instance of the {@link ImageLayer} class with default values.
-   */
+  /// Default no-args constructor for the [ImageLayer] class. Initializes a new instance of the [ImageLayer] class with default values.
   public ImageLayer() {
     //  default no-args constructor
   }
 
-  /**
-   * Copy constructor for the {@link ImageLayer} class. Creates a new instance of the {@link ImageLayer} class by copying the properties from the
-   * provided {@link ImageLayer} object.
-   *
-   * @param original The original {@link ImageLayer} object to copy from.
-   */
+  /// Copy constructor for the [ImageLayer] class. Creates a new instance of the [ImageLayer] class by copying the properties from the
+  /// provided [ImageLayer] object.
+  ///
+  /// @param original The original [ImageLayer] object to copy from.
   public ImageLayer(ImageLayer original) {
     super(original);
     this.repeatx = original.repeatHorizontally();
@@ -92,12 +86,10 @@ public class ImageLayer extends Layer implements IImageLayer {
     return super.getOffsetY();
   }
 
-  /**
-   * Checks if the map is infinite. This method determines whether the map associated with this layer is infinite and is an instance of
-   * {@code TmxMap}.
-   *
-   * @return {@code true} if the map is infinite and an instance of {@code TmxMap}; {@code false} otherwise.
-   */
+  /// Checks if the map is infinite. This method determines whether the map associated with this layer is infinite and is an instance of
+  /// `TmxMap`.
+  ///
+  /// @return `true` if the map is infinite and an instance of `TmxMap`; `false` otherwise.
   private boolean isInfiniteMap() {
     return this.getMap() != null && this.getMap().isInfinite() && this.getMap() instanceof TmxMap;
   }

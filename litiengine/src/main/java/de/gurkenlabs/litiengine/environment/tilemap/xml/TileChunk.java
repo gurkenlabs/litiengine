@@ -5,9 +5,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlValue;
 
-/**
- * This class represents a chunk of tiles in an infinite map.
- */
+/// This class represents a chunk of tiles in an infinite map.
 @XmlRootElement(name = "chunk")
 public class TileChunk implements Comparable<TileChunk> {
   @XmlAttribute

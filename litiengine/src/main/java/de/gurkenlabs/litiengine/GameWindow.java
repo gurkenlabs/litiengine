@@ -29,18 +29,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The {@code GameWindow} class is a wrapper for the game's visual window in which the {@code RenderComponent}
- * lives.<br>
- * It provides the possibility to set a title, provide an icon, configure the cursor or get information about the
- * resolution.
- *
- * @see RenderComponent
- * @see #getResolution()
- * @see #setTitle(String)
- * @see #cursor()
- * @see #setIcon(java.awt.Image)
- */
+/// The `GameWindow` class is a wrapper for the game's visual window in which the `RenderComponent`
+/// lives.
+///
+/// It provides the possibility to set a title, provide an icon, configure the cursor or get information about the
+/// resolution.
+///
+/// @see RenderComponent
+/// @see #getResolution()
+/// @see #setTitle(String)
+/// @see #cursor()
+/// @see #setIcon(java.awt.Image)
 public final class GameWindow {
   private static final Logger log = Logger.getLogger(GameWindow.class.getName());
   private static final int ICONIFIED_MAX_FPS = 1;
@@ -76,11 +75,9 @@ public final class GameWindow {
     }
   }
 
-  /**
-   * Returns true if the GameWindow is the focus owner.
-   *
-   * @return true if the GameWindow is the focus owner; false otherwise
-   */
+  /// Returns true if the GameWindow is the focus owner.
+  ///
+  /// @return true if the GameWindow is the focus owner; false otherwise
   public boolean isFocusOwner() {
     if (this.getRenderComponent() != null && this.getRenderComponent().isFocusOwner()) {
       return true;
@@ -89,131 +86,103 @@ public final class GameWindow {
     return this.hostControl.isFocusOwner();
   }
 
-  /**
-   * Adds the specified resolution changed listener to receive events when the dimensions of this game window are changed.
-   *
-   * @param listener
-   *          The listener to add.
-   */
+  /// Adds the specified resolution changed listener to receive events when the dimensions of this game window are changed.
+  ///
+  /// @param listener
+  /// The listener to add.
   public void onResolutionChanged(final ResolutionChangedListener listener) {
     this.resolutionChangedListeners.add(listener);
   }
 
-  /**
-   * Removes the specified resolution changed listener.
-   *
-   * @param listener
-   *          The listener to remove.
-   */
+  /// Removes the specified resolution changed listener.
+  ///
+  /// @param listener
+  /// The listener to remove.
   public void removeResolutionChangedListener(final ResolutionChangedListener listener) {
     this.resolutionChangedListeners.remove(listener);
   }
 
-  /**
-   * Sets the resolution for the GameWindow.
-   *
-   * @param res
-   *          The desired Resolution to set for the GameWindow.
-   * @see Resolution
-   */
+  /// Sets the resolution for the GameWindow.
+  ///
+  /// @param res
+  /// The desired Resolution to set for the GameWindow.
+  /// @see Resolution
   public void setResolution(Resolution res) {
     this.resolutionScale = setResolution(this.getHostControl(), res.getDimension());
   }
 
-  /**
-   * Gets the current resolution scale. The resolution scale is a float value dictating how much larger or smaller each
-   * pixel is rendered on screen.
-   *
-   * @return The GameWindow's current resolution scale.
-   */
+  /// Gets the current resolution scale. The resolution scale is a float value dictating how much larger or smaller each
+  /// pixel is rendered on screen.
+  ///
+  /// @return The GameWindow's current resolution scale.
   public float getResolutionScale() {
     return this.resolutionScale;
   }
 
-  /**
-   * Gets the current resolution scale. The resolution scale is a float value dictating how much larger or smaller each
-   * pixel is rendered on screen.
-   *
-   * @return The {@code GameWindow}'s current resolution scale.
-   */
+  /// Gets the current resolution scale. The resolution scale is a float value dictating how much larger or smaller each
+  /// pixel is rendered on screen.
+  ///
+  /// @return The `GameWindow`'s current resolution scale.
   public Point2D getCenter() {
     return new Point2D.Double(this.getWidth() / 2.0, this.getHeight() / 2.0);
   }
 
-  /**
-   * Gets the {@code GameWindow}'s JFrame, abstracted as a Container.
-   *
-   * @return The {@code GameWindow}'s {@code JFrame} as an abstract AWT {@code Container}.
-   */
+  /// Gets the `GameWindow`'s JFrame, abstracted as a Container.
+  ///
+  /// @return The `GameWindow`'s `JFrame` as an abstract AWT `Container`.
   public Container getHostControl() {
     return this.hostControl;
   }
 
-  /**
-   * Gets the window width and height wrapped in a {@code Dimension} object.
-   *
-   * @return The {@code GameWindow}'s size as a {@link Dimension}.
-   */
+  /// Gets the window width and height wrapped in a `Dimension` object.
+  ///
+  /// @return The `GameWindow`'s size as a [Dimension].
   public Dimension getSize() {
     return this.hostControl.getSize();
   }
 
-  /**
-   * Gets the window width.
-   *
-   * @return The window width.
-   */
+  /// Gets the window width.
+  ///
+  /// @return The window width.
   public int getWidth() {
     return this.hostControl.getWidth();
   }
 
-  /**
-   * Gets the window height.
-   *
-   * @return The window height.
-   */
+  /// Gets the window height.
+  ///
+  /// @return The window height.
   public int getHeight() {
     return this.hostControl.getHeight();
   }
 
-  /**
-   * Gets the AWT canvas that is used to render the game's content on.
-   *
-   * @return The AWT render component onto which the game contents are rendered.
-   */
+  /// Gets the AWT canvas that is used to render the game's content on.
+  ///
+  /// @return The AWT render component onto which the game contents are rendered.
   public RenderComponent getRenderComponent() {
     return this.renderCanvas;
   }
 
-  /**
-   * Gets the visual representation of the mouse cursor on the {@code GameWindow}.
-   *
-   * <p>
-   * This can be used to provide a custom cursor image, define its visibility or specify a rendering offset from the
-   * actual position.
-   * </p>
-   *
-   * @return The mouse cursor of the game.
-   */
+  /// Gets the visual representation of the mouse cursor on the `GameWindow`.
+  ///
+  /// This can be used to provide a custom cursor image, define its visibility or specify a rendering offset from the
+  /// actual position.
+  ///
+  /// @return The mouse cursor of the game.
   public MouseCursor cursor() {
     return this.cursor;
   }
 
-  /**
-   * Gets the window resolution wrapped in a {@code Dimension} object.
-   *
-   * @return The {@code GameWindow}'s internal resolution as a {@link Dimension}.
-   */
+  /// Gets the window resolution wrapped in a `Dimension` object.
+  ///
+  /// @return The `GameWindow`'s internal resolution as a [Dimension].
   public Dimension getResolution() {
     return this.resolution;
   }
 
-  /**
-   * Gets the screen location of the window's top left corner.
-   *
-   * @return The {@code Point} of the window's top left corner.
-   * @see Container#getLocationOnScreen
-   */
+  /// Gets the screen location of the window's top left corner.
+  ///
+  /// @return The `Point` of the window's top left corner.
+  /// @see Container#getLocationOnScreen
   public Point getLocationOnScreen() {
     if (this.screenLocation != null) {
       return this.screenLocation;
@@ -223,57 +192,48 @@ public final class GameWindow {
     return this.screenLocation;
   }
 
-  /**
-   * Sets the icon image for the window's hosting {@code JFrame}.
-   *
-   * @param image
-   *          The {@code Image} to be used as the window icon.
-   * @see JFrame#setIconImage
-   */
+  /// Sets the icon image for the window's hosting `JFrame`.
+  ///
+  /// @param image
+  /// The `Image` to be used as the window icon.
+  /// @see JFrame#setIconImage
   public void setIcon(Image image) {
     this.hostControl.setIconImage(image);
   }
 
-  /**
-   * Sets the icons for the window's hosting {@code JFrame}. Depending on the platform specifications, one or several
-   * {@code Icon}s with the correct Dimension will be chosen automatically from the list.
-   *
-   * @param images
-   *          A list of {@code Images} to be used as the window icons.
-   * @see JFrame#setIconImages
-   */
+  /// Sets the icons for the window's hosting `JFrame`. Depending on the platform specifications, one or several
+  /// `Icon`s with the correct Dimension will be chosen automatically from the list.
+  ///
+  /// @param images
+  /// A list of `Images` to be used as the window icons.
+  /// @see JFrame#setIconImages
   public void setIcons(List<? extends Image> images) {
     this.hostControl.setIconImages(images);
   }
 
-  /**
-   * Sets the title for this window to the specified string.
-   *
-   * @param title
-   *          the window title to be displayed in the frame's border. A {@code null} value is treated as an empty string,
-   *          "".
-   * @see Frame#setTitle
-   */
+  /// Sets the title for this window to the specified string.
+  ///
+  /// @param title
+  /// the window title to be displayed in the frame's border. A `null` value is treated as an empty string,
+  /// "".
+  /// @see Frame#setTitle
   public void setTitle(String title) {
     this.hostControl.setTitle(title);
   }
 
-  /**
-   * Initialize a {@code JFrame} to host the window with a given {@code DisplayMode} and resolution.
-   * <p>
-   * For example, {@code BORDERLESS} windows are not resizable and are rendered without a border.
-   * </p>
-   *
-   * @param host
-   *          The {@code JFrame} that hosts this window.
-   * @param displaymode
-   *          The {@code DisplayMode} for this window.
-   * @param resolution
-   *          The desired window resolution.
-   * @see DisplayMode
-   * @see JFrame
-   * @see #setResolution
-   */
+  /// Initialize a `JFrame` to host the window with a given `DisplayMode` and resolution.
+  ///
+  /// For example, `BORDERLESS` windows are not resizable and are rendered without a border.
+  ///
+  /// @param host
+  /// The `JFrame` that hosts this window.
+  /// @param displaymode
+  /// The `DisplayMode` for this window.
+  /// @param resolution
+  /// The desired window resolution.
+  /// @see DisplayMode
+  /// @see JFrame
+  /// @see #setResolution
   static void prepareHostControl(JFrame host, DisplayMode displaymode, Dimension resolution) {
     switch (displaymode) {
       case BORDERLESS:
@@ -310,33 +270,27 @@ public final class GameWindow {
     setResolution(host, resolution);
   }
 
-  /**
-   * Sets the display mode for this game window at runtime.
-   *
-   * <p>
-   * This allows switching between windowed, borderless, and fullscreen modes while the game is running.
-   * The change is also persisted to the graphics configuration.
-   * </p>
-   *
-   * @param displayMode
-   *          The new {@code DisplayMode} to apply.
-   * @see DisplayMode
-   */
+  /// Sets the display mode for this game window at runtime.
+  ///
+  /// This allows switching between windowed, borderless, and fullscreen modes while the game is running.
+  /// The change is also persisted to the graphics configuration.
+  ///
+  /// @param displayMode
+  /// The new `DisplayMode` to apply.
+  /// @see DisplayMode
   public void setDisplayMode(DisplayMode displayMode) {
     Game.config().graphics().setDisplayMode(displayMode);
   }
 
-  /**
-   * Initialize the {@code GameWindow}. If the Game is in "No GUI"-mode, the window resolution is set to (0,0) and the
-   * hosting JFrame is hidden. Otherwise, the {@code JFrame} is initialized with the {@code DisplayMode} and resolution
-   * defined in the Graphics Configuration. After initializing the hosting {@code JFrame}, the {@code RenderComponent} is
-   * also initialized and the window requests focus.
-   *
-   * @see Game#isInNoGUIMode
-   * @see #prepareHostControl
-   * @see GraphicConfiguration
-   * @see RenderComponent
-   */
+  /// Initialize the `GameWindow`. If the Game is in "No GUI"-mode, the window resolution is set to (0,0) and the
+  /// hosting JFrame is hidden. Otherwise, the `JFrame` is initialized with the `DisplayMode` and resolution
+  /// defined in the Graphics Configuration. After initializing the hosting `JFrame`, the `RenderComponent` is
+  /// also initialized and the window requests focus.
+  ///
+  /// @see Game#isInNoGUIMode
+  /// @see #prepareHostControl
+  /// @see GraphicConfiguration
+  /// @see RenderComponent
   void init() {
     if (Game.isInNoGUIMode()) {
       this.resolution = new Dimension(0, 0);
@@ -462,20 +416,16 @@ public final class GameWindow {
     });
   }
 
-  /**
-   * This listener interface receives resolution changed events of the game window.
-   *
-   * @see GameWindow#onResolutionChanged(ResolutionChangedListener)
-   * @see GameWindow#setResolution(Resolution)
-   */
+  /// This listener interface receives resolution changed events of the game window.
+  ///
+  /// @see GameWindow#onResolutionChanged(ResolutionChangedListener)
+  /// @see GameWindow#setResolution(Resolution)
   @FunctionalInterface
   public interface ResolutionChangedListener extends EventListener {
-    /**
-     * Invoked when the resolution of the {@code GameWindow} changed.
-     *
-     * @param resolution
-     *          The new resolution.
-     */
+    /// Invoked when the resolution of the `GameWindow` changed.
+    ///
+    /// @param resolution
+    /// The new resolution.
     void resolutionChanged(Dimension resolution);
   }
 

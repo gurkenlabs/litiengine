@@ -16,10 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Represents an abstract collision entity. This class provides the base implementation for entities that can collide with other entities. It extends
- * the Entity class and implements the ICollisionEntity interface.
- */
+/// Represents an abstract collision entity. This class provides the base implementation for entities that can collide with other entities. It extends
+/// the Entity class and implements the ICollisionEntity interface.
 @CollisionInfo(collision = true) public abstract class CollisionEntity extends Entity implements ICollisionEntity {
   private static final Logger log = Logger.getLogger(CollisionEntity.class.getName());
 
@@ -43,10 +41,8 @@ import java.util.logging.Logger;
 
   private Rectangle2D collisionBox;
 
-  /**
-   * Constructs a new CollisionEntity. Initializes the collision box dimensions, alignment, and type based on the CollisionInfo annotation. Refreshes
-   * the collision box to reflect the initial state.
-   */
+  /// Constructs a new CollisionEntity. Initializes the collision box dimensions, alignment, and type based on the CollisionInfo annotation. Refreshes
+  /// the collision box to reflect the initial state.
   protected CollisionEntity() {
     super();
     final CollisionInfo info = getClass().getAnnotation(CollisionInfo.class);
@@ -59,18 +55,16 @@ import java.util.logging.Logger;
     this.refreshCollisionBox();
   }
 
-  /**
-   * Calculates the collision box for an entity based on its location, dimensions, and alignment.
-   *
-   * @param location           the location of the entity
-   * @param entityWidth        the width of the entity
-   * @param entityHeight       the height of the entity
-   * @param collisionBoxWidth  the width of the collision box
-   * @param collisionBoxHeight the height of the collision box
-   * @param align              the horizontal alignment of the collision box
-   * @param valign             the vertical alignment of the collision box
-   * @return the calculated collision box as a Rectangle2D object
-   */
+  /// Calculates the collision box for an entity based on its location, dimensions, and alignment.
+  ///
+  /// @param location           the location of the entity
+  /// @param entityWidth        the width of the entity
+  /// @param entityHeight       the height of the entity
+  /// @param collisionBoxWidth  the width of the collision box
+  /// @param collisionBoxHeight the height of the collision box
+  /// @param align              the horizontal alignment of the collision box
+  /// @param valign             the vertical alignment of the collision box
+  /// @return the calculated collision box as a Rectangle2D object
   public static Rectangle2D getCollisionBox(final Point2D location, final double entityWidth, final double entityHeight,
     final double collisionBoxWidth, final double collisionBoxHeight, final Align align, final Valign valign) {
     double x = location.getX() + align.getLocation(entityWidth, collisionBoxWidth);
@@ -86,21 +80,17 @@ import java.util.logging.Logger;
     return this.align;
   }
 
-  /**
-   * Gets the collision box.
-   *
-   * @return the collision box
-   */
+  /// Gets the collision box.
+  ///
+  /// @return the collision box
   @Override public Rectangle2D getCollisionBox() {
     return this.collisionBox;
   }
 
-  /**
-   * Gets the collision box.
-   *
-   * @param location the location
-   * @return the collision box
-   */
+  /// Gets the collision box.
+  ///
+  /// @param location the location
+  /// @return the collision box
   @Override public Rectangle2D getCollisionBox(final Point2D location) {
     final double newCollisionBoxWidth = getCollisionBoxWidth() != -1 ? getCollisionBoxWidth() : Math.round(getWidth() * WIDTH_FACTOR);
     final double newCollisionBoxHeight = getCollisionBoxHeight() != -1 ? getCollisionBoxHeight() : Math.round(getHeight() * HEIGHT_FACTOR);
@@ -159,20 +149,16 @@ import java.util.logging.Logger;
     }
   }
 
-  /**
-   * Checks for collision.
-   *
-   * @return true, if successful
-   */
+  /// Checks for collision.
+  ///
+  /// @return true, if successful
   @Override public boolean hasCollision() {
     return this.collision && getCollisionBoxWidth() > 0 && getCollisionBoxHeight() > 0;
   }
 
-  /**
-   * Sets the collision.
-   *
-   * @param collision the new collision
-   */
+  /// Sets the collision.
+  ///
+  /// @param collision the new collision
   @Override public void setCollision(final boolean collision) {
     this.collision = collision;
   }
@@ -248,10 +234,8 @@ import java.util.logging.Logger;
     }
   }
 
-  /**
-   * Refreshes the collision box to reflect the current state of the entity. This method recalculates the collision box based on the entity's
-   * location, dimensions, and alignment.
-   */
+  /// Refreshes the collision box to reflect the current state of the entity. This method recalculates the collision box based on the entity's
+  /// location, dimensions, and alignment.
   protected void refreshCollisionBox() {
     this.collisionBox = getCollisionBox(getLocation());
   }

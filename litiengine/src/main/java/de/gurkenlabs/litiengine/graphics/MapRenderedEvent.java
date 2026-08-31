@@ -16,20 +16,16 @@ public class MapRenderedEvent extends EventObject {
     this.map = map;
   }
 
-  /**
-   * Gets the graphics object on which the map is rendered.
-   *
-   * @return The graphics object on which the map is rendered.
-   */
+  /// Gets the graphics object on which the map is rendered.
+  ///
+  /// @return The graphics object on which the map is rendered.
   public Graphics2D getGraphics() {
     return graphics;
   }
 
-  /**
-   * Get the map involved with the rendering process.
-   *
-   * @return The map involved with the rendering process.
-   */
+  /// Get the map involved with the rendering process.
+  ///
+  /// @return The map involved with the rendering process.
   public IMap getMap() {
     return map;
   }

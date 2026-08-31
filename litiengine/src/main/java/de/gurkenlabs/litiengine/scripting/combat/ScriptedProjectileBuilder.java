@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-/** Fluent builder to configure and spawn {@link ScriptedProjectile} instances. */
+/// Fluent builder to configure and spawn [ScriptedProjectile] instances.
 public final class ScriptedProjectileBuilder {
   private final Environment environment;
   private String spritePrefix = "projectile";

@@ -10,14 +10,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * A default behavior controller that loads and manages entity scripts internally.
- *
- * <p>This controller encapsulates script bindings and delegates execution to an internal
- * {@link EntityScriptController}, allowing entity behavior to be driven dynamically by runtime scripts.
- *
- * @param <T> the type of controlled entity
- */
+/// A default behavior controller that loads and manages entity scripts internally.
+///
+/// This controller encapsulates script bindings and delegates execution to an internal
+/// [EntityScriptController], allowing entity behavior to be driven dynamically by runtime scripts.
+///
+/// @param <T> the type of controlled entity
 public class DefaultScriptBehaviorController<T extends IEntity> implements IBehaviorController {
   private final T entity;
   private final EntityScriptController<T> scriptController;
@@ -48,30 +46,24 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
     return this.entity;
   }
 
-  /**
-   * Returns the internal {@link EntityScriptController} managing the script instances.
-   *
-   * @return the script controller
-   */
+  /// Returns the internal [EntityScriptController] managing the script instances.
+  ///
+  /// @return the script controller
   public EntityScriptController<T> getScriptController() {
     return this.scriptController;
   }
 
-  /**
-   * Loads a script by its definition ID with default parameters.
-   *
-   * @param scriptId the script definition ID to load
-   */
+  /// Loads a script by its definition ID with default parameters.
+  ///
+  /// @param scriptId the script definition ID to load
   public void loadScript(final String scriptId) {
     if (scriptId == null || scriptId.isBlank()) return;
     this.loadScript(new ScriptBinding(scriptId));
   }
 
-  /**
-   * Loads a script with specific bindings and configuration parameters.
-   *
-   * @param binding the script binding to load
-   */
+  /// Loads a script with specific bindings and configuration parameters.
+  ///
+  /// @param binding the script binding to load
   public void loadScript(final ScriptBinding binding) {
     if (binding == null || binding.getScript() == null) return;
     this.loadedBindings.removeIf(b -> binding.getScript().equals(b.getScript()));
@@ -79,11 +71,9 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
     this.scriptController.setBindings(this.loadedBindings);
   }
 
-  /**
-   * Loads multiple script bindings.
-   *
-   * @param bindings the script bindings to load
-   */
+  /// Loads multiple script bindings.
+  ///
+  /// @param bindings the script bindings to load
   public void loadScripts(final Collection<ScriptBinding> bindings) {
     if (bindings == null) return;
     for (ScriptBinding binding : bindings) {
@@ -95,11 +85,9 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
     this.scriptController.setBindings(this.loadedBindings);
   }
 
-  /**
-   * Unloads a script by its definition ID.
-   *
-   * @param scriptId the script definition ID to unload
-   */
+  /// Unloads a script by its definition ID.
+  ///
+  /// @param scriptId the script definition ID to unload
   public void unloadScript(final String scriptId) {
     if (scriptId == null) return;
     if (this.loadedBindings.removeIf(b -> scriptId.equals(b.getScript()))) {
@@ -107,19 +95,15 @@ public class DefaultScriptBehaviorController<T extends IEntity> implements IBeha
     }
   }
 
-  /**
-   * Unloads all scripts currently loaded by this behavior controller.
-   */
+  /// Unloads all scripts currently loaded by this behavior controller.
   public void unloadAllScripts() {
     this.loadedBindings.clear();
     this.scriptController.setBindings(this.loadedBindings);
   }
 
-  /**
-   * Returns an unmodifiable list of script bindings currently loaded by this controller.
-   *
-   * @return the loaded script bindings
-   */
+  /// Returns an unmodifiable list of script bindings currently loaded by this controller.
+  ///
+  /// @return the loaded script bindings
   public List<ScriptBinding> getLoadedScripts() {
     return List.copyOf(this.loadedBindings);
   }

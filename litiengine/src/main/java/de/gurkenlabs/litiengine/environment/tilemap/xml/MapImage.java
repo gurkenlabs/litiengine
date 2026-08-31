@@ -32,19 +32,15 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   @XmlTransient
   private URL absolutePath;
 
-  /**
-   * Instantiates a new {@code MapImage} instance.
-   */
+  /// Instantiates a new `MapImage` instance.
   public MapImage() {
     super();
   }
 
-  /**
-   * Instantiates a new {@code MapImage} instance by copying the specified original.
-   *
-   * @param original
-   *          the original we want to copy
-   */
+  /// Instantiates a new `MapImage` instance by copying the specified original.
+  ///
+  /// @param original
+  /// the original we want to copy
   public MapImage(MapImage original) {
     super(original);
 
@@ -143,12 +139,10 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     return this.getTransparentColor().equals(other.getTransparentColor()) && this.getAbsoluteSourcePath().equals(other.getAbsoluteSourcePath());
   }
 
-  /**
-   * Computes a hash code for this map image. The hash code for a map image is equal to the hash code of its absolute
-   * source path xor the hash code of its transparent color.
-   *
-   * @return The hash code for this map image
-   */
+  /// Computes a hash code for this map image. The hash code for a map image is equal to the hash code of its absolute
+  /// source path xor the hash code of its transparent color.
+  ///
+  /// @return The hash code for this map image
   @Override
   public int hashCode() {
     return this.getAbsoluteSourcePath().hashCode() ^ this.getTransparentColor().hashCode();

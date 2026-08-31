@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 
-/** Lazily indexes public types from the engine artifact and optional project classloaders. */
+/// Lazily indexes public types from the engine artifact and optional project classloaders.
 public final class EngineTypeCatalog {
   private static final String ENGINE_PACKAGE = "de/gurkenlabs/litiengine/";
   private static final Map<ClassLoader, List<Class<?>>> CACHE = new ConcurrentHashMap<>();

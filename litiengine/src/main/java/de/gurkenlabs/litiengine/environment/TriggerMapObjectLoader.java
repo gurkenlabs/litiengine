@@ -24,31 +24,23 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     super(MapObjectType.TRIGGER);
   }
 
-  /**
-   * <p>
-   * Registers a custom {@link Trigger} implementation that can be automatically provided by this
-   * {@link MapObjectLoader}.
-   * </p>
-   *
-   * <p>
-   * Whenever a {@link MapObjectType#TRIGGER TRIGGER} map object with a {@link IMapObject#getName() name} equal to the
-   * specified {@code name} is loaded, an instance of the supplied {@code triggerType} is created instead of the default
-   * {@link Trigger}.
-   * </p>
-   *
-   * <p>
-   * Make sure that the implementation has one of the following constructors present:
-   * <ol>
-   * <li>A constructor that matches the {@link Trigger} default constructor signature
-   * ({@link TriggerActivation}, {@link String}, {@code boolean}, {@code int}).</li>
-   * <li>An empty constructor.</li>
-   * </ol>
-   *
-   * @param <T>         The type of the custom trigger implementation.
-   * @param name        The map object name used to identify trigger instances that should be loaded as the specified
-   *                    {@code triggerType}.
-   * @param triggerType The class of the custom {@link Trigger} implementation.
-   */
+  /// Registers a custom [Trigger] implementation that can be automatically provided by this
+  /// [MapObjectLoader].
+  ///
+  /// Whenever a [TRIGGER][MapObjectType#TRIGGER] map object with a [name][IMapObject#getName()] equal to the
+  /// specified `name` is loaded, an instance of the supplied `triggerType` is created instead of the default
+  /// [Trigger].
+  ///
+  /// Make sure that the implementation has one of the following constructors present:
+  ///
+  /// 1. A constructor that matches the [Trigger] default constructor signature
+  /// ([TriggerActivation], [String], `boolean`, `int`).
+  /// 2. An empty constructor.
+  ///
+  /// @param <T>         The type of the custom trigger implementation.
+  /// @param name        The map object name used to identify trigger instances that should be loaded as the specified
+  /// `triggerType`.
+  /// @param triggerType The class of the custom [Trigger] implementation.
   public static <T extends Trigger> void registerCustomTriggerType(String name, Class<T> triggerType) {
     if (name == null || name.isEmpty() || triggerType == null) {
       return;
@@ -57,11 +49,9 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     customTriggerTypes.put(name.toLowerCase(), triggerType);
   }
 
-  /**
-   * Removes all previously registered custom {@link Trigger} types.
-   *
-   * @see #registerCustomTriggerType(String, Class)
-   */
+  /// Removes all previously registered custom [Trigger] types.
+  ///
+  /// @see #registerCustomTriggerType(String, Class)
   public static void clearCustomTriggerTypes() {
     customTriggerTypes.clear();
   }

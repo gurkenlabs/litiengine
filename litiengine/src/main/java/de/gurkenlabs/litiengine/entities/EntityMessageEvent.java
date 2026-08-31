@@ -3,11 +3,9 @@ package de.gurkenlabs.litiengine.entities;
 import java.io.Serial;
 import java.util.EventObject;
 
-/**
- * This implementation is used for events that contain information about a received message.
- *
- * @see IEntity#sendMessage(Object, String)
- */
+/// This implementation is used for events that contain information about a received message.
+///
+/// @see IEntity#sendMessage(Object, String)
 public class EntityMessageEvent extends EventObject {
   @Serial private static final long serialVersionUID = 5131621546037429725L;
   private final transient IEntity entity;
@@ -19,20 +17,16 @@ public class EntityMessageEvent extends EventObject {
     this.message = message;
   }
 
-  /**
-   * Gets the entity that received the message.
-   *
-   * @return The entity that received the message.
-   */
+  /// Gets the entity that received the message.
+  ///
+  /// @return The entity that received the message.
   public IEntity getEntity() {
     return this.entity;
   }
 
-  /**
-   * Gets the message that was received.
-   *
-   * @return The message.
-   */
+  /// Gets the message that was received.
+  ///
+  /// @return The message.
   public String getMessage() {
     return this.message;
   }

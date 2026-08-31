@@ -42,21 +42,17 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
   @XmlElement(name = "objectgroup")
   private MapObjectLayer collisionData;
 
-  /**
-   * Instantiates a new {@code TilesetEntry}.
-   */
+  /// Instantiates a new `TilesetEntry`.
   public TilesetEntry() {
     // keep for serialization
   }
 
-  /**
-   * Instantiates a new {@code TilesetEntry} from the specified tileset.
-   *
-   * @param tileset
-   *          The tileset that contains this entry.
-   * @param id
-   *          The identifier of this instance.
-   */
+  /// Instantiates a new `TilesetEntry` from the specified tileset.
+  ///
+  /// @param tileset
+  /// The tileset that contains this entry.
+  /// @param id
+  /// The identifier of this instance.
   public TilesetEntry(Tileset tileset, int id) {
     this.tileset = tileset;
     this.id = id;
@@ -146,11 +142,9 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     return this.collisionData;
   }
 
-  /**
-   * Gets the collision layer for this tile, creating it if necessary.
-   *
-   * @return the collision layer
-   */
+  /// Gets the collision layer for this tile, creating it if necessary.
+  ///
+  /// @return the collision layer
   public MapObjectLayer getOrCreateCollisionInfo() {
     if (this.collisionData == null) {
       this.collisionData = new MapObjectLayer();
@@ -168,9 +162,7 @@ public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntr
     return this.collisionData;
   }
 
-  /**
-   * Removes all collision information from this tile.
-   */
+  /// Removes all collision information from this tile.
   public void clearCollisionInfo() {
     this.collisionData = null;
   }

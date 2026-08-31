@@ -3,9 +3,7 @@ package de.gurkenlabs.litiengine.abilities;
 import de.gurkenlabs.litiengine.entities.Creature;
 import java.util.function.Consumer;
 
-/**
- * An {@link Ability} implementation configured programmatically with attributes and executed via callbacks.
- */
+/// An [Ability] implementation configured programmatically with attributes and executed via callbacks.
 public class DynamicAbility extends Ability {
   private Consumer<AbilityExecution> castConsumer;
 

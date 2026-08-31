@@ -8,48 +8,38 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A movement controller that supports keyboard input for horizontal entity movement.
- *
- * @param <T>
- *          The type of the controlled entity.
- */
+/// A movement controller that supports keyboard input for horizontal entity movement.
+///
+/// @param <T>
+/// The type of the controlled entity.
 public class PlatformingMovementController<T extends IMobileEntity>
     extends KeyboardEntityController<T> {
-  /**
-   * The identifier that is used by this controller to execute the jumping {@code EntityAction} on the related entity.
-   *
-   * <p>
-   * <i>Note that the entity needs to either specify a method with an {@code Action} annotation that corresponds to this
-   * identifier or it needs to explicitly register an {@code
-   * EntityAction}.</i>
-   *
-   * @see IEntity#register(String, Runnable)
-   * @see Action
-   */
+  /// The identifier that is used by this controller to execute the jumping `EntityAction` on the related entity.
+  ///
+  /// *Note that the entity needs to either specify a method with an `Action` annotation that corresponds to this
+  /// identifier or it needs to explicitly register an `EntityAction`.*
+  ///
+  /// @see IEntity#register(String, Runnable)
+  /// @see Action
   public static final String JUMP_ACTION = "jump";
 
-  /** The list of jump keys, represented by their integer values. */
+  /// The list of jump keys, represented by their integer values.
   private final List<Integer> jump;
 
-  /**
-   * Instantiates a new platforming movement controller.
-   *
-   * @param entity
-   *          the entity
-   */
+  /// Instantiates a new platforming movement controller.
+  ///
+  /// @param entity
+  /// the entity
   public PlatformingMovementController(final T entity) {
     this(entity, KeyEvent.VK_SPACE);
   }
 
-  /**
-   * Instantiates a new platforming movement controller.
-   *
-   * @param entity
-   *          the entity
-   * @param jump
-   *          the jump
-   */
+  /// Instantiates a new platforming movement controller.
+  ///
+  /// @param entity
+  /// the entity
+  /// @param jump
+  /// the jump
   public PlatformingMovementController(T entity, final int jump) {
     super(entity);
     this.getUpKeys().clear();
@@ -67,12 +57,10 @@ public class PlatformingMovementController<T extends IMobileEntity>
     }
   }
 
-  /**
-   * Adds a jump key.
-   *
-   * @param keyCode
-   *          the key code for the newly added jump key
-   */
+  /// Adds a jump key.
+  ///
+  /// @param keyCode
+  /// the key code for the newly added jump key
   public void addJumpKey(int keyCode) {
     if (this.jump.contains(keyCode)) {
       return;
@@ -81,21 +69,17 @@ public class PlatformingMovementController<T extends IMobileEntity>
     this.jump.add(keyCode);
   }
 
-  /**
-   * Gets the list of jump key codes in this controller.
-   *
-   * @return the jump keys
-   */
+  /// Gets the list of jump key codes in this controller.
+  ///
+  /// @return the jump keys
   public List<Integer> getJumpKeys() {
     return this.jump;
   }
 
-  /**
-   * Initializes the jump keys with a given array of key codes.
-   *
-   * @param jump
-   *          the new jump keys
-   */
+  /// Initializes the jump keys with a given array of key codes.
+  ///
+  /// @param jump
+  /// the new jump keys
   public void setJumpKeys(int... jump) {
     this.setUpKeys(ListUtilities.getIntList(jump));
   }

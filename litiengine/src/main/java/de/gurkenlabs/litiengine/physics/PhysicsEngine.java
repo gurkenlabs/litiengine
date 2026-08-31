@@ -21,15 +21,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-/**
- * This class is used to hold all collision aware instances and static collision boxes. It is
- * responsible for resolving movement that respects the collision boxes in the game. This is
- * achieved by the <b>{@code move}</b> method group.
- * <br>
- * The <b>{@code collides}</b> method group can detect a collision at a certain location, for
- * rectangles, or collision aware entities. Also, there's an overload that takes a {@code Line2D} to
- * perform a basic raycast check.
- */
+/// This class is used to hold all collision aware instances and static collision boxes. It is
+/// responsible for resolving movement that respects the collision boxes in the game. This is
+/// achieved by the **`move`** method group.
+///
+/// The **`collides`** method group can detect a collision at a certain location, for
+/// rectangles, or collision aware entities. Also, there's an overload that takes a `Line2D` to
+/// perform a basic raycast check.
 public final class PhysicsEngine implements IUpdateable {
 
   private Rectangle2D environmentBounds;
@@ -38,11 +36,9 @@ public final class PhysicsEngine implements IUpdateable {
   private final Map<Collision, List<ICollisionEntity>> collisionEntities = new ConcurrentHashMap<>();
   private final Map<Collision, List<Rectangle2D>> collisionBoxes = new ConcurrentHashMap<>();
 
-  /**
-   * <b>You should never call this manually! Instead use the {@code Game.physics()} instance.</b>
-   *
-   * @see Game#physics()
-   */
+  /// **You should never call this manually! Instead use the `Game.physics()` instance.**
+  ///
+  /// @see Game#physics()
   public PhysicsEngine() {
     if (Game.physics() != null) {
       throw new UnsupportedOperationException(
@@ -56,18 +52,15 @@ public final class PhysicsEngine implements IUpdateable {
     collisionBoxes.put(Collision.STATIC, new CopyOnWriteArrayList<>());
   }
 
-  /**
-   * Adds the specified collision aware entity to the physics engine which will make it respect the
-   * entity's collision box for upcoming calls.
-   *
-   * <p>
-   * <i>If you add a {@code ICollisionEntiy} to your Environment, it will automatically be added to
-   * the PhysicsEngine. There is typically no need to call this explicitly.</i>
-   *
-   * @param entity The collision entity to be added.
-   * @see ICollisionEntity#getCollisionBox()
-   * @see PhysicsEngine#remove(ICollisionEntity)
-   */
+  /// Adds the specified collision aware entity to the physics engine which will make it respect the
+  /// entity's collision box for upcoming calls.
+  ///
+  /// *If you add a `ICollisionEntiy` to your Environment, it will automatically be added to
+  /// the PhysicsEngine. There is typically no need to call this explicitly.*
+  ///
+  /// @param entity The collision entity to be added.
+  /// @see ICollisionEntity#getCollisionBox()
+  /// @see PhysicsEngine#remove(ICollisionEntity)
   public void add(final ICollisionEntity entity) {
     if (entity.getCollisionType() == null) {
       return;
@@ -75,12 +68,10 @@ public final class PhysicsEngine implements IUpdateable {
     collisionEntities.get(entity.getCollisionType()).add(entity);
   }
 
-  /**
-   * Removes the specified entity from any collision processing. Typically this method is implicitly
-   * called when an entity is removed from the current environment.
-   *
-   * @param entity The entity that is about to be removed.
-   */
+  /// Removes the specified entity from any collision processing. Typically this method is implicitly
+  /// called when an entity is removed from the current environment.
+  ///
+  /// @param entity The entity that is about to be removed.
   public void remove(final ICollisionEntity entity) {
     if (entity.getCollisionType() == null || !collisionEntities.containsKey(entity.getCollisionType())) {
       return;
@@ -89,10 +80,8 @@ public final class PhysicsEngine implements IUpdateable {
     collisionEntities.get(entity.getCollisionType()).remove(entity);
   }
 
-  /**
-   * Clears all previously registered participants in the collision process from this instance. This
-   * includes all entities, static collision boxes and the map boundaries.
-   */
+  /// Clears all previously registered participants in the collision process from this instance. This
+  /// includes all entities, static collision boxes and the map boundaries.
   public void clear() {
     for (Collision type : Collision.values()) {
       if (type == Collision.NONE || type == Collision.ANY) {
@@ -104,24 +93,20 @@ public final class PhysicsEngine implements IUpdateable {
     setBounds(null);
   }
 
-  /**
-   * Gets all {@code CollisionBoxes}, regardless of their {@code Collision} type.
-   *
-   * @return A {@code Collection} of all {@code CollisionBox}es registered on the
-   * {@code PhysicsEngine}.
-   */
+  /// Gets all `CollisionBoxes`, regardless of their `Collision` type.
+  ///
+  /// @return A `Collection` of all `CollisionBox`es registered on the
+  /// `PhysicsEngine`.
   public Collection<Rectangle2D> getCollisionBoxes() {
     return getCollisionBoxes(Collision.ANY);
   }
 
-  /**
-   * Gets all {@code CollisionBoxes} with the given {@code Collision} type.
-   *
-   * @param type The {@code Collision} type by which the {@code CollisionBoxes} are selected.
-   * @return If the {@code Collision} type is {@code NONE}, return an empty set. Otherwise, a
-   * {@code Collection} of all {@code CollisionBoxes} registered on the {@code PhysicsEngine} that
-   * have the given {@code Collision} type.
-   */
+  /// Gets all `CollisionBoxes` with the given `Collision` type.
+  ///
+  /// @param type The `Collision` type by which the `CollisionBoxes` are selected.
+  /// @return If the `Collision` type is `NONE`, return an empty set. Otherwise, a
+  /// `Collection` of all `CollisionBoxes` registered on the `PhysicsEngine` that
+  /// have the given `Collision` type.
   public Collection<Rectangle2D> getCollisionBoxes(Collision type) {
     switch (type) {
       case NONE -> {
@@ -138,24 +123,20 @@ public final class PhysicsEngine implements IUpdateable {
     }
   }
 
-  /**
-   * Gets all {@code ICollisionEntities}, regardless of their {@code Collision} type.
-   *
-   * @return A {@code Collection} of all {@code ICollisionEntities} registered on the
-   * {@code PhysicsEngine}.
-   */
+  /// Gets all `ICollisionEntities`, regardless of their `Collision` type.
+  ///
+  /// @return A `Collection` of all `ICollisionEntities` registered on the
+  /// `PhysicsEngine`.
   public Collection<ICollisionEntity> getCollisionEntities() {
     return getCollisionEntities(Collision.ANY);
   }
 
-  /**
-   * Gets all {@code ICollisionEntities} with the given {@code Collision} type.
-   *
-   * @param type The {@code Collision} type by which the {@code ICollisionEntities} are selected.
-   * @return If the {@code Collision} type is {@code NONE}, return an empty set. Otherwise, a
-   * {@code Collection} of all {@code ICollisionEntities} registered on the {@code PhysicsEngine}
-   * that have the given {@code Collision} type.
-   */
+  /// Gets all `ICollisionEntities` with the given `Collision` type.
+  ///
+  /// @param type The `Collision` type by which the `ICollisionEntities` are selected.
+  /// @return If the `Collision` type is `NONE`, return an empty set. Otherwise, a
+  /// `Collection` of all `ICollisionEntities` registered on the `PhysicsEngine`
+  /// that have the given `Collision` type.
   public Collection<ICollisionEntity> getCollisionEntities(Collision type) {
     switch (type) {
       case NONE -> {
@@ -172,75 +153,63 @@ public final class PhysicsEngine implements IUpdateable {
     }
   }
 
-  /**
-   * Gets the environment bounds that confine the operation area of the {@code PhysicsEngine}.
-   *
-   * @return The {@code Rectangle2D} confining the operation area of the {@code PhysicsEngine}.
-   */
+  /// Gets the environment bounds that confine the operation area of the `PhysicsEngine`.
+  ///
+  /// @return The `Rectangle2D` confining the operation area of the `PhysicsEngine`.
   public Rectangle2D getBounds() {
     return this.environmentBounds;
   }
 
-  /**
-   * Sets the environment bounds that confine the operation area of the {@code PhysicsEngine}.
-   *
-   * @param environmentBounds The {@code Rectangle2D} confining the operation area of the
-   *                          {@code PhysicsEngine}.
-   */
+  /// Sets the environment bounds that confine the operation area of the `PhysicsEngine`.
+  ///
+  /// @param environmentBounds The `Rectangle2D` confining the operation area of the
+  /// `PhysicsEngine`.
   public void setBounds(final Rectangle2D environmentBounds) {
     this.environmentBounds = environmentBounds;
   }
 
-  /**
-   * Checks if a given line collides with anything registered in the {@code PhysicsEngine}.
-   *
-   * @param line The {@code Line2D} to check for collision.
-   * @return {@code true} if the line collides with anything. {@code false} otherwise.
-   */
+  /// Checks if a given line collides with anything registered in the `PhysicsEngine`.
+  ///
+  /// @param line The `Line2D` to check for collision.
+  /// @return `true` if the line collides with anything. `false` otherwise.
   public boolean collides(Line2D line) {
     return this.collides(line, Collision.ANY, null);
   }
 
-  /**
-   * Checks if a line collides with anything of the given {@code Collision} type.
-   *
-   * @param line      The {@code Line2D} to check for collision.
-   * @param collision The {@code Collision} type to check for collisions.
-   * @return {@code true} if the line collides with anything of the given {@code Collision} type.
-   * {@code false} otherwise.
-   * @see Collision
-   */
+  /// Checks if a line collides with anything of the given `Collision` type.
+  ///
+  /// @param line      The `Line2D` to check for collision.
+  /// @param collision The `Collision` type to check for collisions.
+  /// @return `true` if the line collides with anything of the given `Collision` type.
+  /// `false` otherwise.
+  /// @see Collision
   public boolean collides(Line2D line, Collision collision) {
     return this.collides(line, collision, null);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with anything that intersects a specific
-   * line.
-   *
-   * @param line   The {@code Line2D} to check for collision.
-   * @param entity The {@code ICollisionEntity} to check for collision.
-   * @return {@code true} if any {@code ICollisionEntity} intersecting the line collides with the
-   * given {@code ICollisionEntity}. {@code false} otherwise.
-   * @see Collision
-   * @see ICollisionEntity
-   */
+  /// Checks if a given `ICollisionEntity` collides with anything that intersects a specific
+  /// line.
+  ///
+  /// @param line   The `Line2D` to check for collision.
+  /// @param entity The `ICollisionEntity` to check for collision.
+  /// @return `true` if any `ICollisionEntity` intersecting the line collides with the
+  /// given `ICollisionEntity`. `false` otherwise.
+  /// @see Collision
+  /// @see ICollisionEntity
   public boolean collides(Line2D line, ICollisionEntity entity) {
     return this.collides(line, Collision.ANY, entity);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with any {@code ICollisionEntities} of a
-   * given {@code Collision} type that intersect a specific line.
-   *
-   * @param line      The {@code Line2D} to check for collision.
-   * @param collision The {@code Collision} type to check for collision.
-   * @param entity    The {@code ICollisionEntity} to check for collision.
-   * @return {@code true} if the entity collides with any {@code ICollisionEntity} on the given
-   * line. {@code false} otherwise.
-   * @see Collision
-   * @see ICollisionEntity
-   */
+  /// Checks if a given `ICollisionEntity` collides with any `ICollisionEntities` of a
+  /// given `Collision` type that intersect a specific line.
+  ///
+  /// @param line      The `Line2D` to check for collision.
+  /// @param collision The `Collision` type to check for collision.
+  /// @param entity    The `ICollisionEntity` to check for collision.
+  /// @return `true` if the entity collides with any `ICollisionEntity` on the given
+  /// line. `false` otherwise.
+  /// @see Collision
+  /// @see ICollisionEntity
   public boolean collides(final Line2D line, Collision collision, ICollisionEntity entity) {
     return this.collides(
       entity,
@@ -248,55 +217,47 @@ public final class PhysicsEngine implements IUpdateable {
       e -> GeometricUtilities.getIntersectionPoint(line, e.getCollisionBox()) != null);
   }
 
-  /**
-   * Checks if a given rectangle collides with anything registered in the {@code PhysicsEngine}.
-   *
-   * @param rect The {@code Rectangle2D} to check for collision.
-   * @return {@code true} if the rectangle collides with anything. {@code false} otherwise.
-   */
+  /// Checks if a given rectangle collides with anything registered in the `PhysicsEngine`.
+  ///
+  /// @param rect The `Rectangle2D` to check for collision.
+  /// @return `true` if the rectangle collides with anything. `false` otherwise.
   public boolean collides(final Rectangle2D rect) {
     return this.collides(rect, Collision.ANY);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with anything that intersects a specific
-   * rectangle.
-   *
-   * @param rect   The {@code Rectangle2D} to check for collision.
-   * @param entity The {@code ICollisionEntity} to check for collision.
-   * @return {@code true} if the entity collides with any {@code ICollisionEntity} in the given
-   * rectangle. {@code false} otherwise.
-   * @see ICollisionEntity
-   */
+  /// Checks if a given `ICollisionEntity` collides with anything that intersects a specific
+  /// rectangle.
+  ///
+  /// @param rect   The `Rectangle2D` to check for collision.
+  /// @param entity The `ICollisionEntity` to check for collision.
+  /// @return `true` if the entity collides with any `ICollisionEntity` in the given
+  /// rectangle. `false` otherwise.
+  /// @see ICollisionEntity
   public boolean collides(Rectangle2D rect, ICollisionEntity entity) {
     return this.collides(rect, Collision.ANY, entity);
   }
 
-  /**
-   * Checks if a rectangle collides with anything of the given {@code Collision} type.
-   *
-   * @param rect      The {@code Rectangle2D} to check for collision.
-   * @param collision The {@code Collision} type to check for collisions.
-   * @return {@code true} if the rectangle collides with anything of the given {@code Collision}
-   * type. {@code false} otherwise.
-   * @see Collision
-   */
+  /// Checks if a rectangle collides with anything of the given `Collision` type.
+  ///
+  /// @param rect      The `Rectangle2D` to check for collision.
+  /// @param collision The `Collision` type to check for collisions.
+  /// @return `true` if the rectangle collides with anything of the given `Collision`
+  /// type. `false` otherwise.
+  /// @see Collision
   public boolean collides(Rectangle2D rect, Collision collision) {
     return collides(rect, collision, null);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with any {@code ICollisionEntities} of a
-   * given {@code Collision} type that intersect a specific rectangle.
-   *
-   * @param rect      The {@code Rectangle2D} to check for collision.
-   * @param collision The {@code Collision} type to check for collision.
-   * @param entity    The {@code ICollisionEntity} to check for collision.
-   * @return {@code true} if the entity collides with any {@code ICollisionEntity} in the given
-   * rectangle. {@code false} otherwise.
-   * @see Collision
-   * @see ICollisionEntity
-   */
+  /// Checks if a given `ICollisionEntity` collides with any `ICollisionEntities` of a
+  /// given `Collision` type that intersect a specific rectangle.
+  ///
+  /// @param rect      The `Rectangle2D` to check for collision.
+  /// @param collision The `Collision` type to check for collision.
+  /// @param entity    The `ICollisionEntity` to check for collision.
+  /// @return `true` if the entity collides with any `ICollisionEntity` in the given
+  /// rectangle. `false` otherwise.
+  /// @see Collision
+  /// @see ICollisionEntity
   public boolean collides(Rectangle2D rect, Collision collision, ICollisionEntity entity) {
     if (this.environmentBounds != null && !this.environmentBounds.intersects(rect)) {
       return true;
@@ -308,55 +269,47 @@ public final class PhysicsEngine implements IUpdateable {
       otherEntity -> GeometricUtilities.intersects(otherEntity.getCollisionBox(), rect));
   }
 
-  /**
-   * Checks if a given point collides with anything registered in the {@code PhysicsEngine}.
-   *
-   * @param location The {@code Point2D} to check for collision.
-   * @return {@code true} if the point collides with anything. {@code false} otherwise.
-   */
+  /// Checks if a given point collides with anything registered in the `PhysicsEngine`.
+  ///
+  /// @param location The `Point2D` to check for collision.
+  /// @return `true` if the point collides with anything. `false` otherwise.
   public boolean collides(final Point2D location) {
     return this.collides(location, Collision.ANY);
   }
 
-  /**
-   * Checks if a point collides with anything of the given {@code Collision} type.
-   *
-   * @param location  The {@code Point2D} to check for collision.
-   * @param collision The {@code Collision} type to check for collisions.
-   * @return {@code true} if the point collides with anything of the given {@code Collision} type.
-   * {@code false} otherwise.
-   * @see Collision
-   */
+  /// Checks if a point collides with anything of the given `Collision` type.
+  ///
+  /// @param location  The `Point2D` to check for collision.
+  /// @param collision The `Collision` type to check for collisions.
+  /// @return `true` if the point collides with anything of the given `Collision` type.
+  /// `false` otherwise.
+  /// @see Collision
   public boolean collides(Point2D location, Collision collision) {
     return collides(location, collision, null);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with anything that intersects a specific
-   * point.
-   *
-   * @param location The {@code Point2D} to check for collision.
-   * @param entity   The {@code ICollisionEntity} to check for collision.
-   * @return {@code true} if the entity collides with any {@code ICollisionEntity} on the given
-   * point. {@code false} otherwise.
-   * @see ICollisionEntity
-   */
+  /// Checks if a given `ICollisionEntity` collides with anything that intersects a specific
+  /// point.
+  ///
+  /// @param location The `Point2D` to check for collision.
+  /// @param entity   The `ICollisionEntity` to check for collision.
+  /// @return `true` if the entity collides with any `ICollisionEntity` on the given
+  /// point. `false` otherwise.
+  /// @see ICollisionEntity
   public boolean collides(Point2D location, ICollisionEntity entity) {
     return this.collides(location, Collision.ANY, entity);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with any {@code ICollisionEntities} of a
-   * given {@code Collision} type that intersect a specific point.
-   *
-   * @param location  The {@code Point2D} to check for collision.
-   * @param collision The {@code Collision} type to check for collision.
-   * @param entity    The {@code ICollisionEntity} to check for collision.
-   * @return {@code true} if the entity collides with any {@code ICollisionEntity} on the given
-   * point. {@code false} otherwise.
-   * @see Collision
-   * @see ICollisionEntity
-   */
+  /// Checks if a given `ICollisionEntity` collides with any `ICollisionEntities` of a
+  /// given `Collision` type that intersect a specific point.
+  ///
+  /// @param location  The `Point2D` to check for collision.
+  /// @param collision The `Collision` type to check for collision.
+  /// @param entity    The `ICollisionEntity` to check for collision.
+  /// @return `true` if the entity collides with any `ICollisionEntity` on the given
+  /// point. `false` otherwise.
+  /// @see Collision
+  /// @see ICollisionEntity
   public boolean collides(Point2D location, Collision collision, ICollisionEntity entity) {
     if (this.environmentBounds != null && !this.environmentBounds.contains(location)) {
       return true;
@@ -366,163 +319,139 @@ public final class PhysicsEngine implements IUpdateable {
       entity, collision, otherEntity -> otherEntity.getCollisionBox().contains(location));
   }
 
-  /**
-   * Checks if the point at the given coordinates collides with anything registered in the
-   * {@code PhysicsEngine}.
-   *
-   * @param x The x coordinate to check for collision.
-   * @param y The y coordinate to check for collision.
-   * @return {@code true} if the coordinates collide with anything. {@code false} otherwise.
-   */
+  /// Checks if the point at the given coordinates collides with anything registered in the
+  /// `PhysicsEngine`.
+  ///
+  /// @param x The x coordinate to check for collision.
+  /// @param y The y coordinate to check for collision.
+  /// @return `true` if the coordinates collide with anything. `false` otherwise.
   public boolean collides(final double x, final double y) {
     return this.collides(new Point2D.Double(x, y));
   }
 
-  /**
-   * Checks if the point at the given coordinates collides with anything of the given
-   * {@code Collision} type.
-   *
-   * @param x         The x coordinate to check for collision.
-   * @param y         The y coordinate to check for collision.
-   * @param collision The {@code Collision} type to check for collisions.
-   * @return {@code true} if the coordinates collide with anything of the given {@code Collision}
-   * type. {@code false} otherwise.
-   * @see Collision
-   */
+  /// Checks if the point at the given coordinates collides with anything of the given
+  /// `Collision` type.
+  ///
+  /// @param x         The x coordinate to check for collision.
+  /// @param y         The y coordinate to check for collision.
+  /// @param collision The `Collision` type to check for collisions.
+  /// @return `true` if the coordinates collide with anything of the given `Collision`
+  /// type. `false` otherwise.
+  /// @see Collision
   public boolean collides(double x, double y, Collision collision) {
     return this.collides(new Point2D.Double(x, y), collision);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with anything that intersects specific
-   * coordinates.
-   *
-   * @param x      The x coordinate to check for collision.
-   * @param y      The y coordinate to check for collision.
-   * @param entity The {@code ICollisionEntity} to check for collision.
-   * @return {@code true} if the entity collides with any {@code ICollisionEntity} on the given
-   * coordinates. {@code false} otherwise.
-   * @see ICollisionEntity
-   */
+  /// Checks if a given `ICollisionEntity` collides with anything that intersects specific
+  /// coordinates.
+  ///
+  /// @param x      The x coordinate to check for collision.
+  /// @param y      The y coordinate to check for collision.
+  /// @param entity The `ICollisionEntity` to check for collision.
+  /// @return `true` if the entity collides with any `ICollisionEntity` on the given
+  /// coordinates. `false` otherwise.
+  /// @see ICollisionEntity
   public boolean collides(double x, double y, ICollisionEntity entity) {
     return collides(new Point2D.Double(x, y), entity);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with anything registered in the
-   * {@code PhysicsEngine}.
-   *
-   * @param entity The {@code ICollisionEntity} to check for collision.
-   * @return {@code true} if the entity collides with any other {@code ICollisionEntity}.
-   * {@code false} otherwise.
-   * @see ICollisionEntity
-   */
+  /// Checks if a given `ICollisionEntity` collides with anything registered in the
+  /// `PhysicsEngine`.
+  ///
+  /// @param entity The `ICollisionEntity` to check for collision.
+  /// @return `true` if the entity collides with any other `ICollisionEntity`.
+  /// `false` otherwise.
+  /// @see ICollisionEntity
   public boolean collides(ICollisionEntity entity) {
     return this.collides(entity, Collision.ANY);
   }
 
-  /**
-   * Checks if a given {@code ICollisionEntity} collides with anything of the given
-   * {@code Collision} type.
-   *
-   * @param entity    The {@code ICollisionEntity} to check for collision.
-   * @param collision The {@code Collision} type to check for collisions.
-   * @return {@code true} if the entity collides with anything of the given {@code Collision} type.
-   * {@code false} otherwise.
-   * @see Collision
-   */
+  /// Checks if a given `ICollisionEntity` collides with anything of the given
+  /// `Collision` type.
+  ///
+  /// @param entity    The `ICollisionEntity` to check for collision.
+  /// @param collision The `Collision` type to check for collisions.
+  /// @return `true` if the entity collides with anything of the given `Collision` type.
+  /// `false` otherwise.
+  /// @see Collision
   public boolean collides(ICollisionEntity entity, Collision collision) {
     return this.collides(entity.getCollisionBox(), collision, entity);
   }
 
-  /**
-   * From a given point, cast a ray of indefinite length with the given angle and see if it hits
-   * anything.
-   *
-   * @param start The start point of the raycast.
-   * @param angle The angle in degrees.
-   * @return A {@code RaycastHit} determining the hit point, ray length, and corresponding
-   * {@code ICollisionEntity}, if the ray hit something.
-   */
+  /// From a given point, cast a ray of indefinite length with the given angle and see if it hits
+  /// anything.
+  ///
+  /// @param start The start point of the raycast.
+  /// @param angle The angle in degrees.
+  /// @return A `RaycastHit` determining the hit point, ray length, and corresponding
+  /// `ICollisionEntity`, if the ray hit something.
   public RaycastHit raycast(Point2D start, double angle) {
     double diameter = GeometricUtilities.getDiagonal(this.environmentBounds);
     return raycast(start, GeometricUtilities.project(start, angle, diameter));
   }
 
-  /**
-   * From a given point, cast a ray to another point and see if it hits anything.
-   *
-   * @param start  The start point of the raycast.
-   * @param target The end point of the raycast.
-   * @return A {@code RaycastHit} determining the hit point, ray length, and corresponding
-   * {@code ICollisionEntity}, if the ray hit something.
-   */
+  /// From a given point, cast a ray to another point and see if it hits anything.
+  ///
+  /// @param start  The start point of the raycast.
+  /// @param target The end point of the raycast.
+  /// @return A `RaycastHit` determining the hit point, ray length, and corresponding
+  /// `ICollisionEntity`, if the ray hit something.
   public RaycastHit raycast(Point2D start, Point2D target) {
     return raycast(start, target, Collision.ANY);
   }
 
-  /**
-   * From a given point, cast a ray to another point and see if it hits anything with the given
-   * {@code Collision} type.
-   *
-   * @param start     The start point of the raycast.
-   * @param target    The end point of the raycast.
-   * @param collision The {@code Collision} type to check for collision.
-   * @return A {@code RaycastHit} determining the hit point, ray length, and corresponding
-   * {@code ICollisionEntity}, if the ray hit something.
-   */
+  /// From a given point, cast a ray to another point and see if it hits anything with the given
+  /// `Collision` type.
+  ///
+  /// @param start     The start point of the raycast.
+  /// @param target    The end point of the raycast.
+  /// @param collision The `Collision` type to check for collision.
+  /// @return A `RaycastHit` determining the hit point, ray length, and corresponding
+  /// `ICollisionEntity`, if the ray hit something.
   public RaycastHit raycast(Point2D start, Point2D target, Collision collision) {
     final Line2D line = new Line2D.Double(start.getX(), start.getY(), target.getX(), target.getY());
     return raycast(line, collision, null);
   }
 
-  /**
-   * Cast a ray along a given line [from (x1,y1) to (x2,y2)] and see if it hits anything.
-   *
-   * @param line The line along which the ray is cast.
-   * @return A {@code RaycastHit} determining the hit point, ray length, and corresponding
-   * {@code ICollisionEntity}, if the ray hit something.
-   */
+  /// Cast a ray along a given line [from (x1,y1) to (x2,y2)] and see if it hits anything.
+  ///
+  /// @param line The line along which the ray is cast.
+  /// @return A `RaycastHit` determining the hit point, ray length, and corresponding
+  /// `ICollisionEntity`, if the ray hit something.
   public RaycastHit raycast(Line2D line) {
     return raycast(line, Collision.ANY, null);
   }
 
-  /**
-   * Cast a ray along a given line [from (x1,y1) to (x2,y2)] and see if it hits anything with the
-   * given {@code Collision} type.
-   *
-   * @param line      The line along which the ray is cast.
-   * @param collision The {@code Collision} type to check for collision.
-   * @return A {@code RaycastHit} determining the hit point, ray length, and corresponding
-   * {@code ICollisionEntity}, if the ray hit something.
-   */
+  /// Cast a ray along a given line [from (x1,y1) to (x2,y2)] and see if it hits anything with the
+  /// given `Collision` type.
+  ///
+  /// @param line      The line along which the ray is cast.
+  /// @param collision The `Collision` type to check for collision.
+  /// @return A `RaycastHit` determining the hit point, ray length, and corresponding
+  /// `ICollisionEntity`, if the ray hit something.
   public RaycastHit raycast(Line2D line, Collision collision) {
     return raycast(line, collision, null);
   }
 
-  /**
-   * Cast a ray along a given line [from (x1,y1) to (x2,y2)] and see if it hits a given
-   * {@code ICollisionEntity}.
-   *
-   * @param line   The line along which the ray is cast.
-   * @param entity The {@code ICollisionEntity} type to check for collision.
-   * @return A {@code RaycastHit} determining the hit point, ray length, and corresponding
-   * {@code ICollisionEntity}.
-   */
+  /// Cast a ray along a given line [from (x1,y1) to (x2,y2)] and see if it hits a given
+  /// `ICollisionEntity`.
+  ///
+  /// @param line   The line along which the ray is cast.
+  /// @param entity The `ICollisionEntity` type to check for collision.
+  /// @return A `RaycastHit` determining the hit point, ray length, and corresponding
+  /// `ICollisionEntity`.
   public RaycastHit raycast(Line2D line, ICollisionEntity entity) {
     return raycast(line, Collision.ANY, entity);
   }
 
-  /**
-   * Cast a ray along a given line [from (x1,y1) to (x2,y2)] and see if it hits anything with a
-   * certain {@code Collision} type that collides with the given {@code ICollisionEntity}.
-   *
-   * @param line      The line along which the ray is cast.
-   * @param collision The {@code Collision} type to check for collision.
-   * @param entity    The {@code ICollisionEntity} type to check for collision.
-   * @return A {@code RaycastHit} determining the hit point, ray length, and corresponding
-   * {@code ICollisionEntity}.
-   */
+  /// Cast a ray along a given line [from (x1,y1) to (x2,y2)] and see if it hits anything with a
+  /// certain `Collision` type that collides with the given `ICollisionEntity`.
+  ///
+  /// @param line      The line along which the ray is cast.
+  /// @param collision The `Collision` type to check for collision.
+  /// @param entity    The `ICollisionEntity` type to check for collision.
+  /// @return A `RaycastHit` determining the hit point, ray length, and corresponding
+  /// `ICollisionEntity`.
   public RaycastHit raycast(Line2D line, Collision collision, ICollisionEntity entity) {
     final Point2D rayCastSource = new Point2D.Double(line.getX1(), line.getY1());
 
@@ -550,70 +479,60 @@ public final class PhysicsEngine implements IUpdateable {
     return null;
   }
 
-  /**
-   * Moves the specified entity by a given distance and angle.
-   *
-   * @param entity   The entity which is moved
-   * @param angle    The angle in degrees
-   * @param distance The distance to move the entity
-   * @return {@code true}, if the entity can be moved without colliding, otherwise {@code false}.
-   * @see GeometricUtilities#project(Point2D, double, double)
-   */
+  /// Moves the specified entity by a given distance and angle.
+  ///
+  /// @param entity   The entity which is moved
+  /// @param angle    The angle in degrees
+  /// @param distance The distance to move the entity
+  /// @return `true`, if the entity can be moved without colliding, otherwise `false`.
+  /// @see GeometricUtilities#project(Point2D, double, double)
   public boolean move(final IMobileEntity entity, final double angle, final double distance) {
     final Point2D newLocation = GeometricUtilities.project(entity.getLocation(), angle, distance);
     return move(entity, newLocation);
   }
 
-  /**
-   * Moves the specified entity by a given distance and angle.
-   *
-   * @param entity    The {@code IMobileEntity} which is moved
-   * @param direction The {@code Direction} in which the entity is moved
-   * @param distance  The distance to move the entity
-   * @return {@code true}, if the entity can be moved without colliding, otherwise {@code false}.
-   * @see Direction
-   */
+  /// Moves the specified entity by a given distance and angle.
+  ///
+  /// @param entity    The `IMobileEntity` which is moved
+  /// @param direction The `Direction` in which the entity is moved
+  /// @param distance  The distance to move the entity
+  /// @return `true`, if the entity can be moved without colliding, otherwise `false`.
+  /// @see Direction
   public boolean move(IMobileEntity entity, Direction direction, double distance) {
     return move(entity, direction.toAngle(), distance);
   }
 
-  /**
-   * Moves the specified entity by a given distance towards the target coordinates.
-   *
-   * @param entity   The {@code IMobileEntity} which is moved
-   * @param x        The target x coordinate
-   * @param y        The target y coordinate
-   * @param distance The distance to move the entity
-   * @return {@code true}, if the entity can be moved without colliding, otherwise {@code false}.
-   */
+  /// Moves the specified entity by a given distance towards the target coordinates.
+  ///
+  /// @param entity   The `IMobileEntity` which is moved
+  /// @param x        The target x coordinate
+  /// @param y        The target y coordinate
+  /// @param distance The distance to move the entity
+  /// @return `true`, if the entity can be moved without colliding, otherwise `false`.
   public boolean move(
     final IMobileEntity entity, final double x, final double y, final float distance) {
     return move(entity, new Point2D.Double(x, y), distance);
   }
 
-  /**
-   * Moves the specified entity by a given distance and the entity's angle.
-   *
-   * @param entity   The {@code IMobileEntity} which is moved
-   * @param distance The distance to move the entity
-   * @return {@code true}, if the entity can be moved without colliding, otherwise {@code false}.
-   * @see Direction
-   */
+  /// Moves the specified entity by a given distance and the entity's angle.
+  ///
+  /// @param entity   The `IMobileEntity` which is moved
+  /// @param distance The distance to move the entity
+  /// @return `true`, if the entity can be moved without colliding, otherwise `false`.
+  /// @see Direction
   public boolean move(final IMobileEntity entity, final float distance) {
     return move(entity, entity.getAngle(), distance);
   }
 
-  /**
-   * Moves the specified entity to a target point. If {@code turnTowardsTarget} is {@code true}, set
-   * the entity's angle towards the target.
-   *
-   * @param entity            The {@code IMobileEntity} which is moved
-   * @param target            The target point
-   * @param turnTowardsTarget Boolean that determines whether the movement should turn the entity
-   *                          towards the target point.
-   * @return {@code true}, if the entity can be moved without colliding, otherwise {@code false}.
-   * @see #resolveCollisionForNewLocation
-   */
+  /// Moves the specified entity to a target point. If `turnTowardsTarget` is `true`, set
+  /// the entity's angle towards the target.
+  ///
+  /// @param entity            The `IMobileEntity` which is moved
+  /// @param target            The target point
+  /// @param turnTowardsTarget Boolean that determines whether the movement should turn the entity
+  /// towards the target point.
+  /// @return `true`, if the entity can be moved without colliding, otherwise `false`.
+  /// @see #resolveCollisionForNewLocation
   public boolean move(final IMobileEntity entity, Point2D target, boolean turnTowardsTarget) {
     if (turnTowardsTarget) {
       entity.setAngle(
@@ -652,30 +571,26 @@ public final class PhysicsEngine implements IUpdateable {
 
   }
 
-  /**
-   * Moves the specified entity to a target point. If {@code entity.turnOnMove()} is {@code true},
-   * set the entity's angle towards the target.
-   *
-   * @param entity The {@code IMobileEntity} which is moved
-   * @param target The target point
-   * @return {@code true}, if the entity can be moved without colliding, otherwise {@code false}.
-   * @see #resolveCollisionForNewLocation
-   */
+  /// Moves the specified entity to a target point. If `entity.turnOnMove()` is `true`,
+  /// set the entity's angle towards the target.
+  ///
+  /// @param entity The `IMobileEntity` which is moved
+  /// @param target The target point
+  /// @return `true`, if the entity can be moved without colliding, otherwise `false`.
+  /// @see #resolveCollisionForNewLocation
   public boolean move(final IMobileEntity entity, Point2D target) {
     return move(entity, target, entity.turnOnMove());
   }
 
 
-  /**
-   * Moves the specified entity by a given distance towards the target coordinates. If
-   * {@code entity.turnOnMove()} is {@code true}, set the entity's angle towards the target.
-   *
-   * @param entity   The {@code IMobileEntity} which is moved
-   * @param target   The target point
-   * @param distance The distance to move the entity
-   * @return {@code true}, if the entity can be moved without colliding, otherwise {@code false}.
-   * @see #resolveCollisionForNewLocation
-   */
+  /// Moves the specified entity by a given distance towards the target coordinates. If
+  /// `entity.turnOnMove()` is `true`, set the entity's angle towards the target.
+  ///
+  /// @param entity   The `IMobileEntity` which is moved
+  /// @param target   The target point
+  /// @param distance The distance to move the entity
+  /// @return `true`, if the entity can be moved without colliding, otherwise `false`.
+  /// @see #resolveCollisionForNewLocation
   public boolean move(final IMobileEntity entity, final Point2D target, final float distance) {
     final Point2D newLocation = GeometricUtilities.project(entity.getLocation(), target, distance);
     return move(entity, newLocation);
@@ -689,10 +604,8 @@ public final class PhysicsEngine implements IUpdateable {
     this.enabled = enabled;
   }
 
-  /**
-   * Clears all collision boxes registered on the {@code PhysicsEngine} once per tick and re-adds
-   * them with their updated positions.
-   */
+  /// Clears all collision boxes registered on the `PhysicsEngine` once per tick and re-adds
+  /// them with their updated positions.
   @Override
   public void update() {
     if (!this.enabled) {
@@ -709,13 +622,11 @@ public final class PhysicsEngine implements IUpdateable {
     }
   }
 
-  /**
-   * Checks if two entities can collide
-   *
-   * @param entity      The first entity to check for collision
-   * @param otherEntity The second entity to check for collision
-   * @return {@code true} if the entities can collide, {@code false} otherwise.
-   */
+  /// Checks if two entities can collide
+  ///
+  /// @param entity      The first entity to check for collision
+  /// @param otherEntity The second entity to check for collision
+  /// @return `true` if the entities can collide, `false` otherwise.
   private static boolean canCollide(ICollisionEntity entity, ICollisionEntity otherEntity) {
     if (otherEntity == null || !otherEntity.hasCollision()) {
       return false;
@@ -736,14 +647,12 @@ public final class PhysicsEngine implements IUpdateable {
     return entity.canCollideWith(otherEntity);
   }
 
-  /**
-   * Gets the intersection between an entity's collision box and all {@code ICollisionEntities} in a
-   * given rectangle.
-   *
-   * @param entity The {@code ICollisionEntity} to check for intersection.
-   * @param rect   The {@code Rectangle2D} to check for intersection.
-   * @return The {@code Intersection} area.
-   */
+  /// Gets the intersection between an entity's collision box and all `ICollisionEntities` in a
+  /// given rectangle.
+  ///
+  /// @param entity The `ICollisionEntity` to check for intersection.
+  /// @param rect   The `Rectangle2D` to check for intersection.
+  /// @return The `Intersection` area.
   private Intersection getIntersection(final ICollisionEntity entity, final Rectangle2D rect) {
     Intersection result = null;
     for (final ICollisionEntity otherEntity : getCollisionEntities()) {
@@ -782,12 +691,10 @@ public final class PhysicsEngine implements IUpdateable {
     return false;
   }
 
-  /**
-   * Checks if is in map.
-   *
-   * @param collisionBox the collision box
-   * @return true, if is in map
-   */
+  /// Checks if is in map.
+  ///
+  /// @param collisionBox the collision box
+  /// @return true, if is in map
   private boolean isInMap(final Shape collisionBox) {
     if (environmentBounds == null) {
       return true;
@@ -796,15 +703,13 @@ public final class PhysicsEngine implements IUpdateable {
     return environmentBounds.contains(collisionBox.getBounds());
   }
 
-  /**
-   * With the current physics implementation is is possible to glitch through other entities, if
-   * their collisionbox is smaller than the velocity of the moving entity and they also move towards
-   * the currently moving entity.
-   *
-   * @param entity         The entity to resolve the collision for.
-   * @param targetLocation The target location to which the entity should be moved to.
-   * @return The position to which the entity should be moved after resolving the collision.
-   */
+  /// With the current physics implementation is is possible to glitch through other entities, if
+  /// their collisionbox is smaller than the velocity of the moving entity and they also move towards
+  /// the currently moving entity.
+  ///
+  /// @param entity         The entity to resolve the collision for.
+  /// @param targetLocation The target location to which the entity should be moved to.
+  /// @return The position to which the entity should be moved after resolving the collision.
   private Point2D resolveCollision(final ICollisionEntity entity, final Point2D targetLocation) {
     // first resolve x-axis movement
     Point2D resolvedLocation = new Point2D.Double(targetLocation.getX(), entity.getY());
@@ -922,10 +827,8 @@ public final class PhysicsEngine implements IUpdateable {
     }
   }
 
-  /**
-   * A helper class that contains the intersection of a collision event and the involved entities.
-   * This is basically just a {@link Rectangle2D} with some additional information.
-   */
+  /// A helper class that contains the intersection of a collision event and the involved entities.
+  /// This is basically just a [Rectangle2D] with some additional information.
   private static class Intersection extends Rectangle2D.Double {
 
     private final transient ICollisionEntity[] involvedEntities;

@@ -12,31 +12,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Represents an attribute with a base value and a list of modifiers. The attribute value can be modified by adding or removing modifiers.
- * <p>
- * This class is XML-serializable via JAXB. The base {@link #value} is written as an XML attribute
- * named {@code value}; runtime-only data (such as registered modifiers and property change support)
- * is marked transient and is not part of the serialized form.
- * </p>
- *
- * @param <T> the type of the attribute value, which must be a Number
- */
+/// Represents an attribute with a base value and a list of modifiers. The attribute value can be modified by adding or removing modifiers.
+///
+/// This class is XML-serializable via JAXB. The base [#value] is written as an XML attribute
+/// named `value`; runtime-only data (such as registered modifiers and property change support)
+/// is marked transient and is not part of the serialized form.
+///
+/// @param <T> the type of the attribute value, which must be a Number
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Attribute<T extends Number> implements IAttribute<T>, Serializable {
-  /**
-   * The support object used to manage and notify property change listeners. It allows other components to listen for changes to the properties of
-   * this object.
-   */
+  /// The support object used to manage and notify property change listeners. It allows other components to listen for changes to the properties of
+  /// this object.
   protected final transient PropertyChangeSupport support;
-  /**
-   * The base value of the attribute. This value represents the unmodified state of the attribute
-   * before any modifiers are applied. It is serialized as the {@code value} XML attribute.
-   * <p>
-   * Subclasses such as {@link RangeAttribute} that do not want to persist a base value can suppress
-   * serialization at runtime via JAXB {@code beforeMarshal} / {@code afterMarshal} callbacks.
-   * </p>
-   */
+  /// The base value of the attribute. This value represents the unmodified state of the attribute
+  /// before any modifiers are applied. It is serialized as the `value` XML attribute.
+  ///
+  /// Subclasses such as [RangeAttribute] that do not want to persist a base value can suppress
+  /// serialization at runtime via JAXB `beforeMarshal` / `afterMarshal` callbacks.
   @XmlAttribute(name = "value")
   @XmlJavaTypeAdapter(NumberAdapter.class)
   protected T value;
@@ -45,39 +37,31 @@ public class Attribute<T extends Number> implements IAttribute<T>, Serializable 
   private final transient List<AttributeModifier<T>> modifiers = new ArrayList<>();
 
 
-  /**
-   * Default no-argument constructor.
-   */
+  /// Default no-argument constructor.
   public Attribute() {
     this(null);
   }
 
-  /**
-   * Constructs a new Attribute with the specified initial value.
-   *
-   * @param initialValue the initial value of the attribute
-   */
+  /// Constructs a new Attribute with the specified initial value.
+  ///
+  /// @param initialValue the initial value of the attribute
   public Attribute(T initialValue) {
     this.value = initialValue;
     this.support = new PropertyChangeSupport(this);
     this.modifierListener = evt -> support.firePropertyChange(VALUE_PROPERTY, evt.getOldValue(), evt.getNewValue());
   }
 
-  /**
-   * Gets the base value of the attribute.
-   *
-   * @return the base value of the attribute
-   */
+  /// Gets the base value of the attribute.
+  ///
+  /// @return the base value of the attribute
   public T getValue() {
     return this.value;
   }
 
 
-  /**
-   * Gets the current value of the attribute, computed by applying all active modifications to the base value.
-   *
-   * @return the current value
-   */
+  /// Gets the current value of the attribute, computed by applying all active modifications to the base value.
+  ///
+  /// @return the current value
   @Override
   public T getModifiedValue() {
     T modifiedValue = value;
@@ -89,11 +73,9 @@ public class Attribute<T extends Number> implements IAttribute<T>, Serializable 
     return modifiedValue;
   }
 
-  /**
-   * Sets the base value of the attribute and fires a property change event.
-   *
-   * @param newValue the new base value of the attribute
-   */
+  /// Sets the base value of the attribute and fires a property change event.
+  ///
+  /// @param newValue the new base value of the attribute
   @Override
   public void setValue(T newValue) {
     T oldValue = getModifiedValue();
@@ -103,31 +85,25 @@ public class Attribute<T extends Number> implements IAttribute<T>, Serializable 
     support.firePropertyChange("baseValue", oldValue, newModifiedValue);
   }
 
-  /**
-   * Adds a property change listener to the attribute.
-   *
-   * @param listener the property change listener to be added
-   */
+  /// Adds a property change listener to the attribute.
+  ///
+  /// @param listener the property change listener to be added
   @Override
   public void addListener(PropertyChangeListener listener) {
     support.addPropertyChangeListener(listener);
   }
 
-  /**
-   * Removes a property change listener from the attribute.
-   *
-   * @param listener the property change listener to be removed
-   */
+  /// Removes a property change listener from the attribute.
+  ///
+  /// @param listener the property change listener to be removed
   @Override
   public void removeListener(PropertyChangeListener listener) {
     support.removePropertyChangeListener(listener);
   }
 
-  /**
-   * Adds a modifier to the attribute and fires a property change event. If the modifier is already present, it will not be added again.
-   *
-   * @param modifier the property modifier to be added
-   */
+  /// Adds a modifier to the attribute and fires a property change event. If the modifier is already present, it will not be added again.
+  ///
+  /// @param modifier the property modifier to be added
   @Override
   public void addModifier(AttributeModifier<T> modifier) {
     if (modifiers.contains(modifier)) {
@@ -141,11 +117,9 @@ public class Attribute<T extends Number> implements IAttribute<T>, Serializable 
     support.firePropertyChange(VALUE_PROPERTY, oldValue, newValue);
   }
 
-  /**
-   * Removes a modifier from the attribute and fires a property change event. If the modifier is not present, no action is taken.
-   *
-   * @param modifier the property modifier to be removed
-   */
+  /// Removes a modifier from the attribute and fires a property change event. If the modifier is not present, no action is taken.
+  ///
+  /// @param modifier the property modifier to be removed
   @Override
   public void removeModifier(AttributeModifier<T> modifier) {
     if (!modifiers.contains(modifier)) {
@@ -159,41 +133,33 @@ public class Attribute<T extends Number> implements IAttribute<T>, Serializable 
     support.firePropertyChange(VALUE_PROPERTY, oldValue, newValue);
   }
 
-  /**
-   * Gets the list of all property modifiers applied to the attribute.
-   *
-   * @return the list of property modifiers
-   */
+  /// Gets the list of all property modifiers applied to the attribute.
+  ///
+  /// @return the list of property modifiers
   public List<AttributeModifier<T>> getModifiers() {
     return modifiers;
   }
 
-  /**
-   * Modifies the current value of the attribute using the specified property modifier.
-   *
-   * @param modifier the property modifier to apply
-   */
+  /// Modifies the current value of the attribute using the specified property modifier.
+  ///
+  /// @param modifier the property modifier to apply
   @Override
   public void modify(AttributeModifier<T> modifier) {
     this.setValue(modifier.modify(this.getModifiedValue()));
   }
 
-  /**
-   * Modifies the current value of the attribute using a new property modifier created with the specified modification and value.
-   *
-   * @param modification the type of modification to apply
-   * @param value        the value to use for the modification
-   */
+  /// Modifies the current value of the attribute using a new property modifier created with the specified modification and value.
+  ///
+  /// @param modification the type of modification to apply
+  /// @param value        the value to use for the modification
   @Override
   public void modify(Modification modification, double value) {
     this.modify(new AttributeModifier<>(modification, value));
   }
 
-  /**
-   * Returns a string representation of the current value of the attribute.
-   *
-   * @return the string representation of the current value
-   */
+  /// Returns a string representation of the current value of the attribute.
+  ///
+  /// @return the string representation of the current value
   @Override
   public String toString() {
     return getModifiedValue().toString();

@@ -34,22 +34,20 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     return this.mapObjectType;
   }
 
-  /**
-   * Loads engine default properties to the specified {@code IEntity} instance:
-   * <ul>
-   * <li>width, height</li>
-   * <li>mapId</li>
-   * <li>name</li>
-   * <li>location</li>
-   * <li>tags</li>
-   * </ul>
-   * Also, this supports predefined {@code CustomMapObjectProperties}. It loads the specified custom properties via
-   * reflection.
-   *
-   * @param entity    The entity instance that will be initialized.
-   * @param mapObject The mapObject that provides the static information for the new entity.
-   * @see TmxProperty
-   */
+  /// Loads engine default properties to the specified `IEntity` instance:
+  ///
+  /// - width, height
+  /// - mapId
+  /// - name
+  /// - location
+  /// - tags
+  ///
+  /// Also, this supports predefined `CustomMapObjectProperties`. It loads the specified custom properties via
+  /// reflection.
+  ///
+  /// @param entity    The entity instance that will be initialized.
+  /// @param mapObject The mapObject that provides the static information for the new entity.
+  /// @see TmxProperty
   public static void loadDefaultProperties(IEntity entity, IMapObject mapObject) {
     entity.setMapId(mapObject.getId());
     entity.setWidth(mapObject.getWidth());
@@ -130,18 +128,14 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     }
   }
 
-  /**
-   * If present, this method calls the private {@code afterTmxUnmarshal(IMapObject)} method on the specified entity.
-   *
-   * <p>
-   * The {@link MapObjectLoader} implementation provides the possibility to extend the unmarshalling of the IMapObject within the entity
-   * implementation by implementing a private method with the name "afterTmxUnmarshal" accepting a parameter of type {@link IMapObject}. This method
-   * is called, after the loading has been finished and the entities have been instantiated.
-   * </p>
-   *
-   * @param entity    The entity instance to call the "afterTmxUnmarshal" method on.
-   * @param mapObject The map object to pass to the entity instance when invoking the "afterTmxUnmarshal" method.
-   */
+  /// If present, this method calls the private `afterTmxUnmarshal(IMapObject)` method on the specified entity.
+  ///
+  /// The [MapObjectLoader] implementation provides the possibility to extend the unmarshalling of the IMapObject within the entity
+  /// implementation by implementing a private method with the name "afterTmxUnmarshal" accepting a parameter of type [IMapObject]. This method
+  /// is called, after the loading has been finished and the entities have been instantiated.
+  ///
+  /// @param entity    The entity instance to call the "afterTmxUnmarshal" method on.
+  /// @param mapObject The map object to pass to the entity instance when invoking the "afterTmxUnmarshal" method.
   private void callAfterTmxUnmarshal(IEntity entity, IMapObject mapObject) {
     Method afterTmxUnmarshal = ReflectionUtilities.getMethod("afterTmxUnmarshal", entity.getClass(), IMapObject.class);
     if (afterTmxUnmarshal == null) {

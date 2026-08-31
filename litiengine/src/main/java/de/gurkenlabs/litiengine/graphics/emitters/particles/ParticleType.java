@@ -1,25 +1,19 @@
 package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
-/**
- * Enumerates the shape/render types supported by the engine's built-in {@link Particle} implementations.
- */
+/// Enumerates the shape/render types supported by the engine's built-in [Particle] implementations.
 public enum ParticleType {
-  /**
-   * Rectangular particle.
-   */
+  /// Rectangular particle.
   RECTANGLE,
-  /**
-   * Elliptic particle.
-   */
+  /// Elliptic particle.
   ELLIPSE,
-  /** Triangular particle. */
+  /// Triangular particle.
   TRIANGLE,
-  /** Diamond-shaped particle. */
+  /// Diamond-shaped particle.
   DIAMOND,
-  /** Line particle. */
+  /// Line particle.
   LINE,
-  /** Text particle. */
+  /// Text particle.
   TEXT,
-  /** Sprite-based particle. */
+  /// Sprite-based particle.
   SPRITE
 }

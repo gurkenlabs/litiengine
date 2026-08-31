@@ -2,40 +2,30 @@ package de.gurkenlabs.litiengine;
 
 import java.util.EventListener;
 
-/**
- * This listener interface is used for receiving events about the general life-cycle of the {@code Game} (e.g.
- * started/terminated).
- */
+/// This listener interface is used for receiving events about the general life-cycle of the `Game` (e.g.
+/// started/terminated).
 public interface GameListener extends EventListener {
 
-  /**
-   * This method gets called after the {@code Game.start} method was executed.
-   * 
-   * @see Game#start()
-   */
+  /// This method gets called after the `Game.start` method was executed.
+  ///
+  /// @see Game#start()
   default void started() {}
 
-  /**
-   * This method gets called after the {@code Game.init(String...)} method was executed.
-   * 
-   * @param args
-   *          The arguments that were passed to the application.
-   * @see Game#init(String...)
-   */
+  /// This method gets called after the `Game.init(String...)` method was executed.
+  ///
+  /// @param args
+  /// The arguments that were passed to the application.
+  /// @see Game#init(String...)
   default void initialized(String... args) {}
 
-  /**
-   * This method gets called before the {@code Game} is about to be terminated. Returning false prevents the terminate
-   * event to continue.
-   *
-   * @return Return false to interrupt the termination process.
-   */
+  /// This method gets called before the `Game` is about to be terminated. Returning false prevents the terminate
+  /// event to continue.
+  ///
+  /// @return Return false to interrupt the termination process.
   default boolean terminating() {
     return true;
   }
 
-  /**
-   * This method is called when the {@code Game} was terminated (just before {@code System.exit} is about to be called).
-   */
+  /// This method is called when the `Game` was terminated (just before `System.exit` is about to be called).
   default void terminated() {}
 }

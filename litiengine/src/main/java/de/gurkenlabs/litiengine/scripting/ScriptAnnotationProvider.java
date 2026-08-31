@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/** Provides completions and snippet templates for script annotations (@ScriptProperty, @ScriptInfo) and @Override event lifecycle methods. */
+/// Provides completions and snippet templates for script annotations (@ScriptProperty, @ScriptInfo) and @Override event lifecycle methods.
 final class ScriptAnnotationProvider {
   private ScriptAnnotationProvider() {}
 

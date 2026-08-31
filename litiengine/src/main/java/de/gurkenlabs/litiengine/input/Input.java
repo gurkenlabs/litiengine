@@ -6,15 +6,13 @@ import java.awt.AWTException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The static {@code Input} class is the LITIENGINE's access point to devices that capture physical player input. It
- * manages input from different devices, i.e. keyboard, mouse or gamepad, and provides a unified API to access this
- * information.
- *
- * @see #mouse()
- * @see #keyboard()
- * @see #gamepads()
- */
+/// The static `Input` class is the LITIENGINE's access point to devices that capture physical player input. It
+/// manages input from different devices, i.e. keyboard, mouse or gamepad, and provides a unified API to access this
+/// information.
+///
+/// @see #mouse()
+/// @see #keyboard()
+/// @see #gamepads()
 public final class Input {
   private static final Logger log = Logger.getLogger(Input.class.getName());
 
@@ -26,21 +24,17 @@ public final class Input {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * Gets the manager for all gamepad input devices.
-   *
-   * <p>
-   * The manager provides easy access to the default controller as well as access by gamepad index for mulitplayer games.
-   * Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and will auto-detect any
-   * added/removed gamepads.
-   *
-   * <p>
-   * <b>This returns null if {@code Game.config().input().isGamepadSupport()} is set to false.</b>
-   *
-   * @return The gamepad manager.
-   * @see GamepadManager#current()
-   * @see GamepadManager#get(int)
-   */
+  /// Gets the manager for all gamepad input devices.
+  ///
+  /// The manager provides easy access to the default controller as well as access by gamepad index for mulitplayer games.
+  /// Gamepads don't need to be added explicitly, the manager supports hot-plugging at runtime and will auto-detect any
+  /// added/removed gamepads.
+  ///
+  /// **This returns null if `Game.config().input().isGamepadSupport()` is set to false.**
+  ///
+  /// @return The gamepad manager.
+  /// @see GamepadManager#current()
+  /// @see GamepadManager#get(int)
   public static GamepadManager gamepads() {
     if (!Game.config().input().isGamepadSupport()) {
       log.log(
@@ -51,20 +45,16 @@ public final class Input {
     return gamePadManager;
   }
 
-  /**
-   * Gets the keyboard input device.
-   *
-   * @return The keyboard input device.
-   */
+  /// Gets the keyboard input device.
+  ///
+  /// @return The keyboard input device.
   public static IKeyboard keyboard() {
     return keyboard;
   }
 
-  /**
-   * Gets the mouse input device.
-   *
-   * @return The mouse input device.
-   */
+  /// Gets the mouse input device.
+  ///
+  /// @return The mouse input device.
   public static IMouse mouse() {
     return mouse;
   }

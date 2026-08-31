@@ -8,44 +8,34 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.Collision;
 import java.awt.geom.Rectangle2D;
 
-/**
- * The {@code CollisionBox} class represents a collision entity in the game. It extends the {@code CollisionEntity} class and provides additional
- * properties and methods specific to collision boxes.
- *
- * <p>This class is annotated with various annotations to define its behavior
- * and properties in the game environment, such as rendering type, collision information, and map object type.</p>
- */
+/// The `CollisionBox` class represents a collision entity in the game. It extends the `CollisionEntity` class and provides additional
+/// properties and methods specific to collision boxes.
+///
+/// This class is annotated with various annotations to define its behavior
+/// and properties in the game environment, such as rendering type, collision information, and map object type.
 @EntityInfo(renderType = RenderType.OVERLAY)
 @CollisionInfo(collision = true, collisionType = Collision.STATIC)
 @TmxType(MapObjectType.COLLISIONBOX)
 public class CollisionBox extends CollisionEntity {
-  /**
-   * A flag indicating whether this instance should obstruct lights.
-   */
+  /// A flag indicating whether this instance should obstruct lights.
   @TmxProperty(name = MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS)
   private boolean obstructingLight;
 
-  /**
-   * Instantiates a new {@code CollisionBox} entity.
-   */
+  /// Instantiates a new `CollisionBox` entity.
   public CollisionBox() {
   }
 
-  /**
-   * Instantiates a new {@code CollisionBox} entity.
-   *
-   * @param obstructingLight A flag indicating whether this instance should obstruct lights.
-   */
+  /// Instantiates a new `CollisionBox` entity.
+  ///
+  /// @param obstructingLight A flag indicating whether this instance should obstruct lights.
   public CollisionBox(final boolean obstructingLight) {
     this.obstructingLight = obstructingLight;
   }
 
-  /**
-   * Instantiates a new {@code CollisionBox} entity.
-   *
-   * @param width  The width of this instance.
-   * @param height The height of this instance.
-   */
+  /// Instantiates a new `CollisionBox` entity.
+  ///
+  /// @param width  The width of this instance.
+  /// @param height The height of this instance.
   public CollisionBox(double width, double height) {
     this.setWidth(width);
     this.setHeight(height);
@@ -53,34 +43,28 @@ public class CollisionBox extends CollisionEntity {
     this.setCollisionBoxHeight(this.getHeight());
   }
 
-  /**
-   * Instantiates a new {@code CollisionBox} entity.
-   *
-   * @param x      The x-coordinate of this instance.
-   * @param y      The y-coordinate of this instance.
-   * @param width  The width of this instance.
-   * @param height The height of this instance.
-   */
+  /// Instantiates a new `CollisionBox` entity.
+  ///
+  /// @param x      The x-coordinate of this instance.
+  /// @param y      The y-coordinate of this instance.
+  /// @param width  The width of this instance.
+  /// @param height The height of this instance.
   public CollisionBox(double x, double y, double width, double height) {
     this(width, height);
     this.setX(x);
     this.setY(y);
   }
 
-  /**
-   * Instantiates a new {@code CollisionBox} entity.
-   *
-   * @param box The rectangle defining the location and dimension of this instnace.
-   */
+  /// Instantiates a new `CollisionBox` entity.
+  ///
+  /// @param box The rectangle defining the location and dimension of this instnace.
   public CollisionBox(Rectangle2D box) {
     this(box.getX(), box.getY(), box.getWidth(), box.getHeight());
   }
 
-  /**
-   * Checks if this instance is obstructing light.
-   *
-   * @return {@code true} if this instance is obstructing light; {@code false} otherwise.
-   */
+  /// Checks if this instance is obstructing light.
+  ///
+  /// @return `true` if this instance is obstructing light; `false` otherwise.
   public boolean isObstructingLight() {
     return this.obstructingLight;
   }

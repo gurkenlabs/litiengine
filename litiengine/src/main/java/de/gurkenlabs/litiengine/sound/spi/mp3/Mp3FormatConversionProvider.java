@@ -7,7 +7,7 @@ import javax.sound.sampled.spi.FormatConversionProvider;
 
 import static javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED;
 
-/** Converts LITIENGINE MPEG-1 Layer III streams to signed 16-bit PCM. */
+/// Converts LITIENGINE MPEG-1 Layer III streams to signed 16-bit PCM.
 public final class Mp3FormatConversionProvider extends FormatConversionProvider {
 
   @Override

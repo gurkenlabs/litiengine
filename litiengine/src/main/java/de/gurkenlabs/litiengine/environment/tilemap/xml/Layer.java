@@ -12,10 +12,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 
-/**
- * Represents an abstract layer in a tile map. This class extends the {@link CustomPropertyProvider} class and implements the {@link ILayer}
- * interface.
- */
+/// Represents an abstract layer in a tile map. This class extends the [CustomPropertyProvider] class and implements the [ILayer]
+/// interface.
 public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
   @XmlAttribute
@@ -60,19 +58,15 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   private transient RenderType renderType;
   private transient boolean renderTypeLoaded;
 
-  /**
-   * Default constructor for the {@link Layer} class. Initializes a new instance of the {@link Layer} class with default values.
-   */
+  /// Default constructor for the [Layer] class. Initializes a new instance of the [Layer] class with default values.
   protected Layer() {
     super();
   }
 
-  /**
-   * Copy constructor for the {@link Layer} class. Creates a new instance of the {@link Layer} class by copying the properties from the provided
-   * {@link Layer} object.
-   *
-   * @param layerToBeCopied The {@link Layer} object to copy from.
-   */
+  /// Copy constructor for the [Layer] class. Creates a new instance of the [Layer] class by copying the properties from the provided
+  /// [Layer] object.
+  ///
+  /// @param layerToBeCopied The [Layer] object to copy from.
   protected Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);
     this.setWidth(layerToBeCopied.getWidth());
@@ -92,11 +86,9 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.id = id;
   }
 
-  /**
-   * Gets the height.
-   *
-   * @return the height
-   */
+  /// Gets the height.
+  ///
+  /// @return the height
   @Override
   public int getHeight() {
     if (this.height == null) {
@@ -196,11 +188,9 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     return new Dimension(this.getWidth(), this.getHeight());
   }
 
-  /**
-   * Gets the width.
-   *
-   * @return the width
-   */
+  /// Gets the width.
+  ///
+  /// @return the width
   @Override
   public int getWidth() {
     if (this.width == null) {

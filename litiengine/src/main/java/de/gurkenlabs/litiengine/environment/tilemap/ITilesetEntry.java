@@ -8,25 +8,19 @@ public interface ITilesetEntry extends ICustomPropertyProvider {
 
   ITileAnimation getAnimation();
 
-  /**
-   * Gets the current image for this tileset entry.
-   *
-   * @return The current image for this tileset entry, accounting for animation.
-   */
+  /// Gets the current image for this tileset entry.
+  ///
+  /// @return The current image for this tileset entry, accounting for animation.
   BufferedImage getImage();
 
-  /**
-   * Gets the "standard" image for this tileset entry, without applying any animations.
-   *
-   * @return The standard image for this tileset entry
-   */
+  /// Gets the "standard" image for this tileset entry, without applying any animations.
+  ///
+  /// @return The standard image for this tileset entry
   BufferedImage getBasicImage();
 
-  /**
-   * Gets the tileset that this entry belongs to.
-   *
-   * @return The tileset for this entry
-   */
+  /// Gets the tileset that this entry belongs to.
+  ///
+  /// @return The tileset for this entry
   ITileset getTileset();
 
   String getType();

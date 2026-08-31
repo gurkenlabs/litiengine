@@ -3,20 +3,15 @@ package de.gurkenlabs.litiengine.tweening;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The Tweenable interface allows modifying an object's attributes smoothly over time using {@code
- * Tween} instances managed by the {@code TweenEngine}.
- */
+/// The Tweenable interface allows modifying an object's attributes smoothly over time using `Tween` instances managed by the `TweenEngine`.
 public interface Tweenable {
 
-  /**
-   * Gets one or many values from the target object associated to the given tween type. It is used by the Tween Engine to
-   * determine starting values.
-   *
-   * @param tweenType
-   *          The tween type of this interpolation, determining which values are modified.
-   * @return The array of current tween values.
-   */
+  /// Gets one or many values from the target object associated to the given tween type. It is used by the Tween Engine to
+  /// determine starting values.
+  ///
+  /// @param tweenType
+  /// The tween type of this interpolation, determining which values are modified.
+  /// @return The array of current tween values.
   default float[] getTweenValues(final TweenType tweenType) {
     Logger.getLogger(this.getClass().getName())
         .log(
@@ -27,14 +22,12 @@ public interface Tweenable {
     return new float[0];
   }
 
-  /**
-   * This method is called in a Tween's update() method to set the new interpolated values.
-   *
-   * @param tweenType
-   *          The tween type of this interpolation, determining which values are modified.
-   * @param newValues
-   *          The new values determined by the tween equation.
-   */
+  /// This method is called in a Tween's update() method to set the new interpolated values.
+  ///
+  /// @param tweenType
+  /// The tween type of this interpolation, determining which values are modified.
+  /// @param newValues
+  /// The new values determined by the tween equation.
   default void setTweenValues(final TweenType tweenType, final float[] newValues) {
     Logger.getLogger(this.getClass().getName())
         .log(

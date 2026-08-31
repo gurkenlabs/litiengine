@@ -12,12 +12,10 @@ import java.util.Optional;
 public class PropAnimationController<T extends Prop> extends EntityAnimationController<T> {
   public static final String PROP_IDENTIFIER = "prop-";
 
-  /**
-   * Initializes a new instance of the {@code PropAnimationController} class.
-   *
-   * @param prop
-   *          The prop related to this controller.
-   */
+  /// Initializes a new instance of the `PropAnimationController` class.
+  ///
+  /// @param prop
+  /// The prop related to this controller.
   public PropAnimationController(final T prop) {
     super(prop);
 
@@ -26,34 +24,30 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     this.add(createAnimation(this.getEntity(), PropState.DESTROYED));
   }
 
-  /**
-   * Gets the sprite name for the specified prop and state.
-   *
-   * @param prop
-   *          The prop to retrieve the sprite name for.
-   * @param appendState
-   *          A flag indicating whether the state should be appended to the name.
-   * @return A string representing the sprite name for the specified prop in its state.
-   * @see Prop#getSpritesheetName()
-   * @see Prop#getState()
-   */
+  /// Gets the sprite name for the specified prop and state.
+  ///
+  /// @param prop
+  /// The prop to retrieve the sprite name for.
+  /// @param appendState
+  /// A flag indicating whether the state should be appended to the name.
+  /// @return A string representing the sprite name for the specified prop in its state.
+  /// @see Prop#getSpritesheetName()
+  /// @see Prop#getState()
   public static String getSpriteName(final Prop prop, boolean appendState) {
     return getSpriteName(prop, prop.getState(), appendState);
   }
 
-  /**
-   * Gets the sprite name for the specified prop and state.
-   *
-   * @param prop
-   *          The prop to retrieve the sprite name for.
-   * @param state
-   *          The state of the prop.
-   * @param appendState
-   *          A flag indicating whether the state should be appended to the name.
-   * @return A string representing the sprite name for the specified prop in its state.
-   * @see Prop#getSpritesheetName()
-   * @see Prop#getState()
-   */
+  /// Gets the sprite name for the specified prop and state.
+  ///
+  /// @param prop
+  /// The prop to retrieve the sprite name for.
+  /// @param state
+  /// The state of the prop.
+  /// @param appendState
+  /// A flag indicating whether the state should be appended to the name.
+  /// @return A string representing the sprite name for the specified prop in its state.
+  /// @see Prop#getSpritesheetName()
+  /// @see Prop#getState()
   public static String getSpriteName(final Prop prop, PropState state, boolean appendState) {
     StringBuilder sb = new StringBuilder(PROP_IDENTIFIER);
     sb.append(prop.getSpritesheetName());

@@ -13,17 +13,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Represents an attribute with a defined range, extending the base Attribute class. The attribute value is constrained between a minimum and maximum
- * value.
- * <p>
- * This class is XML-serializable via JAXB. The base value, {@link #getMin() min} and
- * {@link #getMax() max} are persisted as XML attributes; modifiers and property change support
- * are runtime-only state and are not serialized.
- * </p>
- *
- * @param <T> the type of the attribute value, which must be a Number and Comparable
- */
+/// Represents an attribute with a defined range, extending the base Attribute class. The attribute value is constrained between a minimum and maximum
+/// value.
+///
+/// This class is XML-serializable via JAXB. The base value, [min][#getMin()] and
+/// [max][#getMax()] are persisted as XML attributes; modifiers and property change support
+/// are runtime-only state and are not serialized.
+///
+/// @param <T> the type of the attribute value, which must be a Number and Comparable
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<T> implements Serializable {
   private static final String MIN_PROPERTY = "min";
@@ -50,15 +47,13 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     this.maxModifierListener = evt -> maxSupport.firePropertyChange(MAX_PROPERTY, evt.getOldValue(), evt.getNewValue());
   }
 
-  /**
-   * Constructs a new RangeAttribute with the specified initial value, minimum value, and maximum value. Ensures that the minimum value is not greater
-   * than the maximum value.
-   *
-   * @param initialValue the initial value of the attribute
-   * @param min          the minimum value of the attribute
-   * @param max          the maximum value of the attribute
-   * @throws IllegalArgumentException if the minimum value is greater than the maximum value
-   */
+  /// Constructs a new RangeAttribute with the specified initial value, minimum value, and maximum value. Ensures that the minimum value is not greater
+  /// than the maximum value.
+  ///
+  /// @param initialValue the initial value of the attribute
+  /// @param min          the minimum value of the attribute
+  /// @param max          the maximum value of the attribute
+  /// @throws IllegalArgumentException if the minimum value is greater than the maximum value
   public RangeAttribute(T initialValue, T min, T max) {
     super(initialValue);
     if (min.compareTo(max) > 0) {
@@ -72,65 +67,54 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     this.maxModifierListener = evt -> maxSupport.firePropertyChange(MAX_PROPERTY, evt.getOldValue(), evt.getNewValue());
   }
 
-  /**
-   * Constructs a new {@code RangeAttribute} with the specified minimum and maximum values, using
-   * {@code min} as the initial base value.
-   *
-   * @param min the minimum value of the attribute
-   * @param max the maximum value of the attribute
-   * @throws IllegalArgumentException if the minimum value is greater than the maximum value
-   */
+  /// Constructs a new `RangeAttribute` with the specified minimum and maximum values, using
+  /// `min` as the initial base value.
+  ///
+  /// @param min the minimum value of the attribute
+  /// @param max the maximum value of the attribute
+  /// @throws IllegalArgumentException if the minimum value is greater than the maximum value
   public RangeAttribute(T min, T max) {
     this(min, min, max);
   }
 
-  /**
-   * Gets the current value of the attribute, ensuring it is within the defined range.
-   *
-   * @return the current value of the attribute
-   */
+  /// Gets the current value of the attribute, ensuring it is within the defined range.
+  ///
+  /// @return the current value of the attribute
   @Override public T getModifiedValue() {
     return enforceRangeForValue(super.getModifiedValue());
   }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * The base value is intentionally <em>not</em> serialized for a {@code RangeAttribute}. Range
-   * attributes describe a value range via {@link #getMin() min} and {@link #getMax() max} (for
-   * example particle emitter parameters); persisting a single base value alongside the range is
-   * not meaningful, since consumers such as the particle system always draw a fresh random sample
-   * between {@code min} and {@code max} (see {@link #getRandomNumber()}). Suppression of the
-   * inherited {@code value} XML attribute is implemented via the JAXB
-   * {@code beforeMarshal} / {@code afterMarshal} callbacks below.
-   * </p>
-   */
+  /// {@inheritDoc}
+  ///
+  /// The base value is intentionally *not* serialized for a `RangeAttribute`. Range
+  /// attributes describe a value range via [min][#getMin()] and [max][#getMax()] (for
+  /// example particle emitter parameters); persisting a single base value alongside the range is
+  /// not meaningful, since consumers such as the particle system always draw a fresh random sample
+  /// between `min` and `max` (see [#getRandomNumber()]). Suppression of the
+  /// inherited `value` XML attribute is implemented via the JAXB
+  /// `beforeMarshal` / `afterMarshal` callbacks below.
   @Override public T getValue() {
     return super.getValue();
   }
 
-  /**
-   * JAXB callback invoked immediately before this instance is marshalled. Clears the inherited
-   * {@link #value} so that it is not written to XML, and stashes it so it can be restored in
-   * {@link #afterMarshal(jakarta.xml.bind.Marshaller)}. This keeps runtime behavior of
-   * {@link #getValue()} unchanged while ensuring the serialized form only contains
-   * {@link #getMin() min} and {@link #getMax() max}.
-   *
-   * @param marshaller the JAXB marshaller invoking this callback (unused)
-   */
+  /// JAXB callback invoked immediately before this instance is marshalled. Clears the inherited
+  /// [#value] so that it is not written to XML, and stashes it so it can be restored in
+  /// [#afterMarshal(jakarta.xml.bind.Marshaller)]. This keeps runtime behavior of
+  /// [#getValue()] unchanged while ensuring the serialized form only contains
+  /// [min][#getMin()] and [max][#getMax()].
+  ///
+  /// @param marshaller the JAXB marshaller invoking this callback (unused)
   @SuppressWarnings("unused")
   private void beforeMarshal(jakarta.xml.bind.Marshaller marshaller) {
     this.suppressedValue = this.value;
     this.value = null;
   }
 
-  /**
-   * JAXB callback invoked immediately after this instance is marshalled. Restores the base
-   * {@link #value} that was temporarily cleared by
-   * {@link #beforeMarshal(jakarta.xml.bind.Marshaller)}.
-   *
-   * @param marshaller the JAXB marshaller invoking this callback (unused)
-   */
+  /// JAXB callback invoked immediately after this instance is marshalled. Restores the base
+  /// [#value] that was temporarily cleared by
+  /// [#beforeMarshal(jakarta.xml.bind.Marshaller)].
+  ///
+  /// @param marshaller the JAXB marshaller invoking this callback (unused)
   @SuppressWarnings("unused")
   private void afterMarshal(jakarta.xml.bind.Marshaller marshaller) {
     this.value = this.suppressedValue;
@@ -139,20 +123,16 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
 
   private transient T suppressedValue;
 
-  /**
-   * Gets the base minimum value of the attribute.
-   *
-   * @return the minimum value of the attribute
-   */
+  /// Gets the base minimum value of the attribute.
+  ///
+  /// @return the minimum value of the attribute
   public T getMin() {
     return min;
   }
 
-  /**
-   * Computes the modified minimum value by applying all active modifiers to the base minimum value.
-   *
-   * @return the computed modified minimum value
-   */
+  /// Computes the modified minimum value by applying all active modifiers to the base minimum value.
+  ///
+  /// @return the computed modified minimum value
   public T getModifiedMin() {
     T modifiedMin = min;
     for (AttributeModifier<T> modifier : getMinModifiers()) {
@@ -163,11 +143,9 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     return modifiedMin;
   }
 
-  /**
-   * Sets the minimum value of the attribute and notifies listeners of the change.
-   *
-   * @param min the new minimum value
-   */
+  /// Sets the minimum value of the attribute and notifies listeners of the change.
+  ///
+  /// @param min the new minimum value
   public void setMin(T min) {
     T oldMin = this.min;
     this.min = min;
@@ -175,20 +153,16 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     minSupport.firePropertyChange("min", oldMin, min);
   }
 
-  /**
-   * Gets the base maximum value of the attribute.
-   *
-   * @return the maximum value of the attribute
-   */
+  /// Gets the base maximum value of the attribute.
+  ///
+  /// @return the maximum value of the attribute
   public T getMax() {
     return max;
   }
 
-  /**
-   * Computes the modified maximum value by applying all active modifiers to the base maximum value.
-   *
-   * @return the computed modified maximum value
-   */
+  /// Computes the modified maximum value by applying all active modifiers to the base maximum value.
+  ///
+  /// @return the computed modified maximum value
   public T getModifiedMax() {
     T modifiedMax = max;
     for (AttributeModifier<T> modifier : getMaxModifiers()) {
@@ -199,11 +173,9 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     return modifiedMax;
   }
 
-  /**
-   * Sets the maximum value of the attribute and notifies listeners of the change.
-   *
-   * @param max the new maximum value
-   */
+  /// Sets the maximum value of the attribute and notifies listeners of the change.
+  ///
+  /// @param max the new maximum value
   public void setMax(T max) {
     T oldMax = this.max;
     this.max = max;
@@ -211,65 +183,51 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     maxSupport.firePropertyChange("max", oldMax, max);
   }
 
-  /**
-   * Adds a PropertyChangeListener for the minimum value.
-   *
-   * @param listener the listener to be added
-   */
+  /// Adds a PropertyChangeListener for the minimum value.
+  ///
+  /// @param listener the listener to be added
   public void addMinListener(PropertyChangeListener listener) {
     minSupport.addPropertyChangeListener(listener);
   }
 
-  /**
-   * Removes a PropertyChangeListener for the minimum value.
-   *
-   * @param listener the listener to be removed
-   */
+  /// Removes a PropertyChangeListener for the minimum value.
+  ///
+  /// @param listener the listener to be removed
   public void removeMinListener(PropertyChangeListener listener) {
     minSupport.removePropertyChangeListener(listener);
   }
 
-  /**
-   * Adds a PropertyChangeListener for the maximum value.
-   *
-   * @param listener the listener to be added
-   */
+  /// Adds a PropertyChangeListener for the maximum value.
+  ///
+  /// @param listener the listener to be added
   public void addMaxListener(PropertyChangeListener listener) {
     maxSupport.addPropertyChangeListener(listener);
   }
 
-  /**
-   * Removes a PropertyChangeListener for the maximum value.
-   *
-   * @param listener the listener to be removed
-   */
+  /// Removes a PropertyChangeListener for the maximum value.
+  ///
+  /// @param listener the listener to be removed
   public void removeMaxListener(PropertyChangeListener listener) {
     maxSupport.removePropertyChangeListener(listener);
   }
 
-  /**
-   * Gets the list of minimum value modifiers.
-   *
-   * @return the list of minimum value modifiers
-   */
+  /// Gets the list of minimum value modifiers.
+  ///
+  /// @return the list of minimum value modifiers
   public List<AttributeModifier<T>> getMinModifiers() {
     return minModifiers;
   }
 
-  /**
-   * Gets the list of maximum value modifiers.
-   *
-   * @return the list of maximum value modifiers
-   */
+  /// Gets the list of maximum value modifiers.
+  ///
+  /// @return the list of maximum value modifiers
   public List<AttributeModifier<T>> getMaxModifiers() {
     return maxModifiers;
   }
 
-  /**
-   * Adds a modifier to the list of minimum value modifiers and notifies listeners of the change.
-   *
-   * @param modifier the modifier to add
-   */
+  /// Adds a modifier to the list of minimum value modifiers and notifies listeners of the change.
+  ///
+  /// @param modifier the modifier to add
   public void addMinModifier(AttributeModifier<T> modifier) {
     if (getMinModifiers().contains(modifier)) {
       return;
@@ -282,11 +240,9 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     minSupport.firePropertyChange(MIN_PROPERTY, oldMin, newMin);
   }
 
-  /**
-   * Removes a modifier from the list of minimum value modifiers and notifies listeners of the change.
-   *
-   * @param modifier the modifier to remove
-   */
+  /// Removes a modifier from the list of minimum value modifiers and notifies listeners of the change.
+  ///
+  /// @param modifier the modifier to remove
   public void removeMinModifier(AttributeModifier<T> modifier) {
     if (!getMinModifiers().contains(modifier)) {
       return;
@@ -299,11 +255,9 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     minSupport.firePropertyChange(MIN_PROPERTY, oldMin, newMin);
   }
 
-  /**
-   * Adds a modifier to the list of maximum value modifiers and notifies listeners of the change.
-   *
-   * @param modifier the modifier to add
-   */
+  /// Adds a modifier to the list of maximum value modifiers and notifies listeners of the change.
+  ///
+  /// @param modifier the modifier to add
   public void addMaxModifier(AttributeModifier<T> modifier) {
     if (getMaxModifiers().contains(modifier)) {
       return;
@@ -316,11 +270,9 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     maxSupport.firePropertyChange(MAX_PROPERTY, oldMax, newMax);
   }
 
-  /**
-   * Removes a modifier from the list of maximum value modifiers and notifies listeners of the change.
-   *
-   * @param modifier the modifier to remove
-   */
+  /// Removes a modifier from the list of maximum value modifiers and notifies listeners of the change.
+  ///
+  /// @param modifier the modifier to remove
   public void removeMaxModifier(AttributeModifier<T> modifier) {
     if (!getMaxModifiers().contains(modifier)) {
       return;
@@ -333,27 +285,22 @@ public class RangeAttribute<T extends Number & Comparable<T>> extends Attribute<
     maxSupport.firePropertyChange(MAX_PROPERTY, oldMax, newMax);
   }
 
-  /**
-   * Gets the ratio of the current value to the maximum value as a float. This is calculated as the current value divided by the maximum value.
-   *
-   * @return The ratio of the current value to the maximum value.
-   */
+  /// Gets the ratio of the current value to the maximum value as a float. This is calculated as the current value divided by the maximum value.
+  ///
+  /// @return The ratio of the current value to the maximum value.
   public float getRatio() {
     return getModifiedValue().floatValue() / getModifiedMax().floatValue();
   }
 
-  /**
-   * Returns a uniformly distributed pseudo-random number between this attribute's modified minimum
-   * and modified maximum values.
-   * <p>
-   * This is intended for use-cases that need to draw a random sample from a configured range (e.g.
-   * particle parameters used by an emitter). If {@code modifiedMin >= modifiedMax}, the modified
-   * minimum is returned.
-   * </p>
-   *
-   * @return a {@link Number} between {@link #getModifiedMin()} (inclusive) and
-   * {@link #getModifiedMax()} (exclusive), or {@link #getModifiedMin()} if the range is empty
-   */
+  /// Returns a uniformly distributed pseudo-random number between this attribute's modified minimum
+  /// and modified maximum values.
+  ///
+  /// This is intended for use-cases that need to draw a random sample from a configured range (e.g.
+  /// particle parameters used by an emitter). If `modifiedMin >= modifiedMax`, the modified
+  /// minimum is returned.
+  ///
+  /// @return a [Number] between [#getModifiedMin()] (inclusive) and
+  /// [#getModifiedMax()] (exclusive), or [#getModifiedMin()] if the range is empty
   public Number getRandomNumber() {
     final T modMin = getModifiedMin();
     final T modMax = getModifiedMax();

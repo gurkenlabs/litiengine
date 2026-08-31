@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.sound.spi.mp3;
 
-/** Hybrid synthesis transform used by MPEG-1 Layer III. */
+/// Hybrid synthesis transform used by MPEG-1 Layer III.
 final class Imdct {
   private Imdct() {}
 
@@ -48,7 +48,7 @@ final class Imdct {
     return output;
   }
 
-  /** Kept for source compatibility; transforms are already windowed. */
+  /// Kept for source compatibility; transforms are already windowed.
   static float[] applyWindow(float[] data, int blockType) {
     return data.clone();
   }

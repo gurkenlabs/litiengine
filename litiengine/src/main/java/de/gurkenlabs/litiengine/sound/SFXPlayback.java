@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 
-/** A {@code SoundPlayback} implementation for the playback of sound effects. */
+/// A `SoundPlayback` implementation for the playback of sound effects.
 public class SFXPlayback extends SoundPlayback {
   private final Sound sound;
   private final FloatControl panControl;

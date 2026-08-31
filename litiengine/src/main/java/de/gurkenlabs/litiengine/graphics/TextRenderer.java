@@ -23,83 +23,71 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This class provides static methods for rendering text with various options such as alignment, scaling, rotation, and anti-aliasing. It cannot be
- * instantiated.
- */
+/// This class provides static methods for rendering text with various options such as alignment, scaling, rotation, and anti-aliasing. It cannot be
+/// instantiated.
 public final class TextRenderer {
   private TextRenderer() {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * Draw text at the given coordinates. This variant of drawText() uses RenderingHints.VALUE_TEXT_ANTIALIAS_OFF as Anti-Aliasing method by standard.
-   * For other Anti-Aliasing options, please use the drawText()-variant with five parameters.
-   *
-   * @param g    the Graphics2D object to draw on
-   * @param text the String to be distributed over all generated lines
-   * @param x    the min x coordinate
-   * @param y    the min y coordinate
-   */
+  /// Draw text at the given coordinates. This variant of drawText() uses RenderingHints.VALUE_TEXT_ANTIALIAS_OFF as Anti-Aliasing method by standard.
+  /// For other Anti-Aliasing options, please use the drawText()-variant with five parameters.
+  ///
+  /// @param g    the Graphics2D object to draw on
+  /// @param text the String to be distributed over all generated lines
+  /// @param x    the min x coordinate
+  /// @param y    the min y coordinate
   public static void render(final Graphics2D g, final String text, final double x, final double y) {
     render(g, text, x, y, true);
   }
 
-  /**
-   * Renders the specified {@code String} to the given {@code Graphics2D} object at the specified location.
-   *
-   * @param g        The graphics object to draw on.
-   * @param text     The text to be drawn.
-   * @param location The location where the text will be drawn.
-   */
+  /// Renders the specified `String` to the given `Graphics2D` object at the specified location.
+  ///
+  /// @param g        The graphics object to draw on.
+  /// @param text     The text to be drawn.
+  /// @param location The location where the text will be drawn.
   public static void render(final Graphics2D g, final String text, Point2D location) {
     render(g, text, location.getX(), location.getY());
   }
 
-  /**
-   * Draws text with the specified alignment.
-   *
-   * @param g       the Graphics2D object to draw on
-   * @param text    the String to be distributed over all generated lines
-   * @param align   The horizontal alignment.
-   * @param valign  The vertical alignment.
-   * @param offsetX The horizontal offset that is added to the alignment.
-   * @param offsetY The vertical offset that is added to the alignment.
-   */
+  /// Draws text with the specified alignment.
+  ///
+  /// @param g       the Graphics2D object to draw on
+  /// @param text    the String to be distributed over all generated lines
+  /// @param align   The horizontal alignment.
+  /// @param valign  The vertical alignment.
+  /// @param offsetX The horizontal offset that is added to the alignment.
+  /// @param offsetY The vertical offset that is added to the alignment.
   public static void render(final Graphics2D g, final String text, Align align, Valign valign, double offsetX, double offsetY) {
     final Rectangle2D bounds = g.getClipBounds();
     render(g, text, bounds, align, valign, offsetX, offsetY, false);
   }
 
-  /**
-   * Renders the specified {@code String} to the given {@code Graphics2D} object within the specified bounds using the specified alignment and scaling
-   * options.
-   *
-   * @param g                 The graphics object to draw on.
-   * @param text              The text to be drawn.
-   * @param bounds            The rectangle defining the boundaries used for alignment and scaling.
-   * @param alignment         The horizontal alignment.
-   * @param verticalAlignment The vertical alignment.
-   * @param scaleFont         If true, scale the font so that the text will fit inside the given rectangle. If not, use the Graphics context's
-   *                          previous font size.
-   */
+  /// Renders the specified `String` to the given `Graphics2D` object within the specified bounds using the specified alignment and scaling
+  /// options.
+  ///
+  /// @param g                 The graphics object to draw on.
+  /// @param text              The text to be drawn.
+  /// @param bounds            The rectangle defining the boundaries used for alignment and scaling.
+  /// @param alignment         The horizontal alignment.
+  /// @param verticalAlignment The vertical alignment.
+  /// @param scaleFont         If true, scale the font so that the text will fit inside the given rectangle. If not, use the Graphics context's
+  /// previous font size.
   public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align alignment, Valign verticalAlignment, boolean scaleFont) {
     render(g, text, bounds, alignment, verticalAlignment, 0, 0, scaleFont);
   }
 
-  /**
-   * Draws text within the given boundaries using the specified alignment and scales the font size, if desired.
-   *
-   * @param g         the Graphics2D object to draw on
-   * @param text      the String to be distributed over all generated lines
-   * @param bounds    the Rectangle defining the boundaries used for alignment and scaling.
-   * @param align     The horizontal alignment.
-   * @param valign    The vertical alignment.
-   * @param offsetX   The horizontal offset that is added to the alignment.
-   * @param offsetY   The vertical offset that is added to the alignment.
-   * @param scaleFont if true, scale the font so that the text will fit inside the given rectangle. If not, use the Graphics context's previous font
-   *                  size.
-   */
+  /// Draws text within the given boundaries using the specified alignment and scales the font size, if desired.
+  ///
+  /// @param g         the Graphics2D object to draw on
+  /// @param text      the String to be distributed over all generated lines
+  /// @param bounds    the Rectangle defining the boundaries used for alignment and scaling.
+  /// @param align     The horizontal alignment.
+  /// @param valign    The vertical alignment.
+  /// @param offsetX   The horizontal offset that is added to the alignment.
+  /// @param offsetY   The vertical offset that is added to the alignment.
+  /// @param scaleFont if true, scale the font so that the text will fit inside the given rectangle. If not, use the Graphics context's previous font
+  /// size.
   public static void render(final Graphics2D g, final String text, Rectangle2D bounds, Align align, Valign valign, double offsetX, double offsetY,
     boolean scaleFont) {
     if (bounds == null) {
@@ -119,16 +107,14 @@ public final class TextRenderer {
     g.setFont(g.getFont().deriveFont(previousFontSize));
   }
 
-  /**
-   * Draw text at the given coordinates. This variant of drawText() uses a provided AntiAliasing parameter.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param x            the min x coordinate
-   * @param y            the min y coordinate
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   * @see RenderingHints
-   */
+  /// Draw text at the given coordinates. This variant of drawText() uses a provided AntiAliasing parameter.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param x            the min x coordinate
+  /// @param y            the min y coordinate
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
+  /// @see RenderingHints
   public static void render(final Graphics2D g, final String text, final double x, final double y, boolean antiAliasing) {
     if (text == null || text.isEmpty()) {
       return;
@@ -144,29 +130,25 @@ public final class TextRenderer {
     g.setRenderingHints(originalHints);
   }
 
-  /**
-   * Renders the specified {@code String} to the given {@code Graphics2D} object at the specified location with optional anti-aliasing.
-   *
-   * @param g            The graphics object to draw on.
-   * @param text         The text to be drawn.
-   * @param location     The location where the text will be drawn.
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   */
+  /// Renders the specified `String` to the given `Graphics2D` object at the specified location with optional anti-aliasing.
+  ///
+  /// @param g            The graphics object to draw on.
+  /// @param text         The text to be drawn.
+  /// @param location     The location where the text will be drawn.
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
   public static void render(final Graphics2D g, final String text, Point2D location, boolean antiAliasing) {
     render(g, text, location.getX(), location.getY(), antiAliasing);
   }
 
-  /**
-   * Renders the specified {@code String} to the given {@code Graphics2D} object at the specified coordinates with rotation and optional
-   * anti-aliasing.
-   *
-   * @param g            The graphics object to draw on.
-   * @param text         The text to be drawn.
-   * @param x            The x-coordinate of the text.
-   * @param y            The y-coordinate of the text.
-   * @param angle        The angle by which the text will be rotated.
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   */
+  /// Renders the specified `String` to the given `Graphics2D` object at the specified coordinates with rotation and optional
+  /// anti-aliasing.
+  ///
+  /// @param g            The graphics object to draw on.
+  /// @param text         The text to be drawn.
+  /// @param x            The x-coordinate of the text.
+  /// @param y            The y-coordinate of the text.
+  /// @param angle        The angle by which the text will be rotated.
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
   public static void renderRotated(final Graphics2D g, final String text, final double x, final double y, final double angle, boolean antiAliasing) {
     RenderingHints originalHints = g.getRenderingHints();
 
@@ -178,15 +160,13 @@ public final class TextRenderer {
     g.setRenderingHints(originalHints);
   }
 
-  /**
-   * Renders the specified {@code String} to the given {@code Graphics2D} object at the specified coordinates with rotation.
-   *
-   * @param g     The graphics object to draw on.
-   * @param text  The text to be drawn.
-   * @param x     The x-coordinate of the text.
-   * @param y     The y-coordinate of the text.
-   * @param angle The angle by which the text will be rotated.
-   */
+  /// Renders the specified `String` to the given `Graphics2D` object at the specified coordinates with rotation.
+  ///
+  /// @param g     The graphics object to draw on.
+  /// @param text  The text to be drawn.
+  /// @param x     The x-coordinate of the text.
+  /// @param y     The y-coordinate of the text.
+  /// @param angle The angle by which the text will be rotated.
   public static void renderRotated(final Graphics2D g, final String text, final double x, final double y, final double angle) {
     AffineTransform oldTx = g.getTransform();
     g.rotate(Math.toRadians(angle), x, y);
@@ -194,88 +174,76 @@ public final class TextRenderer {
     g.setTransform(oldTx);
   }
 
-  /**
-   * Renders the specified {@code String} to the given {@code Graphics2D} object at the specified location with rotation.
-   *
-   * @param g        The graphics object to draw on.
-   * @param text     The text to be drawn.
-   * @param location The location where the text will be drawn.
-   * @param angle    The angle by which the text will be rotated.
-   */
+  /// Renders the specified `String` to the given `Graphics2D` object at the specified location with rotation.
+  ///
+  /// @param g        The graphics object to draw on.
+  /// @param text     The text to be drawn.
+  /// @param location The location where the text will be drawn.
+  /// @param angle    The angle by which the text will be rotated.
   public static void renderRotated(final Graphics2D g, final String text, Point2D location, final double angle) {
     renderRotated(g, text, location.getX(), location.getY(), angle);
   }
 
-  /**
-   * Renders the specified {@code String} to the given {@code Graphics2D} object at the specified location with rotation and optional anti-aliasing.
-   *
-   * @param g            The graphics object to draw on.
-   * @param text         The text to be drawn.
-   * @param location     The location where the text will be drawn.
-   * @param angle        The angle by which the text will be rotated.
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   */
+  /// Renders the specified `String` to the given `Graphics2D` object at the specified location with rotation and optional anti-aliasing.
+  ///
+  /// @param g            The graphics object to draw on.
+  /// @param text         The text to be drawn.
+  /// @param location     The location where the text will be drawn.
+  /// @param angle        The angle by which the text will be rotated.
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
   public static void renderRotated(final Graphics2D g, final String text, Point2D location, final double angle, boolean antiAliasing) {
     renderRotated(g, text, location.getX(), location.getY(), angle, antiAliasing);
   }
 
-  /**
-   * Draw text at the given coordinates with a maximum line width for automatic line breaks. This variant of drawTextWithAutomaticLinebreaks() uses
-   * RenderingHints.VALUE_TEXT_ANTIALIAS_OFF as Anti-Aliasing method by standard. For other Anti-Aliasing options, please use the
-   * drawTextWithAutomaticLinebreaks()-variant with six parameters.
-   *
-   * @param g         the Graphics2D object to draw on
-   * @param text      the String to be distributed over all generated lines
-   * @param x         the min x coordinate
-   * @param y         the min y coordinate
-   * @param lineWidth the max line width
-   */
+  /// Draw text at the given coordinates with a maximum line width for automatic line breaks. This variant of drawTextWithAutomaticLinebreaks() uses
+  /// RenderingHints.VALUE_TEXT_ANTIALIAS_OFF as Anti-Aliasing method by standard. For other Anti-Aliasing options, please use the
+  /// drawTextWithAutomaticLinebreaks()-variant with six parameters.
+  ///
+  /// @param g         the Graphics2D object to draw on
+  /// @param text      the String to be distributed over all generated lines
+  /// @param x         the min x coordinate
+  /// @param y         the min y coordinate
+  /// @param lineWidth the max line width
   public static void renderWithLinebreaks(final Graphics2D g, final String text, final double x, final double y, final double lineWidth) {
     renderWithLinebreaks(g, text, x, y, lineWidth, true);
   }
 
-  /**
-   * Draw text at the given coordinates with a maximum line width for automatic line breaks.
-   *
-   * @param g         The Graphics2D object to draw on.
-   * @param text      The String to be distributed over all generated lines.
-   * @param location  The location where the text will be drawn.
-   * @param lineWidth The max line width.
-   */
+  /// Draw text at the given coordinates with a maximum line width for automatic line breaks.
+  ///
+  /// @param g         The Graphics2D object to draw on.
+  /// @param text      The String to be distributed over all generated lines.
+  /// @param location  The location where the text will be drawn.
+  /// @param lineWidth The max line width.
   public static void renderWithLinebreaks(final Graphics2D g, final String text, Point2D location, final double lineWidth) {
     renderWithLinebreaks(g, text, location.getX(), location.getY(), lineWidth);
   }
 
-  /**
-   * Draw text at the given coordinates with a maximum line width for automatic line breaks and a provided Anti-Aliasing parameter.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param x            the min x coordinate
-   * @param y            the min y coordinate
-   * @param lineWidth    the max line width
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   * @see RenderingHints
-   */
+  /// Draw text at the given coordinates with a maximum line width for automatic line breaks and a provided Anti-Aliasing parameter.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param x            the min x coordinate
+  /// @param y            the min y coordinate
+  /// @param lineWidth    the max line width
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
+  /// @see RenderingHints
   public static void renderWithLinebreaks(final Graphics2D g, final String text, final double x, final double y, final double lineWidth,
     final boolean antiAliasing) {
     renderWithLinebreaks(g, text, Align.LEFT, Valign.TOP, x, y, lineWidth, 0.0, antiAliasing);
   }
 
-  /**
-   * Draw text at the given coordinates with a maximum line width for automatic line breaks and a provided Anti-Aliasing parameter.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param align        The horizontal alignment.
-   * @param valign       The vertical alignment.
-   * @param x            the min x coordinate
-   * @param y            the min y coordinate
-   * @param height       the line height.
-   * @param width        the line width
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   * @see RenderingHints
-   */
+  /// Draw text at the given coordinates with a maximum line width for automatic line breaks and a provided Anti-Aliasing parameter.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param align        The horizontal alignment.
+  /// @param valign       The vertical alignment.
+  /// @param x            the min x coordinate
+  /// @param y            the min y coordinate
+  /// @param height       the line height.
+  /// @param width        the line width
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
+  /// @see RenderingHints
   public static void renderWithLinebreaks(final Graphics2D g, final String text, Align align, Valign valign, final double x, final double y,
     final double width, final double height, final boolean antiAliasing) {
     if (text == null || text.isEmpty()) {
@@ -314,43 +282,37 @@ public final class TextRenderer {
     g.setRenderingHints(originalHints);
   }
 
-  /**
-   * Draw text at the given coordinates with a maximum line width for automatic line breaks and a provided Anti-Aliasing parameter.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param location     The location where the text will be drawn.
-   * @param lineWidth    the max line width
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   * @see RenderingHints
-   */
+  /// Draw text at the given coordinates with a maximum line width for automatic line breaks and a provided Anti-Aliasing parameter.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param location     The location where the text will be drawn.
+  /// @param lineWidth    the max line width
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
+  /// @see RenderingHints
   public static void renderWithLinebreaks(final Graphics2D g, final String text, Point2D location, final double lineWidth,
     final boolean antiAliasing) {
     renderWithLinebreaks(g, text, location.getX(), location.getY(), lineWidth, antiAliasing);
   }
 
-  /**
-   * Draw text at the given coordinates with an outline in the provided color. This variant of drawTextWithShadow() doesn't use Anti-Aliasing. For
-   * other Anti-Aliasing options, please specify the boolean value that controls it.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param x            the min x coordinate
-   * @param y            the min y coordinate
-   * @param outlineColor the outline color
-   */
+  /// Draw text at the given coordinates with an outline in the provided color. This variant of drawTextWithShadow() doesn't use Anti-Aliasing. For
+  /// other Anti-Aliasing options, please specify the boolean value that controls it.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param x            the min x coordinate
+  /// @param y            the min y coordinate
+  /// @param outlineColor the outline color
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor) {
     renderWithOutline(g, text, x, y, outlineColor, false);
   }
 
-  /**
-   * Draw text at the given coordinates with an outline in the provided color.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param location     The location where the text will be drawn.
-   * @param outlineColor the outline color
-   */
+  /// Draw text at the given coordinates with an outline in the provided color.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param location     The location where the text will be drawn.
+  /// @param outlineColor the outline color
   public static void renderWithOutline(final Graphics2D g, final String text, Point2D location, final Color outlineColor) {
     renderWithOutline(g, text, location.getX(), location.getY(), outlineColor);
   }
@@ -361,39 +323,35 @@ public final class TextRenderer {
     renderWithOutline(g, text, x, y, outlineColor, stroke, antiAliasing);
   }
 
-  /**
-   * Draw text at the given coordinates with an outline in the provided color and a provided Anti-Aliasing parameter.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param x            the min x coordinate
-   * @param y            the min y coordinate
-   * @param outlineColor the outline color
-   * @param stroke       the width of the outline
-   * @param antiAliasing the Anti-Aliasing object (e.g. RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
-   * @see RenderingHints
-   */
+  /// Draw text at the given coordinates with an outline in the provided color and a provided Anti-Aliasing parameter.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param x            the min x coordinate
+  /// @param y            the min y coordinate
+  /// @param outlineColor the outline color
+  /// @param stroke       the width of the outline
+  /// @param antiAliasing the Anti-Aliasing object (e.g. RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
+  /// @see RenderingHints
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor,
     final float stroke, final boolean antiAliasing) {
     renderWithOutline(g, text, x, y, 0.0, 0.0, outlineColor, stroke, Align.LEFT, Valign.TOP, antiAliasing);
   }
 
-  /**
-   * Draw text at the given coordinates with an outline in the provided color and a provided Anti-Aliasing parameter.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param x            the min x coordinate
-   * @param y            the min y coordinate
-   * @param width        the width of the bounding box in which the text will be aligned
-   * @param height       the height of the bounding box in which the text will be aligned
-   * @param outlineColor the outline color
-   * @param stroke       the thickness of the outline
-   * @param align        The horizontal alignment.
-   * @param valign       The vertical alignment.
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   * @see RenderingHints
-   */
+  /// Draw text at the given coordinates with an outline in the provided color and a provided Anti-Aliasing parameter.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param x            the min x coordinate
+  /// @param y            the min y coordinate
+  /// @param width        the width of the bounding box in which the text will be aligned
+  /// @param height       the height of the bounding box in which the text will be aligned
+  /// @param outlineColor the outline color
+  /// @param stroke       the thickness of the outline
+  /// @param align        The horizontal alignment.
+  /// @param valign       The vertical alignment.
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
+  /// @see RenderingHints
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, double width, double height,
     final Color outlineColor, final float stroke, Align align, Valign valign, final boolean antiAliasing) {
     if (text == null || text.isEmpty()) {
@@ -435,60 +393,50 @@ public final class TextRenderer {
     g.setRenderingHints(originalHints);
   }
 
-  /**
-   * Draw text at the given coordinates with an outline in the provided color and a provided Anti-Aliasing parameter.
-   *
-   * @param g            the Graphics2D object to draw on
-   * @param text         the String to be distributed over all generated lines
-   * @param location     The location where the text will be drawn.
-   * @param outlineColor the outline color
-   * @param antiAliasing Configure whether or not to render the text with antialiasing.
-   * @see RenderingHints
-   */
+  /// Draw text at the given coordinates with an outline in the provided color and a provided Anti-Aliasing parameter.
+  ///
+  /// @param g            the Graphics2D object to draw on
+  /// @param text         the String to be distributed over all generated lines
+  /// @param location     The location where the text will be drawn.
+  /// @param outlineColor the outline color
+  /// @param antiAliasing Configure whether or not to render the text with antialiasing.
+  /// @see RenderingHints
   public static void renderWithOutline(final Graphics2D g, final String text, Point2D location, final Color outlineColor,
     final boolean antiAliasing) {
     renderWithOutline(g, text, location.getX(), location.getY(), outlineColor, antiAliasing);
   }
 
-  /**
-   * Retrieve the bounds of some text if it was to be drawn on the specified Graphics2D
-   *
-   * @param g    The Graphics2D object to be drawn on
-   * @param text The string to calculate the bounds of
-   * @return The bounds of the specified String in the specified Graphics context.
-   * @see java.awt.FontMetrics#getStringBounds(String str, Graphics context)
-   */
+  /// Retrieve the bounds of some text if it was to be drawn on the specified Graphics2D
+  ///
+  /// @param g    The Graphics2D object to be drawn on
+  /// @param text The string to calculate the bounds of
+  /// @return The bounds of the specified String in the specified Graphics context.
+  /// @see java.awt.FontMetrics#getStringBounds(String str, Graphics context)
   public static Rectangle2D getBounds(final Graphics2D g, final String text) {
     return g.getFontMetrics().getStringBounds(text, g);
   }
 
-  /**
-   * Retrieve the width of some text if it was to be drawn on the specified Graphics2D
-   *
-   * @param g    The Graphics2D object to be drawn on
-   * @param text The string to retrieve the width of
-   * @return The width of the specified text
-   */
+  /// Retrieve the width of some text if it was to be drawn on the specified Graphics2D
+  ///
+  /// @param g    The Graphics2D object to be drawn on
+  /// @param text The string to retrieve the width of
+  /// @return The width of the specified text
   public static double getWidth(final Graphics2D g, final String text) {
     return getBounds(g, text).getWidth();
   }
 
-  /**
-   * Retrieve the height of some text if it was to be drawn on the specified Graphics2D
-   *
-   * @param g    The Graphics2D object to be drawn on
-   * @param text The string to retrieve the height of
-   * @return The height of the specified text
-   */
+  /// Retrieve the height of some text if it was to be drawn on the specified Graphics2D
+  ///
+  /// @param g    The Graphics2D object to be drawn on
+  /// @param text The string to retrieve the height of
+  /// @return The height of the specified text
   public static double getHeight(final Graphics2D g, final String text) {
     return getBounds(g, text).getHeight();
   }
 
-  /**
-   * Enables text anti-aliasing on the provided {@code Graphics2D} object.
-   *
-   * @param g The Graphics2D object on which to enable text anti-aliasing.
-   */
+  /// Enables text anti-aliasing on the provided `Graphics2D` object.
+  ///
+  /// @param g The Graphics2D object on which to enable text anti-aliasing.
   public static void enableTextAntiAliasing(final Graphics2D g) {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

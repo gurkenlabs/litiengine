@@ -5,9 +5,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 
-/**
- * Represents the graphic configuration settings. This class extends the ConfigurationGroup to provide specific settings for graphics.
- */
+/// Represents the graphic configuration settings. This class extends the ConfigurationGroup to provide specific settings for graphics.
 @ConfigurationGroupInfo(prefix = "gfx_")
 public class GraphicConfiguration extends ConfigurationGroup {
 
@@ -31,9 +29,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private Java2DPipeline java2DPipeline;
 
-  /**
-   * Constructs a new GraphicConfiguration with default settings.
-   */
+  /// Constructs a new GraphicConfiguration with default settings.
   GraphicConfiguration() {
     this.graphicQuality = Quality.LOW;
     this.displayMode = DisplayMode.WINDOWED;
@@ -65,175 +61,137 @@ public class GraphicConfiguration extends ConfigurationGroup {
     return new Dimension(this.resolutionWidth, this.resolutionHeight);
   }
 
-  /**
-   * Gets the current resolution height.
-   *
-   * @return the resolution height.
-   */
+  /// Gets the current resolution height.
+  ///
+  /// @return the resolution height.
   public int getResolutionHeight() {
     return resolutionHeight;
   }
 
-  /**
-   * Gets the current resolution width.
-   *
-   * @return the resolution width.
-   */
+  /// Gets the current resolution width.
+  ///
+  /// @return the resolution width.
   public int getResolutionWidth() {
     return resolutionWidth;
   }
 
-  /**
-   * Checks if dynamic shadows rendering is enabled.
-   *
-   * @return true if dynamic shadows rendering is enabled, false otherwise.
-   */
+  /// Checks if dynamic shadows rendering is enabled.
+  ///
+  /// @return true if dynamic shadows rendering is enabled, false otherwise.
   public boolean renderDynamicShadows() {
     return renderDynamicShadows;
   }
 
-  /**
-   * Checks if anti-aliasing is enabled.
-   *
-   * @return true if anti-aliasing is enabled, false otherwise.
-   */
+  /// Checks if anti-aliasing is enabled.
+  ///
+  /// @return true if anti-aliasing is enabled, false otherwise.
   public boolean antiAliasing() {
     return antiAliasing;
   }
 
-  /**
-   * Checks if color interpolation is enabled.
-   *
-   * @return true if color interpolation is enabled, false otherwise.
-   */
+  /// Checks if color interpolation is enabled.
+  ///
+  /// @return true if color interpolation is enabled, false otherwise.
   public boolean colorInterpolation() {
     return colorInterpolation;
   }
 
-  /**
-   * Gets the current display mode.
-   *
-   * @return the display mode.
-   */
+  /// Gets the current display mode.
+  ///
+  /// @return the display mode.
   public DisplayMode getDisplayMode() {
     return displayMode;
   }
 
-  /**
-   * Sets the display mode.
-   *
-   * @param displayMode the new display mode.
-   */
+  /// Sets the display mode.
+  ///
+  /// @param displayMode the new display mode.
   public void setDisplayMode(DisplayMode displayMode) {
     this.set("displayMode", displayMode);
   }
 
-  /**
-   * Sets the graphic quality.
-   *
-   * @param graphicQuality the new graphic quality.
-   */
+  /// Sets the graphic quality.
+  ///
+  /// @param graphicQuality the new graphic quality.
   public void setGraphicQuality(final Quality graphicQuality) {
     this.set("graphicQuality", graphicQuality);
   }
 
-  /**
-   * Sets whether to render dynamic shadows.
-   *
-   * @param renderDynamicShadows true to enable dynamic shadows rendering, false to disable.
-   */
+  /// Sets whether to render dynamic shadows.
+  ///
+  /// @param renderDynamicShadows true to enable dynamic shadows rendering, false to disable.
   public void setRenderDynamicShadows(final boolean renderDynamicShadows) {
     this.set("renderDynamicShadows", renderDynamicShadows);
   }
 
-  /**
-   * Sets the resolution height.
-   *
-   * @param resolutionHeight the new resolution height.
-   */
+  /// Sets the resolution height.
+  ///
+  /// @param resolutionHeight the new resolution height.
   public void setResolutionHeight(final int resolutionHeight) {
     this.set("resolutionHeight", resolutionHeight);
   }
 
-  /**
-   * Sets the resolution width.
-   *
-   * @param resolutionWidth the new resolution width.
-   */
+  /// Sets the resolution width.
+  ///
+  /// @param resolutionWidth the new resolution width.
   public void setResolutionWidth(final int resolutionWidth) {
     this.set("resolutionWidth", resolutionWidth);
   }
 
-  /**
-   * Checks if resolution scaling is enabled.
-   *
-   * @return true if resolution scaling is enabled, false otherwise.
-   */
+  /// Checks if resolution scaling is enabled.
+  ///
+  /// @return true if resolution scaling is enabled, false otherwise.
   public boolean enableResolutionScaling() {
     return enableResolutionScale;
   }
 
-  /**
-   * Sets whether to enable resolution scaling.
-   *
-   * @param enableResolutionScale true to enable resolution scaling, false to disable.
-   */
+  /// Sets whether to enable resolution scaling.
+  ///
+  /// @param enableResolutionScale true to enable resolution scaling, false to disable.
   public void setEnableResolutionScale(boolean enableResolutionScale) {
     this.set("enableResolutionScale", enableResolutionScale);
   }
 
-  /**
-   * Checks if frames should be reduced when not focused.
-   *
-   * @return true if frames should be reduced when not focused, false otherwise.
-   */
+  /// Checks if frames should be reduced when not focused.
+  ///
+  /// @return true if frames should be reduced when not focused, false otherwise.
   public boolean reduceFramesWhenNotFocused() {
     return reduceFramesWhenNotFocused;
   }
 
-  /**
-   * Sets whether to reduce frames when not focused.
-   *
-   * @param reduceFramesWhenNotFocused true to reduce frames when not focused, false to not reduce.
-   */
+  /// Sets whether to reduce frames when not focused.
+  ///
+  /// @param reduceFramesWhenNotFocused true to reduce frames when not focused, false to not reduce.
   public void setReduceFramesWhenNotFocused(boolean reduceFramesWhenNotFocused) {
     this.set("reduceFramesWhenNotFocused", reduceFramesWhenNotFocused);
   }
 
-  /**
-   * Sets whether to enable anti-aliasing.
-   *
-   * @param antiAliasing true to enable anti-aliasing, false to disable.
-   */
+  /// Sets whether to enable anti-aliasing.
+  ///
+  /// @param antiAliasing true to enable anti-aliasing, false to disable.
   public void setAntiAliasing(boolean antiAliasing) {
     this.set("antiAliasing", antiAliasing);
   }
 
-  /**
-   * Sets whether to enable color interpolation.
-   *
-   * @param colorInterpolation true to enable color interpolation, false to disable.
-   */
+  /// Sets whether to enable color interpolation.
+  ///
+  /// @param colorInterpolation true to enable color interpolation, false to disable.
   public void setColorInterpolation(boolean colorInterpolation) {
     this.set("colorInterpolation", colorInterpolation);
   }
 
-  /**
-   * Gets the Java2D rendering pipeline. The pipeline is locked in once the
-   * first {@code Graphics2D} context is created, so changing this after
-   * {@code Game.init()} has no effect.
-   *
-   * @return the configured Java2D pipeline.
-   */
+  /// Gets the Java2D rendering pipeline. The pipeline is locked in once the
+  /// first `Graphics2D` context is created, so changing this after
+  /// `Game.init()` has no effect.
+  ///
+  /// @return the configured Java2D pipeline.
   public Java2DPipeline getJava2DPipeline() {
     return java2DPipeline;
   }
 
-  /**
-   * Sets the Java2D rendering pipeline.
-   *
-   * @param pipeline the desired Java2D pipeline.
-   */
+  /// Sets the Java2D rendering pipeline.
+  ///
+  /// @param pipeline the desired Java2D pipeline.
   public void setJava2DPipeline(Java2DPipeline pipeline) {
     this.set("java2DPipeline", pipeline);
   }

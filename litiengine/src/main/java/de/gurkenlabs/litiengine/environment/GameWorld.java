@@ -15,23 +15,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 
-/**
- * The {@code GameWorld} class is a global environment manager that contains all {@code Environments} and provides the currently active
- * {@code Environment} and {@code Camera}.<br>
- * <p>
- * The {@code GameWorld} returns the same instance for a particular map/mapName until the {@code GameWorld.reset(String)} method is called.
- * </p>
- * <p>
- * Moreover, it provides the possibility to attach game logic via {@code EnvironmentListeners} to different events of the {@code Envrionment's} life
- * cycle (e.g. loaded, initialized, ...).<br>
- * <i>This is typically used to provide some per-level logic or to trigger general loading behavior.</i>
- *
- * @see Environment
- * @see Camera
- * @see GameWorld#environment()
- * @see GameWorld#camera()
- * @see GameWorld#reset(String)
- */
+/// The `GameWorld` class is a global environment manager that contains all `Environments` and provides the currently active
+/// `Environment` and `Camera`.
+///
+/// The `GameWorld` returns the same instance for a particular map/mapName until the `GameWorld.reset(String)` method is called.
+///
+/// Moreover, it provides the possibility to attach game logic via `EnvironmentListeners` to different events of the `Envrionment's` life
+/// cycle (e.g. loaded, initialized, ...).
+///
+/// *This is typically used to provide some per-level logic or to trigger general loading behavior.*
+///
+/// @see Environment
+/// @see Camera
+/// @see GameWorld#environment()
+/// @see GameWorld#camera()
+/// @see GameWorld#reset(String)
 public final class GameWorld implements IUpdateable {
   private final List<EnvironmentListener> listeners = new CopyOnWriteArrayList<>();
   private final List<EnvironmentLoadedListener> loadedListeners = new CopyOnWriteArrayList<>();
@@ -48,22 +46,16 @@ public final class GameWorld implements IUpdateable {
   private ICamera camera;
   private int gravity;
 
-  /**
-   * <p>
-   * <b>You should never call this manually! Instead use the {@code Game.world()} instance.</b>
-   * </p>
-   *
-   * @see Game#world()
-   */
+  /// **You should never call this manually! Instead use the `Game.world()` instance.**
+  ///
+  /// @see Game#world()
   public GameWorld() {
     if (Game.world() != null) {
       throw new UnsupportedOperationException("Never initialize a GameWorld manually. Use Game.world() instead.");
     }
   }
 
-  /**
-   * Don't call this manually!
-   */
+  /// Don't call this manually!
   @Override
   public void update() {
     if (this.environment() == null) {
@@ -78,175 +70,139 @@ public final class GameWorld implements IUpdateable {
     }
   }
 
-  /**
-   * Adds the specified environment listener to receive events about the basic life-cycle of environments. This is a global event that gets called for
-   * any map.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified environment listener to receive events about the basic life-cycle of environments. This is a global event that gets called for
+  /// any map.
+  ///
+  /// @param listener The listener to add.
   public void addListener(EnvironmentListener listener) {
     this.listeners.add(listener);
   }
 
-  /**
-   * Removes the specified environment listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified environment listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeListener(EnvironmentListener listener) {
     this.listeners.remove(listener);
   }
 
-  /**
-   * Adds the specified environment loaded listener to receive events for when an environment gets loaded. This is a global event that gets called for
-   * any map.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified environment loaded listener to receive events for when an environment gets loaded. This is a global event that gets called for
+  /// any map.
+  ///
+  /// @param listener The listener to add.
   public void onLoaded(EnvironmentLoadedListener listener) {
     this.loadedListeners.add(listener);
   }
 
-  /**
-   * Removes the specified environment loaded listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified environment loaded listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeLoadedListener(EnvironmentLoadedListener listener) {
     this.loadedListeners.remove(listener);
   }
 
-  /**
-   * Adds the specified environment unloaded listener to receive events for when an environment gets unloaded. This is a global event that gets called
-   * for any map.
-   *
-   * @param listener The listener to add.
-   */
+  /// Adds the specified environment unloaded listener to receive events for when an environment gets unloaded. This is a global event that gets called
+  /// for any map.
+  ///
+  /// @param listener The listener to add.
   public void onUnloaded(EnvironmentUnloadedListener listener) {
     this.unloadedListeners.add(listener);
   }
 
-  /**
-   * Removes the specified environment unloaded listener.
-   *
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified environment unloaded listener.
+  ///
+  /// @param listener The listener to remove.
   public void removeUnloadedListener(EnvironmentUnloadedListener listener) {
     this.unloadedListeners.remove(listener);
   }
 
-  /**
-   * Adds the specified environment loaded listener to receive events for when an environment with the specified map name gets loaded.
-   *
-   * @param mapName  The name of the map for which to add the listener.
-   * @param listener The listener to add.
-   */
+  /// Adds the specified environment loaded listener to receive events for when an environment with the specified map name gets loaded.
+  ///
+  /// @param mapName  The name of the map for which to add the listener.
+  /// @param listener The listener to add.
   public void onLoaded(String mapName, EnvironmentLoadedListener listener) {
     add(this.environmentLoadedListeners, mapName, listener);
   }
 
-  /**
-   * Removes the specified environment loaded listener for the specified map name.
-   *
-   * @param mapName  The name of the map for which to remove the listener.
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified environment loaded listener for the specified map name.
+  ///
+  /// @param mapName  The name of the map for which to remove the listener.
+  /// @param listener The listener to remove.
   public void removeLoadedListener(String mapName, EnvironmentLoadedListener listener) {
     remove(this.environmentLoadedListeners, mapName, listener);
   }
 
-  /**
-   * Adds the specified environment unloaded listener to receive events for when an environment with the specified map name gets unloaded.
-   *
-   * @param mapName  The name of the map for which to add the listener.
-   * @param listener The listener to add.
-   */
+  /// Adds the specified environment unloaded listener to receive events for when an environment with the specified map name gets unloaded.
+  ///
+  /// @param mapName  The name of the map for which to add the listener.
+  /// @param listener The listener to add.
   public void onUnloaded(String mapName, EnvironmentUnloadedListener listener) {
     add(this.environmentUnloadedListeners, mapName, listener);
   }
 
-  /**
-   * Removes the specified environment unloaded listener for the specified map name.
-   *
-   * @param mapName  The name of the map for which to remove the listener.
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified environment unloaded listener for the specified map name.
+  ///
+  /// @param mapName  The name of the map for which to remove the listener.
+  /// @param listener The listener to remove.
   public void removeUnloadedListener(String mapName, EnvironmentUnloadedListener listener) {
     add(this.environmentUnloadedListeners, mapName, listener);
   }
 
-  /**
-   * Adds the specified environment listener to receive events about the basic life-cycle of environments with the specified map name.
-   *
-   * @param mapName  The name of the map for which to add the listener.
-   * @param listener The listener to add.
-   */
+  /// Adds the specified environment listener to receive events about the basic life-cycle of environments with the specified map name.
+  ///
+  /// @param mapName  The name of the map for which to add the listener.
+  /// @param listener The listener to add.
   public void addListener(String mapName, EnvironmentListener listener) {
     add(this.environmentListeners, mapName, listener);
   }
 
-  /**
-   * Removes the specified environment listener.
-   *
-   * @param mapName  The name of the map for which to remove the listener.
-   * @param listener The listener to remove.
-   */
+  /// Removes the specified environment listener.
+  ///
+  /// @param mapName  The name of the map for which to remove the listener.
+  /// @param listener The listener to remove.
   public void removeListener(String mapName, EnvironmentListener listener) {
     remove(this.environmentListeners, mapName, listener);
   }
 
-  /**
-   * Attaches the specified updatable instance that only gets updated when an environment with the specified map name is currently loaded.
-   *
-   * @param mapName    The name of the map for which to attach the updatable instance.
-   * @param updateable The updatable instance to attach.
-   */
+  /// Attaches the specified updatable instance that only gets updated when an environment with the specified map name is currently loaded.
+  ///
+  /// @param mapName    The name of the map for which to attach the updatable instance.
+  /// @param updateable The updatable instance to attach.
   public void attach(String mapName, IUpdateable updateable) {
     add(this.updatables, mapName, updateable);
   }
 
-  /**
-   * Detaches the specified updatable instance from the updating of environments with the specified map name.
-   *
-   * @param mapName    The name of the map for which to detach the updatable instance.
-   * @param updateable The updatable instance to detach.
-   */
+  /// Detaches the specified updatable instance from the updating of environments with the specified map name.
+  ///
+  /// @param mapName    The name of the map for which to detach the updatable instance.
+  /// @param updateable The updatable instance to detach.
   public void detach(String mapName, IUpdateable updateable) {
     remove(this.updatables, mapName, updateable);
   }
 
-  /**
-   * Gets the game's current {@code Camera}.
-   *
-   * @return The currently active camera.
-   * @see ICamera
-   */
+  /// Gets the game's current `Camera`.
+  ///
+  /// @return The currently active camera.
+  /// @see ICamera
   public ICamera camera() {
     return this.camera;
   }
 
-  /**
-   * Gets the game's current {@code Environment}.
-   *
-   * @return The currently active environment.
-   * @see Environment
-   */
+  /// Gets the game's current `Environment`.
+  ///
+  /// @return The currently active environment.
+  /// @see Environment
   public Environment environment() {
     return this.environment;
   }
 
-  /**
-   * Gets the game worlds gravity that is applied to any environment. This can e.g. be useful for platformers.
-   *
-   * @return The gravity of the game world that gets applied to any environment.
-   */
+  /// Gets the game worlds gravity that is applied to any environment. This can e.g. be useful for platformers.
+  ///
+  /// @return The gravity of the game world that gets applied to any environment.
   public int gravity() {
     return this.gravity;
   }
 
-  /**
-   * Clears the currently active camera and environment, removes all previously loaded environments and clears all listener lists.
-   */
+  /// Clears the currently active camera and environment, removes all previously loaded environments and clears all listener lists.
   public void clear() {
     this.unloadEnvironment();
     this.environments.clear();
@@ -262,21 +218,18 @@ public final class GameWorld implements IUpdateable {
     this.unloadedListeners.clear();
   }
 
-  /**
-   * Gets all environments that are known to the game world.
-   *
-   * @return All known environments.
-   */
+  /// Gets all environments that are known to the game world.
+  ///
+  /// @return All known environments.
   public Collection<Environment> getEnvironments() {
     return this.environments.values();
   }
 
-  /**
-   * Gets the environment that's related to the specified mapName.<br> This method implicitly creates a new {@code Environment} if necessary.
-   *
-   * @param mapName The map name by which the environment is identified.
-   * @return The environment for the map name or null if no such map can be found.
-   */
+  /// Gets the environment that's related to the specified mapName.
+  /// This method implicitly creates a new `Environment` if necessary.
+  ///
+  /// @param mapName The map name by which the environment is identified.
+  /// @return The environment for the map name or null if no such map can be found.
   public Environment getEnvironment(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
       return null;
@@ -286,12 +239,11 @@ public final class GameWorld implements IUpdateable {
     return this.getEnvironment(map);
   }
 
-  /**
-   * Gets the environment that's related to the specified map.<br> This method implicitly creates a new {@code Environment} if necessary.
-   *
-   * @param map The map by which the environment is identified.
-   * @return The environment for the map or null if no such map can be found.
-   */
+  /// Gets the environment that's related to the specified map.
+  /// This method implicitly creates a new `Environment` if necessary.
+  ///
+  /// @param map The map by which the environment is identified.
+  /// @return The environment for the map or null if no such map can be found.
   public Environment getEnvironment(IMap map) {
     if (map == null || map.getName() == null || map.getName().isEmpty()) {
       return null;
@@ -308,27 +260,21 @@ public final class GameWorld implements IUpdateable {
     return env;
   }
 
-  /**
-   * Indicates whether this instance already contains an {@code Environment} for the specified map name.
-   *
-   * @param mapName The map name by which the environment is identified.
-   * @return True if the game world already has an environment for the specified map name; otherwise false.
-   */
+  /// Indicates whether this instance already contains an `Environment` for the specified map name.
+  ///
+  /// @param mapName The map name by which the environment is identified.
+  /// @return True if the game world already has an environment for the specified map name; otherwise false.
   public boolean containsEnvironment(String mapName) {
     return this.environments.containsKey(mapName.toLowerCase());
   }
 
-  /**
-   * Loads the specified {@code Environment} and sets it as current environment of the game. This implicitly unloads the previously loaded environment
-   * (if present).
-   *
-   * <p>
-   * <i>The loaded environment can then be accessed via {@code GameWorld#environment()}.</i>
-   * </p>
-   *
-   * @param env The environment to be loaded.
-   * @see GameWorld#environment()
-   */
+  /// Loads the specified `Environment` and sets it as current environment of the game. This implicitly unloads the previously loaded environment
+  /// (if present).
+  ///
+  /// *The loaded environment can then be accessed via `GameWorld#environment()`.*
+  ///
+  /// @param env The environment to be loaded.
+  /// @see GameWorld#environment()
   public void loadEnvironment(final Environment env) {
     Lock lock = Game.loop().getLock();
     lock.lock();
@@ -366,47 +312,37 @@ public final class GameWorld implements IUpdateable {
     }
   }
 
-  /**
-   * Loads the {@code Environment} that is identified by the specified map name and sets it as current environment of the game. This implicitly
-   * unloads the previously loaded environment (if present).
-   *
-   * <p>
-   * <i>The loaded environment can then be accessed via {@code GameWorld#environment()}.</i>
-   * </p>
-   *
-   * @param mapName The map name by which the environment is identified.
-   * @return The loaded environment.
-   * @see GameWorld#environment()
-   * @see GameWorld#loadEnvironment(Environment)
-   */
+  /// Loads the `Environment` that is identified by the specified map name and sets it as current environment of the game. This implicitly
+  /// unloads the previously loaded environment (if present).
+  ///
+  /// *The loaded environment can then be accessed via `GameWorld#environment()`.*
+  ///
+  /// @param mapName The map name by which the environment is identified.
+  /// @return The loaded environment.
+  /// @see GameWorld#environment()
+  /// @see GameWorld#loadEnvironment(Environment)
   public Environment loadEnvironment(String mapName) {
     Environment env = this.getEnvironment(mapName);
     this.loadEnvironment(env);
     return env;
   }
 
-  /**
-   * Loads the {@code Environment} that is identified by the specified map and sets it as current environment of the game. This implicitly unloads the
-   * previously loaded environment (if present).
-   *
-   * <p>
-   * <i>The loaded environment can then be accessed via {@code GameWorld#environment()}.</i>
-   * </p>
-   *
-   * @param map The map by which the environment is identified.
-   * @return The loaded environment.
-   * @see GameWorld#environment()
-   * @see GameWorld#loadEnvironment(Environment)
-   */
+  /// Loads the `Environment` that is identified by the specified map and sets it as current environment of the game. This implicitly unloads the
+  /// previously loaded environment (if present).
+  ///
+  /// *The loaded environment can then be accessed via `GameWorld#environment()`.*
+  ///
+  /// @param map The map by which the environment is identified.
+  /// @return The loaded environment.
+  /// @see GameWorld#environment()
+  /// @see GameWorld#loadEnvironment(Environment)
   public Environment loadEnvironment(IMap map) {
     Environment env = this.getEnvironment(map);
     this.loadEnvironment(env);
     return env;
   }
 
-  /**
-   * Unloads the current {@code Environment} and sets it to null.
-   */
+  /// Unloads the current `Environment` and sets it to null.
   public void unloadEnvironment() {
     if (this.environment() != null) {
       this.environment().unload();
@@ -427,19 +363,15 @@ public final class GameWorld implements IUpdateable {
     this.environment = null;
   }
 
-  /**
-   * Resets the previously loaded {@code Environment} for the specified map name so that it can be re-initiated upon the next access.
-   *
-   * <p>
-   * <i>This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away
-   * the current environment instance and reload a new one upon the next access.</i>
-   * </p>
-   *
-   * @param mapName The map name by which the environment is identified.
-   * @return The environment instance that was reset or null if none was previously loaded.
-   * @see GameWorld#getEnvironment(String)
-   * @see GameWorld#reset(IMap)
-   */
+  /// Resets the previously loaded `Environment` for the specified map name so that it can be re-initiated upon the next access.
+  ///
+  /// *This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away
+  /// the current environment instance and reload a new one upon the next access.*
+  ///
+  /// @param mapName The map name by which the environment is identified.
+  /// @return The environment instance that was reset or null if none was previously loaded.
+  /// @see GameWorld#getEnvironment(String)
+  /// @see GameWorld#reset(IMap)
   public Environment reset(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
       return null;
@@ -448,19 +380,15 @@ public final class GameWorld implements IUpdateable {
     return this.reset(Resources.maps().get(mapName));
   }
 
-  /**
-   * Resets the previously loaded {@code Environment} for the specified map so that it can be re-initiated upon the next access.
-   *
-   * <p>
-   * <i>This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away
-   * the current environment instance and reload a new one upon the next access.</i>
-   * </p>
-   *
-   * @param map The map by which the environment is identified.
-   * @return The environment instance that was reset or null if none was previously loaded.
-   * @see GameWorld#getEnvironment(String)
-   * @see GameWorld#reset(IMap)
-   */
+  /// Resets the previously loaded `Environment` for the specified map so that it can be re-initiated upon the next access.
+  ///
+  /// *This can be used if one wants to completely reset the state of a level to its initial state. It'll just throw away
+  /// the current environment instance and reload a new one upon the next access.*
+  ///
+  /// @param map The map by which the environment is identified.
+  /// @return The environment instance that was reset or null if none was previously loaded.
+  /// @see GameWorld#getEnvironment(String)
+  /// @see GameWorld#reset(IMap)
   public Environment reset(IMap map) {
     if (map == null) {
       return null;
@@ -488,11 +416,9 @@ public final class GameWorld implements IUpdateable {
     return env;
   }
 
-  /**
-   * Sets the active camera of the game.
-   *
-   * @param cam The new camera to be set.
-   */
+  /// Sets the active camera of the game.
+  ///
+  /// @param cam The new camera to be set.
   public void setCamera(final ICamera cam) {
     if (this.camera() != null) {
       Game.loop().detach(camera);
@@ -506,13 +432,11 @@ public final class GameWorld implements IUpdateable {
     }
   }
 
-  /**
-   * Specify the general gravity that will be used as default value for all environments that are loaded. The value's unit of measure is pixel/second
-   * (similar to the velocity of a {@code IMobileEntity}.)
-   *
-   * @param gravity The default gravity for all environments.
-   * @see IMobileEntity#getVelocity()
-   */
+  /// Specify the general gravity that will be used as default value for all environments that are loaded. The value's unit of measure is pixel/second
+  /// (similar to the velocity of a `IMobileEntity`.)
+  ///
+  /// @param gravity The default gravity for all environments.
+  /// @see IMobileEntity#getVelocity()
   public void setGravity(int gravity) {
     this.gravity = gravity;
   }
