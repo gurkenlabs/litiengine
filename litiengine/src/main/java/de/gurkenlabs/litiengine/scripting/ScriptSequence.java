@@ -148,7 +148,7 @@ public final class ScriptSequence implements Subscription {
   ///
   /// @return `true` while a started sequence has not completed or been closed.
   public boolean isRunning() {
-    return this.started && !this.closed && this.index < this.steps.size();
+    return this.started && !this.closed;
   }
 
   @Override

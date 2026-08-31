@@ -47,4 +47,17 @@ class ScriptSequenceCinematicTests {
     context.close();
     assertFalse(sequence.isRunning());
   }
+
+  @Test
+  void testSinglePendingStepIsRunning() {
+    ScriptDefinition definition = new ScriptDefinition("seq-test", "java", null, "Dummy", ScriptHostType.GAME);
+    ScriptContext<Object> context = new ScriptContext<>(definition, new ScriptBinding("seq-test"), new Object());
+    ScriptSequence sequence = context.sequence().waitFor(1000).then(() -> {});
+
+    sequence.start();
+
+    assertTrue(sequence.isRunning());
+    context.close();
+    assertFalse(sequence.isRunning());
+  }
 }
