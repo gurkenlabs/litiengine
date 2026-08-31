@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.AbilityBuilder;
 import de.gurkenlabs.litiengine.abilities.AbilityExecution;
+import de.gurkenlabs.litiengine.abilities.DynamicAbility;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;

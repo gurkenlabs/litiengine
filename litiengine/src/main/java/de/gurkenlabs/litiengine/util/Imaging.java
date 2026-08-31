@@ -410,7 +410,7 @@ public final class Imaging {
    *
    * @param image the image
    * @param rows  the rows
-   * @param cols  the cols
+   * @param columns the columns
    * @return the two dimensional array containing the sub-images
    */
   public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
