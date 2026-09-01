@@ -339,14 +339,14 @@ public final class SpriteVariantSelector {
     if (mapObject != null) {
       String type = mapObject.getType();
       if (MapObjectType.CREATURE.name().equalsIgnoreCase(type)) {
-        String base = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME);
+        String base = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
         Direction dir = mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED);
         boolean dead = CreaturePanel.isStartDead(mapObject);
         String spriteName = selectCreatureSpriteName(base, dir, dead, Resources.spritesheets().getAll());
         return spriteName != null ? CreaturePanel.getOrLoadSpritesheet(spriteName) : null;
       }
       if (MapObjectType.PROP.name().equalsIgnoreCase(type)) {
-        String base = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME);
+        String base = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
         PropState state = PropPanel.resolvePropState(mapObject);
         String spriteName = selectPropSpriteName(base, state, Resources.spritesheets().getAll());
         if (spriteName != null) {
@@ -396,13 +396,13 @@ public final class SpriteVariantSelector {
     if (mapObject != null) {
       String type = mapObject.getType();
       if (MapObjectType.CREATURE.name().equalsIgnoreCase(type)) {
-        String base = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME);
+        String base = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
         Direction dir = mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED);
         boolean dead = CreaturePanel.isStartDead(mapObject);
         return getCreatureIcon(base, dir, dead, size);
       }
       if (MapObjectType.PROP.name().equalsIgnoreCase(type)) {
-        String base = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME);
+        String base = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME, null);
         PropState state = PropPanel.resolvePropState(mapObject);
         Rotation rot = mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class, Rotation.NONE);
         boolean flipH = mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY, false);

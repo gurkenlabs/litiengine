@@ -1,7 +1,10 @@
 package de.gurkenlabs.utiliti.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -72,6 +75,22 @@ class SpriteVariantSelectorTest {
     assertEquals("prop-barrel1-intact", SpriteVariantSelector.selectPropSpriteName("barrel1", de.gurkenlabs.litiengine.entities.PropState.INTACT, sheets));
     assertEquals("prop-barrel1-damaged", SpriteVariantSelector.selectPropSpriteName("barrel1", de.gurkenlabs.litiengine.entities.PropState.DAMAGED, sheets));
     assertEquals("prop-barrel1-destroyed", SpriteVariantSelector.selectPropSpriteName("barrel1", de.gurkenlabs.litiengine.entities.PropState.DESTROYED, sheets));
+  }
+
+  @Test
+  void previewRenderingToleratesMissingCreatureSpritesheetName() {
+    MapObject mapObject = new MapObject(MapObjectType.CREATURE.name());
+
+    assertNull(SpriteVariantSelector.getPreviewSpritesheet(null, mapObject));
+    assertNull(SpriteVariantSelector.getEntityIcon(null, mapObject, 16));
+  }
+
+  @Test
+  void previewRenderingToleratesMissingPropSpritesheetName() {
+    MapObject mapObject = new MapObject(MapObjectType.PROP.name());
+
+    assertNull(SpriteVariantSelector.getPreviewSpritesheet(null, mapObject));
+    assertNull(SpriteVariantSelector.getEntityIcon(null, mapObject, 16));
   }
 
   private static Spritesheet sheet(String name) {
