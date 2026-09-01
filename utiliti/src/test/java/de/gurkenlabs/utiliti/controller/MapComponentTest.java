@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.GroupLayer;
@@ -26,6 +27,7 @@ import java.awt.Dimension;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -206,6 +208,21 @@ class MapComponentTest {
   }
 
   @Test
+  void doesNotPromoteOverlappingCollisionBoxToEntity() {
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    MapObject collisionBox = mapObject(1, 0, 0, 100, 100);
+    collisionBox.setType(MapObjectType.COLLISIONBOX.name());
+    MapObject creature = mapObject(2, 20, 20, 16, 16);
+    creature.setType(MapObjectType.CREATURE.name());
+    MapObjectLayer layer = new MapObjectLayer();
+    layer.addMapObject(collisionBox);
+    layer.addMapObject(creature);
+    map.addLayer(layer);
+
+    assertSame(collisionBox, MapComponent.resolveParentEntity(collisionBox));
+  }
+
+  @Test
   void excludesObjectsOnHiddenLayersAtLocation() {
     TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
     MapObject mapObject = mapObject(1, 0, 0, 10, 10);
@@ -215,6 +232,50 @@ class MapComponentTest {
     map.addLayer(layer);
 
     assertTrue(MapComponent.mapObjectsAt(map, new Point2D.Double(5, 5)).isEmpty());
+  }
+
+  @Test
+  void ignoresTransparentPixelsWhenFindingSpriteObjects() {
+    BufferedImage image = new BufferedImage(2, 1, BufferedImage.TYPE_INT_ARGB);
+    image.setRGB(1, 0, 0xffffffff);
+    new Spritesheet(image, "prop-transparent-hit-intact.png", 2, 1);
+
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    MapObject prop = mapObject(1, 0, 0, 2, 1);
+    prop.setType(MapObjectType.PROP.name());
+    prop.setValue(MapObjectProperty.SPRITESHEETNAME, "transparent-hit");
+    MapObject collisionBox = mapObject(2, 0, 0, 2, 1);
+    collisionBox.setType(MapObjectType.COLLISIONBOX.name());
+    MapObjectLayer layer = new MapObjectLayer();
+    layer.addMapObject(prop);
+    layer.addMapObject(collisionBox);
+    map.addLayer(layer);
+
+    assertEquals(
+      List.of(collisionBox), MapComponent.mapObjectsAt(map, new Point2D.Double(0.5, 0.5)));
+    assertEquals(
+      List.of(prop, collisionBox), MapComponent.mapObjectsAt(map, new Point2D.Double(1.5, 0.5)));
+  }
+
+  @Test
+  void previewHitTestingDoesNotCombinePixelsFromDifferentAnimationFrames() {
+    BufferedImage image = new BufferedImage(2, 1, BufferedImage.TYPE_INT_ARGB);
+    image.setRGB(1, 0, 0xffffffff);
+    new Spritesheet(image, "prop-multiframe-hit-intact.png", 1, 1);
+
+    TmxMap map = new TmxMap(MapOrientations.ORTHOGONAL);
+    MapObject prop = mapObject(1, 0, 0, 1, 1);
+    prop.setType(MapObjectType.PROP.name());
+    prop.setValue(MapObjectProperty.SPRITESHEETNAME, "multiframe-hit");
+    MapObject collisionBox = mapObject(2, 0, 0, 1, 1);
+    collisionBox.setType(MapObjectType.COLLISIONBOX.name());
+    MapObjectLayer layer = new MapObjectLayer();
+    layer.addMapObject(prop);
+    layer.addMapObject(collisionBox);
+    map.addLayer(layer);
+
+    assertEquals(
+      List.of(collisionBox), MapComponent.mapObjectsAt(map, new Point2D.Double(0.5, 0.5)));
   }
 
   @Test
