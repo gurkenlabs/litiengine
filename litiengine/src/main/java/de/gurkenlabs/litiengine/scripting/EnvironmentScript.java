@@ -9,10 +9,10 @@ public abstract class EnvironmentScript extends AbstractScript<Environment> {
   @Override protected final void detached() throws Exception { this.onUnloaded(); }
 
   /// Called after the environment has loaded and is the current world environment.
-  protected void onLoaded() throws Exception { this.loaded(); }
+  protected void onLoaded() throws Exception {}
 
   /// Called when the environment binding is detached during unload.
-  protected void onUnloaded() throws Exception { this.unloaded(); }
+  protected void onUnloaded() throws Exception {}
 
   /// Called when the attached environment is cleared while it remains active.
   protected void onCleared() throws Exception {}
@@ -22,14 +22,6 @@ public abstract class EnvironmentScript extends AbstractScript<Environment> {
 
   /// Called when an entity is removed from the attached environment.
   protected void onEntityRemoved(IEntity entity) throws Exception {}
-
-  /// @deprecated Override [#onLoaded()] in new scripts.
-  @Deprecated
-  protected void loaded() throws Exception {}
-
-  /// @deprecated Override [#onUnloaded()] in new scripts.
-  @Deprecated
-  protected void unloaded() throws Exception {}
 
   final void dispatchCleared() throws Exception {
     this.onCleared();

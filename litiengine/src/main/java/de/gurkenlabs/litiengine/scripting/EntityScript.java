@@ -14,17 +14,16 @@ public abstract class EntityScript<T extends IEntity> extends AbstractScript<T> 
 
   /// Called from the entity's loaded event after its environment is available.
   /// @throws Exception if initialization fails.
-  protected void onLoaded() throws Exception { this.loaded(); }
+  protected void onLoaded() throws Exception {}
 
   /// Called when the entity controller is detached or the entity is removed.
   /// @throws Exception if cleanup fails.
-  protected void onUnloaded() throws Exception { this.unloaded(); }
+  protected void onUnloaded() throws Exception {}
 
   /// Called for messages delivered to the attached entity.
   /// @param event The message event.
   /// @throws Exception if handling fails.
   protected void onMessage(EntityMessageEvent event) throws Exception {
-    this.message(event);
     if (event != null) {
       this.onMessage(event.getMessage(), event.getSource());
     }
@@ -136,28 +135,6 @@ public abstract class EntityScript<T extends IEntity> extends AbstractScript<T> 
   public int getMaxHealth() {
     return this.host() instanceof de.gurkenlabs.litiengine.entities.ICombatEntity combat ? combat.getHitPoints().getMax() : 0;
   }
-
-  /// Legacy callback invoked after the entity environment becomes available.
-  ///
-  /// @deprecated Override [#onLoaded()] in new scripts.
-  /// @throws Exception if handling fails.
-  @Deprecated
-  protected void loaded() throws Exception {}
-
-  /// Legacy callback invoked when the script is unloaded.
-  ///
-  /// @deprecated Override [#onUnloaded()] in new scripts.
-  /// @throws Exception if handling fails.
-  @Deprecated
-  protected void unloaded() throws Exception {}
-
-  /// Legacy callback invoked when an entity message is received.
-  ///
-  /// @param event The message event.
-  /// @throws Exception if handling fails.
-  /// @deprecated Override [#onMessage(EntityMessageEvent)] or [#onMessage(String, Object)] in new scripts.
-  @Deprecated
-  protected void message(EntityMessageEvent event) throws Exception {}
 
   final void dispatchMessage(EntityMessageEvent event) throws Exception {
     this.onMessage(event);

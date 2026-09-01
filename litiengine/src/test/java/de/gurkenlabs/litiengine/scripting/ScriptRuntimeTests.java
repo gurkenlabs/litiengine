@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -55,6 +56,19 @@ class ScriptRuntimeTests {
     Game.scripts().clearDiagnostics();
     Game.scripts().setEntityBindings(List.of());
     JavaEntityScript.reset();
+  }
+
+  @Test
+  void legacyLifecycleBridgeMethodsAreNotPartOfScriptApi() {
+    assertThrows(NoSuchMethodException.class, () -> EntityScript.class.getDeclaredMethod("loaded"));
+    assertThrows(NoSuchMethodException.class, () -> EntityScript.class.getDeclaredMethod("unloaded"));
+    assertThrows(
+      NoSuchMethodException.class,
+      () -> EntityScript.class.getDeclaredMethod("message", EntityMessageEvent.class));
+    assertThrows(NoSuchMethodException.class, () -> EnvironmentScript.class.getDeclaredMethod("loaded"));
+    assertThrows(NoSuchMethodException.class, () -> EnvironmentScript.class.getDeclaredMethod("unloaded"));
+    assertThrows(NoSuchMethodException.class, () -> GameScript.class.getDeclaredMethod("started"));
+    assertThrows(NoSuchMethodException.class, () -> GameScript.class.getDeclaredMethod("stopped"));
   }
 
   @Test
@@ -585,9 +599,9 @@ class ScriptRuntimeTests {
 
     public JavaEntityScript() {}
 
-    @Override protected void loaded() { loaded++; configuredSpeed = this.speed; }
-    @Override protected void unloaded() { unloaded++; }
-    @Override protected void message(EntityMessageEvent event) { messages++; }
+    @Override protected void onLoaded() { loaded++; configuredSpeed = this.speed; }
+    @Override protected void onUnloaded() { unloaded++; }
+    @Override protected void onMessage(EntityMessageEvent event) { messages++; }
     @Override public void update() { updates++; }
 
     static void reset() {
@@ -1265,7 +1279,7 @@ class ScriptRuntimeTests {
     static int updateCount = 0;
 
     @Override
-    protected void loaded() {
+    protected void onLoaded() {
       if (shouldFailLoad) {
         throw new RuntimeException("Simulated load failure");
       }

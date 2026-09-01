@@ -12,10 +12,10 @@ public abstract class GameScript extends AbstractScript<Object> {
   @Override protected final void detached() throws Exception { this.onStopped(); }
 
   /// Called after the binding enters the running game lifecycle.
-  protected void onStarted() throws Exception { this.started(); }
+  protected void onStarted() throws Exception {}
 
   /// Called before the binding leaves the game lifecycle.
-  protected void onStopped() throws Exception { this.stopped(); }
+  protected void onStopped() throws Exception {}
 
   /// Loads an environment map by map name.
   public void loadMap(String mapName) {
@@ -57,11 +57,4 @@ public abstract class GameScript extends AbstractScript<Object> {
     Game.terminate();
   }
 
-  /// @deprecated Override [#onStarted()] in new scripts.
-  @Deprecated
-  protected void started() throws Exception {}
-
-  /// @deprecated Override [#onStopped()] in new scripts.
-  @Deprecated
-  protected void stopped() throws Exception {}
 }
