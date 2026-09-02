@@ -181,25 +181,25 @@ js_code = """/**
       level1Right.className = 'liti-header-level1-right';
 
       // 1. Theme toggle button (Dark -> Moon icon, Light -> Sun icon)
-      const themeBtn = document.createElement('button');
-      themeBtn.type = 'button';
-      themeBtn.className = 'liti-theme-toggle';
-      themeBtn.title = 'Toggle dark / light mode';
-      themeBtn.setAttribute('aria-label', 'Toggle theme');
+      const dynamicThemeBtn = document.createElement('button');
+      dynamicThemeBtn.type = 'button';
+      dynamicThemeBtn.className = 'liti-theme-toggle';
+      dynamicThemeBtn.title = 'Toggle dark / light mode';
+      dynamicThemeBtn.setAttribute('aria-label', 'Toggle theme');
 
-      function updateToggleIcon() {
-        themeBtn.innerHTML = isDarkMode() ? MOON_SVG : SUN_SVG;
+      function updateDynamicToggleIcon() {
+        dynamicThemeBtn.innerHTML = isDarkMode() ? MOON_SVG : SUN_SVG;
       }
 
-      themeBtn.addEventListener('click', function () {
+      dynamicThemeBtn.addEventListener('click', function () {
         const nextTheme = isDarkMode() ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', nextTheme);
         setStoredTheme(nextTheme);
-        updateToggleIcon();
+        updateDynamicToggleIcon();
       });
 
-      updateToggleIcon();
-      level1Right.appendChild(themeBtn);
+      updateDynamicToggleIcon();
+      level1Right.appendChild(dynamicThemeBtn);
 
       // 2. Search capsule
       if (navListSearch) {
@@ -402,9 +402,10 @@ js_code = """/**
     // 1. Unwrap java.lang.Object root nodes so all direct classes start directly at the top level
     const rootNodes = Array.from(document.querySelectorAll('section.hierarchy > ul > li.circle'));
     rootNodes.forEach(li => {
-      const link = li.querySelector('a[href*="java.lang/Object.html"], a[title*="java.lang.Object"]');
-      const directText = li.childNodes.length ? li.childNodes[0].textContent : '';
-      if ((link && link.textContent.trim() === 'Object') || directText.includes('java.lang.Object') || directText.trim() === 'java.lang.') {
+      const link = li.querySelector('a[href*="Object.html"]');
+      const isObjLink = link && (link.textContent.trim() === 'Object' || link.href.includes('/Object.html'));
+      const isObjText = li.textContent.includes('java.lang.Object') || (li.childNodes.length && li.childNodes[0].textContent.includes('java.lang.'));
+      if (isObjLink || isObjText) {
         const childUl = li.querySelector('ul');
         if (childUl && li.parentNode) {
           const parentUl = li.parentNode;
@@ -649,6 +650,18 @@ js_code = """/**
       }
 
       current = Array.from(current.children).find(el => el.classList.contains('inheritance'));
+    }
+
+    // Also clean up redundant "extends Object" from type-signature
+    const extImplements = document.querySelector('.type-signature .extends-implements');
+    if (extImplements) {
+      const extObjLink = extImplements.querySelector('a[href*="Object.html"]');
+      if (extObjLink && extObjLink.textContent.trim() === 'Object') {
+        const text = extImplements.textContent.trim();
+        if (text === 'extends Object') {
+          extImplements.remove();
+        }
+      }
     }
 
     // Filter out Object nodes

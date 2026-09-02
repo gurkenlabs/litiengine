@@ -158,6 +158,17 @@ void enhanceJavadocHtml(File file, File rootDir) {
     // Remove empty sub-nav on pages without breadcrumbs (overview, tree, index, search, etc.)
     html = html.replaceAll(/(?s)<div class="sub-nav">\s*<div class="nav-content">\s*<ol class="sub-nav-list">\s*<\/ol>\s*<\/div>\s*<\/div>/, '')
 
+    // Remove redundant single-level "java.lang.Object" inheritance tree on class declaration pages
+    html = html.replaceAll(/(?s)<div class="inheritance" title="Inheritance Tree">\s*<a href="[^"]*?Object\.html"[^>]*?>java\.lang\.Object<\/a>\s*<div class="inheritance">([^<]+)<\/div>\s*<\/div>/, '')
+
+    // Remove redundant "extends Object" from type-signature if class only extends Object
+    html = html.replaceAll(/(?s)<span class="extends-implements">\s*extends\s*<a href="[^"]*?Object\.html"[^>]*?>Object<\/a>\s*<\/span>/, '')
+
+    // Unwrap java.lang.Object root node in hierarchy trees
+    if (file.name.endsWith('-tree.html')) {
+      html = html.replaceAll(/(?s)<li class="circle">java\.lang\.<a href="[^"]*?Object\.html"[^>]*?>Object<\/a>\s*<ul>(.*?)<\/ul>\s*<\/li>/, '$1')
+    }
+
     // Statically pre-render sticky alphabet bar on index-all.html
     if (file.name == 'index-all.html') {
       def jumpMatcher = (html =~ /(?s)<div class="header">\s*<h1>Index<\/h1>\s*<\/div>\s*(.*?)(?=<h2 class="title" id="I:A">)/)
