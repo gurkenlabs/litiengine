@@ -120,7 +120,7 @@ void enhanceJavadocHtml(File file, File rootDir) {
   <div class="liti-header-level1">
     <div class="liti-header-container">
       <a class="liti-brand-link" href="https://docs.litiengine.com/">
-        <img class="liti-brand-logo" src="${r}assets/logo.png" alt="LITIENGINE Logo" width="28.79" height="28.79">
+        <img class="liti-brand-logo" src="${r}assets/icon.png" alt="LITIENGINE Logo" width="28.79" height="28.79">
         <span class="liti-brand-text"><strong>LITIENGINE Docs</strong> <span class="api-tag">API</span></span>
       </a>
       <div class="liti-header-level1-right">
