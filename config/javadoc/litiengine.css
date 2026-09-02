@@ -709,6 +709,48 @@ ul.nav-list li.nav-bar-cell1-rev a,
   background-color: transparent !important;
 }
 
+/* Backlink to main documentation in Level 2 */
+ul.nav-list li.nav-item-backlink {
+  margin-right: 0.5rem !important;
+}
+
+ul.nav-list li.nav-item-backlink a.nav-link-docs {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  padding: 0 0.85rem !important;
+  color: var(--color-primary) !important;
+  background-color: var(--color-primary-light) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 6px !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+ul.nav-list li.nav-item-backlink a.nav-link-docs:hover {
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--color-primary) !important;
+  transform: translateX(-2px) !important;
+  text-decoration: none !important;
+}
+
+ul.nav-list li.nav-item-backlink a.nav-link-docs svg.docs-back-icon {
+  width: 14px !important;
+  height: 14px !important;
+  stroke: currentColor !important;
+  transition: transform 0.15s ease !important;
+}
+
+ul.nav-list li.nav-item-backlink a.nav-link-docs:hover svg.docs-back-icon {
+  transform: translateX(-2px) !important;
+}
+
 /* Sponsor button in Level 2 */
 .md-tabs__link--sponsor {
   display: inline-flex !important;

@@ -129,7 +129,7 @@ js_code = """/**
       // Brand Link (Exact 28.79px logo from DevTools)
       const brand = document.createElement('a');
       brand.className = 'liti-brand-link';
-      brand.href = 'https://gurkenlabs.github.io/litiengine-docs/';
+      brand.href = 'https://docs.litiengine.com/';
       brand.innerHTML = `<img class="liti-brand-logo" src="${OFFICIAL_LOGO_SRC}" alt="LITIENGINE Logo" width="28.79" height="28.79"> <span class="liti-brand-text"><strong>LITIENGINE Docs</strong> <span class="api-tag">API</span></span>`;
       level1Inner.appendChild(brand);
 
@@ -218,8 +218,14 @@ js_code = """/**
     const level2Inner = document.createElement('div');
     level2Inner.className = 'liti-header-container';
 
-    // Move navList into level 2
+    // Move navList into level 2 with a prominent backlink to documentation
     if (navList) {
+      if (!navList.querySelector('.nav-item-backlink')) {
+        const backLi = document.createElement('li');
+        backLi.className = 'nav-item-backlink';
+        backLi.innerHTML = `<a href="https://docs.litiengine.com/" class="nav-link-docs" title="Back to LITIENGINE Documentation"><svg class="docs-back-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Docs</span></a>`;
+        navList.insertBefore(backLi, navList.firstChild);
+      }
       level2Inner.appendChild(navList);
     }
 

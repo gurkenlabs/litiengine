@@ -167,7 +167,7 @@ void enhanceJavadocHtml(File file, File rootDir) {
     </a>
   </div>
   <div class="md-copyright">
-    <span>Copyright &copy; 2026 GURKENLABS &middot; Released under the <a href="https://mit-license.org/" target="_blank" rel="noopener noreferrer">MIT License</a></span>
+    <span><a href="https://docs.litiengine.com/" target="_blank" rel="noopener noreferrer">Documentation</a> &middot; Copyright &copy; 2026 GURKENLABS &middot; Released under the <a href="https://mit-license.org/" target="_blank" rel="noopener noreferrer">MIT License</a></span>
   </div>
 </footer>
 """
