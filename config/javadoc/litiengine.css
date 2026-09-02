@@ -1674,9 +1674,9 @@ ul.tag-list li {
   flex-wrap: wrap !important;
   align-items: center !important;
   gap: 0.45rem !important;
-  margin: 2.5rem 0 1rem 0 !important;
-  padding-top: 1.25rem !important;
-  border-top: 1px solid var(--border-subtle) !important;
+  margin: 1.75rem 0 0.5rem 0 !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
 .md-tag {
