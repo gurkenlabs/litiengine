@@ -36,6 +36,7 @@ import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.view.components.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.view.renderers.WorkspaceRenderer;
 import de.gurkenlabs.utiliti.view.components.Tray;
+import de.gurkenlabs.utiliti.view.components.Toast;
 import de.gurkenlabs.utiliti.view.components.UI;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.view.dialogs.EditorFileChooser;
@@ -477,6 +478,7 @@ public class Editor extends Screen {
     }
 
     this.setCurrentStatus(Resources.strings().get("status_project_created"));
+    Toast.show(Resources.strings().get("status_project_created"));
   }
 
   public void load() {
@@ -510,6 +512,7 @@ public class Editor extends Screen {
       UI.getAssetController().refresh();
     }
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
+    Toast.show(Resources.strings().get("status_gamefile_closed"));
   }
 
   public void load(Path gameFile, boolean force) {
@@ -607,6 +610,7 @@ public class Editor extends Screen {
 
       this.gamefileLoaded();
       this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
+      Toast.show(Resources.strings().get("status_gamefile_loaded"));
     } finally {
       Cursors.apply(Cursors.DEFAULT);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] {gameFile, (System.nanoTime() - currentTime) / 1000000.0});
@@ -700,6 +704,7 @@ public class Editor extends Screen {
 
         this.gamefileLoaded();
         this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
+        Toast.show(Resources.strings().get("status_gamefile_loaded"));
         if (onComplete != null) {
           onComplete.run();
         }
@@ -1341,11 +1346,13 @@ public class Editor extends Screen {
           getCurrentResourceFile()
         });
       this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
+      Toast.show(Resources.strings().get("status_gamefile_saved"));
 
       this.saveMaps();
     } catch (IOException e) {
       log.log(Level.SEVERE, "Failed to save game file: " + e.getMessage(), e);
       this.setCurrentStatus(Resources.strings().get("status_gamefile_save_error", e.getMessage()));
+      Toast.show(Resources.strings().get("status_gamefile_save_error", e.getMessage()));
     }
   }
 
