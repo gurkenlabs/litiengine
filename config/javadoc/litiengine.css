@@ -1674,7 +1674,7 @@ ul.tag-list li {
   flex-wrap: wrap !important;
   align-items: center !important;
   gap: 0.45rem !important;
-  margin: 3.5rem 0 1.5rem 0 !important;
+  margin: 2.5rem 0 1rem 0 !important;
   padding-top: 1.25rem !important;
   border-top: 1px solid var(--border-subtle) !important;
 }
@@ -1713,7 +1713,7 @@ ul.tag-list li {
    ========================================================================== */
 
 footer {
-  margin-top: 5rem !important;
+  margin-top: 2rem !important;
   padding: 2.5rem 1.5rem !important;
   border-top: 1px solid var(--border-color) !important;
   text-align: center !important;

@@ -139,16 +139,6 @@ void enhanceJavadocHtml(File file, File rootDir) {
   if (tags.size() < 4) tags.add("api")
   if (tags.size() < 5) tags.add("java")
 
-  if (tags && html.contains("</main>")) {
-    def tagHtml = new StringBuilder('<nav class="md-tags" aria-label="Tags">')
-    tags.each { t ->
-      def cls = t == 'deprecated' ? 'md-tag md-tag--deprecated' : 'md-tag'
-      tagHtml.append("<span class=\"${cls}\">${t}</span>")
-    }
-    tagHtml.append('</nav>')
-    html = html.replace("</main>", tagHtml.toString() + "\n</main>")
-  }
-
   // 3. Social Footer
   def footerHtml = """
 <footer>
@@ -168,6 +158,17 @@ void enhanceJavadocHtml(File file, File rootDir) {
   </div>
 </footer>
 """
+
+  // 4. Insert Bottom Tags BEFORE footer
+  if (tags) {
+    def tagHtml = new StringBuilder('<nav class="md-tags" aria-label="Tags">')
+    tags.each { t ->
+      def cls = t == 'deprecated' ? 'md-tag md-tag--deprecated' : 'md-tag'
+      tagHtml.append("<span class=\"${cls}\">${t}</span>")
+    }
+    tagHtml.append('</nav>\n')
+    footerHtml = tagHtml.toString() + footerHtml
+  }
 
   if (html.contains("<footer>")) {
     html = html.replaceAll(/(?s)<footer>.*?<\/footer>/, footerHtml)
