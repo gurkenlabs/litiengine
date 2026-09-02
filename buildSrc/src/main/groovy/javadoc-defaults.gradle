@@ -1,0 +1,50 @@
+tasks.withType(Javadoc).configureEach {
+  def assetsDir = rootProject.file("config/javadoc/assets")
+  def themeCss = rootProject.file("config/javadoc/litiengine.css")
+  def themeJs = rootProject.file("config/javadoc/litiengine.js")
+
+  if (assetsDir.exists()) {
+    inputs.dir(assetsDir)
+  }
+  if (themeCss.exists()) {
+    inputs.file(themeCss)
+  }
+  if (themeJs.exists()) {
+    inputs.file(themeJs)
+  }
+
+  options.encoding = "UTF-8"
+  options.charSet = "UTF-8"
+  options.docEncoding = "UTF-8"
+
+  def engineName = project.findProperty("LITIENGINE_name") ?: "LITIENGINE"
+  def engineUrl = project.findProperty("LITIENGINE_url") ?: "https://litiengine.com/"
+  def copyrightText = project.findProperty("copyright") ?: "gurkenlabs"
+  def mitName = project.findProperty("MIT_name") ?: "MIT"
+  def mitUrl = project.findProperty("MIT_url") ?: "https://mit-license.org/"
+
+  options.windowTitle = "${engineName} API"
+  options.docTitle = "${engineName} API Documentation"
+  options.header = """<a href="${engineUrl}" target="_blank" class="nav-brand-link"><b>${engineName} 🎮</b> API</a>"""
+  options.bottom = """<p class="legal-copy"><small>Copyright &#169; ${copyrightText}. Released under the <a href="${mitUrl}" target="_blank">${mitName} License</a>.</small></p>"""
+
+  if (themeCss.exists()) {
+    options.addStringOption("-add-stylesheet", themeCss.absolutePath)
+  }
+  if (themeJs.exists()) {
+    options.addStringOption("-add-script", themeJs.absolutePath)
+  }
+
+  doLast {
+    if (assetsDir.exists() && destinationDir) {
+      project.copy {
+        from assetsDir
+        into "${destinationDir}/assets"
+      }
+      project.copy {
+        from assetsDir
+        into "${destinationDir}/resource-files"
+      }
+    }
+  }
+}

@@ -7,6 +7,7 @@ plugins {
   id "licensing-defaults"
   id "publishing-defaults"
   id "testing-defaults"
+  id "javadoc-defaults"
 }
 
 dependencies {

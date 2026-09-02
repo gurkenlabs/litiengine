@@ -4,6 +4,7 @@ plugins {
   id "encoding-defaults"
   id "licensing-defaults"
   id "testing-defaults"
+  id "javadoc-defaults"
 }
 
 dependencies {
