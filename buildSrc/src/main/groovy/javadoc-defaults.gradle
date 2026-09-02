@@ -134,10 +134,12 @@ void enhanceJavadocHtml(File file, File rootDir) {
   if (cleanHeading.endsWith("Listener")) tags.add("listener")
   if (cleanHeading.endsWith("Event")) tags.add("event")
   if (cleanHeading.endsWith("Controller")) tags.add("controller")
-  if (html.contains("deprecation-block") || html.contains("deprecated-label")) tags.add("deprecated")
-
-  if (tags.size() < 4) tags.add("api")
-  if (tags.size() < 5) tags.add("java")
+  if (file.name == 'search.html' || file.name == 'help-doc.html') {
+    tags.clear()
+  } else {
+    if (tags.size() < 4) tags.add("api")
+    if (tags.size() < 5) tags.add("java")
+  }
 
   // 2. Insert Bottom Tags inside <main>
   if (tags && html.contains("</main>")) {

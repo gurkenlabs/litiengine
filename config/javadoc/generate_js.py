@@ -115,8 +115,9 @@ js_code = """/**
       if (!header || document.querySelector('.liti-header-level1')) return;
 
       const navList = document.querySelector('ul.nav-list');
+      if (!navList) return;
+
       const navListSearch = document.querySelector('.nav-list-search');
-      if (!navList || !navListSearch) return;
 
       // Create 2-Level Header Structure
       const level1 = document.createElement('div');
@@ -157,30 +158,46 @@ js_code = """/**
       updateToggleIcon();
       level1Right.appendChild(themeBtn);
 
-    // 2. Search capsule
-    if (navListSearch) {
-      const searchInput = navListSearch.querySelector('#search-input');
-      if (searchInput) {
-        searchInput.setAttribute('placeholder', 'Search');
-      }
+      // 2. Search capsule
+      if (navListSearch) {
+        const searchInput = navListSearch.querySelector('#search-input');
+        if (searchInput) {
+          searchInput.setAttribute('placeholder', 'Search');
+        }
 
-      if (!navListSearch.querySelector('.search-icon-svg')) {
-        const iconWrapper = document.createElement('span');
-        iconWrapper.className = 'search-icon-wrapper';
-        iconWrapper.innerHTML = SEARCH_SVG;
-        navListSearch.insertBefore(iconWrapper, navListSearch.firstChild);
-      }
+        if (!navListSearch.querySelector('.search-icon-svg')) {
+          const iconWrapper = document.createElement('span');
+          iconWrapper.className = 'search-icon-wrapper';
+          iconWrapper.innerHTML = SEARCH_SVG;
+          navListSearch.insertBefore(iconWrapper, navListSearch.firstChild);
+        }
 
-      if (!navListSearch.querySelector('.search-kbd')) {
-        const kbd = document.createElement('kbd');
-        kbd.className = 'search-kbd';
-        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-        kbd.textContent = isMac ? '⌘K' : 'Ctrl+K';
-        navListSearch.appendChild(kbd);
-      }
+        if (!navListSearch.querySelector('.search-kbd')) {
+          const kbd = document.createElement('kbd');
+          kbd.className = 'search-kbd';
+          const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+          kbd.textContent = isMac ? '⌘K' : 'Ctrl+K';
+          navListSearch.appendChild(kbd);
+        }
 
-      level1Right.appendChild(navListSearch);
-    }
+        level1Right.appendChild(navListSearch);
+      } else {
+        const searchCapsule = document.createElement('div');
+        searchCapsule.className = 'nav-list-search';
+        const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+        searchCapsule.innerHTML = `<span class="search-icon-wrapper">${SEARCH_SVG}</span><input type="text" id="search-input" placeholder="Search"><kbd class="search-kbd">${isMac ? '⌘K' : 'Ctrl+K'}</kbd>`;
+        const headerInput = searchCapsule.querySelector('#search-input');
+        if (headerInput) {
+          headerInput.addEventListener('focus', function () {
+            const pageInput = document.getElementById('page-search-input');
+            if (pageInput) {
+              pageInput.focus();
+              pageInput.select();
+            }
+          });
+        }
+        level1Right.appendChild(searchCapsule);
+      }
 
     // 3. GitHub Repo Link (clean & simplified)
     const githubLink = document.createElement('a');
@@ -463,7 +480,7 @@ js_code = """/**
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        const searchInput = document.getElementById('search-input') || document.getElementById('page-search-input');
+        const searchInput = document.getElementById('page-search-input') || document.getElementById('search-input');
         if (searchInput) {
           searchInput.focus();
           searchInput.select();

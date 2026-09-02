@@ -2036,6 +2036,26 @@ dl.index dd .block {
    Search Page (search.html)
    ========================================================================== */
 
+body.search-page .main-grid {
+  max-width: var(--max-content-width) !important;
+  margin: 0 auto !important;
+  padding: 2.5rem 1.5rem 4rem 1.5rem !important;
+  display: block !important;
+}
+
+body.search-page main {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+body.search-page h1.title {
+  font-size: 2.2rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--title-color) !important;
+  margin-bottom: 1.25rem !important;
+}
+
 .page-search-wrapper {
   display: inline-flex !important;
   align-items: center !important;
