@@ -208,6 +208,15 @@ void enhanceJavadocHtml(File file, File rootDir) {
         """<div class="page-search-wrapper">${searchIconSvg}${inp}${resetStr}</div>"""
       }
     }
+
+    // Statically enhance TOC filter input on pages with a table of contents
+    def tocFilterPattern = /(?s)<div class="toc-header">\s*(?:Contents&nbsp;)?(<input type="text" class="filter-input"[^>]*>)\s*(<input type="reset" class="reset-filter"[^>]*>)?\s*<\/div>/
+    def tocSearchSvg = '<span class="search-icon-wrapper"><svg class="search-icon-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>'
+    html = html.replaceAll(tocFilterPattern) { full, inp, rst ->
+      def cleanInp = inp.replace('placeholder="Filter contents (type .)"', 'placeholder="Filter"')
+      def resetStr = rst ?: ''
+      """<div class="toc-header"><div class="toc-filter-wrapper">${tocSearchSvg}${cleanInp}${resetStr}</div></div>"""
+    }
   }
 
   // 2. Build Contextual Tags at generation time
