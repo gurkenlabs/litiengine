@@ -2152,20 +2152,32 @@ body.search-page h1.title {
 }
 
 input#page-search-input {
+  background-color: var(--search-box-bg) !important;
+  border: 1px solid var(--search-box-border) !important;
+  border-radius: 8px !important;
+  height: 44px !important;
+  padding: 0 1rem !important;
+  width: min(100%, 480px) !important;
+  color: var(--search-input-text-color) !important;
+  font-size: 0.95rem !important;
+  font-family: var(--body-font-family) !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+}
+
+.page-search-wrapper input#page-search-input {
   background: transparent !important;
   background-image: none !important;
   background-color: transparent !important;
   border: none !important;
-  color: var(--search-input-text-color) !important;
-  font-size: 0.95rem !important;
-  font-family: var(--body-font-family) !important;
-  outline: none !important;
-  box-shadow: none !important;
+  border-radius: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
   width: 100% !important;
   height: 100% !important;
   flex: 1 1 auto !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 input#page-search-reset {
