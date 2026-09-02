@@ -59,30 +59,6 @@
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
-  function loadGoogleFonts() {
-    if (document.querySelector('link[href*="fonts.googleapis.com"]')) return;
-    const head = document.head || document.getElementsByTagName('head')[0];
-    if (!head) return;
-    const preconnect1 = document.createElement('link');
-    preconnect1.rel = 'preconnect';
-    preconnect1.href = 'https://fonts.googleapis.com';
-    head.appendChild(preconnect1);
-
-    const preconnect2 = document.createElement('link');
-    preconnect2.rel = 'preconnect';
-    preconnect2.href = 'https://fonts.gstatic.com';
-    preconnect2.crossOrigin = 'anonymous';
-    head.appendChild(preconnect2);
-
-    const fontLink = document.createElement('link');
-    fontLink.rel = 'stylesheet';
-    fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap';
-    fontLink.media = 'all';
-    head.appendChild(fontLink);
-  }
-
-  loadGoogleFonts();
-
   function setupFavicons() {
     const r = getRoot();
     const head = document.head || document.getElementsByTagName('head')[0];
