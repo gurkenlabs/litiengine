@@ -2259,6 +2259,97 @@ div.table-tabs > button[id^="result-tab-"].active-table-tab {
   font-weight: 600 !important;
 }
 
+/* ==========================================================================
+   Search Autocomplete Results Dropdown (Header Search Bar)
+   ========================================================================== */
+
+ul.ui-autocomplete {
+  position: fixed !important;
+  z-index: 999999 !important;
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  padding: 0.35rem 0 !important;
+  margin-top: 4px !important;
+  max-height: calc(90vh - 120px) !important;
+  overflow-y: auto !important;
+}
+
+.ui-autocomplete-category {
+  background-color: var(--even-row-color) !important;
+  color: var(--text-muted) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  padding: 0.55rem 1rem 0.35rem 1rem !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.ui-autocomplete > li.result-item {
+  font-family: var(--body-font-family) !important;
+  padding: 0.45rem 1rem !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  cursor: pointer !important;
+  transition: background-color 0.12s ease !important;
+}
+
+.ui-autocomplete > li.result-item:last-of-type {
+  border-bottom: none !important;
+}
+
+.ui-autocomplete > li.result-item:hover,
+.ui-autocomplete > li.result-item.ui-state-active,
+.ui-autocomplete > li.result-item .ui-state-active,
+.ui-menu .ui-state-active {
+  background-color: var(--color-primary-light) !important;
+  border-color: transparent !important;
+  margin: 0 !important;
+}
+
+.ui-autocomplete .search-result-label {
+  color: var(--color-primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.92rem !important;
+}
+
+.ui-autocomplete .search-result-desc {
+  color: var(--text-muted) !important;
+  font-size: 0.8rem !important;
+}
+
+.ui-autocomplete .result-highlight {
+  color: var(--navbar-link-hover) !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+}
+
+ul.ui-autocomplete li.ui-static-link {
+  position: sticky !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  background: var(--card-bg) !important;
+  border-top: 1px solid var(--border-color) !important;
+  padding: 0.65rem 1rem !important;
+  z-index: 1000000 !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+ul.ui-autocomplete li.ui-static-link a {
+  color: var(--color-primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  text-decoration: none !important;
+}
+
+ul.ui-autocomplete li.ui-static-link a:hover {
+  text-decoration: underline !important;
+}
+
 /* Modern Results Table Grid */
 div.result-table,
 .two-column-search-results {
