@@ -68,13 +68,30 @@ void enhanceJavadocHtml(File file, File rootDir) {
   def html = file.getText("UTF-8")
   if (html.contains("<!-- liti-enhanced -->")) return
 
-  // 1. Early Head Injections (Theme script & Fonts at the very top of <head> before any CSS/scripts)
+  // 1. Early Head Injections (Theme script, Critical font variables & Fonts at the very top of <head> before any CSS/scripts)
   def earlyHead = """<head>
   <!-- liti-enhanced -->
   <script>(function(){try{var t=localStorage.getItem('liti-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+  <style>
+    :root {
+      --body-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      --code-font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --body-font-size: 16px;
+      --block-font-size: 16px;
+      --code-font-size: 14px;
+      --nav-font-size: 16.8px;
+      --block-line-height: 1.6;
+      --code-line-height: 1.55;
+    }
+    html, body {
+      font-family: var(--body-font-family);
+      font-size: var(--body-font-size);
+      line-height: var(--block-line-height);
+    }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">"""
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=optional" rel="stylesheet">"""
   html = html.replaceFirst("<head>", earlyHead)
 
   // 2. Metadata & Favicons in <head>
