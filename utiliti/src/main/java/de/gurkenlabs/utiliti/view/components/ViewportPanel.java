@@ -24,6 +24,7 @@ public final class ViewportPanel extends JPanel {
   private final ScrollHandlerBar horizontalScroll;
   private final ScrollHandlerBar verticalScroll;
   private final JPanel corner;
+  private boolean viewportUpdatePending;
 
   public ViewportPanel(Canvas canvas) {
     super(new BorderLayout());
@@ -81,8 +82,7 @@ public final class ViewportPanel extends JPanel {
     Game.world().camera().onFocus(event -> repaintRulers());
     canvas.addComponentListener(new ComponentAdapter() {
       @Override public void componentResized(ComponentEvent event) {
-        Scroll.updateScrollHandlers();
-        repaintRulers();
+        scheduleViewportUpdate();
       }
     });
     refreshTheme();
@@ -125,6 +125,19 @@ public final class ViewportPanel extends JPanel {
 
   private void repaintRulers() {
     SwingUtilities.invokeLater(() -> {
+      this.horizontalRuler.repaint();
+      this.verticalRuler.repaint();
+    });
+  }
+
+  private void scheduleViewportUpdate() {
+    if (this.viewportUpdatePending) {
+      return;
+    }
+    this.viewportUpdatePending = true;
+    SwingUtilities.invokeLater(() -> {
+      this.viewportUpdatePending = false;
+      Scroll.updateScrollHandlers();
       this.horizontalRuler.repaint();
       this.verticalRuler.repaint();
     });

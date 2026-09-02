@@ -9,9 +9,11 @@ import org.junit.jupiter.api.Test;
 class ScrollTest {
   @Test
   void fittedContentHidesScrollbar() {
-    Scroll.AxisModel model = Scroll.AxisModel.create(936, 1000, 32, 32, 468);
+    Scroll.AxisModel model = Scroll.AxisModel.create(936, 1000, 32, 32, 0);
 
     assertFalse(model.visible());
+    assertEquals(468, model.minimumFocus());
+    assertEquals(model.minimumFocus(), model.maximumFocus());
   }
 
   @Test

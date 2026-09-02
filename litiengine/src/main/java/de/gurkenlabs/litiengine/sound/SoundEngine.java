@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.tweening.TweenFunction;
 import java.awt.geom.Point2D;
@@ -46,7 +47,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
   private static final Logger log = Logger.getLogger(SoundEngine.class.getName());
   private Point2D listenerLocation;
-  private UnaryOperator<Point2D> listenerLocationCallback = old -> Game.world().camera().getFocus();
+  private UnaryOperator<Point2D> listenerLocationCallback = SoundEngine::getCameraFocus;
   private int maxDist = DEFAULT_MAX_DISTANCE;
   private MusicPlayback music;
   private final Collection<MusicPlayback> allMusic = ConcurrentHashMap.newKeySet();
@@ -497,7 +498,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
   @Override
   public void start() {
-    listenerLocation = Game.world().camera().getFocus();
+    listenerLocation = getCameraFocus(listenerLocation);
   }
 
   @Override
@@ -561,6 +562,13 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
   void addSound(SFXPlayback playback) {
     this.sounds.add(playback);
+  }
+
+  private static Point2D getCameraFocus(Point2D fallback) {
+    ICamera camera = Game.world().camera();
+    return camera != null
+      ? camera.getFocus()
+      : fallback != null ? fallback : new Point2D.Double(0, 0);
   }
 
   private SFXPlayback playSound(

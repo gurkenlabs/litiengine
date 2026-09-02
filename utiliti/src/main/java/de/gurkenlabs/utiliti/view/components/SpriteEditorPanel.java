@@ -11,6 +11,7 @@ import de.gurkenlabs.utiliti.controller.ControlBehavior;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.SpinnerCellEditor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import de.gurkenlabs.utiliti.controller.WrapLayout;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
 import java.awt.BasicStroke;
@@ -389,15 +390,18 @@ public class SpriteEditorPanel extends JPanel {
     content.add(tableScroll);
     content.add(Box.createVerticalStrut(8));
 
-    JPanel durationTools = new JPanel(new BorderLayout(8, 0));
+    JPanel durationTools = new JPanel(new WrapLayout(FlowLayout.LEFT, 4, 4)) {
+      @Override
+      public Dimension getMaximumSize() {
+        return new Dimension(Integer.MAX_VALUE, this.getPreferredSize().height);
+      }
+    };
     durationTools.setOpaque(false);
-    JPanel apply = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
-    apply.setOpaque(false);
-    apply.add(new JLabel(Resources.strings().get("spriteEditor_setDurationFor")));
-    apply.add(this.durationScopeCombo);
-    apply.add(new JLabel(Resources.strings().get("spriteEditor_durationTo")));
-    apply.add(this.defaultDurationSpinner);
-    apply.add(new JLabel("ms"));
+    durationTools.add(new JLabel(Resources.strings().get("spriteEditor_setDurationFor")));
+    durationTools.add(this.durationScopeCombo);
+    durationTools.add(new JLabel(Resources.strings().get("spriteEditor_durationTo")));
+    durationTools.add(this.defaultDurationSpinner);
+    durationTools.add(new JLabel("ms"));
     JButton applyButton = new JButton(Resources.strings().get("assetpanel_animation_apply"));
     applyButton.setPreferredSize(new Dimension(
         Math.max(64, applyButton.getFontMetrics(applyButton.getFont()).stringWidth(applyButton.getText()) + 24),
@@ -405,10 +409,8 @@ public class SpriteEditorPanel extends JPanel {
     applyButton.setMinimumSize(applyButton.getPreferredSize());
     applyButton.setMaximumSize(applyButton.getPreferredSize());
     applyButton.addActionListener(_ -> applyDurationToSelection());
-    apply.add(applyButton);
-    durationTools.add(apply, BorderLayout.WEST);
-    durationTools.add(this.durationSummaryLabel, BorderLayout.EAST);
-    durationTools.setMaximumSize(new Dimension(Integer.MAX_VALUE, durationTools.getPreferredSize().height));
+    durationTools.add(applyButton);
+    durationTools.add(this.durationSummaryLabel);
     durationTools.setAlignmentX(Component.LEFT_ALIGNMENT);
     content.add(durationTools);
 

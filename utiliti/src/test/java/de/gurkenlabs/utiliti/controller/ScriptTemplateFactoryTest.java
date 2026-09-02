@@ -20,6 +20,7 @@ class ScriptTemplateFactoryTest {
     assertTrue(source.contains("input().bindKeyTyped(KeyEvent.VK_ESCAPE"));
     assertFalse(source.contains("Input.keyboard()"));
     assertTrue(source.contains("void update()"));
+    assertUsesMarkdownDocumentation(source);
   }
 
   @Test
@@ -30,6 +31,7 @@ class ScriptTemplateFactoryTest {
     assertTrue(source.contains("public class Level1Script extends EnvironmentScript"));
     assertTrue(source.contains("@ScriptInfo(id = \"Level1Script\", host = ScriptHostType.ENVIRONMENT)"));
     assertTrue(source.contains("void onLoaded()"));
+    assertUsesMarkdownDocumentation(source);
   }
 
   @Test
@@ -40,6 +42,8 @@ class ScriptTemplateFactoryTest {
     assertTrue(source.contains("public class EnemyAI extends CreatureScript"));
     assertTrue(source.contains("@ScriptInfo(id = \"EnemyAI\", host = ScriptHostType.ENTITY, target = Creature.class)"));
     assertTrue(source.contains("void onHit(EntityHitEvent event)"));
+    assertTrue(source.contains("/// Entity script controller for [Creature]."));
+    assertUsesMarkdownDocumentation(source);
   }
 
   @Test
@@ -49,6 +53,7 @@ class ScriptTemplateFactoryTest {
     assertTrue(source.contains("package com.example.prop;"));
     assertTrue(source.contains("public class ChestScript extends EntityScript<Prop>"));
     assertTrue(source.contains("@ScriptInfo(id = \"ChestScript\", host = ScriptHostType.ENTITY, target = Prop.class)"));
+    assertUsesMarkdownDocumentation(source);
   }
 
   @Test
@@ -70,5 +75,13 @@ class ScriptTemplateFactoryTest {
     assertTrue(updated.contains("public class BossLogic extends CreatureScript"));
     assertTrue(updated.contains("void onLoaded()"));
     assertFalse(updated.contains("void onStarted()"));
+  }
+
+  private static void assertUsesMarkdownDocumentation(String source) {
+    assertTrue(source.contains("/// Responsibilities:"));
+    assertTrue(source.contains("/// - "));
+    assertFalse(source.contains("/**"));
+    assertFalse(source.contains("<ul>"));
+    assertFalse(source.contains("{@"));
   }
 }

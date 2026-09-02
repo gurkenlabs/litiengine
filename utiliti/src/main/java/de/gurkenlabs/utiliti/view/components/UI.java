@@ -107,9 +107,15 @@ public final class UI {
   private static final int INSPECTOR_BASE_WIDTH = 380;
   private static final int SCENE_GRAPH_MIN_WIDTH = 340;
   private static final int SCENE_GRAPH_MAX_WIDTH = 480;
+  static final int WORKSPACE_MIN_WIDTH = 640;
+  static final int WORKSPACE_COMPACT_MODE_THRESHOLD = 760;
+  private static final int WORKSPACE_MODE_BUTTON_SIZE = 43;
+  private static final int WORKSPACE_MODE_BUTTON_COMPACT_SIZE = 32;
+  private static final int WINDOW_MIN_HEIGHT = 480;
   private static final int ASSET_PANEL_MIN_HEIGHT = 280;
   private static final int ASSET_PANEL_MAX_HEIGHT = 420;
   private static final int SPLITTER_SIZE = 4;
+  private static final int COLLAPSIBLE_SPLITTER_SIZE = 14;
   private static final String INVISIBLE_SPLITTER_CONFIGURED = "Editor.invisibleSplitterConfigured";
 
   private static final List<JComponent> orphanComponents = new CopyOnWriteArrayList<>();
@@ -149,6 +155,7 @@ public final class UI {
   private static JButton inspectorForwardButton;
   private static JToggleButton workspaceMapButton;
   private static JToggleButton workspaceScriptButton;
+  private static JPanel workspaceModeRail;
   private static KeyStroke inspectorBackShortcut;
   private static KeyStroke inspectorForwardShortcut;
   private static KeyStroke switchWorkspaceModeShortcut;
@@ -179,7 +186,10 @@ public final class UI {
 
   public static boolean notifyPendingChanges() {
     Path resourceFile = Editor.instance().getCurrentResourceFile();
-    if (Editor.instance().getChangedMaps().isEmpty() && !Editor.instance().isUnsavedProject()) {
+    boolean unsavedScripts = scriptWorkspacePanel != null && scriptWorkspacePanel.hasUnsavedScripts();
+    if (Editor.instance().getChangedMaps().isEmpty()
+        && !Editor.instance().isUnsavedProject()
+        && !unsavedScripts) {
       return true;
     }
 
@@ -187,6 +197,9 @@ public final class UI {
         Resources.strings().get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {
+      if (unsavedScripts && !scriptWorkspacePanel.saveAllScripts()) {
+        return false;
+      }
       Editor.instance().save(false);
     }
 
@@ -684,7 +697,8 @@ public final class UI {
 
     Component workspaceWithBottomPanel = initRenderSplitPanel(workspaceHost, winH);
 
-    JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, workspaceWithBottomPanel);
+    CollapsibleSplitPane mainSplit = new CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, leftPanel, workspaceWithBottomPanel, CollapseSide.FIRST);
 
     int inspectorMinWidth = inspectorMinimumWidth();
     mapObjectPanel = new MapObjectInspector();
@@ -768,11 +782,12 @@ public final class UI {
 
     JPanel leftWorkspaceContainer = new JPanel(new BorderLayout());
     leftWorkspaceContainer.add(viewportToolbar, BorderLayout.NORTH);
-    leftWorkspaceContainer.add(initWorkspaceModeBar(), BorderLayout.WEST);
+    workspaceModeRail = (JPanel) initWorkspaceModeBar();
+    leftWorkspaceContainer.add(workspaceModeRail, BorderLayout.WEST);
     leftWorkspaceContainer.add(mainSplit, BorderLayout.CENTER);
 
-    JSplitPane centerRightSplit = new JSplitPane(
-        JSplitPane.HORIZONTAL_SPLIT, leftWorkspaceContainer, inspectorContainer);
+    CollapsibleSplitPane centerRightSplit = new CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, leftWorkspaceContainer, inspectorContainer, CollapseSide.SECOND);
     configureSplitPane(centerRightSplit);
     centerRightSplit.setContinuousLayout(false);
     centerRightSplit.setResizeWeight(1.0);
@@ -787,6 +802,9 @@ public final class UI {
       }
     });
     mainSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
+      if (mainSplit.isCollapsed()) {
+        return;
+      }
       int location = constrainSceneGraphWidth(mainSplit.getDividerLocation());
       if (location != mainSplit.getDividerLocation()) {
         mainSplit.setDividerLocation(location);
@@ -800,9 +818,33 @@ public final class UI {
     mainSplit.setDividerLocation(initialHierarchyW);
     centerRightSplit.setDividerLocation(initialInspectorDivider);
     centerRightSplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
+      if (centerRightSplit.isCollapsed()) {
+        return;
+      }
       int viewportDivider = centerRightSplit.getDividerLocation()
-          - mainSplit.getDividerLocation() - SPLITTER_SIZE;
+          - mainSplit.getDividerLocation() - mainSplit.getDividerSize();
       Editor.preferences().setSelectionEditSplitter(Math.max(0, viewportDivider));
+    });
+    workspaceWithBottomPanel.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent event) {
+        int workspaceWidth = workspaceWithBottomPanel.getWidth();
+        updateWorkspaceModeBar(
+            workspaceModeRail, workspaceWidth < WORKSPACE_COMPACT_MODE_THRESHOLD);
+        if (window.isShowing()) {
+          preserveWorkspaceWidth(
+              centerRightSplit.getWidth(), workspaceModeRail, mainSplit, centerRightSplit);
+        }
+      }
+    });
+    centerRightSplit.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent event) {
+        if (window.isShowing()) {
+          preserveWorkspaceWidth(
+              centerRightSplit.getWidth(), workspaceModeRail, mainSplit, centerRightSplit);
+        }
+      }
     });
 
     initPopupMenu(canvas);
@@ -816,7 +858,7 @@ public final class UI {
   static Component initWorkspaceModeBar() {
     JPanel rail = new JPanel();
     rail.setLayout(new javax.swing.BoxLayout(rail, javax.swing.BoxLayout.Y_AXIS));
-    rail.setPreferredSize(new Dimension(43 + Style.SPACE_MEDIUM, 0));
+    rail.setPreferredSize(new Dimension(WORKSPACE_MODE_BUTTON_SIZE + Style.SPACE_MEDIUM, 0));
     rail.setBackground(Style.background());
     rail.setBorder(BorderFactory.createEmptyBorder(0, Style.SPACE_MEDIUM, 0, 0));
     workspaceMapButton = createWorkspaceModeButton(Icons.MAP_16);
@@ -893,12 +935,81 @@ public final class UI {
     button.setFocusPainted(false);
     button.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
     button.putClientProperty("Editor.buttonVariant", Style.ButtonVariant.TOOLBAR);
-    Dimension size = new Dimension(43, 42);
+    Dimension size = new Dimension(WORKSPACE_MODE_BUTTON_SIZE, 42);
     button.setPreferredSize(size);
     button.setMinimumSize(size);
     button.setMaximumSize(size);
     button.setAlignmentX(Component.CENTER_ALIGNMENT);
     return button;
+  }
+
+  static void updateWorkspaceModeBar(JPanel rail, boolean compact) {
+    if (rail == null) {
+      return;
+    }
+    int buttonSize = compact ? WORKSPACE_MODE_BUTTON_COMPACT_SIZE : WORKSPACE_MODE_BUTTON_SIZE;
+    int leftInset = compact ? Style.SPACE_SMALL : Style.SPACE_MEDIUM;
+    rail.setBorder(BorderFactory.createEmptyBorder(0, leftInset, 0, 0));
+    rail.setPreferredSize(new Dimension(buttonSize + leftInset, 0));
+    for (Component component : rail.getComponents()) {
+      if (component instanceof JToggleButton button) {
+        Dimension size = new Dimension(buttonSize, compact ? buttonSize : 42);
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
+      }
+    }
+    rail.revalidate();
+    rail.repaint();
+  }
+
+  static void preserveWorkspaceWidth(
+      int availableWidth, JPanel modeRail, CollapsibleSplitPane sceneSplit,
+      CollapsibleSplitPane inspectorSplit) {
+    if (availableWidth <= 0) {
+      return;
+    }
+    if (availableWidth < requiredWorkspaceWidth(modeRail, sceneSplit, inspectorSplit)
+        && !inspectorSplit.isCollapsed()) {
+      inspectorSplit.collapseAutomatically();
+    }
+    if (availableWidth < requiredWorkspaceWidth(modeRail, sceneSplit, inspectorSplit)
+        && !sceneSplit.isCollapsed()) {
+      sceneSplit.collapseAutomatically();
+    }
+
+    if (sceneSplit.isAutomaticallyCollapsed()
+        && availableWidth >= requiredWorkspaceWidth(
+            modeRail, false, inspectorSplit.isCollapsed(), sceneSplit, inspectorSplit)) {
+      sceneSplit.expandAutomatically();
+    }
+    if (inspectorSplit.isAutomaticallyCollapsed()
+        && availableWidth >= requiredWorkspaceWidth(
+            modeRail, sceneSplit.isCollapsed(), false, sceneSplit, inspectorSplit)) {
+      inspectorSplit.expandAutomatically();
+    }
+  }
+
+  private static int requiredWorkspaceWidth(
+      JPanel modeRail, CollapsibleSplitPane sceneSplit, CollapsibleSplitPane inspectorSplit) {
+    return requiredWorkspaceWidth(
+        modeRail, sceneSplit.isCollapsed(), inspectorSplit.isCollapsed(), sceneSplit, inspectorSplit);
+  }
+
+  private static int requiredWorkspaceWidth(
+      JPanel modeRail, boolean sceneCollapsed, boolean inspectorCollapsed,
+      CollapsibleSplitPane sceneSplit, CollapsibleSplitPane inspectorSplit) {
+    int width = WORKSPACE_MIN_WIDTH
+        + modeRail.getPreferredSize().width
+        + sceneSplit.getDividerSize()
+        + inspectorSplit.getDividerSize();
+    if (!sceneCollapsed) {
+      width += sceneSplit.expandedExtent(SCENE_GRAPH_MIN_WIDTH);
+    }
+    if (!inspectorCollapsed) {
+      width += inspectorSplit.expandedExtent(inspectorMinimumWidth());
+    }
+    return width;
   }
 
   private static void installInspectorNavigationShortcuts(JFrame window) {
@@ -1093,12 +1204,22 @@ public final class UI {
     } else if (Editor.preferences().getWidth() != 0 && Editor.preferences().getHeight() != 0) {
       window.setSize(Editor.preferences().getWidth(), Editor.preferences().getHeight());
     }
+    window.setMinimumSize(minimumWindowSize());
 
     return window;
   }
 
+  static Dimension minimumWindowSize() {
+    int compactRailWidth = WORKSPACE_MODE_BUTTON_COMPACT_SIZE + Style.SPACE_SMALL;
+    int frameAllowance = Style.SPACE_LARGE * 2;
+    return new Dimension(
+        WORKSPACE_MIN_WIDTH + compactRailWidth + COLLAPSIBLE_SPLITTER_SIZE * 2 + frameAllowance,
+        WINDOW_MIN_HEIGHT);
+  }
+
   private static Component initRenderSplitPanel(JPanel renderPanel, int winH) {
-    JSplitPane renderSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPanel, initBottomPanel());
+    CollapsibleSplitPane renderSplitPanel = new CollapsibleSplitPane(
+        JSplitPane.VERTICAL_SPLIT, renderPanel, initBottomPanel(), CollapseSide.SECOND);
     configureSplitPane(renderSplitPanel);
     renderSplitPanel.setResizeWeight(1.0);
     if (Editor.preferences().getBottomSplitter() != 0) {
@@ -1107,6 +1228,9 @@ public final class UI {
       renderSplitPanel.setDividerLocation((int) (winH * 0.70));
     }
     renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> {
+      if (renderSplitPanel.isCollapsed()) {
+        return;
+      }
       int location = constrainBottomDivider(
         renderSplitPanel.getHeight(), renderSplitPanel.getDividerSize(), renderSplitPanel.getDividerLocation());
       if (location != renderSplitPanel.getDividerLocation()) {
@@ -1118,6 +1242,9 @@ public final class UI {
     renderSplitPanel.addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(ComponentEvent event) {
+        if (renderSplitPanel.isCollapsed()) {
+          return;
+        }
         renderSplitPanel.setDividerLocation(constrainBottomDivider(
           renderSplitPanel.getHeight(), renderSplitPanel.getDividerSize(), renderSplitPanel.getDividerLocation()));
       }
@@ -1144,7 +1271,8 @@ public final class UI {
     if (!Boolean.TRUE.equals(splitPane.getClientProperty(INVISIBLE_SPLITTER_CONFIGURED))) {
       splitPane.putClientProperty(INVISIBLE_SPLITTER_CONFIGURED, true);
       splitPane.addPropertyChangeListener("UI", event -> {
-        if (!(splitPane.getUI() instanceof InvisibleSplitPaneUI)) {
+        if (!(splitPane.getUI() instanceof InvisibleSplitPaneUI)
+            && !(splitPane.getUI() instanceof CollapsibleSplitPaneUI)) {
           installInvisibleSplitPaneUI(splitPane);
         }
       });
@@ -1153,7 +1281,9 @@ public final class UI {
   }
 
   private static void installInvisibleSplitPaneUI(JSplitPane splitPane) {
-    BasicSplitPaneUI ui = new InvisibleSplitPaneUI();
+    BasicSplitPaneUI ui = splitPane instanceof CollapsibleSplitPane collapsibleSplitPane
+        ? new CollapsibleSplitPaneUI(collapsibleSplitPane)
+        : new InvisibleSplitPaneUI();
     splitPane.setUI(ui);
     if (ui.getDivider() != null) {
       ui.getDivider().setBorder(null);
@@ -1162,7 +1292,9 @@ public final class UI {
     splitPane.setBorder(null);
     splitPane.setOpaque(true);
     splitPane.setBackground(Style.background());
-    splitPane.setDividerSize(SPLITTER_SIZE);
+    splitPane.setDividerSize(splitPane instanceof CollapsibleSplitPane
+        ? COLLAPSIBLE_SPLITTER_SIZE
+        : SPLITTER_SIZE);
   }
 
   private static final class InvisibleSplitPaneUI extends BasicSplitPaneUI {
@@ -1175,6 +1307,267 @@ public final class UI {
           graphics.fillRect(0, 0, getWidth(), getHeight());
         }
       };
+    }
+  }
+
+  enum CollapseSide {
+    FIRST,
+    SECOND
+  }
+
+  static final class CollapsibleSplitPane extends JSplitPane {
+    private final CollapseSide collapseSide;
+    private int expandedCollapsedSideExtent = -1;
+    private boolean collapsed;
+    private boolean automaticallyCollapsed;
+
+    CollapsibleSplitPane(int orientation, Component first, Component second, CollapseSide collapseSide) {
+      super(orientation, first, second);
+      this.collapseSide = collapseSide;
+      this.addComponentListener(new ComponentAdapter() {
+        @Override
+        public void componentResized(ComponentEvent event) {
+          if (collapsed && CollapsibleSplitPane.this.collapseSide == CollapseSide.SECOND) {
+            setDividerLocation(collapsedDividerLocation());
+          }
+        }
+      });
+      this.addPropertyChangeListener(DIVIDER_LOCATION_PROPERTY, event -> {
+        if (collapsed && getDividerLocation() != collapsedDividerLocation()) {
+          setDividerLocation(collapsedDividerLocation());
+        } else if (!collapsed) {
+          rememberExpandedExtent();
+        }
+      });
+    }
+
+    boolean isCollapsed() {
+      return this.collapsed;
+    }
+
+    boolean isAutomaticallyCollapsed() {
+      return this.collapsed && this.automaticallyCollapsed;
+    }
+
+    int expandedExtent(int fallback) {
+      return Math.max(fallback, this.expandedCollapsedSideExtent);
+    }
+
+    void toggleCollapsed() {
+      this.automaticallyCollapsed = false;
+      this.setCollapsed(!this.collapsed);
+    }
+
+    void collapseAutomatically() {
+      if (!this.collapsed) {
+        this.setCollapsed(true);
+        this.automaticallyCollapsed = true;
+      }
+    }
+
+    void expandAutomatically() {
+      if (this.isAutomaticallyCollapsed()) {
+        this.automaticallyCollapsed = false;
+        this.setCollapsed(false);
+      }
+    }
+
+    private void setCollapsed(boolean collapse) {
+      if (this.collapsed == collapse) {
+        return;
+      }
+      if (this.collapsed) {
+        this.collapsed = false;
+        int maximum = this.maximumDividerLocation();
+        int expandedExtent = this.expandedCollapsedSideExtent >= 0
+            ? this.expandedCollapsedSideExtent
+            : this.defaultExpandedExtent();
+        int location = this.collapseSide == CollapseSide.FIRST
+            ? expandedExtent
+            : maximum - expandedExtent;
+        this.setDividerLocation(Math.max(0, Math.min(maximum, location)));
+      } else {
+        this.rememberExpandedExtent();
+        this.collapsed = true;
+        this.setDividerLocation(this.collapsedDividerLocation());
+      }
+      this.revalidate();
+      this.repaint();
+    }
+
+    private void rememberExpandedExtent() {
+      int maximum = this.maximumDividerLocation();
+      int location = this.getDividerLocation();
+      if (maximum <= 0 || location < minimumExtent(this.getLeftComponent())
+          || maximum - location < minimumExtent(this.getRightComponent())) {
+        return;
+      }
+      this.expandedCollapsedSideExtent = this.collapseSide == CollapseSide.FIRST
+          ? location
+          : maximum - location;
+    }
+
+    private int minimumExtent(Component component) {
+      if (component == null) {
+        return 0;
+      }
+      Dimension minimum = component.getMinimumSize();
+      return this.getOrientation() == HORIZONTAL_SPLIT ? minimum.width : minimum.height;
+    }
+
+    private int defaultExpandedExtent() {
+      if (this.getOrientation() == VERTICAL_SPLIT) {
+        return ASSET_PANEL_MIN_HEIGHT;
+      }
+      return this.collapseSide == CollapseSide.FIRST ? SCENE_GRAPH_MIN_WIDTH : inspectorMinimumWidth();
+    }
+
+    private int collapsedDividerLocation() {
+      if (this.collapseSide == CollapseSide.FIRST) {
+        return 0;
+      }
+      return this.maximumDividerLocation();
+    }
+
+    private int maximumDividerLocation() {
+      int extent = this.getOrientation() == HORIZONTAL_SPLIT ? this.getWidth() : this.getHeight();
+      return Math.max(0, extent - this.getDividerSize());
+    }
+  }
+
+  private static final class CollapsibleSplitPaneUI extends BasicSplitPaneUI {
+    private final CollapsibleSplitPane splitPane;
+
+    private CollapsibleSplitPaneUI(CollapsibleSplitPane splitPane) {
+      this.splitPane = splitPane;
+    }
+
+    @Override
+    public BasicSplitPaneDivider createDefaultDivider() {
+      return new BasicSplitPaneDivider(this) {
+        private final JButton collapseButton = createCollapseButton();
+
+        {
+          this.setLayout(new GridBagLayout());
+          this.add(this.collapseButton);
+        }
+
+        private JButton createCollapseButton() {
+          JButton button = new DockCollapseButton(CollapsibleSplitPaneUI.this.splitPane);
+          Dimension size = CollapsibleSplitPaneUI.this.splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT
+              ? new Dimension(COLLAPSIBLE_SPLITTER_SIZE, 28)
+              : new Dimension(28, COLLAPSIBLE_SPLITTER_SIZE);
+          button.setPreferredSize(size);
+          button.setMinimumSize(size);
+          button.setMaximumSize(size);
+          button.setToolTipText(Resources.strings().get("dock_toggle_panel"));
+          button.getAccessibleContext().setAccessibleName(Resources.strings().get("dock_toggle_panel"));
+          button.addActionListener(event -> CollapsibleSplitPaneUI.this.splitPane.toggleCollapsed());
+          return button;
+        }
+
+        @Override
+        public void paint(Graphics graphics) {
+          graphics.setColor(getBackground());
+          graphics.fillRect(0, 0, getWidth(), getHeight());
+          super.paint(graphics);
+        }
+      };
+    }
+  }
+
+  private static final class DockCollapseButton extends JButton {
+    private DockCollapseButton(CollapsibleSplitPane splitPane) {
+      super(new DockArrowIcon(splitPane));
+      this.setBorder(BorderFactory.createEmptyBorder());
+      this.setContentAreaFilled(false);
+      this.setFocusPainted(false);
+      this.setMargin(new java.awt.Insets(0, 0, 0, 0));
+      this.setOpaque(false);
+      this.setRolloverEnabled(true);
+      this.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+    }
+
+    @Override
+    protected void paintComponent(Graphics graphics) {
+      boolean highlighted = this.getModel().isRollover() || this.getModel().isPressed();
+      Graphics2D g2 = (Graphics2D) graphics.create();
+      try {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if (highlighted) {
+          Color accent = Style.accent();
+          int alpha = this.getModel().isPressed() ? 52 : 32;
+          g2.setColor(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), alpha));
+          g2.fillRoundRect(1, 1, Math.max(0, getWidth() - 2), Math.max(0, getHeight() - 2), 8, 8);
+        }
+        if (this.isFocusOwner()) {
+          g2.setColor(Style.accent());
+          g2.setStroke(new java.awt.BasicStroke(1f));
+          g2.drawRoundRect(1, 1, Math.max(0, getWidth() - 3), Math.max(0, getHeight() - 3), 8, 8);
+        }
+      } finally {
+        g2.dispose();
+      }
+      super.paintComponent(graphics);
+    }
+  }
+
+  private static final class DockArrowIcon implements Icon {
+    private static final int SIZE = 10;
+    private final CollapsibleSplitPane splitPane;
+
+    private DockArrowIcon(CollapsibleSplitPane splitPane) {
+      this.splitPane = splitPane;
+    }
+
+    @Override
+    public int getIconWidth() {
+      return SIZE;
+    }
+
+    @Override
+    public int getIconHeight() {
+      return SIZE;
+    }
+
+    @Override
+    public void paintIcon(Component component, Graphics graphics, int x, int y) {
+      Graphics2D g2 = (Graphics2D) graphics.create();
+      try {
+        boolean highlighted = component instanceof JButton button
+            && (button.getModel().isRollover() || button.getModel().isPressed() || button.isFocusOwner());
+        g2.setColor(component.isEnabled()
+            ? highlighted ? Style.accent() : Style.mutedText()
+            : Style.disabledIconColor());
+        g2.setStroke(new java.awt.BasicStroke(1.4f, java.awt.BasicStroke.CAP_ROUND,
+            java.awt.BasicStroke.JOIN_ROUND));
+        int direction = direction();
+        if (direction == javax.swing.SwingConstants.LEFT) {
+          g2.drawLine(x + 7, y + 2, x + 3, y + 5);
+          g2.drawLine(x + 3, y + 5, x + 7, y + 8);
+        } else if (direction == javax.swing.SwingConstants.RIGHT) {
+          g2.drawLine(x + 3, y + 2, x + 7, y + 5);
+          g2.drawLine(x + 7, y + 5, x + 3, y + 8);
+        } else if (direction == javax.swing.SwingConstants.TOP) {
+          g2.drawLine(x + 2, y + 7, x + 5, y + 3);
+          g2.drawLine(x + 5, y + 3, x + 8, y + 7);
+        } else {
+          g2.drawLine(x + 2, y + 3, x + 5, y + 7);
+          g2.drawLine(x + 5, y + 7, x + 8, y + 3);
+        }
+      } finally {
+        g2.dispose();
+      }
+    }
+
+    private int direction() {
+      if (this.splitPane.getOrientation() == JSplitPane.VERTICAL_SPLIT) {
+        return this.splitPane.isCollapsed() ? javax.swing.SwingConstants.TOP : javax.swing.SwingConstants.BOTTOM;
+      }
+      boolean pointsToFirst = this.splitPane.collapseSide == CollapseSide.FIRST
+          ? !this.splitPane.isCollapsed()
+          : this.splitPane.isCollapsed();
+      return pointsToFirst ? javax.swing.SwingConstants.LEFT : javax.swing.SwingConstants.RIGHT;
     }
   }
 
@@ -1931,7 +2324,7 @@ public final class UI {
       int windowWidth, int hierarchyWidth, int inspectorWidth, int preferredInspectorWidth, int persistedDivider) {
     int maximumDivider = Math.max(0, windowWidth - inspectorWidth);
     if (persistedDivider > 0) {
-      return Math.min(persistedDivider + hierarchyWidth + SPLITTER_SIZE, maximumDivider);
+      return Math.min(persistedDivider + hierarchyWidth + COLLAPSIBLE_SPLITTER_SIZE, maximumDivider);
     }
     return Math.max(0, windowWidth - preferredInspectorWidth);
   }

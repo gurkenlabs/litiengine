@@ -31,6 +31,7 @@ import de.gurkenlabs.utiliti.view.dialogs.GameScriptsDialog;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -115,12 +116,16 @@ import javax.swing.tree.TreePath;
 public final class ScriptWorkspacePanel extends JPanel {
   private static final Logger log = Logger.getLogger(ScriptWorkspacePanel.class.getName());
   private static final int BOTTOM_PANEL_HEIGHT = 190;
+  private static final String EDITOR_CARD = "editor";
+  private static final String EMPTY_EDITOR_CARD = "empty";
   static final String DEFAULT_SCRIPT_NAME = "NewScript";
   private final DefaultMutableTreeNode scriptsRoot = new DefaultMutableTreeNode("Scripts");
   private final DefaultTreeModel scriptsModel = new DefaultTreeModel(this.scriptsRoot);
   private final StyledTree scripts = new StyledTree(this.scriptsModel);
   private final JTextField search = createSearchTextField("Search scripts...");
   private final DefaultMutableTreeNode globalsRoot = new DefaultMutableTreeNode("Globals & APIs");
+  private final java.util.function.BiConsumer<Path, Path> projectPathChangedListener =
+      (previous, current) -> this.projectPathChanged();
   private final DefaultTreeModel globalsTreeModel = new DefaultTreeModel(this.globalsRoot);
   private final StyledTree globalsTree = new StyledTree(this.globalsTreeModel);
   private final JTextField globalsSearch = createSearchTextField("Search APIs & events...");
@@ -209,6 +214,8 @@ public final class ScriptWorkspacePanel extends JPanel {
   private MonacoScriptEditor monaco;
   private ScriptTab monacoTab;
   private ScriptTab conflictTab;
+  private volatile boolean keepTabsClosedAfterProjectChange;
+  private boolean closingAllTabs;
   private final ScriptDebuggerPanel debuggerPanel = new ScriptDebuggerPanel();
   private final List<ScriptBreakpoint> breakpoints = new java.util.concurrent.CopyOnWriteArrayList<>();
   private final Timer breakpointSyncTimer = new Timer(300, e -> this.syncBreakpoints());
@@ -224,7 +231,13 @@ public final class ScriptWorkspacePanel extends JPanel {
   private volatile boolean debuggerLaunchFailed;
   private boolean restartRequested;
   private Consumer<ScriptDefinition> selectionListener = ignored -> {};
-  private final JPanel editorHost = new JPanel(new BorderLayout());
+  private final CardLayout editorCards = new CardLayout();
+  private final JPanel editorHost = new JPanel(this.editorCards);
+  private final JPanel emptyEditorState = new JPanel();
+  private final JLabel emptyEditorTitle = new JLabel(
+      Resources.strings().get("script_editor_noScript"), Icons.SCRIPT_16, SwingConstants.CENTER);
+  private final JLabel emptyEditorHint = new JLabel(
+      Resources.strings().get("script_editor_noScript_hint"), SwingConstants.CENTER);
   private final ScriptTypeBadge scriptContext = new ScriptTypeBadge();
   private final ScriptOverviewPanel overviewPanel;
   private final Consumer<ScriptBindingTarget> scriptBindingChangeListener = ignored ->
@@ -355,6 +368,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     });
 
     this.tabs.putClientProperty("JTabbedPane.noContentBorder", Boolean.TRUE);
+    this.tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     this.tabs.putClientProperty("JTabbedPane.hasFullBorder", Boolean.FALSE);
     this.tabs.putClientProperty("JTabbedPane.contentInsets", new java.awt.Insets(0, 0, 0, 0));
     this.tabs.putClientProperty("JTabbedPane.tabAreaInsets", new java.awt.Insets(0, 0, 0, 0));
@@ -383,6 +397,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.mainEditorArea.add(tabStrip, BorderLayout.NORTH);
 
     this.editorHost.setBackground(Style.background());
+    this.configureEmptyEditorState();
+    this.editorHost.add(this.emptyEditorState, EMPTY_EDITOR_CARD);
+    this.editorCards.show(this.editorHost, EMPTY_EDITOR_CARD);
     this.mainEditorArea.add(this.editorHost, BorderLayout.CENTER);
 
     this.statusBar = new JPanel(new BorderLayout());
@@ -452,12 +469,15 @@ public final class ScriptWorkspacePanel extends JPanel {
     Editor.instance().onLoaded(() -> {
       javax.swing.SwingUtilities.invokeLater(() -> {
         this.refreshScripts();
-        if (UI.isScriptWorkspaceActive()) {
+        boolean projectChanged = this.keepTabsClosedAfterProjectChange;
+        this.keepTabsClosedAfterProjectChange = false;
+        if (!projectChanged && UI.isScriptWorkspaceActive()) {
           this.focusOrOpenFirstScript();
         }
         this.refreshActiveUsages();
       });
     });
+    Editor.instance().onProjectPathChanged(this.projectPathChangedListener);
 
     ScriptBindingService.instance().addChangeListener(this.scriptBindingChangeListener);
     UndoManager.onUndoStackChanged(this.undoStackChangeListener);
@@ -483,6 +503,7 @@ public final class ScriptWorkspacePanel extends JPanel {
   }
 
   public synchronized void close() {
+    Editor.instance().removeProjectPathChangedListener(this.projectPathChangedListener);
     ScriptBindingService.instance().removeChangeListener(this.scriptBindingChangeListener);
     UndoManager.removeUndoStackChanged(this.undoStackChangeListener);
     if (this.externalChangeTimer != null) {
@@ -491,12 +512,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (this.problemsRefreshDebounce != null) {
       this.problemsRefreshDebounce.stop();
     }
-    for (ScriptTab tab : new ArrayList<>(this.openTabs.values())) {
-      if (tab != null) {
-        this.closeTab(tab);
-      }
-    }
-    this.openTabs.clear();
+    this.closeAllTabs();
     if (this.monaco != null) {
       this.monaco.close();
       this.monaco = null;
@@ -504,12 +520,51 @@ public final class ScriptWorkspacePanel extends JPanel {
     MonacoScriptEditor.shutdownCef();
   }
 
+  void closeAllTabs() {
+    this.closingAllTabs = true;
+    try {
+      for (ScriptTab tab : new ArrayList<>(this.openTabs.values())) {
+        if (tab != null) {
+          this.closeTab(tab);
+        }
+      }
+    } finally {
+      this.closingAllTabs = false;
+    }
+    this.openTabs.clear();
+    this.tabs.removeAll();
+    this.monacoTab = null;
+    this.conflictTab = null;
+    this.activeTabChanged();
+  }
+
+  int getOpenTabCount() {
+    return this.openTabs.size();
+  }
+
+  int getTabLayoutPolicy() {
+    return this.tabs.getTabLayoutPolicy();
+  }
+
+  boolean isEmptyEditorStateVisible() {
+    return this.emptyEditorState.isVisible();
+  }
+
+  private void projectPathChanged() {
+    this.keepTabsClosedAfterProjectChange = true;
+    if (SwingUtilities.isEventDispatchThread()) {
+      this.closeAllTabs();
+    } else {
+      SwingUtilities.invokeLater(this::closeAllTabs);
+    }
+  }
+
   @Override
   public void addNotify() {
     super.addNotify();
     this.externalChangeTimer.start();
     this.refreshScripts();
-    if (UI.isScriptWorkspaceActive()) {
+    if (!this.keepTabsClosedAfterProjectChange && UI.isScriptWorkspaceActive()) {
       this.focusOrOpenFirstScript();
     }
   }
@@ -594,7 +649,8 @@ public final class ScriptWorkspacePanel extends JPanel {
     for (int row = 0; row < this.scripts.getRowCount(); row++) this.scripts.expandRow(row);
     if (selectedId != null) {
       this.selectTreeNode(selectedId);
-    } else if (UI.isScriptWorkspaceActive() || !this.openTabs.isEmpty()) {
+    } else if (!this.keepTabsClosedAfterProjectChange
+        && (UI.isScriptWorkspaceActive() || !this.openTabs.isEmpty())) {
       this.focusOrOpenFirstScript();
     }
     this.refreshGlobals();
@@ -1210,7 +1266,11 @@ public final class ScriptWorkspacePanel extends JPanel {
     Editor.instance().stopProject();
   }
 
-  private boolean saveAllScripts() {
+  boolean hasUnsavedScripts() {
+    return this.openTabs.values().stream().anyMatch(tab -> tab.dirty);
+  }
+
+  boolean saveAllScripts() {
     for (ScriptTab tab : this.openTabs.values()) {
       if (tab.dirty && !tab.save()) {
         this.setStatus("Could not save " + displayName(tab.definition), true);
@@ -1330,6 +1390,9 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (this.monaco != null) {
       this.monaco.setTheme(Editor.preferences().getTheme() == Style.Theme.DARK);
     }
+    this.emptyEditorState.setBackground(Style.background());
+    this.emptyEditorTitle.setForeground(Style.text());
+    this.emptyEditorHint.setForeground(Style.mutedText());
     this.caretStatus.setForeground(Style.mutedText());
     this.languageStatus.setForeground(Style.mutedText());
     this.status.setForeground(Style.mutedText());
@@ -1785,7 +1848,28 @@ public final class ScriptWorkspacePanel extends JPanel {
     this.openTabs.values().removeIf(t -> t == tab);
     this.openTabs.remove(tab.key);
     this.tabs.remove(tab);
-    this.activeTabChanged();
+    if (!this.closingAllTabs) {
+      this.activeTabChanged();
+    }
+  }
+
+  private void configureEmptyEditorState() {
+    this.emptyEditorState.setLayout(new BoxLayout(this.emptyEditorState, BoxLayout.Y_AXIS));
+    this.emptyEditorState.setBackground(Style.background());
+    this.emptyEditorState.setFocusable(true);
+    this.emptyEditorTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+    this.emptyEditorTitle.setFont(Style.getDefaultFont().deriveFont(Font.BOLD, 14f));
+    this.emptyEditorTitle.setForeground(Style.text());
+    this.emptyEditorTitle.setIconTextGap(Style.SPACE_MEDIUM);
+    this.emptyEditorTitle.getAccessibleContext().setAccessibleName(
+        Resources.strings().get("script_editor_noScript"));
+    this.emptyEditorHint.setAlignmentX(Component.CENTER_ALIGNMENT);
+    this.emptyEditorHint.setForeground(Style.mutedText());
+    this.emptyEditorState.add(Box.createVerticalGlue());
+    this.emptyEditorState.add(this.emptyEditorTitle);
+    this.emptyEditorState.add(Box.createVerticalStrut(Style.SPACE_MEDIUM));
+    this.emptyEditorState.add(this.emptyEditorHint);
+    this.emptyEditorState.add(Box.createVerticalGlue());
   }
 
   private static JTextField createSearchTextField(String placeholder) {
@@ -1838,7 +1922,7 @@ public final class ScriptWorkspacePanel extends JPanel {
           default -> {}
         }
       });
-      this.editorHost.add(this.monaco, BorderLayout.CENTER);
+      this.editorHost.add(this.monaco, EDITOR_CARD);
       this.refreshTheme();
       this.editorHost.revalidate();
       this.editorHost.repaint();
@@ -1860,6 +1944,7 @@ public final class ScriptWorkspacePanel extends JPanel {
     if (active != null) {
       MonacoScriptEditor editor = this.ensureMonaco();
       if (editor != null && !editor.isUnavailable()) {
+        this.editorCards.show(this.editorHost, EDITOR_CARD);
         this.monacoTab = active;
         editor.open(active.path, active.getText(), active.definition);
         if (editor.isReady()) editor.focusEditor();
@@ -1867,11 +1952,10 @@ public final class ScriptWorkspacePanel extends JPanel {
         this.mainEditorArea.revalidate();
         this.mainEditorArea.repaint();
       }
-    } else if (this.monaco != null) {
+    } else {
       this.monacoTab = null;
-      if (!this.monaco.isUnavailable()) {
-        this.monaco.open(null, "", null);
-      }
+      this.editorCards.show(this.editorHost, EMPTY_EDITOR_CARD);
+      this.emptyEditorState.requestFocusInWindow();
     }
     ScriptDefinition definition = active == null ? null : active.definition;
     this.scriptContext.setText(scriptContext(definition));

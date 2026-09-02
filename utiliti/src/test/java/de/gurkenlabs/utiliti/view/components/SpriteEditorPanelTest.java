@@ -8,10 +8,16 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.UndoManager;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -97,6 +103,27 @@ class SpriteEditorPanelTest {
   }
 
   @Test
+  void durationFooterWrapsSummaryWithoutOverlappingApplyButton() {
+    SpriteEditorPanel panel = new SpriteEditorPanel();
+    JButton apply = findButton(panel, Resources.strings().get("assetpanel_animation_apply"));
+    JPanel footer = (JPanel) apply.getParent();
+    JLabel summary = (JLabel) footer.getComponent(footer.getComponentCount() - 1);
+    summary.setText(Resources.strings().get("spriteEditor_fpsEquivalent", "8.33"));
+    footer.setSize(320, 1);
+    int preferredHeight = footer.getPreferredSize().height;
+    footer.setSize(320, preferredHeight);
+
+    footer.doLayout();
+
+    assertFalse(apply.getBounds().intersects(summary.getBounds()));
+    assertEquals(preferredHeight, footer.getMaximumSize().height);
+    for (Component component : footer.getComponents()) {
+      assertTrue(component.getY() + component.getHeight() <= footer.getHeight());
+    }
+    panel.removeNotify();
+  }
+
+  @Test
   void getFamilyVariantsIncludesMirroredCounterpartsWithIndicator() {
     Editor.instance().getGameFile().getSpriteSheets().clear();
     SpritesheetResource idleLeft = new SpritesheetResource(
@@ -168,5 +195,35 @@ class SpriteEditorPanelTest {
     assertTrue(SpriteEditorPanel.isVirtualMirrored("jorge-idle-right"));
 
     Editor.instance().getGameFile().getSpriteSheets().clear();
+  }
+
+  private static JButton findButton(Container root, String text) {
+    for (Component component : root.getComponents()) {
+      if (component instanceof JButton button && text.equals(button.getText())) {
+        return button;
+      }
+      if (component instanceof Container container) {
+        JButton found = findButtonOrNull(container, text);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    throw new AssertionError("Button not found: " + text);
+  }
+
+  private static JButton findButtonOrNull(Container root, String text) {
+    for (Component component : root.getComponents()) {
+      if (component instanceof JButton button && text.equals(button.getText())) {
+        return button;
+      }
+      if (component instanceof Container container) {
+        JButton found = findButtonOrNull(container, text);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 }

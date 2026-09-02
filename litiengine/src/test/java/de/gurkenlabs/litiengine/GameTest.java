@@ -1,7 +1,8 @@
 package de.gurkenlabs.litiengine;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,6 +85,15 @@ public class GameTest {
 
     Game.start();
     assertTrue(started.wasCalled);
+  }
+
+  @Test
+  void soundEngineUpdateToleratesMissingCamera() {
+    Game.terminate();
+    Game.init(Game.COMMANDLINE_ARG_NOGUI);
+    Game.world().setCamera(null);
+
+    assertDoesNotThrow(Game.audio()::update);
   }
 
   @Test

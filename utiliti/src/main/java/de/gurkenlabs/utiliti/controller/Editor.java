@@ -36,6 +36,7 @@ import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.view.components.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.view.renderers.WorkspaceRenderer;
 import de.gurkenlabs.utiliti.view.components.Tray;
+import de.gurkenlabs.utiliti.view.components.Toast;
 import de.gurkenlabs.utiliti.view.components.UI;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.view.dialogs.EditorFileChooser;
@@ -63,6 +64,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -80,6 +82,7 @@ public class Editor extends Screen {
   private static UserPreferences preferences;
 
   private final List<Runnable> loadedCallbacks;
+  private final List<BiConsumer<Path, Path>> projectPathChangedCallbacks;
 
   private final MapComponent mapComponent;
   private ResourceBundle gameFile = new ResourceBundle();
@@ -107,6 +110,7 @@ public class Editor extends Screen {
     Game.scripts().setEnabled(false);
     Game.physics().setEnabled(false);
     this.loadedCallbacks = new CopyOnWriteArrayList<>();
+    this.projectPathChangedCallbacks = new CopyOnWriteArrayList<>();
     this.mapComponent = new MapComponent();
     this.mapComponent.onMapLoaded(map -> this.windowMetadataDirty.set(true));
   }
@@ -361,6 +365,7 @@ public class Editor extends Screen {
   }
 
   public void setProjectPath(Path projectPath) {
+    Path previousProjectPath = this.projectPath;
     this.projectPath = projectPath;
     this.currentResourceFile = projectPath;
     this.projectModel = projectPath == null ? null : this.projectBuildService.resolve(projectPath);
@@ -370,7 +375,22 @@ public class Editor extends Screen {
       Game.scripts().setProjectJavaVersion(Runtime.version().feature());
     }
     this.windowMetadataDirty.set(true);
+    if (!Objects.equals(previousProjectPath, projectPath)) {
+      for (BiConsumer<Path, Path> callback : this.projectPathChangedCallbacks) {
+        callback.accept(previousProjectPath, projectPath);
+      }
+    }
     de.gurkenlabs.utiliti.view.components.UI.updateRunControlStates();
+  }
+
+  public void onProjectPathChanged(BiConsumer<Path, Path> callback) {
+    if (callback != null) {
+      this.projectPathChangedCallbacks.add(callback);
+    }
+  }
+
+  public void removeProjectPathChangedListener(BiConsumer<Path, Path> callback) {
+    this.projectPathChangedCallbacks.remove(callback);
   }
 
   static long buildConfigurationStamp(Path projectRoot) {
@@ -410,6 +430,10 @@ public class Editor extends Screen {
       chooser.setDialogTitle(Resources.strings().get("input_create_new_project"));
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       if (chooser.showOpenDialog(Game.window().getHostControl()) != JFileChooser.APPROVE_OPTION) {
+        return;
+      }
+
+      if (!UI.notifyPendingChanges()) {
         return;
       }
 
@@ -454,6 +478,7 @@ public class Editor extends Screen {
     }
 
     this.setCurrentStatus(Resources.strings().get("status_project_created"));
+    Toast.show(Resources.strings().get("status_project_created"));
   }
 
   public void load() {
@@ -487,6 +512,7 @@ public class Editor extends Screen {
       UI.getAssetController().refresh();
     }
     this.setCurrentStatus(Resources.strings().get("status_gamefile_closed"));
+    Toast.show(Resources.strings().get("status_gamefile_closed"));
   }
 
   public void load(Path gameFile, boolean force) {
@@ -584,6 +610,7 @@ public class Editor extends Screen {
 
       this.gamefileLoaded();
       this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
+      Toast.show(Resources.strings().get("status_gamefile_loaded"));
     } finally {
       Cursors.apply(Cursors.DEFAULT);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] {gameFile, (System.nanoTime() - currentTime) / 1000000.0});
@@ -677,6 +704,7 @@ public class Editor extends Screen {
 
         this.gamefileLoaded();
         this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
+        Toast.show(Resources.strings().get("status_gamefile_loaded"));
         if (onComplete != null) {
           onComplete.run();
         }
@@ -1318,11 +1346,13 @@ public class Editor extends Screen {
           getCurrentResourceFile()
         });
       this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
+      Toast.show(Resources.strings().get("status_gamefile_saved"));
 
       this.saveMaps();
     } catch (IOException e) {
       log.log(Level.SEVERE, "Failed to save game file: " + e.getMessage(), e);
       this.setCurrentStatus(Resources.strings().get("status_gamefile_save_error", e.getMessage()));
+      Toast.show(Resources.strings().get("status_gamefile_save_error", e.getMessage()));
     }
   }
 

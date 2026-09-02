@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.test.SwingTestSuite;
 import de.gurkenlabs.utiliti.controller.ProjectLaunchPhase;
 import de.gurkenlabs.utiliti.controller.UndoManager;
@@ -21,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -150,6 +152,69 @@ class ViewportToolbarTest {
     assertEquals("Build", ((JMenuItem) menu.getComponent(1)).getText());
     assertEquals("Reload from disk", ((JMenuItem) menu.getComponent(2)).getText());
     assertEquals("Configure game scripts...", ((JMenuItem) menu.getComponent(4)).getText());
+  }
+
+  @Test
+  void narrowToolbarCompactsLabelsWithoutOverlappingRightControls() {
+    ViewportToolbar toolbar = new ViewportToolbar(new JComboBox<>());
+    toolbar.setSize(900, toolbar.getPreferredSize().height);
+
+    toolbar.doLayout();
+
+    assertTrue(toolbar.isCompactLayout());
+    assertTrue(toolbar.isOverflowLayout());
+    Component left = toolbar.getComponent(0);
+    Component right = toolbar.getComponent(1);
+    assertTrue(left.getX() + left.getWidth() <= right.getX());
+    AbstractButton cut = findButton(toolbar, "Cut ("
+        + KeyBindings.format(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X,
+            java.awt.event.InputEvent.CTRL_DOWN_MASK)) + ")");
+    assertEquals(null, cut.getText());
+    assertTrue(cut.getToolTipText().startsWith("Cut"));
+
+    toolbar.setSize(2400, toolbar.getHeight());
+    toolbar.doLayout();
+
+    assertFalse(toolbar.isCompactLayout());
+    assertFalse(toolbar.isOverflowLayout());
+    assertEquals("Cut", cut.getText());
+  }
+
+  @Test
+  void narrowMapToolbarKeepsSecondaryCommandsInOverflowMenu() {
+    ViewportToolbar toolbar = new ViewportToolbar(new JComboBox<>());
+    toolbar.setSize(640, toolbar.getPreferredSize().height);
+
+    toolbar.doLayout();
+
+    assertTrue(toolbar.isOverflowLayout());
+    AbstractButton overflow = findButton(toolbar, "More map actions");
+    assertTrue(overflow.isVisible());
+    Component left = toolbar.getComponent(0);
+    Component right = toolbar.getComponent(1);
+    assertTrue(left.getX() + left.getWidth() <= right.getX());
+    assertTrue(left.getPreferredSize().width <= left.getWidth());
+    assertTrue(right.getPreferredSize().width <= right.getWidth());
+    JPopupMenu menu = toolbar.createMapActionsMenu();
+    assertEquals("Undo", ((JMenuItem) menu.getComponent(0)).getText());
+    assertEquals("Undo history", ((JMenuItem) menu.getComponent(1)).getText());
+    assertEquals("Redo", ((JMenuItem) menu.getComponent(2)).getText());
+    assertEquals("Redo history", ((JMenuItem) menu.getComponent(3)).getText());
+    assertEquals("Add", ((JMenuItem) menu.getComponent(5)).getText());
+    assertEquals("Cut", ((JMenuItem) menu.getComponent(7)).getText());
+    assertEquals("Grid", ((JMenuItem) menu.getComponent(12)).getText());
+  }
+
+  @Test
+  void scriptModeDoesNotReserveHiddenMapControlsOrShowMapOverflow() {
+    ViewportToolbar toolbar = new ViewportToolbar(new JComboBox<>());
+    toolbar.setScriptMode(true);
+    toolbar.setSize(700, toolbar.getPreferredSize().height);
+
+    toolbar.doLayout();
+
+    assertFalse(toolbar.isOverflowLayout());
+    assertFalse(findButton(toolbar, Resources.strings().get("toolbar_moreMapActions")).getParent().isVisible());
   }
 
   private static List<UndoManager.HistoryEntry> history(int size) {

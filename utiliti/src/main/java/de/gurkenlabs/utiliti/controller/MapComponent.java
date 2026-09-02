@@ -27,6 +27,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxMap;
+import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
@@ -39,6 +41,7 @@ import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.ImageFormat;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.utiliti.controller.Transform.TransformMode;
@@ -49,6 +52,7 @@ import de.gurkenlabs.utiliti.model.Cursors;
 import de.gurkenlabs.utiliti.view.components.CreaturePanel;
 import de.gurkenlabs.utiliti.view.components.PropPanel;
 import de.gurkenlabs.utiliti.view.components.SceneGraph;
+import de.gurkenlabs.utiliti.view.components.Toast;
 import de.gurkenlabs.utiliti.view.components.UI;
 import java.awt.Point;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
@@ -559,12 +563,94 @@ public class MapComponent extends GuiComponent {
       for (IMapObject mapObject : layer.getMapObjects()) {
         if (mapObject != null
           && MapObjectType.get(mapObject.getType()) != null
-          && GeometricUtilities.intersects(point, mapObject.getBoundingBox())) {
+          && GeometricUtilities.intersects(point, mapObject.getBoundingBox())
+          && hitsVisibleMapObjectPixel(mapObject, location)) {
           matches.add(mapObject);
         }
       }
     }
     return matches;
+  }
+
+  static boolean hitsVisibleMapObjectPixel(IMapObject mapObject, Point2D location) {
+    MapObjectType type = MapObjectType.get(mapObject.getType());
+    if (type != MapObjectType.PROP && type != MapObjectType.CREATURE) {
+      return true;
+    }
+
+    Rectangle2D bounds = mapObject.getBoundingBox();
+    if (bounds.getWidth() <= 0 || bounds.getHeight() <= 0) {
+      return true;
+    }
+
+    HitTestSprite hitTestSprite = getHitTestSprite(mapObject, type);
+    if (hitTestSprite == null) {
+      return true;
+    }
+    if (hitTestSprite.image() == null) {
+      return false;
+    }
+
+    BufferedImage sprite = hitTestSprite.image();
+    Rectangle2D renderedBounds = hitTestSprite.scaled()
+      ? bounds
+      : new Rectangle2D.Double(
+        bounds.getCenterX() - sprite.getWidth() / 2.0,
+        bounds.getCenterY() - sprite.getHeight() / 2.0,
+        sprite.getWidth(),
+        sprite.getHeight());
+    double relativeX = (location.getX() - renderedBounds.getX()) / renderedBounds.getWidth();
+    double relativeY = (location.getY() - renderedBounds.getY()) / renderedBounds.getHeight();
+    if (relativeX < 0 || relativeX >= 1 || relativeY < 0 || relativeY >= 1) {
+      return false;
+    }
+
+    int x = Math.min((int) (relativeX * sprite.getWidth()), sprite.getWidth() - 1);
+    int y = Math.min((int) (relativeY * sprite.getHeight()), sprite.getHeight() - 1);
+    return (sprite.getRGB(x, y) >>> 24) != 0;
+  }
+
+  private static HitTestSprite getHitTestSprite(IMapObject mapObject, MapObjectType type) {
+    Environment environment = Game.world().environment();
+    if (environment != null
+      && environment.getMap() != null
+      && environment.getMap().getMapObject(mapObject.getId()) == mapObject) {
+      IEntity entity = environment.get(mapObject.getId());
+      if (entity != null && entity.animations() != null) {
+        BufferedImage currentImage = entity.animations().getCurrentImage();
+        return new HitTestSprite(currentImage, entity.animations().isAutoScaling());
+      }
+    }
+
+    Spritesheet spritesheet = SpriteVariantSelector.getPreviewSpritesheet(null, mapObject);
+    if (spritesheet == null || spritesheet.getTotalNumberOfSprites() == 0) {
+      return null;
+    }
+    BufferedImage preview = transformPropSprite(spritesheet.getSprite(0), mapObject, type);
+    return new HitTestSprite(
+      preview, mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE, false));
+  }
+
+  private record HitTestSprite(BufferedImage image, boolean scaled) {}
+
+  private static BufferedImage transformPropSprite(
+    BufferedImage sprite, IMapObject mapObject, MapObjectType type) {
+    if (sprite == null || type != MapObjectType.PROP) {
+      return sprite;
+    }
+
+    Rotation rotation = mapObject.getEnumValue(
+      MapObjectProperty.PROP_ROTATION, Rotation.class, Rotation.NONE);
+    if (rotation != Rotation.NONE) {
+      sprite = Imaging.rotate(sprite, rotation);
+    }
+    if (mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY, false)) {
+      sprite = Imaging.horizontalFlip(sprite);
+    }
+    if (mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY, false)) {
+      sprite = Imaging.verticalFlip(sprite);
+    }
+    return sprite;
   }
 
   public boolean addMapObjectFromAsset(Object asset, Point2D location) {
@@ -774,20 +860,31 @@ public class MapComponent extends GuiComponent {
       return;
     }
 
-    UndoManager.instance().beginOperation();
+    List<IMapObject> deletedObjects = List.copyOf(getSelectedMapObjects());
+    UndoManager undoManager = UndoManager.instance();
+    undoManager.beginOperation();
     try {
-      for (IMapObject deleteObject : getSelectedMapObjects()) {
+      for (IMapObject deleteObject : deletedObjects) {
         if (deleteObject == null) {
           continue;
         }
 
         // call the undomanager first because otherwise the information about
         // the object's layer will be lost
-        UndoManager.instance().mapObjectDeleted(deleteObject);
+        undoManager.mapObjectDeleted(deleteObject);
         this.delete(deleteObject);
       }
     } finally {
-      UndoManager.instance().endOperation();
+      undoManager.endOperation();
+    }
+
+    if (!deletedObjects.isEmpty()) {
+      long deletionRevision = undoManager.getRevision();
+      String message = deletedObjects.size() == 1
+        ? Resources.strings().get("panel_objectDeleted")
+        : Resources.strings().get(
+          "panel_objectsDeleted", Integer.toString(deletedObjects.size()));
+      Toast.show(message, () -> undoManager.undoIfRevision(deletionRevision));
     }
   }
 
@@ -975,43 +1072,8 @@ public class MapComponent extends GuiComponent {
   }
 
   public static IMapObject resolveParentEntity(IMapObject mapObject) {
-    IMap map =
-      Game.world() != null && Game.world().environment() != null
-        ? Game.world().environment().getMap()
-        : null;
-    return resolveParentEntity(mapObject, map);
-  }
-
-  static IMapObject resolveParentEntity(IMapObject mapObject, IMap map) {
-    if (mapObject == null) {
-      return null;
-    }
-    MapObjectType type = MapObjectType.get(mapObject.getType());
-    if (type == MapObjectType.PROP
-      || type == MapObjectType.CREATURE
-      || type == MapObjectType.SOUNDSOURCE
-      || type == MapObjectType.LIGHTSOURCE) {
-      return mapObject;
-    }
-
-    if (map != null && mapObject.getBoundingBox() != null) {
-      for (IMapObjectLayer layer : map.getMapObjectLayers()) {
-        if (layer == null || !isLayerEffectivelyVisible(map, layer)) {
-          continue;
-        }
-        for (IMapObject other : layer.getMapObjects()) {
-          if (other == null || other.equals(mapObject)) {
-            continue;
-          }
-          MapObjectType otherType = MapObjectType.get(other.getType());
-          if ((otherType == MapObjectType.PROP || otherType == MapObjectType.CREATURE)
-              && other.getBoundingBox() != null
-              && other.getBoundingBox().intersects(mapObject.getBoundingBox())) {
-            return other;
-          }
-        }
-      }
-    }
+    // Standalone map objects do not encode a parent relationship. Geometric overlap alone must
+    // not turn a selected collision box, trigger, or area into an unrelated prop or creature.
     return mapObject;
   }
 
@@ -2251,6 +2313,10 @@ public class MapComponent extends GuiComponent {
 
         MapObjectType type = MapObjectType.get(mapObject.getType());
         if (type == null || !GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
+          continue;
+        }
+        if (rect.getWidth() == 0 && rect.getHeight() == 0
+          && !hitsVisibleMapObjectPixel(mapObject, new Point2D.Double(rect.getX(), rect.getY()))) {
           continue;
         }
 

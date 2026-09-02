@@ -141,6 +141,109 @@ class EditorStyleTest {
   }
 
   @Test
+  void workspaceModeButtonsShrinkBelowUsableEditorThreshold() {
+    JPanel rail = (JPanel) UI.initWorkspaceModeBar();
+    JToggleButton mapButton = (JToggleButton) rail.getComponent(0);
+    JToggleButton scriptButton = (JToggleButton) rail.getComponent(2);
+
+    UI.updateWorkspaceModeBar(rail, true);
+
+    assertEquals(32, mapButton.getPreferredSize().width);
+    assertEquals(32, mapButton.getPreferredSize().height);
+    assertEquals(mapButton.getPreferredSize(), scriptButton.getPreferredSize());
+    assertEquals(32 + Style.SPACE_SMALL, rail.getPreferredSize().width);
+
+    UI.updateWorkspaceModeBar(rail, false);
+
+    assertEquals(43, mapButton.getPreferredSize().width);
+    assertEquals(42, mapButton.getPreferredSize().height);
+  }
+
+  @Test
+  void windowMinimumContainsUsableEditorInsteadOfOversizingChildComponents() {
+    java.awt.Dimension minimum = UI.minimumWindowSize();
+
+    assertEquals(728, minimum.width);
+    assertEquals(480, minimum.height);
+    assertTrue(minimum.width > UI.WORKSPACE_MIN_WIDTH);
+  }
+
+  @Test
+  void narrowWorkspaceCollapsesInspectorBeforeSceneGraph() {
+    JPanel rail = (JPanel) UI.initWorkspaceModeBar();
+    UI.CollapsibleSplitPane sceneSplit = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel(), UI.CollapseSide.FIRST);
+    UI.CollapsibleSplitPane inspectorSplit = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, sceneSplit, new JPanel(), UI.CollapseSide.SECOND);
+    sceneSplit.setSize(1000, 600);
+    inspectorSplit.setSize(1100, 600);
+    UI.configureSplitPane(sceneSplit);
+    UI.configureSplitPane(inspectorSplit);
+
+    UI.preserveWorkspaceWidth(1100, rail, sceneSplit, inspectorSplit);
+
+    assertTrue(inspectorSplit.isCollapsed());
+    assertFalse(sceneSplit.isCollapsed());
+
+    UI.preserveWorkspaceWidth(900, rail, sceneSplit, inspectorSplit);
+
+    assertTrue(sceneSplit.isCollapsed());
+
+    UI.preserveWorkspaceWidth(1100, rail, sceneSplit, inspectorSplit);
+
+    assertFalse(sceneSplit.isCollapsed());
+    assertTrue(inspectorSplit.isCollapsed());
+
+    UI.preserveWorkspaceWidth(1600, rail, sceneSplit, inspectorSplit);
+
+    assertFalse(inspectorSplit.isCollapsed());
+  }
+
+  @Test
+  void growingWorkspaceDoesNotExpandPanelsCollapsedByUser() {
+    JPanel rail = (JPanel) UI.initWorkspaceModeBar();
+    UI.CollapsibleSplitPane sceneSplit = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel(), UI.CollapseSide.FIRST);
+    UI.CollapsibleSplitPane inspectorSplit = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, sceneSplit, new JPanel(), UI.CollapseSide.SECOND);
+    sceneSplit.setSize(1000, 600);
+    inspectorSplit.setSize(1600, 600);
+    UI.configureSplitPane(sceneSplit);
+    UI.configureSplitPane(inspectorSplit);
+    inspectorSplit.toggleCollapsed();
+
+    UI.preserveWorkspaceWidth(1600, rail, sceneSplit, inspectorSplit);
+
+    assertTrue(inspectorSplit.isCollapsed());
+    assertFalse(inspectorSplit.isAutomaticallyCollapsed());
+  }
+
+  @Test
+  void automaticRestoreWaitsForTheRememberedDockWidths() {
+    JPanel rail = (JPanel) UI.initWorkspaceModeBar();
+    UI.CollapsibleSplitPane sceneSplit = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel(), UI.CollapseSide.FIRST);
+    UI.CollapsibleSplitPane inspectorSplit = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, sceneSplit, new JPanel(), UI.CollapseSide.SECOND);
+    sceneSplit.setSize(1200, 600);
+    inspectorSplit.setSize(1600, 600);
+    UI.configureSplitPane(sceneSplit);
+    UI.configureSplitPane(inspectorSplit);
+    sceneSplit.setDividerLocation(400);
+    inspectorSplit.setDividerLocation(1086);
+
+    UI.preserveWorkspaceWidth(1500, rail, sceneSplit, inspectorSplit);
+
+    assertTrue(inspectorSplit.isCollapsed());
+
+    inspectorSplit.setSize(1700, 600);
+    UI.preserveWorkspaceWidth(1700, rail, sceneSplit, inspectorSplit);
+
+    assertFalse(inspectorSplit.isCollapsed());
+    assertEquals(1186, inspectorSplit.getDividerLocation());
+  }
+
+  @Test
   void expandableCardHeaderSupportsKeyboardToggle() {
     ExpandableCard card = new ExpandableCard("General", new JPanel(), true);
     JPanel header = (JPanel) card.getComponent(0);
@@ -234,7 +337,106 @@ class EditorStyleTest {
   void inspectorDividerTranslatesPersistedViewportPosition() {
     int divider = UI.initialInspectorDivider(1920, 300, 380, 380, 1200);
 
-    assertEquals(1504, divider);
+    assertEquals(1514, divider);
+  }
+
+  @Test
+  void collapsibleSplitPaneRestoresLastExpandedLocation() {
+    UI.CollapsibleSplitPane splitPane = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel(), UI.CollapseSide.FIRST);
+    splitPane.setSize(1000, 600);
+    UI.configureSplitPane(splitPane);
+    splitPane.setDividerLocation(340);
+
+    splitPane.toggleCollapsed();
+
+    assertTrue(splitPane.isCollapsed());
+    assertEquals(0, splitPane.getDividerLocation());
+
+    splitPane.toggleCollapsed();
+
+    assertFalse(splitPane.isCollapsed());
+    assertEquals(340, splitPane.getDividerLocation());
+  }
+
+  @Test
+  void collapsibleBottomPanelUsesFarEdgeAndRestoresItsHeight() {
+    UI.CollapsibleSplitPane splitPane = new UI.CollapsibleSplitPane(
+        JSplitPane.VERTICAL_SPLIT, new JPanel(), new JPanel(), UI.CollapseSide.SECOND);
+    splitPane.setSize(1000, 800);
+    UI.configureSplitPane(splitPane);
+    splitPane.setDividerLocation(500);
+
+    splitPane.toggleCollapsed();
+
+    assertTrue(splitPane.isCollapsed());
+    assertEquals(786, splitPane.getDividerLocation());
+
+    splitPane.toggleCollapsed();
+
+    assertFalse(splitPane.isCollapsed());
+    assertEquals(500, splitPane.getDividerLocation());
+  }
+
+  @Test
+  void collapsedFarEdgePanelKeepsItsSizeWhenContainerGrows() {
+    UI.CollapsibleSplitPane splitPane = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel(), UI.CollapseSide.SECOND);
+    splitPane.setSize(1000, 600);
+    UI.configureSplitPane(splitPane);
+    splitPane.setDividerLocation(620);
+    splitPane.getLeftComponent().setMinimumSize(new java.awt.Dimension(640, 0));
+    splitPane.getRightComponent().setMinimumSize(new java.awt.Dimension(320, 0));
+    splitPane.setDividerLocation(0);
+
+    splitPane.collapseAutomatically();
+    splitPane.setSize(1800, 600);
+    splitPane.expandAutomatically();
+
+    assertFalse(splitPane.isCollapsed());
+    assertEquals(1420, splitPane.getDividerLocation());
+  }
+
+  @Test
+  void collapseButtonIsQuietUntilHovered() {
+    UI.CollapsibleSplitPane splitPane = new UI.CollapsibleSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel(), UI.CollapseSide.SECOND);
+    UI.configureSplitPane(splitPane);
+    BasicSplitPaneUI splitPaneUI = (BasicSplitPaneUI) splitPane.getUI();
+    JButton button = (JButton) splitPaneUI.getDivider().getComponent(0);
+
+    assertEquals(14, splitPane.getDividerSize());
+    assertFalse(button.isOpaque());
+    assertFalse(button.isContentAreaFilled());
+    assertTrue(button.isRolloverEnabled());
+    assertEquals(new java.awt.Dimension(14, 28), button.getPreferredSize());
+
+    button.setSize(button.getPreferredSize());
+    BufferedImage quiet = paint(button);
+    button.getModel().setRollover(true);
+    BufferedImage hovered = paint(button);
+
+    assertTrue(imagesDiffer(quiet, hovered));
+  }
+
+  private static BufferedImage paint(JComponent component) {
+    BufferedImage image = new BufferedImage(
+        component.getWidth(), component.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    Graphics2D graphics = image.createGraphics();
+    component.paint(graphics);
+    graphics.dispose();
+    return image;
+  }
+
+  private static boolean imagesDiffer(BufferedImage first, BufferedImage second) {
+    for (int y = 0; y < first.getHeight(); y++) {
+      for (int x = 0; x < first.getWidth(); x++) {
+        if (first.getRGB(x, y) != second.getRGB(x, y)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Test
