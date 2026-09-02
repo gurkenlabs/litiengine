@@ -15,9 +15,12 @@ import de.gurkenlabs.utiliti.controller.Editor;
 import de.gurkenlabs.utiliti.controller.ScriptBindingService;
 import de.gurkenlabs.utiliti.controller.ScriptBindingTarget;
 import de.gurkenlabs.utiliti.model.Icons;
+import java.nio.file.Path;
 import java.util.List;
+import javax.swing.JTabbedPane;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 
 @ExtendWith(SwingTestSuite.class)
 class ScriptWorkspacePanelTest {
@@ -91,6 +94,59 @@ class ScriptWorkspacePanelTest {
       assertNull(panel.getMonaco(), "Monaco editor should not be loaded on ScriptWorkspacePanel creation");
     } finally {
       panel.close();
+    }
+  }
+
+  @Test
+  void scriptTabsUseSingleRowOverflowInsteadOfClippedWrappedTabs() {
+    ScriptWorkspacePanel panel = new ScriptWorkspacePanel();
+    try {
+      assertEquals(JTabbedPane.SCROLL_TAB_LAYOUT, panel.getTabLayoutPolicy());
+    } finally {
+      panel.close();
+    }
+  }
+
+  @Test
+  void projectChangeAndCloseRemoveEveryOpenScriptTab(@TempDir Path tempDirectory) throws Exception {
+    de.gurkenlabs.litiengine.Game.init(de.gurkenlabs.litiengine.Game.COMMANDLINE_ARG_NOGUI);
+    Editor editor = Editor.instance();
+    Path originalProject = editor.getProjectPath();
+    Path firstProject = tempDirectory.resolve("first/game.litidata");
+    Path secondProject = tempDirectory.resolve("second/game.litidata");
+    ScriptWorkspacePanel panel = null;
+    try {
+      editor.setProjectPath(firstProject);
+      panel = new ScriptWorkspacePanel();
+      ScriptWorkspacePanel workspace = panel;
+      assertTrue(workspace.isEmptyEditorStateVisible());
+      ScriptDefinition first = new ScriptDefinition(
+          "first", "java", "scripts/First.java", "First", ScriptHostType.GAME);
+      workspace.open(first);
+      assertEquals(1, workspace.getOpenTabCount());
+      assertFalse(workspace.isEmptyEditorStateVisible());
+      assertFalse(workspace.hasUnsavedScripts());
+
+      editor.setProjectPath(firstProject);
+      assertEquals(1, workspace.getOpenTabCount());
+
+      editor.setProjectPath(secondProject);
+      assertEquals(0, workspace.getOpenTabCount());
+      assertTrue(workspace.isEmptyEditorStateVisible());
+
+      ScriptDefinition second = new ScriptDefinition(
+          "second", "java", "scripts/Second.java", "Second", ScriptHostType.GAME);
+      workspace.open(second);
+      assertEquals(1, workspace.getOpenTabCount());
+
+      editor.setProjectPath(null);
+      assertEquals(0, workspace.getOpenTabCount());
+      assertTrue(workspace.isEmptyEditorStateVisible());
+    } finally {
+      if (panel != null) {
+        panel.close();
+      }
+      editor.setProjectPath(originalProject);
     }
   }
 

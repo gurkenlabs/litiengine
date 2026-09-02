@@ -179,7 +179,10 @@ public final class UI {
 
   public static boolean notifyPendingChanges() {
     Path resourceFile = Editor.instance().getCurrentResourceFile();
-    if (Editor.instance().getChangedMaps().isEmpty() && !Editor.instance().isUnsavedProject()) {
+    boolean unsavedScripts = scriptWorkspacePanel != null && scriptWorkspacePanel.hasUnsavedScripts();
+    if (Editor.instance().getChangedMaps().isEmpty()
+        && !Editor.instance().isUnsavedProject()
+        && !unsavedScripts) {
       return true;
     }
 
@@ -187,6 +190,9 @@ public final class UI {
         Resources.strings().get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {
+      if (unsavedScripts && !scriptWorkspacePanel.saveAllScripts()) {
+        return false;
+      }
       Editor.instance().save(false);
     }
 
