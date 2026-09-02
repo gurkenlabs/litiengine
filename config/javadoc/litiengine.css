@@ -495,13 +495,20 @@ header[role="banner"] {
 }
 
 .liti-brand-text .api-tag {
-  color: var(--color-primary);
-  font-size: 0.8rem;
-  font-weight: 700;
-  background-color: var(--color-primary-light);
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  margin-left: 0.4rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  padding: 0.22rem 0.5rem !important;
+  border-radius: 4px !important;
+  margin-left: 0.5rem !important;
+  vertical-align: middle !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #ff6b5b 0%, #e64a3b 100%) !important;
+  box-shadow: 0 2px 8px rgba(230, 74, 59, 0.3) !important;
 }
 
 .liti-header-level1-right {
