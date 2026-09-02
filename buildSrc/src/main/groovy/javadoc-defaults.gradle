@@ -98,8 +98,57 @@ void enhanceJavadocHtml(File file, File rootDir) {
   <meta name="twitter:description" content="Official Java API reference documentation for ${cleanHeading} in the LITIENGINE 2D Game Engine.">
 """
 
+  headAdditions += """  <script>(function(){try{var t=localStorage.getItem('liti-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>\n"""
+
   if (html.contains("</head>")) {
     html = html.replace("</head>", headAdditions + "\n</head>")
+  }
+
+  // 2. Generation-Time 2-Level Header (Eliminates DOM delay on large pages like index-all.html)
+  def navMatcher = (html =~ /(?s)(<ul id="navbar-top-firstrow"[^>]*>.*?<\/ul>)/)
+  if (navMatcher) {
+    def origNavList = navMatcher[0][1]
+    def backlink = '<li class="nav-item-backlink"><a href="https://docs.litiengine.com/" class="nav-link-docs" title="Back to LITIENGINE Documentation"><svg class="docs-back-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Docs</span></a></li>'
+    def enhancedNavList = origNavList.replaceFirst(/(<ul[^>]*>)/, "\$1\n${backlink}")
+
+    def level1Html = """
+  <div class="liti-header-level1">
+    <div class="liti-header-container">
+      <a class="liti-brand-link" href="https://docs.litiengine.com/">
+        <img class="liti-brand-logo" src="${r}assets/logo.png" alt="LITIENGINE Logo" width="28.79" height="28.79">
+        <span class="liti-brand-text"><strong>LITIENGINE Docs</strong> <span class="api-tag">API</span></span>
+      </a>
+      <div class="liti-header-level1-right">
+        <button type="button" class="liti-theme-toggle" title="Toggle dark / light mode" aria-label="Toggle theme">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <div class="nav-list-search">
+          <span class="search-icon-wrapper"><svg class="search-icon-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+          <input type="text" id="search-input" placeholder="Search" autocomplete="off">
+          <kbd class="search-kbd">Ctrl+K</kbd>
+        </div>
+        <a href="https://github.com/gurkenlabs/litiengine" target="_blank" rel="noopener noreferrer" class="liti-github-link">
+          <svg class="github-icon" viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> <span>gurkenlabs/litiengine</span>
+        </a>
+      </div>
+    </div>
+  </div>"""
+
+    def level2Html = """
+  <div class="liti-header-level2">
+    <div class="liti-header-container">
+      ${enhancedNavList}
+      <a href="https://opencollective.com/litiengine" target="_blank" rel="noopener noreferrer" class="md-tabs__link--sponsor">
+        <svg class="sponsor-heart-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> <span>Sponsor</span>
+      </a>
+    </div>
+  </div>"""
+
+    def newTopNav = """<div class="top-nav" id="navbar-top">${level1Html}${level2Html}\n</div>"""
+    // Remove the old nav-list-search from sub-nav first
+    html = html.replaceFirst(/(?s)<div class="nav-list-search">.*?<\/div>/, '')
+    // Replace the entire top-nav block cleanly up to sub-nav
+    html = html.replaceFirst(/(?s)<div class="top-nav" id="navbar-top">.*?<\/div>(?=\s*<div class="sub-nav">)/, newTopNav)
   }
 
   // 2. Build Contextual Tags at generation time

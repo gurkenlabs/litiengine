@@ -112,14 +112,49 @@ js_code = """/**
   function setupTwoLevelNavigation() {
     try {
       const header = document.querySelector('header[role="banner"]');
-      if (!header || document.querySelector('.liti-header-level1')) return;
+      if (!header) return;
+
+      const themeBtn = header.querySelector('.liti-theme-toggle');
+      if (themeBtn) {
+        function updateToggleIcon() {
+          themeBtn.innerHTML = isDarkMode() ? MOON_SVG : SUN_SVG;
+        }
+
+        themeBtn.addEventListener('click', function () {
+          const nextTheme = isDarkMode() ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', nextTheme);
+          setStoredTheme(nextTheme);
+          updateToggleIcon();
+        });
+
+        updateToggleIcon();
+      }
+
+      const searchInput = header.querySelector('#search-input');
+      if (searchInput && document.body.classList.contains('search-page')) {
+        searchInput.addEventListener('focus', function () {
+          const pageInput = document.getElementById('page-search-input');
+          if (pageInput) {
+            pageInput.focus();
+            pageInput.select();
+          }
+        });
+      }
+
+      const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      if (isMac) {
+        header.querySelectorAll('.search-kbd').forEach(k => { k.textContent = '⌘K'; });
+      }
+
+      // If header is already baked statically into HTML, our work here is done!
+      if (header.querySelector('.liti-header-level1')) return;
 
       const navList = document.querySelector('ul.nav-list');
       if (!navList) return;
 
       const navListSearch = document.querySelector('.nav-list-search');
 
-      // Create 2-Level Header Structure
+      // Create 2-Level Header Structure Fallback
       const level1 = document.createElement('div');
       level1.className = 'liti-header-level1';
 
