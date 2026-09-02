@@ -59,30 +59,6 @@
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
-  function loadGoogleFonts() {
-    if (document.querySelector('link[href*="fonts.googleapis.com"]')) return;
-    const head = document.head || document.getElementsByTagName('head')[0];
-    if (!head) return;
-    const preconnect1 = document.createElement('link');
-    preconnect1.rel = 'preconnect';
-    preconnect1.href = 'https://fonts.googleapis.com';
-    head.appendChild(preconnect1);
-
-    const preconnect2 = document.createElement('link');
-    preconnect2.rel = 'preconnect';
-    preconnect2.href = 'https://fonts.gstatic.com';
-    preconnect2.crossOrigin = 'anonymous';
-    head.appendChild(preconnect2);
-
-    const fontLink = document.createElement('link');
-    fontLink.rel = 'stylesheet';
-    fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap';
-    fontLink.media = 'all';
-    head.appendChild(fontLink);
-  }
-
-  loadGoogleFonts();
-
   function setupFavicons() {
     const r = getRoot();
     const head = document.head || document.getElementsByTagName('head')[0];
@@ -108,13 +84,57 @@
   function setupTwoLevelNavigation() {
     try {
       const header = document.querySelector('header[role="banner"]');
-      if (!header || document.querySelector('.liti-header-level1')) return;
+      if (!header) return;
+
+      const themeBtn = header.querySelector('.liti-theme-toggle');
+      if (themeBtn) {
+        function updateToggleIcon() {
+          themeBtn.innerHTML = isDarkMode() ? MOON_SVG : SUN_SVG;
+        }
+
+        themeBtn.addEventListener('click', function () {
+          const nextTheme = isDarkMode() ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', nextTheme);
+          setStoredTheme(nextTheme);
+          updateToggleIcon();
+        });
+
+        updateToggleIcon();
+      }
+
+      const searchInput = header.querySelector('#search-input');
+      if (searchInput && document.body.classList.contains('search-page')) {
+        searchInput.addEventListener('focus', function () {
+          const pageInput = document.getElementById('page-search-input');
+          if (pageInput) {
+            pageInput.focus();
+            pageInput.select();
+          }
+        });
+      }
+
+      const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      if (isMac) {
+        header.querySelectorAll('.search-kbd').forEach(k => { k.textContent = '⌘K'; });
+      }
+
+      // Remove Deprecated and Help navigation items
+      header.querySelectorAll('ul.nav-list li').forEach(li => {
+        const text = li.textContent.trim().toLowerCase();
+        if (text === 'deprecated' || text === 'help') {
+          li.remove();
+        }
+      });
+
+      // If header is already baked statically into HTML, our work here is done!
+      if (header.querySelector('.liti-header-level1')) return;
 
       const navList = document.querySelector('ul.nav-list');
-      const navListSearch = document.querySelector('.nav-list-search');
-      if (!navList || !navListSearch) return;
+      if (!navList) return;
 
-      // Create 2-Level Header Structure
+      const navListSearch = document.querySelector('.nav-list-search');
+
+      // Create 2-Level Header Structure Fallback
       const level1 = document.createElement('div');
       level1.className = 'liti-header-level1';
 
@@ -124,7 +144,7 @@
       // Brand Link (Exact 28.79px logo from DevTools)
       const brand = document.createElement('a');
       brand.className = 'liti-brand-link';
-      brand.href = 'https://gurkenlabs.github.io/litiengine-docs/';
+      brand.href = 'https://docs.litiengine.com/';
       brand.innerHTML = `<img class="liti-brand-logo" src="${OFFICIAL_LOGO_SRC}" alt="LITIENGINE Logo" width="28.79" height="28.79"> <span class="liti-brand-text"><strong>LITIENGINE Docs</strong> <span class="api-tag">API</span></span>`;
       level1Inner.appendChild(brand);
 
@@ -133,50 +153,66 @@
       level1Right.className = 'liti-header-level1-right';
 
       // 1. Theme toggle button (Dark -> Moon icon, Light -> Sun icon)
-      const themeBtn = document.createElement('button');
-      themeBtn.type = 'button';
-      themeBtn.className = 'liti-theme-toggle';
-      themeBtn.title = 'Toggle dark / light mode';
-      themeBtn.setAttribute('aria-label', 'Toggle theme');
+      const dynamicThemeBtn = document.createElement('button');
+      dynamicThemeBtn.type = 'button';
+      dynamicThemeBtn.className = 'liti-theme-toggle';
+      dynamicThemeBtn.title = 'Toggle dark / light mode';
+      dynamicThemeBtn.setAttribute('aria-label', 'Toggle theme');
 
-      function updateToggleIcon() {
-        themeBtn.innerHTML = isDarkMode() ? MOON_SVG : SUN_SVG;
+      function updateDynamicToggleIcon() {
+        dynamicThemeBtn.innerHTML = isDarkMode() ? MOON_SVG : SUN_SVG;
       }
 
-      themeBtn.addEventListener('click', function () {
+      dynamicThemeBtn.addEventListener('click', function () {
         const nextTheme = isDarkMode() ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', nextTheme);
         setStoredTheme(nextTheme);
-        updateToggleIcon();
+        updateDynamicToggleIcon();
       });
 
-      updateToggleIcon();
-      level1Right.appendChild(themeBtn);
+      updateDynamicToggleIcon();
+      level1Right.appendChild(dynamicThemeBtn);
 
-    // 2. Search capsule
-    if (navListSearch) {
-      const searchInput = navListSearch.querySelector('#search-input');
-      if (searchInput) {
-        searchInput.setAttribute('placeholder', 'Search');
+      // 2. Search capsule
+      if (navListSearch) {
+        const searchInput = navListSearch.querySelector('#search-input');
+        if (searchInput) {
+          searchInput.setAttribute('placeholder', 'Search');
+        }
+
+        if (!navListSearch.querySelector('.search-icon-svg')) {
+          const iconWrapper = document.createElement('span');
+          iconWrapper.className = 'search-icon-wrapper';
+          iconWrapper.innerHTML = SEARCH_SVG;
+          navListSearch.insertBefore(iconWrapper, navListSearch.firstChild);
+        }
+
+        if (!navListSearch.querySelector('.search-kbd')) {
+          const kbd = document.createElement('kbd');
+          kbd.className = 'search-kbd';
+          const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+          kbd.textContent = isMac ? '⌘K' : 'Ctrl+K';
+          navListSearch.appendChild(kbd);
+        }
+
+        level1Right.appendChild(navListSearch);
+      } else {
+        const searchCapsule = document.createElement('div');
+        searchCapsule.className = 'nav-list-search';
+        const isMac = navigator.platform && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+        searchCapsule.innerHTML = `<span class="search-icon-wrapper">${SEARCH_SVG}</span><input type="text" id="search-input" placeholder="Search"><kbd class="search-kbd">${isMac ? '⌘K' : 'Ctrl+K'}</kbd>`;
+        const headerInput = searchCapsule.querySelector('#search-input');
+        if (headerInput) {
+          headerInput.addEventListener('focus', function () {
+            const pageInput = document.getElementById('page-search-input');
+            if (pageInput) {
+              pageInput.focus();
+              pageInput.select();
+            }
+          });
+        }
+        level1Right.appendChild(searchCapsule);
       }
-
-      if (!navListSearch.querySelector('.search-icon-svg')) {
-        const iconWrapper = document.createElement('span');
-        iconWrapper.className = 'search-icon-wrapper';
-        iconWrapper.innerHTML = SEARCH_SVG;
-        navListSearch.insertBefore(iconWrapper, navListSearch.firstChild);
-      }
-
-      if (!navListSearch.querySelector('.search-kbd')) {
-        const kbd = document.createElement('kbd');
-        kbd.className = 'search-kbd';
-        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-        kbd.textContent = isMac ? '⌘K' : 'Ctrl+K';
-        navListSearch.appendChild(kbd);
-      }
-
-      level1Right.appendChild(navListSearch);
-    }
 
     // 3. GitHub Repo Link (clean & simplified)
     const githubLink = document.createElement('a');
@@ -197,8 +233,14 @@
     const level2Inner = document.createElement('div');
     level2Inner.className = 'liti-header-container';
 
-    // Move navList into level 2
+    // Move navList into level 2 with a prominent backlink to documentation
     if (navList) {
+      if (!navList.querySelector('.nav-item-backlink')) {
+        const backLi = document.createElement('li');
+        backLi.className = 'nav-item-backlink';
+        backLi.innerHTML = `<a href="https://docs.litiengine.com/" class="nav-link-docs" title="Back to LITIENGINE Documentation"><svg class="docs-back-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Docs</span></a>`;
+        navList.insertBefore(backLi, navList.firstChild);
+      }
       level2Inner.appendChild(navList);
     }
 
@@ -332,9 +374,10 @@
     // 1. Unwrap java.lang.Object root nodes so all direct classes start directly at the top level
     const rootNodes = Array.from(document.querySelectorAll('section.hierarchy > ul > li.circle'));
     rootNodes.forEach(li => {
-      const link = li.querySelector('a[href*="java.lang/Object.html"], a[title*="java.lang.Object"]');
-      const directText = li.childNodes.length ? li.childNodes[0].textContent : '';
-      if ((link && link.textContent.trim() === 'Object') || directText.includes('java.lang.Object') || directText.trim() === 'java.lang.') {
+      const link = li.querySelector('a[href*="Object.html"]');
+      const isObjLink = link && (link.textContent.trim() === 'Object' || link.href.includes('/Object.html'));
+      const isObjText = li.textContent.includes('java.lang.Object') || (li.childNodes.length && li.childNodes[0].textContent.includes('java.lang.'));
+      if (isObjLink || isObjText) {
         const childUl = li.querySelector('ul');
         if (childUl && li.parentNode) {
           const parentUl = li.parentNode;
@@ -459,7 +502,7 @@
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        const searchInput = document.getElementById('search-input') || document.getElementById('page-search-input');
+        const searchInput = document.getElementById('page-search-input') || document.getElementById('search-input');
         if (searchInput) {
           searchInput.focus();
           searchInput.select();
@@ -579,6 +622,18 @@
       }
 
       current = Array.from(current.children).find(el => el.classList.contains('inheritance'));
+    }
+
+    // Also clean up redundant "extends Object" from type-signature
+    const extImplements = document.querySelector('.type-signature .extends-implements');
+    if (extImplements) {
+      const extObjLink = extImplements.querySelector('a[href*="Object.html"]');
+      if (extObjLink && extObjLink.textContent.trim() === 'Object') {
+        const text = extImplements.textContent.trim();
+        if (text === 'extends Object') {
+          extImplements.remove();
+        }
+      }
     }
 
     // Filter out Object nodes

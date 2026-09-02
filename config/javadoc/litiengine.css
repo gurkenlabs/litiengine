@@ -495,13 +495,20 @@ header[role="banner"] {
 }
 
 .liti-brand-text .api-tag {
-  color: var(--color-primary);
-  font-size: 0.8rem;
-  font-weight: 700;
-  background-color: var(--color-primary-light);
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  margin-left: 0.4rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  padding: 0.22rem 0.5rem !important;
+  border-radius: 4px !important;
+  margin-left: 0.5rem !important;
+  vertical-align: middle !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #ff6b5b 0%, #e64a3b 100%) !important;
+  box-shadow: 0 2px 8px rgba(230, 74, 59, 0.3) !important;
 }
 
 .liti-header-level1-right {
@@ -709,6 +716,54 @@ ul.nav-list li.nav-bar-cell1-rev a,
   background-color: transparent !important;
 }
 
+/* Hide Deprecated and Help navigation items */
+ul.nav-list li:has(a[href*="deprecated-list"]),
+ul.nav-list li:has(a[href*="help-doc"]) {
+  display: none !important;
+}
+
+/* Backlink to main documentation in Level 2 */
+ul.nav-list li.nav-item-backlink {
+  margin-right: 0.5rem !important;
+}
+
+ul.nav-list li.nav-item-backlink a.nav-link-docs {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  padding: 0 0.85rem !important;
+  color: var(--color-primary) !important;
+  background-color: var(--color-primary-light) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 6px !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+ul.nav-list li.nav-item-backlink a.nav-link-docs:hover {
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--color-primary) !important;
+  transform: translateX(-2px) !important;
+  text-decoration: none !important;
+}
+
+ul.nav-list li.nav-item-backlink a.nav-link-docs svg.docs-back-icon {
+  width: 14px !important;
+  height: 14px !important;
+  stroke: currentColor !important;
+  transition: transform 0.15s ease !important;
+}
+
+ul.nav-list li.nav-item-backlink a.nav-link-docs:hover svg.docs-back-icon {
+  transform: translateX(-2px) !important;
+}
+
 /* Sponsor button in Level 2 */
 .md-tabs__link--sponsor {
   display: inline-flex !important;
@@ -759,6 +814,7 @@ div.sub-nav {
   width: 100%;
 }
 
+.sub-nav:not(:has(li)),
 .sub-nav:has(.sub-nav-list:empty) {
   display: none !important;
 }
@@ -999,10 +1055,34 @@ ol.sub-nav-list .current-selection {
   flex-shrink: 0 !important;
 }
 
+input.filter-input {
+  background-color: var(--search-box-bg) !important;
+  background-image: none !important;
+  border: 1px solid var(--search-box-border) !important;
+  border-radius: 6px !important;
+  color: var(--body-text-color) !important;
+  font-size: 0.82rem !important;
+  font-family: var(--body-font-family) !important;
+  padding: 0.35rem 0.6rem !important;
+  height: 34px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+}
+
+input.filter-input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(0, 189, 165, 0.25) !important;
+  background-color: var(--code-background-color) !important;
+}
+
 .toc-filter-wrapper input.filter-input {
   background: transparent !important;
   background-color: transparent !important;
+  background-image: none !important;
   border: none !important;
+  border-radius: 0 !important;
   color: var(--body-text-color) !important;
   font-size: 0.82rem !important;
   font-family: var(--body-font-family) !important;
@@ -1451,9 +1531,17 @@ div.table-tabs > .active-table-tab {
   line-height: 1.55 !important;
   overflow: visible !important;
   border-bottom: 1px solid var(--border-subtle) !important;
-  display: flex !important;
+  display: flex;
   align-items: center !important;
   word-break: break-word !important;
+}
+
+/* Ensure inline display: none applied by script.js table filtering is always respected */
+.summary-table > div[style*="display: none"],
+.summary-table > div[style*="display:none"],
+.details-table > div[style*="display: none"],
+.details-table > div[style*="display:none"] {
+  display: none !important;
 }
 
 .col-first, .col-second, .col-last, .col-constructor-name {
@@ -1770,10 +1858,19 @@ footer {
    Alphabetical Index Page (index-all.html)
    ========================================================================== */
 
-body.index-page main {
+body.index-page .main-grid {
+  display: block !important;
+  width: 100% !important;
   max-width: var(--max-content-width) !important;
   margin: 0 auto !important;
-  padding: 2rem 1.5rem !important;
+  padding: 1.25rem 1.5rem 4rem 1.5rem !important;
+}
+
+body.index-page main {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 body.index-page main h1 {
@@ -1781,7 +1878,8 @@ body.index-page main h1 {
   font-weight: 700 !important;
   letter-spacing: -0.02em !important;
   color: var(--title-color) !important;
-  margin-bottom: 1.5rem !important;
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important;
 }
 
 /* Raw Alphabet Jump Links (Pure CSS Fallback before JS wrapping) */
@@ -1825,21 +1923,21 @@ body.index-page main > span.vertical-separator {
 /* Sticky Alphabet Quick-Jump Bar */
 .index-sticky-bar {
   position: sticky !important;
-  top: 130px !important;
-  z-index: 90 !important;
+  top: 128px !important;
+  z-index: 100 !important;
   background-color: var(--header-glass-bg) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  padding: 0.85rem 1.25rem !important;
-  margin: 1rem 1rem 2.5rem 1rem !important;
-  width: calc(100% - 2rem) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  padding: 1rem 1.25rem !important;
+  margin: 1.25rem 0 2.5rem 0 !important;
+  width: 100% !important;
   box-sizing: border-box !important;
   border: 1px solid var(--border-color) !important;
   border-radius: 12px !important;
-  box-shadow: var(--elevated-shadow) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), var(--elevated-shadow) !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 0.65rem !important;
+  gap: 0.75rem !important;
 }
 
 .index-letters-container {
@@ -2036,6 +2134,26 @@ dl.index dd .block {
    Search Page (search.html)
    ========================================================================== */
 
+body.search-page .main-grid {
+  max-width: var(--max-content-width) !important;
+  margin: 0 auto !important;
+  padding: 2.5rem 1.5rem 4rem 1.5rem !important;
+  display: block !important;
+}
+
+body.search-page main {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+body.search-page h1.title {
+  font-size: 2.2rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--title-color) !important;
+  margin-bottom: 1.25rem !important;
+}
+
 .page-search-wrapper {
   display: inline-flex !important;
   align-items: center !important;
@@ -2073,20 +2191,32 @@ dl.index dd .block {
 }
 
 input#page-search-input {
+  background-color: var(--search-box-bg) !important;
+  border: 1px solid var(--search-box-border) !important;
+  border-radius: 8px !important;
+  height: 44px !important;
+  padding: 0 1rem !important;
+  width: min(100%, 480px) !important;
+  color: var(--search-input-text-color) !important;
+  font-size: 0.95rem !important;
+  font-family: var(--body-font-family) !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+}
+
+.page-search-wrapper input#page-search-input {
   background: transparent !important;
   background-image: none !important;
   background-color: transparent !important;
   border: none !important;
-  color: var(--search-input-text-color) !important;
-  font-size: 0.95rem !important;
-  font-family: var(--body-font-family) !important;
-  outline: none !important;
-  box-shadow: none !important;
+  border-radius: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
   width: 100% !important;
   height: 100% !important;
   flex: 1 1 auto !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 input#page-search-reset {
@@ -2166,6 +2296,97 @@ div.table-tabs > button[id^="result-tab-"].active-table-tab {
   border: 1px solid var(--color-primary) !important;
   color: var(--color-primary) !important;
   font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   Search Autocomplete Results Dropdown (Header Search Bar)
+   ========================================================================== */
+
+ul.ui-autocomplete {
+  position: fixed !important;
+  z-index: 999999 !important;
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  padding: 0.35rem 0 !important;
+  margin-top: 4px !important;
+  max-height: calc(90vh - 120px) !important;
+  overflow-y: auto !important;
+}
+
+.ui-autocomplete-category {
+  background-color: var(--even-row-color) !important;
+  color: var(--text-muted) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  padding: 0.55rem 1rem 0.35rem 1rem !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.ui-autocomplete > li.result-item {
+  font-family: var(--body-font-family) !important;
+  padding: 0.45rem 1rem !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  cursor: pointer !important;
+  transition: background-color 0.12s ease !important;
+}
+
+.ui-autocomplete > li.result-item:last-of-type {
+  border-bottom: none !important;
+}
+
+.ui-autocomplete > li.result-item:hover,
+.ui-autocomplete > li.result-item.ui-state-active,
+.ui-autocomplete > li.result-item .ui-state-active,
+.ui-menu .ui-state-active {
+  background-color: var(--color-primary-light) !important;
+  border-color: transparent !important;
+  margin: 0 !important;
+}
+
+.ui-autocomplete .search-result-label {
+  color: var(--color-primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.92rem !important;
+}
+
+.ui-autocomplete .search-result-desc {
+  color: var(--text-muted) !important;
+  font-size: 0.8rem !important;
+}
+
+.ui-autocomplete .result-highlight {
+  color: var(--navbar-link-hover) !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+}
+
+ul.ui-autocomplete li.ui-static-link {
+  position: sticky !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  background: var(--card-bg) !important;
+  border-top: 1px solid var(--border-color) !important;
+  padding: 0.65rem 1rem !important;
+  z-index: 1000000 !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+ul.ui-autocomplete li.ui-static-link a {
+  color: var(--color-primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  text-decoration: none !important;
+}
+
+ul.ui-autocomplete li.ui-static-link a:hover {
+  text-decoration: underline !important;
 }
 
 /* Modern Results Table Grid */
@@ -2255,11 +2476,28 @@ span.search-result-desc a:hover {
    Hierarchy & Tree Pages (overview-tree.html & package-tree.html)
    ========================================================================== */
 
-body.tree-page main,
-body.package-tree-page main {
+body.tree-page .main-grid,
+body.package-tree-page .main-grid {
+  display: block !important;
+  width: 100% !important;
   max-width: var(--max-content-width) !important;
   margin: 0 auto !important;
-  padding: 2rem 1.5rem !important;
+  padding: 1.25rem 1.5rem 4rem 1.5rem !important;
+}
+
+body.tree-page main,
+body.package-tree-page main {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.tree-page h1.title,
+body.package-tree-page h1.title {
+  margin-top: 0 !important;
+  margin-bottom: 0.75rem !important;
+  padding-top: 0 !important;
 }
 
 .package-hierarchy-label {
