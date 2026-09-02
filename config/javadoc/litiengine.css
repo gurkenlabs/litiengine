@@ -1884,21 +1884,21 @@ body.index-page main > span.vertical-separator {
 /* Sticky Alphabet Quick-Jump Bar */
 .index-sticky-bar {
   position: sticky !important;
-  top: 116px !important;
+  top: 128px !important;
   z-index: 100 !important;
   background-color: var(--header-glass-bg) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  padding: 0.85rem 1.25rem !important;
-  margin: 0.75rem 0 2rem 0 !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  padding: 1rem 1.25rem !important;
+  margin: 1.25rem 0 2.5rem 0 !important;
   width: 100% !important;
   box-sizing: border-box !important;
   border: 1px solid var(--border-color) !important;
   border-radius: 12px !important;
-  box-shadow: var(--elevated-shadow) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), var(--elevated-shadow) !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 0.65rem !important;
+  gap: 0.75rem !important;
 }
 
 .index-letters-container {
