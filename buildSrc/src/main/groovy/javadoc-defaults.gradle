@@ -68,7 +68,7 @@ void enhanceJavadocHtml(File file, File rootDir) {
   def html = file.getText("UTF-8")
   if (html.contains("<!-- liti-enhanced -->")) return
 
-  // 1. Early Head Injections (Theme script, Critical font variables & Fonts at the very top of <head> before any CSS/scripts)
+  // 1. Early Head Injections (Theme script & Critical font variables at the very top of <head> before any CSS/scripts)
   def earlyHead = """<head>
   <!-- liti-enhanced -->
   <script>(function(){try{var t=localStorage.getItem('liti-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
@@ -88,10 +88,7 @@ void enhanceJavadocHtml(File file, File rootDir) {
       font-size: var(--body-font-size);
       line-height: var(--block-line-height);
     }
-  </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=optional" rel="stylesheet">"""
+  </style>"""
   html = html.replaceFirst("<head>", earlyHead)
 
   // 2. Metadata & Favicons in <head>
