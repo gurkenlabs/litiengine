@@ -952,7 +952,7 @@ ol.sub-nav-list .current-selection {
   background-color: transparent !important;
   width: 100% !important;
   min-height: auto !important;
-  gap: 0.5rem !important;
+  gap: 0.65rem !important;
   font-size: 0 !important;
 }
 
@@ -964,18 +964,6 @@ ol.sub-nav-list .current-selection {
   letter-spacing: -0.01em !important;
   display: block !important;
   line-height: 1.3 !important;
-}
-
-.main-grid nav.toc input.filter-input {
-  font-size: 0.82rem !important;
-  width: 100% !important;
-  background-color: var(--search-box-bg) !important;
-  border: 1px solid var(--search-box-border) !important;
-  border-radius: 6px !important;
-  padding: 0.35rem 0.6rem !important;
-  color: var(--body-text-color) !important;
-  outline: none !important;
-  box-sizing: border-box !important;
 }
 
 .toc-title {
@@ -990,8 +978,8 @@ ol.sub-nav-list .current-selection {
   background-color: var(--search-box-bg) !important;
   border: 1px solid var(--search-box-border) !important;
   border-radius: 6px !important;
-  padding: 0 0.5rem 0 0.6rem !important;
-  height: 32px !important;
+  padding: 0 0.6rem !important;
+  height: 34px !important;
   width: 100% !important;
   box-sizing: border-box !important;
   transition: all 0.2s ease !important;
@@ -1007,25 +995,38 @@ ol.sub-nav-list .current-selection {
   width: 14px !important;
   height: 14px !important;
   color: var(--text-muted) !important;
-  margin-right: 0.4rem !important;
+  margin-right: 0.45rem !important;
   flex-shrink: 0 !important;
 }
 
-.filter-input {
+.toc-filter-wrapper input.filter-input {
   background: transparent !important;
+  background-color: transparent !important;
   border: none !important;
-  color: var(--search-input-text-color) !important;
-  font-size: 14.5px !important;
+  color: var(--body-text-color) !important;
+  font-size: 0.82rem !important;
   font-family: var(--body-font-family) !important;
   outline: none !important;
   box-shadow: none !important;
   padding: 0 !important;
   width: 100% !important;
+  height: 100% !important;
   flex: 1 1 auto !important;
+  box-sizing: border-box !important;
 }
 
-.filter-input::placeholder {
-  color: var(--search-input-placeholder-color) !important;
+.toc-filter-wrapper input.filter-input::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.8 !important;
+}
+
+.toc-filter-wrapper input.reset-filter {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-muted) !important;
+  cursor: pointer;
+  font-size: 0.75rem !important;
+  padding: 0 0.2rem !important;
 }
 
 .reset-filter {

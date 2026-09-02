@@ -469,12 +469,32 @@
   }
 
   function updateTocHeader() {
-    document.querySelectorAll('nav.toc').forEach(tocNav => {
-      const filterInput = tocNav.querySelector('input.filter-input');
-      if (filterInput) {
-        filterInput.setAttribute('placeholder', 'Filter');
-      }
-    });
+    try {
+      document.querySelectorAll('nav.toc').forEach(tocNav => {
+        const tocHeader = tocNav.querySelector('.toc-header');
+        if (tocHeader && !tocHeader.querySelector('.toc-filter-wrapper')) {
+          const filterInput = tocHeader.querySelector('input.filter-input');
+          if (filterInput) {
+            filterInput.setAttribute('placeholder', 'Filter');
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'toc-filter-wrapper';
+
+            const iconSpan = document.createElement('span');
+            iconSpan.innerHTML = SEARCH_SVG;
+
+            tocHeader.appendChild(wrapper);
+            wrapper.appendChild(iconSpan.firstChild);
+            wrapper.appendChild(filterInput);
+
+            const resetBtn = tocHeader.querySelector('input.reset-filter');
+            if (resetBtn) {
+              wrapper.appendChild(resetBtn);
+            }
+          }
+        }
+      });
+    } catch (e) {}
   }
 
   function initTocHighlight() {
