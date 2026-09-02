@@ -149,7 +149,8 @@ void enhanceJavadocHtml(File file, File rootDir) {
     </div>
   </div>"""
 
-    def newTopNav = """<div class="top-nav" id="navbar-top">${level1Html}${level2Html}\n</div>"""
+    def hiddenToggleBtn = '<button id="navbar-toggle-button" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation links" style="display:none;"></button>'
+    def newTopNav = """<div class="top-nav" id="navbar-top">${hiddenToggleBtn}${level1Html}${level2Html}\n</div>"""
     // Remove the old nav-list-search from sub-nav first
     html = html.replaceFirst(/(?s)<div class="nav-list-search">.*?<\/div>/, '')
     // Replace the entire top-nav block cleanly up to sub-nav
