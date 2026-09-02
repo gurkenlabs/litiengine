@@ -1713,18 +1713,21 @@ ul.tag-list li {
    ========================================================================== */
 
 footer {
-  margin-top: 2rem !important;
-  padding: 2.5rem 1.5rem !important;
+  margin-top: 3.5rem !important;
+  padding: 3rem 1.5rem !important;
   border-top: 1px solid var(--border-color) !important;
   text-align: center !important;
   color: var(--text-muted) !important;
   font-size: 0.85rem !important;
   background-color: var(--canvas-bg) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 1.25rem !important;
+  clear: both !important;
 }
 
 .md-social {

@@ -139,7 +139,18 @@ void enhanceJavadocHtml(File file, File rootDir) {
   if (tags.size() < 4) tags.add("api")
   if (tags.size() < 5) tags.add("java")
 
-  // 3. Social Footer
+  // 2. Insert Bottom Tags inside <main>
+  if (tags && html.contains("</main>")) {
+    def tagHtml = new StringBuilder('<nav class="md-tags" aria-label="Tags">')
+    tags.each { t ->
+      def cls = t == 'deprecated' ? 'md-tag md-tag--deprecated' : 'md-tag'
+      tagHtml.append("<span class=\"${cls}\">${t}</span>")
+    }
+    tagHtml.append('</nav>\n')
+    html = html.replace("</main>", tagHtml.toString() + "</main>")
+  }
+
+  // 3. Social Footer (Placed outside main-grid at bottom of page for full content + navigation width)
   def footerHtml = """
 <footer>
   <div class="md-social">
@@ -159,20 +170,11 @@ void enhanceJavadocHtml(File file, File rootDir) {
 </footer>
 """
 
-  // 4. Insert Bottom Tags BEFORE footer
-  if (tags) {
-    def tagHtml = new StringBuilder('<nav class="md-tags" aria-label="Tags">')
-    tags.each { t ->
-      def cls = t == 'deprecated' ? 'md-tag md-tag--deprecated' : 'md-tag'
-      tagHtml.append("<span class=\"${cls}\">${t}</span>")
-    }
-    tagHtml.append('</nav>\n')
-    footerHtml = tagHtml.toString() + footerHtml
-  }
+  // Remove default javadoc footer from inside main-grid
+  html = html.replaceAll(/(?s)<footer>.*?<\/footer>/, '')
 
-  if (html.contains("<footer>")) {
-    html = html.replaceAll(/(?s)<footer>.*?<\/footer>/, footerHtml)
-  } else if (html.contains("</body>")) {
+  // Place clean footer outside main-grid at bottom of page
+  if (html.contains("</body>")) {
     html = html.replace("</body>", footerHtml + "\n</body>")
   }
 
