@@ -1524,9 +1524,17 @@ div.table-tabs > .active-table-tab {
   line-height: 1.55 !important;
   overflow: visible !important;
   border-bottom: 1px solid var(--border-subtle) !important;
-  display: flex !important;
+  display: flex;
   align-items: center !important;
   word-break: break-word !important;
+}
+
+/* Ensure inline display: none applied by script.js table filtering is always respected */
+.summary-table > div[style*="display: none"],
+.summary-table > div[style*="display:none"],
+.details-table > div[style*="display: none"],
+.details-table > div[style*="display:none"] {
+  display: none !important;
 }
 
 .col-first, .col-second, .col-last, .col-constructor-name {
