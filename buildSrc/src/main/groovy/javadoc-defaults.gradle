@@ -28,6 +28,9 @@ tasks.withType(Javadoc).configureEach {
   options.header = """<a href="${engineUrl}" target="_blank" class="nav-brand-link"><b>${engineName} 🎮</b> API</a>"""
   options.bottom = """<p class="legal-copy"><small>Copyright &#169; ${copyrightText}. Released under the <a href="${mitUrl}" target="_blank">${mitName} License</a>.</small></p>"""
 
+  options.noDeprecatedList = true
+  options.noHelp = true
+
   if (themeCss.exists()) {
     options.addStringOption("-add-stylesheet", themeCss.absolutePath)
   }
@@ -108,6 +111,8 @@ void enhanceJavadocHtml(File file, File rootDir) {
   def navMatcher = (html =~ /(?s)(<ul id="navbar-top-firstrow"[^>]*>.*?<\/ul>)/)
   if (navMatcher) {
     def origNavList = navMatcher[0][1]
+    origNavList = origNavList.replaceAll(/(?s)<li>\s*<a[^>]*href="[^"]*(deprecated-list|help-doc)\.html[^"]*"[^>]*>.*?<\/li>/, '')
+    origNavList = origNavList.replaceAll(/(?s)<li class="nav-bar-cell1-rev">\s*(Deprecated|Help)\s*<\/li>/, '')
     def backlink = '<li class="nav-item-backlink"><a href="https://docs.litiengine.com/" class="nav-link-docs" title="Back to LITIENGINE Documentation"><svg class="docs-back-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Docs</span></a></li>'
     def enhancedNavList = origNavList.replaceFirst(/(<ul[^>]*>)/, "\$1\n${backlink}")
 

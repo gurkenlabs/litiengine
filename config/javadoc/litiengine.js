@@ -142,6 +142,14 @@
         header.querySelectorAll('.search-kbd').forEach(k => { k.textContent = '⌘K'; });
       }
 
+      // Remove Deprecated and Help navigation items
+      header.querySelectorAll('ul.nav-list li').forEach(li => {
+        const text = li.textContent.trim().toLowerCase();
+        if (text === 'deprecated' || text === 'help') {
+          li.remove();
+        }
+      });
+
       // If header is already baked statically into HTML, our work here is done!
       if (header.querySelector('.liti-header-level1')) return;
 

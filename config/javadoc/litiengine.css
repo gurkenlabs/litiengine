@@ -709,6 +709,12 @@ ul.nav-list li.nav-bar-cell1-rev a,
   background-color: transparent !important;
 }
 
+/* Hide Deprecated and Help navigation items */
+ul.nav-list li:has(a[href*="deprecated-list"]),
+ul.nav-list li:has(a[href*="help-doc"]) {
+  display: none !important;
+}
+
 /* Backlink to main documentation in Level 2 */
 ul.nav-list li.nav-item-backlink {
   margin-right: 0.5rem !important;
