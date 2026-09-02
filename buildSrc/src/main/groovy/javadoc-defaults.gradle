@@ -68,12 +68,17 @@ void enhanceJavadocHtml(File file, File rootDir) {
   def html = file.getText("UTF-8")
   if (html.contains("<!-- liti-enhanced -->")) return
 
-  // 1. Favicons & Fonts in <head>
-  def headAdditions = """
+  // 1. Early Head Injections (Theme script & Fonts at the very top of <head> before any CSS/scripts)
+  def earlyHead = """<head>
   <!-- liti-enhanced -->
+  <script>(function(){try{var t=localStorage.getItem('liti-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Montserrat:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">"""
+  html = html.replaceFirst("<head>", earlyHead)
+
+  // 2. Metadata & Favicons in <head>
+  def headAdditions = """
   <link rel="icon" type="image/png" sizes="32x32" href="${r}assets/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="${r}assets/favicon-16x16.png">
   <link rel="shortcut icon" href="${r}assets/favicon.ico">
@@ -100,8 +105,6 @@ void enhanceJavadocHtml(File file, File rootDir) {
   <meta name="twitter:title" content="${cleanHeading} | LITIENGINE API">
   <meta name="twitter:description" content="Official Java API reference documentation for ${cleanHeading} in the LITIENGINE 2D Game Engine.">
 """
-
-  headAdditions += """  <script>(function(){try{var t=localStorage.getItem('liti-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>\n"""
 
   if (html.contains("</head>")) {
     html = html.replace("</head>", headAdditions + "\n</head>")
