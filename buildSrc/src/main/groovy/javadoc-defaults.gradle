@@ -52,6 +52,14 @@ tasks.withType(Javadoc).configureEach {
 
     // Generation-time HTML adjustments (Favicons, Fonts, SEO/GEO metadata, Bottom Tags, and Footer)
     if (destinationDir && destinationDir.exists()) {
+      // Optimize stylesheet.css by stripping unused @import url('fonts/dejavu.css');
+      def stylesheetFile = new File(destinationDir, 'resource-files/stylesheet.css')
+      if (stylesheetFile.exists()) {
+        def css = stylesheetFile.getText('UTF-8')
+        css = css.replace("@import url('fonts/dejavu.css');", "/* dejavu.css omitted */")
+        stylesheetFile.setText(css, 'UTF-8')
+      }
+
       destinationDir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
         if (file.name.endsWith(".html")) {
           enhanceJavadocHtml(file, destinationDir)
