@@ -807,6 +807,7 @@ div.sub-nav {
   width: 100%;
 }
 
+.sub-nav:not(:has(li)),
 .sub-nav:has(.sub-nav-list:empty) {
   display: none !important;
 }
@@ -1818,10 +1819,19 @@ footer {
    Alphabetical Index Page (index-all.html)
    ========================================================================== */
 
-body.index-page main {
+body.index-page .main-grid {
+  display: block !important;
+  width: 100% !important;
   max-width: var(--max-content-width) !important;
   margin: 0 auto !important;
-  padding: 2rem 1.5rem !important;
+  padding: 1.25rem 1.5rem 4rem 1.5rem !important;
+}
+
+body.index-page main {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 body.index-page main h1 {
@@ -1829,7 +1839,8 @@ body.index-page main h1 {
   font-weight: 700 !important;
   letter-spacing: -0.02em !important;
   color: var(--title-color) !important;
-  margin-bottom: 1.5rem !important;
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important;
 }
 
 /* Raw Alphabet Jump Links (Pure CSS Fallback before JS wrapping) */
@@ -1873,14 +1884,14 @@ body.index-page main > span.vertical-separator {
 /* Sticky Alphabet Quick-Jump Bar */
 .index-sticky-bar {
   position: sticky !important;
-  top: 130px !important;
-  z-index: 90 !important;
+  top: 116px !important;
+  z-index: 100 !important;
   background-color: var(--header-glass-bg) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
   padding: 0.85rem 1.25rem !important;
-  margin: 1rem 1rem 2.5rem 1rem !important;
-  width: calc(100% - 2rem) !important;
+  margin: 0.75rem 0 2rem 0 !important;
+  width: 100% !important;
   box-sizing: border-box !important;
   border: 1px solid var(--border-color) !important;
   border-radius: 12px !important;
@@ -2323,11 +2334,28 @@ span.search-result-desc a:hover {
    Hierarchy & Tree Pages (overview-tree.html & package-tree.html)
    ========================================================================== */
 
-body.tree-page main,
-body.package-tree-page main {
+body.tree-page .main-grid,
+body.package-tree-page .main-grid {
+  display: block !important;
+  width: 100% !important;
   max-width: var(--max-content-width) !important;
   margin: 0 auto !important;
-  padding: 2rem 1.5rem !important;
+  padding: 1.25rem 1.5rem 4rem 1.5rem !important;
+}
+
+body.tree-page main,
+body.package-tree-page main {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.tree-page h1.title,
+body.package-tree-page h1.title {
+  margin-top: 0 !important;
+  margin-bottom: 0.75rem !important;
+  padding-top: 0 !important;
 }
 
 .package-hierarchy-label {

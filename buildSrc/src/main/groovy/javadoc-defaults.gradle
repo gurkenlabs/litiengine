@@ -154,6 +154,39 @@ void enhanceJavadocHtml(File file, File rootDir) {
     html = html.replaceFirst(/(?s)<div class="nav-list-search">.*?<\/div>/, '')
     // Replace the entire top-nav block cleanly up to sub-nav
     html = html.replaceFirst(/(?s)<div class="top-nav" id="navbar-top">.*?<\/div>(?=\s*<div class="sub-nav">)/, newTopNav)
+
+    // Remove empty sub-nav on pages without breadcrumbs (overview, tree, index, search, etc.)
+    html = html.replaceAll(/(?s)<div class="sub-nav">\s*<div class="nav-content">\s*<ol class="sub-nav-list">\s*<\/ol>\s*<\/div>\s*<\/div>/, '')
+
+    // Statically pre-render sticky alphabet bar on index-all.html
+    if (file.name == 'index-all.html') {
+      def jumpMatcher = (html =~ /(?s)<div class="header">\s*<h1>Index<\/h1>\s*<\/div>\s*(.*?)(?=<h2 class="title" id="I:A">)/)
+      if (jumpMatcher) {
+        def rawJump = jumpMatcher[0][1]
+        def letterLinks = []
+        def letM = (rawJump =~ /<a href="#I:[A-Z]">([A-Z])<\/a>/)
+        while (letM.find()) {
+          letterLinks.add(letM.group(0))
+        }
+        def secondaryLinks = []
+        def secM = (rawJump =~ /<a href="[^"]*?(allclasses-index|allpackages-index|constant-values|serialized-form)\.html">(.*?)<\/a>/)
+        while (secM.find()) {
+          secondaryLinks.add(secM.group(0))
+        }
+
+        def stickyBarHtml = """<div class="index-sticky-bar">
+  <div class="index-letters-container">
+    ${letterLinks.join('\n    ')}
+  </div>
+  <div class="index-secondary-container">
+    ${secondaryLinks.join('\n    ')}
+  </div>
+</div>\n"""
+
+        html = html.replace(jumpMatcher[0][0], """<div class="header"><h1>Index</h1></div>\n${stickyBarHtml}""")
+        html = html.replaceAll(/(?s)<\/dl>\s*<a href="#I:A">A<\/a>.*?<\/main>/, '</dl>\n</main>')
+      }
+    }
   }
 
   // 2. Build Contextual Tags at generation time
