@@ -55,6 +55,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -76,6 +77,7 @@ public class ViewportToolbar extends JPanel {
   private static final int DROPDOWN_BUTTON_WIDTH = 22;
   private static final int TOOLBAR_VERTICAL_PADDING = 8;
   private static final int ICON_TEXT_GAP = 5;
+  private static final int COMPACT_BUTTON_WIDTH = 32;
   static final int MAX_HISTORY_VISIBLE_ROWS = 12;
   private static final Insets BUTTON_MARGIN = new Insets(0, BUTTON_HORIZONTAL_PADDING, 0, BUTTON_HORIZONTAL_PADDING);
   private final ZoomControls zoomControls;
@@ -92,6 +94,8 @@ public class ViewportToolbar extends JPanel {
   private final JToggleButton btnCollision;
   private final List<JPanel> controlGroups = new ArrayList<>();
   private final List<JPanel> groupDividers = new ArrayList<>();
+  private final List<AbstractButton> compactableButtons = new ArrayList<>();
+  private final List<Component> mapOverflowComponents = new ArrayList<>();
   private final JButton btnRunProject;
   private final JButton btnDebugProject;
   private final JButton btnStopProject;
@@ -103,6 +107,13 @@ public class ViewportToolbar extends JPanel {
   private final JPanel mapControlsContainer;
   private final JPanel scriptControlsContainer;
   private final JPanel rightControlsContainer;
+  private final JPanel leftControlsContainer;
+  private final JComboBox<?> mapSelector;
+  private final JButton btnMoreMapActions;
+  private final Dimension expandedMapSelectorSize;
+  private boolean compactLayout;
+  private boolean overflowLayout;
+  private boolean scriptMode;
 
   public ViewportToolbar(JComboBox<?> mapSelector) {
     super(new BorderLayout());
@@ -112,11 +123,14 @@ public class ViewportToolbar extends JPanel {
 
     JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, Style.SPACE_MEDIUM, 0));
     left.setOpaque(false);
+    this.leftControlsContainer = left;
 
     JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, Style.SPACE_MEDIUM, 0));
     right.setOpaque(false);
 
-    mapSelector.setPreferredSize(new Dimension(232, Style.CONTROL_HEIGHT));
+    this.mapSelector = mapSelector;
+    this.expandedMapSelectorSize = new Dimension(232, Style.CONTROL_HEIGHT);
+    mapSelector.setPreferredSize(this.expandedMapSelectorSize);
     mapSelector.setMinimumSize(new Dimension(140, Style.CONTROL_HEIGHT));
     mapSelector.setBackground(Style.surface());
     mapSelector.setForeground(Style.text());
@@ -187,16 +201,22 @@ public class ViewportToolbar extends JPanel {
     }
     addToControlStrip(this.mapControlsContainer, toolGroup);
     this.btnUndo = button(Resources.strings().get("menu_edit_undo"), Icons.UNDO_16, () -> UndoManager.instance().undo(), shortcut(KeyEvent.VK_Z));
+    makeCompactable(this.btnUndo);
     this.btnUndoHistory = button(Resources.strings().get("toolbar_undoHistory"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(this.btnUndoHistory, DROPDOWN_BUTTON_WIDTH);
     this.btnUndoHistory.addActionListener(e -> showHistory(this.btnUndoHistory, true));
     this.btnRedo = button(Resources.strings().get("menu_edit_redo"), Icons.REDO_16, () -> UndoManager.instance().redo(), shortcut(KeyEvent.VK_Y));
+    makeCompactable(this.btnRedo);
     this.btnRedoHistory = button(Resources.strings().get("toolbar_redoHistory"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(this.btnRedoHistory, DROPDOWN_BUTTON_WIDTH);
     this.btnRedoHistory.addActionListener(e -> showHistory(this.btnRedoHistory, false));
-    addToControlStrip(this.mapControlsContainer,
-        controlGroup(splitButton(this.btnUndo, this.btnUndoHistory), splitButton(this.btnRedo, this.btnRedoHistory)));
-    addToControlStrip(this.mapControlsContainer, controlGroup(addButton()));
+    JPanel historyGroup =
+        controlGroup(splitButton(this.btnUndo, this.btnUndoHistory), splitButton(this.btnRedo, this.btnRedoHistory));
+    addToControlStrip(this.mapControlsContainer, historyGroup);
+    this.mapOverflowComponents.add(historyGroup);
+    JPanel addGroup = controlGroup(addButton());
+    addToControlStrip(this.mapControlsContainer, addGroup);
+    this.mapOverflowComponents.add(addGroup);
     this.btnCopy = button(Resources.strings().get("menu_edit_copy"), Icons.COPY_16, () -> {
       if (Editor.instance().getMapComponent() != null) {
         Editor.instance().getMapComponent().copy();
@@ -219,8 +239,13 @@ public class ViewportToolbar extends JPanel {
         Editor.instance().getMapComponent().paste();
       }
     }, shortcut(KeyEvent.VK_V));
-    addToControlStrip(this.mapControlsContainer,
-        controlGroup(this.btnCut, this.btnCopy, this.btnPaste, this.btnDelete));
+    makeCompactable(this.btnCut);
+    makeCompactable(this.btnCopy);
+    makeCompactable(this.btnPaste);
+    makeCompactable(this.btnDelete);
+    JPanel clipboardGroup = controlGroup(this.btnCut, this.btnCopy, this.btnPaste, this.btnDelete);
+    addToControlStrip(this.mapControlsContainer, clipboardGroup);
+    this.mapOverflowComponents.add(clipboardGroup);
     left.add(this.mapControlsContainer);
 
     this.scriptControlsContainer = controlStrip();
@@ -235,17 +260,21 @@ public class ViewportToolbar extends JPanel {
     JButton btnSaveScript = button("Save", Icons.SAVE_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().saveActive();
     }, null);
+    makeCompactable(btnNewScript);
+    makeCompactable(btnSaveScript);
 
     JButton btnDuplicateScript = button("Duplicate", Icons.COPY_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().duplicateActiveOrSelected();
     }, null);
     sizeLabeledButton(btnDuplicateScript);
+    makeCompactable(btnDuplicateScript);
 
     JButton btnDeleteScript = button("Delete", Icons.DELETE_16, () -> {
       if (UI.getScriptWorkspacePanel() != null) UI.getScriptWorkspacePanel().deleteActiveOrSelected();
     }, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     Style.styleButton(btnDeleteScript, Style.ButtonVariant.DESTRUCTIVE);
     sizeLabeledButton(btnDeleteScript);
+    makeCompactable(btnDeleteScript);
 
     JButton btnMoreScriptActions = button("", Icons.MISC_24, () -> {}, null);
     makeIconOnly(btnMoreScriptActions, 28);
@@ -299,7 +328,22 @@ public class ViewportToolbar extends JPanel {
     this.btnGrid = viewToggle(Resources.strings().get("toolbar_grid"), new MonochromeIcon(Icons.GRID_16), Editor.preferences().showGrid(), selected -> Editor.preferences().setShowGrid(selected), shortcut(KeyEvent.VK_G));
     this.btnSnap = viewToggle(Resources.strings().get("toolbar_snap"), new MonochromeIcon(Icons.SNAP_GRID_16), Editor.preferences().snapToGrid(), selected -> Editor.preferences().setSnapToGrid(selected), null);
     this.btnCollision = viewToggle(Resources.strings().get("toolbar_outlines"), new MonochromeIcon(Icons.COLLISIONBOX_16), Editor.preferences().renderBoundingBoxes(), selected -> Editor.preferences().setRenderBoundingBoxes(selected), shortcut(KeyEvent.VK_H));
+    makeCompactable(this.btnGrid);
+    makeCompactable(this.btnSnap);
+    makeCompactable(this.btnCollision);
     JPanel viewControls = controlGroup(this.btnGrid, this.btnSnap, this.btnCollision);
+    this.mapOverflowComponents.add(viewControls);
+
+    this.btnMoreMapActions = button("", Icons.MISC_24, () -> {}, null);
+    makeIconOnly(this.btnMoreMapActions, 28);
+    String moreMapActions = Resources.strings().get("toolbar_moreMapActions");
+    this.btnMoreMapActions.setToolTipText(moreMapActions);
+    this.btnMoreMapActions.getAccessibleContext().setAccessibleName(moreMapActions);
+    this.btnMoreMapActions.addActionListener(event ->
+      this.createMapActionsMenu().show(
+        this.btnMoreMapActions, 0, this.btnMoreMapActions.getHeight()));
+    JPanel mapOverflowGroup = controlGroup(this.btnMoreMapActions);
+    mapOverflowGroup.setVisible(false);
 
     this.zoomControls = new ZoomControls(
         () -> {
@@ -314,11 +358,23 @@ public class ViewportToolbar extends JPanel {
         Resources.strings().get("toolbar_fit"));
     this.zoomControls.setZoomText(formatZoom());
     right.add(viewControls);
+    right.add(mapOverflowGroup);
     right.add(this.zoomControls);
     this.rightControlsContainer = right;
 
-    add(left, BorderLayout.WEST);
+    add(left, BorderLayout.CENTER);
     add(right, BorderLayout.EAST);
+  }
+
+  @Override
+  public void doLayout() {
+    if (this.overflowLayout) {
+      this.applyOverflowLayout(false);
+    }
+    this.applyCompactLayout(this.getWidth() < this.expandedRequiredWidth());
+    this.applyOverflowLayout(
+        !this.scriptMode && this.compactLayout && this.getWidth() < this.compactRequiredWidth());
+    super.doLayout();
   }
 
   public void updateRunState(boolean hasProject, boolean isRunning) {
@@ -345,10 +401,16 @@ public class ViewportToolbar extends JPanel {
   }
 
   public void setScriptMode(boolean scriptMode) {
+    this.scriptMode = scriptMode;
+    if (scriptMode) {
+      this.applyOverflowLayout(false);
+    }
     this.mapSelectorContainer.setVisible(true);
     this.mapControlsContainer.setVisible(!scriptMode);
     this.scriptControlsContainer.setVisible(scriptMode);
     this.rightControlsContainer.setVisible(!scriptMode);
+    this.revalidate();
+    this.repaint();
   }
 
   JPopupMenu createScriptActionsMenu() {
@@ -376,6 +438,69 @@ public class ViewportToolbar extends JPanel {
     menu.addSeparator();
     menu.add(configure);
     menu.add(guide);
+    return menu;
+  }
+
+  JPopupMenu createMapActionsMenu() {
+    JPopupMenu menu = new JPopupMenu();
+    menu.add(actionItem(this.btnUndo));
+    menu.add(historyMenu(true));
+    menu.add(actionItem(this.btnRedo));
+    menu.add(historyMenu(false));
+    menu.addSeparator();
+
+    JMenu add = new JMenu(Resources.strings().get("toolbar_add"));
+    add.setIcon(Icons.ADD_16);
+    addCreateItems(add);
+    menu.add(add);
+    menu.addSeparator();
+
+    menu.add(actionItem(this.btnCut));
+    menu.add(actionItem(this.btnCopy));
+    menu.add(actionItem(this.btnPaste));
+    menu.add(actionItem(this.btnDelete));
+    menu.addSeparator();
+
+    menu.add(toggleItem(this.btnGrid));
+    menu.add(toggleItem(this.btnSnap));
+    menu.add(toggleItem(this.btnCollision));
+    return menu;
+  }
+
+  private static JMenu historyMenu(boolean undo) {
+    UndoManager manager = Game.world().environment() != null
+        && Game.world().environment().getMap() != null ? UndoManager.instance() : null;
+    List<UndoManager.HistoryEntry> history = manager == null
+        ? List.of()
+        : undo ? manager.getUndoHistory() : manager.getRedoHistory();
+    JMenu menu = new JMenu(Resources.strings().get(undo ? "toolbar_undoHistory" : "toolbar_redoHistory"));
+    menu.setIcon(undo ? Icons.UNDO_16 : Icons.REDO_16);
+    if (history.isEmpty()) {
+      JMenuItem empty = new JMenuItem(Resources.strings().get(
+          undo ? "history_nothingToUndo" : "history_nothingToRedo"));
+      empty.setEnabled(false);
+      menu.add(empty);
+      return menu;
+    }
+
+    for (int index = 0; index < history.size(); index++) {
+      int operations = index + 1;
+      String label = Resources.strings().get(
+          undo ? "history_undoEntry" : "history_redoEntry", history.get(index).description());
+      if (operations > 1) {
+        label = Resources.strings().get(
+            "history_multipleOperations", label, Integer.toString(operations));
+      }
+      JMenuItem item = new JMenuItem(label);
+      item.addActionListener(event -> {
+        if (undo) {
+          manager.undo(operations);
+        } else {
+          manager.redo(operations);
+        }
+      });
+      menu.add(item);
+    }
     return menu;
   }
 
@@ -481,6 +606,7 @@ public class ViewportToolbar extends JPanel {
 
   private JPanel addButton() {
     JButton main = button(Resources.strings().get("toolbar_add"), Icons.ADD_16, () -> {});
+    makeCompactable(main);
     JButton arrow = button(Resources.strings().get("toolbar_addMenu"), new DropdownArrowIcon(), () -> {});
     makeIconOnly(arrow, DROPDOWN_BUTTON_WIDTH);
     main.addActionListener(e -> createAddPopup().show(main, 0, main.getHeight()));
@@ -505,6 +631,7 @@ public class ViewportToolbar extends JPanel {
       styleToggle(button);
       button.repaint();
     }));
+    makeCompactable(button);
     return button;
   }
 
@@ -751,24 +878,47 @@ public class ViewportToolbar extends JPanel {
 
   private static JPopupMenu createAddPopup() {
     JPopupMenu popup = new JPopupMenu();
-    addCreateItem(popup, Resources.strings().get("menu_add_prop"), Icons.PROP_16, MapObjectType.PROP, KeyEvent.VK_1);
-    addCreateItem(popup, Resources.strings().get("menu_add_creature"), Icons.CREATURE_16, MapObjectType.CREATURE, KeyEvent.VK_2);
-    addCreateItem(popup, Resources.strings().get("menu_add_collisionbox"), Icons.COLLISIONBOX_16, MapObjectType.COLLISIONBOX, KeyEvent.VK_3);
-    addCreateItem(popup, Resources.strings().get("menu_add_trigger"), Icons.TRIGGER_16, MapObjectType.TRIGGER, KeyEvent.VK_4);
-    addCreateItem(popup, Resources.strings().get("menu_add_spawnpoint"), Icons.SPAWNPOINT_16, MapObjectType.SPAWNPOINT, KeyEvent.VK_5);
-    addCreateItem(popup, Resources.strings().get("menu_add_area"), Icons.MAPAREA_16, MapObjectType.AREA, KeyEvent.VK_6);
-    addCreateItem(popup, Resources.strings().get("menu_add_light"), Icons.BULB_16, MapObjectType.LIGHTSOURCE, KeyEvent.VK_7);
-    addCreateItem(popup, Resources.strings().get("menu_add_shadow"), Icons.SHADOWBOX_16, MapObjectType.STATICSHADOW, KeyEvent.VK_8);
-    addCreateItem(popup, Resources.strings().get("menu_add_emitter"), Icons.EMITTER_16, MapObjectType.EMITTER, KeyEvent.VK_9);
-    addCreateItem(popup, Resources.strings().get("menu_add_soundsource"), Icons.SOUND_16, MapObjectType.SOUNDSOURCE, KeyEvent.VK_0);
+    addCreateItems(popup);
     return popup;
   }
 
-  private static void addCreateItem(JPopupMenu popup, String text, javax.swing.Icon icon, MapObjectType type, int keyCode) {
+  private static void addCreateItems(java.awt.Container menu) {
+    addCreateItem(menu, Resources.strings().get("menu_add_prop"), Icons.PROP_16, MapObjectType.PROP, KeyEvent.VK_1);
+    addCreateItem(menu, Resources.strings().get("menu_add_creature"), Icons.CREATURE_16, MapObjectType.CREATURE, KeyEvent.VK_2);
+    addCreateItem(menu, Resources.strings().get("menu_add_collisionbox"), Icons.COLLISIONBOX_16, MapObjectType.COLLISIONBOX, KeyEvent.VK_3);
+    addCreateItem(menu, Resources.strings().get("menu_add_trigger"), Icons.TRIGGER_16, MapObjectType.TRIGGER, KeyEvent.VK_4);
+    addCreateItem(menu, Resources.strings().get("menu_add_spawnpoint"), Icons.SPAWNPOINT_16, MapObjectType.SPAWNPOINT, KeyEvent.VK_5);
+    addCreateItem(menu, Resources.strings().get("menu_add_area"), Icons.MAPAREA_16, MapObjectType.AREA, KeyEvent.VK_6);
+    addCreateItem(menu, Resources.strings().get("menu_add_light"), Icons.BULB_16, MapObjectType.LIGHTSOURCE, KeyEvent.VK_7);
+    addCreateItem(menu, Resources.strings().get("menu_add_shadow"), Icons.SHADOWBOX_16, MapObjectType.STATICSHADOW, KeyEvent.VK_8);
+    addCreateItem(menu, Resources.strings().get("menu_add_emitter"), Icons.EMITTER_16, MapObjectType.EMITTER, KeyEvent.VK_9);
+    addCreateItem(menu, Resources.strings().get("menu_add_soundsource"), Icons.SOUND_16, MapObjectType.SOUNDSOURCE, KeyEvent.VK_0);
+  }
+
+  private static void addCreateItem(java.awt.Container menu, String text, javax.swing.Icon icon,
+      MapObjectType type, int keyCode) {
     JMenuItem item = new JMenuItem(text, icon);
     item.setAccelerator(KeyStroke.getKeyStroke(keyCode, InputEvent.CTRL_DOWN_MASK));
     item.addActionListener(e -> AddMenu.setCreateMode(type));
-    popup.add(item);
+    menu.add(item);
+  }
+
+  private static JMenuItem actionItem(AbstractButton source) {
+    String label = (String) source.getClientProperty("Editor.expandedToolbarText");
+    JMenuItem item = new JMenuItem(label != null ? label : source.getAccessibleContext().getAccessibleName(), source.getIcon());
+    item.setEnabled(source.isEnabled());
+    item.addActionListener(event -> source.doClick());
+    return item;
+  }
+
+  private static JCheckBoxMenuItem toggleItem(JToggleButton source) {
+    String label = (String) source.getClientProperty("Editor.expandedToolbarText");
+    JCheckBoxMenuItem item = new JCheckBoxMenuItem(
+        label != null ? label : source.getAccessibleContext().getAccessibleName(), source.isSelected());
+    item.setIcon(source.getIcon());
+    item.setEnabled(source.isEnabled());
+    item.addActionListener(event -> source.doClick());
+    return item;
   }
 
   private JButton button(String text, javax.swing.Icon icon, Runnable action) {
@@ -862,6 +1012,94 @@ public class ViewportToolbar extends JPanel {
     button.setText(null);
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setPreferredSize(new Dimension(width, BUTTON_SIZE.height));
+  }
+
+  private void makeCompactable(AbstractButton button) {
+    if (button.getText() == null || button.getText().isEmpty()) {
+      return;
+    }
+    button.putClientProperty("Editor.expandedToolbarText", button.getText());
+    button.putClientProperty("Editor.expandedToolbarSize", button.getPreferredSize());
+    this.compactableButtons.add(button);
+  }
+
+  private void applyCompactLayout(boolean compact) {
+    if (this.compactLayout == compact) {
+      return;
+    }
+    this.compactLayout = compact;
+    this.mapSelector.setPreferredSize(compact
+        ? new Dimension(140, Style.CONTROL_HEIGHT)
+        : this.expandedMapSelectorSize);
+    for (AbstractButton button : this.compactableButtons) {
+      String text = (String) button.getClientProperty("Editor.expandedToolbarText");
+      Dimension expandedSize = (Dimension) button.getClientProperty("Editor.expandedToolbarSize");
+      button.setText(compact ? null : text);
+      button.setMargin(compact ? new Insets(0, 0, 0, 0) : BUTTON_MARGIN);
+      Dimension size = compact ? new Dimension(COMPACT_BUTTON_WIDTH, BUTTON_SIZE.height) : expandedSize;
+      button.setPreferredSize(size);
+      button.setMinimumSize(size);
+      button.setMaximumSize(size);
+    }
+  }
+
+  private void applyOverflowLayout(boolean overflow) {
+    if (this.overflowLayout == overflow) {
+      return;
+    }
+    this.overflowLayout = overflow;
+    for (Component component : this.mapOverflowComponents) {
+      component.setVisible(!overflow);
+    }
+    this.btnMoreMapActions.getParent().setVisible(overflow);
+  }
+
+  private int compactRequiredWidth() {
+    return this.leftControlsContainer.getPreferredSize().width
+        + visiblePreferredWidth(this.rightControlsContainer)
+        + Style.SPACE_MEDIUM;
+  }
+
+  private int expandedRequiredWidth() {
+    int width = this.leftControlsContainer.getPreferredSize().width
+        + visiblePreferredWidth(this.rightControlsContainer)
+        + Style.SPACE_MEDIUM;
+    if (!this.compactLayout) {
+      return width;
+    }
+
+    width += this.expandedMapSelectorSize.width - this.mapSelector.getPreferredSize().width;
+    for (AbstractButton button : this.compactableButtons) {
+      if (!isVisibleInToolbar(button)) {
+        continue;
+      }
+      Dimension expandedSize = (Dimension) button.getClientProperty("Editor.expandedToolbarSize");
+      width += Math.max(0, expandedSize.width - button.getPreferredSize().width);
+    }
+    return width;
+  }
+
+  private static int visiblePreferredWidth(Component component) {
+    return component.isVisible() ? component.getPreferredSize().width : 0;
+  }
+
+  private boolean isVisibleInToolbar(Component component) {
+    Component current = component;
+    while (current != null && current != this) {
+      if (!current.isVisible()) {
+        return false;
+      }
+      current = current.getParent();
+    }
+    return current == this;
+  }
+
+  boolean isCompactLayout() {
+    return this.compactLayout;
+  }
+
+  boolean isOverflowLayout() {
+    return this.overflowLayout;
   }
 
   private JPanel controlGroup(java.awt.Component... components) {
