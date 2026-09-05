@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gurkenlabs.utiliti.model.KeyBindings.Command;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.KeyStroke;
 import org.junit.jupiter.api.Test;
 
 class SettingsDialogTest {
@@ -63,7 +66,29 @@ class SettingsDialogTest {
     assertTrue(SettingsDialog.matchesKeymap(Command.SCRIPT_SAVE, Command.SCRIPT_SAVE.defaultKeyStroke(), "save"));
     assertTrue(SettingsDialog.matchesKeymap(Command.DEBUG_PROJECT, Command.DEBUG_PROJECT.defaultKeyStroke(), "f9"));
     assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, Command.SAVE_PROJECT.defaultKeyStroke(), "ctrl+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, Command.SAVE_PROJECT.defaultKeyStroke(), "cmd+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, Command.SAVE_PROJECT.defaultKeyStroke(), "command+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, Command.SAVE_PROJECT.defaultKeyStroke(), "ctrl s"));
     assertFalse(SettingsDialog.matchesKeymap(Command.UNDO, Command.UNDO.defaultKeyStroke(), "nonexistentqueryxyz"));
+  }
+
+  @Test
+  void keymapSearchSupportsMacAndWindowsShortcutsAcrossPlatforms() {
+    KeyStroke macSave = KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_DOWN_MASK);
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, macSave, "ctrl+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, macSave, "cmd+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, macSave, "command+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, macSave, "ctrl s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, macSave, "ctrl"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, macSave, "cmd"));
+
+    KeyStroke winSave = KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK);
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, winSave, "ctrl+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, winSave, "cmd+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, winSave, "command+s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, winSave, "ctrl s"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, winSave, "ctrl"));
+    assertTrue(SettingsDialog.matchesKeymap(Command.SAVE_PROJECT, winSave, "cmd"));
   }
 
   @Test

@@ -38,6 +38,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -572,9 +573,9 @@ public final class SettingsDialog extends JDialog {
 
     int matchCount = 0;
     for (int row = 0; row < this.keymapModel.getRowCount(); row++) {
-      String action = this.keymapModel.getValueAt(row, 0).toString().toLowerCase(Locale.ROOT);
-      String shortcut = this.keymapModel.getValueAt(row, 1).toString().toLowerCase(Locale.ROOT);
-      if (action.contains(query) || shortcut.contains(query)) {
+      Command command = this.keymapModel.commands.get(row);
+      KeyStroke binding = this.keymapModel.bindingAt(row);
+      if (matchesKeymap(command, binding, query)) {
         matchCount++;
       }
     }
@@ -583,9 +584,10 @@ public final class SettingsDialog extends JDialog {
       this.keymapSorter.setRowFilter(new RowFilter<>() {
         @Override
         public boolean include(Entry<? extends KeymapTableModel, ? extends Integer> entry) {
-          String action = entry.getStringValue(0).toLowerCase(Locale.ROOT);
-          String shortcut = entry.getStringValue(1).toLowerCase(Locale.ROOT);
-          return action.contains(query) || shortcut.contains(query);
+          int row = entry.getIdentifier();
+          Command command = keymapModel.commands.get(row);
+          KeyStroke binding = keymapModel.bindingAt(row);
+          return matchesKeymap(command, binding, query);
         }
       });
     }
@@ -934,17 +936,20 @@ public final class SettingsDialog extends JDialog {
         JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       String text = value != null ? value.toString() : "";
-      if (!currentSearchQuery.isEmpty() && text.toLowerCase(Locale.ROOT).contains(currentSearchQuery)) {
+      int modelRow = table.convertRowIndexToModel(row);
+      Command command = keymapModel.commands.get(modelRow);
+      KeyStroke binding = keymapModel.bindingAt(modelRow);
+      boolean rowMatches = !currentSearchQuery.isEmpty() && matchesKeymap(command, binding, currentSearchQuery);
+      if (rowMatches && text.toLowerCase(Locale.ROOT).contains(currentSearchQuery)) {
         this.setText(highlightHtml(text, currentSearchQuery));
-        if (!isSelected) {
-          Color accent = Style.accent();
-          this.setBackground(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 26));
-        }
       } else {
         this.setText(text);
-        if (!isSelected) {
-          this.setBackground(null);
-        }
+      }
+      if (rowMatches && !isSelected) {
+        Color accent = Style.accent();
+        this.setBackground(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 26));
+      } else if (!isSelected) {
+        this.setBackground(null);
       }
       this.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
       return c;
@@ -1539,8 +1544,84 @@ public final class SettingsDialog extends JDialog {
     }
     String q = query.strip().toLowerCase(Locale.ROOT);
     String action = text(command.resourceKey()).toLowerCase(Locale.ROOT);
-    String shortcut = binding != null ? KeyBindings.format(binding).toLowerCase(Locale.ROOT) : "";
-    return action.contains(q) || shortcut.contains(q) || command.name().toLowerCase(Locale.ROOT).contains(q);
+    if (action.contains(q) || command.name().toLowerCase(Locale.ROOT).contains(q)) {
+      return true;
+    }
+    if (binding == null) {
+      return false;
+    }
+    String shortcut = KeyBindings.format(binding).toLowerCase(Locale.ROOT);
+    if (shortcut.contains(q)) {
+      return true;
+    }
+    return matchesShortcutAliases(binding, shortcut, q);
+  }
+
+  static boolean matchesShortcutAliases(KeyStroke binding, String formattedShortcut, String query) {
+    if (binding == null || formattedShortcut == null || formattedShortcut.isEmpty()) {
+      return false;
+    }
+    List<String> variants = new ArrayList<>();
+    variants.add(formattedShortcut);
+
+    // Expand Mac modifier symbols to text
+    String withWords = formattedShortcut
+        .replace("⌘", "cmd")
+        .replace("⌥", "alt")
+        .replace("⇧", "shift")
+        .replace("⌃", "ctrl");
+    variants.add(withWords);
+    variants.add(withWords.replace("cmd", "ctrl"));
+    variants.add(withWords.replace("cmd", "command"));
+    variants.add(withWords.replace("alt", "option"));
+
+    if (formattedShortcut.contains("ctrl")) {
+      variants.add(formattedShortcut.replace("ctrl", "cmd"));
+      variants.add(formattedShortcut.replace("ctrl", "command"));
+      variants.add(formattedShortcut.replace("ctrl", "control"));
+    }
+    if (formattedShortcut.contains("meta")) {
+      variants.add(formattedShortcut.replace("meta", "cmd"));
+      variants.add(formattedShortcut.replace("meta", "ctrl"));
+      variants.add(formattedShortcut.replace("meta", "command"));
+    }
+
+    for (String variant : variants) {
+      if (variant.contains(query)) {
+        return true;
+      }
+    }
+
+    // Match individual tokens (e.g. user typed "ctrl s" or "cmd s" or "shift f9")
+    int modifiers = binding.getModifiers();
+    boolean hasCtrlOrMeta = (modifiers & (InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK)) != 0;
+    boolean hasShift = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
+    boolean hasAlt = (modifiers & InputEvent.ALT_DOWN_MASK) != 0;
+    String keyText = binding.getKeyCode() != 0
+        ? KeyEvent.getKeyText(binding.getKeyCode()).toLowerCase(Locale.ROOT)
+        : Character.toString(binding.getKeyChar()).toLowerCase(Locale.ROOT);
+
+    String cleanQuery = query.replace("+", " ").replace("-", " ").strip();
+    String[] queryTokens = cleanQuery.split("\\s+");
+    boolean allTokensMatch = queryTokens.length > 0;
+    for (String token : queryTokens) {
+      boolean tokenMatches = false;
+      if (token.equals(keyText)) {
+        tokenMatches = true;
+      } else if (hasCtrlOrMeta && (token.equals("ctrl") || token.equals("control")
+          || token.equals("cmd") || token.equals("command") || token.equals("meta") || token.equals("⌘"))) {
+        tokenMatches = true;
+      } else if (hasShift && (token.equals("shift") || token.equals("⇧"))) {
+        tokenMatches = true;
+      } else if (hasAlt && (token.equals("alt") || token.equals("option") || token.equals("opt") || token.equals("⌥"))) {
+        tokenMatches = true;
+      }
+      if (!tokenMatches) {
+        allTokensMatch = false;
+        break;
+      }
+    }
+    return allTokensMatch;
   }
 
   private enum LocaleOption {
