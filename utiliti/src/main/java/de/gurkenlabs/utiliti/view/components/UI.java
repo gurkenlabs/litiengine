@@ -38,6 +38,7 @@ import de.gurkenlabs.utiliti.controller.tool.TerrainBrushTool;
 import de.gurkenlabs.utiliti.controller.tool.ToolManager;
 import de.gurkenlabs.utiliti.model.Style;
 import de.gurkenlabs.utiliti.model.Style.Theme;
+import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
 import de.gurkenlabs.utiliti.view.menus.CanvasPopupMenu;
 import de.gurkenlabs.utiliti.view.menus.MainMenuBar;
 import java.awt.AWTEvent;
@@ -207,9 +208,12 @@ public final class UI {
   }
 
   public static boolean showRevertWarning() {
-    int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_revertChangesMessage"),
-        Resources.strings().get("hud_revertChanges"), JOptionPane.YES_NO_OPTION);
-    return n == JOptionPane.YES_OPTION;
+    return ConfirmDialog.showDestructive(
+      Resources.strings().get("hud_revertChangesTitle"),
+      Resources.strings().get("hud_revertChangesPrompt") + "\n"
+        + Resources.strings().get("hud_revertChangesDescription"),
+      Resources.strings().get("hud_revert"),
+      Icons.UNDO_24);
   }
 
   public static synchronized void init() {

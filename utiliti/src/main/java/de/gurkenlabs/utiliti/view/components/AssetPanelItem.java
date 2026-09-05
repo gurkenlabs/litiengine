@@ -18,6 +18,8 @@ import de.gurkenlabs.utiliti.controller.tool.AssetFileExporter;
 import de.gurkenlabs.utiliti.controller.tool.AssetTransferable;
 import de.gurkenlabs.utiliti.model.Icons;
 import de.gurkenlabs.utiliti.model.Style;
+import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
+import de.gurkenlabs.utiliti.view.dialogs.ExportFormatDialog;
 import de.gurkenlabs.utiliti.view.dialogs.XmlExportDialog;
 import de.gurkenlabs.utiliti.view.menus.AssetPanelItemPopupMenu;
 import java.awt.BasicStroke;
@@ -811,7 +813,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   private boolean confirmDelete(String assetType, String assetName) {
-    return JOptionPane.OK_OPTION == getDeleteDialog(assetType, assetName);
+    return getDeleteDialog(assetType, assetName);
   }
 
   public void addEntity() {
@@ -876,18 +878,15 @@ public class AssetPanelItem extends JPanel {
     }
 
     ImageFormat format = sprite.getImageFormat() != ImageFormat.UNSUPPORTED ? sprite.getImageFormat() : ImageFormat.PNG;
-    Object[] options = {".xml", format.toFileExtension()};
+    ExportFormatDialog.Format answer = ExportFormatDialog.choose(
+      Resources.strings().get("contextmenu_resource_export_spritesheet"),
+      Resources.strings().get("assetpanel_export_format_prompt"),
+      format.toFileExtension());
 
-    int answer =
-      JOptionPane.showOptionDialog(Game.window().getRenderComponent(),
-        Resources.strings().get("assetpanel_export_format_prompt"),
-        Resources.strings().get("contextmenu_resource_export_spritesheet"), JOptionPane.DEFAULT_OPTION,
-        JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-
-    if (answer == 0) {
+    if (answer == ExportFormatDialog.Format.XML) {
       XmlExportDialog.export(spritesheetResource, Resources.strings().get("panel_spritesheet"),
           AssetFileExporter.safeFileName(spritesheetResource.getName()));
-    } else if (answer == 1) {
+    } else if (answer == ExportFormatDialog.Format.IMAGE) {
       exportImage(sprite, format, AssetFileExporter.safeFileName(spritesheetResource.getName()));
     }
   }
@@ -1007,11 +1006,12 @@ public class AssetPanelItem extends JPanel {
       && Editor.instance().getGameFile().getScripts().stream().anyMatch(candidate -> candidate == definition);
   }
 
-  private static int getDeleteDialog(String assetType, String assetName) {
-    return JOptionPane.showConfirmDialog(Game.window().getRenderComponent(),
+  private static boolean getDeleteDialog(String assetType, String assetName) {
+    return ConfirmDialog.showDestructive(
+      Resources.strings().get(String.format("assetpanel_confirmdelete_%s_title", assetType)),
       Resources.strings().get(String.format("assetpanel_confirmdelete_%s", assetType), assetName),
-      Resources.strings().get(String.format("assetpanel_confirmdelete_%s_title", assetType)), JOptionPane.YES_NO_OPTION,
-      JOptionPane.QUESTION_MESSAGE);
+      Resources.strings().get("menu_edit_delete"),
+      Icons.DELETE_24);
   }
 
   private void updateButtonVisibility(boolean visible) {
