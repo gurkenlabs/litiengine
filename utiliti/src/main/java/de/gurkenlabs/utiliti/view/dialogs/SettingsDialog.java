@@ -27,6 +27,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -34,7 +35,10 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -47,7 +51,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.swing.AbstractCellEditor;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
@@ -76,6 +79,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.RowFilter;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -89,11 +93,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableRowSorter;
 
 /** Application settings for utiLITI. */
 public final class SettingsDialog extends JDialog {
   private static final int DIALOG_WIDTH = 1280;
   private static final int DIALOG_HEIGHT = 800;
+  private static final String EMPTY_CARD = "__EMPTY__";
 
   private final UserPreferences preferences = Editor.preferences();
   private final JComboBox<LocaleOption> language;
@@ -117,6 +123,15 @@ public final class SettingsDialog extends JDialog {
   private Color gridColor;
   private final KeymapTableModel keymapModel;
   private final JLabel restartNotice;
+  private final CardLayout contentCards = new CardLayout();
+  private final JPanel contentPanel = new JPanel(this.contentCards);
+  private final DefaultListModel<Category> categoryModel = new DefaultListModel<>();
+  private final JList<Category> categoryList = new JList<>(this.categoryModel);
+  private final List<SettingItem> settingItems = new ArrayList<>();
+  private final Map<Category, Integer> matchCounts = new EnumMap<>(Category.class);
+  private String currentSearchQuery = "";
+  private TableRowSorter<KeymapTableModel> keymapSorter;
+  private JLabel emptySearchDescription;
 
   private enum LogLevelOption {
     INFO("INFO (Default - Clean User Logs)"),
@@ -276,27 +291,34 @@ public final class SettingsDialog extends JDialog {
     int height = Math.min(DIALOG_HEIGHT, screen.height);
     this.setMinimumSize(new Dimension(Math.min(900, width), Math.min(620, height)));
     this.setSize(width, height);
-    this.addWindowListener(new WindowAdapter() {
-      @Override public void windowClosed(WindowEvent event) {
-        Point location = getLocation();
-        preferences.setSettingsDialogX(location.x);
-        preferences.setSettingsDialogY(location.y);
-        Game.config().save();
-      }
-    });
   }
 
   public static void show(Component owner) {
-    Window window = owner == null ? null : SwingUtilities.getWindowAncestor(owner);
+    Window window = owner instanceof Window win ? win : (owner == null ? null : SwingUtilities.getWindowAncestor(owner));
     SettingsDialog dialog = new SettingsDialog(window);
-    int x = dialog.preferences.getSettingsDialogX();
-    int y = dialog.preferences.getSettingsDialogY();
-    if (isVisibleOnScreen(x, y, dialog.getWidth(), dialog.getHeight())) {
-      dialog.setLocation(x, y);
-    } else {
-      dialog.setLocationRelativeTo(owner);
-    }
+    dialog.setLocationRelativeTo(window);
+    clampToScreen(dialog);
     dialog.setVisible(true);
+  }
+
+  static void clampToScreen(Window window) {
+    if (GraphicsEnvironment.isHeadless()) {
+      return;
+    }
+    GraphicsConfiguration gc = window.getGraphicsConfiguration();
+    Rectangle bounds = gc != null
+        ? gc.getBounds()
+        : GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+    Insets insets = gc != null
+        ? Toolkit.getDefaultToolkit().getScreenInsets(gc)
+        : new Insets(0, 0, 0, 0);
+    int minX = bounds.x + insets.left;
+    int minY = bounds.y + insets.top;
+    int maxX = bounds.x + bounds.width - insets.right - window.getWidth();
+    int maxY = bounds.y + bounds.height - insets.bottom - window.getHeight();
+    int x = maxX >= minX ? Math.max(minX, Math.min(window.getX(), maxX)) : minX;
+    int y = maxY >= minY ? Math.max(minY, Math.min(window.getY(), maxY)) : minY;
+    window.setLocation(x, y);
   }
 
   static boolean isVisibleOnScreen(int x, int y, int width, int height) {
@@ -317,30 +339,14 @@ public final class SettingsDialog extends JDialog {
     root.setBackground(Style.background());
     root.setBorder(BorderFactory.createEmptyBorder(18, 18, 14, 18));
 
-    CardLayout cards = new CardLayout();
-    JPanel content = new JPanel(cards);
-    content.setOpaque(false);
-    content.setBorder(BorderFactory.createEmptyBorder(0, 28, 0, 0));
-    content.add(scrollable(this.createAppearancePanel()), Category.APPEARANCE.name());
-    content.add(scrollable(this.createGeneralPanel()), Category.GENERAL.name());
-    content.add(scrollable(this.createGridPanel()), Category.GRID.name());
-    content.add(scrollable(this.createKeymapPanel()), Category.KEYMAP.name());
-    content.add(scrollable(this.createMcpPanel()), Category.MCP.name());
-
-    DefaultListModel<Category> categoryModel = new DefaultListModel<>();
-    for (Category category : Category.values()) {
-      categoryModel.addElement(category);
-    }
-    JList<Category> categoryList = new JList<>(categoryModel);
-    categoryList.setOpaque(false);
-    categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    categoryList.setFixedCellHeight(68);
-    categoryList.setCellRenderer(new CategoryRenderer());
-    categoryList.addListSelectionListener(event -> {
-      if (!event.getValueIsAdjusting() && categoryList.getSelectedValue() != null) {
-        cards.show(content, categoryList.getSelectedValue().name());
-      }
-    });
+    this.settingItems.clear();
+    this.contentPanel.setOpaque(false);
+    this.contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 28, 0, 0));
+    this.contentPanel.add(scrollable(this.createAppearancePanel()), Category.APPEARANCE.name());
+    this.contentPanel.add(scrollable(this.createGeneralPanel()), Category.GENERAL.name());
+    this.contentPanel.add(scrollable(this.createGridPanel()), Category.GRID.name());
+    this.contentPanel.add(scrollable(this.createKeymapPanel()), Category.KEYMAP.name());
+    this.contentPanel.add(scrollable(this.createMcpPanel()), Category.MCP.name());
 
     JTextField search = new JTextField() {
       @Override public void updateUI() {
@@ -354,6 +360,22 @@ public final class SettingsDialog extends JDialog {
         // The parent search box owns the only visible border.
       }
     };
+    this.contentPanel.add(this.createEmptyStatePanel(search), EMPTY_CARD);
+
+    this.categoryModel.clear();
+    for (Category category : Category.values()) {
+      this.categoryModel.addElement(category);
+    }
+    this.categoryList.setOpaque(false);
+    this.categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.categoryList.setFixedCellHeight(68);
+    this.categoryList.setCellRenderer(new CategoryRenderer());
+    this.categoryList.addListSelectionListener(event -> {
+      if (!event.getValueIsAdjusting() && this.categoryList.getSelectedValue() != null) {
+        this.contentCards.show(this.contentPanel, this.categoryList.getSelectedValue().name());
+      }
+    });
+
     String searchPlaceholder = text("settings_search");
     search.putClientProperty(DarkTextUI.KEY_DEFAULT_TEXT, searchPlaceholder);
     search.setToolTipText(searchPlaceholder);
@@ -362,22 +384,9 @@ public final class SettingsDialog extends JDialog {
     search.setOpaque(false);
     search.putClientProperty("JComponent.outline", "none");
     search.getDocument().addDocumentListener(new DocumentListener() {
-      @Override public void insertUpdate(DocumentEvent event) { filter(); }
-      @Override public void removeUpdate(DocumentEvent event) { filter(); }
-      @Override public void changedUpdate(DocumentEvent event) { filter(); }
-
-      private void filter() {
-        String query = search.getText().strip().toLowerCase(Locale.ROOT);
-        categoryModel.clear();
-        for (Category category : Category.values()) {
-          if (category.searchText().contains(query)) {
-            categoryModel.addElement(category);
-          }
-        }
-        if (!categoryModel.isEmpty()) {
-          categoryList.setSelectedIndex(0);
-        }
-      }
+      @Override public void insertUpdate(DocumentEvent event) { filter(search.getText()); }
+      @Override public void removeUpdate(DocumentEvent event) { filter(search.getText()); }
+      @Override public void changedUpdate(DocumentEvent event) { filter(search.getText()); }
     });
     RoundedSearchBox searchBox = new RoundedSearchBox(search, 0);
     searchBox.getClearButton().addActionListener(event -> search.setText(""));
@@ -388,7 +397,7 @@ public final class SettingsDialog extends JDialog {
     navigation.setBackground(Style.background());
     navigation.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Style.border()));
     navigation.add(searchBox, BorderLayout.NORTH);
-    JScrollPane categoryScroll = new JScrollPane(categoryList);
+    JScrollPane categoryScroll = new JScrollPane(this.categoryList);
     categoryScroll.setOpaque(false);
     categoryScroll.getViewport().setOpaque(false);
     categoryScroll.setBorder(null);
@@ -397,7 +406,7 @@ public final class SettingsDialog extends JDialog {
     navigation.add(this.createSupportCard(), BorderLayout.SOUTH);
 
     root.add(navigation, BorderLayout.WEST);
-    root.add(content, BorderLayout.CENTER);
+    root.add(this.contentPanel, BorderLayout.CENTER);
     root.add(this.createFooter(), BorderLayout.SOUTH);
     root.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
         KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK), "focusSearch");
@@ -407,7 +416,8 @@ public final class SettingsDialog extends JDialog {
         search.selectAll();
       }
     });
-    categoryList.setSelectedValue(Category.APPEARANCE, true);
+    this.categoryList.setSelectedValue(Category.APPEARANCE, true);
+    this.contentCards.show(this.contentPanel, Category.APPEARANCE.name());
     return root;
   }
 
@@ -443,20 +453,285 @@ public final class SettingsDialog extends JDialog {
     return card;
   }
 
+  private JPanel createEmptyStatePanel(JTextField search) {
+    JPanel panel = new JPanel(new GridBagLayout());
+    panel.setOpaque(false);
+    JPanel card = new RoundedSurfacePanel(new BorderLayout(0, 16));
+    card.setBorder(BorderFactory.createEmptyBorder(32, 40, 32, 40));
+    JLabel icon = new JLabel(Icons.SEARCH_16);
+    icon.setHorizontalAlignment(SwingConstants.CENTER);
+    card.add(icon, BorderLayout.NORTH);
+
+    JPanel copy = new JPanel();
+    copy.setOpaque(false);
+    copy.setLayout(new BoxLayout(copy, BoxLayout.Y_AXIS));
+    JLabel title = new JLabel(text("settings_no_results"));
+    title.setFont(title.getFont().deriveFont(Font.BOLD, 17f));
+    title.setAlignmentX(Component.CENTER_ALIGNMENT);
+    this.emptySearchDescription = new JLabel();
+    this.emptySearchDescription.setForeground(Style.mutedText());
+    this.emptySearchDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    copy.add(title);
+    copy.add(Box.createRigidArea(new Dimension(0, 8)));
+    copy.add(this.emptySearchDescription);
+    card.add(copy, BorderLayout.CENTER);
+
+    JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    actions.setOpaque(false);
+    JButton clearButton = new JButton(text("settings_clear_search"), Icons.CLEAR_CONSOLE_16);
+    clearButton.addActionListener(e -> search.setText(""));
+    actions.add(clearButton);
+    card.add(actions, BorderLayout.SOUTH);
+
+    panel.add(card);
+    return panel;
+  }
+
+  private void filter(String rawQuery) {
+    this.currentSearchQuery = rawQuery == null ? "" : rawQuery.strip().toLowerCase(Locale.ROOT);
+    this.matchCounts.clear();
+
+    for (Category category : Category.values()) {
+      int matches;
+      if (category == Category.KEYMAP) {
+        matches = this.updateKeymap(this.currentSearchQuery);
+      } else {
+        matches = this.updateSettingRows(category, this.currentSearchQuery);
+      }
+      this.matchCounts.put(category, matches);
+    }
+
+    Category previousSelection = this.categoryList.getSelectedValue();
+    this.categoryModel.clear();
+    for (Category category : Category.values()) {
+      if (this.currentSearchQuery.isEmpty() || this.matchCounts.getOrDefault(category, 0) > 0) {
+        this.categoryModel.addElement(category);
+      }
+    }
+
+    if (this.categoryModel.isEmpty()) {
+      this.emptySearchDescription.setText(text("settings_no_results_description", rawQuery == null ? "" : rawQuery.strip()));
+      this.contentCards.show(this.contentPanel, EMPTY_CARD);
+    } else {
+      if (previousSelection != null && this.categoryModel.contains(previousSelection)) {
+        this.categoryList.setSelectedValue(previousSelection, true);
+        this.contentCards.show(this.contentPanel, previousSelection.name());
+      } else {
+        this.categoryList.setSelectedIndex(0);
+        this.contentCards.show(this.contentPanel, this.categoryModel.get(0).name());
+      }
+    }
+    this.categoryList.repaint();
+  }
+
+  private int updateSettingRows(Category category, String query) {
+    boolean categoryMatchesDirectly = category.matchesCategory(query);
+    int matchCount = 0;
+    List<SettingItem> categoryItems = this.settingItems.stream()
+        .filter(item -> item.category == category)
+        .toList();
+
+    for (SettingItem item : categoryItems) {
+      boolean matches = query.isEmpty() || categoryMatchesDirectly || item.matches(query);
+      item.row.setVisible(matches);
+      item.updateHighlight(query);
+      if (matches && (!query.isEmpty() || categoryMatchesDirectly)) {
+        matchCount++;
+      }
+    }
+
+    for (SettingItem item : categoryItems) {
+      if (item.separator != null) {
+        if (!item.row.isVisible()) {
+          item.separator.setVisible(false);
+        } else {
+          boolean hasNextVisible = false;
+          int index = categoryItems.indexOf(item);
+          for (int i = index + 1; i < categoryItems.size(); i++) {
+            if (categoryItems.get(i).row.isVisible()) {
+              hasNextVisible = true;
+              break;
+            }
+          }
+          item.separator.setVisible(hasNextVisible);
+        }
+      }
+    }
+
+    return matchCount;
+  }
+
+  private int updateKeymap(String query) {
+    boolean categoryMatchesDirectly = Category.KEYMAP.matchesCategory(query);
+    if (query.isEmpty() || categoryMatchesDirectly) {
+      if (this.keymapSorter != null) {
+        this.keymapSorter.setRowFilter(null);
+      }
+      return this.keymapModel.getRowCount();
+    }
+
+    int matchCount = 0;
+    for (int row = 0; row < this.keymapModel.getRowCount(); row++) {
+      Command command = this.keymapModel.commands.get(row);
+      KeyStroke binding = this.keymapModel.bindingAt(row);
+      if (matchesKeymap(command, binding, query)) {
+        matchCount++;
+      }
+    }
+
+    if (this.keymapSorter != null) {
+      this.keymapSorter.setRowFilter(new RowFilter<>() {
+        @Override
+        public boolean include(Entry<? extends KeymapTableModel, ? extends Integer> entry) {
+          int row = entry.getIdentifier();
+          Command command = keymapModel.commands.get(row);
+          KeyStroke binding = keymapModel.bindingAt(row);
+          return matchesKeymap(command, binding, query);
+        }
+      });
+    }
+    return matchCount;
+  }
+
+  private JPanel addSetting(
+      JPanel body,
+      Category category,
+      Icon icon,
+      String title,
+      String description,
+      JComponent control,
+      boolean addSeparator,
+      String... extraKeywords) {
+    SettingRowPanel row = settingRow(icon, title, description, control);
+    body.add(row);
+    JSeparator separator = null;
+    if (addSeparator) {
+      separator = rowSeparator();
+      body.add(separator);
+    }
+    String[] allTokens = new String[extraKeywords.length + 2];
+    allTokens[0] = title;
+    allTokens[1] = description;
+    System.arraycopy(extraKeywords, 0, allTokens, 2, extraKeywords.length);
+    this.settingItems.add(new SettingItem(
+        category, row, separator, row.titleLabel, row.descriptionLabel, title, description, allTokens));
+    return row;
+  }
+
+  private static final class SettingItem {
+    private final Category category;
+    private final SettingRowPanel row;
+    private final JSeparator separator;
+    private final JLabel titleLabel;
+    private final JLabel descriptionLabel;
+    private final String originalTitle;
+    private final String originalDescription;
+    private final String searchText;
+
+    private SettingItem(
+        Category category,
+        SettingRowPanel row,
+        JSeparator separator,
+        JLabel titleLabel,
+        JLabel descriptionLabel,
+        String originalTitle,
+        String originalDescription,
+        String... tokens) {
+      this.category = category;
+      this.row = row;
+      this.separator = separator;
+      this.titleLabel = titleLabel;
+      this.descriptionLabel = descriptionLabel;
+      this.originalTitle = originalTitle;
+      this.originalDescription = originalDescription;
+      StringBuilder sb = new StringBuilder();
+      for (String token : tokens) {
+        if (token != null && !token.isBlank()) {
+          sb.append(' ').append(token);
+        }
+      }
+      this.searchText = sb.toString().toLowerCase(Locale.ROOT);
+    }
+
+    private boolean matches(String query) {
+      return query.isEmpty() || this.searchText.contains(query);
+    }
+
+    private void updateHighlight(String query) {
+      if (query == null || query.isBlank()) {
+        this.row.setHighlighted(false);
+        this.titleLabel.setText(this.originalTitle);
+        this.descriptionLabel.setText(this.originalDescription);
+      } else {
+        boolean matches = this.matches(query);
+        this.row.setHighlighted(matches);
+        this.titleLabel.setText(highlightHtml(this.originalTitle, query));
+        this.descriptionLabel.setText(highlightHtml(this.originalDescription, query));
+      }
+    }
+  }
+
+  static String highlightHtml(String text, String query) {
+    if (text == null || text.isBlank()) {
+      return text == null ? "" : text;
+    }
+    if (query == null || query.isBlank()) {
+      return text;
+    }
+    String lowerText = text.toLowerCase(Locale.ROOT);
+    String lowerQuery = query.strip().toLowerCase(Locale.ROOT);
+    int idx = lowerText.indexOf(lowerQuery);
+    if (idx < 0) {
+      return text;
+    }
+
+    StringBuilder sb = new StringBuilder("<html>");
+    int lastIdx = 0;
+    while (idx >= 0) {
+      sb.append(escapeHtml(text.substring(lastIdx, idx)));
+      sb.append("<span style=\"background-color: #f59e0b; color: #18181b; font-weight: bold;\">");
+      sb.append(escapeHtml(text.substring(idx, idx + lowerQuery.length())));
+      sb.append("</span>");
+      lastIdx = idx + lowerQuery.length();
+      idx = lowerText.indexOf(lowerQuery, lastIdx);
+    }
+    sb.append(escapeHtml(text.substring(lastIdx)));
+    sb.append("</html>");
+    return sb.toString();
+  }
+
+  static String escapeHtml(String text) {
+    if (text == null) {
+      return "";
+    }
+    return text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;");
+  }
+
   private JPanel createMcpPanel() {
     JPanel panel = settingsPanel(Category.MCP);
     JPanel body = verticalBody();
-    body.add(settingRow(
+    this.addSetting(
+        body,
+        Category.MCP,
         Icons.CONSOLE_16,
         text("settings_mcp_enable"),
         text("settings_mcp_enable_description"),
-        this.mcpEnabled));
-    body.add(rowSeparator());
-    body.add(settingRow(
+        this.mcpEnabled,
+        true,
+        "mcp", "model context protocol", "server", "ai", "assistant", "tools", "enable");
+    this.addSetting(
+        body,
+        Category.MCP,
         Icons.CONSOLE_16,
         text("settings_mcp_port"),
         text("settings_mcp_port_description"),
-        this.mcpPort));
+        this.mcpPort,
+        false,
+        "port", "http", "connection", "listen", "8080", "network");
     panel.add(topAligned(body), BorderLayout.CENTER);
     return panel;
   }
@@ -464,29 +739,42 @@ public final class SettingsDialog extends JDialog {
   private JPanel createGeneralPanel() {
     JPanel panel = settingsPanel(Category.GENERAL);
     JPanel body = verticalBody();
-    body.add(settingRow(
+    this.addSetting(
+        body,
+        Category.GENERAL,
         Icons.HISTORY_16,
         text("settings_reopen_last_project"),
         text("settings_reopen_last_project_description"),
-        this.reopenLastProject));
-    body.add(rowSeparator());
-    body.add(settingRow(
+        this.reopenLastProject,
+        true,
+        "startup", "continue", "recent", "project", "open");
+    this.addSetting(
+        body,
+        Category.GENERAL,
         Icons.SETTINGS_DISPLAY_24,
         text("settings_editor_fps_cap"),
         text("settings_editor_fps_cap_description"),
-        this.editorFpsCap));
-    body.add(rowSeparator());
-    body.add(settingRow(
+        this.editorFpsCap,
+        true,
+        "fps", "frame rate", "refresh rate", "performance", "limit", "cap", "hz");
+    this.addSetting(
+        body,
+        Category.GENERAL,
         Icons.GREEN_PLAY_16,
         text("settings_gradle_launch_arguments"),
         text("settings_gradle_launch_arguments_description"),
-        this.gradleLaunchArguments));
-    body.add(rowSeparator());
-    body.add(settingRow(
+        this.gradleLaunchArguments,
+        true,
+        "gradle", "launch", "vm", "arguments", "options", "flags", "run", "debug", "--stacktrace", "--info");
+    this.addSetting(
+        body,
+        Category.GENERAL,
         Icons.CONSOLE_16,
-        "Logging Verbosity",
-        "Configure application log detail (INFO: clean user logs, FINE: detailed diagnostics)",
-        this.logLevel));
+        text("settings_log_level"),
+        text("settings_log_level_description"),
+        this.logLevel,
+        false,
+        "logging", "verbosity", "logger", "log level", "info", "fine", "warning", "severe", "console", "diagnostics");
     panel.add(topAligned(body), BorderLayout.CENTER);
     return panel;
   }
@@ -501,24 +789,30 @@ public final class SettingsDialog extends JDialog {
     panel.add(top, BorderLayout.NORTH);
     JPanel body = verticalBody();
     this.language.setPreferredSize(new Dimension(300, 34));
-    body.add(settingRow(
+    this.addSetting(
+        body,
+        Category.APPEARANCE,
         Icons.SETTINGS_LANGUAGE_24,
         text("settings_language"),
         text("settings_language_description"),
-        this.language));
-    body.add(rowSeparator());
+        this.language,
+        true,
+        "locale", "system", "english", "german", "spanish", "french", "deutsch", "español", "français");
 
     JPanel themes = new JPanel(new GridLayout(1, 2, 10, 0));
     themes.setOpaque(false);
     themes.setPreferredSize(new Dimension(300, 64));
     themes.add(this.lightTheme);
     themes.add(this.darkTheme);
-    body.add(settingRow(
+    this.addSetting(
+        body,
+        Category.APPEARANCE,
         Icons.SETTINGS_THEME_LIGHT_24,
         text("menu_view_theme"),
         text("settings_theme_description"),
-        themes));
-    body.add(rowSeparator());
+        themes,
+        true,
+        "dark", "light", "appearance", "mode", "color");
 
     JPanel scale = new JPanel(new BorderLayout(10, 4));
     scale.setOpaque(false);
@@ -533,12 +827,15 @@ public final class SettingsDialog extends JDialog {
     hint.setForeground(Style.COLOR_ACCENT_BLUE);
     scale.add(hint, BorderLayout.SOUTH);
     scale.setPreferredSize(new Dimension(430, 100));
-    body.add(settingRow(
+    this.addSetting(
+        body,
+        Category.APPEARANCE,
         Icons.SETTINGS_DISPLAY_24,
         text("settings_ui_scale"),
         text("settings_ui_scale_description"),
-        scale));
-    body.add(rowSeparator());
+        scale,
+        true,
+        "scale", "zoom", "size", "percentage", "dpi", text("settings_scale_hint"));
 
     this.editorFontFamily.setPreferredSize(new Dimension(280, 34));
     this.editorFontSize.setPreferredSize(new Dimension(76, 34));
@@ -551,11 +848,15 @@ public final class SettingsDialog extends JDialog {
     fontControl.add(fontInputs, BorderLayout.NORTH);
     fontControl.add(this.editorFontPreview, BorderLayout.CENTER);
     fontControl.setPreferredSize(new Dimension(370, 70));
-    body.add(settingRow(
+    this.addSetting(
+        body,
+        Category.APPEARANCE,
         Icons.SETTINGS_FONT_24,
         text("settings_editor_font"),
         text("settings_editor_font_description"),
-        fontControl));
+        fontControl,
+        false,
+        "font", "family", "size", "typography", "roboto", text("settings_font_family"), text("settings_font_size"));
     panel.add(topAligned(body), BorderLayout.CENTER);
     return panel;
   }
@@ -563,23 +864,33 @@ public final class SettingsDialog extends JDialog {
   private JPanel createGridPanel() {
     JPanel panel = settingsPanel(Category.GRID);
     JPanel body = verticalBody();
-    body.add(settingRow(
+    this.addSetting(
+        body,
+        Category.GRID,
         Icons.PENCIL_16,
         text("menu_view_gridStroke"),
         text("settings_grid_stroke_description"),
-        this.gridLineWidth));
-    body.add(rowSeparator());
-    body.add(settingRow(
+        this.gridLineWidth,
+        true,
+        "grid line width", "stroke", "thickness", "pixel", "width");
+    this.addSetting(
+        body,
+        Category.GRID,
         Icons.COLOR_16,
         text("menu_view_gridColor"),
         text("settings_grid_color_description"),
-        this.gridColorButton));
-    body.add(rowSeparator());
-    body.add(settingRow(
+        this.gridColorButton,
+        true,
+        "color", "rgba", "picker", "background");
+    this.addSetting(
+        body,
+        Category.GRID,
         Icons.FIT_16,
         text("menu_view_snapDivision"),
         text("settings_snap_division_description"),
-        this.snapDivision));
+        this.snapDivision,
+        false,
+        "snap", "snapping", "division", "subdivisions", "tile", "grid");
     panel.add(topAligned(body), BorderLayout.CENTER);
     return panel;
   }
@@ -593,6 +904,10 @@ public final class SettingsDialog extends JDialog {
     table.getColumnModel().getColumn(0).setPreferredWidth(320);
     table.getColumnModel().getColumn(1).setPreferredWidth(180);
     table.getColumnModel().getColumn(1).setCellEditor(new ShortcutEditor());
+    this.keymapSorter = new TableRowSorter<>(this.keymapModel);
+    table.setRowSorter(this.keymapSorter);
+    table.getColumnModel().getColumn(0).setCellRenderer(new KeymapCellRenderer());
+    table.getColumnModel().getColumn(1).setCellRenderer(new KeymapCellRenderer());
 
     JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
     JButton resetSelected = new JButton(text("settings_reset_selected"));
@@ -613,6 +928,32 @@ public final class SettingsDialog extends JDialog {
     tablePanel.add(commands, BorderLayout.SOUTH);
     panel.add(tablePanel, BorderLayout.CENTER);
     return panel;
+  }
+
+  private final class KeymapCellRenderer extends javax.swing.table.DefaultTableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(
+        JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+      String text = value != null ? value.toString() : "";
+      int modelRow = table.convertRowIndexToModel(row);
+      Command command = keymapModel.commands.get(modelRow);
+      KeyStroke binding = keymapModel.bindingAt(modelRow);
+      boolean rowMatches = !currentSearchQuery.isEmpty() && matchesKeymap(command, binding, currentSearchQuery);
+      if (rowMatches && text.toLowerCase(Locale.ROOT).contains(currentSearchQuery)) {
+        this.setText(highlightHtml(text, currentSearchQuery));
+      } else {
+        this.setText(text);
+      }
+      if (rowMatches && !isSelected) {
+        Color accent = Style.accent();
+        this.setBackground(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 26));
+      } else if (!isSelected) {
+        this.setBackground(null);
+      }
+      this.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+      return c;
+    }
   }
 
   private JPanel createFooter() {
@@ -874,8 +1215,41 @@ public final class SettingsDialog extends JDialog {
     return body;
   }
 
-  private static JPanel settingRow(Icon icon, String title, String description, JComponent control) {
-    JPanel row = new JPanel(new BorderLayout(16, 0));
+  private static final class SettingRowPanel extends JPanel {
+    private boolean highlighted;
+    private JLabel titleLabel;
+    private JLabel descriptionLabel;
+
+    private SettingRowPanel(java.awt.LayoutManager layout) {
+      super(layout);
+      this.setOpaque(false);
+    }
+
+    private void setHighlighted(boolean highlighted) {
+      if (this.highlighted != highlighted) {
+        this.highlighted = highlighted;
+        this.repaint();
+      }
+    }
+
+    @Override
+    protected void paintComponent(Graphics graphics) {
+      if (this.highlighted) {
+        Graphics2D g = (Graphics2D) graphics.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Color accent = Style.accent();
+        g.setColor(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 26));
+        g.fillRoundRect(2, 2, this.getWidth() - 4, this.getHeight() - 4, 10, 10);
+        g.setColor(accent);
+        g.fillRoundRect(2, 6, 4, this.getHeight() - 12, 4, 4);
+        g.dispose();
+      }
+      super.paintComponent(graphics);
+    }
+  }
+
+  private static SettingRowPanel settingRow(Icon icon, String title, String description, JComponent control) {
+    SettingRowPanel row = new SettingRowPanel(new BorderLayout(16, 0));
     row.setOpaque(false);
     row.setBorder(BorderFactory.createEmptyBorder(14, 4, 14, 4));
     row.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -903,6 +1277,8 @@ public final class SettingsDialog extends JDialog {
     control.getAccessibleContext().setAccessibleDescription(description);
     row.add(control, BorderLayout.EAST);
     row.setMaximumSize(new Dimension(Integer.MAX_VALUE, Math.max(80, control.getPreferredSize().height + 32)));
+    row.titleLabel = titleLabel;
+    row.descriptionLabel = descriptionLabel;
     return row;
   }
 
@@ -1063,7 +1439,7 @@ public final class SettingsDialog extends JDialog {
     return new Font(family == null ? Font.SANS_SERIF : family, Font.PLAIN, size);
   }
 
-  private enum Category {
+  enum Category {
     APPEARANCE("settings_appearance", "settings_appearance_description", "settings_appearance_nav_description", Icons.SETTINGS_APPEARANCE_24),
     GENERAL("settings_general", "settings_general_description", "settings_general_nav_description", Icons.SETTINGS_24),
     GRID("settings_grid", "settings_grid_description", "settings_grid_nav_description", Icons.SETTINGS_GRID_24),
@@ -1086,39 +1462,166 @@ public final class SettingsDialog extends JDialog {
       return text(this.resourceKey);
     }
 
-    private String searchText() {
+    boolean matchesCategory(String query) {
+      if (query == null || query.isBlank()) {
+        return true;
+      }
+      String q = query.strip().toLowerCase(Locale.ROOT);
+      return this.name().toLowerCase(Locale.ROOT).contains(q)
+          || this.toString().toLowerCase(Locale.ROOT).contains(q)
+          || text(this.descriptionKey).toLowerCase(Locale.ROOT).contains(q)
+          || text(this.navigationDescriptionKey).toLowerCase(Locale.ROOT).contains(q);
+    }
+
+    String searchText() {
       StringBuilder value = new StringBuilder()
           .append(this).append(' ')
           .append(text(this.descriptionKey)).append(' ')
           .append(text(this.navigationDescriptionKey));
       switch (this) {
         case APPEARANCE -> value
+            .append(" language locale theme dark light scale zoom font size typography ")
             .append(' ').append(text("settings_language"))
             .append(' ').append(text("settings_language_description"))
             .append(' ').append(text("menu_view_theme"))
             .append(' ').append(text("settings_theme_description"))
             .append(' ').append(text("settings_ui_scale"))
-            .append(' ').append(text("settings_ui_scale_description"));
+            .append(' ').append(text("settings_ui_scale_description"))
+            .append(' ').append(text("settings_editor_font"))
+            .append(' ').append(text("settings_editor_font_description"))
+            .append(' ').append(text("settings_font_family"))
+            .append(' ').append(text("settings_font_size"));
         case GENERAL -> value
+            .append(" startup reopen fps cap frame rate gradle launch arguments logging verbosity ")
             .append(' ').append(text("settings_reopen_last_project"))
             .append(' ').append(text("settings_reopen_last_project_description"))
+            .append(' ').append(text("settings_editor_fps_cap"))
+            .append(' ').append(text("settings_editor_fps_cap_description"))
             .append(' ').append(text("settings_gradle_launch_arguments"))
-            .append(' ').append(text("settings_gradle_launch_arguments_description"));
+            .append(' ').append(text("settings_gradle_launch_arguments_description"))
+            .append(' ').append(text("settings_log_level"))
+            .append(' ').append(text("settings_log_level_description"));
         case GRID -> value
+            .append(" grid stroke line width thickness color snap division ")
             .append(' ').append(text("menu_view_gridStroke"))
             .append(' ').append(text("settings_grid_stroke_description"))
             .append(' ').append(text("menu_view_gridColor"))
             .append(' ').append(text("settings_grid_color_description"))
             .append(' ').append(text("menu_view_snapDivision"))
             .append(' ').append(text("settings_snap_division_description"));
+        case MCP -> value
+            .append(" mcp model context protocol server port enable ai assistant ")
+            .append(' ').append(text("settings_mcp_enable"))
+            .append(' ').append(text("settings_mcp_enable_description"))
+            .append(' ').append(text("settings_mcp_port"))
+            .append(' ').append(text("settings_mcp_port_description"));
         case KEYMAP -> {
+          value.append(" keymap shortcut shortcuts hotkeys actions bindings ");
           for (Command command : Command.values()) {
             value.append(' ').append(text(command.resourceKey()));
+            KeyStroke ks = command.defaultKeyStroke();
+            if (ks != null) {
+              value.append(' ').append(KeyBindings.format(ks));
+            }
           }
         }
       }
       return value.toString().toLowerCase(Locale.ROOT);
     }
+  }
+
+  static boolean matchesCategoryOrSettings(Category category, String query) {
+    if (query == null || query.isBlank()) {
+      return true;
+    }
+    String q = query.strip().toLowerCase(Locale.ROOT);
+    return category.matchesCategory(q) || category.searchText().contains(q);
+  }
+
+  static boolean matchesKeymap(Command command, KeyStroke binding, String query) {
+    if (query == null || query.isBlank()) {
+      return true;
+    }
+    String q = query.strip().toLowerCase(Locale.ROOT);
+    String action = text(command.resourceKey()).toLowerCase(Locale.ROOT);
+    if (action.contains(q) || command.name().toLowerCase(Locale.ROOT).contains(q)) {
+      return true;
+    }
+    if (binding == null) {
+      return false;
+    }
+    String shortcut = KeyBindings.format(binding).toLowerCase(Locale.ROOT);
+    if (shortcut.contains(q)) {
+      return true;
+    }
+    return matchesShortcutAliases(binding, shortcut, q);
+  }
+
+  static boolean matchesShortcutAliases(KeyStroke binding, String formattedShortcut, String query) {
+    if (binding == null || formattedShortcut == null || formattedShortcut.isEmpty()) {
+      return false;
+    }
+    List<String> variants = new ArrayList<>();
+    variants.add(formattedShortcut);
+
+    // Expand Mac modifier symbols to text
+    String withWords = formattedShortcut
+        .replace("⌘", "cmd")
+        .replace("⌥", "alt")
+        .replace("⇧", "shift")
+        .replace("⌃", "ctrl");
+    variants.add(withWords);
+    variants.add(withWords.replace("cmd", "ctrl"));
+    variants.add(withWords.replace("cmd", "command"));
+    variants.add(withWords.replace("alt", "option"));
+
+    if (formattedShortcut.contains("ctrl")) {
+      variants.add(formattedShortcut.replace("ctrl", "cmd"));
+      variants.add(formattedShortcut.replace("ctrl", "command"));
+      variants.add(formattedShortcut.replace("ctrl", "control"));
+    }
+    if (formattedShortcut.contains("meta")) {
+      variants.add(formattedShortcut.replace("meta", "cmd"));
+      variants.add(formattedShortcut.replace("meta", "ctrl"));
+      variants.add(formattedShortcut.replace("meta", "command"));
+    }
+
+    for (String variant : variants) {
+      if (variant.contains(query)) {
+        return true;
+      }
+    }
+
+    // Match individual tokens (e.g. user typed "ctrl s" or "cmd s" or "shift f9")
+    int modifiers = binding.getModifiers();
+    boolean hasCtrlOrMeta = (modifiers & (InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK)) != 0;
+    boolean hasShift = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
+    boolean hasAlt = (modifiers & InputEvent.ALT_DOWN_MASK) != 0;
+    String keyText = binding.getKeyCode() != 0
+        ? KeyEvent.getKeyText(binding.getKeyCode()).toLowerCase(Locale.ROOT)
+        : Character.toString(binding.getKeyChar()).toLowerCase(Locale.ROOT);
+
+    String cleanQuery = query.replace("+", " ").replace("-", " ").strip();
+    String[] queryTokens = cleanQuery.split("\\s+");
+    boolean allTokensMatch = queryTokens.length > 0;
+    for (String token : queryTokens) {
+      boolean tokenMatches = false;
+      if (token.equals(keyText)) {
+        tokenMatches = true;
+      } else if (hasCtrlOrMeta && (token.equals("ctrl") || token.equals("control")
+          || token.equals("cmd") || token.equals("command") || token.equals("meta") || token.equals("⌘"))) {
+        tokenMatches = true;
+      } else if (hasShift && (token.equals("shift") || token.equals("⇧"))) {
+        tokenMatches = true;
+      } else if (hasAlt && (token.equals("alt") || token.equals("option") || token.equals("opt") || token.equals("⌥"))) {
+        tokenMatches = true;
+      }
+      if (!tokenMatches) {
+        allTokensMatch = false;
+        break;
+      }
+    }
+    return allTokensMatch;
   }
 
   private enum LocaleOption {
@@ -1143,7 +1646,7 @@ public final class SettingsDialog extends JDialog {
     }
   }
 
-  private static final class CategoryRenderer implements ListCellRenderer<Category> {
+  private final class CategoryRenderer implements ListCellRenderer<Category> {
     @Override public Component getListCellRendererComponent(
         JList<? extends Category> list, Category category, int index, boolean selected, boolean focused) {
       JPanel row = new CategoryRow(selected);
@@ -1157,10 +1660,26 @@ public final class SettingsDialog extends JDialog {
       JPanel copy = new JPanel();
       copy.setOpaque(false);
       copy.setLayout(new BoxLayout(copy, BoxLayout.Y_AXIS));
-      JLabel title = new JLabel(category.toString());
+      JLabel title = new JLabel();
+      if (!currentSearchQuery.isEmpty() && category.toString().toLowerCase(Locale.ROOT).contains(currentSearchQuery)) {
+        title.setText(highlightHtml(category.toString(), currentSearchQuery));
+      } else {
+        title.setText(category.toString());
+      }
       title.setFont(title.getFont().deriveFont(Font.BOLD, 14f));
       title.setAlignmentX(Component.LEFT_ALIGNMENT);
-      JLabel description = new JLabel(text(category.navigationDescriptionKey));
+
+      String subtitleText;
+      if (currentSearchQuery.isEmpty()) {
+        subtitleText = text(category.navigationDescriptionKey);
+      } else {
+        int count = matchCounts.getOrDefault(category, 0);
+        subtitleText = count == 1
+            ? text("settings_matches_singular", count)
+            : text("settings_matches_plural", count);
+      }
+
+      JLabel description = new JLabel(subtitleText);
       description.setForeground(Style.mutedText());
       description.setAlignmentX(Component.LEFT_ALIGNMENT);
       copy.add(title);
