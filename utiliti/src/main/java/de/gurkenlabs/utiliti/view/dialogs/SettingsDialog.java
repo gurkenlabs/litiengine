@@ -27,6 +27,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -34,6 +35,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -47,7 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.swing.AbstractCellEditor;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
@@ -276,27 +277,34 @@ public final class SettingsDialog extends JDialog {
     int height = Math.min(DIALOG_HEIGHT, screen.height);
     this.setMinimumSize(new Dimension(Math.min(900, width), Math.min(620, height)));
     this.setSize(width, height);
-    this.addWindowListener(new WindowAdapter() {
-      @Override public void windowClosed(WindowEvent event) {
-        Point location = getLocation();
-        preferences.setSettingsDialogX(location.x);
-        preferences.setSettingsDialogY(location.y);
-        Game.config().save();
-      }
-    });
   }
 
   public static void show(Component owner) {
-    Window window = owner == null ? null : SwingUtilities.getWindowAncestor(owner);
+    Window window = owner instanceof Window win ? win : (owner == null ? null : SwingUtilities.getWindowAncestor(owner));
     SettingsDialog dialog = new SettingsDialog(window);
-    int x = dialog.preferences.getSettingsDialogX();
-    int y = dialog.preferences.getSettingsDialogY();
-    if (isVisibleOnScreen(x, y, dialog.getWidth(), dialog.getHeight())) {
-      dialog.setLocation(x, y);
-    } else {
-      dialog.setLocationRelativeTo(owner);
-    }
+    dialog.setLocationRelativeTo(window);
+    clampToScreen(dialog);
     dialog.setVisible(true);
+  }
+
+  static void clampToScreen(Window window) {
+    if (GraphicsEnvironment.isHeadless()) {
+      return;
+    }
+    GraphicsConfiguration gc = window.getGraphicsConfiguration();
+    Rectangle bounds = gc != null
+        ? gc.getBounds()
+        : GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+    Insets insets = gc != null
+        ? Toolkit.getDefaultToolkit().getScreenInsets(gc)
+        : new Insets(0, 0, 0, 0);
+    int minX = bounds.x + insets.left;
+    int minY = bounds.y + insets.top;
+    int maxX = bounds.x + bounds.width - insets.right - window.getWidth();
+    int maxY = bounds.y + bounds.height - insets.bottom - window.getHeight();
+    int x = maxX >= minX ? Math.max(minX, Math.min(window.getX(), maxX)) : minX;
+    int y = maxY >= minY ? Math.max(minY, Math.min(window.getY(), maxY)) : minY;
+    window.setLocation(x, y);
   }
 
   static boolean isVisibleOnScreen(int x, int y, int width, int height) {

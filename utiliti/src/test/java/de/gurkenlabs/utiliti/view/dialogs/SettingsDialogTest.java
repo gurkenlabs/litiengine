@@ -24,4 +24,18 @@ class SettingsDialogTest {
     org.junit.jupiter.api.Assertions.assertFalse(
         SettingsDialog.isVisibleOnScreen(Integer.MIN_VALUE, Integer.MIN_VALUE, 1280, 800));
   }
+
+  @Test
+  void clampToScreenKeepsDialogWithinBounds() {
+    if (java.awt.GraphicsEnvironment.isHeadless()) {
+      return;
+    }
+    javax.swing.JDialog dialog = new javax.swing.JDialog();
+    dialog.setSize(300, 200);
+    dialog.setLocation(-500, -500);
+    SettingsDialog.clampToScreen(dialog);
+    org.junit.jupiter.api.Assertions.assertTrue(dialog.getX() >= 0);
+    org.junit.jupiter.api.Assertions.assertTrue(dialog.getY() >= 0);
+    dialog.dispose();
+  }
 }
