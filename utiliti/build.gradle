@@ -29,6 +29,18 @@ sourceSets {
   }
 }
 
+processResources {
+  from(rootProject.file("gradlew")) {
+    into("project-template")
+  }
+  from(rootProject.file("gradlew.bat")) {
+    into("project-template")
+  }
+  from(rootProject.file("gradle/wrapper")) {
+    into("project-template/gradle/wrapper")
+  }
+}
+
 application {
   mainClass = "de.gurkenlabs.utiliti.Program"
   applicationName = utiLITI_name

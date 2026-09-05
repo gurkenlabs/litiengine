@@ -39,6 +39,7 @@ import de.gurkenlabs.utiliti.view.components.Tray;
 import de.gurkenlabs.utiliti.view.components.Toast;
 import de.gurkenlabs.utiliti.view.components.UI;
 import de.gurkenlabs.utiliti.view.dialogs.ConfirmDialog;
+import de.gurkenlabs.utiliti.view.dialogs.CreateProjectDialog;
 import de.gurkenlabs.utiliti.view.dialogs.EditorFileChooser;
 import de.gurkenlabs.utiliti.view.dialogs.EditorFileSaver;
 import de.gurkenlabs.utiliti.view.dialogs.XmlImportDialog;
@@ -424,61 +425,24 @@ public class Editor extends Screen {
   }
 
   public void create() {
-    JFileChooser chooser;
-    try {
-      chooser = new JFileChooser(new File(".").getCanonicalPath());
-      chooser.setDialogTitle(Resources.strings().get("input_create_new_project"));
-      chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      if (chooser.showOpenDialog(Game.window().getHostControl()) != JFileChooser.APPROVE_OPTION) {
-        return;
-      }
-
-      if (!UI.notifyPendingChanges()) {
-        return;
-      }
-
-      if (Game.world().environment() != null) {
-        Game.world().unloadEnvironment();
-      }
-
-      UI.clearConsole();
-
-      // set up project settings
-      this.setProjectPath(chooser.getSelectedFile().toPath());
-
-      // load all maps in the directory
-      this.mapComponent.loadMaps(getProjectPath());
-      this.currentResourceFile = null;
-      this.gameFile = new ResourceBundle();
-
-      // add sprite sheets by tile sets of all maps in the project director
-      for (TmxMap map : this.mapComponent.getMaps()) {
-        this.loadSpriteSheets(map);
-      }
-
-    if (UI.getAssetController() != null) {
-      UI.getAssetController().refresh();
+    GradleProjectCreator.Options options = CreateProjectDialog.show(Game.window().getHostControl());
+    if (options == null || !UI.notifyPendingChanges()) {
+      return;
     }
 
-      // load custom emitter files
-      loadCustomEmitters(this.getGameFile().getEmitters());
-
-      // update new game file by the loaded information
-      this.updateGameFileMaps();
-
-      // display first available map after loading all stuff
-      if (!this.mapComponent.getMaps().isEmpty()) {
-        this.mapComponent.loadEnvironment(this.mapComponent.getMaps().getFirst());
-      }
-
-      this.gamefileLoaded();
-      this.save(true);
+    try {
+      Path gameFile = new GradleProjectCreator().create(options);
+      this.load(gameFile, true);
+      this.setCurrentStatus(Resources.strings().get("status_project_created"));
+      Toast.show(Resources.strings().get("status_project_created"));
     } catch (IOException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+      JOptionPane.showMessageDialog(
+        Game.window().getHostControl(),
+        Resources.strings().get("dialog_create_project_error", e.getMessage()),
+        Resources.strings().get("input_create_new_project"),
+        JOptionPane.ERROR_MESSAGE);
     }
-
-    this.setCurrentStatus(Resources.strings().get("status_project_created"));
-    Toast.show(Resources.strings().get("status_project_created"));
   }
 
   public void load() {
