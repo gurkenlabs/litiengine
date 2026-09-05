@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti.view.dialogs;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.controller.GradleProjectCreator;
 import de.gurkenlabs.utiliti.controller.MavenCentralVersions;
@@ -233,8 +234,9 @@ public final class CreateProjectDialog extends EditorDialog {
     if (failure != null || versions == null || versions.isEmpty()) {
       this.version.setEditable(true);
       this.version.setEnabled(true);
-      this.version.addItem("0.12.0");
-      this.version.setSelectedItem("0.12.0");
+      String fallback = defaultEngineVersion();
+      this.version.addItem(fallback);
+      this.version.setSelectedItem(fallback);
       this.versionsLoaded = true;
       this.versionStatus.setForeground(Style.COLOR_RED);
       this.versionStatus.setText(Resources.strings().get("dialog_create_project_versions_failed"));
@@ -335,5 +337,18 @@ public final class CreateProjectDialog extends EditorDialog {
 
   private static String defaultLocation() {
     return Path.of(System.getProperty("user.home"), "Projects").toString();
+  }
+
+  static String defaultEngineVersion() {
+    String version = Game.info().getVersion();
+    if (version == null || version.isBlank()) {
+      return "0.12.0";
+    }
+    String normalized = version.trim();
+    if (normalized.toUpperCase(java.util.Locale.ROOT).endsWith("-SNAPSHOT")) {
+      String stripped = normalized.substring(0, normalized.length() - "-SNAPSHOT".length()).trim();
+      return stripped.isEmpty() ? "0.12.0" : stripped;
+    }
+    return normalized;
   }
 }

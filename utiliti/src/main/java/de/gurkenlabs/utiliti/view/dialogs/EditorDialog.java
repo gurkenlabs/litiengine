@@ -89,7 +89,9 @@ abstract class EditorDialog extends JDialog {
 
       @Override
       public void mousePressed(MouseEvent event) {
-        this.offset = event.getPoint();
+        Point location = EditorDialog.this.getLocation();
+        Point screen = event.getLocationOnScreen();
+        this.offset = new Point(screen.x - location.x, screen.y - location.y);
       }
 
       @Override
@@ -103,6 +105,9 @@ abstract class EditorDialog extends JDialog {
     header.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
     header.addMouseListener(drag);
     header.addMouseMotionListener(drag);
+    heading.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+    heading.addMouseListener(drag);
+    heading.addMouseMotionListener(drag);
 
     this.getRootPane().registerKeyboardAction(
       event -> this.close(),

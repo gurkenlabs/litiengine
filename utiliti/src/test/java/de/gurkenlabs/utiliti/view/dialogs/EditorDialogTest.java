@@ -26,4 +26,12 @@ class EditorDialogTest {
     assertEquals(".gif", ExportFormatDialog.normalizeExtension(".gif"));
     assertEquals(".png", ExportFormatDialog.normalizeExtension(""));
   }
+
+  @Test
+  void derivesDefaultEngineVersion() {
+    String version = CreateProjectDialog.defaultEngineVersion();
+    org.junit.jupiter.api.Assertions.assertNotNull(version);
+    org.junit.jupiter.api.Assertions.assertFalse(version.isBlank());
+    org.junit.jupiter.api.Assertions.assertFalse(version.endsWith("-SNAPSHOT"));
+  }
 }

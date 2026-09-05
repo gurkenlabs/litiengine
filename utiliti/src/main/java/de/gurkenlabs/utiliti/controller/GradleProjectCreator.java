@@ -11,6 +11,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.lang.model.SourceVersion;
 
 /** Creates the on-disk Gradle project opened by utiLITI's new-project dialog. */
@@ -62,15 +63,16 @@ public final class GradleProjectCreator {
       if (location == null) {
         throw new IllegalArgumentException("A project location is required.");
       }
-      projectName = requireValue(projectName, "A project name is required.");
+      if (projectName == null || projectName.isBlank()) {
+        throw new IllegalArgumentException("A project name is required.");
+      }
+      if (!isValidPortableDirectoryName(projectName)) {
+        throw new IllegalArgumentException("The project name must be a valid portable directory name.");
+      }
       gameName = requireValue(gameName, "A game name is required.");
       gameVersion = requireValue(gameVersion, "A game version is required.");
       namespace = requireValue(namespace, "A Java namespace is required.");
       engineVersion = requireValue(engineVersion, "A LITIENGINE version is required.");
-      if (projectName.equals(".") || projectName.equals("..") || projectName.matches(".*[<>:\"/\\\\|?*].*")
-          || projectName.endsWith(".") || projectName.endsWith(" ")) {
-        throw new IllegalArgumentException("The project name must be a single directory name.");
-      }
       if (!SourceVersion.isName(namespace)) {
         throw new IllegalArgumentException("The namespace must be a valid Java package name.");
       }
@@ -157,20 +159,45 @@ public final class GradleProjectCreator {
     }
   }
 
+  private static final Pattern WINDOWS_RESERVED_NAMES = Pattern.compile(
+      "^(?i)(CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])(\\..*)?$");
+
+  static boolean isValidPortableDirectoryName(String name) {
+    if (name == null || name.isBlank() || name.length() > 255) {
+      return false;
+    }
+    if (name.equals(".") || name.equals("..")) {
+      return false;
+    }
+    if (name.startsWith(" ") || name.endsWith(" ") || name.startsWith(".") || name.endsWith(".")) {
+      return false;
+    }
+    for (int i = 0; i < name.length(); i++) {
+      char c = name.charAt(i);
+      if (c < 32 || c == 127) {
+        return false;
+      }
+      if (c == '<' || c == '>' || c == ':' || c == '"' || c == '/' || c == '\\' || c == '|' || c == '?' || c == '*') {
+        return false;
+      }
+    }
+    return !WINDOWS_RESERVED_NAMES.matcher(name).matches();
+  }
+
   private static String settings(Options options) {
-    String name = escape(options.projectName());
     return options.buildScript() == BuildScript.KOTLIN
-      ? "rootProject.name = \"" + name + "\"\n"
-      : "rootProject.name = '" + name + "'\n";
+      ? "rootProject.name = \"" + escapeKotlinString(options.projectName()) + "\"\n"
+      : "rootProject.name = '" + escapeGroovyString(options.projectName()) + "'\n";
   }
 
   private static String build(Options options) {
-    String version = escape(options.engineVersion());
-    String projectVersion = escape(options.gameVersion());
-    String group = escape(options.namespace());
-    String mainClass = options.packageName() + ".Main";
     int javaVersion = Runtime.version().feature();
+    String mainClass = options.packageName() + ".Main";
     if (options.buildScript() == BuildScript.KOTLIN) {
+      String version = escapeKotlinString(options.engineVersion());
+      String projectVersion = escapeKotlinString(options.gameVersion());
+      String group = escapeKotlinString(options.namespace());
+      String escapedMainClass = escapeKotlinString(mainClass);
       return """
         plugins {
           application
@@ -201,8 +228,12 @@ public final class GradleProjectCreator {
         tasks.named<JavaExec>("run") {
           workingDir = projectDir
         }
-        """.formatted(group, projectVersion, version, javaVersion, mainClass);
+        """.formatted(group, projectVersion, version, javaVersion, escapedMainClass);
     }
+    String version = escapeGroovyString(options.engineVersion());
+    String projectVersion = escapeGroovyString(options.gameVersion());
+    String group = escapeGroovyString(options.namespace());
+    String escapedMainClass = escapeGroovyString(mainClass);
     return """
       plugins {
         id 'application'
@@ -233,7 +264,7 @@ public final class GradleProjectCreator {
       tasks.named('run', JavaExec) {
         workingDir = projectDir
       }
-      """.formatted(group, projectVersion, version, javaVersion, mainClass);
+      """.formatted(group, projectVersion, version, javaVersion, escapedMainClass);
   }
 
   private static String mainSource(Options options) {
@@ -262,8 +293,25 @@ public final class GradleProjectCreator {
       .replace("\r", "\\r").replace("\n", "\\n");
   }
 
-  private static String escape(String value) {
-    return value.replace("\\", "\\\\").replace("\"", "\\\"").replace("'", "\\'");
+  static String escapeKotlinString(String value) {
+    if (value == null) {
+      return "";
+    }
+    return value.replace("\\", "\\\\")
+      .replace("\"", "\\\"")
+      .replace("$", "\\$")
+      .replace("\r", "\\r")
+      .replace("\n", "\\n");
+  }
+
+  static String escapeGroovyString(String value) {
+    if (value == null) {
+      return "";
+    }
+    return value.replace("\\", "\\\\")
+      .replace("'", "\\'")
+      .replace("\r", "\\r")
+      .replace("\n", "\\n");
   }
 
   private static void copyTemplate(Path root, String relativePath) throws IOException {
