@@ -92,4 +92,30 @@ class SettingsDialogTest {
     assertTrue(SettingsDialog.matchesCategoryOrSettings(SettingsDialog.Category.KEYMAP, "keymap"));
     assertTrue(SettingsDialog.matchesCategoryOrSettings(SettingsDialog.Category.MCP, "mcp"));
   }
+
+  @Test
+  void highlightHtmlHighlightsMatchingTextPreservingCase() {
+    String highlighted = SettingsDialog.highlightHtml("Editor FPS cap", "fps");
+    assertTrue(highlighted.startsWith("<html>"));
+    assertTrue(highlighted.contains(">FPS</span>"));
+    assertTrue(highlighted.contains("Editor "));
+    assertTrue(highlighted.contains(" cap"));
+  }
+
+  @Test
+  void highlightHtmlReturnsOriginalWhenNoMatchOrEmptyQuery() {
+    assertEquals("Editor FPS cap", SettingsDialog.highlightHtml("Editor FPS cap", "xyz"));
+    assertEquals("Editor FPS cap", SettingsDialog.highlightHtml("Editor FPS cap", ""));
+    assertEquals("Editor FPS cap", SettingsDialog.highlightHtml("Editor FPS cap", null));
+    assertEquals("", SettingsDialog.highlightHtml(null, "fps"));
+  }
+
+  @Test
+  void highlightHtmlEscapesHtmlAndHighlightsMultiple() {
+    String text = "<Script> & Save & save";
+    String highlighted = SettingsDialog.highlightHtml(text, "save");
+    assertTrue(highlighted.contains("&lt;Script&gt; &amp; "));
+    assertTrue(highlighted.contains(">Save</span>"));
+    assertTrue(highlighted.contains(">save</span>"));
+  }
 }

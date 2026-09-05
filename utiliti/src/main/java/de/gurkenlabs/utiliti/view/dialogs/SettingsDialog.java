@@ -35,6 +35,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
@@ -533,6 +534,7 @@ public final class SettingsDialog extends JDialog {
     for (SettingItem item : categoryItems) {
       boolean matches = query.isEmpty() || categoryMatchesDirectly || item.matches(query);
       item.row.setVisible(matches);
+      item.updateHighlight(query);
       if (matches && (!query.isEmpty() || categoryMatchesDirectly)) {
         matchCount++;
       }
@@ -599,7 +601,7 @@ public final class SettingsDialog extends JDialog {
       JComponent control,
       boolean addSeparator,
       String... extraKeywords) {
-    JPanel row = settingRow(icon, title, description, control);
+    SettingRowPanel row = settingRow(icon, title, description, control);
     body.add(row);
     JSeparator separator = null;
     if (addSeparator) {
@@ -610,20 +612,37 @@ public final class SettingsDialog extends JDialog {
     allTokens[0] = title;
     allTokens[1] = description;
     System.arraycopy(extraKeywords, 0, allTokens, 2, extraKeywords.length);
-    this.settingItems.add(new SettingItem(category, row, separator, allTokens));
+    this.settingItems.add(new SettingItem(
+        category, row, separator, row.titleLabel, row.descriptionLabel, title, description, allTokens));
     return row;
   }
 
   private static final class SettingItem {
     private final Category category;
-    private final JPanel row;
+    private final SettingRowPanel row;
     private final JSeparator separator;
+    private final JLabel titleLabel;
+    private final JLabel descriptionLabel;
+    private final String originalTitle;
+    private final String originalDescription;
     private final String searchText;
 
-    private SettingItem(Category category, JPanel row, JSeparator separator, String... tokens) {
+    private SettingItem(
+        Category category,
+        SettingRowPanel row,
+        JSeparator separator,
+        JLabel titleLabel,
+        JLabel descriptionLabel,
+        String originalTitle,
+        String originalDescription,
+        String... tokens) {
       this.category = category;
       this.row = row;
       this.separator = separator;
+      this.titleLabel = titleLabel;
+      this.descriptionLabel = descriptionLabel;
+      this.originalTitle = originalTitle;
+      this.originalDescription = originalDescription;
       StringBuilder sb = new StringBuilder();
       for (String token : tokens) {
         if (token != null && !token.isBlank()) {
@@ -636,6 +655,58 @@ public final class SettingsDialog extends JDialog {
     private boolean matches(String query) {
       return query.isEmpty() || this.searchText.contains(query);
     }
+
+    private void updateHighlight(String query) {
+      if (query == null || query.isBlank()) {
+        this.row.setHighlighted(false);
+        this.titleLabel.setText(this.originalTitle);
+        this.descriptionLabel.setText(this.originalDescription);
+      } else {
+        boolean matches = this.matches(query);
+        this.row.setHighlighted(matches);
+        this.titleLabel.setText(highlightHtml(this.originalTitle, query));
+        this.descriptionLabel.setText(highlightHtml(this.originalDescription, query));
+      }
+    }
+  }
+
+  static String highlightHtml(String text, String query) {
+    if (text == null || text.isBlank()) {
+      return text == null ? "" : text;
+    }
+    if (query == null || query.isBlank()) {
+      return text;
+    }
+    String lowerText = text.toLowerCase(Locale.ROOT);
+    String lowerQuery = query.strip().toLowerCase(Locale.ROOT);
+    int idx = lowerText.indexOf(lowerQuery);
+    if (idx < 0) {
+      return text;
+    }
+
+    StringBuilder sb = new StringBuilder("<html>");
+    int lastIdx = 0;
+    while (idx >= 0) {
+      sb.append(escapeHtml(text.substring(lastIdx, idx)));
+      sb.append("<span style=\"background-color: #f59e0b; color: #18181b; font-weight: bold;\">");
+      sb.append(escapeHtml(text.substring(idx, idx + lowerQuery.length())));
+      sb.append("</span>");
+      lastIdx = idx + lowerQuery.length();
+      idx = lowerText.indexOf(lowerQuery, lastIdx);
+    }
+    sb.append(escapeHtml(text.substring(lastIdx)));
+    sb.append("</html>");
+    return sb.toString();
+  }
+
+  static String escapeHtml(String text) {
+    if (text == null) {
+      return "";
+    }
+    return text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;");
   }
 
   private JPanel createMcpPanel() {
@@ -833,6 +904,8 @@ public final class SettingsDialog extends JDialog {
     table.getColumnModel().getColumn(1).setCellEditor(new ShortcutEditor());
     this.keymapSorter = new TableRowSorter<>(this.keymapModel);
     table.setRowSorter(this.keymapSorter);
+    table.getColumnModel().getColumn(0).setCellRenderer(new KeymapCellRenderer());
+    table.getColumnModel().getColumn(1).setCellRenderer(new KeymapCellRenderer());
 
     JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
     JButton resetSelected = new JButton(text("settings_reset_selected"));
@@ -853,6 +926,29 @@ public final class SettingsDialog extends JDialog {
     tablePanel.add(commands, BorderLayout.SOUTH);
     panel.add(tablePanel, BorderLayout.CENTER);
     return panel;
+  }
+
+  private final class KeymapCellRenderer extends javax.swing.table.DefaultTableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(
+        JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+      String text = value != null ? value.toString() : "";
+      if (!currentSearchQuery.isEmpty() && text.toLowerCase(Locale.ROOT).contains(currentSearchQuery)) {
+        this.setText(highlightHtml(text, currentSearchQuery));
+        if (!isSelected) {
+          Color accent = Style.accent();
+          this.setBackground(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 26));
+        }
+      } else {
+        this.setText(text);
+        if (!isSelected) {
+          this.setBackground(null);
+        }
+      }
+      this.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+      return c;
+    }
   }
 
   private JPanel createFooter() {
@@ -1114,8 +1210,41 @@ public final class SettingsDialog extends JDialog {
     return body;
   }
 
-  private static JPanel settingRow(Icon icon, String title, String description, JComponent control) {
-    JPanel row = new JPanel(new BorderLayout(16, 0));
+  private static final class SettingRowPanel extends JPanel {
+    private boolean highlighted;
+    private JLabel titleLabel;
+    private JLabel descriptionLabel;
+
+    private SettingRowPanel(java.awt.LayoutManager layout) {
+      super(layout);
+      this.setOpaque(false);
+    }
+
+    private void setHighlighted(boolean highlighted) {
+      if (this.highlighted != highlighted) {
+        this.highlighted = highlighted;
+        this.repaint();
+      }
+    }
+
+    @Override
+    protected void paintComponent(Graphics graphics) {
+      if (this.highlighted) {
+        Graphics2D g = (Graphics2D) graphics.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Color accent = Style.accent();
+        g.setColor(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 26));
+        g.fillRoundRect(2, 2, this.getWidth() - 4, this.getHeight() - 4, 10, 10);
+        g.setColor(accent);
+        g.fillRoundRect(2, 6, 4, this.getHeight() - 12, 4, 4);
+        g.dispose();
+      }
+      super.paintComponent(graphics);
+    }
+  }
+
+  private static SettingRowPanel settingRow(Icon icon, String title, String description, JComponent control) {
+    SettingRowPanel row = new SettingRowPanel(new BorderLayout(16, 0));
     row.setOpaque(false);
     row.setBorder(BorderFactory.createEmptyBorder(14, 4, 14, 4));
     row.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -1143,6 +1272,8 @@ public final class SettingsDialog extends JDialog {
     control.getAccessibleContext().setAccessibleDescription(description);
     row.add(control, BorderLayout.EAST);
     row.setMaximumSize(new Dimension(Integer.MAX_VALUE, Math.max(80, control.getPreferredSize().height + 32)));
+    row.titleLabel = titleLabel;
+    row.descriptionLabel = descriptionLabel;
     return row;
   }
 
@@ -1448,7 +1579,12 @@ public final class SettingsDialog extends JDialog {
       JPanel copy = new JPanel();
       copy.setOpaque(false);
       copy.setLayout(new BoxLayout(copy, BoxLayout.Y_AXIS));
-      JLabel title = new JLabel(category.toString());
+      JLabel title = new JLabel();
+      if (!currentSearchQuery.isEmpty() && category.toString().toLowerCase(Locale.ROOT).contains(currentSearchQuery)) {
+        title.setText(highlightHtml(category.toString(), currentSearchQuery));
+      } else {
+        title.setText(category.toString());
+      }
       title.setFont(title.getFont().deriveFont(Font.BOLD, 14f));
       title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
