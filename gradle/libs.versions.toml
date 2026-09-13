@@ -12,7 +12,7 @@ monaco = "0.56.0"
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
 darklaf_propertyLoader = { module = "com.github.weisj:darklaf-property-loader", version.ref = "darklaf" }
-input4j = { module = "de.gurkenlabs:input4j", version = "1.3.1" }
+input4j = { module = "de.gurkenlabs:input4j", version = "1.4.0" }
 javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.4" }
 json_api = { module = "jakarta.json:jakarta.json-api", version = "2.1.3" }
 json_bind_api = { module = "jakarta.json.bind:jakarta.json.bind-api", version = "3.0.2" }
@@ -47,5 +47,5 @@ xml_runtime = ["xml-runtime-core", "xml-runtime-impl"]
 beryxRuntime = { id = "org.beryx.runtime", version = "2.0.1" }
 gradle-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.37.0" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
-sonarQube = { id = "org.sonarqube", version = "7.4.0.8496" }
+sonarQube = { id = "org.sonarqube", version = "7.5.0.8588" }
 spotless = { id = "com.diffplug.spotless", version = "8.10.0" }
