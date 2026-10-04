@@ -3,8 +3,8 @@ darklaf = "3.1.1"
 jaxb = "4.0.9"
 junit = "6.1.3"
 mcp = "2.0.1"
-slf4j = "2.0.18"
-tomcat = "11.0.25"
+slf4j = "2.0.20"
+tomcat = "11.0.26"
 jcef = "146.0.10"
 jcefNatives = "jcef-d3de827+cef-146.0.10+g8219561+chromium-146.0.7680.179"
 monaco = "0.56.0"
@@ -15,7 +15,7 @@ darklaf_propertyLoader = { module = "com.github.weisj:darklaf-property-loader", 
 input4j = { module = "de.gurkenlabs:input4j", version = "1.3.1" }
 javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.4" }
 json_api = { module = "jakarta.json:jakarta.json-api", version = "2.1.3" }
-json_bind_api = { module = "jakarta.json.bind:jakarta.json.bind-api", version = "3.0.2" }
+json_bind_api = { module = "jakarta.json.bind:jakarta.json.bind-api", version = "3.0.3" }
 json_runtime_parsson = { module = "org.eclipse.parsson:parsson", version = "1.1.9" }
 json_runtime_yasson = { module = "org.eclipse:yasson", version = "3.0.5" }
 junit_jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
@@ -48,4 +48,4 @@ beryxRuntime = { id = "org.beryx.runtime", version = "2.0.1" }
 gradle-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.37.0" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
 sonarQube = { id = "org.sonarqube", version = "7.4.0.8496" }
-spotless = { id = "com.diffplug.spotless", version = "8.10.0" }
+spotless = { id = "com.diffplug.spotless", version = "8.10.3" }
