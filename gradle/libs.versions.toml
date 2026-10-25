@@ -2,17 +2,17 @@
 darklaf = "3.1.1"
 jaxb = "4.0.9"
 junit = "6.1.3"
-mcp = "2.0.1"
+mcp = "2.1.0"
 slf4j = "2.0.18"
 tomcat = "11.0.25"
 jcef = "146.0.10"
 jcefNatives = "jcef-d3de827+cef-146.0.10+g8219561+chromium-146.0.7680.179"
-monaco = "0.56.0"
+monaco = "0.57.0"
 
 [libraries]
 darklaf_core = { module = "com.github.weisj:darklaf-core", version.ref = "darklaf" }
 darklaf_propertyLoader = { module = "com.github.weisj:darklaf-property-loader", version.ref = "darklaf" }
-input4j = { module = "de.gurkenlabs:input4j", version = "1.3.1" }
+input4j = { module = "de.gurkenlabs:input4j", version = "1.4.0" }
 javax_activation = { module = "jakarta.activation:jakarta.activation-api", version = "2.1.4" }
 json_api = { module = "jakarta.json:jakarta.json-api", version = "2.1.3" }
 json_bind_api = { module = "jakarta.json.bind:jakarta.json.bind-api", version = "3.0.2" }
@@ -22,7 +22,7 @@ junit_jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 junit_jupiter_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit_jupiter_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit_jupiter_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-mockito_core = { module = "org.mockito:mockito-core", version = "5.23.0" }
+mockito_core = { module = "org.mockito:mockito-core", version = "5.24.0" }
 mcp_bom = { module = "io.modelcontextprotocol.sdk:mcp-bom", version.ref = "mcp" }
 mcp_sdk = { module = "io.modelcontextprotocol.sdk:mcp" }
 slf4j_jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4j" }
@@ -47,5 +47,5 @@ xml_runtime = ["xml-runtime-core", "xml-runtime-impl"]
 beryxRuntime = { id = "org.beryx.runtime", version = "2.0.1" }
 gradle-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.37.0" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
-sonarQube = { id = "org.sonarqube", version = "7.4.0.8496" }
+sonarQube = { id = "org.sonarqube", version = "7.5.0.8588" }
 spotless = { id = "com.diffplug.spotless", version = "8.10.0" }
